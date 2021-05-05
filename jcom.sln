@@ -1,0 +1,78 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jfor", "fortran\jfor.csproj", "{A36CF6D7-74E9-4316-A927-A7C38E337D0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{E5714391-D79D-4662-8968-37C4E32DC687}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jcomlib", "lib\jcomlib.csproj", "{3FE2EAC5-0B96-4402-854E-9CCBC9715B01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com", "com\com.csproj", "{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jcomal", "comal\jcomal.csproj", "{A36CF6D7-74E9-4316-A927-A7C38E337D0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jforlib", "fortranlib\jforlib.csproj", "{21240936-1600-4099-8C63-BA64CE8AB514}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jcomallib", "comallib\jcomallib.csproj", "{499AA4DA-E5E7-43AF-882B-F18067BD4E26}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|Any CPU = Default|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FE2EAC5-0B96-4402-854E-9CCBC9715B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FE2EAC5-0B96-4402-854E-9CCBC9715B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FE2EAC5-0B96-4402-854E-9CCBC9715B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FE2EAC5-0B96-4402-854E-9CCBC9715B01}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A36CF6D7-74E9-4316-A927-A7C38E337D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5714391-D79D-4662-8968-37C4E32DC687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5714391-D79D-4662-8968-37C4E32DC687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5714391-D79D-4662-8968-37C4E32DC687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5714391-D79D-4662-8968-37C4E32DC687}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21240936-1600-4099-8C63-BA64CE8AB514}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{21240936-1600-4099-8C63-BA64CE8AB514}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{21240936-1600-4099-8C63-BA64CE8AB514}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21240936-1600-4099-8C63-BA64CE8AB514}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21240936-1600-4099-8C63-BA64CE8AB514}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21240936-1600-4099-8C63-BA64CE8AB514}.Release|Any CPU.Build.0 = Release|Any CPU
+		{499AA4DA-E5E7-43AF-882B-F18067BD4E26}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{499AA4DA-E5E7-43AF-882B-F18067BD4E26}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{499AA4DA-E5E7-43AF-882B-F18067BD4E26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{499AA4DA-E5E7-43AF-882B-F18067BD4E26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{499AA4DA-E5E7-43AF-882B-F18067BD4E26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{499AA4DA-E5E7-43AF-882B-F18067BD4E26}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = jfor.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$0.TextStylePolicy = $2
+		$2.EolMarker = Windows
+		$2.scope = text/plain
+		$2.TabsToSpaces = True
+		$0.ChangeLogPolicy = $3
+		$3.UpdateMode = ProjectRoot
+		$3.VcsIntegration = RequireEntry
+		$3.MessageStyle = $4
+		$4.LineAlign = 0
+		$3.inheritsSet = Mono
+		$0.StandardHeader = $5
+		$5.Text = @// Project title\n// File title\n//\n// Authors:\n//  ${AuthorName}\n//\n// Copyright (C) ${Year} ${AuthorName}\n//\n// Licensed to the Apache Software Foundation (ASF) under one\n// or more contributor license agreements.  See the NOTICE file\n// distributed with this work for additional information\n// regarding copyright ownership.  The ASF licenses this file\n// to you under the Apache License, Version 2.0 (the\n// "License"); you may not use this file except in compliance\n// with the License.  You may obtain a copy of the License at\n// \n// # http://www.apache.org/licenses/LICENSE-2.0\n//\n// Unless required by applicable law or agreed to in writing,\n// software distributed under the License is distributed on an\n// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n// KIND, either express or implied.  See the License for the\n// specific language governing permissions and limitations\n// under the License.
+		$0.VersionControlPolicy = $6
+		outputpath = .
+		version = 0.2
+	EndGlobalSection
+EndGlobal

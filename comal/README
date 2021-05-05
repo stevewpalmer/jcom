@@ -1,0 +1,2 @@
+This folder contains the source files for a simple interpreter and compiler for COMAL. The COMAL
+dialect implemented is based on that for the 1980 Definition published on 25/3/1980.

@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <StartupObject>JFortran.Program</StartupObject>
+    <ReleaseVersion>0.2</ReleaseVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS;DEBUG;NETFRAMEWORK;NET48;</DefineConstants>
+    <Commandlineparameters>../../../samples/tiny.f -dump</Commandlineparameters>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp ${TargetFile} ../drop/</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp jfor /usr/local/bin</command>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <EnvironmentVariables>
+      <EnvironmentVariables>
+        <Variable name="MONO_TRACE_LISTENER" value="Console.Error" />
+      </EnvironmentVariables>
+    </EnvironmentVariables>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <ConsolePause>False</ConsolePause>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <OutputPath>bin\Release</OutputPath>
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\lib\jcomlib.csproj" />
+    <ProjectReference Include="..\com\com.csproj" />
+    <ProjectReference Include="..\fortranlib\jforlib.csproj" />
+  </ItemGroup>
+</Project>

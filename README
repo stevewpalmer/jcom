@@ -1,0 +1,14 @@
+This repository contains the source code for the JFor FORTRAN compiler,
+the JCom compiler toolkit and the JComLib run-time library.
+
+JCom is an experiment in creating a compiler for various languages in
+C# using the .NET Reflection classes to emit the output code and to
+define a single back-end and run-time for all these languages. Currently
+only FORTRAN is implemented through the JFor front-end but the plan is
+to add support for further languages.
+
+At the present time, FORTRAN support in JFor is a subset of Fortran 77
+with various pieces not yet implemented. Consequently this is very much
+a work in progress. Consider this alpha quality software.
+
+-Steve
