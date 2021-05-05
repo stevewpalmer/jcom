@@ -269,13 +269,30 @@ namespace JComal {
                             _currentLine.PushToken(token);
                         }
                         IdentifierToken identToken = ParseIdentifier();
+
+                        // Array parameters must be specified with (). Multiple
+                        // dimensions are indicated with commas within the
+                        // parenthesis.
+                        token = GetNextToken();
+                        Collection<SymDimension> dimensions = new();
+                        if (token.ID == TokenID.LPAREN) {
+                            do {
+                                dimensions.Add(new SymDimension());
+                                token = GetNextToken();
+                            } while (token.ID == TokenID.COMMA);
+                            _currentLine.PushToken(token);
+                            ExpectToken(TokenID.RPAREN);
+                        } else {
+                            _currentLine.PushToken(token);
+                        }
+
                         if (identToken != null) {
                             Symbol sym = symbolTable.Get(identToken.Name);
                             if (sym != null) {
                                 Messages.Error(MessageCode.PARAMETERDEFINED, $"Parameter {identToken.Name} already defined");
                             } else {
                                 SymFullType symType = GetTypeFromName(identToken.Name);
-                                sym = symbolTable.Add(identToken.Name, symType, SymClass.VAR, null, _currentLineNumber);
+                                sym = symbolTable.Add(identToken.Name, symType, SymClass.VAR, dimensions, _currentLineNumber);
                                 sym.Scope = scope;
                                 sym.Linkage = linkage;
                                 sym.Defined = true;

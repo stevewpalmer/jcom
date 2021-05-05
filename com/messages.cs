@@ -380,6 +380,7 @@ namespace CCompiler {
         MISSINGEXPORT,
         NOTINCLOSED,
         METHODNOTFOUND,
-        ALREADYIMPORTED
+        ALREADYIMPORTED,
+        UNDEFINEDFUNCTION
     }
 }

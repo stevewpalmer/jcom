@@ -81,6 +81,7 @@
      9770   ENDPROC
      9780   
      9790   FUNC getkey$ CLOSED  //like KEY$ but no blinking cursor
+     9795     IMPORT clearkeys
      9800     clearkeys
      9810     REPEAT
      9820       reply$:=KEY$
@@ -89,6 +90,7 @@
      9850   ENDFUNC
      9860   
      9870   FUNC getvalidkey$(valid$) CLOSED
+     9875     IMPORT clearkeys
      9880     clearkeys
      9890     REPEAT
      9900       reply$:=KEY$
@@ -157,6 +159,7 @@
     10530   ENDPROC
     10540   
     10550   FUNC yes(prompt$) CLOSED
+    10555     IMPORT getvalidkey$
     10560     PRINT prompt$
     10570     reply$:=getvalidkey$("yYnN")
     10580     IF reply$ IN "Yy" THEN
@@ -260,7 +263,7 @@
     11550       IF num>=65 AND num<=90 THEN
     11560         num:+32
     11570       ENDIF
-    11580       $text(x):=CHR$(num)
+    11580       text$(x):=CHR$(num)
     11590     ENDFOR x
     11600     RETURN text$
     11610   ENDFUNC lower$
@@ -271,7 +274,7 @@
     11660       IF num>=97 AND num<=122 THEN
     11670         num:-32
     11680       ENDIF
-    11690       $text(x):=CHR$(num)
+    11690       text$(x):=CHR$(num)
     11700     ENDFOR x
     11710     RETURN text$
     11720   ENDFUNC upper$    

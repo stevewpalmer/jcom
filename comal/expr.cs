@@ -648,7 +648,7 @@ namespace JComal {
                     }
                     
                     // If there are any arguments, this is a function call
-                    if (!match && node.Indexes != null) {
+                    if (!match && node.Indexes != null && sym.Scope != SymScope.PARAMETER) {
                         return FunctionOperand(identToken.Name, node);
                     }
 
@@ -790,36 +790,23 @@ namespace JComal {
         // Parse a function call operand
         private ParseNode FunctionOperand(string name, IdentifierParseNode identNode) {
 
-            Symbol sym = GetSymbolForCurrentScope(name);
-            SymType type = SymType.NONE;
+            CallParseNode node = new();
 
             // Look for this symbol name in the local table which means its type
             // was predefined.
-            Symbol symLocal = _localSymbols.Get(name);
-            if (symLocal != null && symLocal.Scope != SymScope.PARAMETER && symLocal.Class != SymClass.FUNCTION && !symLocal.IsIntrinsic) {
-                type = symLocal.Type;
-                _localSymbols.Remove(symLocal);
-                sym = _globalSymbols.Get(name);
+            Symbol method = _globalSymbols.Get(name);
+            if (method == null) {
+                Messages.Error(MessageCode.UNDEFINEDFUNCTION, $"Undefined function {name}");
+                return node;
             }
 
-            if (sym == null) {
-                sym = _globalSymbols.Add(name, new SymFullType(type), SymClass.FUNCTION, null, _currentLineNumber);
-            }
+            method.IsReferenced = true;
 
-            // If this was a parameter now being used as a function, change its
-            // class and type.
-            if (sym.Class != SymClass.FUNCTION) {
-                sym.Class = SymClass.FUNCTION;
-                sym.Defined = true;
-                sym.Linkage = SymLinkage.BYVAL;
-            }
-            sym.IsReferenced = true;
-
-            CallParseNode node = new();
-            node.ProcName = new IdentifierParseNode(sym);
+            node.ProcName = new IdentifierParseNode(method);
             node.Parameters = new ParametersParseNode();
+            node.Type = method.Type;
 
-            CastNodeToType(node, sym.Type);
+            CastNodeToType(node, method.Type);
             if (identNode.Indexes != null) {
                 foreach (ParseNode t in identNode.Indexes) {
                     node.Parameters.Add(t, true);
