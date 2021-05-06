@@ -118,7 +118,7 @@ namespace JComLib {
             if (string.IsNullOrEmpty(str)) {
                 stopMessage = "STOP" + (lineNumber > 0 ? " AT LINE " + lineNumber : string.Empty);
             } else {
-                stopMessage = string.Format("STOP {0}", str);
+                stopMessage = $"STOP {str}";
             }
             throw new JComRuntimeException(stopMessage) {
                 Type = JComRuntimeExceptionType.STOP,

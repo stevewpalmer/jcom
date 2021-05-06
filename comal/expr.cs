@@ -486,11 +486,6 @@ namespace JComal {
                     return CastNodeToType(node, SymType.INTEGER);
                     }
 
-                case TokenID.REAL: {
-                    RealToken realToken = (RealToken)token;
-                    return new NumberParseNode(new Variant(realToken.Value));
-                    }
-
                 case TokenID.KTRUE:
                     return new NumberParseNode(new Variant(1));
 
@@ -599,6 +594,11 @@ namespace JComal {
                 case TokenID.KLEN:      return InlineString("LEN", SymType.INTEGER);
                 case TokenID.KASC:      return InlineString("ICHAR", SymType.INTEGER);
 
+                case TokenID.REAL: {
+                        RealToken realToken = (RealToken)token;
+                        return new NumberParseNode(new Variant(realToken.Value));
+                    }
+
                 case TokenID.INTEGER: {
                     IntegerToken intToken = (IntegerToken)token;
                     return new NumberParseNode(new Variant((float)intToken.Value));
@@ -619,37 +619,26 @@ namespace JComal {
 
                     // Possible function?
                     Symbol sym = _globalSymbols.Get(identToken.Name);
-                    if (sym != null) {
+                    if (sym != null && sym.Class == SymClass.FUNCTION) {
                         return FunctionOperand(identToken.Name, node);
                     }
 
-                    // If we're an array we're done.
+                    // OK if we're an array.
                     sym = _localSymbols.Get(identToken.Name);
                     if (sym != null && sym.IsArray) {
-                        if (node.Indexes == null || sym.Dimensions.Count != node.Indexes.Count) {
+                        if (node.Indexes != null && sym.Dimensions.Count != node.Indexes.Count) {
                             Messages.Error(MessageCode.MISSINGARRAYDIMENSIONS, "Incorrect number of array indexes");
                         }
                         match = true;
                     }
 
-                    // Substrings? Must be character type
+                    // Substrings? Must be fixed character type
                     if (!match && node.HasSubstring) {
                         sym = GetMakeSymbolForCurrentScope(identToken.Name);
                         if (sym != null && sym.Type != SymType.FIXEDCHAR) {
                             Messages.Error(MessageCode.TYPEMISMATCH, "Character type expected");
                             return null;
                         }
-                        match = true;
-                    }
-
-                    // Statement functions will have been predefined
-                    if (!match && sym != null && sym.Class == SymClass.INLINE) {
-                        match = true;
-                    }
-                    
-                    // If there are any arguments, this is a function call
-                    if (!match && node.Indexes != null && sym.Scope != SymScope.PARAMETER) {
-                        return FunctionOperand(identToken.Name, node);
                     }
 
                     // Anything else is an identifier.
@@ -660,10 +649,7 @@ namespace JComal {
                             return node;
                         }
                     }
-                    if (node.HasSubstring && sym.Type != SymType.FIXEDCHAR) {
-                        Messages.Error(MessageCode.TYPEMISMATCH, "Character type expected");
-                        return node;
-                    }
+
                     sym.IsReferenced = true;
                     node.Symbol = sym;
                     return node;

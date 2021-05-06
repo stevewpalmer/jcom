@@ -172,16 +172,20 @@ namespace JComal {
                 parameters = ParseParameterDecl(_localSymbols, SymScope.PARAMETER);
             }
 
-            // Closed?
+            // Closed? If so, we create an _importSymbols table so to which any symbols
+            // referenced by IMPORT are added. We also implicitly add any imported
+            // symbols from our parent procedure if we're a nested procedure as there
+            // is an implicit trust relationship between us. In addition, we add any
+            // other nested procedures to _importSymbols since those are assumed to be
+            // imported by default.
             SimpleToken token = GetNextToken();
             SymbolCollection savedImportSymbols = _importSymbols;
             if (token.ID == TokenID.KCLOSED) {
                 _importSymbols = new SymbolCollection("Import");
-            }
-
-            // Add this method to the global symbol table now.
-            if (method == null) {
-                method = _globalSymbols.Add(methodName, new SymFullType(), klass, null, _currentLineNumber);
+                if (savedImportSymbols != null) {
+                    _importSymbols.Add(savedImportSymbols);
+                };
+                AddChildSymbols(_importSymbols, method);
             }
 
             if (klass == SymClass.FUNCTION) {
@@ -277,7 +281,10 @@ namespace JComal {
                         Collection<SymDimension> dimensions = new();
                         if (token.ID == TokenID.LPAREN) {
                             do {
-                                dimensions.Add(new SymDimension());
+                                dimensions.Add(new SymDimension {
+                                    LowerBound = new NumberParseNode(1),
+                                    UpperBound = new NumberParseNode(1)
+                                });
                                 token = GetNextToken();
                             } while (token.ID == TokenID.COMMA);
                             _currentLine.PushToken(token);

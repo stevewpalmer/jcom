@@ -452,6 +452,12 @@ namespace CCompiler {
         /// </value>
         public Symbol RetVal { get; set; }
 
+        /// <value>
+        /// Gets or sets the parent symbol if this symbol is scoped to
+        /// another.
+        /// </value>
+        public Symbol Parent { get; set; }
+
         /// <summary>
         /// Gets or retrieves the block depth at which this symbol was set.
         /// </summary>
@@ -812,6 +818,16 @@ namespace CCompiler {
                 throw new ArgumentNullException(nameof(sym));
             }
             _symbols[name] = sym;
+        }
+
+        /// <summary>
+        /// Add the specified symbol collection to this symbol table.
+        /// </summary>
+        /// <param name="symbols">Symbols to be added</param>
+        public void Add(SymbolCollection symbols) {
+            foreach (Symbol sym in symbols) {
+                Add(sym);
+            }
         }
 
         /// <summary>

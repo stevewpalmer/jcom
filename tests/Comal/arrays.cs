@@ -177,5 +177,52 @@ namespace ComalTests {
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
             Assert.Throws(typeof(IndexOutOfRangeException), delegate { comp.Execute("array'oob"); });
         }
+
+        // Test calling a function with an array by value.
+        [Test]
+        public void TestPassArrayByVal() {
+            string code = @"
+                func array'byval
+                  dim a(10)
+                  for x=1 to 10 do
+                    a(x) := x*x
+                  endfor
+                  return test'by'val(a)
+                endfunc
+                func test'by'val(b())
+                  for x=1 to 10 do
+                    if b(x)<>x*x return false
+                  endfor
+                  return true
+                endfunc
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "array'byval", 1);
+        }
+
+        // Test calling a function with an array by reference.
+        [Test]
+        public void TestPassArrayByRef() {
+            string code = @"
+                func array'byref
+                  dim a(10)
+                  init'by'ref(a)
+                  return test'by'val(a)
+                endfunc
+                proc init'by'ref(ref b())
+                  for x=1 to 10 do
+                    b(x)=x*x
+                  endfor
+                endproc
+                func test'by'val(b())
+                  for x=1 to 10 do
+                    if b(x)<>x*x return false
+                  endfor
+                  return true
+                endfunc
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "array'byref", 1);
+        }
     }
 }

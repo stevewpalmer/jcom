@@ -335,13 +335,10 @@ namespace JComal {
                         break;
                 }
                 if (exprNode != null) {
-                    bool valid = ValidateAssignmentTypes(identNode.Type, exprNode.Type);
+                    bool valid = ValidateAssignment(identNode, exprNode);
                     if (!valid) {
                         Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in assignment");
                     }
-                    //if (!exprNode.IsString) {
-                    //    exprNode = CastNodeToType(exprNode, identNode.Type);
-                    //}
                     values.Add(exprNode);
                 }
                 token = GetNextToken();

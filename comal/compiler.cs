@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -220,11 +221,11 @@ namespace JComal {
                 }
 
                 // Create special variables
-                _globalSymbols.Add(new(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
+                _globalSymbols.Add(new Symbol(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
                     Modifier = SymModifier.STATIC,
                     Value = new Variant(0)
                 });
-                _globalSymbols.Add(new(Consts.ErrText, new SymFullType(SymType.CHAR), SymClass.VAR, null, 0) {
+                _globalSymbols.Add(new Symbol(Consts.ErrText, new SymFullType(SymType.CHAR), SymClass.VAR, null, 0) {
                     Modifier = SymModifier.STATIC,
                     Value = new Variant(string.Empty)
                 });
@@ -279,6 +280,11 @@ namespace JComal {
         // to the correct type, particularly for functions.
         private void Pass0() {
 
+            Stack<Symbol> parents = new(new Symbol [] { null });
+
+            // Add implicit entrypoint subroutine name.
+            _globalSymbols.Add(_entryPointName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
+
             foreach (Line line in _ls.AllLines) {
                 int lineNumber = 0;
 
@@ -289,6 +295,9 @@ namespace JComal {
                     lineNumber = lineNumberToken.Value;
                     Messages.Linenumber = lineNumber;
                     token = GetNextToken();
+                }
+                if (token.ID == TokenID.KENDPROC || token.ID == TokenID.KENDFUNC) {
+                    parents.Pop();
                 }
                 if (token.ID == TokenID.KPROC || token.ID == TokenID.KFUNC) {
                     SymClass klass = token.ID == TokenID.KPROC ? SymClass.SUBROUTINE : SymClass.FUNCTION;
@@ -314,6 +323,8 @@ namespace JComal {
                         // Add this method to the global symbol table now.
                         if (method == null) {
                             method = _globalSymbols.Add(methodName, new SymFullType(), klass, null, lineNumber);
+                            method.Parent = parents.Peek();
+                            parents.Push(method);
                         }
                         if (klass == SymClass.FUNCTION) {
                             method.FullType = GetTypeFromName(methodName);
@@ -322,6 +333,18 @@ namespace JComal {
                         method.Defined = true;
                         method.Class = klass;
                     }
+                }
+            }
+        }
+
+        // Add all symbols from _globalSymbols to the symbols class whose parent
+        // is the specified symbol.
+        private void AddChildSymbols(SymbolCollection symbols, Symbol parentSymbol) {
+
+            foreach (Symbol childSymbol in _globalSymbols) {
+                if (childSymbol.IsMethod && childSymbol.Parent == parentSymbol) {
+                    symbols.Add(childSymbol);
+                    AddChildSymbols(symbols, childSymbol);
                 }
             }
         }
@@ -825,22 +848,46 @@ namespace JComal {
             node.ProcName = new IdentifierParseNode(sym);
             node.Parameters = new ParametersParseNode();
 
+            int declParameterIndex = 0;
+
             if (!_currentLine.IsAtEndOfStatement) {
                 ExpectToken(TokenID.LPAREN);
                 if (_currentLine.PeekToken().ID != TokenID.RPAREN) {
                     SimpleToken token;
                     do {
+                        if (declParameterIndex == sym.Parameters.Count) {
+                            break;
+                        }
                         ParseNode exprNode = Expression();
                         if (exprNode != null) {
-                            node.Parameters.Add(exprNode, true);
+                            Symbol symParameter = sym.Parameters[declParameterIndex];
+                            bool valid = ValidateAssignmentTypes(symParameter.Type, exprNode.Type);
+                            if (!valid) {
+                                Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in assignment");
+                            }
+                            node.Parameters.Add(exprNode, symParameter.IsByRef);
                         }
                         token = GetNextToken();
-                    } while (token.ID == TokenID.COMMA);
-                    _currentLine.PushToken(token);
+                        if (token.ID == TokenID.RPAREN) {
+                            _currentLine.PushToken(token);
+                            break;
+                        }
+                        ExpectToken(TokenID.COMMA);
+                    } while (true);
+                    declParameterIndex++;
                 }
                 ExpectToken(TokenID.RPAREN);
             }
+
+            if (declParameterIndex != sym.Parameters.Count) {
+                Messages.Error(MessageCode.PARAMETERCOUNTMISMATCH, "Parameter count mismatch");
+            }
             return node;
+        }
+
+        // Validate an assignment of the exprNode to the specified identNode.
+        private bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
+            return ValidateAssignmentTypes(identNode.Type, exprNode.Type);
         }
 
         // Verify that the type on the right hand side of an assignment can be
