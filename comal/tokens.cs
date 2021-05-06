@@ -407,6 +407,7 @@ namespace JComal {
     /// <summary>
     /// Specifies a simple token with no additional data.
     /// </summary>
+    [Serializable]
     public class SimpleToken {
 
         /// <summary>
@@ -434,6 +435,7 @@ namespace JComal {
     /// <summary>
     /// Specifies an error found in the token stream
     /// </summary>
+    [Serializable]
     public class ErrorToken : SimpleToken {
 
         /// <summary>
@@ -467,6 +469,7 @@ namespace JComal {
     /// <summary>
     /// Specifies a string token with a literal string value.
     /// </summary>
+    [Serializable]
     public class StringToken : SimpleToken {
 
         /// <summary>
@@ -494,6 +497,7 @@ namespace JComal {
     /// <summary>
     /// Specifies an integer token with a single integer value.
     /// </summary>
+    [Serializable]
     public class IntegerToken : SimpleToken {
 
         /// <summary>
@@ -522,6 +526,7 @@ namespace JComal {
     /// Specifies a floating point (real) token with a single
     /// floating point value.
     /// </summary>
+    [Serializable]
     public class RealToken : SimpleToken {
 
         /// <summary>
@@ -550,6 +555,7 @@ namespace JComal {
     /// Specifies an identifier token with a identifier name that is
     /// valid in the rules of the language.
     /// </summary>
+    [Serializable]
     public class IdentifierToken : SimpleToken {
 
         /// <summary>

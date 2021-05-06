@@ -195,8 +195,8 @@ namespace CCompiler {
             if (needTryBlock) {
                 cg.Emitter.AddDefaultTryCatchHandlerBlock();
                 cg.Emitter.CloseTryCatchBlock();
-                cg.Emitter.Return();
             }
+            cg.Emitter.Return();
             cg.Emitter.Save();
         }
 

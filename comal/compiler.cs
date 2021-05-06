@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml;
 using CCompiler;
 
@@ -93,14 +95,23 @@ namespace JComal {
         /// <param name="filename">The full path and file name to be compiled</param>
         public void Compile(string filename) {
 
-            Lines lines = new();
-            LineTokeniser tokeniser = new();
+            Lines lines;
 
-            using (StreamReader sr = new(filename)) {
-                while (sr.Peek() != -1) {
-                    string sourceLine = sr.ReadLine();
-                    Line line = new(tokeniser.TokeniseLine(sourceLine));
-                    lines.Add(line);
+            string extension = Path.GetExtension(filename).ToLower();
+            if (extension == ".cml") {
+                IFormatter formatter = new BinaryFormatter();
+                using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                lines = (Lines)formatter.Deserialize(stream);
+            } else {
+                lines = new();
+                LineTokeniser tokeniser = new();
+
+                using (StreamReader sr = new(filename)) {
+                    while (sr.Peek() != -1) {
+                        string sourceLine = sr.ReadLine();
+                        Line line = new(tokeniser.TokeniseLine(sourceLine));
+                        lines.Add(line);
+                    }
                 }
             }
             CompileString(filename, lines);
@@ -199,6 +210,20 @@ namespace JComal {
             MarkExecutable();
             codegen.GenerateCode(_programDef);
             return codegen.Run(entryPointName);
+        }
+
+        /// <summary>
+        /// Add the specified extension to the filename is no extension was
+        /// already supplied.
+        /// </summary>
+        /// <param name="filename">Filename</param>
+        /// <param name="extension">Extension to supply</param>
+        /// <returns>Filename with an extension</returns>
+        public static string AddExtensionIfMissing(string filename, string extension) {
+            if (string.IsNullOrEmpty(Path.GetExtension(filename))) {
+                return Path.ChangeExtension(filename, extension);
+            }
+            return filename;
         }
 
         // Compile an array of source lines.

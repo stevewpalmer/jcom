@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -33,6 +34,7 @@ namespace JComal {
     /// <summary>
     /// A single tokenised line
     /// </summary>
+    [Serializable]
     public class Line {
 
         private int _tindex;
@@ -246,6 +248,7 @@ namespace JComal {
     /// <summary>
     /// Storage of lines and line numbers
     /// </summary>
+    [Serializable]
     public class Lines {
 
         private readonly List<Line> _lines;

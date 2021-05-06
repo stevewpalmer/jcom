@@ -26,6 +26,8 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using CCompiler;
 using JComalLib;
 using JComLib;
@@ -136,7 +138,7 @@ namespace JComal {
                                 break;
 
                             case TokenID.KLOAD:
-                                KLoad(line, tokeniser);
+                                KLoad(line);
                                 break;
 
                             case TokenID.KSAVE:
@@ -333,7 +335,7 @@ namespace JComal {
                 if (token == null) {
                     SyntaxError();
                 }
-                string filename = Path.ChangeExtension(filenameToken.String, "lst");
+                string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "lst");
                 listFile = new StreamWriter(filename);
             }
 
@@ -495,7 +497,7 @@ namespace JComal {
                 SyntaxError();
             }
 
-            string filename = Path.ChangeExtension(filenameToken.String, "lst");
+            string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "lst");
 
             if (!File.Exists(filename)) {
                 throw new Exception("File not found");
@@ -543,17 +545,49 @@ namespace JComal {
         //
         // Syntax: LOAD <filename>
         //
-        // Loads a tokenised Comal program from disk.
+        // Loads a Comal program from disk in binary format.
         //
-        private void KLoad(Line ls, LineTokeniser tokeniser) {
-            throw new ApplicationException("Not Yet Implemented");
+        private void KLoad(Line ls) {
+
+            SimpleToken token = ls.GetToken();
+            StringToken filenameToken = token as StringToken;
+            if (filenameToken == null) {
+                SyntaxError();
+            }
+
+            string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "cml");
+
+            if (!File.Exists(filename)) {
+                throw new Exception("File not found");
+            }
+
+            IFormatter formatter = new BinaryFormatter();
+            using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
+            Lines = (Lines)formatter.Deserialize(stream);
         }
 
         // SAVE
+        //
         // Syntax: SAVE <string constant>
-        // Save the program to disk
+        //
+        // Save the program to disk in binary format.
+        //
         private void KSave(Line ls) {
-            throw new ApplicationException("Not Yet Implemented");
+
+            SimpleToken token = ls.GetToken();
+            StringToken filenameToken = token as StringToken;
+            if (filenameToken == null) {
+                SyntaxError();
+            }
+
+            string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "cml");
+
+            IFormatter formatter = new BinaryFormatter();
+            using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write)) {
+                formatter.Serialize(stream, Lines);
+            }
+
+            Console.WriteLine("Saved");
         }
 
         // CAT/DIR
