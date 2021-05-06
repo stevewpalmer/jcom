@@ -49,6 +49,27 @@ namespace JComLib {
     }
 
     /// <summary>
+    /// Behaviour at end of input
+    /// </summary>
+    public enum LineTerminator {
+
+        /// <summary>
+        /// Do nothing
+        /// </summary>
+        NONE = 0,
+
+        /// <summary>
+        /// Advance cursor to the next line
+        /// </summary>
+        NEWLINE = 1,
+
+        /// <summary>
+        /// Advance cursor to the next zone
+        /// </summary>
+        NEXTZONE = 2
+    }
+
+    /// <summary>
     /// A class that encapsulates the standard output file.
     /// </summary>            
     public sealed class StdoutIOFile : IOFile {
@@ -131,10 +152,14 @@ namespace JComLib {
         public override bool IsFormatted => true;
 
         /// <summary>
-        /// Whether we should echo a carriage return at the end of
-        /// the input.
+        /// Behaviour of the cursor at the end of input.
         /// </summary>
-        public bool CarriageReturnAtEndOfInput { get; set; }
+        public LineTerminator Terminator { get; set; }
+
+        /// <summary>
+        /// Zone width for next zone terminator.
+        /// </summary>
+        public int Zone { get; set; }
 
         /// <summary>
         /// Maximum width of input.
@@ -161,7 +186,12 @@ namespace JComLib {
         /// </summary>
         /// <returns>A line of text, or null if there is an error.</returns>
         public override string ReadLine() {
-            return Runtime.ReadLine(string.Empty, Width, CarriageReturnAtEndOfInput);
+            ReadLine readLine = new() {
+                Terminator = Terminator,
+                MaxWidth = Width,
+                Zone = Zone
+            };
+            return readLine.Read(string.Empty);
         }
     }
 

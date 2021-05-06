@@ -39,8 +39,8 @@ namespace JComalLib {
         /// <param name="iodevice">The device to read from</param>
         /// <param name="promptString">Optional prompt string</param>
         /// <param name="carriageReturn">Whether to issue a newline at the end of input</param>
-        public InputManager(int iodevice, string promptString, bool carriageReturn):
-            this(0, 0, 0, iodevice, promptString, carriageReturn) {
+        public InputManager(int iodevice, string promptString, LineTerminator terminator):
+            this(0, 0, -1, iodevice, promptString, terminator) {
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace JComalLib {
         /// <param name="iodevice">The device to read from</param>
         /// <param name="promptString">Optional prompt string</param>
         /// <param name="carriageReturn">Whether to issue a newline at the end of input</param>
-        public InputManager(int row, int column, int maxWidth, int iodevice, string promptString, bool carriageReturn) {
+        public InputManager(int row, int column, int maxWidth, int iodevice, string promptString, LineTerminator terminator) {
 
             _file = IOFile.Get(iodevice);
             if (_file == null) {
@@ -74,8 +74,9 @@ namespace JComalLib {
             // prompt is ignored.
             if (_file is StdinIOFile) {
                 StdinIOFile file = _file as StdinIOFile;
-                file.CarriageReturnAtEndOfInput = carriageReturn;
+                file.Terminator = terminator;
                 file.Width = maxWidth;
+                file.Zone = PrintManager.Zone;
 
                 IOFile stdoutFile = new StdoutIOFile();
                 if (row > 0 && column > 0) {

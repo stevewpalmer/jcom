@@ -26,6 +26,7 @@
 using System;
 using System.Collections.Generic;
 using JComalLib;
+using JComLib;
 
 namespace CCompiler {
 
@@ -60,10 +61,9 @@ namespace CCompiler {
         public ParseNode MaximumWidth { get; set; }
 
         /// <summary>
-        /// Gets or sets whether a carriage return is issued at the end
-        /// of the input. If false, a space is issued instead
+        /// Gets or sets the end of input line termination behaviour.
         /// </summary>
-        public bool CarriageReturnAtEnd { get; set; }
+        public LineTerminator Terminator { get; set; }
 
         /// <summary>
         /// Gets or sets the list of identifiers for the input.
@@ -78,7 +78,16 @@ namespace CCompiler {
         /// <param name="root">The parent XML node</param>
         public override void Dump(ParseNodeXml root) {
             ParseNodeXml blockNode = root.Node("InputManager");
-            blockNode.Attribute("CarriageReturnAtEnd", CarriageReturnAtEnd.ToString());
+            blockNode.Attribute("Terminator", Terminator.ToString());
+            if (ColumnPosition != null) {
+                ColumnPosition.Dump(blockNode);
+            }
+            if (RowPosition != null) {
+                RowPosition.Dump(blockNode);
+            }
+            if (MaximumWidth != null) {
+                MaximumWidth.Dump(blockNode);
+            }
             if (FileHandle != null) {
                 FileHandle.Dump(blockNode);
             }
@@ -116,11 +125,11 @@ namespace CCompiler {
             }
             cg.GenerateExpression(SymType.INTEGER, FileHandle);
             cg.GenerateExpression(SymType.CHAR, Prompt);
-            cg.Emitter.LoadBoolean(CarriageReturnAtEnd);
+            cg.Emitter.LoadInteger((int)Terminator);
 
             constructorTypes.Add(typeof(int));
             constructorTypes.Add(typeof(string));
-            constructorTypes.Add(typeof(bool));
+            constructorTypes.Add(typeof(LineTerminator));
 
             Type inputManagerType = typeof(InputManager);
             cg.Emitter.CreateObject(inputManagerType, constructorTypes.ToArray());

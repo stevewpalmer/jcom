@@ -76,7 +76,7 @@
      9720   PROC clearlines(row1, row2) CLOSED
      9730     FOR x#:=row1 TO row2 DO
      9740       CURSOR x#,1
-     9750       SYS clrtoeol
+     9750       PRINT SPC$(79);
      9760     ENDFOR
      9770   ENDPROC
      9780   
@@ -171,6 +171,7 @@
     10640   ENDFUNC
     10650   
     10660   PROC center(text$) CLOSED
+    10665     IMPORT center'at
     10670     center'at(CURROW, text$)
     10680     IF LEN(text$)<=79 THEN PRINT   // new line
     10690   ENDPROC
@@ -185,6 +186,8 @@
     10780   ENDPROC
     10790   
     10800   PROC getinfile(REF infile$) CLOSED
+    10805     IMPORT pause,clearlines
+    10806     IMPORT file'exists
     10810     r:=CURROW
     10820     REPEAT
     10830       REPEAT
@@ -204,6 +207,9 @@
     10970   ENDPROC
     10980   
     10990   PROC getoutfile(REF outfile$) CLOSED
+    10991     IMPORT clearlines
+    10992     IMPORT file'exists,getvalidkey$
+    10993     IMPORT clearkeys
     11000     r:=CURROW
     11010     REPEAT
     11020       REPEAT
@@ -225,6 +231,8 @@
     11180   ENDPROC
     11190   
     11200   PROC getfiles(REF infile$, REF outfile$) CLOSED
+    11205     IMPORT pause,clearlines
+    11206     IMPORT getinfile,getoutfile
     11210     row:=CURROW
     11220     REPEAT
     11230       CURSOR row,1
@@ -243,10 +251,9 @@
     11360   ENDPROC
     11365   
     11370   PROC waitkey CLOSED
+    11375     IMPORT pause
     11380     r:=CURROW; c:=CURCOL; msg$:=" << Press a key to continue >> "
-    11390     SYS rvson
     11400     PRINT msg$,
-    11410     SYS rvsoff
     11420     pause
     11430     IF r=CURROW AND CURCOL<c THEN r:-1  // screen scrolled
     11440     PRINT AT r,c: SPC$(LEN(msg$)),  // overwrites msg
@@ -254,7 +261,7 @@
     11460   ENDPROC
     11470
     11480   PROC pause CLOSED
-    11490     _$:=INKEY$(-1)
+    11490     k$:=INKEY$(-1)
     11500   ENDPROC
     11510
     11520   FUNC lower$(text$) CLOSED

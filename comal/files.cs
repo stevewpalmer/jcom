@@ -25,6 +25,7 @@
 
 using System.Collections.Generic;
 using CCompiler;
+using JComalLib;
 using JComLib;
 
 namespace JComal {
@@ -152,7 +153,7 @@ namespace JComal {
 
             ParseNode rowPosition = null;
             ParseNode columnPosition = null;
-            ParseNode maximumWidth = new NumberParseNode(0);
+            ParseNode maximumWidth = new NumberParseNode(-1);
             SimpleToken token;
 
             // Optional FILE number
@@ -193,17 +194,17 @@ namespace JComal {
             }
 
             // Variables
-            bool carriageReturn = true;
             List<IdentifierParseNode> identifiers = new();
             bool hasStringIdentifier = false;
             bool isStringIdentifier = false;
+            TokenID lastToken = TokenID.EOL;
 
             do {
                 if (exprNode is not IdentifierParseNode identNode) {
                     Messages.Error(MessageCode.EXPECTEDTOKEN, "Identifier expected");
                     break;
                 }
-                isStringIdentifier = identNode.Type == SymType.CHAR || identNode.Type == SymType.FIXEDCHAR;
+                isStringIdentifier = identNode.IsString;
                 if (isStringIdentifier && hasStringIdentifier) {
                     Messages.Error(MessageCode.EXPECTEDTOKEN, "Only one string variable permitted in INPUT");
                 }
@@ -213,9 +214,16 @@ namespace JComal {
                 identifiers.Add(identNode);
 
                 token = _currentLine.GetToken();
+                lastToken = token.ID;
                 if (token.ID == TokenID.SEMICOLON) {
-                    carriageReturn = false;
-                    token = _currentLine.GetToken();
+                    ExpectEndOfLine();
+                    break;
+                }
+                if (token.ID == TokenID.COMMA) {
+                    token = _currentLine.PeekToken();
+                    if (token.ID == TokenID.EOL) {
+                        break;
+                    }
                 }
                 if (token.ID == TokenID.EOL) {
                     break;
@@ -237,12 +245,20 @@ namespace JComal {
                 Messages.Error(MessageCode.ILLEGALATWITHFILE, "AT cannot be used with FILE");
             }
 
+            LineTerminator terminator = LineTerminator.NEWLINE;
+            if (lastToken == TokenID.COMMA) {
+                terminator = LineTerminator.NEXTZONE;
+            }
+            if (lastToken == TokenID.SEMICOLON) {
+                terminator = LineTerminator.NONE;
+            }
+
             node.MaximumWidth = maximumWidth;
             node.RowPosition = rowPosition;
             node.ColumnPosition = columnPosition;
             node.FileHandle = fileParseNode;
             node.Prompt = promptNode ?? new StringParseNode(string.Empty);
-            node.CarriageReturnAtEnd = carriageReturn;
+            node.Terminator = terminator;
             node.Identifiers = identifiers.ToArray();
             return node;
         }

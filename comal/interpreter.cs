@@ -27,6 +27,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using CCompiler;
+using JComalLib;
 using JComLib;
 
 namespace JComal {
@@ -423,7 +424,9 @@ namespace JComal {
             }
 
             Console.Write(line.LineNumber);
-            string editedLine = Runtime.ReadLine(line.PrintableLine(0, false));
+
+            ReadLine readLine = new();
+            string editedLine = readLine.Read(line.PrintableLine(0, false));
 
             line = new(tokeniser.TokeniseLine(line.LineNumber + editedLine));
             Lines.Add(line);
@@ -651,7 +654,10 @@ namespace JComal {
                 AutoLineNumber += AutoSteps;
             }
             Console.Write(">" + prefix);
-            return prefix + Runtime.ReadLine(string.Empty);
+            ReadLine readLine = new() {
+                AllowHistory = true
+            };
+            return prefix + readLine.Read(string.Empty);
         }
     }
 }

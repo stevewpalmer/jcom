@@ -77,6 +77,7 @@ namespace JComalLib {
                 Path = filename
             };
             file.IsNew = mode == "w";
+            file.IsFormatted = mode == "x";
             file.Open();
             if (file.Handle == null) {
                 throw new JComRuntimeException(JComRuntimeErrors.CANNOT_OPEN_FILE);
