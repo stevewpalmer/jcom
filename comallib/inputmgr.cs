@@ -33,6 +33,23 @@ namespace JComalLib {
         private readonly IOFile _file;
 
         /// <summary>
+        /// Construct an InputManager for random access file I/O.
+        /// </summary>
+        /// <param name="iodevice">The device to read from</param>
+        /// <param name="recordNumber">The number of the record to read</param>
+        public InputManager(int iodevice, int recordNumber) {
+
+            _file = IOFile.Get(iodevice);
+            if (_file == null) {
+                throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN);
+            }
+            if (_file.RecordLength == 0) {
+                throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN_FOR_RANDOM_ACCESS);
+            }
+            _file.RecordIndex = recordNumber;
+        }
+
+        /// <summary>
         /// Construct an InputManager for repeated input calls from the specified
         /// device.
         /// </summary>
@@ -63,9 +80,9 @@ namespace JComalLib {
 
             _file = IOFile.Get(iodevice);
             if (_file == null) {
-                _file = new IOFile(iodevice);
-                _file.Open();
+                throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN);
             }
+
             if (string.IsNullOrEmpty(promptString)) {
                 promptString = "? ";
             }

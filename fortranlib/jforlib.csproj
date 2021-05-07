@@ -2,7 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <ReleaseVersion>0.2</ReleaseVersion>
+    <ReleaseVersion>0.3</ReleaseVersion>
+    <RootNamespace>JFortranLib</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <LangVersion>9.0</LangVersion>

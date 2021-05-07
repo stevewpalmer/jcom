@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
-    <ReleaseVersion>0.2</ReleaseVersion>
+    <ReleaseVersion>0.3</ReleaseVersion>
     <Description>JComal Compiler and Interpreter</Description>
     <Copyright>2013-21 Steven Palmer</Copyright>
     <RootNamespace>JComal</RootNamespace>

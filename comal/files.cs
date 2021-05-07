@@ -36,10 +36,10 @@ namespace JComal {
 
         // OPEN
         //
-        // Syntax: OPEN [FILE] <integer expression>,<string expression>
+        // Syntax: OPEN [FILE] <file>,<filename>,<mode>
         //
         // Opens a data file for reading or writing. The first integer expression
-        // specifies the file handle. 
+        // specifies the file handle.
         //
         private ParseNode KOpen() {
 
@@ -95,7 +95,7 @@ namespace JComal {
 
         // CLOSE
         //
-        // Syntax: CLOSE [[FILE] <integer expression>]
+        // Syntax: CLOSE [[FILE] <file>]
         //
         // Close the data file specified by the given integer expression, or
         // close all opened files if no integer expression is specified.
@@ -116,7 +116,7 @@ namespace JComal {
 
         // DELETE
         //
-        // Syntax: DELETE <string expression>
+        // Syntax: DELETE <filename>
         //
         // Deletes the specified file
         //
@@ -131,7 +131,7 @@ namespace JComal {
 
         // WRITE
         //
-        // Syntax: WRITE [FILE] filenum,record: values
+        // Syntax: WRITE [FILE] <file> [,<record>]: values
         //
         // Writes the specified values to the given record of the random access file.
         //
@@ -169,6 +169,45 @@ namespace JComal {
             paramsNode.Add(recnumParseNode);
             paramsNode.Add(varargs);
             node.Parameters = paramsNode;
+            return node;
+        }
+
+        // READ (FILE)
+        //
+        // Syntax: READ [FILE] <file> [,<record>] : <vars>
+        //
+        // READs data from a disk RANDOM or direct access file that previously was OPENed as a RANDOM type file
+        // and correctly specifying the fixed record length. Random access files reserve a fixed length for each
+        // record. The actual record may be shorter, but the same amount of space is used. Any record can be read
+        // at any time by specifying its record number.
+        //
+        private ParseNode KReadFile() {
+            InputManagerParseNode node = new();
+            List<IdentifierParseNode> identifiers = new();
+
+            // Optional FILE number
+            TestAndSkipToken(TokenID.KFILE);
+
+            ParseNode fileParseNode = IntegerExpression();
+            ExpectToken(TokenID.COMMA);
+            ParseNode recnumParseNode = IntegerExpression();
+            ExpectToken(TokenID.COLON);
+
+            while (!_currentLine.IsAtEndOfStatement) {
+                SimpleToken token = ExpectToken(TokenID.IDENT);
+                if (token != null) {
+                    IdentifierToken identToken = token as IdentifierToken;
+                    IdentifierParseNode identNode = ParseIdentifierFromToken(identToken);
+                    identifiers.Add(identNode);
+                }
+                if (!_currentLine.IsAtEndOfStatement) {
+                    ExpectToken(TokenID.COMMA);
+                }
+            }
+
+            node.FileHandle = fileParseNode;
+            node.RecordNumber = recnumParseNode;
+            node.Identifiers = identifiers.ToArray();
             return node;
         }
 

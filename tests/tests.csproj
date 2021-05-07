@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <OutputType>Library</OutputType>
-    <ReleaseVersion>0.2</ReleaseVersion>
+    <ReleaseVersion>0.3</ReleaseVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

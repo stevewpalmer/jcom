@@ -70,7 +70,7 @@ namespace JComal {
 
         // Parse an identifier from the specified token and assign the corresponding
         // symbol to the identifier parse node.
-        private ParseNode ParseIdentifierFromToken(IdentifierToken identToken) {
+        private IdentifierParseNode ParseIdentifierFromToken(IdentifierToken identToken) {
             IdentifierParseNode node = ParseIdentifierParseNode();
 
             if (node != null) {

@@ -143,6 +143,17 @@ namespace JComal {
 
             List<IdentifierParseNode> identifiers = new();
 
+            // Discrimate READ data and READ FILE based on the first
+            // tokens. READ FILE or READ <int> will definitely be a
+            // READFILE statement.
+            SimpleToken token = _currentLine.PeekToken();
+            if (token.ID == TokenID.KFILE) {
+                return KReadFile();
+            }
+            if (token.ID == TokenID.INTEGER) {
+                return KReadFile();
+            }
+
             IdentifierToken identToken = ParseIdentifier();
 
             while (true) {
@@ -151,7 +162,21 @@ namespace JComal {
                     break;
                 }
                 identifiers.Add(identNode);
-                SimpleToken token = GetNextToken();
+                token = GetNextToken();
+                if (token.ID == TokenID.COLON && identifiers.Count == 1) {
+
+                    // OK, we got READ FILE <var>: where a variable was
+                    // used to specify the file number. So this is definitely
+                    // a READFILE statement so we have to go all the way back
+                    // to the start of the line, get and throw away the line
+                    // number and start again in KReadFile.
+                    _currentLine.Reset();
+                    token = GetNextToken();
+                    if (token.ID != TokenID.INTEGER) {
+                        _currentLine.PushToken(token);
+                    }
+                    return KReadFile();
+                }
                 if (token.ID != TokenID.COMMA) {
                     _currentLine.PushToken(token);
                     break;

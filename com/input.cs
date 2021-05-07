@@ -46,6 +46,11 @@ namespace CCompiler {
         public ParseNode FileHandle { get; set; }
 
         /// <summary>
+        /// Parse node that computes the record number
+        /// </summary>
+        public ParseNode RecordNumber { get; set; }
+
+        /// <summary>
         /// Parse node that computes the input row position
         /// </summary>
         public ParseNode RowPosition { get; set; }
@@ -91,6 +96,9 @@ namespace CCompiler {
             if (FileHandle != null) {
                 FileHandle.Dump(blockNode);
             }
+            if (RecordNumber != null) {
+                RecordNumber.Dump(blockNode);
+            }
             if (Prompt != null) {
                 Prompt.Dump(blockNode);
             }
@@ -123,13 +131,22 @@ namespace CCompiler {
                 constructorTypes.Add(Symbol.SymTypeToSystemType(ColumnPosition.Type));
                 constructorTypes.Add(Symbol.SymTypeToSystemType(MaximumWidth.Type));
             }
-            cg.GenerateExpression(SymType.INTEGER, FileHandle);
-            cg.GenerateExpression(SymType.CHAR, Prompt);
-            cg.Emitter.LoadInteger((int)Terminator);
 
+            cg.GenerateExpression(SymType.INTEGER, FileHandle);
             constructorTypes.Add(typeof(int));
-            constructorTypes.Add(typeof(string));
-            constructorTypes.Add(typeof(LineTerminator));
+
+            if (Prompt != null) {
+                cg.GenerateExpression(SymType.CHAR, Prompt);
+                cg.Emitter.LoadInteger((int)Terminator);
+
+                constructorTypes.Add(typeof(string));
+                constructorTypes.Add(typeof(LineTerminator));
+            }
+
+            if (RecordNumber != null) {
+                cg.GenerateExpression(SymType.INTEGER, RecordNumber);
+                constructorTypes.Add(Symbol.SymTypeToSystemType(RecordNumber.Type));
+            }
 
             Type inputManagerType = typeof(InputManager);
             cg.Emitter.CreateObject(inputManagerType, constructorTypes.ToArray());
