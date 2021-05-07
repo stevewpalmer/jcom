@@ -5,6 +5,7 @@
     <ReleaseVersion>0.2</ReleaseVersion>
     <Description>JComal Compiler and Interpreter</Description>
     <Copyright>2013-21 Steven Palmer</Copyright>
+    <RootNamespace>JComal</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <LangVersion>9.0</LangVersion>
@@ -36,13 +37,4 @@
     <ProjectReference Include="..\lib\jcomlib.csproj" />
     <ProjectReference Include="..\comallib\jcomallib.csproj" />
   </ItemGroup>
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Policies>
-          <StandardHeader Text="" IncludeInNewFiles="True" />
-        </Policies>
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
 </Project>

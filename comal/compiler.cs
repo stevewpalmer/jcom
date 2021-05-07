@@ -89,7 +89,10 @@ namespace JComal {
         }
 
         /// <summary>
-        /// Compile one file.
+        /// Compile one file. If the filename ends with SaveFileExtension then it is assumed to be
+        /// a tokenised Comal file created by SAVE. Otherwise it is assumed to be ASCII
+        /// source code.
+        ///
         /// An exception is thrown if the file doesn't exist.
         /// </summary>
         /// <param name="filename">The full path and file name to be compiled</param>
@@ -98,7 +101,7 @@ namespace JComal {
             Lines lines;
 
             string extension = Path.GetExtension(filename).ToLower();
-            if (extension == ".cml") {
+            if (extension == Consts.SaveFileExtension) {
                 IFormatter formatter = new BinaryFormatter();
                 using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
                 lines = (Lines)formatter.Deserialize(stream);
@@ -210,20 +213,6 @@ namespace JComal {
             MarkExecutable();
             codegen.GenerateCode(_programDef);
             return codegen.Run(entryPointName);
-        }
-
-        /// <summary>
-        /// Add the specified extension to the filename is no extension was
-        /// already supplied.
-        /// </summary>
-        /// <param name="filename">Filename</param>
-        /// <param name="extension">Extension to supply</param>
-        /// <returns>Filename with an extension</returns>
-        public static string AddExtensionIfMissing(string filename, string extension) {
-            if (string.IsNullOrEmpty(Path.GetExtension(filename))) {
-                return Path.ChangeExtension(filename, extension);
-            }
-            return filename;
         }
 
         // Compile an array of source lines.

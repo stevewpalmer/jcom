@@ -83,6 +83,24 @@ namespace ComalTests {
             Assert.AreEqual(opts.SourceFiles[1], "testfile2.cml");
             Assert.IsTrue(opts.GenerateDebug);
         }
+
+        // Verify that a filename without an extension is assumed to
+        // have the list file extension by default.
+        [Test]
+        public void ValidateFilenameExtension() {
+            ComalOptions opts = new();
+            string[] args = {
+                "testfile1.",
+                "-debug",
+                "testfile2"
+            };
+
+            Assert.IsTrue(opts.Parse(args));
+            Assert.IsTrue(opts.SourceFiles.Count == 2);
+            Assert.AreEqual(opts.SourceFiles[0], "testfile1.lst");
+            Assert.AreEqual(opts.SourceFiles[1], "testfile2.lst");
+            Assert.IsTrue(opts.GenerateDebug);
+        }
     }
 }
 

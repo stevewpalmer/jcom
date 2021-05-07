@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jcomlib", "lib\jcomlib.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com", "com\com.csproj", "{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jcomal", "comal\jcomal.csproj", "{A36CF6D7-74E9-4316-A927-A7C38E337D0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JComal", "comal\jcomal.csproj", "{A36CF6D7-74E9-4316-A927-A7C38E337D0F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jforlib", "fortranlib\jforlib.csproj", "{21240936-1600-4099-8C63-BA64CE8AB514}"
 EndProject

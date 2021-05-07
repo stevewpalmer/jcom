@@ -154,16 +154,13 @@ namespace JComal {
                                 break;
 
                             case TokenID.KDISPLAY:
-                                KDisplay(line);
-                                break;
-
                             case TokenID.KLIST:
-                                KList(line);
+                                KListOrDisplay(line, token.ID == TokenID.KLIST);
                                 break;
 
                             case TokenID.KCHANGE:
                             case TokenID.KFIND:
-                                KFind(line, token.ID == TokenID.KFIND);
+                                KFindOrChange(line, token.ID == TokenID.KFIND);
                                 break;
 
                             case TokenID.KDEL:
@@ -228,9 +225,12 @@ namespace JComal {
         }
 
         // AUTO
-        // Syntax: AUTO [<numeric constant>][,[<numeric constant>]]
+        //
+        // Syntax: AUTO [<start>][,[<steps>]]
+        //
         // Starts automatic line numbering from the first specified value in
         // steps of the second value. The defaults for both are 10.
+        //
         private void KAuto(Line ls) {
 
             int steps = 10;
@@ -245,6 +245,147 @@ namespace JComal {
             AutoSteps = steps;
         }
 
+        // CAT
+        //
+        // Syntax: CAT [<string constant>]
+        //
+        // List all programs in the current directory. If the optional string
+        // constant is specified, all files are shown that match the string.
+        //
+        private void KCat(Line ls) {
+
+            string wildcard = "*";
+            if (!ls.IsAtEndOfLine) {
+                SimpleToken token = ls.GetToken();
+                StringToken filenameToken = token as StringToken;
+                if (filenameToken == null) {
+                    SyntaxError();
+                }
+                wildcard = filenameToken.String;
+            }
+            Runtime.CATALOG(wildcard);
+        }
+
+        // DEL
+        //
+        // Syntax: DEL <start>[-[<end>]]
+        //
+        // Deletes program lines. At least one line number is required
+        // in the range.
+        //
+        private void KDel(Line ls) {
+
+            int startLine = 1;
+            int endLine = int.MaxValue;
+
+            if (ls.IsAtEndOfLine) {
+                SyntaxError();
+            }
+            GetCommandRange(ls, ref startLine, ref endLine);
+            if (!ls.IsAtEndOfLine) {
+                SyntaxError();
+            }
+            Lines.Delete(startLine, endLine);
+
+            IsModified = true;
+        }
+
+        // EDIT
+        //
+        // Syntax: EDIT <numeric_constant>
+        //
+        // Edit a single program line.
+        //
+        private void KEdit(LineTokeniser tokeniser, Line ls) {
+
+            SimpleToken token = ls.GetToken();
+            IntegerToken lineToken = token as IntegerToken;
+            if (token == null) {
+                SyntaxError();
+            }
+            Line line = Lines.Get(lineToken.Value);
+            if (line == null) {
+                throw new Exception("No such line");
+            }
+
+            Console.Write(line.LineNumber);
+
+            ReadLine readLine = new();
+            string editedLine = readLine.Read(line.PrintableLine(0, false));
+
+            line = new(tokeniser.TokeniseLine(line.LineNumber + editedLine));
+            Lines.Add(line);
+            Lines.Reset();
+
+            IsModified = true;
+        }
+
+        // ENTER/MERGE
+        //
+        // Syntax: ENTER <filename>
+        //         MERGE <filename>
+        //
+        // Loads a text version of a Comal program from disk and enters it into
+        // memory. The program must have valid line numbers and warnings are issued
+        // if they are out of sequence. ENTER clears the current program. MERGE
+        // retains the current program and adds the new lines at the end, with the
+        // line numebers being automatically renumbered.
+        //
+        // Text versions of Comal programs are assumed to have the ListFileExtension file
+        // extension if none is supplied.
+        //
+        private void KEnterOrMerge(Line ls, LineTokeniser tokeniser, bool isMerge) {
+
+            SimpleToken token = ls.GetToken();
+            StringToken filenameToken = token as StringToken;
+            if (filenameToken == null) {
+                SyntaxError();
+            }
+
+            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "lst");
+
+            if (!File.Exists(filename)) {
+                throw new Exception("File not found");
+            }
+            string[] sourceLines = File.ReadAllLines(filename);
+
+            int lastLine = 0;
+            int lineNumber = Lines.MaxLine + 10;
+
+            if (!isMerge) {
+                Lines.Clear();
+            }
+
+            foreach (string sourceLine in sourceLines) {
+                if (string.IsNullOrEmpty(sourceLine)) {
+                    continue;
+                }
+                Line line = new(tokeniser.TokeniseLine(sourceLine));
+                if (isMerge) {
+                    line.LineNumber = lineNumber;
+                    lineNumber += 10;
+                } else {
+                    // Possible enter of a source file with no line
+                    // numbers? 
+                    if (line.LineNumber == 0) {
+                        line.LineNumber = lineNumber;
+                        lineNumber += 10;
+                    }
+                    if (line.LineNumber < lastLine) {
+                        Lines.Clear();
+                        throw new Exception($"Out of sequence at line {line.LineNumber}");
+                    }
+                    if (Lines.Get(line.LineNumber) != null) {
+                        Lines.Clear();
+                        throw new Exception($"Duplicate line {line.LineNumber}");
+                    }
+                }
+                Lines.Add(line);
+                lastLine = line.LineNumber;
+            }
+            IsModified = true;
+        }
+
         // FIND/CHANGE
         //
         // Syntax: FIND <string>
@@ -254,7 +395,7 @@ namespace JComal {
         // specified, the string found is replaced with the replacement
         // string and the line is re-tokenised and saved.
         //
-        private void KFind(Line ls, bool findOnly) {
+        private void KFindOrChange(Line ls, bool findOnly) {
 
             SimpleToken token = ls.GetToken();
             StringToken findToken;
@@ -294,29 +435,19 @@ namespace JComal {
                     Console.WriteLine(lineToSearch);
                 }
             }
+            IsModified = true;
         }
 
-        // DISPLAY
+        // LIST/DISPLAY
         //
-        // Syntax: DISPLAY [line][,[<line]]
+        // Syntax: LIST [filename] [<start>][-[end>]]
+        //         DISPLAY [filename] [<start>][-[end>]]
         //
-        // Display the program without line numbers.
+        // Lists the program to the console or a files. If listOnly is
+        // true then we add line numbers to the output. If filename is
+        // specified, we output to the file instead of the console.
         //
-        private void KDisplay(Line ls) {
-            ListOrDisplay(ls, false);
-        }
-
-        // LIST
-        // Syntax: LIST [<numeric constant>][,[<numeric constant>]]
-        // Lists the program.
-        private void KList(Line ls) {
-            ListOrDisplay(ls, true);
-        }
-
-        // List or display the current program. If listOnly is true
-        // then we list the program with line numbers. If it is false,
-        // the same program is listed without line numbers.
-        private void ListOrDisplay(Line ls, bool listOnly) {
+        private void KListOrDisplay(Line ls, bool listOnly) {
 
             int startLine = 1;
             int endLine = int.MaxValue;
@@ -335,7 +466,7 @@ namespace JComal {
                 if (token == null) {
                     SyntaxError();
                 }
-                string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "lst");
+                string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "lst");
                 listFile = new StreamWriter(filename);
             }
 
@@ -410,137 +541,6 @@ namespace JComal {
             Lines.Reset();
         }
 
-        // EDIT
-        // Syntax: EDIT <numeric_constant>
-        // Handle the EDIT line command
-        private void KEdit(LineTokeniser tokeniser, Line ls) {
-
-            SimpleToken token = ls.GetToken();
-            IntegerToken lineToken = token as IntegerToken;
-            if (token == null) {
-                SyntaxError();
-            }
-            Line line = Lines.Get(lineToken.Value);
-            if (line == null) {
-                throw new Exception("No such line");
-            }
-
-            Console.Write(line.LineNumber);
-
-            ReadLine readLine = new();
-            string editedLine = readLine.Read(line.PrintableLine(0, false));
-
-            line = new(tokeniser.TokeniseLine(line.LineNumber + editedLine));
-            Lines.Add(line);
-            Lines.Reset();
-
-            IsModified = true;
-        }
-
-        // DEL
-        // Syntax: DEL <numeric constant>[,[<numeric constant>]]
-        // Deletes program lines
-        private void KDel(Line ls) {
-
-            int startLine = 1;
-            int endLine = int.MaxValue;
-
-            if (ls.IsAtEndOfLine) {
-                SyntaxError();
-            } 
-            GetCommandRange(ls, ref startLine, ref endLine);
-            if (!ls.IsAtEndOfLine) {
-                SyntaxError();
-            }
-            Lines.Delete(startLine, endLine);
-
-            IsModified = true;
-        }
-
-        // RENUMBER
-        // Syntax: RENUMBER [<numeric constant>][,[<numeric constant>]]
-        // If no start is specified, the default is 10. If no steps are specified
-        // then the default is also 10.
-        private void KRenumber(Line ls) {
-
-            int start = 10;
-            int steps = 10;
-
-            GetCommandRange(ls, ref start, ref steps, TokenID.COMMA);
-            if (!ls.IsAtEndOfLine) {
-                SyntaxError();
-            }
-            Lines.Renumber(start, steps);
-
-            IsModified = true;
-        }
-
-        // ENTER/MERGE
-        //
-        // Syntax: ENTER <filename>
-        //         MERGE <filename>
-        //
-        // Loads a text version of a Comal program from disk and enters it into
-        // memory. The program must have valid line numbers and warnings are issued
-        // if they are out of sequence. ENTER clears the current program. MERGE
-        // retains the current program and adds the new lines at the end, with the
-        // line numebers being automatically renumbered.
-        //
-        // Text versions of Comal programs are assumed to have the ".lst" file
-        // extension if none is supplied.
-        //
-        private void KEnterOrMerge(Line ls, LineTokeniser tokeniser, bool isMerge) {
-
-            SimpleToken token = ls.GetToken();
-            StringToken filenameToken = token as StringToken;
-            if (filenameToken == null) {
-                SyntaxError();
-            }
-
-            string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "lst");
-
-            if (!File.Exists(filename)) {
-                throw new Exception("File not found");
-            }
-            string[] sourceLines = File.ReadAllLines(filename);
-
-            int lastLine = 0;
-            int lineNumber = Lines.MaxLine + 10;
-
-            if (!isMerge) {
-                Lines.Clear();
-            }
-
-            foreach (string sourceLine in sourceLines) {
-                if (string.IsNullOrEmpty(sourceLine)) {
-                    continue;
-                }
-                Line line = new(tokeniser.TokeniseLine(sourceLine));
-                if (isMerge) {
-                    line.LineNumber = lineNumber;
-                    lineNumber += 10;
-                } else {
-                    // Possible enter of a source file with no line
-                    // numbers? 
-                    if (line.LineNumber == 0) {
-                        line.LineNumber = lineNumber;
-                        lineNumber += 10;
-                    }
-                    if (line.LineNumber < lastLine) {
-                        Lines.Clear();
-                        throw new Exception($"Out of sequence at line {line.LineNumber}");
-                    }
-                    if (Lines.Get(line.LineNumber) != null) {
-                        Lines.Clear();
-                        throw new Exception($"Duplicate line {line.LineNumber}");
-                    }
-                }
-                Lines.Add(line);
-                lastLine = line.LineNumber;
-            }
-            IsModified = true;
-        }
-
         // LOAD
         //
         // Syntax: LOAD <filename>
@@ -555,7 +555,7 @@ namespace JComal {
                 SyntaxError();
             }
 
-            string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "cml");
+            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "cml");
 
             if (!File.Exists(filename)) {
                 throw new Exception("File not found");
@@ -566,9 +566,31 @@ namespace JComal {
             Lines = (Lines)formatter.Deserialize(stream);
         }
 
+        // RENUMBER
+        //
+        // Syntax: RENUMBER [<start>][,[<steps>]]
+        //
+        // Renumbers the lines in the program. If no start is specified,
+        // the default is 10. If no steps are specified then the default is
+        // also 10.
+        //
+        private void KRenumber(Line ls) {
+
+            int start = 10;
+            int steps = 10;
+
+            GetCommandRange(ls, ref start, ref steps, TokenID.COMMA);
+            if (!ls.IsAtEndOfLine) {
+                SyntaxError();
+            }
+            Lines.Renumber(start, steps);
+
+            IsModified = true;
+        }
+
         // SAVE
         //
-        // Syntax: SAVE <string constant>
+        // Syntax: SAVE <filename>
         //
         // Save the program to disk in binary format.
         //
@@ -580,7 +602,7 @@ namespace JComal {
                 SyntaxError();
             }
 
-            string filename = Compiler.AddExtensionIfMissing(filenameToken.String, "cml");
+            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "cml");
 
             IFormatter formatter = new BinaryFormatter();
             using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write)) {
@@ -588,33 +610,16 @@ namespace JComal {
             }
 
             Console.WriteLine("Saved");
-        }
 
-        // CAT/DIR
-        //
-        // Syntax: CAT [<string constant>]
-        //         DIR [<string constant>]
-        //
-        // List all programs in the current directory. If the optional string
-        // constant is specified, all files are shown that match the string.
-        //
-        private void KCat(Line ls) {
-
-            string wildcard = "*";
-            if (!ls.IsAtEndOfLine) {
-                SimpleToken token = ls.GetToken();
-                StringToken filenameToken = token as StringToken;
-                if (filenameToken == null) {
-                    SyntaxError();
-                }
-                wildcard = filenameToken.String;
-            }
-            Runtime.CATALOG(wildcard);
+            IsModified = false;
         }
 
         // SCAN
+        //
         // Syntax: SCAN
+        //
         // Scans the source code for errors by performing a compile
+        //
         private void KScan() {
             ComalOptions localOpts = new() {
                 Interactive = false,
@@ -682,6 +687,7 @@ namespace JComal {
 
         // Display interpreter prompt and read a line
         private string ReadLine() {
+
             string prefix = string.Empty;
             if (IsAutoMode) {
                 prefix = AutoLineNumber + " ";
