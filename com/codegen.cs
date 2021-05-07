@@ -432,7 +432,7 @@ namespace CCompiler {
 
         /// <summary>
         /// Emit the code that loads the base array and the offset of the
-        /// indexed element to the top of the stack..
+        /// indexed element to the top of the stack.
         /// </summary>
         /// <param name="identNode">Parse node for array identifier</param>
         public void GenerateLoadArrayAddress(IdentifierParseNode identNode) {

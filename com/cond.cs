@@ -71,6 +71,7 @@ namespace CCompiler {
     /// Specifies a parse node that defines a conditional block.
     /// </summary>
     public sealed class ConditionalParseNode : ParseNode {
+
         private readonly Collection<ParseNode> _exprList = new();
 
         /// <summary>

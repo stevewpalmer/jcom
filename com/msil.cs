@@ -117,15 +117,19 @@ namespace CCompiler {
     /// destination point in the instruction sequence.
     /// </summary>
     public class InstructionLabelMarker : Instruction {
-        private Label _target;
-        
+
+        /// <summary>
+        /// Target of label.
+        /// </summary>
+        public Label Target { get; set; }
+
         /// <summary>
         /// Create an InstructionLabelMarker object with the specified
         /// label target.
         /// </summary>
         /// <param name="target">Label target</param>
         public InstructionLabelMarker(Label target) {
-            _target = target;
+            Target = target;
         }
         
         /// <summary>
@@ -139,7 +143,7 @@ namespace CCompiler {
             if (Deleted) {
                 return;
             }
-            il.MarkLabel(_target);
+            il.MarkLabel(Target);
         }
     }
 

@@ -70,6 +70,23 @@ namespace CCompiler {
             OptimiseReturnTail(code);
             OptimiseBranch(code);
             OptimiseNotBranch(code);
+            OptimiseReturn(code);
+        }
+
+        // Optimise a BRANCH to a label that is immediately following by removing
+        // that branch.
+        //
+        private static void OptimiseReturn(Collection<Instruction> code) {
+
+            for (int c = 0; c < code.Count - 2; ++c) {
+                if (code[c].Code == OpCodes.Br && code[c + 1] is InstructionLabelMarker) {
+                    InstructionLabel brLabel = code[c] as InstructionLabel;
+                    InstructionLabelMarker label = code[c + 1] as InstructionLabelMarker;
+                    if (brLabel.Target == label.Target) {
+                        code[c].Deleted = true;
+                    }
+                }
+            }
         }
 
         // Optimise a RETURN instruction that is the result of a comparision. This occurs when
