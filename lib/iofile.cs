@@ -26,6 +26,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace JComLib {
@@ -385,8 +386,9 @@ namespace JComLib {
         /// Close all opened files.
         /// </summary>
         public static void CloseAll() {
-            foreach (IOFile file in _filemap.Values) {
-                file.Close(false);
+
+            foreach (IOFile s in _filemap.Select(p => p.Value).ToList()) {
+                s.Close(false);
             }
         }
 

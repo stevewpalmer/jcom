@@ -46,6 +46,7 @@ namespace JComalLib {
             if (_file.RecordLength == 0) {
                 throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN_FOR_RANDOM_ACCESS);
             }
+            _file.IsFormatted = false;
             _file.RecordIndex = recordNumber;
         }
 

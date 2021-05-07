@@ -78,8 +78,8 @@ namespace JComalLib {
                 Path = filename
             };
             file.IsNew = mode == "w";
-            file.IsFormatted = mode == "x";
-            if (file.IsFormatted && !File.Exists(filename)) {
+            file.IsSequential = mode != "x";
+            if (!file.IsSequential && !File.Exists(filename)) {
                 file.IsNew = true;
             }
             file.Open();
@@ -89,8 +89,11 @@ namespace JComalLib {
             if (mode == "w+") {
                 file.SeekToEnd();
             }
-            if (file.IsFormatted) {
+            if (!file.IsSequential) {
                 file.RecordLength = recordSize;
+                if (recordSize > 0) {
+                    file.IsFormatted = false;
+                }
             }
         }
 
