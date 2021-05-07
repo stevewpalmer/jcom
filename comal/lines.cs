@@ -23,18 +23,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using JComLib;
 
 namespace JComal {
 
     /// <summary>
     /// A single tokenised line
     /// </summary>
-    [Serializable]
     public class Line {
 
         private int _tindex;
@@ -243,12 +242,38 @@ namespace JComal {
             }
             return line.ToString();
         }
+
+        /// <summary>
+        /// Serialize this program line to the specified byte stream.
+        /// </summary>
+        public void Serialize(ByteWriter byteWriter) {
+
+            foreach (SimpleToken token in _tokens) {
+                token.Serialize(byteWriter);
+            }
+        }
+
+        /// <summary>
+        /// Deserialize a program line from the byte reader into a Line
+        /// </summary>
+        /// <param name="byteReader">Byte reader</param>
+        /// <returns></returns>
+        public static Line Deserialize(ByteReader byteReader) {
+
+            List<SimpleToken> tokens = new();
+            SimpleToken token;
+            do {
+                token = SimpleToken.Deserialize(byteReader);
+                tokens.Add(token);
+            } while (token.ID != TokenID.EOL);
+            return new Line(tokens.ToArray());
+
+        }
     }
 
     /// <summary>
     /// Storage of lines and line numbers
     /// </summary>
-    [Serializable]
     public class Lines {
 
         private readonly List<Line> _lines;
@@ -431,6 +456,31 @@ namespace JComal {
         public void Clear() {
             _lines.Clear();
             _currentLine = 0;
+        }
+
+        /// <summary>
+        /// Serialize the current program lines to a byte array for
+        /// saving to disk.
+        /// </summary>
+        /// <returns>Byte array</returns>
+        public byte [] Serialize() {
+
+            ByteWriter byteWriter = new();
+            foreach (Line line in _lines) {
+                line.Serialize(byteWriter);
+            }
+            return byteWriter.Buffer;
+        }
+
+        /// <summary>
+        /// Deserialize the byte array to program lines.
+        /// </summary>
+        /// <param name="byteStream">Byte array</param>
+        public void Deserialize(ByteReader byteReader) {
+            do {
+                Line line = Line.Deserialize(byteReader);
+                Add(line);
+            } while (!byteReader.End);
         }
     }
 }

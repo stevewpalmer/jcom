@@ -112,7 +112,7 @@ namespace JComal {
                         success = false;
                     }
                 } else {
-                    string filename = Utilities.AddExtensionIfMissing(optstring, Consts.ListFileExtension);
+                    string filename = Utilities.AddExtensionIfMissing(optstring, Consts.SourceFileExtension);
                     SourceFiles.Add(filename);
                 }
                 if (stopParse) {

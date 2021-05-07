@@ -5,7 +5,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jfor", "fortran\jfor.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{E5714391-D79D-4662-8968-37C4E32DC687}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jcomlib", "lib\jcomlib.csproj", "{3FE2EAC5-0B96-4402-854E-9CCBC9715B01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JComLib", "lib\jcomlib.csproj", "{3FE2EAC5-0B96-4402-854E-9CCBC9715B01}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "com", "com\com.csproj", "{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}"
 EndProject

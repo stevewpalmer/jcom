@@ -26,6 +26,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using JComLib;
 
 namespace JComal {
 
@@ -407,7 +408,6 @@ namespace JComal {
     /// <summary>
     /// Specifies a simple token with no additional data.
     /// </summary>
-    [Serializable]
     public class SimpleToken {
 
         /// <summary>
@@ -430,12 +430,36 @@ namespace JComal {
         public override string ToString() {
             return Tokens.TokenIDToString(ID);
         }
+
+        /// <summary>
+        /// Serialize this token to the specified byte stream.
+        /// </summary>
+        public virtual void Serialize(ByteWriter byteWriter) {
+            byteWriter.WriteInteger((int)ID);
+        }
+
+        /// <summary>
+        /// Deserialize a token from the byte stream.
+        /// </summary>
+        /// <param name="byteReader">Byte reader</param>
+        /// <returns>A SimpleToken constructed from the byte stream</returns>
+        public static SimpleToken Deserialize(ByteReader byteReader) {
+
+            TokenID tokenID = (TokenID)byteReader.ReadInteger();
+            return tokenID switch {
+                TokenID.ERROR =>    ErrorToken.Deserialize(byteReader),
+                TokenID.INTEGER =>  IntegerToken.Deserialize(byteReader),
+                TokenID.IDENT =>    IdentifierToken.Deserialize(byteReader),
+                TokenID.STRING =>   StringToken.Deserialize(byteReader),
+                TokenID.REAL =>     FloatToken.Deserialize(byteReader),
+                _ =>                new SimpleToken(tokenID),
+            };
+        }
     }
 
     /// <summary>
     /// Specifies an error found in the token stream
     /// </summary>
-    [Serializable]
     public class ErrorToken : SimpleToken {
 
         /// <summary>
@@ -464,12 +488,31 @@ namespace JComal {
         public override string ToString() {
             return String;
         }
+
+        /// <summary>
+        /// Serialize this token to the specified byte stream.
+        /// </summary>
+        public override void Serialize(ByteWriter byteWriter) {
+            base.Serialize(byteWriter);
+            byteWriter.WriteString(Message);
+            byteWriter.WriteString(String);
+        }
+
+        /// <summary>
+        /// Deserialize an error token from the byte stream.
+        /// </summary>
+        /// <param name="byteReader">Byte reader</param>
+        /// <returns>An ErrorToken constructed from the byte stream</returns>
+        public static new ErrorToken Deserialize(ByteReader byteReader) {
+            string message = byteReader.ReadString();
+            string errorString = byteReader.ReadString();
+            return new ErrorToken(message, errorString);
+        }
     }
 
     /// <summary>
     /// Specifies a string token with a literal string value.
     /// </summary>
-    [Serializable]
     public class StringToken : SimpleToken {
 
         /// <summary>
@@ -492,12 +535,30 @@ namespace JComal {
         public override string ToString() {
             return "\"" + String + "\"";
         }
+
+        /// <summary>
+        /// Serialize this token to the specified byte stream.
+        /// </summary>
+        public override void Serialize(ByteWriter byteWriter) {
+            base.Serialize(byteWriter);
+            byteWriter.WriteString(String);
+        }
+
+        /// <summary>
+        /// Deserialize a string token from the byte stream.
+        /// </summary>
+        /// <param name="streamIndex">Index into the byte stream</param>
+        /// <param name="byteStream">Byte stream</param>
+        /// <returns>A StringToken constructed from the byte stream</returns>
+        public static new StringToken Deserialize(ByteReader byteReader) {
+            string value = byteReader.ReadString();
+            return new StringToken(value);
+        }
     }
 
     /// <summary>
     /// Specifies an integer token with a single integer value.
     /// </summary>
-    [Serializable]
     public class IntegerToken : SimpleToken {
 
         /// <summary>
@@ -520,20 +581,37 @@ namespace JComal {
         public override string ToString() {
             return Value.ToString();
         }
+
+        /// <summary>
+        /// Serialize this token to the specified byte stream.
+        /// </summary>
+        public override void Serialize(ByteWriter byteWriter) {
+            base.Serialize(byteWriter);
+            byteWriter.WriteInteger(Value);
+        }
+
+        /// <summary>
+        /// Deserialize an integer token from the byte stream.
+        /// </summary>
+        /// <param name="byteReader">Byte reader</param>
+        /// <returns>An IntegerToken constructed from the byte stream</returns>
+        public static new IntegerToken Deserialize(ByteReader byteReader) {
+            int value = byteReader.ReadInteger();
+            return new IntegerToken(value);
+        }
     }
 
     /// <summary>
     /// Specifies a floating point (real) token with a single
     /// floating point value.
     /// </summary>
-    [Serializable]
-    public class RealToken : SimpleToken {
+    public class FloatToken : SimpleToken {
 
         /// <summary>
         /// Creates a real token with the given floating point value.
         /// </summary>
         /// <param name="value">A floating point value</param>
-        public RealToken(float value) : base(TokenID.REAL) {
+        public FloatToken(float value) : base(TokenID.REAL) {
             Value = value;
         }
 
@@ -549,13 +627,30 @@ namespace JComal {
         public override string ToString() {
             return Value.ToString();
         }
+
+        /// <summary>
+        /// Serialize this token to the specified byte stream.
+        /// </summary>
+        public override void Serialize(ByteWriter byteWriter) {
+            base.Serialize(byteWriter);
+            byteWriter.WriteFloat(Value);
+        }
+
+        /// <summary>
+        /// Deserialize an floating point token from the byte stream.
+        /// </summary>
+        /// <param name="byteReader">Byte reader</param>
+        /// <returns>A FloatToken constructed from the byte stream</returns>
+        public static new FloatToken Deserialize(ByteReader byteReader) {
+            float value = byteReader.ReadFloat();
+            return new FloatToken(value);
+        }
     }
 
     /// <summary>
     /// Specifies an identifier token with a identifier name that is
     /// valid in the rules of the language.
     /// </summary>
-    [Serializable]
     public class IdentifierToken : SimpleToken {
 
         /// <summary>
@@ -577,6 +672,24 @@ namespace JComal {
         /// <returns>Token string</returns>
         public override string ToString() {
             return Name;
+        }
+
+        /// <summary>
+        /// Serialize this token to the specified byte stream.
+        /// </summary>
+        public override void Serialize(ByteWriter byteWriter) {
+            base.Serialize(byteWriter);
+            byteWriter.WriteString(Name);
+        }
+
+        /// <summary>
+        /// Deserialize an identifier token from the byte stream.
+        /// </summary>
+        /// <param name="byteReader">Byte reader</param>
+        /// <returns></returns>
+        public static new IdentifierToken Deserialize(ByteReader byteReader) {
+            string name = byteReader.ReadString();
+            return new IdentifierToken(name);
         }
     }
 }

@@ -92,6 +92,18 @@ namespace JComLib {
         CANNOT_CREATE_FILE = 9,
 
         /// <summary>
+        /// File is not open for random access
+        /// </summary>
+        [Description("File was not opened for RANDOM access")]
+        FILE_NOT_OPEN_FOR_RANDOM_ACCESS = 10,
+
+        /// <summary>
+        /// Zone value incorrect
+        /// </summary>
+        [Description("Zone value is negative")]
+        ZONE_VALUE_INCORRECT = 11,
+
+        /// <summary>
         /// Format record mismatch (Fortran)
         /// </summary>
         [Description("Format Record Mismatch")]
@@ -149,7 +161,7 @@ namespace JComLib {
         /// Multiple repeat in format specifier.
         /// </summary>
         [Description("Multiple repeat specifiers")]
-        FORMAT_MULTIPLE_REPEAT = 109,
+        FORMAT_MULTIPLE_REPEAT = 109
     }
 
     /// <summary>

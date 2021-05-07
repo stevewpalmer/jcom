@@ -25,7 +25,6 @@
 
 using System;
 using System.IO;
-using System.Text;
 
 namespace JComLib {
 
@@ -205,6 +204,7 @@ namespace JComLib {
         public static void CATALOG(string wildcard) {
 
             string[] allfiles = Directory.GetFiles(".", wildcard, SearchOption.TopDirectoryOnly);
+            Array.Sort(allfiles);
             foreach (string file in allfiles) {
                 FileInfo info = new(file);
                 long size = info.Length;

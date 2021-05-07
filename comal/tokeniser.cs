@@ -264,7 +264,7 @@ namespace JComal {
             PushChar(ch);
             if (isFloat) {
                 if (float.TryParse(str.ToString(), out float result)) {
-                    return new RealToken(result);
+                    return new FloatToken(result);
                 }
             } else {
                 if (int.TryParse(str.ToString(), out int result)) {

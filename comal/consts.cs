@@ -79,13 +79,13 @@ namespace JComal {
         public const int MaximumIdentifierLength = 80;
 
         /// <summary>
-        /// Comal binary source file suffix (created by SAVE).
+        /// Comal program file suffix (created by SAVE).
         /// </summary>
-        public const string SaveFileExtension = ".cml";
+        public const string ProgramFileExtension = ".cml";
 
         /// <summary>
-        /// Comal binary source file suffix (created by LIST/DISPLAY).
+        /// Comal source file suffix (created by LIST/DISPLAY).
         /// </summary>
-        public const string ListFileExtension = ".lst";
+        public const string SourceFileExtension = ".lst";
     }
 }

@@ -143,6 +143,7 @@ namespace JComalLib {
                 file = new IOFile(iodevice);
                 file.Open();
             }
+
             char[] formats = formatString.ToCharArray();
             StringBuilder output = new();
             int fmtIndex = 0;
@@ -152,6 +153,12 @@ namespace JComalLib {
             if (row > 0 && column > 0 && iodevice == IOConstant.Stdout) {
                 Console.SetCursorPosition(column - 1, row - 1);
             }
+
+            // Validate zone
+            if (Zone < 0) {
+                throw new JComRuntimeException(JComRuntimeErrors.ZONE_VALUE_INCORRECT);
+            }
+
             while (fmtIndex < formatString.Length) {
                 string result;
                 switch (formats[fmtIndex++]) {

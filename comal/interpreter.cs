@@ -561,9 +561,13 @@ namespace JComal {
                 throw new Exception("File not found");
             }
 
-            IFormatter formatter = new BinaryFormatter();
-            using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-            Lines = (Lines)formatter.Deserialize(stream);
+            try {
+                using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
+                ByteReader byteReader = new(stream);
+                Lines.Deserialize(byteReader);
+            } catch (Exception) {
+                throw new Exception("Invalid program file");
+            }
         }
 
         // RENUMBER
@@ -604,9 +608,9 @@ namespace JComal {
 
             string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "cml");
 
-            IFormatter formatter = new BinaryFormatter();
             using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write)) {
-                formatter.Serialize(stream, Lines);
+                using BinaryWriter writer = new(stream);
+                writer.Write(Lines.Serialize());
             }
 
             Console.WriteLine("Saved");

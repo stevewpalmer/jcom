@@ -25,7 +25,6 @@
 
 using System.Collections.Generic;
 using CCompiler;
-using JComalLib;
 using JComLib;
 
 namespace JComal {
@@ -62,6 +61,13 @@ namespace JComal {
                 case TokenID.KRANDOM:   mode = "x"; break;
             }
             paramsNode.Add(new StringParseNode(mode));
+
+            // Random requires a record size
+            ParseNode recordSizeParseNode = new NumberParseNode(0);
+            if (mode == "x") {
+                recordSizeParseNode = IntegerExpression();
+            }
+            paramsNode.Add(recordSizeParseNode);
 
             node.Parameters = paramsNode;
             return node;
@@ -123,9 +129,47 @@ namespace JComal {
             return node;
         }
 
-        /// WRITE keyword
+        // WRITE
+        //
+        // Syntax: WRITE [FILE] filenum,record: values
+        //
+        // Writes the specified values to the given record of the random access file.
+        //
         private ParseNode KWrite() {
-            return null;
+            VarArgParseNode varargs = new();
+
+            // Optional FILE number
+            TestAndSkipToken(TokenID.KFILE);
+
+            ParseNode fileParseNode = IntegerExpression();
+            ParseNode recnumParseNode = new NumberParseNode(0);
+
+            SimpleToken token = GetNextToken();
+            if (token.ID == TokenID.COMMA) {
+                recnumParseNode = IntegerExpression();
+            } else {
+                _currentLine.PushToken(token);
+            }
+            ExpectToken(TokenID.COLON);
+
+            while (!_currentLine.IsAtEndOfStatement) {
+                ParseNode exprNode = Expression();
+                if (exprNode.Type == SymType.DOUBLE) {
+                    exprNode = CastNodeToType(exprNode, SymType.FLOAT);
+                }
+                varargs.Add(exprNode);
+                if (!_currentLine.IsAtEndOfStatement) {
+                    ExpectToken(TokenID.COMMA);
+                }
+            }
+
+            ExtCallParseNode node = new("JComalLib.FileManager,jcomallib", "WRITE");
+            ParametersParseNode paramsNode = new();
+            paramsNode.Add(fileParseNode);
+            paramsNode.Add(recnumParseNode);
+            paramsNode.Add(varargs);
+            node.Parameters = paramsNode;
+            return node;
         }
 
         // INPUT

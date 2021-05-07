@@ -32,6 +32,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml;
 using CCompiler;
+using JComLib;
 
 namespace JComal {
 
@@ -89,24 +90,23 @@ namespace JComal {
         }
 
         /// <summary>
-        /// Compile one file. If the filename ends with SaveFileExtension then it is assumed to be
-        /// a tokenised Comal file created by SAVE. Otherwise it is assumed to be ASCII
-        /// source code.
+        /// Compile one file. If the filename ends with SaveFileExtension then it is
+        /// assumed to be a Comal program file created by SAVE. Otherwise it is assumed
+        /// to be a Comal source file.
         ///
         /// An exception is thrown if the file doesn't exist.
         /// </summary>
         /// <param name="filename">The full path and file name to be compiled</param>
         public void Compile(string filename) {
 
-            Lines lines;
+            Lines lines = new();
 
             string extension = Path.GetExtension(filename).ToLower();
-            if (extension == Consts.SaveFileExtension) {
-                IFormatter formatter = new BinaryFormatter();
+            if (extension == Consts.ProgramFileExtension) {
                 using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
-                lines = (Lines)formatter.Deserialize(stream);
+                ByteReader byteReader = new(stream);
+                lines.Deserialize(byteReader);
             } else {
-                lines = new();
                 LineTokeniser tokeniser = new();
 
                 using (StreamReader sr = new(filename)) {
@@ -880,15 +880,14 @@ namespace JComal {
                                 Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in assignment");
                             }
                             node.Parameters.Add(exprNode, symParameter.IsByRef);
+                            declParameterIndex++;
                         }
-                        token = GetNextToken();
+                        token = _currentLine.PeekToken();
                         if (token.ID == TokenID.RPAREN) {
-                            _currentLine.PushToken(token);
                             break;
                         }
                         ExpectToken(TokenID.COMMA);
-                    } while (true);
-                    declParameterIndex++;
+                    } while (token.ID != TokenID.EOL);
                 }
                 ExpectToken(TokenID.RPAREN);
             }

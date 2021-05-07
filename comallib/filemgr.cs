@@ -67,7 +67,8 @@ namespace JComalLib {
         /// <param name="iodevice">The file number for the opened file</param>
         /// <param name="filename">The filename</param>
         /// <param name="mode">The file open mode</param>
-        public static void OPEN(int iodevice, string filename, string mode) {
+        /// <param name="recordSize">Record size, for random access files</param>
+        public static void OPEN(int iodevice, string filename, string mode, int recordSize) {
 
             IOFile file = IOFile.Get(iodevice);
             if (file != null) {
@@ -78,12 +79,18 @@ namespace JComalLib {
             };
             file.IsNew = mode == "w";
             file.IsFormatted = mode == "x";
+            if (file.IsFormatted && !File.Exists(filename)) {
+                file.IsNew = true;
+            }
             file.Open();
             if (file.Handle == null) {
                 throw new JComRuntimeException(JComRuntimeErrors.CANNOT_OPEN_FILE);
             }
             if (mode == "w+") {
                 file.SeekToEnd();
+            }
+            if (file.IsFormatted) {
+                file.RecordLength = recordSize;
             }
         }
 
@@ -127,6 +134,52 @@ namespace JComalLib {
         /// </summary>
         public static void CLOSE() {
             IOFile.CloseAll();
+        }
+
+        /// <summary>
+        /// Writes the data to an unformatted random access file.
+        /// </summary>
+        /// <param name="iodevice">The file number to write to</param>
+        /// <param name="recordNumber">The record number to write to</param>
+        /// <param name="args">Write arguments</param>
+        public static void WRITE(int iodevice, int recordNumber, params object[] args) {
+
+            IOFile file = IOFile.Get(iodevice);
+            if (file == null) {
+                throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN);
+            }
+            if (recordNumber > 0) {
+                if (file.RecordLength == 0) {
+                    throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN_FOR_RANDOM_ACCESS);
+                }
+                file.RecordIndex = recordNumber;
+            }
+            foreach (object arg in args) {
+                if (arg is double doubleValue) {
+                    file.WriteDouble(doubleValue);
+                    continue;
+                }
+                if (arg is float floatValue) {
+                    file.WriteFloat(floatValue);
+                    continue;
+                }
+                if (arg is string stringValue) {
+                    file.WriteString(stringValue);
+                    continue;
+                }
+                if (arg is FixedString fixedStringValue) {
+                    file.WriteString(fixedStringValue.ToString());
+                    continue;
+                }
+                if (arg is int intValue) {
+                    file.WriteInteger(intValue);
+                    continue;
+                }
+                if (arg is bool boolValue) {
+                    file.WriteBoolean(boolValue);
+                    continue;
+                }
+            }
         }
 
         /// <summary>

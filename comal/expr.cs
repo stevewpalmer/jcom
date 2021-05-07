@@ -595,7 +595,7 @@ namespace JComal {
                 case TokenID.KASC:      return InlineString("ICHAR", SymType.INTEGER);
 
                 case TokenID.REAL: {
-                        RealToken realToken = (RealToken)token;
+                        FloatToken realToken = (FloatToken)token;
                         return new NumberParseNode(new Variant(realToken.Value));
                     }
 
