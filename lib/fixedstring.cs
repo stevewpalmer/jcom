@@ -461,7 +461,7 @@ namespace JComLib {
         /// </summary>
         /// <returns>A <see cref="string"/> that represents the current <see cref="FixedString"/>.</returns>
         public override string ToString() {
-            return new string(_fixedString);
+            return new string(_fixedString, 0, RealLength);
         }
 
         // Copy the characters from the specified string to this one at the
@@ -507,6 +507,9 @@ namespace JComLib {
             }
             while (pos < endPos) {
                 _fixedString[pos++] = ' ';
+            }
+            if (endPos > RealLength) {
+                RealLength = endPos;
             }
         }
     }

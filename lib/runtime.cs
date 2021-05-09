@@ -76,7 +76,7 @@ namespace JComLib {
         public static string KEY {
             get {
                 if (Console.KeyAvailable) {
-                    ConsoleKeyInfo keyInfo = Console.ReadKey();
+                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
                     return keyInfo.KeyChar.ToString();
                 }
                 return string.Empty;

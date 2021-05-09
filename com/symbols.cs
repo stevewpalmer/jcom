@@ -299,6 +299,12 @@ namespace CCompiler {
         /// </value>
         public bool IsMethod => Class == SymClass.FUNCTION || Class == SymClass.SUBROUTINE;
 
+        /// <summary>
+        /// Returns whether the symbol refers to a method imported from an external
+        /// library.
+        /// </summary>
+        public bool IsImported => IsExternal && !string.IsNullOrEmpty(ExternalLibrary);
+
         /// <value>
         /// Returns whether the symbol is an intrinsic function name.
         /// </value>

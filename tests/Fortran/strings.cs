@@ -43,7 +43,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunString(comp, "ITEST", "CALOIUM   ");
+            Utilities.Helper.HelperRunString(comp, "ITEST", "CALOIUM");
         }
     }
 }

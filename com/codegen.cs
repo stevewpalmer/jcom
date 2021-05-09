@@ -283,7 +283,7 @@ namespace CCompiler {
             }
             bool needConstructor = false;
             foreach (Symbol sym in symbols) {
-                if (sym.IsExternal) {
+                if (sym.IsImported) {
                     continue;
                 }
                 if (sym.IsMethod && sym.Defined && !sym.IsParameter) {
