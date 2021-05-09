@@ -94,7 +94,7 @@ namespace JComalLib {
                 StdinIOFile file = _file as StdinIOFile;
                 file.Terminator = terminator;
                 file.Width = maxWidth;
-                file.Zone = PrintManager.Zone;
+                file.Zone = FileManager.Zone;
 
                 IOFile stdoutFile = new StdoutIOFile();
                 if (row > 0 && column > 0) {

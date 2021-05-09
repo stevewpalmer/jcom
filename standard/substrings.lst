@@ -1,0 +1,57 @@
+   10 DIM s$ OF 10, t$ OF 4
+   20 PRINT "=====testing substring assignment:"
+   30 s$(1:7):="abcde"
+   40 IF LEN(s$)=7 THEN
+   50   PRINT "correct length"
+   60   IF s$(7:7)=" " THEN
+   70    PRINT "correct padding with spaces"
+   80  ELSE
+   90    PRINT "failed padding with spaces"
+  100   ENDIF
+  110 ELSE
+  120  PRINT "failed - wrong length"
+  130 ENDIF
+  140 PRINT "=====testing auto truncating assignment" 
+  150 t$:="abcde"
+  160 IF t$="abcd" THEN
+  170   PRINT "passed" 
+  180 ELSE
+  190   PRINT "failed"
+  200 ENDIF
+  210 PRINT "=====testing substrings"
+  220 t$:="abcd"
+  230 s$:=t$(2:)
+  240 IF s$="bcd" THEN
+  250   PRINT "passed (2:)" 
+  260 ELSE
+  270   PRINT "failed (2:)"
+  280 ENDIF
+  300 s$:=t$(:3)
+  310 IF s$="abc" THEN
+  320   PRINT "passed (:3)"
+  330 ELSE
+  340   PRINT "failed (:3)"
+  350 ENDIF
+  360 PRINT "=====testing substring inserting" 
+  370 t$(2:2):="x"
+  380 IF t$="axcd" THEN
+  390   PRINT "passed"
+  400 ELSE
+  410   PRINT "failed"
+  420 ENDIF
+  430 PRINT "=====testing string concatenating" 
+  440 t$:="abcd"
+  450 s$:=t$+t$
+  460 IF s$="abcdabcd" THEN
+  470   PRINT "passed" 
+  480 ELSE
+  490   PRINT "failed"
+  500 ENDIF
+  510 s$:="z"
+  520 s$:+t$
+  530 IF s$="zabcd" THEN
+  540   PRINT "passed" 
+  550 ELSE
+  560   PRINT "failed" 
+  570 ENDIF
+

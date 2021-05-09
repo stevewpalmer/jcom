@@ -94,8 +94,8 @@ namespace CCompiler {
         public override void Dump(ParseNodeXml root) {
             ParseNodeXml blockNode = root.Node("ExtCall");
             blockNode.Attribute("Inline", Inline.ToString());
-            blockNode.Write("LibraryName", LibraryName);
-            blockNode.Write("Name", Name);
+            blockNode.Attribute("LibraryName", LibraryName);
+            blockNode.Attribute("Name", Name);
             if (Parameters != null) {
                 Parameters.Dump(blockNode);
             }

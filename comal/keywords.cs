@@ -322,7 +322,7 @@ namespace JComal {
             if (sym == null || !sym.Defined || (sym.Defined && sym.IsMethod)) {
                 if (token.ID == TokenID.EOL || token.ID == TokenID.LPAREN) {
                     _currentLine.PushToken(token);
-                    return KExecWithIdentifier(identToken);
+                    return ExecWithIdentifier(identToken);
                 }
             }
 
@@ -449,12 +449,9 @@ namespace JComal {
                 if (token.ID == TokenID.KWHEN) {
 
                     conditionalNode = ParseBinaryOpNode(ParseID.EQ, 0, exprNode);
-                    token = _currentLine.PeekToken();
-                    while (token.ID == TokenID.COMMA) {
-                        GetNextToken();
+                    while (TestToken(TokenID.COMMA)) {
                         ParseNode nextConditional = ParseBinaryOpNode(ParseID.EQ, 0, exprNode);
                         conditionalNode = CreateBinaryOpNode(ParseID.OR, conditionalNode, nextConditional);
-                        token = _currentLine.PeekToken();
                     }
                 } else if (token.ID != TokenID.KOTHERWISE) {
                     Messages.Error(MessageCode.MISSINGENDSTATEMENT, "WHEN or OTHERWISE expected");
@@ -493,7 +490,7 @@ namespace JComal {
                 SkipToEndOfLine();
                 return null;
             }
-            return KExecWithIdentifier(identToken);
+            return ExecWithIdentifier(identToken);
         }
 
         // ZONE
@@ -503,7 +500,7 @@ namespace JComal {
         // Sets the PRINT zone
         //
         private ParseNode KZone() {
-            ExtCallParseNode node = new("JComalLib.PrintManager,jcomallib", "set_Zone");
+            ExtCallParseNode node = GetFileManagerExtCallNode("set_Zone");
             node.Parameters = new();
             node.Parameters.Add(IntegerExpression(), false);
             return node;

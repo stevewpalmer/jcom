@@ -337,12 +337,19 @@ namespace JComal {
                         // Add this method to the global symbol table now.
                         if (method == null) {
                             method = _globalSymbols.Add(methodName, new SymFullType(), klass, null, lineNumber);
-                            method.Parent = parents.Peek();
-                            parents.Push(method);
                         }
                         if (klass == SymClass.FUNCTION) {
                             method.FullType = GetTypeFromName(methodName);
                         }
+
+                        if (TestToken(TokenID.KEXTERNAL)) {
+                            method.Modifier = SymModifier.EXTERNAL;
+                            method.ExternalLibrary = ParseStringLiteral();
+                        } else {
+                            method.Parent = parents.Peek();
+                            parents.Push(method);
+                        }
+
                         method.Parameters = parameters;
                         method.Defined = true;
                         method.Class = klass;
@@ -384,16 +391,17 @@ namespace JComal {
 
                 if (token.ID != TokenID.EOL) {
                     if (Array.IndexOf(endTokens, token.ID) >= 0) {
-                        break;
+                        return token.ID;
                     }
                     node.Add(MarkLine());
                     CompileLine(token, node);
                 }
             }
-            if (!_ls.EndOfFile && token.ID == TokenID.EOL ) {
-                string endTokenName = Tokens.TokenIDToString(endTokens[0]);
-                Messages.Error(MessageCode.MISSINGENDSTATEMENT, $"Missing {endTokenName}");
+            if (endTokens[0] == TokenID.ENDOFFILE) {
+                return token.ID;
             }
+            string endTokenName = Tokens.TokenIDToString(endTokens[0]);
+            Messages.Error(MessageCode.MISSINGENDSTATEMENT, $"Missing {endTokenName}");
             return token.ID;
         }
 
@@ -613,7 +621,7 @@ namespace JComal {
         private SimpleToken ExpectToken(TokenID expectedID) {
             SimpleToken token = GetNextToken();
             if (token.ID != expectedID) {
-                Messages.Error(MessageCode.EXPECTEDTOKEN, $"Expected '{Tokens.TokenIDToString(expectedID)}'");
+                Messages.Error(MessageCode.EXPECTEDTOKEN, $"Expected '{Tokens.TokenIDToString(expectedID)}' not '{Tokens.TokenIDToString(token.ID)}'");
                 return null;
             }
             return token;
@@ -662,7 +670,7 @@ namespace JComal {
         }
 
         // Check whether the next token is the one specified and skip it if so.
-        private bool TestAndSkipToken(TokenID id) {
+        private bool TestToken(TokenID id) {
             SimpleToken token = _currentLine.PeekToken();
             if (token.ID == id) {
                 GetNextToken();
@@ -841,7 +849,7 @@ namespace JComal {
         }
 
         // Generate a call to a subroutine given the specified identifier
-        private ParseNode KExecWithIdentifier(IdentifierToken identToken) {
+        private ParseNode ExecWithIdentifier(IdentifierToken identToken) {
             Symbol sym = GetSymbolForCurrentScope(identToken.Name);
             if (sym == null) {
                 Messages.Error(MessageCode.METHODNOTFOUND, $"{identToken.Name} not found");
@@ -849,18 +857,23 @@ namespace JComal {
                 return null;
             }
 
-            // If this was a parameter now being used as a function, change its
-            // class and type.
-            if (sym.Class != SymClass.SUBROUTINE) {
-                sym.Class = SymClass.SUBROUTINE;
-                sym.Defined = true;
-                sym.Linkage = SymLinkage.BYVAL;
+            // If this is an EXTERNAL symbol, create an ExtCall node for it
+            ParseNode node;
+            ParametersParseNode parameters = new();
+            if (sym.Modifier == SymModifier.EXTERNAL) {
+                node = new ExtCallParseNode {
+                    Parameters = parameters,
+                    LibraryName = sym.ExternalLibrary,
+                    Name = sym.Name
+                };
+            } else {
+                node = new CallParseNode {
+                    ProcName = new IdentifierParseNode(sym),
+                    Parameters = parameters
+                };
             }
-            sym.IsReferenced = true;
 
-            CallParseNode node = new();
-            node.ProcName = new IdentifierParseNode(sym);
-            node.Parameters = new ParametersParseNode();
+            sym.IsReferenced = true;
 
             int declParameterIndex = 0;
 
@@ -879,7 +892,12 @@ namespace JComal {
                             if (!valid) {
                                 Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in assignment");
                             }
-                            node.Parameters.Add(exprNode, symParameter.IsByRef);
+
+                            // For string types, always enforce fixed char over char for parameters.
+                            if (symParameter.Type == SymType.FIXEDCHAR) {
+                                exprNode.Type = SymType.FIXEDCHAR;
+                            }
+                            parameters.Add(exprNode, symParameter.IsByRef);
                             declParameterIndex++;
                         }
                         token = _currentLine.PeekToken();

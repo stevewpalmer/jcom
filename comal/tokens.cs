@@ -192,7 +192,8 @@ namespace JComal {
         KBITXOR = 154,
         KCHANGE = 155,
         KDIR = 156,
-        KIMPORT = 157
+        KIMPORT = 157,
+        KEXTERNAL = 158
     }
 
     /// <summary>
@@ -257,6 +258,7 @@ namespace JComal {
             { "exit",       TokenID.KEXIT       },
             { "exp",        TokenID.KEXP        },
             { "export",     TokenID.KEXPORT     },
+            { "external",   TokenID.KEXTERNAL   },
             { "false",      TokenID.KFALSE      },
             { "file",       TokenID.KFILE       },
             { "find",       TokenID.KFIND       },

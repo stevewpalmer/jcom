@@ -44,6 +44,16 @@ namespace JComal {
             return new Variant(0);
         }
 
+        // Parse and return a string literal
+        private string ParseStringLiteral() {
+            SimpleToken token = ExpectToken(TokenID.STRING);
+            if (token != null) {
+                StringToken stringToken = (StringToken)token;
+                return stringToken.String;
+            }
+            return null;
+        }
+
         // Parse an identifier
         private IdentifierToken ParseIdentifier() {
             SimpleToken token = ExpectToken(TokenID.IDENT);
@@ -144,6 +154,8 @@ namespace JComal {
 
             ProcedureParseNode node = new();
             IdentifierToken identToken = null;
+            SimpleToken token;
+            bool isImplicit = endToken == TokenID.ENDOFFILE;
 
             // Add the name to the global scope, ensuring it hasn't already been
             // defined.
@@ -172,15 +184,21 @@ namespace JComal {
                 parameters = ParseParameterDecl(_localSymbols, SymScope.PARAMETER);
             }
 
+            // EXTERNAL?
+            if (!isImplicit && TestToken(TokenID.KEXTERNAL)) {
+                method.Modifier = SymModifier.EXTERNAL;
+                SkipToEndOfLine();
+            }
+
             // Closed? If so, we create an _importSymbols table so to which any symbols
             // referenced by IMPORT are added. We also implicitly add any imported
             // symbols from our parent procedure if we're a nested procedure as there
             // is an implicit trust relationship between us. In addition, we add any
             // other nested procedures to _importSymbols since those are assumed to be
             // imported by default.
-            SimpleToken token = GetNextToken();
             SymbolCollection savedImportSymbols = _importSymbols;
-            if (token.ID == TokenID.KCLOSED) {
+            if (!isImplicit && !_currentLine.IsAtEndOfLine) {
+                ExpectToken(TokenID.KCLOSED);
                 _importSymbols = new SymbolCollection("Import");
                 if (savedImportSymbols != null) {
                     _importSymbols.Add(savedImportSymbols);
@@ -195,6 +213,11 @@ namespace JComal {
             method.Parameters = parameters;
             method.Defined = true;
             method.Class = klass;
+
+            // External methods are declarations only
+            if (method.Modifier == SymModifier.EXTERNAL) {
+                return null;
+            }
 
             if (methodName == _entryPointName) {
                 method.Modifier |= SymModifier.ENTRYPOINT;
@@ -266,31 +289,23 @@ namespace JComal {
                 if (_currentLine.PeekToken().ID != TokenID.RPAREN) {
                     do {
                         SymLinkage linkage = SymLinkage.BYVAL;
-                        token = GetNextToken();
-                        if (token.ID == TokenID.KREF) {
+                        if (TestToken(TokenID.KREF)) {
                             linkage = SymLinkage.BYREF;
-                        } else {
-                            _currentLine.PushToken(token);
                         }
                         IdentifierToken identToken = ParseIdentifier();
 
                         // Array parameters must be specified with (). Multiple
                         // dimensions are indicated with commas within the
                         // parenthesis.
-                        token = GetNextToken();
                         Collection<SymDimension> dimensions = new();
-                        if (token.ID == TokenID.LPAREN) {
+                        if (TestToken(TokenID.LPAREN)) {
                             do {
                                 dimensions.Add(new SymDimension {
                                     LowerBound = new NumberParseNode(1),
                                     UpperBound = new NumberParseNode(1)
                                 });
-                                token = GetNextToken();
-                            } while (token.ID == TokenID.COMMA);
-                            _currentLine.PushToken(token);
+                            } while (TestToken(TokenID.COMMA));
                             ExpectToken(TokenID.RPAREN);
-                        } else {
-                            _currentLine.PushToken(token);
                         }
 
                         if (identToken != null) {
@@ -382,10 +397,8 @@ namespace JComal {
         // Parse set of array dimensions if one is found.
         private Collection<SymDimension> ParseArrayDimensions() {
             Collection<SymDimension> dimensions = new();
-            SimpleToken token = _currentLine.PeekToken();
 
-            if (token.ID == TokenID.LPAREN) {
-                ExpectToken(TokenID.LPAREN);
+            if (TestToken(TokenID.LPAREN)) {
                 do {
                     do {
                         ParseNode intVal = IntegerExpression();
@@ -400,15 +413,12 @@ namespace JComal {
                         // specify a custom bound range with the lower:upper syntax.
                         ParseNode in1 = new NumberParseNode(1);
                         ParseNode in2 = intVal;
-                        token = GetNextToken();
-                        if (token.ID == TokenID.COLON) {
+                        if (TestToken(TokenID.COLON)) {
                             intVal = IntegerExpression();
                             if (intVal != null) {
                                 in1 = in2;
                                 in2 = intVal;
                             }
-                        } else {
-                            _currentLine.PushToken(token);
                         }
                         if (in2.IsConstant && in1.IsConstant) {
                             if (in2.Value.IntValue > 0 && in2.Value.IntValue < in1.Value.IntValue) {
@@ -422,13 +432,9 @@ namespace JComal {
                         } else {
                             dimensions.Add(dim);
                         }
-                        token = GetNextToken();
-                    } while (token.ID == TokenID.COMMA);
-                    _currentLine.PushToken(token);
+                    } while (TestToken(TokenID.COMMA));
                     ExpectToken(TokenID.RPAREN);
-                    token = GetNextToken();
-                } while (token.ID == TokenID.LPAREN);
-                _currentLine.PushToken(token);
+                } while (TestToken(TokenID.LPAREN));
             }
             return dimensions;
         }

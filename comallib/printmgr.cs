@@ -35,23 +35,6 @@ namespace JComalLib {
     public class PrintManager {
 
         /// <summary>
-        /// Default zone.
-        /// </summary>
-        public const int DefaultZone = 0;
-
-        /// <summary>
-        /// Default static constructor
-        /// </summary>
-        static PrintManager() {
-            Zone = DefaultZone;
-        }
-
-        /// <summary>
-        /// Get or set the default zone
-        /// </summary>
-        public static int Zone { get; set; }
-
-        /// <summary>
         /// Writes the specified string to the stdout device followed by a newline.
         /// </summary>
         /// <param name="stringToWrite">String to write</param>
@@ -148,14 +131,14 @@ namespace JComalLib {
             StringBuilder output = new();
             int fmtIndex = 0;
             int argIndex = 0;
-            int fieldWidth = Zone;
+            int fieldWidth = FileManager.Zone;
             bool useHex = false;
             if (row > 0 && column > 0 && iodevice == IOConstant.Stdout) {
                 Console.SetCursorPosition(column - 1, row - 1);
             }
 
             // Validate zone
-            if (Zone < 0) {
+            if (FileManager.Zone < 0) {
                 throw new JComRuntimeException(JComRuntimeErrors.ZONE_VALUE_INCORRECT);
             }
 
@@ -163,7 +146,7 @@ namespace JComalLib {
                 string result;
                 switch (formats[fmtIndex++]) {
                     case 'H':
-                        fieldWidth = Zone;
+                        fieldWidth = FileManager.Zone;
                         break;
                     case 'V':
                         fieldWidth = 0;

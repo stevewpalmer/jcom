@@ -520,7 +520,7 @@ namespace JComal {
                     }
 
                 case TokenID.KZONE: {
-                    ExtCallParseNode node = new("JComalLib.PrintManager,jcomallib", "get_Zone");
+                    ExtCallParseNode node = GetFileManagerExtCallNode("get_Zone");
                     return CastNodeToType(node, SymType.INTEGER);
                     }
 
@@ -559,9 +559,7 @@ namespace JComal {
 
                 case TokenID.KRND: {
                     ExtCallParseNode node = GetIntrinsicExtCallNode("RND");
-                    token = _currentLine.PeekToken();
-                    if (token.ID == TokenID.LPAREN) {
-                        ExpectToken(TokenID.LPAREN);
+                    if (TestToken(TokenID.LPAREN)) {
                         node.Parameters = new ParametersParseNode();
                         node.Parameters.Add(IntegerExpression(), true);
                         ExpectToken(TokenID.COMMA);

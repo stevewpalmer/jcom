@@ -44,7 +44,7 @@ namespace JComal {
         private ParseNode KOpen() {
 
             // Optional FILE keyword
-            TestAndSkipToken(TokenID.KFILE);
+            TestToken(TokenID.KFILE);
 
             ExtCallParseNode node = GetFileManagerExtCallNode("OPEN");
             ParametersParseNode paramsNode = new();
@@ -103,7 +103,7 @@ namespace JComal {
         private ParseNode KClose() {
 
             // Optional FILE keyword
-            TestAndSkipToken(TokenID.KFILE);
+            TestToken(TokenID.KFILE);
 
             ExtCallParseNode node = GetFileManagerExtCallNode("CLOSE");
             ParametersParseNode paramsNode = new();
@@ -139,7 +139,7 @@ namespace JComal {
             VarArgParseNode varargs = new();
 
             // Optional FILE number
-            TestAndSkipToken(TokenID.KFILE);
+            TestToken(TokenID.KFILE);
 
             ParseNode fileParseNode = IntegerExpression();
             ParseNode recnumParseNode = new NumberParseNode(0);
@@ -186,7 +186,7 @@ namespace JComal {
             List<IdentifierParseNode> identifiers = new();
 
             // Optional FILE number
-            TestAndSkipToken(TokenID.KFILE);
+            TestToken(TokenID.KFILE);
 
             ParseNode fileParseNode = IntegerExpression();
             ExpectToken(TokenID.COMMA);
@@ -240,10 +240,10 @@ namespace JComal {
             SimpleToken token;
 
             // Optional FILE number
-            TestAndSkipToken(TokenID.KFILE);
+            TestToken(TokenID.KFILE);
 
             // Optional positional statements.
-            if (TestAndSkipToken(TokenID.KAT)) {
+            if (TestToken(TokenID.KAT)) {
                 rowPosition = IntegerExpression();
                 ExpectToken(TokenID.COMMA);
                 columnPosition = IntegerExpression();
@@ -362,10 +362,10 @@ namespace JComal {
             ParseNode columnPosition = null;
 
             // Optional FILE number
-            TestAndSkipToken(TokenID.KFILE);
+            TestToken(TokenID.KFILE);
 
             // Optional positional statements.
-            if (TestAndSkipToken(TokenID.KAT)) {
+            if (TestToken(TokenID.KAT)) {
                 rowPosition = IntegerExpression();
                 ExpectToken(TokenID.COMMA);
                 columnPosition = IntegerExpression();

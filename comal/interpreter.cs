@@ -186,7 +186,7 @@ namespace JComal {
                                     oldLines = new Lines(Lines);
                                 }
                                 Lines.Clear();
-                                PrintManager.Zone = PrintManager.DefaultZone;
+                                FileManager.Zone = FileManager.DefaultZone;
                                 IsModified = false;
                                 break;
 
@@ -527,6 +527,7 @@ namespace JComal {
                             case TokenID.KUNTIL:
                             case TokenID.KTHEN:
                             case TokenID.KDO:
+                            case TokenID.KEXTERNAL:
                                 if (!line.IsAtEndOfStatement) {
                                     --indent;
                                 }

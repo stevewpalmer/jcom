@@ -180,8 +180,38 @@ namespace CCompiler {
             if (methodName == null) {
                 throw new ArgumentNullException(nameof(methodName));
             }
+            Type baseType;
+            if (!baseTypeName.Contains(",")) {
 
-            Type baseType = Type.GetType(baseTypeName);
+                // This is a Comal external library so, for the purpose of simplifying
+                // the syntax, we make some assumptions:
+                //
+                // 1. The library is in the same folder as the current program.
+                // 2. The library is a ".dll" if no explicit extension is given.
+                // 3. The namespace is the library basename.
+                // 4. The class is the library basename.
+                //
+                // Assumptions 3 and 4 derive from the way CCompiler builds the
+                // library. The class name is always the source filename without
+                // an extension and formatted as per CapitaliseString().
+                //
+                // If more flexibility is required, the caller simply needs to specify
+                // the ExternalLibrary fully qualified. E.g:
+                //
+                // Namespace.Class,Assembly
+                //
+                string currentDirectory = Directory.GetCurrentDirectory();
+                string typeDllPath = Path.Combine(currentDirectory, baseTypeName);
+                if (string.IsNullOrEmpty(Path.GetExtension(typeDllPath))) {
+                    typeDllPath = Path.ChangeExtension(typeDllPath, ".dll");
+                }
+                var dll = Assembly.LoadFile(typeDllPath);
+
+                string name = Path.GetFileNameWithoutExtension(baseTypeName).CapitaliseString();
+                baseType = dll.GetType(name + "." + name);
+            } else {
+                baseType = Type.GetType(baseTypeName);
+            }
             if (baseType == null) {
                 Error($"Type {baseTypeName} not found");
             }
@@ -253,6 +283,9 @@ namespace CCompiler {
             }
             bool needConstructor = false;
             foreach (Symbol sym in symbols) {
+                if (sym.IsExternal) {
+                    continue;
+                }
                 if (sym.IsMethod && sym.Defined && !sym.IsParameter) {
                     _prog.CreateMethod(sym);
                     continue;

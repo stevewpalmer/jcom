@@ -31,6 +31,23 @@ namespace JComalLib {
     public class FileManager {
 
         /// <summary>
+        /// Default zone.
+        /// </summary>
+        public const int DefaultZone = 0;
+
+        /// <summary>
+        /// Default static constructor
+        /// </summary>
+        static FileManager() {
+            Zone = DefaultZone;
+        }
+
+        /// <summary>
+        /// Get or set the default zone
+        /// </summary>
+        public static int Zone { get; set; }
+
+        /// <summary>
         /// Get the next available free file number.
         /// </summary>
         public static int FREEFILE {

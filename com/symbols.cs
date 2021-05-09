@@ -459,6 +459,12 @@ namespace CCompiler {
         public Symbol Parent { get; set; }
 
         /// <summary>
+        /// Get or sets the external library name for EXTERNAL procedures
+        /// or functions.
+        /// </summary>
+        public string ExternalLibrary { get; set; }
+
+        /// <summary>
         /// Gets or retrieves the block depth at which this symbol was set.
         /// </summary>
         /// <value>The depth.</value>
@@ -512,6 +518,12 @@ namespace CCompiler {
             }
             if (IsParameter) {
                 str.Append("local ");
+            }
+            if (IsExternal) {
+                str.Append("external ");
+                if (!string.IsNullOrEmpty(ExternalLibrary)) {
+                    str.Append("\"" + ExternalLibrary + "\" ");
+                }
             }
             str.Append(FullType + " " + Name);
             if (IsArray && Dimensions.Count > 0) {
@@ -706,6 +718,12 @@ namespace CCompiler {
             blockNode.Write("Class", Class.ToString());
             if (Modifier != 0) {
                 blockNode.Write("Modifiers", Modifier.ToString());
+            }
+            if (Parent != null) {
+                Parent.Dump(blockNode);
+            }
+            if (!string.IsNullOrEmpty(ExternalLibrary)) {
+                blockNode.Write("ExternalLibrary", ExternalLibrary);
             }
         }
     }
