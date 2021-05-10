@@ -104,6 +104,12 @@ namespace JComLib {
         ZONE_VALUE_INCORRECT = 11,
 
         /// <summary>
+        /// File already open for random access
+        /// </summary>
+        [Description("File already opened for RANDOM access")]
+        FILE_OPEN_FOR_RANDOM_ACCESS = 12,
+
+        /// <summary>
         /// Format record mismatch (Fortran)
         /// </summary>
         [Description("Format Record Mismatch")]

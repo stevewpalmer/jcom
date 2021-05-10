@@ -189,8 +189,10 @@ namespace JComal {
             TestToken(TokenID.KFILE);
 
             ParseNode fileParseNode = IntegerExpression();
-            ExpectToken(TokenID.COMMA);
-            ParseNode recnumParseNode = IntegerExpression();
+            ParseNode recnumParseNode = null;
+            if (TestToken(TokenID.COMMA)) {
+                recnumParseNode = IntegerExpression();
+            }
             ExpectToken(TokenID.COLON);
 
             while (!_currentLine.IsAtEndOfStatement) {
@@ -288,6 +290,9 @@ namespace JComal {
                     break;
                 }
                 isStringIdentifier = identNode.IsString;
+                if (isStringIdentifier && identNode.Symbol.IsArray) {
+                    Messages.Error(MessageCode.EXPECTEDTOKEN, "Cannot INPUT into a string array");
+                }
                 if (isStringIdentifier && hasStringIdentifier) {
                     Messages.Error(MessageCode.EXPECTEDTOKEN, "Only one string variable permitted in INPUT");
                 }

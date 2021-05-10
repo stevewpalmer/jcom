@@ -399,6 +399,9 @@ namespace JComal {
                 token = GetNextToken();
                 if (token.ID == TokenID.KOF) {
                     ParseNode intVal = IntegerExpression();
+                    if (sym.Type != SymType.FIXEDCHAR) {
+                        Messages.Error(MessageCode.INVALIDOF, "OF can only be used with strings");
+                    }
                     if (!intVal.IsConstant) {
                         Messages.Error(MessageCode.CONSTANTEXPECTED, "Number expected");
                     }
@@ -660,15 +663,16 @@ namespace JComal {
                 ParseNode statement = Statement(token);
                 if (statement != null) {
                     node.LoopBody.Add(statement);
+                    ExpectEndOfLine();
                 }
             } else {
                 // Long format
                 CompileBlock(node.LoopBody, new[] { TokenID.KNEXT });
-            }
 
-            // Check identifier matches
-            token = GetNextToken();
-            CheckEndOfBlockName(identToken, token);
+                // Check identifier matches
+                token = GetNextToken();
+                CheckEndOfBlockName(identToken, token);
+            }
 
             // Warn if the loop will be skipped
             if (node.IterationCount() == 0) {

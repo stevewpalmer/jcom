@@ -33,6 +33,23 @@ namespace JComalLib {
         private readonly IOFile _file;
 
         /// <summary>
+        /// Construct an InputManager for sequential file I/O.
+        /// </summary>
+        /// <param name="iodevice">The device to read from</param>
+        /// <param name="recordNumber">The number of the record to read</param>
+        public InputManager(int iodevice) {
+
+            _file = IOFile.Get(iodevice);
+            if (_file == null) {
+                throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN);
+            }
+            if (_file.RecordLength > 0) {
+                throw new JComRuntimeException(JComRuntimeErrors.FILE_OPEN_FOR_RANDOM_ACCESS);
+            }
+            _file.IsFormatted = false;
+        }
+
+        /// <summary>
         /// Construct an InputManager for random access file I/O.
         /// </summary>
         /// <param name="iodevice">The device to read from</param>
@@ -107,9 +124,19 @@ namespace JComalLib {
         /// <summary>
         /// Reads from the input into the specified float variable.
         /// </summary>
-        /// <param name="intValue">Float value that was read</param>
+        /// <param name="floatValue">Float value to be read</param>
         public void READ(ref float floatValue) {
             _file.ReadFloat(ref floatValue);
+        }
+
+        /// <summary>
+        /// Reads from the input into the specified float array.
+        /// </summary>
+        /// <param name="floatArray">Float array to be read</param>
+        public void READ(ref float [] floatArray) {
+            for (int index = 0; index < floatArray.Length; index++) {
+                _file.ReadFloat(ref floatArray[index]);
+            }
         }
 
         /// <summary>
@@ -121,6 +148,16 @@ namespace JComalLib {
         }
 
         /// <summary>
+        /// Reads from the input into the specified integer array.
+        /// </summary>
+        /// <param name="intArray">Integer array to be read</param>
+        public void READ(ref int[] intArray) {
+            for (int index = 0; index < intArray.Length; index++) {
+                _file.ReadInteger(ref intArray[index]);
+            }
+        }
+
+        /// <summary>
         /// Reads from the input into the specified string variable.
         /// </summary>
         /// <param name="stringData">String value that was read</param>
@@ -129,11 +166,31 @@ namespace JComalLib {
         }
 
         /// <summary>
-        /// Reads from the input into the specified string variable.
+        /// Reads from the input into the specified string array.
         /// </summary>
-        /// <param name="stringData">String value that was read</param>
-        public void READ(ref FixedString stringValue) {
-            _file.ReadString(ref stringValue, int.MaxValue);
+        /// <param name="stringArray">String array to be read</param>
+        public void READ(ref string[] stringArray) {
+            for (int index = 0; index < stringArray.Length; index++) {
+                _file.ReadString(ref stringArray[index], int.MaxValue);
+            }
+        }
+
+        /// <summary>
+        /// Reads from the input into the specified fixed string variable.
+        /// </summary>
+        /// <param name="fixedStringValue">String value that was read</param>
+        public void READ(ref FixedString fixedStringValue) {
+            _file.ReadString(ref fixedStringValue, int.MaxValue);
+        }
+
+        /// <summary>
+        /// Reads from the input into the specified fixed string array.
+        /// </summary>
+        /// <param name="fixedstringArray">String array to be read</param>
+        public void READ(ref FixedString[] fixedstringArray) {
+            for (int index = 0; index < fixedstringArray.Length; index++) {
+                _file.ReadString(ref fixedstringArray[index], int.MaxValue);
+            }
         }
     }
 }

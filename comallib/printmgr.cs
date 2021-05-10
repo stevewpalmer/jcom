@@ -39,8 +39,7 @@ namespace JComalLib {
         /// </summary>
         /// <param name="stringToWrite">String to write</param>
         public static void WRITE(string stringToWrite) {
-            IOFile file = IOFile.Get(IOConstant.Stdout);
-            file.WriteLine(stringToWrite, true);
+            WRITE(0, 0, IOConstant.Stdout, "S", new object[] { stringToWrite });
         }
 
         /// <summary>
@@ -48,8 +47,23 @@ namespace JComalLib {
         /// </summary>
         /// <param name="stringToWrite">String to write</param>
         public static void WRITE(FixedString stringToWrite) {
-            IOFile file = IOFile.Get(IOConstant.Stdout);
-            file.WriteLine(stringToWrite.ToString(), true);
+            WRITE(0, 0, IOConstant.Stdout, "S", new object[] { stringToWrite });
+        }
+
+        /// <summary>
+        /// Writes the specified string array to the stdout device followed by a newline.
+        /// </summary>
+        /// <param name="stringArray">String array to write</param>
+        public static void WRITE(FixedString[] stringArray) {
+            WRITE(0, 0, IOConstant.Stdout, "S", new object[] { stringArray });
+        }
+
+        /// <summary>
+        /// Writes the specified string array to the stdout device followed by a newline.
+        /// </summary>
+        /// <param name="stringArray">String array to write</param>
+        public static void WRITE(string[] stringArray) {
+            WRITE(0, 0, IOConstant.Stdout, "S", new object[] { stringArray });
         }
 
         /// <summary>
@@ -59,11 +73,7 @@ namespace JComalLib {
         /// <param name="column">Column at which to write. 0 means don't change the column.</param>
         /// <param name="stringToWrite">String to write</param>
         public static void WRITE(int row, int column, string stringToWrite) {
-            IOFile file = IOFile.Get(IOConstant.Stdout);
-            if (row > 0 && column > 0) {
-                Console.SetCursorPosition(column - 1, row - 1);
-            }
-            file.WriteLine(stringToWrite, true);
+            WRITE(row, column, IOConstant.Stdout, "S", new object[] { stringToWrite });
         }
 
         /// <summary>
@@ -73,11 +83,7 @@ namespace JComalLib {
         /// <param name="column">Column at which to write. 0 means don't change the column.</param>
         /// <param name="stringToWrite">String to write</param>
         public static void WRITE(int row, int column, FixedString stringToWrite) {
-            IOFile file = IOFile.Get(IOConstant.Stdout);
-            if (row > 0 && column > 0) {
-                Console.SetCursorPosition(column - 1, row - 1);
-            }
-            file.WriteLine(stringToWrite.ToString(), true);
+            WRITE(row, column, IOConstant.Stdout, "S", new object[] { stringToWrite });
         }
 
         /// <summary>
@@ -120,7 +126,7 @@ namespace JComalLib {
         /// <param name="iodevice">The device to read from</param>
         /// <param name="formatString">Format string</param>
         /// <param name="args">Write arguments</param>
-        public static void WRITE(int row, int column, int iodevice, string formatString, params object [] args) {
+        public static void WRITE(int row, int column, int iodevice, string formatString, params object[] args) {
             IOFile file = IOFile.Get(iodevice);
             if (file == null) {
                 file = new IOFile(iodevice);
@@ -143,7 +149,6 @@ namespace JComalLib {
             }
 
             while (fmtIndex < formatString.Length) {
-                string result;
                 switch (formats[fmtIndex++]) {
                     case 'H':
                         fieldWidth = FileManager.Zone;
@@ -182,40 +187,50 @@ namespace JComalLib {
                             if (fmtIndex < formats.Length && formats[fmtIndex] == 'H') {
                                 fieldWidth = FileManager.Zone;
                             }
-                            string str;
-                            if (args[argIndex] is FixedString) {
-                                str = (args[argIndex] as FixedString).ToString();
+                            if (args[argIndex] is string[] stringArray) {
+                                foreach (string stringElement in stringArray) {
+                                    WriteValue(output, stringElement.ToString(), fieldWidth);
+                                    output.Append(" ");
+                                }
+                            } else if (args[argIndex] is FixedString[] fixedStringArray) {
+                                foreach (FixedString fixedStringElement in fixedStringArray) {
+                                    WriteValue(output, fixedStringElement.ToString(), fieldWidth);
+                                    output.Append(" ");
+                                }
                             } else {
-                                str = args[argIndex] as string;
+                                if (args[argIndex] is FixedString fixedString) {
+                                    WriteValue(output, fixedString.ToString(), fieldWidth);
+                                } else if (args[argIndex] is string nativeString) {
+                                    WriteValue(output, nativeString, fieldWidth);
+                                }
                             }
                             argIndex++;
-                            if (str != null) {
-                                result = str;
-                                if (fieldWidth > 0 && result.Length < fieldWidth) {
-                                    result = result.PadRight(fieldWidth);
-                                }
-                                output.Append(result);
-                            }
                             break;
                         }
                     case 'I': {
-                            if (args[argIndex++] is int intValue) {
-                                result = useHex ? intValue.ToString("X") : intValue.ToString();
-                                if (fieldWidth > 0 && result.Length < fieldWidth) {
-                                    result = result.PadLeft(fieldWidth);
-                                }
-                                output.Append(result);
+                            if (args[argIndex] is int intValue) {
+                                WriteValue(output, intValue, useHex, fieldWidth);
                             }
+                            else if (args[argIndex] is int[] intArray) {
+                                foreach (int intElement in intArray) {
+                                    WriteValue(output, intElement, useHex, fieldWidth);
+                                    output.Append(" ");
+                                }
+                            }
+                            argIndex++;
                             break;
                         }
                     case 'F': {
-                            if (args[argIndex++] is float floatValue) {
-                                result = useHex ? ((int)floatValue).ToString("X") : floatValue.ToString();
-                                if (fieldWidth > 0 && result.Length < fieldWidth) {
-                                    result = result.PadLeft(fieldWidth);
-                                }
-                                output.Append(result);
+                            if (args[argIndex] is float floatValue) {
+                                WriteValue(output, floatValue, useHex, fieldWidth);
                             }
+                            else if (args[argIndex] is float[] floatArray) {
+                                foreach (float floatElement in floatArray) {
+                                    WriteValue(output, floatElement, useHex, fieldWidth);
+                                    output.Append(" ");
+                                }
+                            }
+                            argIndex++;
                             break;
                         }
                 }
@@ -227,6 +242,32 @@ namespace JComalLib {
             if (file != null) {
                 file.Flush();
             }
+        }
+
+        // Write an integer value
+        private static void WriteValue(StringBuilder output, int intValue, bool useHex, int fieldWidth) {
+            string result = useHex ? intValue.ToString("X") : intValue.ToString();
+            if (fieldWidth > 0 && result.Length < fieldWidth) {
+                result = result.PadLeft(fieldWidth);
+            }
+            output.Append(result);
+        }
+
+        // Write a float value
+        private static void WriteValue(StringBuilder output, float floatValue, bool useHex, int fieldWidth) {
+            string result = useHex ? floatValue.ToString("X") : floatValue.ToString();
+            if (fieldWidth > 0 && result.Length < fieldWidth) {
+                result = result.PadLeft(fieldWidth);
+            }
+            output.Append(result);
+        }
+
+        // Write a string value
+        private static void WriteValue(StringBuilder output, string stringValue, int fieldWidth) {
+            if (fieldWidth > 0 && stringValue.Length < fieldWidth) {
+                stringValue = stringValue.PadRight(fieldWidth);
+            }
+            output.Append(stringValue);
         }
     }
 }

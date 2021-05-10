@@ -687,6 +687,9 @@ namespace CCompiler {
         /// <param name="actualType">The actual type of the operation</param>
         /// <param name="typeNeeded">The type needed.</param>
         public SymType ConvertType(SymType actualType, SymType typeNeeded) {
+            if (actualType == SymType.REF) {
+                return actualType;
+            }
             if (actualType != typeNeeded) {
                 switch (typeNeeded) {
                     case SymType.NONE:      typeNeeded = actualType; break;

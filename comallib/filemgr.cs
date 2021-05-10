@@ -179,24 +179,60 @@ namespace JComalLib {
                     file.WriteDouble(doubleValue);
                     continue;
                 }
+                if (arg is double[] doubleArray) {
+                    foreach (double doubleElement in doubleArray) {
+                        file.WriteDouble(doubleElement);
+                    }
+                    continue;
+                }
                 if (arg is float floatValue) {
                     file.WriteFloat(floatValue);
+                    continue;
+                }
+                if (arg is float [] floatArray) {
+                    foreach (float floatElement in floatArray) {
+                        file.WriteFloat(floatElement);
+                    }
                     continue;
                 }
                 if (arg is string stringValue) {
                     file.WriteString(stringValue);
                     continue;
                 }
+                if (arg is string[] stringArray) {
+                    foreach (string floatElement in stringArray) {
+                        file.WriteString(floatElement);
+                    }
+                    continue;
+                }
                 if (arg is FixedString fixedStringValue) {
                     file.WriteString(fixedStringValue.ToString());
+                    continue;
+                }
+                if (arg is FixedString[] fixedStringArray) {
+                    foreach (FixedString fixedStringElement in fixedStringArray) {
+                        file.WriteString(fixedStringElement.ToString());
+                    }
                     continue;
                 }
                 if (arg is int intValue) {
                     file.WriteInteger(intValue);
                     continue;
                 }
+                if (arg is int[] intArray) {
+                    foreach (int intElement in intArray) {
+                        file.WriteInteger(intElement);
+                    }
+                    continue;
+                }
                 if (arg is bool boolValue) {
                     file.WriteBoolean(boolValue);
+                    continue;
+                }
+                if (arg is bool[] boolArray) {
+                    foreach (bool boolElement in boolArray) {
+                        file.WriteBoolean(boolElement);
+                    }
                     continue;
                 }
             }
