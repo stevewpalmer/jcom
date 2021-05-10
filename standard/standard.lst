@@ -41,6 +41,7 @@
      9380   
      9390   PROC type(filename$) CLOSED
      9395     IMPORT waitkey
+     9396     IMPORT file'exists
      9400     IF file'exists(filename$) THEN
      9410       f#:=FREEFILE
      9420       OPEN FILE f#, filename$, READ 
@@ -231,7 +232,7 @@
     11180   ENDPROC
     11190   
     11200   PROC getfiles(REF infile$, REF outfile$) CLOSED
-    11205     IMPORT pause,clearlines
+    11205     IMPORT pause,clearlines,UPPER$
     11206     IMPORT getinfile,getoutfile
     11210     row:=CURROW
     11220     REPEAT

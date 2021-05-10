@@ -254,8 +254,10 @@ namespace JComal {
 
                 Symbol thisSymbol = _currentProcedure.ProcedureSymbol;
                 ParseNode exprNode = Expression();
-                if (!ValidateAssignmentTypes(thisSymbol.Type, exprNode.Type)) {
-                    Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in RETURN");
+                if (exprNode != null) {
+                    if (!ValidateAssignmentTypes(thisSymbol.Type, exprNode.Type)) {
+                        Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in RETURN");
+                    }
                 }
                 node.ReturnExpression = exprNode;
             }
@@ -333,6 +335,7 @@ namespace JComal {
             while (true) {
                 IdentifierParseNode identNode = (IdentifierParseNode)ParseIdentifierFromToken(identToken);
                 if (identNode == null) {
+                    SkipToEndOfLine();
                     break;
                 }
                 identifiers.Add(identNode);

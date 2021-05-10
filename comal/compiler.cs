@@ -860,7 +860,7 @@ namespace JComal {
             // If this is an EXTERNAL symbol, create an ExtCall node for it
             ParseNode node;
             ParametersParseNode parameters = new();
-            if (sym.Modifier == SymModifier.EXTERNAL) {
+            if (sym.Modifier.HasFlag(SymModifier.EXTERNAL)) {
                 node = new ExtCallParseNode {
                     Parameters = parameters,
                     LibraryName = sym.ExternalLibrary,
@@ -874,6 +874,9 @@ namespace JComal {
             }
 
             sym.IsReferenced = true;
+            if (sym.Class == SymClass.FUNCTION) {
+                node.Type = sym.Type;
+            }
 
             int declParameterIndex = 0;
 

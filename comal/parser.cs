@@ -82,19 +82,34 @@ namespace JComal {
         // symbol to the identifier parse node.
         private IdentifierParseNode ParseIdentifierFromToken(IdentifierToken identToken) {
             IdentifierParseNode node = ParseIdentifierParseNode();
+            Debug.Assert(node != null);
 
-            if (node != null) {
-                Symbol sym = GetMakeSymbolForCurrentScope(identToken.Name);
-                if (sym == null) {
-                    Messages.Error(MessageCode.UNDEFINEDVARIABLE, $"Undefined identifier {identToken.Name}");
-                    return null;
-                }
-                if (sym != null && sym.IsArray && sym.Dimensions.Count != node.Indexes.Count) {
-                    Messages.Error(MessageCode.MISSINGARRAYDIMENSIONS, "Incorrect number of array indexes");
-                }
-                node.Symbol = sym;
-                sym.IsReferenced = true;
+            Symbol sym = GetMakeSymbolForCurrentScope(identToken.Name);
+
+            // Make sure array indexes match only where they are specified
+            if (sym.IsArray && node.Indexes != null && sym.Dimensions.Count != node.Indexes.Count) {
+                Messages.Error(MessageCode.MISSINGARRAYDIMENSIONS, "Incorrect number of array indexes");
             }
+
+            // Substring specification can only be used on strings
+            else if (node.HasSubstring && sym.Type != SymType.FIXEDCHAR) {
+                Messages.Error(MessageCode.TYPEMISMATCH, "Substrings can only be used on string variables");
+            }
+
+            // If this a string and we've got array indexes? If so then this is
+            // a non-standard substring reference. Fix this up unless strict is
+            // specified in which case this is an error
+            else if (sym.Type == SymType.FIXEDCHAR && !sym.IsArray && node.HasIndexes) {
+                if (_opts.Strict || node.Indexes.Count > 1) {
+                    Messages.Error(MessageCode.BADSUBSTRINGSPEC, $"Substring must have start and end specification");
+                } else {
+                    node.SubstringStart = node.Indexes[0];
+                    node.SubstringEnd = node.Indexes[0];
+                    node.Indexes = null;
+                }
+            }
+            node.Symbol = sym;
+            sym.IsReferenced = true;
             return node;
         }
 
@@ -203,6 +218,7 @@ namespace JComal {
                 if (savedImportSymbols != null) {
                     _importSymbols.Add(savedImportSymbols);
                 };
+                _importSymbols.Add(method);
                 AddChildSymbols(_importSymbols, method);
             }
 

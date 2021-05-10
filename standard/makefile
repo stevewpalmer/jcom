@@ -3,7 +3,13 @@ DROP=../drop
 JFOR=mono $(DROP)/jfor.exe $(JFLAGS)
 JCOMAL=mono $(DROP)/jcomal.exe $(JFLAGS)
 
-all: append.exe and.exe and2.exe standard.dll substrings.exe jcomlib.dll jcomallib.dll jforlib.dll
+SOURCES=append.exe and.exe and2.exe standard.dll substrings.exe
+
+BINARIES=jcomlib.dll jcomallib.dll jforlib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll $(DROP)/jfor.exe
+
+all: $(SOURCES)
+
+$(SOURCES): $(BINARIES)
 
 jcomlib.dll: $(DROP)/jcomlib.dll
 	cp $(DROP)/jcomlib.dll .
@@ -14,12 +20,12 @@ jforlib.dll: $(DROP)/jforlib.dll
 jcomallib.dll: $(DROP)/jcomallib.dll
 	cp $(DROP)/jcomallib.dll .
 
-%.exe : %.lst
+%.dll %.exe : %.lst
 	$(JCOMAL) $<
 
 %.exe : %.FOR
 	$(JFOR) $<
 
 clean:
-	-rm *.exe *.pdb *.exe.mdb *.out FORT.*
+	-rm *.exe *.dll *.pdb *.exe.mdb *.out FORT.*
 

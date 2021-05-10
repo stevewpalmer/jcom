@@ -381,6 +381,7 @@ namespace CCompiler {
         NOTINCLOSED,
         METHODNOTFOUND,
         ALREADYIMPORTED,
-        UNDEFINEDFUNCTION
+        UNDEFINEDFUNCTION,
+        BADSUBSTRINGSPEC
     }
 }

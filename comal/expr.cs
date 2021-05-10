@@ -572,7 +572,7 @@ namespace JComal {
                 case TokenID.KSPC:      return KSpc();
                 case TokenID.KSTR:      return KStr();
                 case TokenID.KGET:      return KGet();
-                case TokenID.KTIME:     return KGetTime();
+                case TokenID.KTIME:     return KTime();
 
                 case TokenID.KLOG:      return InlineDouble("LOG10");
                 case TokenID.KSIN:      return InlineDouble("SIN");
@@ -609,48 +609,13 @@ namespace JComal {
 
                 case TokenID.IDENT: {
                     IdentifierToken identToken = (IdentifierToken)token;
-                    bool match = false;
 
-                    // Parse the entire identifier, including array and
-                    // substring references.
-                    IdentifierParseNode node = ParseIdentifierParseNode();
-
-                    // Possible function?
+                    // Function?
                     Symbol sym = _globalSymbols.Get(identToken.Name);
                     if (sym != null && sym.Class == SymClass.FUNCTION) {
-                        return FunctionOperand(identToken.Name, node);
+                        return ExecWithIdentifier(identToken);
                     }
-
-                    // OK if we're an array.
-                    sym = _localSymbols.Get(identToken.Name);
-                    if (sym != null && sym.IsArray) {
-                        if (node.Indexes != null && sym.Dimensions.Count != node.Indexes.Count) {
-                            Messages.Error(MessageCode.MISSINGARRAYDIMENSIONS, "Incorrect number of array indexes");
-                        }
-                        match = true;
-                    }
-
-                    // Substrings? Must be fixed character type
-                    if (!match && node.HasSubstring) {
-                        sym = GetMakeSymbolForCurrentScope(identToken.Name);
-                        if (sym != null && sym.Type != SymType.FIXEDCHAR) {
-                            Messages.Error(MessageCode.TYPEMISMATCH, "Character type expected");
-                            return null;
-                        }
-                    }
-
-                    // Anything else is an identifier.
-                    if (sym == null) {
-                        sym = GetMakeSymbolForCurrentScope(identToken.Name);
-                        if (sym == null) {
-                            Messages.Error(MessageCode.UNDEFINEDVARIABLE, $"Undefined identifier {identToken.Name}");
-                            return node;
-                        }
-                    }
-
-                    sym.IsReferenced = true;
-                    node.Symbol = sym;
-                    return node;
+                    return ParseIdentifierFromToken(identToken);
                 }
             }
             Messages.Error(MessageCode.UNRECOGNISEDOPERAND, "Unrecognised operand");
@@ -765,38 +730,10 @@ namespace JComal {
         }
 
         // Generate code to retrieve the current value of TIME
-        private ParseNode KGetTime() {
+        private ParseNode KTime() {
 
             ExtCallParseNode node = GetIntrinsicExtCallNode("get_TIME");
             return CastNodeToType(node, SymType.INTEGER);
-        }
-
-        // Parse a function call operand
-        private ParseNode FunctionOperand(string name, IdentifierParseNode identNode) {
-
-            CallParseNode node = new();
-
-            // Look for this symbol name in the local table which means its type
-            // was predefined.
-            Symbol method = _globalSymbols.Get(name);
-            if (method == null) {
-                Messages.Error(MessageCode.UNDEFINEDFUNCTION, $"Undefined function {name}");
-                return node;
-            }
-
-            method.IsReferenced = true;
-
-            node.ProcName = new IdentifierParseNode(method);
-            node.Parameters = new ParametersParseNode();
-            node.Type = method.Type;
-
-            CastNodeToType(node, method.Type);
-            if (identNode.Indexes != null) {
-                foreach (ParseNode t in identNode.Indexes) {
-                    node.Parameters.Add(t, true);
-                }
-            }
-            return node;
         }
 
         // Do type equalisation on the expression node and report an error if the
