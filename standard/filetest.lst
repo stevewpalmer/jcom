@@ -1,0 +1,118 @@
+   10 DIM filename$ OF 20, filename2$ OF 20, reply$ OF 1
+   20 DIM temp$ OF 40, temp2$ OF 40, screen$ OF 5
+   30 DIM text$ OF 999, text2$ OF 999
+   40 filename$:="uqtestzp.dat"; filename2$:="uqtestzu.dat"
+   50 PAGE
+   60 PRINT "==> making sure files";filename$;
+   70 PRINT "and";filename2$;"are deleted..."
+   80 DELETE filename$
+   90 DELETE filename2$
+  100 PRINT "OK"
+  110 PRINT "==> creating";filename$;"as random file..."
+  120 CREATE filename$,10,40
+  130 PRINT "==> opening";filename$;"as random file..."
+  140 OPEN FILE 7,filename$,RANDOM 40
+  150 PRINT "==> writing 10 records to";filename$;"...";
+  160 FOR x:=10 TO 1 STEP -1 DO
+  170   PRINT X;
+  180   WRITE FILE 7,x: "line",x
+  190 ENDFOR x
+  200 PRINT "OK"
+  210 PRINT "==> Reading the 10 lines back..."
+  220 FOR x:=1 TO 10 DO
+  230   READ FILE 7,x: temp$,line
+  240   PRINT temp$;line;
+  250   IF temp$<>"line" OR line<>x THEN
+  260     CLOSE
+  270     END "error in RANDOM file"
+  280   ENDIF
+  290 ENDFOR x
+  300 PRINT "OK"
+  310 PRINT "==> closing the file..."
+  320 CLOSE
+  330 PRINT "==> deleting file";filename$
+  340 DELETE filename$
+  350 PRINT "==> file redirection not possible"
+  360 OPEN FILE 7,filename$,WRITE
+  370 WHILE NOT EOD DO
+  380   READ temp$
+  390   PRINT FILE 7: temp$
+  400 ENDWHILE
+  410 PRINT FILE 7: CHR$(12),
+  420 CLOSE FILE 7
+  430 PRINT "==> opening file";filename$;"for append..."
+  440 OPEN FILE 4,filename$,APPEND
+  450 PRINT "==> writing to file..."
+  460 number#:=7
+  470 PRINT FILE 4: number#
+  480 PRINT "==> closing file"
+  490 CLOSE FILE 4
+  500 RESTORE
+  510 PRINT "==> opening file";filename$;"to read..."
+  520 OPEN FILE 2,filename$,READ
+  530 PRINT "==> reading from file..."
+  540 WHILE NOT EOD DO
+  550   READ temp$//from DATA statements
+  560   INPUT FILE 2: temp2$
+  570   PRINT temp2$;"..."
+  580   IF temp$<>temp2$ THEN
+  590     CLOSE
+  600     END "PRINT to file or INPUT FILE failed"
+  610   ENDIF
+  620 ENDWHILE
+  630 PRINT
+  640 PRINT "==> GET$ checking Form Feed from PAGE...";
+  650 IF GET$(2,1)<>CHR$(12) THEN
+  660   CLOSE
+  670   END "PAGE or GET$ failed."
+  680 ENDIF
+  690 PRINT "OK"
+  700 PRINT "==> reading back integer as a string...";
+  710 INPUT FILE 2: temp2$
+  720 PRINT temp2$
+  730 IF temp2$<>"7" THEN
+  740   CLOSE
+  750   END "PRINT number#/INPUT FILE as string FAILed"
+  760 ENDIF
+  770 PRINT "==> checking for EOF flag set...";
+  780 IF NOT EOF(2) THEN
+  790   CLOSE
+  800   END "End Of File not found"
+  810 ENDIF
+  820 PRINT "OK"
+  830 CLOSE FILE 2
+  840 RESTORE
+  850 PRINT "==> checking GET$...";
+  860 OPEN FILE 2,filename$,READ
+  870 READ temp$ //from DATA statements again
+  880 temp2$:=GET$(2,10)
+  890 CLOSE
+  900 IF temp2$<>temp$(1:10) THEN
+  910   END "GET$ failed"
+  920 ENDIF
+  930 PRINT "OK"
+  940 PRINT "==> Open 2 files at once:";
+  950 PRINT "One READ - One WRITE - (file copy)"
+  960 OPEN FILE 1,filename$,READ'
+  970 OPEN FILE 2,filename2$,WRITE
+  980 PRINT FILE 2: GET$(1,999), // copy whole FILE
+  990 CLOSE
+ 1000 PRINT "==> checking if file copy worked...";
+ 1010 OPEN FILE 1,filename$,READ
+ 1020 OPEN FILE 2,filename2$,READ
+ 1030 text$:=GET$(1,999); text2$:=GET$(2,999)
+ 1040 CLOSE
+ 1050 IF text$<>text2$ THEN
+ 1060   END "Failed."
+ 1070 ENDIF
+ 1080 PRINT "OK"
+ 1090 DELETE filename$// done with it
+ 1100 DELETE filename2$ // done with it
+ 1110 PRINT "APPEND, READ, WRITE, RANDOM,";
+ 1120 PRINT "OPEN, CLOSE, SELECT, CREATE,"
+ 1130 PRINT "PRINT FILE, INPUT FILE, GET$,";
+ 1140 PRINT "WRITE FILE, READ FILE, EOF"
+ 1150 INPUT "==> all tests passed. press <return>:": reply$
+ 1160 DATA "Mary had a little lamb"
+ 1170 DATA "Jack and Jill"
+ 1180 DATA "Happily ever after"

@@ -189,7 +189,7 @@ namespace JComalLib {
                     file.WriteFloat(floatValue);
                     continue;
                 }
-                if (arg is float [] floatArray) {
+                if (arg is float[] floatArray) {
                     foreach (float floatElement in floatArray) {
                         file.WriteFloat(floatElement);
                     }
@@ -236,6 +236,7 @@ namespace JComalLib {
                     continue;
                 }
             }
+            file.Flush();
         }
 
         /// <summary>
@@ -243,7 +244,7 @@ namespace JComalLib {
         /// </summary>
         /// <param name="iodevice">The file number to test for EOF</param>
         /// <returns>True if we've reached EOF, false otherwise</returns>
-        public bool EOF(int iodevice) {
+        public static bool EOF(int iodevice) {
 
             IOFile file = IOFile.Get(iodevice);
             if (file == null) {

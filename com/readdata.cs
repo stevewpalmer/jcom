@@ -113,6 +113,9 @@ namespace CCompiler {
                 if (identifierType == SymType.INTEGER) {
                     identifierType = SymType.FLOAT;
                 }
+                if (identifierType == SymType.FIXEDCHAR) {
+                    identifierType = SymType.CHAR;
+                }
                 cg.Emitter.LoadElementReference(identifierType);
                 cg.Emitter.ConvertType(identifierType, identifier.Type);
                 if (sym.IsArray) {

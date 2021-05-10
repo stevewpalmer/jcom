@@ -26,8 +26,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using CCompiler;
 using JComalLib;
 using JComLib;
@@ -220,6 +218,7 @@ namespace JComal {
                     if (!string.IsNullOrEmpty(e.Message)) {
                         Console.WriteLine(e.Message);
                     }
+                    FileManager.CLOSE();
                 }
             }
         }
@@ -687,6 +686,7 @@ namespace JComal {
             compiler.CompileLines(lines);
             if (compiler.Messages.ErrorCount == 0) {
                 compiler.Execute();
+                FileManager.CLOSE();
             }
         }
 

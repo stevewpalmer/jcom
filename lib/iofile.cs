@@ -569,14 +569,14 @@ namespace JComLib {
         /// <summary>
         /// Read the specified number of characters from the file stream.
         /// </summary>
-        /// <param name="intValue">A reference to the integer to be set</param>
-        /// <returns>The number of bytes read</returns>
+        /// <param name="count">The number of characters to read</param>
+        /// <returns>The string read</returns>
         public virtual string ReadChars(int count) {
             if (_isDisposed) {
                 throw new ObjectDisposedException(GetType().Name);
             }
             string value = string.Empty;
-            ReadString(ref value, count);
+            ReadCharacters(ref value, count);
             return value;
         }
 
@@ -787,6 +787,45 @@ namespace JComLib {
         }
 
         /// <summary>
+        /// Read a given number of characters from the data file.
+        /// </summary>
+        /// <param name="strValue">A reference to the string to be set</param>
+        /// <param name="count">Maximum number of characters to read</param>
+        /// <returns>The number of bytes read</returns>
+        public int ReadCharacters(ref string strValue, int count) {
+            if (_isDisposed) {
+                throw new ObjectDisposedException(GetType().Name);
+            }
+            if (IsFormatted) {
+                StringBuilder strBuilder = new();
+
+                if (count > 0) {
+                    char ch = ReadChar();
+                    int charsRead = 0;
+                    while (ch != EOF && charsRead < count) {
+                        strBuilder.Append(ch);
+                        ch = ReadChar();
+                        ++charsRead;
+                    }
+                    SkipSeparators(ch);
+                }
+                strValue = strBuilder.ToString();
+                return strValue.Length;
+            } else {
+                int intSize = sizeof(int);
+                byte[] intBuffer = new byte[intSize];
+                if (ReadBytes(intBuffer, intSize) != intSize) {
+                    return 0;
+                }
+                int stringLength = BitConverter.ToInt32(intBuffer, 0);
+                byte[] data = new byte[stringLength];
+                int bytesRead = ReadBytes(data, stringLength);
+                strValue = Encoding.ASCII.GetString(data, 0, bytesRead);
+                return bytesRead + sizeof(int);
+            }
+        }
+
+        /// <summary>
         /// Read a string from an formatted data file into a fixed string.
         /// The string is truncated to fit the fixed string length.
         /// </summary>
@@ -818,6 +857,10 @@ namespace JComLib {
                     char ch = ReadChar();
                     int charsRead = 0;
                     while (ch != EOL && charsRead < count) {
+                        if (ch == '\r') {
+                            ch = ReadChar();
+                            break;
+                        }
                         strBuilder.Append(ch);
                         ch = ReadChar();
                         ++charsRead;
@@ -897,6 +940,7 @@ namespace JComLib {
                 _recordLength = value;
                 if (_recordLength > 0) {
                     _writeBuffer = new byte[_recordLength];
+                    _writeBufferIndex = 0;
                 }
             }
         }
@@ -969,6 +1013,9 @@ namespace JComLib {
                 }
                 byte outByte = 0;
                 if (!ReadByte(ref outByte)) {
+                    if (bufferIndex == 0) {
+                        return null;
+                    }
                     break;
                 }
                 if (outByte == '\n') {
@@ -1011,10 +1058,9 @@ namespace JComLib {
             int dataIndex = 0;
 
             while (dataIndex < bytesToWrite) {
-                if (_writeBufferIndex == _writeBufferSize && RecordLength == 0) {
+                if (_writeBufferIndex == _writeBufferSize) {
                     _writeBufferSize += 256;
                     Array.Resize(ref _writeBuffer, _writeBufferSize);
-                    _writeBufferIndex = 0;
                 }
                 _writeBuffer[_writeBufferIndex++] = data[dataIndex++];
             }
