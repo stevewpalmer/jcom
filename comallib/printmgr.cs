@@ -179,6 +179,9 @@ namespace JComalLib {
                             if (fmtIndex < formats.Length && formats[fmtIndex] == 'V') {
                                 fieldWidth = 0;
                             }
+                            if (fmtIndex < formats.Length && formats[fmtIndex] == 'H') {
+                                fieldWidth = FileManager.Zone;
+                            }
                             string str;
                             if (args[argIndex] is FixedString) {
                                 str = (args[argIndex] as FixedString).ToString();

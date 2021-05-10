@@ -96,7 +96,7 @@ namespace JComalLib {
             };
             file.IsNew = mode == "w";
             file.IsSequential = mode != "x";
-            if (!file.IsSequential && !File.Exists(filename)) {
+            if ((mode == "w+" || mode == "x") && !File.Exists(filename)) {
                 file.IsNew = true;
             }
             file.Open();

@@ -795,7 +795,7 @@ namespace JComLib {
         public int ReadString(ref FixedString strValue, int count) {
             string value = null;
             int charsRead = ReadString(ref value, count);
-            strValue = value.Substring(0, Math.Min(charsRead, strValue.Length));
+            strValue.Set(value);
             return count;
         }
 
