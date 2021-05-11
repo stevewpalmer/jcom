@@ -211,7 +211,7 @@ namespace CCompiler {
         // given offset.
         private void GenerateLoadSubArray(CodeGenerator cg, IdentifierParseNode identNode, Symbol symParam, Temporaries locals) {
             if (!identNode.HasIndexes) {
-                cg.GenerateLoadArray(identNode, false);
+                cg.GenerateLoadArray(identNode, symParam.IsByRef);
                 return;
             }
             

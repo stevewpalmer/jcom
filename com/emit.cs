@@ -965,6 +965,7 @@ namespace CCompiler {
                 case SymType.INTEGER:   Emit0(OpCodes.Ldind_I4); break;
                 case SymType.BOOLEAN:   Emit0(OpCodes.Ldind_I1); break;
                 case SymType.CHAR:      Emit0(OpCodes.Ldind_Ref); break;
+                case SymType.REF:       Emit0(OpCodes.Ldind_Ref); break;
 
                 default:
                     Debug.Assert(false, $"LoadIndirect: Unsupported type {type}");

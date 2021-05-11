@@ -612,6 +612,10 @@ namespace CCompiler {
 
                 case SymLinkage.BYREF:
                     Emitter.LoadParameter(sym.ParameterIndex);
+                    if (sym.IsArray) {
+                        Emitter.LoadIndirect(SymType.REF);
+                        break;
+                    }
                     if (sym.IsValueType) {
                         Emitter.LoadIndirect(sym.Type);
                     }
