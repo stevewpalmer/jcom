@@ -713,7 +713,7 @@ namespace JFortranLib {
 
         // Read a string unformatted from the file.
         private int ReadStringUnformatted(ref FixedString stringValue) {
-            return _file.ReadString(ref stringValue, Int32.MaxValue);
+            return _file.ReadString(ref stringValue, int.MaxValue);
         }
 
         // Returns whether this file has been opened for formatted read. For

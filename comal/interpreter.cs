@@ -95,10 +95,6 @@ namespace JComal {
                     break;
                 }
 
-                MessageCollection messages = new(opts) {
-                    Interactive = opts.Interactive
-                };
-
                 try {
                     LineTokeniser tokeniser = new();
                     Line line = new(tokeniser.TokeniseLine(inputLine));

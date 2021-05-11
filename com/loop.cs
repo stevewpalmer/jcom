@@ -25,6 +25,7 @@
 
 using System;
 using System.Reflection.Emit;
+using JComLib;
 
 namespace CCompiler {
 

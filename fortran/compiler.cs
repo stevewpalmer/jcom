@@ -30,6 +30,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using CCompiler;
+using JComLib;
 
 namespace JFortran {
 

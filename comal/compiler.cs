@@ -28,8 +28,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml;
 using CCompiler;
 using JComLib;
@@ -110,12 +108,11 @@ namespace JComal {
             } else {
                 LineTokeniser tokeniser = new();
 
-                using (StreamReader sr = new(filename)) {
-                    while (sr.Peek() != -1) {
-                        string sourceLine = sr.ReadLine();
-                        Line line = new(tokeniser.TokeniseLine(sourceLine));
-                        lines.Add(line);
-                    }
+                using StreamReader sr = new(filename);
+                while (sr.Peek() != -1) {
+                    string sourceLine = sr.ReadLine();
+                    Line line = new(tokeniser.TokeniseLine(sourceLine));
+                    lines.Add(line);
                 }
             }
             CompileString(filename, lines);

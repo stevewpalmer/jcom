@@ -79,7 +79,7 @@ namespace CCompiler {
                 case ParseID.NOT:       return GenerateNot(cg);
             }
             Debug.Assert(false, "Unsupported parse ID for UnaryOpParseNode");
-            return Value.Type;
+            return Symbol.VariantTypeToSymbolType(Value.Type);
         }
 
         // Generate the code for a unary NOT logical operator

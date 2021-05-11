@@ -26,6 +26,7 @@
 using System;
 using System.Diagnostics;
 using CCompiler;
+using JComLib;
 
 namespace JComal {
 

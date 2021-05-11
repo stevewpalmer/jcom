@@ -378,7 +378,6 @@ namespace JComal {
             }
 
             ParseNode fileParseNode = new NumberParseNode(IOConstant.Stdout);
-            ParametersParseNode usingParams = null;
 
             while (!_currentLine.IsAtEndOfStatement) {
                 ParseNode exprNode;
@@ -405,11 +404,11 @@ namespace JComal {
                         }
 
                         ExtCallParseNode usingFunc = new("JComalLib.Intrinsics,jcomallib", "USING");
-                        usingParams = new();
+                        ParametersParseNode usingParams = new();
                         usingFunc.Parameters = usingParams;
                         usingFunc.Type = SymType.CHAR;
 
-                        VarArgParseNode usingArgs = new VarArgParseNode();
+                        VarArgParseNode usingArgs = new();
 
                         usingParams.Add(StringExpression());
                         usingParams.Add(usingArgs);

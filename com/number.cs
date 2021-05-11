@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using JComLib;
 
 namespace CCompiler {
 
@@ -44,7 +45,7 @@ namespace CCompiler {
         /// <param name="value">A double value for the node</param>
         public NumberParseNode(Variant value) : base(ParseID.NUMBER) {
             Value = value;
-            Type = value.Type;
+            Type = Symbol.VariantTypeToSymbolType(value.Type);
         }
 
         /// <summary>
@@ -85,7 +86,7 @@ namespace CCompiler {
                 case SymType.DOUBLE:    actualValue = new Variant(Value.DoubleValue); break;
             }
             cg.Emitter.GenerateLoad(actualValue);
-            return actualValue.Type;
+            return Symbol.VariantTypeToSymbolType(actualValue.Type);
         }
 
         /// <summary>

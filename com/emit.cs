@@ -157,24 +157,24 @@ namespace CCompiler {
             }
             string name = $"S{_staticIndex++}_{sym.Name}";
             FieldAttributes flags = FieldAttributes.Private | FieldAttributes.Static;
-            if (sym.Value.Type != SymType.CHAR) {
+            if (sym.Value.Type != VariantType.STRING) {
                 flags |= FieldAttributes.Literal;
             }
             FieldBuilder fieldInfo = tb.DefineField(name, sym.SystemType, flags);
             switch (sym.Value.Type) {
-                case SymType.DOUBLE:
+                case VariantType.DOUBLE:
                     fieldInfo.SetConstant(sym.Value.DoubleValue);
                     break;
-                case SymType.FLOAT:
+                case VariantType.FLOAT:
                     fieldInfo.SetConstant(sym.Value.RealValue);
                     break;
-                case SymType.INTEGER:
+                case VariantType.INTEGER:
                     fieldInfo.SetConstant(sym.Value.IntValue);
                     break;
-                case SymType.BOOLEAN:
+                case VariantType.BOOLEAN:
                     fieldInfo.SetConstant(sym.Value.BoolValue);
                     break;
-                case SymType.COMPLEX:
+                case VariantType.COMPLEX:
                     fieldInfo.SetConstant(sym.Value.ComplexValue);
                     break;
             }
@@ -753,7 +753,7 @@ namespace CCompiler {
                     Emit0(OpCodes.Dup);
                     LoadInteger(arrayIndex);
                     GenerateLoad(value);
-                    StoreElementReference(value.Type);
+                    StoreElementReference(Symbol.VariantTypeToSymbolType(value.Type));
                     arrayIndex++;
                 }
                 StoreLocal(sym);
@@ -761,7 +761,7 @@ namespace CCompiler {
             }
             if (sym.CanInitialise) {
                 GenerateLoad(sym.Value);
-                ConvertType(sym.Value.Type, sym.Type);
+                ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
                 StoreLocal(sym);
             }
         }
@@ -776,12 +776,12 @@ namespace CCompiler {
                 throw new ArgumentNullException(nameof(value));
             }
             switch (value.Type) {
-                case SymType.CHAR: LoadString(value.StringValue); break;
-                case SymType.FLOAT: LoadFloat(value.RealValue); break;
-                case SymType.DOUBLE: LoadDouble(value.DoubleValue); break;
-                case SymType.BOOLEAN: LoadBoolean(value.BoolValue); break;
-                case SymType.INTEGER: LoadInteger(value.IntValue); break;
-                case SymType.COMPLEX: LoadComplex(value.ComplexValue); break;
+                case VariantType.STRING:    LoadString(value.StringValue); break;
+                case VariantType.FLOAT:     LoadFloat(value.RealValue); break;
+                case VariantType.DOUBLE:    LoadDouble(value.DoubleValue); break;
+                case VariantType.BOOLEAN:   LoadBoolean(value.BoolValue); break;
+                case VariantType.INTEGER:   LoadInteger(value.IntValue); break;
+                case VariantType.COMPLEX:   LoadComplex(value.ComplexValue); break;
 
                 default:
                     Debug.Assert(false, $"GenerateLoad: Unsupported type {value.Type}");

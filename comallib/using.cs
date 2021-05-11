@@ -42,13 +42,13 @@ namespace JComalLib {
             StringBuilder str = new();
             int length = template.Length;
             int index = 0;
-            VarType value = null;
+            Variant value = null;
             int argIndex = 0;
 
             while (index < length) {
 
                 if (value == null && argIndex < args.Length) {
-                    value = new VarType(args[argIndex++]);
+                    value = new Variant(args[argIndex++]);
                 }
 
                 char ch = template[index++];

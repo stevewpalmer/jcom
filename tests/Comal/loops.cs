@@ -158,6 +158,24 @@ namespace ComalTests {
             Utilities.Helper.HelperRunFloat(comp, "for'test'1", 55);
         }
 
+        // Verify that the FOR loop variable is local
+        // to the loop body.
+        [Test]
+        public void TestForLoopVariable() {
+            string code = @"
+                FUNC for'var'test CLOSED
+                    total:=0
+                    x:=99
+                    FOR x:=1 TO 10
+                        total:+x
+                    ENDFOR
+                    RETURN x
+                ENDFUNC
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "for'var'test", 99);
+        }
+
         // Test FOR loop with STEP
         [Test]
         public void TestForLoop2() {

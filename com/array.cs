@@ -26,6 +26,7 @@
 using System;
 using System.Diagnostics;
 using System.Reflection.Emit;
+using JComLib;
 
 namespace CCompiler {
 
@@ -88,7 +89,7 @@ namespace CCompiler {
                         paramTypes[index++] = typeof(int);
                     }
                     cg.Emitter.GenerateLoad(RangeValue);
-                    paramTypes[index] = Symbol.SymTypeToSystemType(RangeValue.Type);
+                    paramTypes[index] = Variant.VariantTypeToSystemType(RangeValue.Type);
                     
                     cg.Emitter.Call(cg.GetMethodForType(sym.SystemType, "Set", paramTypes));
                 }
@@ -140,7 +141,7 @@ namespace CCompiler {
             cg.LoadLocal(sym);
             cg.Emitter.LoadInteger(index);
             cg.Emitter.GenerateLoad(value);
-            cg.Emitter.ConvertType(value.Type, sym.Type);
+            cg.Emitter.ConvertType(Symbol.VariantTypeToSymbolType(value.Type), sym.Type);
             cg.Emitter.StoreElement(sym.Type);
         }
     }

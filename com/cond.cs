@@ -26,6 +26,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
+using JComLib;
 
 namespace CCompiler {
 

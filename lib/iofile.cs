@@ -833,7 +833,7 @@ namespace JComLib {
         /// <returns>The number of bytes read</returns>
         public int ReadString(ref FixedString strValue, int count) {
             string value = null;
-            int charsRead = ReadString(ref value, count);
+            ReadString(ref value, count);
             strValue.Set(value);
             return count;
         }

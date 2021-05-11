@@ -26,6 +26,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CCompiler;
+using JComLib;
 
 namespace JFortran {
 

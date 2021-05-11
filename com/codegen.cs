@@ -205,7 +205,7 @@ namespace CCompiler {
                 if (string.IsNullOrEmpty(Path.GetExtension(typeDllPath))) {
                     typeDllPath = Path.ChangeExtension(typeDllPath, ".dll");
                 }
-                var dll = Assembly.LoadFile(typeDllPath);
+                Assembly dll = Assembly.LoadFile(typeDllPath);
 
                 string name = Path.GetFileNameWithoutExtension(baseTypeName).CapitaliseString();
                 baseType = dll.GetType(name + "." + name);

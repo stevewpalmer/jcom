@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using JComLib;
 
 namespace CCompiler {
 

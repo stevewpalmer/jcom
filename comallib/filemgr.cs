@@ -50,11 +50,7 @@ namespace JComalLib {
         /// <summary>
         /// Get the next available free file number.
         /// </summary>
-        public static int FREEFILE {
-            get {
-                return IOFile.FreeFileNumber();
-            }
-        }
+        public static int FREEFILE => IOFile.FreeFileNumber();
 
         /// <summary>
         /// Get the specified number of characters from the given device.

@@ -1,10 +1,10 @@
-// JCom Compiler Toolkit
-// Variant class
+﻿// JCom Compiler Toolkit
+// VarType class
 //
 // Authors:
 //  Steve Palmer
 //
-// Copyright (C) 2013 Steve Palmer
+// Copyright (C) 2021 Steve Palmer
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -24,22 +24,50 @@
 // under the License.
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
 
-namespace CCompiler {
-    
+namespace JComLib {
+
     /// <summary>
-    /// Encapsulates a symbol value in any supported type and provides an
+    /// Variant type
+    /// </summary>
+    public enum VariantType {
+        NONE,
+        INTEGER,
+        FLOAT,
+        DOUBLE,
+        BOOLEAN,
+        COMPLEX,
+        STRING
+    }
+
+    /// <summary>
+    /// Encapsulates a value in any supported type and provides an
     /// interface for setting and retrieving the value.
     /// </summary>
-    public sealed class Variant {
+    public class Variant {
         private double _value;
         private Complex _complexValue;
 
         public Variant() {
             HasValue = false;
-            Type = SymType.NONE;
+            Type = VariantType.NONE;
+        }
+
+        /// <summary>
+        /// Instantiates a variant from an object.
+        /// </summary>
+        /// <param name="value">Object value to set</param>
+        public Variant(object value) {
+            if (value is float floatValue)      { Set(floatValue); return; }
+            if (value is int intValue)          { Set(intValue); return; }
+            if (value is double doubleValue)    { Set(doubleValue); return; }
+            if (value is string stringValue)    { Set(stringValue); return; }
+            if (value is bool boolValue)        { Set(boolValue); return; }
+            if (value is Complex complexValue)  { Set(complexValue); return; }
+            Debug.Assert(false, "Invalid object type");
         }
 
         /// <summary>
@@ -61,7 +89,7 @@ namespace CCompiler {
         /// <summary>
         /// Instantiates a floating point variant.
         /// </summary>
-        /// <param name="value">Float  value to set</param>
+        /// <param name="value">Float value to set</param>
         public Variant(float value) {
             Set(value);
         }
@@ -95,7 +123,7 @@ namespace CCompiler {
         /// specified value.
         /// </summary>
         /// <param name="i">An integer value</param>
-        /// <returns>A new Variant representing the specified integer value</returns>
+        /// <returns>A new VarType representing the specified integer value</returns>
         public static explicit operator Variant(int i) {
             return new Variant(i);
         }
@@ -106,7 +134,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="v1">First variant</param>
         /// <param name="v2">Second variant</param>
-        /// <returns>A Variant that contains the result of adding v to this variant</returns>
+        /// <returns>A VarType that contains the result of adding v to this variant</returns>
         public static Variant operator +(Variant v1, Variant v2) {
             if (v1 == null) {
                 throw new ArgumentNullException(nameof(v1));
@@ -114,12 +142,12 @@ namespace CCompiler {
             if (v2 == null) {
                 throw new ArgumentNullException(nameof(v2));
             }
-            return Symbol.LargestType(v1.Type, v2.Type) switch {
-                SymType.DOUBLE =>   new Variant(v1.DoubleValue + v2.DoubleValue),
-                SymType.INTEGER =>  new Variant(v1.IntValue + v2.IntValue),
-                SymType.FLOAT =>    new Variant(v1.RealValue + v2.RealValue),
-                SymType.COMPLEX =>  new Variant(v1.ComplexValue + v2.ComplexValue),
-                SymType.CHAR =>     new Variant(v1.StringValue + v2.StringValue),
+            return LargestType(v1.Type, v2.Type) switch {
+                VariantType.DOUBLE => new Variant(v1.DoubleValue + v2.DoubleValue),
+                VariantType.INTEGER => new Variant(v1.IntValue + v2.IntValue),
+                VariantType.FLOAT => new Variant(v1.RealValue + v2.RealValue),
+                VariantType.COMPLEX => new Variant(v1.ComplexValue + v2.ComplexValue),
+                VariantType.STRING => new Variant(v1.StringValue + v2.StringValue),
                 _ => throw new InvalidOperationException("Addition not permitted on type"),
             };
         }
@@ -129,7 +157,7 @@ namespace CCompiler {
         /// operator overloading.
         /// </summary>
         /// <param name="v">The variant to be added to this one</param>
-        /// <returns>A Variant that contains the result of adding v to this variant</returns>
+        /// <returns>A VarType that contains the result of adding v to this variant</returns>
         public Variant Add(Variant v) {
             return this + v;
         }
@@ -139,16 +167,16 @@ namespace CCompiler {
         /// the type of v1.
         /// </summary>
         /// <param name="v1">Left operand</param>
-        /// <returns>A Variant that contains the result of negating this variant</returns>
+        /// <returns>A VarType that contains the result of negating this variant</returns>
         public static Variant operator -(Variant v1) {
             if (v1 == null) {
                 throw new ArgumentNullException(nameof(v1));
             }
             return v1.Type switch {
-                SymType.DOUBLE =>   new Variant(-v1.DoubleValue),
-                SymType.INTEGER =>  new Variant(-v1.IntValue),
-                SymType.FLOAT =>    new Variant(-v1.RealValue),
-                SymType.COMPLEX =>  new Variant(-v1.ComplexValue),
+                VariantType.DOUBLE => new Variant(-v1.DoubleValue),
+                VariantType.INTEGER => new Variant(-v1.IntValue),
+                VariantType.FLOAT => new Variant(-v1.RealValue),
+                VariantType.COMPLEX => new Variant(-v1.ComplexValue),
                 _ => throw new InvalidOperationException("Unary minus not permitted on type"),
             };
         }
@@ -157,7 +185,7 @@ namespace CCompiler {
         /// Provides an alternative to unary operator- for languages that do not support
         /// operator overloading.
         /// </summary>
-        /// <returns>A Variant that contains the result of negating this variant</returns>
+        /// <returns>A VarType that contains the result of negating this variant</returns>
         public Variant Negate() {
             return -this;
         }
@@ -168,7 +196,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="v1">Left operand</param>
         /// <param name="v2">Right operand</param>
-        /// <returns>A Variant that contains the result of subtracting v from this variant</returns>
+        /// <returns>A VarType that contains the result of subtracting v from this variant</returns>
         public static Variant operator -(Variant v1, Variant v2) {
             if (v1 == null) {
                 throw new ArgumentNullException(nameof(v1));
@@ -176,11 +204,11 @@ namespace CCompiler {
             if (v2 == null) {
                 throw new ArgumentNullException(nameof(v2));
             }
-            return Symbol.LargestType(v1.Type, v2.Type) switch {
-                SymType.DOUBLE =>   new Variant(v1.DoubleValue - v2.DoubleValue),
-                SymType.INTEGER =>  new Variant(v1.IntValue - v2.IntValue),
-                SymType.FLOAT =>    new Variant(v1.RealValue - v2.RealValue),
-                SymType.COMPLEX =>  new Variant(v1.ComplexValue - v2.ComplexValue),
+            return LargestType(v1.Type, v2.Type) switch {
+                VariantType.DOUBLE => new Variant(v1.DoubleValue - v2.DoubleValue),
+                VariantType.INTEGER => new Variant(v1.IntValue - v2.IntValue),
+                VariantType.FLOAT => new Variant(v1.RealValue - v2.RealValue),
+                VariantType.COMPLEX => new Variant(v1.ComplexValue - v2.ComplexValue),
                 _ => throw new InvalidOperationException("Subtraction not permitted on type"),
             };
         }
@@ -190,7 +218,7 @@ namespace CCompiler {
         /// operator overloading.
         /// </summary>
         /// <param name="v">The variant to be subtracted from this one</param>
-        /// <returns>A Variant that contains the result of subtracting v from this variant</returns>
+        /// <returns>A VarType that contains the result of subtracting v from this variant</returns>
         public Variant Subtract(Variant v) {
             return this - v;
         }
@@ -201,7 +229,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="v1">Left operand</param>
         /// <param name="v2">Right operand</param>
-        /// <returns>A Variant that contains the result of multiplying v with this variant</returns>
+        /// <returns>A VarType that contains the result of multiplying v with this variant</returns>
         public static Variant operator *(Variant v1, Variant v2) {
             if (v1 == null) {
                 throw new ArgumentNullException(nameof(v1));
@@ -209,11 +237,11 @@ namespace CCompiler {
             if (v2 == null) {
                 throw new ArgumentNullException(nameof(v2));
             }
-            return Symbol.LargestType(v1.Type, v2.Type) switch {
-                SymType.DOUBLE =>   new Variant(v1.DoubleValue * v2.DoubleValue),
-                SymType.INTEGER =>  new Variant(v1.IntValue * v2.IntValue),
-                SymType.FLOAT =>    new Variant(v1.RealValue * v2.RealValue),
-                SymType.COMPLEX =>  new Variant(v1.ComplexValue * v2.ComplexValue),
+            return LargestType(v1.Type, v2.Type) switch {
+                VariantType.DOUBLE => new Variant(v1.DoubleValue * v2.DoubleValue),
+                VariantType.INTEGER => new Variant(v1.IntValue * v2.IntValue),
+                VariantType.FLOAT => new Variant(v1.RealValue * v2.RealValue),
+                VariantType.COMPLEX => new Variant(v1.ComplexValue * v2.ComplexValue),
                 _ => throw new InvalidOperationException("Multiplication not permitted on type"),
             };
         }
@@ -223,7 +251,7 @@ namespace CCompiler {
         /// operator overloading.
         /// </summary>
         /// <param name="v">The variant to be multiplied by this one</param>
-        /// <returns>A Variant that contains the result of multiplying v with this variant</returns>
+        /// <returns>A VarType that contains the result of multiplying v with this variant</returns>
         public Variant Multiply(Variant v) {
             return this * v;
         }
@@ -235,7 +263,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="v1">Left operand</param>
         /// <param name="v2">Right operand</param>
-        /// <returns>A Variant that contains the result of dividing this variant by v</returns>
+        /// <returns>A VarType that contains the result of dividing this variant by v</returns>
         public static Variant operator /(Variant v1, Variant v2) {
             if (v1 == null) {
                 throw new ArgumentNullException(nameof(v1));
@@ -243,11 +271,11 @@ namespace CCompiler {
             if (v2 == null) {
                 throw new ArgumentNullException(nameof(v2));
             }
-            return Symbol.LargestType(v1.Type, v2.Type) switch {
-                SymType.DOUBLE =>   new Variant(v1.DoubleValue / v2.DoubleValue),
-                SymType.INTEGER =>  new Variant(v1.IntValue / v2.IntValue),
-                SymType.FLOAT =>    new Variant(v1.RealValue / v2.RealValue),
-                SymType.COMPLEX =>  new Variant(v1.ComplexValue / v2.ComplexValue),
+            return LargestType(v1.Type, v2.Type) switch {
+                VariantType.DOUBLE => new Variant(v1.DoubleValue / v2.DoubleValue),
+                VariantType.INTEGER => new Variant(v1.IntValue / v2.IntValue),
+                VariantType.FLOAT => new Variant(v1.RealValue / v2.RealValue),
+                VariantType.COMPLEX => new Variant(v1.ComplexValue / v2.ComplexValue),
                 _ => throw new InvalidOperationException("Division not permitted on type"),
             };
         }
@@ -257,7 +285,7 @@ namespace CCompiler {
         /// operator overloading.
         /// </summary>
         /// <param name="v">The variant to be divided into this one</param>
-        /// <returns>A Variant that contains the result of dividing this variant by v</returns>
+        /// <returns>A VarType that contains the result of dividing this variant by v</returns>
         public Variant Divide(Variant v) {
             return this / v;
         }
@@ -269,7 +297,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="v1">Left operand</param>
         /// <param name="v2">Right operand</param>
-        /// <returns>A Variant that contains the remainder after dividing this variant by v</returns>
+        /// <returns>A VarType that contains the remainder after dividing this variant by v</returns>
         public static Variant operator %(Variant v1, Variant v2) {
             if (v1 == null) {
                 throw new ArgumentNullException(nameof(v1));
@@ -277,10 +305,10 @@ namespace CCompiler {
             if (v2 == null) {
                 throw new ArgumentNullException(nameof(v2));
             }
-            return Symbol.LargestType(v1.Type, v2.Type) switch {
-                SymType.DOUBLE =>   new Variant(v1.DoubleValue % v2.DoubleValue),
-                SymType.INTEGER =>  new Variant(v1.IntValue % v2.IntValue),
-                SymType.FLOAT =>    new Variant(v1.RealValue % v2.RealValue),
+            return LargestType(v1.Type, v2.Type) switch {
+                VariantType.DOUBLE => new Variant(v1.DoubleValue % v2.DoubleValue),
+                VariantType.INTEGER => new Variant(v1.IntValue % v2.IntValue),
+                VariantType.FLOAT => new Variant(v1.RealValue % v2.RealValue),
                 _ => throw new InvalidOperationException("Modulo not permitted on type"),
             };
         }
@@ -290,7 +318,7 @@ namespace CCompiler {
         /// operator overloading.
         /// </summary>
         /// <param name="v">The variant for which the remainder is to be obtained</param>
-        /// <returns>A Variant that contains the remainder after dividing this variant by v</returns>
+        /// <returns>A VarType that contains the remainder after dividing this variant by v</returns>
         public Variant Modulus(Variant v) {
             return this % v;
         }
@@ -301,16 +329,16 @@ namespace CCompiler {
         /// are undefined if the variant base is negative.
         /// </summary>
         /// <param name="v">A variant that specifies the power</param>
-        /// <returns>A Variant that contains the result of raising this variant to the power of v</returns>
+        /// <returns>A VarType that contains the result of raising this variant to the power of v</returns>
         public Variant Pow(Variant v) {
             if (v == null) {
                 throw new ArgumentNullException(nameof(v));
             }
-            return Symbol.LargestType(Type, v.Type) switch {
-                SymType.DOUBLE =>   new Variant(Math.Pow(DoubleValue, v.DoubleValue)),
-                SymType.INTEGER =>  new Variant((int)Math.Pow(IntValue, v.IntValue)),
-                SymType.FLOAT =>    new Variant((float)Math.Pow(RealValue, v.RealValue)),
-                SymType.COMPLEX =>  new Variant(Complex.Pow(ComplexValue, v.ComplexValue)),
+            return LargestType(Type, v.Type) switch {
+                VariantType.DOUBLE => new Variant(Math.Pow(DoubleValue, v.DoubleValue)),
+                VariantType.INTEGER => new Variant((int)Math.Pow(IntValue, v.IntValue)),
+                VariantType.FLOAT => new Variant((float)Math.Pow(RealValue, v.RealValue)),
+                VariantType.COMPLEX => new Variant(Complex.Pow(ComplexValue, v.ComplexValue)),
                 _ => throw new InvalidOperationException("Exponentiation not permitted on type"),
             };
         }
@@ -325,7 +353,7 @@ namespace CCompiler {
             _value = IntValue;
             StringValue = BoolValue.ToString();
             _complexValue = boolValue ? -1 : 0;
-            Type = SymType.BOOLEAN;
+            Type = VariantType.BOOLEAN;
             HasValue = true;
         }
 
@@ -339,7 +367,7 @@ namespace CCompiler {
             BoolValue = intValue != 0;
             StringValue = intValue.ToString();
             _complexValue = _value;
-            Type = SymType.INTEGER;
+            Type = VariantType.INTEGER;
             HasValue = true;
         }
 
@@ -353,7 +381,7 @@ namespace CCompiler {
             BoolValue = (int)floatValue != 0;
             StringValue = floatValue.ToString(CultureInfo.InvariantCulture);
             _complexValue = _value;
-            Type = SymType.FLOAT;
+            Type = VariantType.FLOAT;
             HasValue = true;
         }
 
@@ -367,7 +395,7 @@ namespace CCompiler {
             BoolValue = (int)doubleValue != 0;
             StringValue = doubleValue.ToString(CultureInfo.InvariantCulture);
             _complexValue = _value;
-            Type = SymType.DOUBLE;
+            Type = VariantType.DOUBLE;
             HasValue = true;
         }
 
@@ -381,7 +409,7 @@ namespace CCompiler {
             BoolValue = IntValue != 0;
             StringValue = stringValue;
             _complexValue = _value;
-            Type = SymType.CHAR;
+            Type = VariantType.STRING;
             HasValue = true;
         }
 
@@ -395,7 +423,7 @@ namespace CCompiler {
             BoolValue = (int)complexValue.Real != 0;
             StringValue = complexValue.ToString();
             _complexValue = complexValue;
-            Type = SymType.COMPLEX;
+            Type = VariantType.COMPLEX;
             HasValue = true;
         }
 
@@ -404,6 +432,15 @@ namespace CCompiler {
         /// </summary>
         /// <returns><c>true</c> if the variant is zero; otherwise, <c>false</c>.</returns>
         public bool IsZero => Compare(new Variant(0));
+
+        /// <summary>
+        /// Returns whether the variant is a number.
+        /// </summary>
+        /// <returns><c>true</c> if the variant is a number; otherwise, <c>false</c>.</returns>
+        public bool IsNumber => Type == VariantType.INTEGER ||
+                                Type == VariantType.DOUBLE ||
+                                Type == VariantType.FLOAT ||
+                                Type == VariantType.COMPLEX;
 
         /// <summary>
         /// Compares a variant against an integer value.
@@ -424,10 +461,10 @@ namespace CCompiler {
                 throw new ArgumentNullException(nameof(v));
             }
             return Type switch {
-                SymType.INTEGER =>  IntValue == v.IntValue,
-                SymType.FLOAT =>    _value.CompareTo(v.RealValue) == 0,
-                SymType.DOUBLE =>   _value.CompareTo(v.DoubleValue) == 0,
-                SymType.COMPLEX =>  _complexValue == v.ComplexValue,
+                VariantType.INTEGER =>  IntValue == v.IntValue,
+                VariantType.FLOAT =>    _value.CompareTo(v.RealValue) == 0,
+                VariantType.DOUBLE =>   _value.CompareTo(v.DoubleValue) == 0,
+                VariantType.COMPLEX =>  _complexValue == v.ComplexValue,
                 _ => false,
             };
         }
@@ -471,7 +508,7 @@ namespace CCompiler {
         /// <summary>
         /// Returns the current underlying type of the variant.
         /// </summary>
-        public SymType Type { get; private set; }
+        public VariantType Type { get; private set; }
 
         /// <summary>
         /// Returns the variant value as a string.
@@ -479,6 +516,37 @@ namespace CCompiler {
         /// <returns></returns>
         public override string ToString() {
             return StringValue;
+        }
+
+        /// <summary>
+        /// Maps a variant type to a system type.
+        /// </summary>
+        /// <param name="type">Variant type</param>
+        /// <returns>The corresponding system type</returns>
+        public static Type VariantTypeToSystemType(VariantType type) {
+            switch (type) {
+                case VariantType.STRING: return typeof(string);
+                case VariantType.FLOAT: return typeof(float);
+                case VariantType.DOUBLE: return typeof(double);
+                case VariantType.INTEGER: return typeof(int);
+                case VariantType.BOOLEAN: return typeof(bool);
+                case VariantType.COMPLEX: return typeof(Complex);
+            }
+            Debug.Assert(false, $"No system type for {type}");
+            return typeof(int);
+        }
+
+        // Return the variant type that can contain the largest of the two given. The types
+        // must both be numeric. Thus if one type is double and the other is integer, an
+        // double is returned since it can contain a value of both types.
+        private static VariantType LargestType(VariantType op1, VariantType op2) {
+            if (op1 == VariantType.INTEGER) {
+                return op2;
+            }
+            if (op1 == VariantType.FLOAT) {
+                return op2 == VariantType.INTEGER ? op1 : op2;
+            }
+            return op1;
         }
     }
 }

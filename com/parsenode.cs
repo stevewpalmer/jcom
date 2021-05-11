@@ -26,6 +26,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using JComLib;
 
 namespace CCompiler {
 
@@ -257,7 +258,7 @@ namespace CCompiler {
                 return cg.LoadLocal(Symbol);
             }
             Debug.Assert(false, "Unsupported parse ID for SymbolParseNode");
-            return Value.Type;
+            return Symbol.VariantTypeToSymbolType(Value.Type);
         }
 
         /// <summary>

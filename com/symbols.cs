@@ -712,6 +712,26 @@ namespace CCompiler {
         }
 
         /// <summary>
+        /// Map a Variant type to its equivalent symbol type.
+        /// </summary>
+        /// <param name="variantType">Variant type</param>
+        /// <returns>Symbol type</returns>
+        public static SymType VariantTypeToSymbolType(VariantType variantType) {
+
+            switch (variantType) {
+                case VariantType.BOOLEAN:   return SymType.BOOLEAN;
+                case VariantType.NONE:      return SymType.NONE;
+                case VariantType.INTEGER:   return SymType.INTEGER;
+                case VariantType.FLOAT:     return SymType.FLOAT;
+                case VariantType.DOUBLE:    return SymType.DOUBLE;
+                case VariantType.COMPLEX:   return SymType.COMPLEX;
+                case VariantType.STRING:    return SymType.CHAR;
+            }
+            Debug.Assert(false, $"Unhandled variant type {variantType}");
+            return SymType.NONE;
+        }
+
+        /// <summary>
         /// Dumps the contents of this symbol item to the ParseNode XML
         /// output under the specified parent node.
         /// </summary>
@@ -838,10 +858,7 @@ namespace CCompiler {
             if (!CaseSensitive) {
                 name = name.ToUpper();
             }
-            if (sym == null) {
-                throw new ArgumentNullException(nameof(sym));
-            }
-            _symbols[name] = sym;
+            _symbols[name] = sym ?? throw new ArgumentNullException(nameof(sym));
         }
 
         /// <summary>

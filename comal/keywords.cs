@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CCompiler;
+using JComLib;
 
 namespace JComal {
 
@@ -114,7 +115,7 @@ namespace JComal {
             Variant valueNode;
             do {
                 valueNode = ParseConstant();
-                if (valueNode.Type == SymType.INTEGER) {
+                if (valueNode.Type == VariantType.INTEGER) {
                     valueNode = new Variant(valueNode.RealValue);
                 }
                 token = GetNextToken();
@@ -342,7 +343,7 @@ namespace JComal {
             List<IdentifierParseNode> identifiers = new();
             List<ParseNode> values = new();
             while (true) {
-                IdentifierParseNode identNode = (IdentifierParseNode)ParseIdentifierFromToken(identToken);
+                IdentifierParseNode identNode = ParseIdentifierFromToken(identToken);
                 if (identNode == null) {
                     SkipToEndOfLine();
                     break;

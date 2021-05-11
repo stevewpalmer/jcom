@@ -26,6 +26,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CCompiler;
+using JComLib;
 
 namespace JComal {
 
@@ -57,10 +58,7 @@ namespace JComal {
         // Parse an identifier
         private IdentifierToken ParseIdentifier() {
             SimpleToken token = ExpectToken(TokenID.IDENT);
-            if (token == null) {
-                return null;
-            }
-            return token as IdentifierToken;
+            return token == null ? null : token as IdentifierToken;
         }
 
         // Parse a label

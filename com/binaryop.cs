@@ -105,7 +105,7 @@ namespace CCompiler {
                 case ParseID.EXP:       return GenerateExp(cg);
             }
             Debug.Assert(false, "Unsupported parse ID for BinaryOpParseNode");
-            return Value.Type;
+            return Symbol.VariantTypeToSymbolType(Value.Type);
         }
 
         // Generate the code for a binary addition operator
