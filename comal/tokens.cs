@@ -193,7 +193,11 @@ namespace JComal {
         KCHANGE = 155,
         KDIR = 156,
         KIMPORT = 157,
-        KEXTERNAL = 158
+        KEXTERNAL = 158,
+        KUSING = 159,
+        KCON = 160,
+        KSELECT = 161,
+        KSIZE = 162
     }
 
     /// <summary>
@@ -221,6 +225,7 @@ namespace JComal {
             { "close",      TokenID.KCLOSE      },
             { "closed",     TokenID.KCLOSED     },
             { "colour",     TokenID.KCOLOUR     },
+            { "con",        TokenID.KCON        },
             { "cos",        TokenID.KCOS        },
             { "create",     TokenID.KCREATE     },
             { "curcol",     TokenID.KCURCOL     },
@@ -312,8 +317,10 @@ namespace JComal {
             { "run",        TokenID.KRUN        },
             { "save",       TokenID.KSAVE       },
             { "scan",       TokenID.KSCAN       },
+            { "select",     TokenID.KSELECT     },
             { "sgn",        TokenID.KSGN        },
             { "sin",        TokenID.KSIN        },
+            { "size",       TokenID.KSIZE       },
             { "spc$",       TokenID.KSPC        },
             { "sqr",        TokenID.KSQR        },
             { "step",       TokenID.KSTEP       },
@@ -327,6 +334,7 @@ namespace JComal {
             { "trap",       TokenID.KTRAP       },
             { "true",       TokenID.KTRUE       },
             { "until",      TokenID.KUNTIL      },
+            { "using",      TokenID.KUSING      },
             { "val",        TokenID.KVAL        },
             { "when",       TokenID.KWHEN       },
             { "while",      TokenID.KWHILE      },

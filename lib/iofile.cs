@@ -405,7 +405,7 @@ namespace JComLib {
             if (deleteFile && Path != null) {
                 File.Delete(Path);
             }
-            if (this != StdinFile && this != StdoutFile) {
+            if (Unit != IOConstant.Stdin && Unit != IOConstant.Stdout) {
                 if (_filemap.ContainsKey(Unit)) {
                     _filemap.Remove(Unit);
                 }

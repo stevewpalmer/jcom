@@ -378,6 +378,7 @@ namespace JComal {
             }
 
             ParseNode fileParseNode = new NumberParseNode(IOConstant.Stdout);
+            ParametersParseNode usingParams = null;
 
             while (!_currentLine.IsAtEndOfStatement) {
                 ParseNode exprNode;
@@ -385,8 +386,8 @@ namespace JComal {
                 SimpleToken token = GetNextToken();
                 switch (token.ID) {
                     case TokenID.SEMICOLON:     formats.Add('V'); continue;
-                    case TokenID.APOSTROPHE:    formats.Add('N'); continue;
                     case TokenID.COMMA:         formats.Add('H'); continue;
+                    case TokenID.APOSTROPHE:    formats.Add('N'); continue;
                     case TokenID.TILDE:         formats.Add('6'); continue;
 
                     case TokenID.KTAB:
@@ -396,6 +397,46 @@ namespace JComal {
                         varargs.Add(exprNode);
                         formats.Add('T');
                         continue;
+
+                    case TokenID.KUSING: {
+                        if (formats.Count > 1) {
+                            Messages.Error(MessageCode.UNEXPECTEDTOKEN, "Misplaced USING");
+                            return null;
+                        }
+
+                        ExtCallParseNode usingFunc = new("JComalLib.Intrinsics,jcomallib", "USING");
+                        usingParams = new();
+                        usingFunc.Parameters = usingParams;
+                        usingFunc.Type = SymType.CHAR;
+
+                        VarArgParseNode usingArgs = new VarArgParseNode();
+
+                        usingParams.Add(StringExpression());
+                        usingParams.Add(usingArgs);
+
+                        ExpectToken(TokenID.COLON);
+
+                        while (!_currentLine.IsAtEndOfStatement) {
+
+                            exprNode = Expression();
+                            usingArgs.Add(exprNode);
+
+                            TokenID tokenID = _currentLine.PeekToken().ID;
+                            if (tokenID == TokenID.SEMICOLON ||
+                                tokenID == TokenID.APOSTROPHE ||
+                                tokenID == TokenID.TILDE ||
+                                tokenID == TokenID.EOL) {
+                                break;
+                            }
+                            ExpectToken(TokenID.COMMA);
+                        }
+
+                        if (usingParams.Nodes.Count > 0) {
+                            varargs.Add(usingFunc);
+                            formats.Insert(0, 'S');
+                        }
+                        continue;
+                        }
 
                     default:
                         _currentLine.PushToken(token);

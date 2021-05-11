@@ -31,7 +31,7 @@ namespace JComalLib {
     /// <summary>
     /// Fortran external intrinsics.
     /// </summary>
-    public static class Intrinsics {
+    public static partial class Intrinsics {
 
         /// <summary>
         /// Default randomizer seed to ensure that repeated iterations of
@@ -392,7 +392,7 @@ namespace JComalLib {
         /// <param name="start">Lower range of random number</param>
         /// <param name="end">Upper range of random number</param>
         /// <returns>The next random number in the given range</returns>
-        public static float RND(ref int start, ref int end) {
+        public static float RND(int start, int end) {
             return Convert.ToSingle(_rand.Next(start, end));
         }
 

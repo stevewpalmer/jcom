@@ -427,7 +427,7 @@ namespace CCompiler {
                 SymType.INTEGER =>  IntValue == v.IntValue,
                 SymType.FLOAT =>    _value.CompareTo(v.RealValue) == 0,
                 SymType.DOUBLE =>   _value.CompareTo(v.DoubleValue) == 0,
-                SymType.COMMON =>   _complexValue == v.ComplexValue,
+                SymType.COMPLEX =>  _complexValue == v.ComplexValue,
                 _ => false,
             };
         }

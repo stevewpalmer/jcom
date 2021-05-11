@@ -561,9 +561,9 @@ namespace JComal {
                     ExtCallParseNode node = GetIntrinsicExtCallNode("RND");
                     if (TestToken(TokenID.LPAREN)) {
                         node.Parameters = new ParametersParseNode();
-                        node.Parameters.Add(IntegerExpression(), true);
+                        node.Parameters.Add(IntegerExpression(), false);
                         ExpectToken(TokenID.COMMA);
-                        node.Parameters.Add(IntegerExpression(), true);
+                        node.Parameters.Add(IntegerExpression(), false);
                         ExpectToken(TokenID.RPAREN);
                     }
                     return CastNodeToType(node, SymType.FLOAT);

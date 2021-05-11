@@ -60,13 +60,7 @@ namespace JComal {
             if (token == null) {
                 return null;
             }
-            IdentifierToken identToken = token as IdentifierToken;
-            if (identToken != null) {
-                if (identToken.Name.Length > 31) {
-                    Messages.Error(MessageCode.IDENTIFIERTOOLONG, $"Variable name {identToken.Name} too long");
-                }
-            }
-            return identToken;
+            return token as IdentifierToken;
         }
 
         // Parse a label

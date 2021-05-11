@@ -99,34 +99,13 @@ namespace JComalLib {
         /// <summary>
         /// Writes the specified data to the given I/O device using the format string.
         /// </summary>
-        /// <param name="iodevice">The device to read from</param>
-        /// <param name="formatString">Format string</param>
-        /// <param name="args">Write arguments</param>
-        public static void WRITE(int iodevice, FixedString formatString, params object[] args) {
-            WRITE(0, 0, iodevice, formatString.ToString(), args);
-        }
-
-        /// <summary>
-        /// Writes the specified data to the given I/O device using the format string.
-        /// </summary>
-        /// <param name="row">Row at which to write. 0 means don't change the row.</param>
-        /// <param name="column">Column at which to write. 0 means don't change the column.</param>
-        /// <param name="iodevice">The device to read from</param>
-        /// <param name="formatString">Format string</param>
-        /// <param name="args">Write arguments</param>
-        public static void WRITE(int row, int column, int iodevice, FixedString formatString, params object[] args) {
-            WRITE(row, column, iodevice, formatString.ToString(), args);
-        }
-
-        /// <summary>
-        /// Writes the specified data to the given I/O device using the format string.
-        /// </summary>
         /// <param name="row">Row at which to write. 0 means don't change the row.</param>
         /// <param name="column">Column at which to write. 0 means don't change the column.</param>
         /// <param name="iodevice">The device to read from</param>
         /// <param name="formatString">Format string</param>
         /// <param name="args">Write arguments</param>
         public static void WRITE(int row, int column, int iodevice, string formatString, params object[] args) {
+
             IOFile file = IOFile.Get(iodevice);
             if (file == null) {
                 file = new IOFile(iodevice);
@@ -238,10 +217,7 @@ namespace JComalLib {
             }
             bool hasNewline = fmtIndex == 0 || (formats[fmtIndex - 1] != 'V' && formats[fmtIndex - 1] != 'H');
             file.WriteLine(output.ToString(), hasNewline);
-
-            if (file != null) {
-                file.Flush();
-            }
+            file.Flush();
         }
 
         // Write an integer value

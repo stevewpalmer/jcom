@@ -39,15 +39,16 @@ namespace JComal {
         //
         // Syntax: MODULE <string constant>
         //
-        // Specifies the name of this module. By default, the module name is taken
-        // from the source filename so this provides a way to specify an alternative
-        // module name.
+        // Specifies the name of this module. By default, the module name is
+        // taken from the source filename so this provides a way to specify
+        // an alternative module name.
         //
         private ParseNode KModule() {
 
             SimpleToken token = GetNextToken();
             if (token is not IdentifierToken identToken) {
-                Messages.Error(MessageCode.MODULENAMEEXPECTED, "Module name expected");
+                Messages.Error(MessageCode.MODULENAMEEXPECTED,
+                               "Module name expected");
             } else {
                 _programDef.Name = identToken.Name;
                 ExpectEndOfLine();
@@ -60,22 +61,28 @@ namespace JComal {
         //
         // Syntax: EXPORT <string constant>
         //
-        // Specifies that the procedure or function should be exported and made available
-        // to external programs.
+        // Specifies that the procedure or function should be exported and
+        // made available to external programs.
         //
         private ParseNode KExport() {
 
             SimpleToken token = GetNextToken();
             if (token is not IdentifierToken identToken) {
-                Messages.Error(MessageCode.PROCFUNCNAMEEXPECTED, "Procedure or function name expected");
+                Messages.Error(MessageCode.PROCFUNCNAMEEXPECTED,
+                               "Procedure or function name expected");
             } else {
                 string methodName = identToken.Name;
                 Symbol sym = _globalSymbols.Get(methodName);
                 if (sym != null && sym.IsExported) {
-                    Messages.Error(MessageCode.ALREADYEXPORTED, "{0} already exported");
+                    Messages.Error(MessageCode.ALREADYEXPORTED,
+                                   $"{methodName} already exported");
                 }
                 if (sym == null) {
-                    sym = _globalSymbols.Add(methodName, new SymFullType(), SymClass.SUBROUTINE, null, _currentLineNumber);
+                    sym = _globalSymbols.Add(methodName,
+                                             new SymFullType(),
+                                             SymClass.SUBROUTINE,
+                                             null,
+                                             _currentLineNumber);
                     sym.Modifier |= SymModifier.EXPORTED;
                 }
                 ExpectEndOfLine();
@@ -87,10 +94,12 @@ namespace JComal {
         //
         // Syntax: DATA <constant values>*
         //
-        // Adds data to the internal _DATA symbol. This causes a static array of variants to be
-        // created when the program starts. We also add the _DATAINDEX index if one is not present
-        // so that the READ statement has an index to maintain. Multiple DATA statements are allowed
-        // and each one adds to the same array. Local DATA statements aren't supported.
+        // Adds data to the internal _DATA symbol. This causes a static array
+        // of variants to be created when the program starts. We also add the
+        // _DATAINDEX index if one is not present so that the READ statement
+        // has an index to maintain. Multiple DATA statements are allowed and
+        // each one adds to the same array. Local DATA statements aren't
+        // supported.
         //
         private ParseNode KData() {
             SimpleToken token;
@@ -157,7 +166,7 @@ namespace JComal {
             IdentifierToken identToken = ParseIdentifier();
 
             while (true) {
-                IdentifierParseNode identNode = (IdentifierParseNode)ParseIdentifierFromToken(identToken);
+                IdentifierParseNode identNode = ParseIdentifierFromToken(identToken);
                 if (identNode == null) {
                     break;
                 }
@@ -430,6 +439,7 @@ namespace JComal {
 
             ConditionalParseNode parseNode = new();
             ParseNode exprNode = Expression();
+
             InsertTokenIfMissing(TokenID.KOF);
             ExpectEndOfLine();
 
@@ -533,6 +543,7 @@ namespace JComal {
         // Syntax: IF <expression> THEN statements ELSE statements
         //
         // Conditional statement evaluation.
+        //
         private ParseNode KIf() {
             ConditionalParseNode node = new();
 
@@ -575,13 +586,14 @@ namespace JComal {
         // Syntax: TRAP <statements> HANDLER <statements> ENDTRAP
         //         TRAP ESC +|-
         //
-        // Sets up a trap handler
+        // Sets up a trap handler or controls the behaviour of the
+        // ESC key.
+        //
         private ParseNode KTrap() {
 
             // Is this a TRAP ESC?
-            SimpleToken token = GetNextToken();
-            if (token.ID == TokenID.KESC) {
-                token = GetNextToken();
+            if (TestToken(TokenID.KESC)) {
+                SimpleToken token = GetNextToken();
                 bool escFlag = false;
                 switch (token.ID) {
                     case TokenID.PLUS:  escFlag = true; break;
@@ -590,12 +602,11 @@ namespace JComal {
                         Messages.Error(MessageCode.UNEXPECTEDTOKEN, "+ or - expected after TRAP ESC");
                         break;
                 }
-                ExtCallParseNode node = new("JComLib.Runtime,jcomlib", "SETESCAPE");
+                ExtCallParseNode node = GetRuntimeExtCallNode("SETESCAPE");
                 node.Parameters = new ParametersParseNode();
                 node.Parameters.Add(new NumberParseNode(new Variant(escFlag)));
                 return node;
             }
-            _currentLine.PushToken(token);
 
             TrappableParseNode parseNode = new() {
                 Body = new CollectionParseNode(),
@@ -709,9 +720,12 @@ namespace JComal {
 
         // WHILE
         //
-        // Syntax: WHILE <integer expression> DO body ENDWHILE
+        // Syntax: WHILE <condition> DO <body> ENDWHILE
+        //         WHILE <condition> DO <statement>
         //
-        // While a condition is satisified, repeat the loop.
+        // While a condition is satisified, repeat the loop. Both
+        // multi-line and single line versions are supported.
+        //
         private ParseNode KWhile() {
 
             LoopParseNode node = new();
@@ -739,6 +753,7 @@ namespace JComal {
         //
         // Creates a loop construct that requires an EXIT statement
         // in the body to exit
+        //
         private ParseNode KLoop() {
 
             ExpectEndOfLine();
@@ -759,7 +774,8 @@ namespace JComal {
         //
         // Syntax: EXIT [WHEN <condition>]
         //
-        // Exits from a LOOP statement
+        // Exits from a LOOP statement. If a condition is specified then
+        // the EXIT occurs if the condition is satisified.
         //
         private ParseNode KExit() {
 
@@ -769,7 +785,7 @@ namespace JComal {
                 return null;
             }
 
-            // This is a very simple break statement.
+            // This is just a very simple break statement.
             BreakParseNode parseNode = new();
             parseNode.ScopeParseNode = _currentLoop;
             if (!_currentLine.IsAtEndOfStatement) {
@@ -783,8 +799,9 @@ namespace JComal {
         //
         // Syntax: [LABEL] identifier:
         //
-        // Assigns a label name to the line. This label is only referenced by RESTORE or GOTO. It is non-executable
-        // and may be placed anywhere within a program as a one line statement.
+        // Assigns a label name to the line. This label is only referenced by GOTO
+        // It is non-executable and may be placed anywhere within a program
+        // as a one line statement.
         //
         private ParseNode KLabel() {
 
@@ -802,7 +819,8 @@ namespace JComal {
         //
         // Syntax: GOTO <label name>
         //
-        // Statement - Transfers program execution to the line with the specified label name.
+        // Statement - Transfers program execution to the line with the
+        // specified label name.
         //
         private ParseNode KGoto() {
             return new GotoParseNode(ParseLabel());
@@ -810,12 +828,12 @@ namespace JComal {
 
         // COLOUR
         //
-        // Syntax: COLOUR <integer expression>
+        // Syntax: COLOUR <colcode>
         //
         // Change the text background and foreground colour.
         //
         private ParseNode KColour() {
-            ExtCallParseNode node = new("JComLib.Runtime,jcomlib", "COLOUR");
+            ExtCallParseNode node = GetRuntimeExtCallNode("COLOUR");
             node.Parameters = new ParametersParseNode();
             node.Parameters.Add(IntegerExpression());
             return node;
@@ -823,12 +841,12 @@ namespace JComal {
 
         // CURSOR
         //
-        // Syntax: CURSOR <integer expression>,<integer expression>
+        // Syntax: CURSOR <row>,<column>
         //
         // Move the cursor on the screen to the specified row and column.
         //
         private ParseNode KCursor() {
-            ExtCallParseNode node = new("JComLib.Runtime,jcomlib", "CURSOR");
+            ExtCallParseNode node = GetRuntimeExtCallNode("CURSOR");
             node.Parameters = new ParametersParseNode();
             node.Parameters.Add(IntegerExpression());
             ExpectToken(TokenID.COMMA);
@@ -838,18 +856,17 @@ namespace JComal {
 
         // REPORT
         //
-        // Syntax: REPORT [<integer expression>]
+        // Syntax: REPORT [<errnum>]
         //
-        // Part of the error handler structure. REPORT causes an error (optionally you can specify what error
-        // number to generate). This is useful when using multiple nested handlers. REPORT puts you into the
-        // next outer handler. If REPORT is issued while not in a handler section, the error is reported to
-        // the system.
+        // REPORTs an error where <errnum> is an optional error number taken
+        // from MessageCode. If REPORT is used within a TRAP handler then the
+        // error is caught and _ERR and _ERRTEXT will be assigned the
+        // specified errnum and it's associated message.
         //
         private ParseNode KReport() {
 
-            ExtCallParseNode node = new("JComLib.Runtime,jcomlib", "REPORT") {
-                Inline = true
-            };
+            ExtCallParseNode node = GetRuntimeExtCallNode("REPORT");
+            node.Inline = true;
             node.Parameters = new ParametersParseNode();
             if (!_currentLine.IsAtEndOfStatement) {
                 node.Parameters.Add(IntegerExpression());
@@ -861,15 +878,13 @@ namespace JComal {
 
         // STOP
         //
-        // Syntax: STOP [<string expression>]
+        // Syntax: STOP [<message>]
         //
-        // Terminates program execution. Execution may be continued with the CON command. Variables may be
-        // displayed or changed before continuing. Lines may also be listed. However, if any lines are added,
-        // deleted, or modified the program may not be able to be restarted (due to internal tables).
+        // Terminates program execution with an optional message.
         //
         private ParseNode KStop() {
 
-            ExtCallParseNode node = new("JComLib.Runtime,jcomlib", "STOP");
+            ExtCallParseNode node = GetRuntimeExtCallNode("STOP");
             node.Parameters = new ParametersParseNode();
             if (!_currentLine.IsAtEndOfStatement) {
                 node.Parameters.Add(CastNodeToType(StringExpression(), SymType.CHAR));
@@ -882,12 +897,9 @@ namespace JComal {
 
         // END
         //
-        // Syntax: END
+        // Syntax: END [<message>]
         //
-        // Terminates program execution. END is optional. Without an END statement, a program ends automatically0
-        // after its last line is executed. There may be more than one END statement in a program. Programs ending
-        // at an END statement may not be restarted via CON (use STOP for this capability). A message may be
-        // included to replace the system default end message (usually End At Line 0100 or something similar).
+        // ENDs the current program with an optional message.
         //
         private ParseNode KEnd() {
 

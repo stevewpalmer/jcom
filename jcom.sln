@@ -60,7 +60,7 @@ Global
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$0.TextStylePolicy = $2
-		$2.EolMarker = Windows
+		$2.EolMarker = Unix
 		$2.scope = text/plain
 		$2.TabsToSpaces = True
 		$0.ChangeLogPolicy = $3

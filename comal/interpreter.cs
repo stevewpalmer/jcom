@@ -198,6 +198,10 @@ namespace JComal {
                                 Lines.Reset();
                                 break;
 
+                            case TokenID.KCON:
+                            case TokenID.KSIZE:
+                                throw new Exception("Not Implemented");
+
                             default:
                                 possibleStatement = true;
                                 ExecuteLines(opts, messages, new Lines(line));
@@ -341,7 +345,7 @@ namespace JComal {
                 SyntaxError();
             }
 
-            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "lst");
+            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, Consts.SourceFileExtension);
 
             if (!File.Exists(filename)) {
                 throw new Exception("File not found");
@@ -462,10 +466,10 @@ namespace JComal {
                     token = ls.GetToken();
                 }
                 StringToken filenameToken = token as StringToken;
-                if (token == null) {
+                if (filenameToken == null) {
                     SyntaxError();
                 }
-                string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "lst");
+                string filename = Utilities.AddExtensionIfMissing(filenameToken.String, Consts.SourceFileExtension);
                 listFile = new StreamWriter(filename);
             }
 
@@ -555,7 +559,7 @@ namespace JComal {
                 SyntaxError();
             }
 
-            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "cml");
+            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, Consts.ProgramFileExtension);
 
             if (!File.Exists(filename)) {
                 throw new Exception("File not found");
@@ -606,7 +610,7 @@ namespace JComal {
                 SyntaxError();
             }
 
-            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, "cml");
+            string filename = Utilities.AddExtensionIfMissing(filenameToken.String, Consts.ProgramFileExtension);
 
             using (Stream stream = new FileStream(filename, FileMode.Create, FileAccess.Write)) {
                 using BinaryWriter writer = new(stream);
