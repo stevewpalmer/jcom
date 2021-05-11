@@ -165,7 +165,7 @@ namespace JComLib {
         /// <param name="index">1 based index at which the substring starts</param>
         /// <returns>A native string containing the requested substring of the fixed string</returns>
         public FixedString Substring(int start) {
-            if (start < 1 || start >= Length) {
+            if (start < 1 || start > Length) {
                 throw new InvalidOperationException("index");
             }
             return Substring(start, Length);
@@ -227,8 +227,8 @@ namespace JComLib {
         /// length.
         /// </summary>
         /// <param name="newString">The new fixed string to copy to this one</param>
-        /// <param name="start">The 0 based index of the start of the range</param>
-        /// <param name="end">The 0 based index of the end of the range</param>
+        /// <param name="start">The 1 based index of the start of the range</param>
+        /// <param name="end">The 1 based index of the end of the range</param>
         public void Set(FixedString newString, int start, int end) {
             if (newString == null) {
                 throw new ArgumentNullException(nameof(newString));

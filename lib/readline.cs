@@ -76,6 +76,10 @@ namespace JComLib {
         /// <returns>Input string</returns>
         public string Read(string existingLine) {
 
+            if (Console.IsInputRedirected) {
+                return Console.ReadLine();
+            }
+
             int historyIndex = history.Count;
 
             SetBuffer(existingLine);

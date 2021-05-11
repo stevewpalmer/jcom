@@ -768,7 +768,7 @@ namespace JFortranLib {
             if (charsRead == -1) {
                 iostat = IOError.ReadError;
             } else {
-                fixedstrVar.Set(fixedString, start - 1, end - 1);
+                fixedstrVar.Set(fixedString, start, end);
             }
             return charsRead;
         }
