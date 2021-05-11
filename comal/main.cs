@@ -42,7 +42,9 @@ namespace JComal {
                     Interpreter interpreter = new();
                     interpreter.Run(opts);
                 } else {
-                    Compiler comp = new(opts, messages);
+                    Compiler comp = new(opts) {
+                        Messages = messages
+                    };
 
                     foreach (string srcfile in opts.SourceFiles) {
                         if (!File.Exists(srcfile)) {

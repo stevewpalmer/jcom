@@ -142,7 +142,7 @@ namespace ComalTests {
             ";
 
             ComalOptions opts = new();
-            Compiler comp = new(opts, new(opts));
+            Compiler comp = new(opts);
             comp.CompileString(code, true);
             Assert.AreEqual(0, comp.Messages.ErrorCount);
             Assert.Throws(typeof(DivideByZeroException), delegate { comp.Execute("ITEST"); });

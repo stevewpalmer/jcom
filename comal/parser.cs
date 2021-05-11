@@ -126,7 +126,7 @@ namespace JComal {
                             break;
                         }
                         if (_currentLine.PeekToken().ID != TokenID.COLON) {
-                            item = Expression();
+                            item = IntegerExpression();
                         }
                         token = GetNextToken();
                         if (token.ID == TokenID.COLON) {
@@ -138,7 +138,7 @@ namespace JComal {
                             token = GetNextToken();
                             if (token.ID != TokenID.RPAREN) {
                                 _currentLine.PushToken(token);
-                                item = Expression();
+                                item = IntegerExpression();
                                 token = GetNextToken();
                             }
                             node.SubstringEnd = item;

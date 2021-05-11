@@ -35,8 +35,7 @@ namespace ComalTests {
         // Compile the given code and return the error count.
         public static Compiler HelperCompile(string code, ComalOptions opts) {
             opts.Run = true;
-            MessageCollection messages = new(opts);
-            Compiler comp = new(opts, messages);
+            Compiler comp = new(opts);
             comp.CompileString(code, true);
             Assert.AreEqual(0, comp.Messages.ErrorCount, string.Format("Compiler Errors : {0}", string.Join("\n", comp.Messages)));
             return comp;
@@ -45,8 +44,7 @@ namespace ComalTests {
         // Compile the given code and check the specified errors occurred.
         public static void HelperCompileAndCheckErrors(string code, ComalOptions opts, Message [] expectedErrors) {
             opts.Run = true;
-            MessageCollection messages = new(opts);
-            Compiler comp = new(opts, messages);
+            Compiler comp = new(opts);
             comp.CompileString(code, true);
             Assert.AreEqual(expectedErrors.Length, comp.Messages.ErrorCount);
             for (int index = 0; index < expectedErrors.Length; index++) {

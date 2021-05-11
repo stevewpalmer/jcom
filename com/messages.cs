@@ -75,6 +75,14 @@ namespace CCompiler {
         public int Linenumber { get; set; }
 
         /// <summary>
+        /// Clear the messages list.
+        /// </summary>
+        public void Clear() {
+            _messages.Clear();
+            ErrorCount = 0;
+        }
+
+        /// <summary>
         /// Adds the specified informational string to the message list.
         /// </summary>
         /// <param name="str">The string to write</param>

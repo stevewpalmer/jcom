@@ -39,10 +39,14 @@ namespace JComal {
         /// </summary>
         public Interpreter() {
             IsAutoMode = false;
-            AutoLineNumber = 10;
-            AutoSteps = 10;
             Lines = new();
+            ActiveCompiler = null;
         }
+
+        /// <summary>
+        /// Active compiler instance
+        /// </summary>
+        private static Compiler ActiveCompiler { get; set; }
 
         /// <summary>
         /// Return whether we're in auto line numbering mode
@@ -110,6 +114,7 @@ namespace JComal {
                                 throw new Exception("Invalid line number");
                             }
                             Lines.Add(line);
+                            ActiveCompiler = null;
                             IsModified = true;
                         }
                         continue;
@@ -183,6 +188,7 @@ namespace JComal {
                                 if (oldLines == null) {
                                     oldLines = new Lines(Lines);
                                 }
+                                ActiveCompiler = null;
                                 Lines.Clear();
                                 FileManager.Zone = FileManager.DefaultZone;
                                 IsModified = false;
@@ -194,7 +200,7 @@ namespace JComal {
 
                             case TokenID.KRUN:
                                 Lines.Reset();
-                                ExecuteLines(opts, messages, Lines);
+                                ExecuteLines(opts, Lines);
                                 Lines.Reset();
                                 break;
 
@@ -204,7 +210,7 @@ namespace JComal {
 
                             default:
                                 possibleStatement = true;
-                                ExecuteLines(opts, messages, new Lines(line));
+                                ExecuteStatement(opts, line);
                                 break;
                         }
 
@@ -290,6 +296,7 @@ namespace JComal {
             }
             Lines.Delete(startLine, endLine);
 
+            ActiveCompiler = null;
             IsModified = true;
         }
 
@@ -320,6 +327,7 @@ namespace JComal {
             Lines.Add(line);
             Lines.Reset();
 
+            ActiveCompiler = null;
             IsModified = true;
         }
 
@@ -351,6 +359,8 @@ namespace JComal {
                 throw new Exception("File not found");
             }
             string[] sourceLines = File.ReadAllLines(filename);
+
+            ActiveCompiler = null;
 
             int lastLine = 0;
             int lineNumber = Lines.MaxLine + 10;
@@ -438,6 +448,8 @@ namespace JComal {
                     Console.WriteLine(lineToSearch);
                 }
             }
+
+            ActiveCompiler = null;
             IsModified = true;
         }
 
@@ -565,6 +577,8 @@ namespace JComal {
                 throw new Exception("File not found");
             }
 
+            ActiveCompiler = null;
+
             try {
                 using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
                 ByteReader byteReader = new(stream);
@@ -593,6 +607,7 @@ namespace JComal {
             }
             Lines.Renumber(start, steps);
 
+            ActiveCompiler = null;
             IsModified = true;
         }
 
@@ -634,9 +649,9 @@ namespace JComal {
                 WarnLevel = 4
             };
             MessageCollection messages = new(localOpts);
-            Compiler compiler = new(localOpts, messages);
+            ActiveCompiler = new(localOpts);
             Lines.Reset();
-            compiler.CompileLines(Lines);
+            ActiveCompiler.CompileLines(Lines);
             foreach (Message msg in messages) {
                 Console.WriteLine(msg);
             }
@@ -684,14 +699,34 @@ namespace JComal {
             }
         }
 
-        // Scan and optionally execute the current sequence of lines
-        private static void ExecuteLines(ComalOptions opts, MessageCollection messages, Lines lines) {
-            Compiler compiler = new(opts, messages);
-            compiler.CompileLines(lines);
-            if (compiler.Messages.ErrorCount == 0) {
-                compiler.Execute();
-                FileManager.CLOSE();
+        // Compile and execute the given statement by compiling it as a method named
+        // _Direct() which is added to the existing parse tree.
+        //
+        // This allows us to issue direct statements that call functions and procedures
+        // in the program currently loaded into memory, assuming that program has first
+        // been run or scanned. Note that this doesn't allow us to persist variables
+        // across calls.
+        //
+        private static void ExecuteStatement(ComalOptions opts, Line line) {
+
+            if (ActiveCompiler == null) {
+                ActiveCompiler = new(opts);
             }
+            ActiveCompiler.Messages.Interactive = opts.Interactive;
+            ActiveCompiler.Messages.Clear();
+            ActiveCompiler.CompileMethod("_Direct", new Lines(line));
+            ActiveCompiler.Execute("_Direct");
+            FileManager.CLOSE();
+        }
+
+        // Scan and execute the specified source lines.
+        private static void ExecuteLines(ComalOptions opts, Lines lines) {
+
+            ActiveCompiler = new(opts);
+            ActiveCompiler.Messages.Interactive = opts.Interactive;
+            ActiveCompiler.CompileLines(lines);
+            ActiveCompiler.Execute();
+            FileManager.CLOSE();
         }
 
         // Display interpreter prompt and read a line

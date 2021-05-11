@@ -78,13 +78,14 @@ namespace JComal {
         /// Constructs a compiler object with the given options.
         /// </summary>
         /// <param name="opts">Compiler options</param>
-        /// <param name="messages">Messages table</param>
-        public Compiler(ComalOptions opts, MessageCollection messages) {
+        public Compiler(ComalOptions opts) {
             _globalSymbols = new("Global");
             _localSymbols = null;
             _importSymbols = null;
             _ptree = new CollectionParseNode();
-            Messages = messages;
+            Messages = new MessageCollection(opts) {
+                Interactive = opts.Interactive
+            };
             _entryPointName = "Main";
             _opts = opts;
         }
@@ -176,6 +177,50 @@ namespace JComal {
         }
 
         /// <summary>
+        /// Compile a collection of lines into the given method.
+        /// </summary>
+        /// <param name="methodName">Method name</param>
+        /// <param name="lines">A Lines object representing the method body</param>
+        public void CompileMethod(string methodName, Lines lines) {
+
+            if (_programDef == null) {
+                InitProgram();
+            }
+
+            // Find an existing instance of this method
+            ProcedureParseNode activeMethod = null;
+            foreach (ParseNode node in _programDef.Root.Nodes) {
+                if (node is ProcedureParseNode procNode && procNode.ProcedureSymbol.Name == methodName) {
+                    activeMethod = procNode;
+                    break;
+                }
+            }
+
+            // If the method already exists, clear the body of the method.
+            // Otherwise create this method and add it to the root of the
+            // program.
+            if (activeMethod != null) {
+                activeMethod.Nodes.Clear();
+            } else { 
+                Symbol method = _globalSymbols.Add(methodName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
+                method.Defined = true;
+
+                activeMethod = new ProcedureParseNode {
+                    ProcedureSymbol = method,
+                    LocalSymbols = new SymbolCollection("Local")
+                };
+                _programDef.Root.Nodes.Add(activeMethod);
+            }
+
+            // Now compile the lines into the method body.
+            _localSymbols = activeMethod.LocalSymbols;
+            _currentProcedure = activeMethod;
+            _ls = lines;
+
+            CompileBlock(activeMethod, new[] { TokenID.ENDOFFILE });
+        }
+
+        /// <summary>
         /// Convert the parse tree to executable code then save it to the
         /// filename specified in the options.
         /// </summary>
@@ -218,32 +263,7 @@ namespace JComal {
         // Compile an array of source lines.
         private void CompileString(string filename, Lines lines) {
             try {
-                _blockDepth = 0;
-                _state = BlockState.NONE;
-
-                // Create the top-level program node.
-                if (_programDef == null) {
-                    string moduleName = Path.GetFileNameWithoutExtension(_opts.OutputFile);
-                    if (string.IsNullOrEmpty(moduleName)) {
-                        moduleName = "Class";
-                    }
-                    _programDef = new();
-                    _programDef.Name = moduleName;
-                    _programDef.Globals = _globalSymbols;
-                    _programDef.IsExecutable = true;
-                    _programDef.Root = _ptree;
-                }
-
-                // Create special variables
-                _globalSymbols.Add(new Symbol(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
-                    Modifier = SymModifier.STATIC,
-                    Value = new Variant(0)
-                });
-                _globalSymbols.Add(new Symbol(Consts.ErrText, new SymFullType(SymType.CHAR), SymClass.VAR, null, 0) {
-                    Modifier = SymModifier.STATIC,
-                    Value = new Variant(string.Empty)
-                });
-
+                InitProgram();
                 CompileUnit(filename, lines);
 
                 // Warn about exported methods that are not defined
@@ -267,6 +287,36 @@ namespace JComal {
                 }
                 Messages.Error(MessageCode.COMPILERFAILURE, $"Compiler error: {e.Message}");
             }
+        }
+
+        // Initialise a top-level program node.
+        private void InitProgram() {
+
+            _blockDepth = 0;
+            _state = BlockState.NONE;
+
+            // Create the top-level program node.
+            if (_programDef == null) {
+                string moduleName = Path.GetFileNameWithoutExtension(_opts.OutputFile);
+                if (string.IsNullOrEmpty(moduleName)) {
+                    moduleName = "Class";
+                }
+                _programDef = new();
+                _programDef.Name = moduleName;
+                _programDef.Globals = _globalSymbols;
+                _programDef.IsExecutable = true;
+                _programDef.Root = _ptree;
+            }
+
+            // Create special variables
+            _globalSymbols.Add(new Symbol(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
+                Modifier = SymModifier.STATIC,
+                Value = new Variant(0)
+            });
+            _globalSymbols.Add(new Symbol(Consts.ErrText, new SymFullType(SymType.CHAR), SymClass.VAR, null, 0) {
+                Modifier = SymModifier.STATIC,
+                Value = new Variant(string.Empty)
+            });
         }
 
         // Compile a code unit, such as an include file.
