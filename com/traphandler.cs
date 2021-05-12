@@ -39,14 +39,14 @@ namespace CCompiler {
         /// <summary>
         /// Gets or sets the statements within the trapper.
         /// </summary>
-        /// <value>The CollectionParseNode parse node</value>
-        public CollectionParseNode Body { get; set; }
+        /// <value>The BlockParseNode parse node</value>
+        public BlockParseNode Body { get; set; }
 
         /// <summary>
         /// Gets or sets the statements within the handler.
         /// </summary>
-        /// <value>The CollectionParseNode parse node</value>
-        public CollectionParseNode Handler { get; set; }
+        /// <value>The BlockParseNode parse node</value>
+        public BlockParseNode Handler { get; set; }
 
         /// <summary>
         /// Gets or sets the symbol that is set to the runtime error value.
@@ -81,13 +81,9 @@ namespace CCompiler {
         /// <param name="cg">A code generator object</param>
         public override void Generate(CodeGenerator cg) {
             cg.Emitter.SetupTryCatchBlock();
-            foreach (ParseNode t in Body.Nodes) {
-                t.Generate(cg);
-            }
+            Body.Generate(cg);
             cg.Emitter.AddTryCatchHandlerBlock(Err, Message);
-            foreach (ParseNode t in Handler.Nodes) {
-                t.Generate(cg);
-            }
+            Handler.Generate(cg);
             cg.Emitter.CloseTryCatchBlock();
         }
     }

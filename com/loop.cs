@@ -80,10 +80,10 @@ namespace CCompiler {
         public ParseNode Callback { get; set; }
 
         /// <summary>
-        /// Gets or sets the parse node for the loop body.
+        /// Gets or sets the parse block for the loop body.
         /// </summary>
         /// <value>The parse node for the loop body.</value>
-        public CollectionParseNode LoopBody { get; set; }
+        public BlockParseNode LoopBody { get; set; }
 
         /// <summary>
         /// Loop exit label for EXIT statement
@@ -142,10 +142,7 @@ namespace CCompiler {
                 StepExpression.Dump(blockNode.Node("StepExpression"));
             }
             if (LoopBody != null) {
-                blockNode = blockNode.Node("LoopBody");
-                foreach (ParseNode node in LoopBody.Nodes) {
-                    node.Dump(blockNode);
-                }
+                LoopBody.Dump(blockNode.Node("LoopBody"));
             }
         }
 
@@ -186,10 +183,9 @@ namespace CCompiler {
                 cg.GenerateExpression(SymType.BOOLEAN, StartExpression);
                 cg.Emitter.BranchIfFalse(ExitLabel);
             }
-            CollectionParseNode block = LoopBody;
-            foreach (ParseNode t in block.Nodes) {
-                t.Generate(cg);
-            }
+
+            LoopBody.Generate(cg);
+
             cg.Emitter.Branch(loopStart);
             cg.Emitter.MarkLabel(ExitLabel);
         }
@@ -202,10 +198,9 @@ namespace CCompiler {
             Label loopStart = cg.Emitter.CreateLabel();
 
             cg.Emitter.MarkLabel(loopStart);
-            CollectionParseNode block = LoopBody;
-            foreach (ParseNode t in block.Nodes) {
-                t.Generate(cg);
-            }
+
+            LoopBody.Generate(cg);
+
             cg.GenerateExpression(SymType.BOOLEAN, EndExpression);
             cg.Emitter.BranchIfFalse(loopStart);
         }
@@ -268,10 +263,7 @@ namespace CCompiler {
             }
 
             if (LoopBody != null) {
-                CollectionParseNode block = LoopBody;
-                foreach (ParseNode t in block.Nodes) {
-                    t.Generate(cg);
-                }
+                LoopBody.Generate(cg);
             }
 
             cg.Emitter.LoadLocal(sym.Index);

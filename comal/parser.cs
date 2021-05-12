@@ -176,19 +176,21 @@ namespace JComal {
             }
 
             // Method should exist in _globalSymbols due to Pass 0.
-            Symbol method = _globalSymbols.Get(methodName);
+            Symbol method = Globals.Get(methodName);
             Debug.Assert(method != null);
 
-            // New local symbol table for this block
-            SymbolCollection savedLocalSymbols = _localSymbols;
+            // Save return statement requirement
             bool savedHasReturn = _hasReturn;
-            _localSymbols = new SymbolCollection("Local");
             _hasReturn = false;
+
+            // New local symbol table for this block
+            SymbolCollection localSymbols = new("Local");
+            SymbolStack.Push(localSymbols);
 
             // Parameter list.
             Collection<Symbol> parameters = null;
             if (methodName != _entryPointName) {
-                parameters = ParseParameterDecl(_localSymbols, SymScope.PARAMETER);
+                parameters = ParseParameterDecl(SymbolStack.Top, SymScope.PARAMETER);
             }
 
             // EXTERNAL?
@@ -233,24 +235,28 @@ namespace JComal {
             }
 
             node.ProcedureSymbol = method;
-            node.LocalSymbols = _localSymbols;
+            node.LocalSymbols.Add(localSymbols);
             node.LabelList = new Collection<ParseNode>();
 
-            ProcedureParseNode savedCurrentProcedure = _currentProcedure;
-            _currentProcedure = node;
+            ProcedureParseNode savedCurrentProcedure = CurrentProcedure;
+            CurrentProcedure = node;
 
             // Don't catch run-time exceptions if we're running in
             // the interpreter.
-            _currentProcedure.CatchExceptions = !_opts.Interactive;
+            CurrentProcedure.CatchExceptions = !_opts.Interactive;
+
+            // Create a block
+            BlockParseNode block = new();
+            node.Body = block;
 
             // Compile the body of the procedure
             ++_blockDepth;
-            CompileBlock(node, new[] { endToken });
+            CompileBlock(block, new[] { endToken });
             --_blockDepth;
 
             // Make sure we have a RETURN statement.
             if (!_hasReturn) {
-                node.Add(new ReturnParseNode());
+                block.Add(new ReturnParseNode());
             }
 
             // Check identifier matches
@@ -258,7 +264,7 @@ namespace JComal {
             CheckEndOfBlockName(identToken, token);
 
             // Validate the block.
-            foreach (Symbol sym in _localSymbols) {
+            foreach (Symbol sym in SymbolStack.Top) {
                 if (sym.IsLabel && !sym.Defined) {
                     Messages.Error(MessageCode.UNDEFINEDLABEL, sym.RefLine, $"Undefined label {sym.Name}");
                 }
@@ -276,11 +282,14 @@ namespace JComal {
                         $"Unused {scopeName} {sym.Name} in function");
                 }
             }
-            ValidateBlock(1, node);
+            ValidateBlock(1, block);
             _state = BlockState.SPECIFICATION;
-            _currentProcedure = savedCurrentProcedure;
+            CurrentProcedure = savedCurrentProcedure;
             _importSymbols = savedImportSymbols;
-            _localSymbols = savedLocalSymbols;
+
+            // Remove the local symbol table
+            SymbolStack.Pop();
+
             _hasReturn = savedHasReturn;
 
             _ptree.Add(node);
@@ -348,7 +357,7 @@ namespace JComal {
             if (identToken != null) {
                 
                 // Ban any conflict with PROGRAM name or the current function
-                Symbol globalSym = _globalSymbols.Get(identToken.Name);
+                Symbol globalSym = Globals.Get(identToken.Name);
                 if (globalSym != null && globalSym.Type == SymType.PROGRAM) {
                     Messages.Error(MessageCode.IDENTIFIERISGLOBAL,
                         $"Identifier {identToken.Name} already has global declaration");
@@ -357,7 +366,7 @@ namespace JComal {
                 }
                 
                 // Now check the local program unit
-                sym = _localSymbols.Get(identToken.Name);
+                sym = SymbolStack.Top.Get(identToken.Name);
 
                 // Handle array syntax and build a list of dimensions
                 Collection<SymDimension> dimensions = ParseArrayDimensions();

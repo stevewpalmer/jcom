@@ -81,17 +81,17 @@ namespace CCompiler {
         public ConditionalParseNode() : base(ParseID.COND) {}
 
         /// <summary>
-        /// Return the list of body tokens for each conditional block.
+        /// Return the list of block nodes for each conditional block.
         /// </summary>
         /// <value>The body list.</value>
-        public Collection<CollectionParseNode> BodyList { get; } = new();
+        public Collection<BlockParseNode> BodyList { get; } = new();
 
         /// <summary>
         /// Adds a conditional and body.
         /// </summary>
         /// <param name="expr">Conditional expression node</param>
         /// <param name="body">Statements to be executed</param>
-        public void Add(ParseNode expr, CollectionParseNode body) {
+        public void Add(ParseNode expr, BlockParseNode body) {
             _exprList.Add(expr);
             BodyList.Add(body);
         }
@@ -108,7 +108,7 @@ namespace CCompiler {
                 if (expr != null) {
                     expr.Dump(blockNode);
                 }
-                ParseNode body = BodyList[c];
+                BlockParseNode body = BodyList[c];
                 if (body != null) {
                     body.Dump(blockNode);
                 }
@@ -150,10 +150,7 @@ namespace CCompiler {
                     }
                 }
                 if (!skipBlock) {
-                    CollectionParseNode body = BodyList[index];
-                    foreach (ParseNode node in body.Nodes) {
-                        node.Generate(cg);
-                    }
+                    BodyList[index].Generate(cg);
                 }
                 if (!isLastBlock) {
                     if (!skipBlock) {

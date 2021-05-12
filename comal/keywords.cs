@@ -73,13 +73,13 @@ namespace JComal {
                                "Procedure or function name expected");
             } else {
                 string methodName = identToken.Name;
-                Symbol sym = _globalSymbols.Get(methodName);
+                Symbol sym = Globals.Get(methodName);
                 if (sym != null && sym.IsExported) {
                     Messages.Error(MessageCode.ALREADYEXPORTED,
                                    $"{methodName} already exported");
                 }
                 if (sym == null) {
-                    sym = _globalSymbols.Add(methodName,
+                    sym = Globals.Add(methodName,
                                              new SymFullType(),
                                              SymClass.SUBROUTINE,
                                              null,
@@ -252,17 +252,17 @@ namespace JComal {
         private ParseNode KReturn() {
 
             ReturnParseNode node = new();
-            if (!_currentLine.IsAtEndOfLine && _currentProcedure.ProcedureSymbol.Class == SymClass.SUBROUTINE) {
+            if (!_currentLine.IsAtEndOfLine && CurrentProcedure.ProcedureSymbol.Class == SymClass.SUBROUTINE) {
                 Messages.Error(MessageCode.ILLEGALRETURN, "Cannot RETURN a value");
                 return null;
             }
-            if (_currentLine.IsAtEndOfLine && _currentProcedure.ProcedureSymbol.Class == SymClass.FUNCTION) {
+            if (_currentLine.IsAtEndOfLine && CurrentProcedure.ProcedureSymbol.Class == SymClass.FUNCTION) {
                 Messages.Error(MessageCode.ILLEGALRETURN, "Must RETURN a value");
                 return null;
             }
             if (!_currentLine.IsAtEndOfLine) {
 
-                Symbol thisSymbol = _currentProcedure.ProcedureSymbol;
+                Symbol thisSymbol = CurrentProcedure.ProcedureSymbol;
                 ParseNode exprNode = Expression();
                 if (exprNode != null) {
                     if (!ValidateAssignmentTypes(thisSymbol.Type, exprNode.Type)) {
@@ -291,7 +291,7 @@ namespace JComal {
             }
             do {
                 IdentifierToken identToken = ParseIdentifier();
-                Symbol sym = _globalSymbols.Get(identToken.Name);
+                Symbol sym = Globals.Get(identToken.Name);
                 if (sym == null) {
                     Messages.Error(MessageCode.METHODNOTFOUND, $"{identToken.Name} not found");
                 }
@@ -476,12 +476,12 @@ namespace JComal {
                 ExpectEndOfLine();
 
                 // Parse the body of a WHEN or OTHERWISE statement.
-                CollectionParseNode nodes = new();
-                TokenID endTokenID = CompileBlock(nodes, new[] {
+                BlockParseNode block = new();
+                TokenID endTokenID = CompileBlock(block, new[] {
                     TokenID.KENDCASE,
                     TokenID.KOTHERWISE,
                     TokenID.KWHEN });
-                parseNode.Add(conditionalNode, nodes);
+                parseNode.Add(conditionalNode, block);
 
                 // End of statement?
                 if (endTokenID == TokenID.KENDCASE) {
@@ -551,7 +551,7 @@ namespace JComal {
             ParseNode expr = Expression();
             InsertTokenIfMissing(TokenID.KTHEN);
 
-            CollectionParseNode statements;
+            BlockParseNode statements;
             if (!_currentLine.IsAtEndOfLine) {
 
                 // Single line IF
@@ -610,10 +610,10 @@ namespace JComal {
             }
 
             TrappableParseNode parseNode = new() {
-                Body = new CollectionParseNode(),
-                Handler = new CollectionParseNode(),
-                Err = _globalSymbols.Get(Consts.ErrName),
-                Message = _globalSymbols.Get(Consts.ErrText)
+                Body = new BlockParseNode(),
+                Handler = new BlockParseNode(),
+                Err = Globals.Get(Consts.ErrName),
+                Message = Globals.Get(Consts.ErrText)
             };
             CompileBlock(parseNode.Body, new[] { TokenID.KENDTRAP, TokenID.KHANDLER });
             CompileBlock(parseNode.Handler, new[] { TokenID.KENDTRAP });
@@ -628,6 +628,12 @@ namespace JComal {
         //
         private ParseNode KFor() {
 
+            // Need a new local symbol table as Comal FOR keywords are
+            // local to the FOR block
+            SymbolCollection forSymbols = new("_LOCAL");
+            SymbolStack.Push(forSymbols);
+            CurrentProcedure.LocalSymbols.Add(forSymbols);
+
             // Control identifier
             IdentifierToken identToken = ParseIdentifier();
             if (identToken == null) {
@@ -637,7 +643,7 @@ namespace JComal {
 
             LoopParseNode node = new();
 
-            Symbol symLoop = GetMakeSymbolForCurrentScope(identToken.Name);
+            Symbol symLoop = MakeSymbolForCurrentScope(identToken.Name);
             symLoop.IsReferenced = true;
             node.LoopVariable = new IdentifierParseNode(symLoop);
 
@@ -690,6 +696,8 @@ namespace JComal {
             if (node.IterationCount() == 0) {
                 Messages.Warning(MessageCode.LOOPSKIPPED, 2, "Loop will be skipped because iteration count is zero");
             }
+
+            SymbolStack.Pop();
             return node;
         }
 

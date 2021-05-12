@@ -52,7 +52,7 @@ namespace JFortran {
         }
 
         private readonly FortranOptions _opts;
-        private readonly CollectionParseNode _ptree;
+        private readonly BlockParseNode _ptree;
         private readonly FortranSymbolCollection _globalSymbols;
 
         private BlockState _state;
@@ -76,7 +76,7 @@ namespace JFortran {
         public Compiler(FortranOptions opts) {
             _globalSymbols = new FortranSymbolCollection("Global"); // Functions and Subroutines
             _localSymbols = new FortranSymbolCollection("Local"); // Everything else including labels
-            _ptree = new CollectionParseNode();
+            _ptree = new BlockParseNode();
             Messages = new MessageCollection(opts);
             _entryPointName = "Main";
             _opts = opts;
@@ -696,7 +696,7 @@ namespace JFortran {
             do {
                 ParseNode labelNode;
 
-                CollectionParseNode statements = new();
+                BlockParseNode statements = new();
 
                 SimpleToken token = _ls.GetKeyword();
                 ++_blockDepth;
@@ -754,7 +754,7 @@ namespace JFortran {
         private ParseNode KLogicalIf(ParseNode expr) {
             ConditionalParseNode node = new();
             _parsingIf = true;
-            CollectionParseNode body = new();
+            BlockParseNode body = new();
             body.Add(Statement(_ls.GetKeyword()));
             _parsingIf = false;
             node.Add(expr, body);
@@ -864,25 +864,26 @@ namespace JFortran {
         }
 
         // Parse the body of a standard DO or DO WHILE loop.
-        private CollectionParseNode ParseDoBody(SymbolParseNode endLabelNode) {
-            CollectionParseNode statements = new();
+        private BlockParseNode ParseDoBody(SymbolParseNode endLabelNode) {
+
+            BlockParseNode block = new();
             bool loopDone = false;
             SimpleToken token = _ls.GetKeyword();
             ++_blockDepth;
             do {
                 ParseNode labelNode = CheckLabel();
                 if (labelNode != null) {
-                    statements.Add(labelNode);
+                    block.Add(labelNode);
                 }
                 if (token.ID == TokenID.KENDDO) {
                     Messages.Warning(MessageCode.NONSTANDARDENDDO, 4, "Use of ENDDO is non-standard");
                     loopDone = true;
                     break;
                 }
-                statements.Add(MarkLine());
+                block.Add(MarkLine());
                 ParseNode subnode = Statement(token);
                 if (subnode != null) {
-                    statements.Add(subnode);
+                    block.Add(subnode);
                 }
                 if (_ls.HasLabel && endLabelNode != null && _ls.Label == endLabelNode.Symbol.Name) {
                     loopDone = true;
@@ -895,7 +896,7 @@ namespace JFortran {
             if (!loopDone) {
                 Messages.Error(MessageCode.MISSINGDOENDLABEL, "End label for DO loop not found");
             }
-            return statements;
+            return block;
         }
 
         // Parse an assignment statement.
@@ -1160,7 +1161,7 @@ namespace JFortran {
         // Recursive validation of a block and all sub-blocks. Currently the only
         // validation done at this point is for GO TO to verify we're not jumping
         // into the middle of an inner block.
-        private void ValidateBlock(int level, CollectionParseNode blockNodes) {
+        private void ValidateBlock(int level, BlockParseNode blockNodes) {
             string filename = null;
             int line = 0;
 

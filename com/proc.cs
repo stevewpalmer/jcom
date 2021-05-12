@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
@@ -32,7 +33,14 @@ namespace CCompiler {
     /// <summary>
     /// Specifies a parse node for a procedure.
     /// </summary>
-    public sealed class ProcedureParseNode : CollectionParseNode {
+    public sealed class ProcedureParseNode : ParseNode {
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public ProcedureParseNode() {
+            LocalSymbols = new List<SymbolCollection>();
+        }
 
         /// <summary>
         /// Gets or sets the symbol table entry for this procedure.
@@ -41,10 +49,11 @@ namespace CCompiler {
         public Symbol ProcedureSymbol { get; set; }
 
         /// <summary>
-        /// Gets or sets the symbol table for this procedure.
+        /// Gets or sets the collection of symbol tables for this procedure.
+        /// There may be multiple symbol tables for each nested scope.
         /// </summary>
         /// <value>The local symbol table</value>
-        public SymbolCollection LocalSymbols { get; set; }
+        public List<SymbolCollection> LocalSymbols { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this procedure is the main program.
@@ -84,6 +93,12 @@ namespace CCompiler {
         public int AlternateReturnCount { get; set; }
 
         /// <summary>
+        /// Gets or sets the parse block for the procedure body.
+        /// </summary>
+        /// <value>The parse node for the loop body.</value>
+        public BlockParseNode Body { get; set; }
+
+        /// <summary>
         /// Whether or not we handle exceptions
         /// </summary>
         public bool CatchExceptions { get; set; }
@@ -110,8 +125,8 @@ namespace CCompiler {
             ReturnLabel = cg.Emitter.CreateLabel();
 
             // Generate all locals for this method
-            if (LocalSymbols != null) {
-                cg.GenerateSymbols(LocalSymbols);
+            foreach (SymbolCollection symbols in LocalSymbols) {
+                cg.GenerateSymbols(symbols);
             }
 
             // Generate all the initialisation code
@@ -127,9 +142,9 @@ namespace CCompiler {
             if (needTryBlock) {
                 cg.Emitter.SetupTryCatchBlock();
             }
-            foreach (ParseNode statement in Nodes) {
-                statement.Generate(cg);
-            }
+
+            Body.Generate(cg);
+
             if (needTryBlock) {
                 cg.Emitter.AddDefaultTryCatchHandlerBlock();
                 cg.Emitter.CloseTryCatchBlock();
@@ -151,7 +166,11 @@ namespace CCompiler {
             blockNode.Attribute("IsMainProgram", IsMainProgram.ToString());
             blockNode.Attribute("CatchExceptions", CatchExceptions.ToString());
             blockNode.Attribute("AlternateReturnCount", AlternateReturnCount.ToString());
-            LocalSymbols.Dump(blockNode);
+
+            ParseNodeXml localSymbols = blockNode.Node("LocalSymbols");
+            foreach (SymbolCollection symbols in LocalSymbols) {
+                symbols.Dump(localSymbols);
+            }
 
             if (InitList?.Nodes != null) {
                 ParseNodeXml initNode = blockNode.Node("InitList");
@@ -159,10 +178,8 @@ namespace CCompiler {
                     init.Dump(initNode);
                 }
             }
-            ParseNodeXml statementNode = blockNode.Node("Statements");
-            foreach (ParseNode statement in Nodes) {
-                statement.Dump(statementNode);
-            }
+            ParseNodeXml statementNode = blockNode.Node("Body");
+            Body.Dump(statementNode);
         }
     }
 }

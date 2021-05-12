@@ -61,7 +61,7 @@ namespace CCompiler {
         /// Gets or sets the root of the parse tree.
         /// </summary>
         /// <value>The parse tree root</value>
-        public CollectionParseNode Root { get; set; }
+        public BlockParseNode Root { get; set; }
 
         /// <summary>
         /// Dumps the contents of this parse node to the ParseNode XML
