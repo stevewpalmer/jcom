@@ -115,7 +115,7 @@ namespace JComal {
                     lines.Add(line);
                 }
             }
-            CompileString(filename, lines);
+            CompileLines(filename, lines);
         }
 
         /// <summary>
@@ -144,33 +144,15 @@ namespace JComal {
                     lines.Add(line);
                 }
             }
-            CompileString(null, lines);
+            CompileLines(null, lines);
         }
 
         /// <summary>
         /// Compile an array of source lines.
-        /// This function exists primarily for unit tests.
-        /// </summary>
-        /// <param name="lines">A Lines object representing the source file</param>
-        public void CompileString(string [] sourceLines) {
-
-            // Tokenise the file
-            Lines lines = new();
-            LineTokeniser tokeniser = new();
-            foreach (string sourceLine in sourceLines) {
-                Line line = new(tokeniser.TokeniseLine(sourceLine));
-                lines.Add(line);
-            }
-            CompileString(null, lines);
-        }
-
-        /// <summary>
-        /// Compile an array of source lines.
-        /// This function exists primarily for unit tests.
         /// </summary>
         /// <param name="lines">A Lines object representing the source file</param>
         public void CompileLines(Lines lines) {
-            CompileString(null, lines);
+            CompileLines(null, lines);
         }
 
         /// <summary>
@@ -258,10 +240,24 @@ namespace JComal {
         }
 
         // Compile an array of source lines.
-        private void CompileString(string filename, Lines lines) {
+        private void CompileLines(string filename, Lines lines) {
             try {
                 InitProgram();
-                CompileUnit(filename, lines);
+
+                _ls = lines;
+
+                // Mark this file.
+                if (filename != null) {
+                    Messages.Filename = filename;
+                    _ptree.Add(MarkFilename());
+                }
+
+                // Pre-scan to locate all PROC/FUNCs so we have their declaration
+                // ahead of their usage
+                Pass0();
+
+                // Compile everything to the end of the file.
+                CompileBlock(_ptree, new[] { TokenID.ENDOFFILE });
 
                 // Warn about exported methods that are not defined
                 foreach (Symbol sym in _globalSymbols) {
@@ -314,25 +310,6 @@ namespace JComal {
                 Modifier = SymModifier.STATIC,
                 Value = new Variant(string.Empty)
             });
-        }
-
-        // Compile a code unit, such as an include file.
-        private void CompileUnit(string filename, Lines lines) {
-
-            _ls = lines;
-            Messages.Filename = filename;
-
-            // Mark this file.
-            if (filename != null) {
-                _ptree.Add(MarkFilename());
-            }
-
-            // Pre-scan to locate all PROC/FUNCs so we have their declaration
-            // ahead of their usage
-            Pass0();
-
-            // Loop and parse one single line at a time.
-            CompileBlock(_ptree, new[] { TokenID.ENDOFFILE });
         }
 
         // Do an initial pass-0 scan of all lines looking for PROC and FUNC tokens,
@@ -490,9 +467,10 @@ namespace JComal {
         private SimpleToken GetNextToken() {
 
             SimpleToken token = _currentLine.GetToken();
-            while (token.ID == TokenID.ERROR && Messages != null) {
-                ErrorToken errorToken = token as ErrorToken;
-                Messages.Error(MessageCode.EXPECTEDTOKEN, errorToken.Message);
+            while (token is ErrorToken errorToken) {
+                if (Messages != null) {
+                    Messages.Error(MessageCode.EXPECTEDTOKEN, errorToken.Message);
+                }
                 token = _currentLine.GetToken();
             }
             return token;
@@ -668,7 +646,8 @@ namespace JComal {
         private SimpleToken ExpectToken(TokenID expectedID) {
             SimpleToken token = GetNextToken();
             if (token.ID != expectedID) {
-                Messages.Error(MessageCode.EXPECTEDTOKEN, $"Expected '{Tokens.TokenIDToString(expectedID)}' not '{Tokens.TokenIDToString(token.ID)}'");
+                Messages.Error(MessageCode.EXPECTEDTOKEN,
+                    $"Expected '{Tokens.TokenIDToString(expectedID)}' not '{Tokens.TokenIDToString(token.ID)}'");
                 return null;
             }
             return token;
@@ -688,7 +667,8 @@ namespace JComal {
             if (token.ID != expectedID) {
 
                 if (_opts.Strict) {
-                    Messages.Error(MessageCode.EXPECTEDTOKEN, $"Expected '{Tokens.TokenIDToString(expectedID)}'");
+                    Messages.Error(MessageCode.EXPECTEDTOKEN,
+                        $"Expected '{Tokens.TokenIDToString(expectedID)}' not '{Tokens.TokenIDToString(token.ID)}'");
                 }
                 _currentLine.InsertTokens(new [] {
                     new SimpleToken(TokenID.SPACE),

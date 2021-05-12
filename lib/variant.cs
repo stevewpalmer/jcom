@@ -48,8 +48,6 @@ namespace JComLib {
     /// interface for setting and retrieving the value.
     /// </summary>
     public class Variant {
-        private double _value;
-        private Complex _complexValue;
 
         public Variant() {
             HasValue = false;
@@ -350,9 +348,10 @@ namespace JComLib {
         public void Set(bool boolValue) {
             BoolValue = boolValue;
             IntValue = boolValue ? -1 : 0;
-            _value = IntValue;
+            DoubleValue = IntValue;
+            RealValue = IntValue;
             StringValue = BoolValue.ToString();
-            _complexValue = boolValue ? -1 : 0;
+            ComplexValue = boolValue ? -1 : 0;
             Type = VariantType.BOOLEAN;
             HasValue = true;
         }
@@ -362,11 +361,12 @@ namespace JComLib {
         /// </summary>
         /// <param name="intValue">Integer value to set</param>
         public void Set(int intValue) {
-            _value = intValue;
+            DoubleValue = intValue;
+            RealValue = intValue;
             IntValue = intValue;
             BoolValue = intValue != 0;
             StringValue = intValue.ToString();
-            _complexValue = _value;
+            ComplexValue = intValue;
             Type = VariantType.INTEGER;
             HasValue = true;
         }
@@ -376,11 +376,12 @@ namespace JComLib {
         /// </summary>
         /// <param name="floatValue">Float value to set</param>
         public void Set(float floatValue) {
-            _value = floatValue;
+            RealValue = floatValue;
+            DoubleValue = (double)floatValue;
             IntValue = (int)floatValue;
             BoolValue = (int)floatValue != 0;
             StringValue = floatValue.ToString(CultureInfo.InvariantCulture);
-            _complexValue = _value;
+            ComplexValue = floatValue;
             Type = VariantType.FLOAT;
             HasValue = true;
         }
@@ -390,11 +391,12 @@ namespace JComLib {
         /// </summary>
         /// <param name="doubleValue">Double value to set</param>
         public void Set(double doubleValue) {
-            _value = doubleValue;
+            DoubleValue = doubleValue;
+            RealValue = (float)doubleValue;
             IntValue = (int)doubleValue;
             BoolValue = (int)doubleValue != 0;
             StringValue = doubleValue.ToString(CultureInfo.InvariantCulture);
-            _complexValue = _value;
+            ComplexValue = doubleValue;
             Type = VariantType.DOUBLE;
             HasValue = true;
         }
@@ -404,11 +406,14 @@ namespace JComLib {
         /// </summary>
         /// <param name="stringValue">String value to set</param>
         public void Set(string stringValue) {
-            double.TryParse(stringValue, out _value);
-            IntValue = (int)_value;
+            double _doubleValue;
+            double.TryParse(stringValue, out _doubleValue);
+            DoubleValue = _doubleValue;
+            RealValue = (float)_doubleValue;
+            IntValue = (int)DoubleValue;
             BoolValue = IntValue != 0;
             StringValue = stringValue;
-            _complexValue = _value;
+            ComplexValue = DoubleValue;
             Type = VariantType.STRING;
             HasValue = true;
         }
@@ -418,11 +423,12 @@ namespace JComLib {
         /// </summary>
         /// <param name="complexValue">Complex value to set</param>
         public void Set(Complex complexValue) {
-            _value = complexValue.Real;
+            DoubleValue = complexValue.Real;
+            RealValue = (float)complexValue.Real;
             IntValue = (int)complexValue.Real;
             BoolValue = (int)complexValue.Real != 0;
             StringValue = complexValue.ToString();
-            _complexValue = complexValue;
+            ComplexValue = complexValue;
             Type = VariantType.COMPLEX;
             HasValue = true;
         }
@@ -443,6 +449,61 @@ namespace JComLib {
                                 Type == VariantType.COMPLEX;
 
         /// <summary>
+        /// Determines whether the specified <see cref="object"/> is equal to
+        /// the current <see cref="Variant"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="Variant"/>.</param>
+        /// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current
+        /// <see cref="Variant"/>; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object obj) {
+            if (!(obj is Variant)) {
+                return false;
+            }
+            Variant s2 = (Variant)obj;
+            return Compare(s2);
+        }
+
+        /// <summary>
+        /// Serves as a hash function for a <see><cref>CCompiler.SymFullType</cref>
+        /// </see>object.
+        /// </summary>
+        /// <returns>A hash code for this instance that is suitable for use in hashing
+        /// algorithms and data structures such as a hash table.</returns>
+        public override int GetHashCode() {
+            unchecked {
+                int hash = 17;
+                hash = (hash * 23) + DoubleValue.GetHashCode();
+                return hash;
+            }
+        }
+
+        /// <summary>
+        /// Implements the equality operator between two variants.
+        /// </summary>            
+        /// <param name="s1">First variant</param>
+        /// <param name="s2">Second variant</param>
+        /// <returns>True if the two variants are equal, false otherwise</returns>
+        public static bool operator ==(Variant s1, Variant s2) {
+            if (s1 is null) {
+                return s2 is null;
+            }
+            return s1.Compare(s2);
+        }
+
+        /// <summary>
+        /// Implements the equality operator between two variants.
+        /// </summary>            
+        /// <param name="s1">First variant</param>
+        /// <param name="s2">Second variant</param>
+        /// <returns>True if the two variants are equal, false otherwise</returns>
+        public static bool operator !=(Variant s1, Variant s2) {
+            if (s1 is null) {
+                return s2 is not null;
+            }
+            return !s1.Compare(s2);
+        }
+
+        /// <summary>
         /// Compares a variant against an integer value.
         /// </summary>
         /// <param name="v">The integer value to compare against</param>
@@ -457,14 +518,14 @@ namespace JComLib {
         /// <param name="v">The variant to compare against</param>
         /// <returns><c>true</c> if the two variants match; otherwise, <c>false</c>.</returns>
         public bool Compare(Variant v) {
-            if (v == null) {
-                throw new ArgumentNullException(nameof(v));
+            if (v is null) {
+                return false;
             }
             return Type switch {
                 VariantType.INTEGER =>  IntValue == v.IntValue,
-                VariantType.FLOAT =>    _value.CompareTo(v.RealValue) == 0,
-                VariantType.DOUBLE =>   _value.CompareTo(v.DoubleValue) == 0,
-                VariantType.COMPLEX =>  _complexValue == v.ComplexValue,
+                VariantType.FLOAT =>    RealValue.CompareTo(v.RealValue) == 0,
+                VariantType.DOUBLE =>   DoubleValue.CompareTo(v.DoubleValue) == 0,
+                VariantType.COMPLEX =>  ComplexValue == v.ComplexValue,
                 _ => false,
             };
         }
@@ -482,7 +543,7 @@ namespace JComLib {
         /// <summary>
         /// Returns the float value of this variant.
         /// </summary>
-        public float RealValue => (float)_value;
+        public float RealValue { get; private set; }
 
         /// <summary>
         /// Returns the string value of this variant.
@@ -492,12 +553,12 @@ namespace JComLib {
         /// <summary>
         /// Returns the double value of this variant.
         /// </summary>
-        public double DoubleValue => _value;
+        public double DoubleValue { get; private set; }
 
         /// <summary>
         /// Returns the complex value of this variant.
         /// </summary>
-        public Complex ComplexValue => _complexValue;
+        public Complex ComplexValue { get; private set; }
 
         /// <summary>
         /// Returns whether this variant has an explicit value

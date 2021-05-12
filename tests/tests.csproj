@@ -32,5 +32,6 @@
     <Folder Include="Fortran\" />
     <Folder Include="Comal\" />
     <Folder Include="Utilities\" />
+    <Folder Include="ComLib\" />
   </ItemGroup>
 </Project>

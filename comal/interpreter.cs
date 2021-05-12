@@ -26,6 +26,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using CCompiler;
 using JComalLib;
 using JComLib;
@@ -80,7 +81,8 @@ namespace JComal {
         /// <param name="opts">Command line options</param>
         public void Run(ComalOptions opts) {
 
-            Console.WriteLine("JComal v" + opts.VersionString);
+            Version ver = Assembly.GetEntryAssembly().GetName().Version;
+            Console.WriteLine($"JComal v{ver.Major}.{ver.Minor}");
             Console.WriteLine();
 
             Lines oldLines = null;

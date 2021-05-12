@@ -61,6 +61,11 @@ namespace JComalLib {
                     if (ch == '-' && index < length) {
                         ++integerPart;
                         ch = template[index++];
+                        if (ch != '#') {
+                            index--;
+                            str.Append('-');
+                            continue;
+                        }
                     }
                     if (ch == '#' && index < length) {
                         do {
@@ -84,8 +89,13 @@ namespace JComalLib {
                             } while (ch == '#');
                         }
                     }
+                    if (decimalPart == 1 && integerPart == 0 && fractionPart == 0) {
+                        index--;
+                        str.Append('.');
+                        continue;
+                    }
                     if (index < length) {
-                        --index;
+                        index--;
                     }
 
                     int fieldWidth = integerPart + decimalPart + fractionPart;

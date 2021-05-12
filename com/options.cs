@@ -23,8 +23,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace CCompiler {
 
@@ -48,7 +51,13 @@ namespace CCompiler {
             Run = false;
             DevMode = true;
             VersionString = "1.0.0.0";
+            Messages = new MessageCollection(this);
         }
+
+        /// <value>
+        /// Return or set the list of compiler messages.
+        /// </value>
+        public MessageCollection Messages { get; set; }
 
         /// <value>
         /// Sets and returns whether debuggable code is enabled.
@@ -111,6 +120,42 @@ namespace CCompiler {
                 return string.Empty;
             }
             set => _outputFile = value;
+        }
+
+        /// <summary>
+        /// Return the assembly copyright from the assemblyinfo module
+        /// </summary>
+        /// <returns>Assembly copyright</returns>
+        public string AssemblyCopyright() {
+            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+            Debug.Assert(attributes.Length > 0);
+            return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+        }
+
+        /// <summary>
+        /// Return the assembly description from the assemblyinfo module
+        /// </summary>
+        /// <returns>Assembly description</returns>
+        public string AssemblyDescription() {
+            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
+            Debug.Assert(attributes.Length > 0);
+            return ((AssemblyDescriptionAttribute)attributes[0]).Description;
+        }
+
+        /// <summary>
+        /// Return this executable filename.
+        /// </summary>
+        /// <returns>Executable filename string</returns>
+        public string ExecutableFilename() {
+            return Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
+        }
+
+        /// <summary>
+        /// Display the current version number
+        /// </summary>
+        public void DisplayVersion() {
+            Version ver = Assembly.GetEntryAssembly().GetName().Version;
+            Messages.Info($"{ver.Major}.{ver.Minor}.{ver.Build}");
         }
     }
 }

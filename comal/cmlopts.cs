@@ -38,18 +38,6 @@ namespace JComal {
     public class ComalOptions : Options {
 
         /// <summary>
-        /// Initialises an instance of the <c>ComalOptions</c> class.
-        /// </summary>
-        public ComalOptions() {
-            Messages = new MessageCollection(this);
-        }
-
-        /// <value>
-        /// Return or set the list of compiler messages.
-        /// </value>
-        public MessageCollection Messages { get; set; }
-
-        /// <summary>
         /// Sets and returns whether the compiler is operating in interactive
         /// mode or as an interpreter.
         /// </summary>
@@ -123,31 +111,6 @@ namespace JComal {
                 Interactive = true;
             }
             return success;
-        }
-
-        // Return the assembly copyright from the assemblyinfo module
-        private string AssemblyCopyright() {
-            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            Debug.Assert(attributes.Length > 0);
-            return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
-        }
-
-        // Return the assembly description from the assemblyinfo module
-        private string AssemblyDescription() {
-            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
-            Debug.Assert(attributes.Length > 0);
-            return ((AssemblyDescriptionAttribute)attributes[0]).Description;
-        }
-
-        // Return this executable filename.
-        private string ExecutableFilename() {
-            return Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
-        }
-
-        // Display the current version number
-        private void DisplayVersion() {
-            Version ver = Assembly.GetEntryAssembly().GetName().Version;
-            Messages.Info($"{ver.Major}.{ver.Minor}.{ver.Build}");
         }
 
         // Display the compiler Help page
