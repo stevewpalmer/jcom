@@ -36,40 +36,40 @@ namespace Utilities {
         // that the integer result matches
         public static void HelperRunInteger(ICompiler comp, string entryPointName, int expectedValue) {
             ExecutionResult execResult = comp.Execute(entryPointName);
-            Assert.IsTrue(execResult.Success);
-            Assert.IsTrue(expectedValue == (int)execResult.Result, "Saw " + execResult.Result + " but expected " + expectedValue);
+            Assert.IsTrue(execResult.Success, $"Execution Status : {execResult.Success}");
+            Assert.IsTrue(expectedValue == (int)execResult.Result, $"Saw {execResult.Result} but expected {expectedValue}");
         }
 
         // Compile the given code, run the specified function and verify
         // that the string result matches
         public static void HelperRunString(ICompiler comp, string entryPointName, string expectedValue) {
             ExecutionResult execResult = comp.Execute(entryPointName);
-            Assert.IsTrue(execResult.Success);
-            Assert.IsTrue(expectedValue == execResult.Result.ToString(), "Saw " + execResult.Result.ToString() + " but expected " + expectedValue);
+            Assert.IsTrue(execResult.Success, $"Execution Status : {execResult.Success}");
+            Assert.IsTrue(expectedValue == execResult.Result.ToString(), $"Saw {execResult.Result} but expected {expectedValue}");
         }
 
         // Compile the given code, run the specified function and verify
         // that the float result matches
         public static void HelperRunFloat(ICompiler comp, string entryPointName, float expectedValue) {
             ExecutionResult execResult = comp.Execute(entryPointName);
-            Assert.IsTrue(execResult.Success);
-            Assert.IsTrue(FloatCompare(expectedValue, (float)execResult.Result), "Saw " + execResult.Result + " but expected " + expectedValue);
+            Assert.IsTrue(execResult.Success, $"Execution Status : {execResult.Success}");
+            Assert.IsTrue(FloatCompare(expectedValue, (float)execResult.Result), $"Saw {execResult.Result} but expected {expectedValue}");
         }
 
         // Compile the given code, run the specified function and verify
         // that the double precision result matches
         public static void HelperRunDouble(ICompiler comp, string entryPointName, double expectedValue) {
             ExecutionResult execResult = comp.Execute(entryPointName);
-            Assert.IsTrue(execResult.Success);
-            Assert.IsTrue(DoubleCompare(expectedValue, (double)execResult.Result), "Saw " + execResult.Result + " but expected " + expectedValue);
+            Assert.IsTrue(execResult.Success, $"Execution Status : {execResult.Success}");
+            Assert.IsTrue(DoubleCompare(expectedValue, (double)execResult.Result), $"Saw {execResult.Result} but expected {expectedValue}");
         }
 
         // Compile the given code, run the specified function and verify
         // that the double precision result matches
         public static void HelperRunComplex(ICompiler comp, string entryPointName, Complex expectedValue) {
             ExecutionResult execResult = comp.Execute(entryPointName);
-            Assert.IsTrue(execResult.Success);
-            Assert.IsTrue(ComplexCompare(expectedValue, (Complex)execResult.Result), "Saw " + execResult.Result + " but expected " + expectedValue);
+            Assert.IsTrue(execResult.Success, $"Execution Status : {execResult.Success}");
+            Assert.IsTrue(ComplexCompare(expectedValue, (Complex)execResult.Result), $"Saw {execResult.Result} but expected {expectedValue}");
         }
 
         /// <summary>

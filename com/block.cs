@@ -48,6 +48,13 @@ namespace CCompiler {
         }
 
         /// <summary>
+        /// Clears all child nodes.
+        /// </summary>
+        public void Clear() {
+            Nodes.Clear();
+        }
+
+        /// <summary>
         /// Returns a list of all child nodes.
         /// </summary>
         public Collection<ParseNode> Nodes { get; private set; }

@@ -110,7 +110,7 @@ namespace CCompiler {
                     if (sym.IsParameter) {
                         cg.Emitter.LoadParameter(sym.ParameterIndex);
                     } else {
-                        cg.Emitter.LoadLocal(sym.Index);
+                        cg.Emitter.LoadSymbol(sym);
                     }
                     SymType exprType = cg.GenerateExpression(SymType.NONE, valueExpression);
                     GenerateSaveSubstring(cg, Identifiers[arrayIndex], exprType);
@@ -120,7 +120,7 @@ namespace CCompiler {
                     if (sym.IsParameter) {
                         cg.Emitter.LoadParameter(sym.ParameterIndex);
                     } else {
-                        cg.Emitter.LoadLocal(sym.Index);
+                        cg.Emitter.LoadSymbol(sym);
                     }
                     SymType wantedType = sym.Type;
                     if (wantedType == SymType.FIXEDCHAR && valueExpression.Type == SymType.CHAR) {
@@ -135,7 +135,7 @@ namespace CCompiler {
                 }
                 if (sym.IsLocal) {
                     cg.GenerateExpression(sym.Type, valueExpression);
-                    cg.Emitter.StoreLocal(sym);
+                    cg.StoreLocal(sym);
                     continue;
                 }
                 GenerateStoreArgument(cg, valueExpression, sym);

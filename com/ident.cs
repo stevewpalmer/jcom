@@ -144,7 +144,7 @@ namespace CCompiler {
                 cg.Emitter.LoadFunction(sym);
                 thisType = SymType.INTEGER;
             } else if (sym.IsLocal) {
-                cg.LoadLocal(sym);
+                cg.Emitter.LoadSymbol(sym);
                 thisType = sym.Type;
             } else {
                 Debug.Assert(false, "Unknown identifier type (not local OR parameter)");

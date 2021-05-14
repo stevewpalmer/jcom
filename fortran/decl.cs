@@ -438,24 +438,20 @@ namespace JFortran {
             _initList = new CollectionParseNode();
             node.InitList = _initList;
 
-            // Compile the body of the procedure
-            BlockParseNode body = new();
-            node.Body = body;
-
             SimpleToken token = _ls.GetKeyword();
             while (token.ID != TokenID.ENDOFFILE) {
                 if (token.ID != TokenID.EOL) {
                     ParseNode labelNode = CheckLabel();
                     if (labelNode != null) {
-                        body.Add(labelNode);
+                        node.Body.Add(labelNode);
                     }
                     if (token.ID == TokenID.KEND) {
                         break;
                     }
                     ParseNode lineNode = Statement(token);
                     if (lineNode != null) {
-                        body.Add(MarkLine());
-                        body.Add(lineNode);
+                        node.Body.Add(MarkLine());
+                        node.Body.Add(lineNode);
                     }
                     ExpectEndOfLine();
                 }
@@ -470,7 +466,7 @@ namespace JFortran {
 
             // Make sure we have a RETURN statement.
             if (!_hasReturn) {
-                body.Add(new ReturnParseNode());
+                node.Body.Add(new ReturnParseNode());
             }
 
             // Validate the block.
@@ -495,7 +491,7 @@ namespace JFortran {
                         $"Unused {scopeName} {sym.Name} in function");
                 }
             }
-            ValidateBlock(0, body);
+            ValidateBlock(0, node.Body);
             _state = BlockState.SPECIFICATION; 
             return node;
         }

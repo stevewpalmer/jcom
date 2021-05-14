@@ -483,6 +483,7 @@ namespace JComal {
                 listFile = new StreamWriter(filename);
             }
 
+            Lines.Reset();
             foreach (Line line in Lines.AllLines) {
                 SimpleToken token = line.GetToken();
                 if (token.ID == TokenID.INTEGER) {

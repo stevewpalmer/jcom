@@ -436,15 +436,15 @@ namespace JComal {
 
                         ExtCallParseNode node = GetIntrinsicExtCallNode("INDEX");
                         node.Parameters = new ParametersParseNode();
-                        node.Parameters.Add(op2, false);
-                        node.Parameters.Add(op1, false);
-                        if (op1.Type == SymType.CHAR || op2.Type == SymType.CHAR) {
-                            op1.Type = SymType.CHAR;
-                            op2.Type = SymType.CHAR;
-                        } else {
+                        if (op1.Type == SymType.FIXEDCHAR || op2.Type == SymType.FIXEDCHAR) {
                             op1.Type = SymType.FIXEDCHAR;
                             op2.Type = SymType.FIXEDCHAR;
+                        } else {
+                            op1.Type = SymType.CHAR;
+                            op2.Type = SymType.CHAR;
                         }
+                        node.Parameters.Add(op2, false);
+                        node.Parameters.Add(op1, false);
                         node.Type = SymType.INTEGER;
                         op1 = node;
                     } else {

@@ -255,7 +255,7 @@ namespace CCompiler {
                     cg.Emitter.LoadString(Symbol.Value.StringValue);
                     return Type;
                 }
-                return cg.LoadLocal(Symbol);
+                return cg.Emitter.LoadSymbol(Symbol);
             }
             Debug.Assert(false, "Unsupported parse ID for SymbolParseNode");
             return Symbol.VariantTypeToSymbolType(Value.Type);

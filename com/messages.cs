@@ -79,6 +79,7 @@ namespace CCompiler {
         /// </summary>
         public void Clear() {
             _messages.Clear();
+            Linenumber = 0;
             ErrorCount = 0;
         }
 
@@ -391,6 +392,7 @@ namespace CCompiler {
         ALREADYIMPORTED,
         UNDEFINEDFUNCTION,
         BADSUBSTRINGSPEC,
-        INVALIDOF
+        INVALIDOF,
+        REFMISMATCH
     }
 }

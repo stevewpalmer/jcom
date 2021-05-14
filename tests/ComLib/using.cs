@@ -63,7 +63,7 @@ namespace ComLibTests {
         public void Using4() {
             object[] args = { 0.78 };
             Assert.AreEqual("", Intrinsics.USING("", args));
-            Assert.AreEqual("", Intrinsics.USING("-", args));
+            Assert.AreEqual("-", Intrinsics.USING("-", args));
             Assert.AreEqual("---...---", Intrinsics.USING("---...---", args));
             Assert.AreEqual("....", Intrinsics.USING("....", args));
         }

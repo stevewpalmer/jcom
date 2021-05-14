@@ -734,8 +734,24 @@ namespace CCompiler {
             return typeNeeded;
 		}
 
+        // Handle creation of a symbol. The symbol is not initialised and
+        // array symbols will require explicit initialisation later.
+        //
+        public void CreateSymbol(Symbol sym) {
+
+        }
+
         // Handle initialisation of a symbol using its default value if one
-        // is specified.
+        // is specified. This works for all symbol types - local and static.
+        //
+        // Strings that aren't initialised with an explicit value are given
+        // an empty string here.
+        //
+        // Arrays are considered to require 'initialisation' as they need to be
+        // created in code to the specific size. So it is important to ensure that
+        // InitialiseSymbol is always called for arrays. In addition, arrays
+        // that have values in ArrayValues are also initialised here.
+        //
         public void InitialiseSymbol(Symbol sym) {
             if (sym.Type == SymType.CHAR && !sym.Value.HasValue) {
                 sym.Value = new Variant(string.Empty);
@@ -743,27 +759,81 @@ namespace CCompiler {
             if (sym.IsFixedStatic) {
                 return;
             }
-            if (sym.IsArray && sym.ArrayValues?.Length > 0) {
-                Debug.Assert(sym.ArrayValues.Length <= sym.ArraySize);
-
+            if (sym.IsArray) {
                 CreateArray(sym);
-
-                int arrayIndex = 0;
-                foreach (Variant value in sym.ArrayValues) {
-                    Emit0(OpCodes.Dup);
-                    LoadInteger(arrayIndex);
-                    GenerateLoad(value);
-                    StoreElementReference(Symbol.VariantTypeToSymbolType(value.Type));
-                    arrayIndex++;
+                if (sym.ArrayValues?.Length > 0) {
+                    Debug.Assert(sym.ArrayValues.Length <= sym.ArraySize);
+                    int arrayIndex = 0;
+                    foreach (Variant value in sym.ArrayValues) {
+                        Emit0(OpCodes.Dup);
+                        LoadInteger(arrayIndex);
+                        GenerateLoad(value);
+                        StoreElementReference(Symbol.VariantTypeToSymbolType(value.Type));
+                        arrayIndex++;
+                    }
                 }
-                StoreLocal(sym);
+                StoreSymbol(sym);
+                if (sym.Type == SymType.FIXEDCHAR) {
+                    InitFixedStringArray(sym);
+                }
                 return;
+            }
+            if (sym.Type == SymType.FIXEDCHAR) {
+                CreateString(sym);
+                StoreSymbol(sym);
             }
             if (sym.CanInitialise) {
                 GenerateLoad(sym.Value);
                 ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
-                StoreLocal(sym);
+                StoreSymbol(sym);
             }
+        }
+
+        // Generate the code to initialise a fixed string array by calling
+        // the Length on every element.
+        public void InitFixedStringArray(Symbol sym) {
+            Debug.Assert(sym.Dimensions.Count > 1 && !sym.IsFlatArray);
+            LocalDescriptor count = GetTemporary(typeof(int));
+            Label loopStart = CreateLabel();
+            LoadInteger(0);
+            StoreLocal(count);
+            MarkLabel(loopStart);
+            LoadSymbol(sym);
+            LoadLocal(count);
+            LoadInteger(sym.FullType.Width);
+            CreateObject(typeof(FixedString), new[] { typeof(int) });
+            StoreArrayElement(sym);
+            LoadLocal(count);
+            LoadInteger(1);
+            Add(SymType.INTEGER);
+            StoreLocal(count);
+            LoadLocal(count);
+            LoadInteger(sym.ArraySize);
+            BranchLess(loopStart);
+            ReleaseTemporary(count);
+        }
+
+        /// <summary>
+        /// Emit the code to load a local variable onto the stack. Different code
+        /// is emitted depending on whether the variable is a static.
+        /// </summary>
+        /// <param name="sym">A Symbol object representing the variable</param>
+        /// <returns>The SymType of the variable loaded</returns>
+        public SymType LoadSymbol(Symbol sym) {
+            if (sym == null) {
+                throw new ArgumentNullException(nameof(sym));
+            }
+            if (sym.IsInCommon) {
+                Symbol symCommon = sym.Common;
+                List<Symbol> commonList = (List<Symbol>)symCommon.Info;
+                sym = commonList[sym.CommonIndex];
+            }
+            if (sym.IsStatic) {
+                LoadStatic((FieldInfo)sym.Info);
+            } else {
+                LoadLocal(sym.Index);
+            }
+            return sym.Type;
         }
 
         /// <summary>
@@ -790,11 +860,11 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// Emit the save the value on the top of the stack to a local.
+        /// Emit the save the value on the top of the stack to a symbol.
         /// </summary>
         /// <param name="sym">The symbol to which the value should be stored</param>
         /// <returns>The type of the value stored</returns>
-        public void StoreLocal(Symbol sym) {
+        public void StoreSymbol(Symbol sym) {
             if (sym == null) {
                 throw new ArgumentNullException(nameof(sym));
             }

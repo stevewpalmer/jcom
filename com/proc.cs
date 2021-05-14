@@ -40,6 +40,7 @@ namespace CCompiler {
         /// </summary>
         public ProcedureParseNode() {
             LocalSymbols = new List<SymbolCollection>();
+            Body = new();
         }
 
         /// <summary>

@@ -51,53 +51,59 @@ namespace JComalLib {
                     value = new Variant(args[argIndex++]);
                 }
 
+                int startIndex = index;
                 char ch = template[index++];
                 if (ch == '-' || ch == '#' || ch == '.') {
 
+                    int signPart = 0;
                     int integerPart = 0;
                     int fractionPart = 0;
                     int decimalPart = 0;
 
-                    if (ch == '-' && index < length) {
+                    while (ch == '-') {
+                        ++signPart;
+                        if (index == length) {
+                            break;
+                        }
+                        ch = template[index++];
+                    }
+                    while (ch == '#') {
                         ++integerPart;
-                        ch = template[index++];
-                        if (ch != '#') {
-                            index--;
-                            str.Append('-');
-                            continue;
+                        if (index == length) {
+                            break;
                         }
+                        ch = template[index++];
                     }
-                    if (ch == '#' && index < length) {
-                        do {
-                            ++integerPart;
-                            if (index == length) {
-                                break;
-                            }
-                            ch = template[index++];
-                        } while (ch == '#');
-                    }
-                    if (ch == '.' && index < length) {
+                    while (ch == '.') {
                         ++decimalPart;
-                        ch = template[index++];
-                        if (ch == '#' && index < length) {
-                            do {
-                                ++fractionPart;
-                                if (index == length) {
-                                    break;
-                                }
-                                ch = template[index++];
-                            } while (ch == '#');
+                        if (index == length) {
+                            break;
                         }
+                        ch = template[index++];
                     }
-                    if (decimalPart == 1 && integerPart == 0 && fractionPart == 0) {
-                        index--;
-                        str.Append('.');
+                    while (ch == '#') {
+                        ++fractionPart;
+                        if (index == length) {
+                            break;
+                        }
+                        ch = template[index++];
+                    }
+                    bool valid = signPart <= 1 && decimalPart <= 1;
+                    valid = valid && (integerPart > 0 || fractionPart > 0);
+                    if (!valid) {
+                        while (startIndex < index) {
+                            str.Append(template[startIndex]);
+                            startIndex++;
+                        }
                         continue;
                     }
                     if (index < length) {
                         index--;
                     }
 
+                    if (signPart > 0) {
+                        ++integerPart;
+                    }
                     int fieldWidth = integerPart + decimalPart + fractionPart;
 
                     if (value != null && value.IsNumber) {

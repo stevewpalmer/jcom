@@ -119,9 +119,11 @@ namespace ComalTests {
                 ENDPROC
                 FUNC test'func'1
                    IMPORT foo
+                   RETURN 12
                 ENDFUNC
                 FUNC test'func'2 CLOSED
                    IMPORT foo
+                   RETURN 13
                 ENDFUNC
                 FUNC foo
                    return TRUE
@@ -151,10 +153,28 @@ namespace ComalTests {
             ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
         }
 
+        // Test scope.
+        [Test]
+        public void TestProcFuncScope() {
+            string code = @"
+                FUNC scopetest$
+                  DIM text$ OF 10
+                  text$:=""happy""
+                  testing
+                  RETURN text$
+                ENDFUNC
+                PROC testing CLOSED
+                  text$:=""sad""
+                ENDPROC testing
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunString(comp, "scopetest$", "happy");
+        }
+
         // Test scope of a variable in an open procedure. This should succeed
         // since PROC1 is not CLOSED so it should have access to Foo# in the
         // main scope.
-        /*[Test]
+        [Test]
         public void TestProc3() {
             string code = @"
                 Foo# := 1234
@@ -173,7 +193,7 @@ namespace ComalTests {
             };
             Compiler comp = ComalHelper.HelperCompile(code, opts);
             Assert.Throws(typeof(JComRuntimeException), delegate { comp.Execute("Main"); });
-        }*/
+        }
     }
 }
 

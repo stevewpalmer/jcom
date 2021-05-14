@@ -193,7 +193,7 @@ namespace JComal {
             // Otherwise create this method and add it to the root of the
             // program.
             if (activeMethod != null) {
-                activeMethod.Body.Nodes.Clear();
+                activeMethod.Body.Clear();
             } else { 
                 Symbol method = Globals.Add(methodName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
                 method.Defined = true;
@@ -396,7 +396,7 @@ namespace JComal {
             }
         }
 
-        // Add all symbols from _globalSymbols to the symbols class whose parent
+        // Add all symbols from Globals to the symbols class whose parent
         // is the specified symbol.
         private void AddChildSymbols(SymbolCollection symbols, Symbol parentSymbol) {
 
@@ -570,7 +570,11 @@ namespace JComal {
 
             Symbol sym = null;
             foreach (SymbolCollection symbols in SymbolStack.All) {
-                sym = symbols.Get(name);
+                if (symbols == Globals && _importSymbols != null) {
+                    sym = _importSymbols.Get(name);
+                } else {
+                    sym = symbols.Get(name);
+                }
                 if (sym != null) {
                     break;
                 }
@@ -588,10 +592,14 @@ namespace JComal {
             return sym;
         }
 
-        // Make a symbol for the current scope and initialise it.
+        // Make a symbol for the current scope and initialise it. If we're in the main
+        // program, all symbols go into the global symbol table.
         private Symbol MakeSymbolForCurrentScope(string name) {
             SymFullType symType = GetTypeFromName(name);
             Symbol sym = SymbolStack.Top.Add(name, symType, SymClass.VAR, null, _currentLineNumber);
+            if (CurrentProcedure.IsMainProgram) {
+                sym.Modifier |= SymModifier.STATIC;
+            }
             sym.Defined = true;
             InitialiseToDefault(sym);
             return sym;
@@ -938,6 +946,12 @@ namespace JComal {
                             if (symParameter.Type == SymType.FIXEDCHAR) {
                                 exprNode.Type = SymType.FIXEDCHAR;
                             }
+
+                            // If parameter is REF, exprNode must be an identifier
+                            if (symParameter.IsByRef && exprNode is not IdentifierParseNode) {
+                                Messages.Error(MessageCode.REFMISMATCH, "REF requires an identifier");
+                            }
+
                             parameters.Add(exprNode, symParameter.IsByRef);
                             declParameterIndex++;
                         }

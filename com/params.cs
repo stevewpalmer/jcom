@@ -152,7 +152,7 @@ namespace CCompiler {
                     // a reference so don't double it up.
                     if (symIdent.IsParameter) {
                         cg.Emitter.LoadParameter(symIdent.ParameterIndex);
-                        if (!isByRef && symIdent.IsValueType) {
+                        if (!isByRef && symIdent.IsValueType && symIdent.IsByRef) {
                             cg.Emitter.LoadIndirect(identType);
                         }
                     } else {

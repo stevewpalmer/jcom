@@ -125,6 +125,8 @@ namespace CCompiler {
                 foreach (ParseNode node in programDef.Root.Nodes) {
                     node.Generate(this);
                 }
+
+                _prog.Finish();
             } catch (Exception e) {
                 if (_opts.DevMode) {
                     throw;
@@ -318,19 +320,19 @@ namespace CCompiler {
                                     needConstructor = true;
                                 } else {
                                     sym.Index = Emitter.CreateLocal(sym);
-                                }
-                                if (sym.IsArray) {
-                                    Emitter.CreateArray(sym);
-                                    Emitter.StoreLocal(sym);
-                                    if (sym.Type == SymType.FIXEDCHAR) {
-                                        InitFixedStringArray(sym);
+                                    if (sym.IsArray) {
+                                        Emitter.CreateArray(sym);
+                                        Emitter.StoreSymbol(sym);
+                                        if (sym.Type == SymType.FIXEDCHAR) {
+                                            Emitter.InitFixedStringArray(sym);
+                                        }
+                                    } else if (sym.Type == SymType.FIXEDCHAR) {
+                                        Emitter.CreateString(sym);
+                                        Emitter.StoreSymbol(sym);
                                     }
-                                } else if (sym.Type == SymType.FIXEDCHAR) {
-                                    Emitter.CreateString(sym);
-                                    Emitter.StoreLocal(sym);
-                                }
-                                if (!sym.IsFixedStatic && Emitter != null) {
-                                    Emitter.InitialiseSymbol(sym);
+                                    if (!sym.IsFixedStatic) {
+                                        Emitter.InitialiseSymbol(sym);
+                                    }
                                 }
                             }
                             break;
@@ -348,16 +350,12 @@ namespace CCompiler {
             if (needConstructor) {
                 Emitter ctorEmitter = null;
                 foreach (Symbol sym in symbols) {
-                    if (sym.IsStatic && !sym.IsFixedStatic && sym.CanInitialise && sym.IsReferenced) {
+                    if (sym.IsStatic && !sym.IsFixedStatic && sym.IsReferenced) {
                         if (ctorEmitter == null) {
-                            ctorEmitter = _prog.CreateConstructor();
+                            ctorEmitter = _prog.GetConstructor();
                         }
                         ctorEmitter.InitialiseSymbol(sym);
                     }
-                }
-                if (ctorEmitter != null) {
-                    ctorEmitter.Emit0(OpCodes.Ret);
-                    ctorEmitter.Save();
                 }
             }
         }
@@ -382,33 +380,6 @@ namespace CCompiler {
             }
         }
 
-        // Generate the code to initialise a fixed string array by calling
-        // the Length on every element.
-        private void InitFixedStringArray(Symbol sym) {
-            if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
-                Error("Cannot initialise multi-dimensional arrays");
-            } else {
-                LocalDescriptor count = Emitter.GetTemporary(typeof(int));
-                Label loopStart = Emitter.CreateLabel();
-                Emitter.LoadInteger(0);
-                Emitter.StoreLocal(count);
-                Emitter.MarkLabel(loopStart);
-                LoadLocal(sym);
-                Emitter.LoadLocal(count);
-                Emitter.LoadInteger(sym.FullType.Width);
-                Emitter.CreateObject(typeof(FixedString), new [] { typeof(int) });
-                Emitter.StoreArrayElement(sym);
-                Emitter.LoadLocal(count);
-                Emitter.LoadInteger(1);
-                Emitter.Add(SymType.INTEGER);
-                Emitter.StoreLocal(count);
-                Emitter.LoadLocal(count);
-                Emitter.LoadInteger(sym.ArraySize);
-                Emitter.BranchLess(loopStart);
-                Emitter.ReleaseTemporary(count);
-            }
-        }
-
         /// <summary>
         /// Emit the code that loads an entire array. This is generally
         /// emitting the base address of the array if useRef is specified, or
@@ -428,7 +399,7 @@ namespace CCompiler {
             if (useRef) {
                 GenerateLoadAddress(sym);
             } else if (sym.IsLocal) {
-                LoadLocal(sym);
+                Emitter.LoadSymbol(sym);
             } else {
                 GenerateLoadArgument(sym);
             }
@@ -475,7 +446,7 @@ namespace CCompiler {
 
             Symbol sym = identNode.Symbol;
             if (sym.IsLocal) {
-                LoadLocal(sym);
+                Emitter.LoadSymbol(sym);
             } else {
                 GenerateLoadArgument(sym);
             }
@@ -542,12 +513,12 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// Emit the code to load a local variable onto the stack. Different code
+        /// Emit the code to store a local variable onto the stack. Different code
         /// is emitted depending on whether the variable is a static.
         /// </summary>
         /// <param name="sym">A Symbol object representing the variable</param>
         /// <returns>The SymType of the variable loaded</returns>
-        public SymType LoadLocal(Symbol sym) {
+        public SymType StoreLocal(Symbol sym) {
             if (sym == null) {
                 throw new ArgumentNullException(nameof(sym));
             }
@@ -557,9 +528,9 @@ namespace CCompiler {
                 sym = commonList[sym.CommonIndex];
             }
             if (sym.IsStatic) {
-                Emitter.LoadStatic((FieldInfo)sym.Info);
+                Emitter.StoreStatic((FieldInfo)sym.Info);
             } else {
-                Emitter.LoadLocal(sym.Index);
+                Emitter.StoreLocal(sym.Index);
             }
             return sym.Type;
         }

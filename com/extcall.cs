@@ -93,9 +93,9 @@ namespace CCompiler {
         /// <param name="root">The parent XML node</param>
         public override void Dump(ParseNodeXml root) {
             ParseNodeXml blockNode = root.Node("ExtCall");
-            blockNode.Attribute("Inline", Inline.ToString());
             blockNode.Attribute("LibraryName", LibraryName);
             blockNode.Attribute("Name", Name);
+            blockNode.Attribute("Inline", Inline.ToString());
             if (Parameters != null) {
                 Parameters.Dump(blockNode);
             }
@@ -103,7 +103,7 @@ namespace CCompiler {
 
         /// <summary>
         /// Emit the code to call an external function complete with
-        /// parameters.
+        /// parameters that has no return value.
         /// </summary>
         /// <param name="cg">A code generator object</param>
         public override void Generate(CodeGenerator cg) {
@@ -112,15 +112,18 @@ namespace CCompiler {
 
         /// <summary>
         /// Emit the code to call an external function complete with
-        /// parameters.
+        /// parameters that returns the specified type.
         /// </summary>
         /// <param name="cg">A code generator object</param>
         /// <param name="returnType">The expected return type</param>
         /// <returns>The actual return type from the function</returns>
         public override SymType Generate(CodeGenerator cg, SymType returnType) {
+
             Type argType = typeof(void);
             Type [] paramTypes;
-            
+
+            // It is the caller responsibility to set the parameter
+            // node types to match the external function types.
             if (Parameters != null) {
                 paramTypes = Parameters.Generate(cg);
                 if (paramTypes.Length > 0) {

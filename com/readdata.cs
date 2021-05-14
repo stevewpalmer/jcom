@@ -122,7 +122,7 @@ namespace CCompiler {
                     cg.Emitter.StoreArrayElement(sym);
                 }
                 else if (sym.IsLocal) {
-                    cg.Emitter.StoreLocal(sym);
+                    cg.Emitter.StoreSymbol(sym);
                 }
 
                 // Advance the data index. If EndOfData is referenced then set

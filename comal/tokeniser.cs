@@ -124,10 +124,11 @@ namespace JComal {
 
                     case ' ':
                         ch = GetChar();
-                        if (ch != ' ') {
-                            tokens.Add(new SimpleToken(TokenID.SPACE));
-                            PushChar(ch);
+                        while (ch == ' ') {
+                            ch = GetChar();
                         }
+                        PushChar(ch);
+                        tokens.Add(new SimpleToken(TokenID.SPACE));
                         break;
 
                     case '(':   tokens.Add(new SimpleToken(TokenID.LPAREN)); break;

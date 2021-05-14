@@ -81,7 +81,7 @@ namespace CCompiler {
                     Type [] paramTypes = new Type[Identifier.Indexes.Count + 1];
                     int index = 0;
                     
-                    cg.LoadLocal(sym);
+                    cg.Emitter.LoadSymbol(sym);
                     while (index < Identifier.Indexes.Count) {
                         NumberParseNode number = (NumberParseNode)Identifier.Indexes[index];
                         Debug.Assert(sym.Dimensions[index].LowerBound.IsConstant);
@@ -138,7 +138,7 @@ namespace CCompiler {
         // Emit code that writes the variant value to the given array index where
         // the array is specified by the symbol..
         private void GenerateStoreToArray(CodeGenerator cg, Symbol sym, int index, Variant value) {
-            cg.LoadLocal(sym);
+            cg.Emitter.LoadSymbol(sym);
             cg.Emitter.LoadInteger(index);
             cg.Emitter.GenerateLoad(value);
             cg.Emitter.ConvertType(Symbol.VariantTypeToSymbolType(value.Type), sym.Type);

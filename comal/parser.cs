@@ -184,8 +184,11 @@ namespace JComal {
             _hasReturn = false;
 
             // New local symbol table for this block
-            SymbolCollection localSymbols = new("Local");
-            SymbolStack.Push(localSymbols);
+            SymbolCollection localSymbols = null;
+            if (!isImplicit) {
+                localSymbols = new("Local");
+                SymbolStack.Push(localSymbols);
+            }
 
             // Parameter list.
             Collection<Symbol> parameters = null;
@@ -235,7 +238,9 @@ namespace JComal {
             }
 
             node.ProcedureSymbol = method;
-            node.LocalSymbols.Add(localSymbols);
+            if (localSymbols != null) {
+                node.LocalSymbols.Add(localSymbols);
+            }
             node.LabelList = new Collection<ParseNode>();
 
             ProcedureParseNode savedCurrentProcedure = CurrentProcedure;
@@ -245,18 +250,18 @@ namespace JComal {
             // the interpreter.
             CurrentProcedure.CatchExceptions = !_opts.Interactive;
 
-            // Create a block
-            BlockParseNode block = new();
-            node.Body = block;
 
             // Compile the body of the procedure
             ++_blockDepth;
-            CompileBlock(block, new[] { endToken });
+            CompileBlock(node.Body, new[] { endToken });
             --_blockDepth;
 
             // Make sure we have a RETURN statement.
             if (!_hasReturn) {
-                block.Add(new ReturnParseNode());
+                if (klass == SymClass.FUNCTION) {
+                    Messages.Error(MessageCode.ILLEGALRETURN, $"Missing RETURN in {methodName}");
+                }
+                node.Body.Add(new ReturnParseNode());
             }
 
             // Check identifier matches
@@ -282,7 +287,7 @@ namespace JComal {
                         $"Unused {scopeName} {sym.Name} in function");
                 }
             }
-            ValidateBlock(1, block);
+            ValidateBlock(1, node.Body);
             _state = BlockState.SPECIFICATION;
             CurrentProcedure = savedCurrentProcedure;
             _importSymbols = savedImportSymbols;
@@ -366,7 +371,7 @@ namespace JComal {
                 }
                 
                 // Now check the local program unit
-                sym = SymbolStack.Top.Get(identToken.Name);
+                sym = GetSymbolForCurrentScope(identToken.Name);
 
                 // Handle array syntax and build a list of dimensions
                 Collection<SymDimension> dimensions = ParseArrayDimensions();

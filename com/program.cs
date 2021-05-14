@@ -92,6 +92,7 @@ namespace CCompiler {
         private readonly bool _isCLSCompliant = true;
 
         private Type _mainType;
+        private Emitter _ctorEmitter;
         private ISymbolDocumentWriter _currentDoc;
 
         /// <summary>
@@ -154,12 +155,26 @@ namespace CCompiler {
         }
 
         /// <summary>
+        /// Do work to complete the program creation.
+        /// </summary>
+        public void Finish() {
+            if (_ctorEmitter != null) {
+                _ctorEmitter.Emit0(OpCodes.Ret);
+                _ctorEmitter.Save();
+            }
+        }
+
+        /// <summary>
         /// Create a constructor and adds it to the assembly.
         /// </summary>
         /// <returns></returns>
-        public Emitter CreateConstructor() {
-            ConstructorBuilder cntb = _tb.DefineConstructor(MethodAttributes.Static, CallingConventions.Standard, new Type[0]);
-            return new Emitter(cntb);
+        public Emitter GetConstructor() {
+            if (_ctorEmitter == null) {
+                ConstructorBuilder cntb;
+                cntb = _tb.DefineConstructor(MethodAttributes.Static, CallingConventions.Standard, new Type[0]);
+                _ctorEmitter = new Emitter(cntb);
+            }
+            return _ctorEmitter;
         }
 
         /// <summary>
@@ -169,7 +184,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="sym">An optional symbol that defines the method</param>
         /// <returns>An Emitter that should be used to emit code for this method</returns>
-        public Emitter CreateMethod(Symbol sym) {
+        public void CreateMethod(Symbol sym) {
             if (sym == null) {
                 throw new ArgumentNullException(nameof(sym));
             }
@@ -229,7 +244,6 @@ namespace CCompiler {
             if (sym.Modifier.HasFlag(SymModifier.ENTRYPOINT)) {
                 _ab.SetEntryPoint(metb);
             }
-            return new Emitter(metb);
         }
 
         /// <summary>
@@ -272,6 +286,7 @@ namespace CCompiler {
         public void Save() {
             AddCLSCompliant(_ab);
             AddCOMVisiblity(_ab);
+
             if (_mainType == null) {
                 _mainType = GetMainType();
             }

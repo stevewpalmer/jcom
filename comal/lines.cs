@@ -194,7 +194,7 @@ namespace JComal {
                 _pushedToken = null;
             } else {
                 Debug.Assert(_tindex < Tokens.Length);
-                if (Tokens[_tindex].ID == TokenID.SPACE) {
+                while (Tokens[_tindex].ID == TokenID.SPACE) {
                     ++_tindex;
                 }
                 token = Tokens[_tindex];
