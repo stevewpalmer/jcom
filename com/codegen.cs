@@ -29,8 +29,6 @@ using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Reflection;
-using System.Reflection.Emit;
-using JComLib;
 
 namespace CCompiler {
     

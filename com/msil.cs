@@ -745,62 +745,31 @@ namespace CCompiler {
                     break;
 
                 case EmitExceptionHandlerType.Catch: {
+
+                    // This catch handler is used by the try...catch logic in the program.
                     Type runtimeException = typeof(Exception);
+                    Type jcomRuntimeException = typeof(JComRuntimeException);
+
                     il.BeginCatchBlock(runtimeException);
 
-                    LocalBuilder tmp1 = il.DeclareLocal(runtimeException);
-                    Label skipArith = il.DefineLabel();
-                    Label skipToEnd = il.DefineLabel();
-                    Label skipRethrow = il.DefineLabel();
-                    Label skipIndex = il.DefineLabel();
+                    LocalBuilder tmp1 = il.DeclareLocal(jcomRuntimeException);
+                    MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandler", new[] { typeof(Exception) });
+                    il.EmitCall(OpCodes.Call, methodInfo, new[] { typeof(Exception) });
 
                     il.Emit(OpCodes.Stloc_S, tmp1);
-
-                    il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.Emit(OpCodes.Isinst, typeof(ArithmeticException));
-                    il.Emit(OpCodes.Brfalse, skipArith);
-                    il.Emit(OpCodes.Ldc_I4, (int)JComRuntimeErrors.DIVISION_BY_ZERO);
-                    il.Emit(OpCodes.Newobj, typeof(JComRuntimeException).GetConstructor(new[] { typeof(JComRuntimeErrors) }));
-                    il.Emit(OpCodes.Stloc_S, tmp1);
-
-                    il.MarkLabel(skipArith);
-
-                    il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.Emit(OpCodes.Isinst, typeof(IndexOutOfRangeException));
-                    il.Emit(OpCodes.Brfalse, skipIndex);
-                    il.Emit(OpCodes.Ldc_I4, (int)JComRuntimeErrors.INDEX_OUT_OF_RANGE);
-                    il.Emit(OpCodes.Newobj, typeof(JComRuntimeException).GetConstructor(new[] { typeof(JComRuntimeErrors) }));
-                    il.Emit(OpCodes.Stloc_S, tmp1);
-
-                    il.MarkLabel(skipIndex);
-
-                    il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.Emit(OpCodes.Isinst, typeof(JComRuntimeException));
-                    il.Emit(OpCodes.Brfalse, skipToEnd);
-
-                    Type jcomException = typeof(JComRuntimeException);
-
-                    il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.EmitCall(OpCodes.Call, jcomException.GetMethod("get_Type"), null);
-                    il.Emit(OpCodes.Ldc_I4, (int)JComRuntimeExceptionType.FAILURE);
-                    il.Emit(OpCodes.Beq, skipRethrow);
-                    il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.Emit(OpCodes.Throw);
-                    il.MarkLabel(skipRethrow);
 
                     if (Err != null || ErrText != null) {
                         if (Err != null && Err.IsReferenced) {
                             il.Emit(OpCodes.Ldloc_S, tmp1);
-                            il.EmitCall(OpCodes.Call, jcomException.GetMethod("get_ErrorCode"), null);
+                            il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_ErrorCode"), null);
                             il.Emit(OpCodes.Stsfld, (FieldInfo)Err.Info);
                         }
                         if (ErrText != null && ErrText.IsReferenced) {
                             il.Emit(OpCodes.Ldloc_S, tmp1);
-                            il.EmitCall(OpCodes.Call, jcomException.GetMethod("get_Message"), null);
+                            il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Message"), null);
                             il.Emit(OpCodes.Stsfld, (FieldInfo)ErrText.Info);
                         }
                     }
-                    il.MarkLabel(skipToEnd);
                     break;
                     }
 
@@ -809,42 +778,33 @@ namespace CCompiler {
                     break;
 
                 case EmitExceptionHandlerType.DefaultCatch: {
-                    Type runtimeException = typeof(JComRuntimeException);
 
-                    // Pass JComRuntimeException up the chain
+                    // The default catch is the top-level exception handler around which we wrap
+                    // the entire application. 
+                    Type runtimeException = typeof(Exception);
+                    Type jcomRuntimeException = typeof(JComRuntimeException);
+
                     il.BeginCatchBlock(runtimeException);
 
-                    LocalBuilder tmp1 = il.DeclareLocal(runtimeException);
-                    Label skipMessage = il.DefineLabel();
+                    LocalBuilder tmp1 = il.DeclareLocal(jcomRuntimeException);
+                    MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandlerNoThrow", new[] { typeof(Exception) });
+                    il.EmitCall(OpCodes.Call, methodInfo, new[] { typeof(Exception) });
 
                     il.Emit(OpCodes.Stloc_S, tmp1);
 
+                    Label skipMessage = il.DefineLabel();
+
                     il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.EmitCall(OpCodes.Call, runtimeException.GetMethod("get_Type"), null);
+                    il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Type"), null);
                     il.Emit(OpCodes.Ldc_I4, (int)JComRuntimeExceptionType.END);
                     il.Emit(OpCodes.Beq, skipMessage);
 
                     il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.EmitCall(OpCodes.Call, runtimeException.GetMethod("get_Message"), null);
+                    il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Message"), null);
 
                     MethodInfo meth = typeof(Console).GetMethod("WriteLine", new[] { typeof(string) });
                     il.EmitCall(OpCodes.Call, meth, null);
                     il.MarkLabel(skipMessage);
-
-                    runtimeException = typeof(Exception);
-
-                    LocalBuilder tmp2 = il.DeclareLocal(runtimeException);
-
-                    il.BeginCatchBlock(runtimeException);
-                    il.Emit(OpCodes.Stloc_S, tmp2);
-
-                    il.Emit(OpCodes.Ldstr, "JCom Runtime Error: {0}");
-
-                    il.Emit(OpCodes.Ldloc_S, tmp2);
-                    il.EmitCall(OpCodes.Call, runtimeException.GetMethod("get_Message"), null);
-
-                    meth = typeof(Console).GetMethod("WriteLine", new [] {typeof(string), typeof(object)});
-                    il.EmitCall(OpCodes.Call, meth, null);
                     break;
                 }
             }

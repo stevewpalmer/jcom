@@ -393,6 +393,7 @@ namespace CCompiler {
         UNDEFINEDFUNCTION,
         BADSUBSTRINGSPEC,
         INVALIDOF,
-        REFMISMATCH
+        REFMISMATCH,
+        MISSINGSTRINGDECLARATION
     }
 }

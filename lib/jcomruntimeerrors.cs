@@ -167,7 +167,12 @@ namespace JComLib {
         /// Multiple repeat in format specifier.
         /// </summary>
         [Description("Multiple repeat specifiers")]
-        FORMAT_MULTIPLE_REPEAT = 109
+        FORMAT_MULTIPLE_REPEAT = 109,
+
+        /// <summary>
+        /// System error
+        /// </summary>
+        SYSTEM_ERROR = 9999
     }
 
     /// <summary>
@@ -257,6 +262,39 @@ namespace JComLib {
         /// <param name="message">The exception message.</param>
         /// <param name="innerException">The inner exception object that yielded this exception.</param>
         public JComRuntimeException(string message, Exception innerException) : base(message, innerException) {
+        }
+
+        /// <summary>
+        /// General purpose exception handler to convert .NET exceptions into JComRuntimeException
+        /// types.
+        /// </summary>
+        /// <param name="e">Exception</param>
+        /// <returns>A JComRuntimeException object</returns>
+        public static JComRuntimeException GeneralHandlerNoThrow(Exception e) {
+            if (e is IndexOutOfRangeException) {
+                return new JComRuntimeException(JComRuntimeErrors.INDEX_OUT_OF_RANGE);
+            }
+            if (e is ArithmeticException) {
+                return new JComRuntimeException(JComRuntimeErrors.DIVISION_BY_ZERO);
+            }
+            if (e is not JComRuntimeException jce) {
+                return new JComRuntimeException(JComRuntimeErrors.SYSTEM_ERROR, e.Message);
+            }
+            return jce;
+        }
+
+        /// <summary>
+        /// General purpose exception handler to convert .NET exceptions into JComRuntimeException
+        /// types. If the exception is not a FAILURE type, it is rethrown.
+        /// </summary>
+        /// <param name="e">Exception</param>
+        /// <returns>A JComRuntimeException object</returns>
+        public static JComRuntimeException GeneralHandler(Exception e) {
+            JComRuntimeException jce = GeneralHandlerNoThrow(e);
+            if (jce.Type != JComRuntimeExceptionType.FAILURE) {
+                throw jce;
+            }
+            return jce;
         }
 
         /// <summary>

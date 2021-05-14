@@ -223,8 +223,9 @@ namespace JComal {
                     }
                 }
                 catch (Exception e) {
-                    if (!string.IsNullOrEmpty(e.Message)) {
-                        Console.WriteLine(e.Message);
+                    JComRuntimeException jce = JComRuntimeException.GeneralHandlerNoThrow(e);
+                    if (!string.IsNullOrEmpty(jce.Message)) {
+                        Console.WriteLine(jce.Message);
                     }
                     FileManager.CLOSE();
                 }

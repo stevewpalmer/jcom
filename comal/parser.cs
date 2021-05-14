@@ -77,6 +77,14 @@ namespace JComal {
             Debug.Assert(node != null);
 
             Symbol sym = GetMakeSymbolForCurrentScope(identToken.Name);
+            Debug.Assert(sym != null);
+
+            // Make sure strings have been explicitly DIM'd in strict mode. We set an
+            // explicit width to avoid this error being thrown several times.
+            if (sym.Type == SymType.FIXEDCHAR && sym.FullType.Width == 0 && _opts.Strict) {
+                Messages.Error(MessageCode.MISSINGSTRINGDECLARATION, "String width must be specified with DIM before use");
+                sym.FullType.Width = Consts.DefaultStringWidth;
+            }
 
             // Make sure array indexes match only where they are specified
             if (sym.IsArray && node.Indexes != null && sym.Dimensions.Count != node.Indexes.Count) {
@@ -249,7 +257,6 @@ namespace JComal {
             // Don't catch run-time exceptions if we're running in
             // the interpreter.
             CurrentProcedure.CatchExceptions = !_opts.Interactive;
-
 
             // Compile the body of the procedure
             ++_blockDepth;

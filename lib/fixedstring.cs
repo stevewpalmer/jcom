@@ -53,7 +53,7 @@ namespace JComLib {
         /// <param name="length">Required length of the string</param>
         public FixedString(int length) {
             if (length < 0) {
-                throw new ArgumentOutOfRangeException(nameof(length));
+                throw new IndexOutOfRangeException(nameof(length));
             }
             _fixedString = new char[length];
             Length = length;
@@ -147,13 +147,13 @@ namespace JComLib {
         public char this[int index] {
             get {
                 if (index < 0 || index >= Length) {
-                    throw new InvalidOperationException("index");
+                    throw new IndexOutOfRangeException("index");
                 }
                 return _fixedString[index];
             }
             set {
                 if (index < 0 || index >= Length) {
-                    throw new InvalidOperationException("index");
+                    throw new IndexOutOfRangeException("index");
                 }
                 _fixedString[index] = value;
             }
@@ -166,7 +166,7 @@ namespace JComLib {
         /// <returns>A native string containing the requested substring of the fixed string</returns>
         public FixedString Substring(int start) {
             if (start < 1 || start > Length) {
-                throw new InvalidOperationException("index");
+                throw new IndexOutOfRangeException("index");
             }
             return Substring(start, Length);
         }
@@ -179,10 +179,10 @@ namespace JComLib {
         /// <returns>A native string containing the requested substring of the fixed string</returns>
         public FixedString Substring(int start, int end) {
             if (start < 1 || start > Length) {
-                throw new ArgumentOutOfRangeException(nameof(start));
+                throw new IndexOutOfRangeException(nameof(start));
             }
             if (end < 1 || end > Length || end < start) {
-                throw new ArgumentOutOfRangeException(nameof(end));
+                throw new IndexOutOfRangeException(nameof(end));
             }
             int length = end - start + 1;
             FixedString newString = new(length);
@@ -234,10 +234,10 @@ namespace JComLib {
                 throw new ArgumentNullException(nameof(newString));
             }
             if (start < 1 || end < start) {
-                throw new ArgumentOutOfRangeException(nameof(start));
+                throw new IndexOutOfRangeException(nameof(start));
             }
             if (end < 1) {
-                throw new ArgumentOutOfRangeException(nameof(end));
+                throw new IndexOutOfRangeException(nameof(end));
             }
             InternalSet(newString.ToCharArray(), start - 1, end - 1);
         }
@@ -256,10 +256,10 @@ namespace JComLib {
                 throw new ArgumentNullException(nameof(newString));
             }
             if (start < 1 || end < start) {
-                throw new ArgumentOutOfRangeException(nameof(start));
+                throw new IndexOutOfRangeException(nameof(start));
             }
             if (end < 1) {
-                throw new ArgumentOutOfRangeException(nameof(end));
+                throw new IndexOutOfRangeException(nameof(end));
             }
             InternalSet(newString.ToCharArray(), start - 1, end - 1);
         }

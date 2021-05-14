@@ -208,6 +208,7 @@ namespace JComal {
 
             // Now compile the lines into the method body.
             CurrentProcedure = activeMethod;
+            _currentLineNumber = 0;
             _ls = lines;
 
             CompileBlock(activeMethod.Body, new[] { TokenID.ENDOFFILE });
@@ -300,6 +301,7 @@ namespace JComal {
         private void InitProgram() {
 
             _blockDepth = 0;
+            _currentLineNumber = 0;
             _state = BlockState.NONE;
 
             // Create the top-level program node.
