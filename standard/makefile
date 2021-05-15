@@ -4,7 +4,7 @@ JFOR=mono $(DROP)/jfor.exe $(JFLAGS)
 JCOMAL=mono $(DROP)/jcomal.exe $(JFLAGS)
 
 SOURCES=append.exe and.exe and2.exe standard.dll substrings.exe filetest.exe using.exe \
-	isprime.exe btree.exe
+	isprime.exe btree.exe hammurabi.exe
 
 BINARIES=jcomlib.dll jcomallib.dll jforlib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll $(DROP)/jfor.exe
 

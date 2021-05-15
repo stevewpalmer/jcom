@@ -286,24 +286,29 @@ namespace JComal {
 
             if (_importSymbols == null) {
                 Messages.Error(MessageCode.NOTINCLOSED, "IMPORT can only be used in a CLOSED procedure or function");
-                SkipToEndOfLine();
-                return null;
+            } else {
+                do {
+                    IdentifierDefinition identToken = ParseIdentifierDefinition();
+                    if (identToken == null) {
+                        break;
+                    }
+                    Symbol sym = Globals.Get(identToken.Name);
+                    if (sym == null) {
+                        Messages.Error(MessageCode.METHODNOTFOUND, $"{identToken.Name} not found");
+                    }
+                    else if (_importSymbols.Get(identToken.Name) != null) {
+                        Messages.Error(MessageCode.ALREADYIMPORTED, $"{identToken.Name} is already IMPORTed");
+                    }
+                    else if (sym != null) {
+                        _importSymbols.Add(sym);
+                    }
+                    if (_currentLine.IsAtEndOfLine) {
+                        break;
+                    }
+                    ExpectToken(TokenID.COMMA);
+                } while (true);
             }
-            do {
-                IdentifierToken identToken = ParseIdentifier();
-                Symbol sym = Globals.Get(identToken.Name);
-                if (sym == null) {
-                    Messages.Error(MessageCode.METHODNOTFOUND, $"{identToken.Name} not found");
-                }
-                if (_importSymbols.Get(identToken.Name) != null) {
-                    Messages.Error(MessageCode.ALREADYIMPORTED, $"{identToken.Name} is already IMPORTed");
-                }
-                _importSymbols.Add(sym);
-                if (_currentLine.IsAtEndOfLine) {
-                    break;
-                }
-                ExpectToken(TokenID.COMMA);
-            } while (true);
+            SkipToEndOfLine();
             return null;
         }
 
@@ -643,7 +648,7 @@ namespace JComal {
 
             LoopParseNode node = new();
 
-            Symbol symLoop = MakeSymbolForCurrentScope(identToken.Name);
+            Symbol symLoop = MakeSymbolForScope(identToken.Name, forSymbols);
             symLoop.IsReferenced = true;
             node.LoopVariable = new IdentifierParseNode(symLoop);
 

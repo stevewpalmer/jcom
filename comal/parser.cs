@@ -186,6 +186,8 @@ namespace JComal {
             // Method should exist in _globalSymbols due to Pass 0.
             Symbol method = Globals.Get(methodName);
             Debug.Assert(method != null);
+            method.Defined = true;
+            method.Class = klass;
 
             // Save return statement requirement
             bool savedHasReturn = _hasReturn;
@@ -203,11 +205,13 @@ namespace JComal {
             if (methodName != _entryPointName) {
                 parameters = ParseParameterDecl(SymbolStack.Top, SymScope.PARAMETER);
             }
+            method.Parameters = parameters;
 
             // EXTERNAL?
             if (!isImplicit && TestToken(TokenID.KEXTERNAL)) {
                 method.Modifier = SymModifier.EXTERNAL;
                 SkipToEndOfLine();
+                return null;
             }
 
             // Closed? If so, we create an _importSymbols table so to which any symbols
@@ -218,27 +222,25 @@ namespace JComal {
             // imported by default.
             SymbolCollection savedImportSymbols = _importSymbols;
             if (!isImplicit && !_currentLine.IsAtEndOfLine) {
+
                 ExpectToken(TokenID.KCLOSED);
+
                 _importSymbols = new SymbolCollection("Import");
                 if (savedImportSymbols != null) {
                     _importSymbols.Add(savedImportSymbols);
                 };
                 _importSymbols.Add(method);
                 AddChildSymbols(_importSymbols, method);
+                node.IsClosed = true;
             }
 
             if (klass == SymClass.FUNCTION) {
                 method.FullType = GetTypeFromName(methodName);
             }
-    
-            method.Parameters = parameters;
-            method.Defined = true;
-            method.Class = klass;
 
-            // External methods are declarations only
-            if (method.Modifier == SymModifier.EXTERNAL) {
-                return null;
-            }
+            // Don't catch run-time exceptions if we're running in
+            // the interpreter.
+            node.CatchExceptions = !_opts.Interactive;
 
             if (methodName == _entryPointName) {
                 method.Modifier |= SymModifier.ENTRYPOINT;
@@ -253,10 +255,6 @@ namespace JComal {
 
             ProcedureParseNode savedCurrentProcedure = CurrentProcedure;
             CurrentProcedure = node;
-
-            // Don't catch run-time exceptions if we're running in
-            // the interpreter.
-            CurrentProcedure.CatchExceptions = !_opts.Interactive;
 
             // Compile the body of the procedure
             ++_blockDepth;
@@ -321,29 +319,19 @@ namespace JComal {
                         if (TestToken(TokenID.KREF)) {
                             linkage = SymLinkage.BYREF;
                         }
-                        IdentifierToken identToken = ParseIdentifier();
+                        IdentifierDefinition identifier = ParseIdentifierDefinition();
 
-                        // Array parameters must be specified with (). Multiple
-                        // dimensions are indicated with commas within the
-                        // parenthesis.
-                        Collection<SymDimension> dimensions = new();
-                        if (TestToken(TokenID.LPAREN)) {
-                            do {
-                                dimensions.Add(new SymDimension {
-                                    LowerBound = new NumberParseNode(1),
-                                    UpperBound = new NumberParseNode(1)
-                                });
-                            } while (TestToken(TokenID.COMMA));
-                            ExpectToken(TokenID.RPAREN);
-                        }
-
-                        if (identToken != null) {
-                            Symbol sym = symbolTable.Get(identToken.Name);
+                        if (identifier != null) {
+                            Symbol sym = symbolTable.Get(identifier.Name);
                             if (sym != null) {
-                                Messages.Error(MessageCode.PARAMETERDEFINED, $"Parameter {identToken.Name} already defined");
+                                Messages.Error(MessageCode.PARAMETERDEFINED, $"Parameter {identifier.Name} already defined");
                             } else {
-                                SymFullType symType = GetTypeFromName(identToken.Name);
-                                sym = symbolTable.Add(identToken.Name, symType, SymClass.VAR, dimensions, _currentLineNumber);
+                                SymFullType symType = GetTypeFromName(identifier.Name);
+                                sym = symbolTable.Add(identifier.Name,
+                                                      symType,
+                                                      SymClass.VAR,
+                                                      identifier.Dimensions,
+                                                      _currentLineNumber);
                                 sym.Scope = scope;
                                 sym.Linkage = linkage;
                                 sym.Defined = true;
@@ -359,6 +347,30 @@ namespace JComal {
                 _currentLine.PushToken(token);
             }
             return parameters;
+        }
+
+        // Parse an identifier with optional array dimensions.
+        private IdentifierDefinition ParseIdentifierDefinition() {
+
+            IdentifierToken identToken = ParseIdentifier();
+
+            // Array parameters must be specified with (). Multiple
+            // dimensions are indicated with commas within the
+            // parenthesis.
+            Collection<SymDimension> dimensions = new();
+            if (TestToken(TokenID.LPAREN)) {
+                do {
+                    dimensions.Add(new SymDimension {
+                        LowerBound = new NumberParseNode(1),
+                        UpperBound = new NumberParseNode(1)
+                    });
+                } while (TestToken(TokenID.COMMA));
+                ExpectToken(TokenID.RPAREN);
+            }
+            return new IdentifierDefinition {
+                Name = identToken.Name,
+                Dimensions = dimensions
+            };
         }
 
         // Parse an identifier declaration

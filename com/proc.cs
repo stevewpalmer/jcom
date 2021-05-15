@@ -105,6 +105,12 @@ namespace CCompiler {
         public bool CatchExceptions { get; set; }
 
         /// <summary>
+        /// Whether this method is closed (i.e. all identifiers are
+        /// automatically local).
+        /// </summary>
+        public bool IsClosed { get; set; }
+
+        /// <summary>
         /// Predefined label for the return statement for any
         /// inner parse nodes that issue a RETURN statement.
         /// </summary>

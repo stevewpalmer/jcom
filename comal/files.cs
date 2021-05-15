@@ -290,10 +290,10 @@ namespace JComal {
                     break;
                 }
                 isStringIdentifier = identNode.IsString;
-                if (isStringIdentifier && identNode.Symbol.IsArray) {
+                if (isStringIdentifier && identNode.IsArrayBase) {
                     Messages.Error(MessageCode.EXPECTEDTOKEN, "Cannot INPUT into a string array");
                 }
-                if (isStringIdentifier && hasStringIdentifier) {
+                else if (isStringIdentifier && hasStringIdentifier) {
                     Messages.Error(MessageCode.EXPECTEDTOKEN, "Only one string variable permitted in INPUT");
                 }
                 if (isStringIdentifier) {

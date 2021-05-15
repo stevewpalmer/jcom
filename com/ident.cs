@@ -30,6 +30,22 @@ using System.Diagnostics;
 namespace CCompiler {
 
     /// <summary>
+    /// A single identifier definition
+    /// </summary>
+    public class IdentifierDefinition {
+
+        /// <summary>
+        /// Identifier name
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Optional dimensions
+        /// </summary>
+        public Collection<SymDimension> Dimensions { get; set; }
+    }
+
+    /// <summary>
     /// Specifies an Identifier parse node that stores a symbol table
     /// reference along with any optional array indexes.
     /// </summary>

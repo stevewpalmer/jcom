@@ -363,6 +363,7 @@ namespace JComal {
                         Symbol method = Globals.Get(methodName);
                         if (method != null && method.Defined && !method.IsExternal) {
                             Messages.Error(MessageCode.SUBFUNCDEFINED, $"{methodName} already defined");
+                            parents.Push(method);
                             SkipToEndOfLine();
                             continue;
                         }
@@ -597,11 +598,25 @@ namespace JComal {
         // Make a symbol for the current scope and initialise it. If we're in the main
         // program, all symbols go into the global symbol table.
         private Symbol MakeSymbolForCurrentScope(string name) {
-            SymFullType symType = GetTypeFromName(name);
-            Symbol sym = SymbolStack.Top.Add(name, symType, SymClass.VAR, null, _currentLineNumber);
-            if (CurrentProcedure.IsMainProgram) {
+
+            Symbol sym;
+
+            if (!CurrentProcedure.IsClosed) {
+                sym = MakeSymbolForScope(name, Globals);
                 sym.Modifier |= SymModifier.STATIC;
+            } else {
+                sym = MakeSymbolForScope(name, SymbolStack.Top);
             }
+            return sym;
+        }
+
+
+        // Make a symbol for the current scope and initialise it. If we're in the main
+        // program, all symbols go into the global symbol table.
+        private Symbol MakeSymbolForScope(string name, SymbolCollection symbols) {
+
+            SymFullType symType = GetTypeFromName(name);
+            Symbol sym = symbols.Add(name, symType, SymClass.VAR, null, _currentLineNumber);
             sym.Defined = true;
             InitialiseToDefault(sym);
             return sym;
