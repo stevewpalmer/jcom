@@ -85,7 +85,7 @@ namespace CCompiler {
                 case SymType.FLOAT:     actualValue = new Variant(Value.RealValue); break;
                 case SymType.DOUBLE:    actualValue = new Variant(Value.DoubleValue); break;
             }
-            cg.Emitter.GenerateLoad(actualValue);
+            cg.Emitter.LoadVariant(actualValue);
             return Symbol.VariantTypeToSymbolType(actualValue.Type);
         }
 

@@ -88,7 +88,7 @@ namespace CCompiler {
                         cg.Emitter.LoadInteger(number.Value.IntValue + (0 - sym.Dimensions[index].LowerBound.Value.IntValue));
                         paramTypes[index++] = typeof(int);
                     }
-                    cg.Emitter.GenerateLoad(RangeValue);
+                    cg.Emitter.LoadVariant(RangeValue);
                     paramTypes[index] = Variant.VariantTypeToSystemType(RangeValue.Type);
                     
                     cg.Emitter.Call(cg.GetMethodForType(sym.SystemType, "Set", paramTypes));
@@ -140,7 +140,7 @@ namespace CCompiler {
         private void GenerateStoreToArray(CodeGenerator cg, Symbol sym, int index, Variant value) {
             cg.Emitter.LoadSymbol(sym);
             cg.Emitter.LoadInteger(index);
-            cg.Emitter.GenerateLoad(value);
+            cg.Emitter.LoadVariant(value);
             cg.Emitter.ConvertType(Symbol.VariantTypeToSymbolType(value.Type), sym.Type);
             cg.Emitter.StoreElement(sym.Type);
         }

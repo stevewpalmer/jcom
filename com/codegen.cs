@@ -311,9 +311,7 @@ namespace CCompiler {
                         case SymType.COMPLEX:
                         case SymType.BOOLEAN: {
                             if (sym.IsLocal && !sym.IsIntrinsic && !sym.IsReferenceCommon && !sym.IsMethod) {
-                                if (sym.IsFixedStatic) {
-                                    sym.Info = StaticEmitter.CreateFixedStatic(_prog.GetCurrentType(), sym);
-                                } else if (sym.IsStatic) {
+                                if (sym.IsStatic) {
                                     sym.Info = StaticEmitter.CreateStatic(_prog.GetCurrentType(), sym);
                                     needConstructor = true;
                                 } else {
@@ -325,12 +323,10 @@ namespace CCompiler {
                                             Emitter.InitFixedStringArray(sym);
                                         }
                                     } else if (sym.Type == SymType.FIXEDCHAR) {
-                                        Emitter.CreateString(sym);
+                                        Emitter.CreateFixedString(sym);
                                         Emitter.StoreSymbol(sym);
                                     }
-                                    if (!sym.IsFixedStatic) {
-                                        Emitter.InitialiseSymbol(sym);
-                                    }
+                                    Emitter.InitialiseSymbol(sym);
                                 }
                             }
                             break;
@@ -348,7 +344,7 @@ namespace CCompiler {
             if (needConstructor) {
                 Emitter ctorEmitter = null;
                 foreach (Symbol sym in symbols) {
-                    if (sym.IsStatic && !sym.IsFixedStatic && sym.IsReferenced) {
+                    if (sym.IsStatic && sym.IsReferenced) {
                         if (ctorEmitter == null) {
                             ctorEmitter = _prog.GetConstructor();
                         }

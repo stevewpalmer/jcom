@@ -207,7 +207,7 @@ namespace JFortran {
             SimpleToken token = ExpectToken(TokenID.INTEGER);
             if (token != null) {
                 IntegerToken intToken = (IntegerToken)token;
-                return new SymbolParseNode(ParseID.LABEL, GetMakeLabel(intToken.Value.ToString(), false));
+                return new SymbolParseNode(GetMakeLabel(intToken.Value.ToString(), false));
             }
             return null;
         }

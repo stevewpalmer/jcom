@@ -65,7 +65,7 @@ namespace JComal {
         private SymbolParseNode ParseLabel() {
             IdentifierToken identToken = ParseIdentifier();
             if (identToken != null) {
-                return new SymbolParseNode(ParseID.LABEL, GetMakeLabel(identToken.Name, false));
+                return new SymbolParseNode(GetMakeLabel(identToken.Name, false));
             }
             return null;
         }

@@ -1124,7 +1124,7 @@ namespace JFortran {
                     sym = _localSymbols.Add(label, new SymFullType(SymType.NONE), SymClass.VAR, null, _ls.LineNumber);
                 }
                 sym.FullType = new SymFullType(SymType.CHAR, str.Length);
-                sym.Modifier = SymModifier.FIXED|SymModifier.STATIC;
+                sym.Modifier = SymModifier.STATIC;
                 sym.Defined = true;
                 sym.Value.Set(str);
             }

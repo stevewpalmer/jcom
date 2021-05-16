@@ -231,11 +231,10 @@ namespace CCompiler {
     public class SymbolParseNode : ParseNode {
 
         /// <summary>
-        /// Creates a symbol parse node with the specified parse ID.
+        /// Creates a symbol parse node for the specified symbol.
         /// </summary>
-        /// <param name="id">A parse ID</param>
         /// <param name="sym">A symbol entry</param>
-        public SymbolParseNode(ParseID id, Symbol sym) : base(id) {
+        public SymbolParseNode(Symbol sym) : base(ParseID.LABEL) {
             Symbol = sym;
             Type = sym.Type;
         }
@@ -250,15 +249,7 @@ namespace CCompiler {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
-            if (ID == ParseID.LABEL) {
-                if (Symbol.IsFixedStatic) {
-                    cg.Emitter.LoadString(Symbol.Value.StringValue);
-                    return Type;
-                }
-                return cg.Emitter.LoadSymbol(Symbol);
-            }
-            Debug.Assert(false, "Unsupported parse ID for SymbolParseNode");
-            return Symbol.VariantTypeToSymbolType(Value.Type);
+            return cg.Emitter.LoadSymbol(Symbol);
         }
 
         /// <summary>

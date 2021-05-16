@@ -316,19 +316,18 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// Creates an string from the given symbol and save the reference
-        /// to the top of the stack.
+        /// Creates a fixed string using the width specified by the symbol and
+        /// stores it at the top of the stack.
         /// </summary>
         /// <param name="sym">Symbol</param>
-        public void CreateString(Symbol sym) {
+        public void CreateFixedString(Symbol sym) {
             if (sym == null) {
                 throw new ArgumentNullException(nameof(sym));
             }
-            if (sym.Type == SymType.FIXEDCHAR) {
-                Type baseType = typeof(FixedString);
-                LoadInteger(sym.FullType.Width);
-                CreateObject(baseType, new [] { typeof(int) });
-            }
+            Debug.Assert(sym.Type == SymType.FIXEDCHAR);
+            Type baseType = typeof(FixedString);
+            LoadInteger(sym.FullType.Width);
+            CreateObject(baseType, new [] { typeof(int) });
         }
 
         /// <summary>
@@ -598,13 +597,6 @@ namespace CCompiler {
             return typeNeeded;
 		}
 
-        // Handle creation of a symbol. The symbol is not initialised and
-        // array symbols will require explicit initialisation later.
-        //
-        public void CreateSymbol(Symbol sym) {
-
-        }
-
         // Handle initialisation of a symbol using its default value if one
         // is specified. This works for all symbol types - local and static.
         //
@@ -620,9 +612,6 @@ namespace CCompiler {
             if (sym.Type == SymType.CHAR && !sym.Value.HasValue) {
                 sym.Value = new Variant(string.Empty);
             }
-            if (sym.IsFixedStatic) {
-                return;
-            }
             if (sym.IsArray) {
                 CreateArray(sym);
                 if (sym.ArrayValues?.Length > 0) {
@@ -631,7 +620,7 @@ namespace CCompiler {
                     foreach (Variant value in sym.ArrayValues) {
                         Emit0(OpCodes.Dup);
                         LoadInteger(arrayIndex);
-                        GenerateLoad(value);
+                        LoadVariant(value);
                         StoreElementReference(Symbol.VariantTypeToSymbolType(value.Type));
                         arrayIndex++;
                     }
@@ -643,11 +632,11 @@ namespace CCompiler {
                 return;
             }
             if (sym.Type == SymType.FIXEDCHAR) {
-                CreateString(sym);
+                CreateFixedString(sym);
                 StoreSymbol(sym);
             }
             if (sym.CanInitialise) {
-                GenerateLoad(sym.Value);
+                LoadVariant(sym.Value);
                 ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
                 StoreSymbol(sym);
             }
@@ -705,7 +694,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="em">Emitter</param>
         /// <param name="value">The value to be loaded</param>
-        public void GenerateLoad(Variant value) {
+        public void LoadVariant(Variant value) {
             if (value == null) {
                 throw new ArgumentNullException(nameof(value));
             }

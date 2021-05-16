@@ -29,10 +29,12 @@ using System.Reflection.Emit;
 using JComLib;
 
 namespace CCompiler {
+
     /// <summary>
     /// Defines a class that emits static opcodes and operands
     /// </summary>
     public static class StaticEmitter {
+
         private static int _staticIndex = 0;
 
         /// <summary>
@@ -50,46 +52,6 @@ namespace CCompiler {
             }
             string name = $"S{_staticIndex++}_{sym.Name}";
             FieldBuilder fieldInfo = tb.DefineField(name, sym.SystemType, FieldAttributes.Static);
-            return fieldInfo;
-        }
-
-        /// <summary>
-        /// Creates a fixed value static local variable that is initialised with
-        /// the symbol's value.
-        /// </summary>
-        /// <param name="tb">Typebuilder for the current type</param>
-        /// <param name="sym">The symbol</param>
-        /// <returns>The A FieldInfo representing the static variable</returns>
-        public static FieldInfo CreateFixedStatic(TypeBuilder tb, Symbol sym) {
-            if (tb == null) {
-                throw new ArgumentNullException(nameof(tb));
-            }
-            if (sym == null) {
-                throw new ArgumentNullException(nameof(sym));
-            }
-            string name = $"S{_staticIndex++}_{sym.Name}";
-            FieldAttributes flags = FieldAttributes.Private | FieldAttributes.Static;
-            if (sym.Value.Type != VariantType.STRING) {
-                flags |= FieldAttributes.Literal;
-            }
-            FieldBuilder fieldInfo = tb.DefineField(name, sym.SystemType, flags);
-            switch (sym.Value.Type) {
-                case VariantType.DOUBLE:
-                    fieldInfo.SetConstant(sym.Value.DoubleValue);
-                    break;
-                case VariantType.FLOAT:
-                    fieldInfo.SetConstant(sym.Value.RealValue);
-                    break;
-                case VariantType.INTEGER:
-                    fieldInfo.SetConstant(sym.Value.IntValue);
-                    break;
-                case VariantType.BOOLEAN:
-                    fieldInfo.SetConstant(sym.Value.BoolValue);
-                    break;
-                case VariantType.COMPLEX:
-                    fieldInfo.SetConstant(sym.Value.ComplexValue);
-                    break;
-            }
             return fieldInfo;
         }
     }

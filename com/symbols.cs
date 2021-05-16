@@ -72,7 +72,6 @@ namespace CCompiler {
         EXTERNAL = 2,
         STATIC = 4,
         RETVAL = 8,
-        FIXED = 16,
         FLATARRAY = 32,
         ENTRYPOINT = 64,
         EXPORTED = 128
@@ -324,11 +323,6 @@ namespace CCompiler {
         /// Returns whether the symbol is exported for other modules to use.
         /// </summary>
         public bool IsExported => Modifier.HasFlag(SymModifier.EXPORTED);
-
-        /// <summary>
-        /// Returns whether the symbol is a fixed static on it.
-        /// </summary>
-        public bool IsFixedStatic => Modifier.HasFlag(SymModifier.FIXED) && Modifier.HasFlag(SymModifier.STATIC);
 
         /// <summary>
         /// Returns whether arrays are flattened. If the code generator supports multi-dimensional
