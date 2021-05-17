@@ -125,8 +125,10 @@ namespace JComal {
                 using StreamReader sr = new(filename);
                 while (sr.Peek() != -1) {
                     string sourceLine = sr.ReadLine();
-                    Line line = new(tokeniser.TokeniseLine(sourceLine));
-                    lines.Add(line);
+                    if (!string.IsNullOrEmpty(sourceLine)) {
+                        Line line = new(tokeniser.TokeniseLine(sourceLine));
+                        lines.Add(line);
+                    }
                 }
             }
             CompileLines(filename, lines);

@@ -406,8 +406,7 @@ namespace JComLib {
         /// </summary>
         /// <param name="stringValue">String value to set</param>
         public void Set(string stringValue) {
-            double _doubleValue;
-            double.TryParse(stringValue, out _doubleValue);
+            double.TryParse(stringValue, out double _doubleValue);
             DoubleValue = _doubleValue;
             RealValue = (float)_doubleValue;
             IntValue = (int)DoubleValue;

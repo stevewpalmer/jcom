@@ -577,7 +577,7 @@ namespace CCompiler {
 
                     case SymType.CHAR:
                         if (actualType == SymType.FIXEDCHAR) {
-                            Emit0(OpCodes.Call, typeof(FixedString).GetMethod("ToString", Type.EmptyTypes ));
+                            Emit0(OpCodes.Callvirt, typeof(FixedString).GetMethod("ToString", Type.EmptyTypes ));
                         }
                         break;
 
@@ -645,7 +645,6 @@ namespace CCompiler {
         // Generate the code to initialise a fixed string array by calling
         // the Length on every element.
         public void InitFixedStringArray(Symbol sym) {
-            Debug.Assert(sym.Dimensions.Count > 1 && !sym.IsFlatArray);
             LocalDescriptor count = GetTemporary(typeof(int));
             Label loopStart = CreateLabel();
             LoadInteger(0);
@@ -1146,7 +1145,7 @@ namespace CCompiler {
         /// Releases the specified temporary variable for reuse.
         /// </summary>
         /// <param name="temp">A local descriptor for the temporary variable</param>
-        public void ReleaseTemporary(LocalDescriptor temp) {
+        public static void ReleaseTemporary(LocalDescriptor temp) {
             if (temp == null) {
                 throw new ArgumentNullException(nameof(temp));
             }

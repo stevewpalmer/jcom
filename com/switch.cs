@@ -97,7 +97,7 @@ namespace CCompiler {
                     Symbol sym = cg.GetLabel(_labelList[switchIndex]);
                     cg.Emitter.BranchEqual((Label)sym.Info);
                 }
-                cg.Emitter.ReleaseTemporary(index);
+                Emitter.ReleaseTemporary(index);
             }
         }
     }

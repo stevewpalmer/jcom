@@ -210,8 +210,9 @@ namespace JComLib {
     /// </summary>            
     public class IOFile : IDisposable {
 
-        // Map between system file objects and I/O units
         private static Dictionary<int, IOFile> _filemap = new();
+        private static IOFile stdinFile = new StdinIOFile();
+        private static IOFile stdoutFile = new StdoutIOFile();
 
         /// <summary>
         /// The value of an End Of File character
@@ -222,18 +223,6 @@ namespace JComLib {
         /// The value of an End Of Line character.
         /// </summary>
         public const char EOL = '\n';
-
-        /// <summary>
-        /// A predefined IOFile object that represents the standard
-        /// input device.
-        /// </summary>
-        public static IOFile StdinFile = new StdinIOFile();
-
-        /// <summary>
-        /// A predefined IOFile object that represents the standard
-        /// output device.
-        /// </summary>
-        public static IOFile StdoutFile = new StdoutIOFile();
 
         // Class variables
         private bool _isDisposed;
@@ -346,6 +335,18 @@ namespace JComLib {
             } while (_filemap.ContainsKey(iodevice));
             return iodevice;
         }
+
+        /// <summary>
+        /// A predefined IOFile object that represents the standard
+        /// input device.
+        /// </summary>
+        public static IOFile StdinFile { get => stdinFile; set => stdinFile = value; }
+
+        /// <summary>
+        /// A predefined IOFile object that represents the standard
+        /// output device.
+        /// </summary>
+        public static IOFile StdoutFile { get => stdoutFile; set => stdoutFile = value; }
 
         /// <summary>
         /// Physically open the file.

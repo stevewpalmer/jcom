@@ -527,14 +527,14 @@ namespace CCompiler {
             }
             str.Append(FullType + " " + Name);
             if (IsArray && Dimensions.Count > 0) {
-                str.Append("(");
+                str.Append('(');
                 for (int c = 0; c < Dimensions.Count; ++c) {
                     if (c > 0) {
-                        str.Append(",");
+                        str.Append(',');
                     }
                     str.Append(Dimensions[c]);
                 }
-                str.Append(")");
+                str.Append(')');
             }
             if (!Defined) {
                 str.Append(" (undef)");
@@ -635,6 +635,7 @@ namespace CCompiler {
                 case "fixedstring":     return SymType.FIXEDCHAR;
                 case "string":          return SymType.CHAR;
                 case "bool":            return SymType.BOOLEAN;
+                case "boolean":         return SymType.BOOLEAN;
                 case "complex":         return SymType.COMPLEX;
                 case "void":            return SymType.NONE;
             }

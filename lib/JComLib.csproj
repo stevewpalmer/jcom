@@ -22,7 +22,7 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <LangVersion>9.0</LangVersion>
@@ -30,4 +30,7 @@
     <OutputPath>bin\Release</OutputPath>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(TargetPath) ..\drop" />
+  </Target>
 </Project>

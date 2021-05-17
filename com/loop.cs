@@ -286,8 +286,8 @@ namespace CCompiler {
             cg.Emitter.BranchIfTrue(loopStart);
             cg.Emitter.Pop();
             cg.Emitter.MarkLabel(loopEnd);
-            cg.Emitter.ReleaseTemporary(iterCount);
-            cg.Emitter.ReleaseTemporary(stepVar);
+            Emitter.ReleaseTemporary(iterCount);
+            Emitter.ReleaseTemporary(stepVar);
         }
 
         // Emit the code that computes the number of iterations that the

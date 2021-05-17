@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "jcomal": {
+      "commandName": "Project",
+      "commandLineArgs": "-run append.lst",
+      "workingDirectory": "C:\\Source\\jcom\\standard"
+    }
+  }
+}

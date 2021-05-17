@@ -137,7 +137,7 @@ namespace CCompiler {
 
         // Emit code that writes the variant value to the given array index where
         // the array is specified by the symbol..
-        private void GenerateStoreToArray(CodeGenerator cg, Symbol sym, int index, Variant value) {
+        private static void GenerateStoreToArray(CodeGenerator cg, Symbol sym, int index, Variant value) {
             cg.Emitter.LoadSymbol(sym);
             cg.Emitter.LoadInteger(index);
             cg.Emitter.LoadVariant(value);

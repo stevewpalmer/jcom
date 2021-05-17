@@ -4,10 +4,8 @@
     <OutputType>Library</OutputType>
     <ReleaseVersion>0.3</ReleaseVersion>
     <RootNamespace>JFortranLib</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <LangVersion>9.0</LangVersion>
-    <OutputPath>bin\Debug</OutputPath>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <CustomCommands>
       <CustomCommands>
@@ -22,15 +20,18 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <LangVersion>9.0</LangVersion>
     <DebugType>none</DebugType>
     <OutputPath>bin\Release</OutputPath>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\lib\jcomlib.csproj" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(TargetPath) ..\drop" />
+  </Target>
 </Project>

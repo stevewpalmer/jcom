@@ -766,7 +766,7 @@ namespace CCompiler {
                         }
                         if (ErrText != null && ErrText.IsReferenced) {
                             il.Emit(OpCodes.Ldloc_S, tmp1);
-                            il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Message"), null);
+                            il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message"), null);
                             il.Emit(OpCodes.Stsfld, (FieldInfo)ErrText.Info);
                         }
                     }
@@ -800,7 +800,7 @@ namespace CCompiler {
                     il.Emit(OpCodes.Beq, skipMessage);
 
                     il.Emit(OpCodes.Ldloc_S, tmp1);
-                    il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Message"), null);
+                    il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message"), null);
 
                     MethodInfo meth = typeof(Console).GetMethod("WriteLine", new[] { typeof(string) });
                     il.EmitCall(OpCodes.Call, meth, null);

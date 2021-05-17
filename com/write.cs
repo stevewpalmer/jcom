@@ -85,8 +85,7 @@ namespace CCompiler {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
-            if (node is LoopParseNode) {
-                LoopParseNode loopNode = (LoopParseNode)node;
+            if (node is LoopParseNode loopNode) {
                 loopNode.Callback = this;
                 loopNode.Generate(cg);
             } else {
@@ -238,8 +237,8 @@ namespace CCompiler {
                 cg.Emitter.Pop();
             }
 
-            cg.Emitter.ReleaseTemporary(index);
-            cg.Emitter.ReleaseTemporary(objIndex);
+            Emitter.ReleaseTemporary(index);
+            Emitter.ReleaseTemporary(objIndex);
             return SymType.CHAR;
         }
 

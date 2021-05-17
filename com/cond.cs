@@ -64,7 +64,7 @@ namespace CCompiler {
             cg.Emitter.LoadValue(exprType, new Variant(0));
             cg.Emitter.BranchEqual((Label)label2.Info);
             cg.Emitter.Branch((Label)label3.Info);
-            cg.Emitter.ReleaseTemporary(tempIndex);
+            Emitter.ReleaseTemporary(tempIndex);
         }
     }
 

@@ -70,7 +70,7 @@ namespace CCompiler {
         /// </summary>
         public void Free() {
             foreach (LocalDescriptor local in _locals) {
-                _em.ReleaseTemporary(local);
+                Emitter.ReleaseTemporary(local);
             }
             _locals.Clear();
         }

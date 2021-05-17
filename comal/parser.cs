@@ -298,7 +298,9 @@ namespace JComal {
             _importSymbols = savedImportSymbols;
 
             // Remove the local symbol table
-            SymbolStack.Pop();
+            if (!isImplicit) {
+                SymbolStack.Pop();
+            }
 
             _hasReturn = savedHasReturn;
 

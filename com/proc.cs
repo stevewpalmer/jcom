@@ -152,12 +152,13 @@ namespace CCompiler {
 
             Body.Generate(cg);
 
+            cg.Emitter.MarkLabel(ReturnLabel);
+
             if (needTryBlock) {
                 cg.Emitter.AddDefaultTryCatchHandlerBlock();
                 cg.Emitter.CloseTryCatchBlock();
             }
 
-            cg.Emitter.MarkLabel(ReturnLabel);
             cg.Emitter.Return();
             cg.Emitter.Save();
         }

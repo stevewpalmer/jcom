@@ -92,8 +92,7 @@ namespace CCompiler {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
-            if (node is LoopParseNode) {
-                LoopParseNode loopNode = (LoopParseNode)node;
+            if (node is LoopParseNode loopNode) {
                 loopNode.Callback = this;
                 loopNode.Generate(cg);
             } else {
@@ -105,8 +104,7 @@ namespace CCompiler {
                 
                 readParamTypes.AddRange(ReadParamsNode.Generate(cg));
 
-                if (node is IdentifierParseNode) {
-                    IdentifierParseNode identNode = (IdentifierParseNode)node;
+                if (node is IdentifierParseNode identNode) {
                     if (identNode.IsArrayBase) {
                         cg.Emitter.LoadInteger(identNode.Symbol.ArraySize);
                         identNode.Generate(cg);
@@ -251,8 +249,8 @@ namespace CCompiler {
             cg.Emitter.LoadLocal(objIndex);
             cg.Emitter.Call(cg.GetMethodForType(readManagerType, "EndRecord", System.Type.EmptyTypes));
             
-            cg.Emitter.ReleaseTemporary(index);
-            cg.Emitter.ReleaseTemporary(objIndex);
+            Emitter.ReleaseTemporary(index);
+            Emitter.ReleaseTemporary(objIndex);
         }
     }
 }

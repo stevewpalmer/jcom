@@ -6,11 +6,6 @@
     <ReleaseVersion>0.3</ReleaseVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RootNamespace>JFortran</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS;DEBUG;NETFRAMEWORK;NET48;</DefineConstants>
-    <Commandlineparameters>../../../samples/tiny.f -dump</Commandlineparameters>
     <CustomCommands>
       <CustomCommands>
         <Command>
@@ -28,24 +23,31 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <LangVersion>9.0</LangVersion>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS;DEBUG;NETFRAMEWORK;NET48;</DefineConstants>
+    <Commandlineparameters>../../../samples/tiny.f -dump</Commandlineparameters>
     <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="MONO_TRACE_LISTENER" value="Console.Error" />
       </EnvironmentVariables>
     </EnvironmentVariables>
-    <RunCodeAnalysis>true</RunCodeAnalysis>
     <ConsolePause>False</ConsolePause>
-    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <OutputPath>bin\Release</OutputPath>
-    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\lib\jcomlib.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
     <ProjectReference Include="..\fortranlib\jforlib.csproj" />
   </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(TargetPath) ..\drop" />
+  </Target>
 </Project>
