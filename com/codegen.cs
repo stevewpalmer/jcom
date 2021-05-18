@@ -286,56 +286,51 @@ namespace CCompiler {
                 if (sym.IsImported) {
                     continue;
                 }
+
+                // Methods may be defined but not reference, but still need to be
+                // created as they may be exported. (Should we automatically set
+                // the reference flag on them?)
                 if (sym.IsMethod && sym.Defined && !sym.IsParameter) {
                     _prog.CreateMethod(sym);
+                    continue;
+                }
+                if (!sym.IsReferenced) {
                     continue;
                 }
                 if (sym.IsArray) {
                     InitDynamicArray(sym);
                 }
-                if (sym.IsReferenced) {
-                    switch (sym.Type) {
-                        case SymType.GENERIC:
+                switch (sym.Type) {
+                    case SymType.GENERIC:
+                        if (sym.IsStatic) {
+                            // Static array of objects
+                            sym.Info = StaticEmitter.CreateStatic(_prog.GetCurrentType(), sym);
+                            needConstructor = true;
+                        }
+                        break;
+
+                    case SymType.DOUBLE:
+                    case SymType.CHAR:
+                    case SymType.FIXEDCHAR:
+                    case SymType.INTEGER:
+                    case SymType.FLOAT:
+                    case SymType.COMPLEX:
+                    case SymType.BOOLEAN: {
+                        if (sym.IsLocal && !sym.IsIntrinsic && !sym.IsReferenceCommon && !sym.IsMethod) {
                             if (sym.IsStatic) {
-                                // Static array of objects
                                 sym.Info = StaticEmitter.CreateStatic(_prog.GetCurrentType(), sym);
                                 needConstructor = true;
+                            } else {
+                                sym.Index = Emitter.CreateLocal(sym);
+                                Emitter.InitialiseSymbol(sym);
                             }
-                            break;
-
-                        case SymType.DOUBLE:
-                        case SymType.CHAR:
-                        case SymType.FIXEDCHAR:
-                        case SymType.INTEGER:
-                        case SymType.FLOAT:
-                        case SymType.COMPLEX:
-                        case SymType.BOOLEAN: {
-                            if (sym.IsLocal && !sym.IsIntrinsic && !sym.IsReferenceCommon && !sym.IsMethod) {
-                                if (sym.IsStatic) {
-                                    sym.Info = StaticEmitter.CreateStatic(_prog.GetCurrentType(), sym);
-                                    needConstructor = true;
-                                } else {
-                                    sym.Index = Emitter.CreateLocal(sym);
-                                    if (sym.IsArray) {
-                                        Emitter.CreateArray(sym);
-                                        Emitter.StoreSymbol(sym);
-                                        if (sym.Type == SymType.FIXEDCHAR) {
-                                            Emitter.InitFixedStringArray(sym);
-                                        }
-                                    } else if (sym.Type == SymType.FIXEDCHAR) {
-                                        Emitter.CreateFixedString(sym);
-                                        Emitter.StoreSymbol(sym);
-                                    }
-                                    Emitter.InitialiseSymbol(sym);
-                                }
-                            }
-                            break;
                         }
-
-                        case SymType.LABEL:
-                            sym.Info = Emitter.CreateLabel();
-                            break;
+                        break;
                     }
+
+                    case SymType.LABEL:
+                        sym.Info = Emitter.CreateLabel();
+                        break;
                 }
             }
 

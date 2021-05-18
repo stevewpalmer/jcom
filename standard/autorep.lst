@@ -1,6 +1,6 @@
        10 //AUTOREP - a selfreproducing program ------------
        20 line:=21
-       30 DIM a$(21) OF 50, quote$ OF 2
+       30 DIM a$(line) OF 50, quote$ OF 2
        40 pre:=4; after:=5; quote$:=""""
        50 a$(1):="//AUTOREP - a selfreproducing program ------------"
        60 a$(2):="line:=21                                          "

@@ -145,7 +145,10 @@ namespace JComLib {
     /// </summary>            
     public sealed class StdinIOFile : IOFile {
 
-        public StdinIOFile() : base(IOConstant.Stdin) {}
+        public StdinIOFile() : base(IOConstant.Stdin) {
+            Width = -1;
+            Terminator = LineTerminator.NEWLINE;
+        }
 
         /// <summary>
         /// Stdin always takes formatted input.

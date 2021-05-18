@@ -916,8 +916,17 @@ namespace JFortran {
             // then we're a statement function. Array element assignments here MUST have been
             // predefined.
             Symbol sym = _localSymbols.Get(identToken.Name);
-            if (_ls.PeekToken().ID == TokenID.LPAREN && (sym == null || !sym.IsArray)) {
-                return KStatementFunction(identToken);
+            if (_ls.PeekToken().ID == TokenID.LPAREN) {
+                bool stfunc = sym == null;
+                if (sym != null && sym.Type == SymType.FIXEDCHAR) {
+                    stfunc = false;
+                }
+                else if (sym != null && !sym.IsArray) {
+                    stfunc = true;
+                }
+                if (stfunc) {
+                    return KStatementFunction(identToken);
+                }
             }
 
             IdentifierParseNode identNode = (IdentifierParseNode)ParseIdentifierFromToken(identToken);

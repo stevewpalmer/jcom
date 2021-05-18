@@ -636,9 +636,15 @@ namespace CCompiler {
                 StoreSymbol(sym);
             }
             if (sym.CanInitialise) {
-                LoadVariant(sym.Value);
-                ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
-                StoreSymbol(sym);
+                if (sym.Type == SymType.FIXEDCHAR) {
+                    LoadSymbol(sym);
+                    LoadVariant(sym.Value);
+                    Emit0(OpCodes.Call, typeof(FixedString).GetMethod("Set", new[] { typeof(string) }));
+                } else {
+                    LoadVariant(sym.Value);
+                    ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
+                    StoreSymbol(sym);
+                }
             }
         }
 

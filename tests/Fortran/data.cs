@@ -209,6 +209,20 @@ namespace FortranTests {
             Utilities.Helper.HelperRunInteger(comp, "ITEST", 143);
         }
 
+        // Test initialisation of a CHARACTER with DATA
+        [Test]
+        public void DataCharacterSet() {
+            string[] code = {
+                "      FUNCTION ITEST",
+                "        CHARACTER * 20 B, ITEST",
+                "        DATA B /20*'A'/",
+                "        RETURN B",
+                "      END"
+            };
+            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+            Utilities.Helper.HelperRunString(comp, "ITEST", "AAAAAAAAAAAAAAAAAAAA");
+        }
+
         // DATA statement with a nested implied DO loop
         // Currently broken in the compiler.
         /*

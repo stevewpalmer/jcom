@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using CCompiler;
 using JComLib;
 
@@ -316,6 +317,10 @@ namespace JFortran {
                         AssignmentParseNode assignNode = new(idNode, new StringParseNode(valueNode.StringValue));
                         AddInit(assignNode);
                     } else {
+                        if (valueNode.Type == VariantType.STRING && repeatCount > 1) {
+                            string newString = string.Concat(Enumerable.Repeat(valueNode.ToString(), repeatCount));
+                            valueNode = new Variant(newString);
+                        }
                         sym.Value = valueNode;
                     }
                     --repeatCount;
@@ -631,7 +636,7 @@ namespace JFortran {
             SimpleToken token;
 
             if (Symbol.IsCharType(type)) {
-                fullType.Width = ParseTypeWidth(0);
+                fullType.Width = ParseTypeWidth(1);
             }
 
             // Could be a function declaration preceded by type?
