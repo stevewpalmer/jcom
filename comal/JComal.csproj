@@ -41,7 +41,7 @@
     <ProjectReference Include="..\lib\jcomlib.csproj" />
     <ProjectReference Include="..\comallib\jcomallib.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)'=='Windows_NT'">
     <Exec Command="copy $(TargetPath) ..\drop" />
   </Target>
 </Project>
