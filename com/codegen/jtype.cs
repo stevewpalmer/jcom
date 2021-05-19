@@ -1,5 +1,5 @@
-﻿// Project title
-// File title
+﻿// JCom Compiler Toolkit
+// Type Builder
 //
 // Authors:
 //  Steven Palmer
@@ -64,6 +64,15 @@ namespace CCompiler {
             return Builder.DefineField(name, sym.SystemType, FieldAttributes.Static);
         }
 
+        /// <summary>
+        /// Creates a temporary field of the specified type.
+        /// </summary>
+        /// <param name="type">The symbol system type</param>
+        /// <returns>The A FieldInfo representing the new temporary field</returns>
+        public FieldInfo TemporaryField(Type type) {
+            string name = $"S{_staticIndex++}_Temp";
+            return Builder.DefineField(name, type, FieldAttributes.Static);
+        }
 
         /// <summary>
         /// Creates a constructor for the type
@@ -71,8 +80,9 @@ namespace CCompiler {
         /// <param name="attributes">Constructor attributes</param>
         /// <param name="paramTypes">Parameter types</param>
         /// <returns></returns>
-        public ConstructorBuilder CreateConstructor(MethodAttributes attributes, Type[] paramTypes) {
-            return Builder.DefineConstructor(attributes, CallingConventions.Standard, paramTypes);
+        public JMethod CreateConstructor(MethodAttributes attributes, Type[] paramTypes) {
+            ConstructorBuilder cntb = Builder.DefineConstructor(attributes, CallingConventions.Standard, paramTypes);
+            return new JMethod(this, cntb);
         }
 
         /// <summary>
@@ -82,7 +92,7 @@ namespace CCompiler {
         /// <param name="atributes">Method attributes</param>
         /// <param name="paramTypes">Parameter types</param>
         /// <returns></returns>
-        public MethodBuilder CreateMethod(Symbol sym, MethodAttributes atributes) {
+        public JMethod CreateMethod(Symbol sym, MethodAttributes atributes) {
 
             bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
             Type returnType;
@@ -132,7 +142,7 @@ namespace CCompiler {
                 }
             }
 
-            return metb;
+            return new JMethod(this, metb);
         }
     }
 }

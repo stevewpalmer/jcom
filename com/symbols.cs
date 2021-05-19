@@ -487,6 +487,23 @@ namespace CCompiler {
         public Variant [] ArrayValues { get; set; }
 
         /// <summary>
+        /// Is this a dynamic array where one of the bounds is
+        /// computed at run-time?
+        /// </summary>
+        public bool IsDynamicArray {
+            get {
+                if (IsArray) {
+                    for (int c = 0; c < Dimensions.Count; ++c) {
+                        if (Dimensions[c].Size < 0) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Return the total number of elements in this array, which is the
         /// product of all dimension sizes. Returns 0 if this is not an array.
         /// </summary>

@@ -49,7 +49,7 @@ namespace CCompiler {
             Dump = false;
             Inline = true;
             Run = false;
-            DevMode = true;
+            DevMode = false;
             VersionString = "1.0.0.0";
             Messages = new MessageCollection(this);
         }

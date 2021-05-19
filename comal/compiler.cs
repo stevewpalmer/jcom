@@ -609,18 +609,12 @@ namespace JComal {
             return sym;
         }
 
-        // Initialise the specified symbol to the default in Comal. Numbers are
-        // initialised to 0 and strings are initialised to empty. If we're not
-        // in strict mode, we also dimension the string to the default width.
+        // Initialise fixed char strings to empty. We don't attempt to initialise
+        // other types as MSIL will do this automatically for us.
         private void InitialiseToDefault(Symbol sym) {
+
             if (!sym.IsArray) {
-                if (sym.Type == SymType.INTEGER) {
-                    sym.Value = new Variant(0);
-                }
-                if (sym.Type == SymType.FLOAT) {
-                    sym.Value = new Variant((float)0);
-                }
-                if (sym.Type == SymType.CHAR || sym.Type == SymType.FIXEDCHAR) {
+                if (sym.Type == SymType.FIXEDCHAR) {
                     sym.Value = new Variant(string.Empty);
                     if (!_opts.Strict) {
                         sym.FullType.Width = Consts.DefaultStringWidth;

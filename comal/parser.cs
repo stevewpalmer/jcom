@@ -400,14 +400,6 @@ namespace JComal {
                     return null;
                 }
 
-                // All array dimensions must be constant
-                foreach (SymDimension dim in dimensions) {
-                    if (dim.Size < 0) {
-                        Messages.Error(MessageCode.ARRAYILLEGALBOUNDS, "Array dimensions must be constant");
-                        break;
-                    }
-                }
-
                 // Indicate this symbol is explicitly declared
                 SymFullType thisFullType = GetTypeFromName(identToken.Name);
                 if (sym == null) {
