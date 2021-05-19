@@ -57,7 +57,7 @@ namespace JFortran {
 
         private BlockState _state;
         private Lexer _ls;
-        private ProgramDefinition _programDef;
+        private ProgramParseNode _cg;
         private FortranSymbolCollection _localSymbols;
         private FortranSymbolCollection _stfSymbols;
         private ProcedureParseNode _currentProcedure;
@@ -113,10 +113,9 @@ namespace JFortran {
         /// </summary>
         public void Save() {
             try {
-                CodeGenerator codegen = new(_opts);
                 MarkExecutable();
-                codegen.GenerateCode(_programDef);
-                codegen.Save();
+                _cg.Generate();
+                _cg.Save();
             } catch (CodeGeneratorException e) {
                 Messages.Error(e.Filename, MessageCode.CODEGEN, e.Linenumber, e.Message);
             }
@@ -149,10 +148,9 @@ namespace JFortran {
         /// <param name="entryPointName">The name of the method to be called</param>
         /// <returns>An ExecutionResult object representing the result of the execution</returns>
         public ExecutionResult Execute(string entryPointName) {
-            CodeGenerator codegen = new(_opts);
             MarkExecutable();
-            codegen.GenerateCode(_programDef);
-            return codegen.Run(entryPointName);
+            _cg.Generate();
+            return _cg.Run(entryPointName);
         }
 
         /// <summary>
@@ -168,12 +166,12 @@ namespace JFortran {
                 _state = BlockState.NONE;
                 
                 // Create the top-level program node.
-                if (_programDef == null) {
+                if (_cg == null) {
                     string moduleName = Path.GetFileNameWithoutExtension(_opts.OutputFile);
                     if (string.IsNullOrEmpty(moduleName)) {
                         moduleName = "Class";
                     }
-                    _programDef = new ProgramDefinition {
+                    _cg = new ProgramParseNode(_opts) {
                         Name = moduleName,
                         Globals = _globalSymbols,
                         IsExecutable = true,
@@ -185,7 +183,7 @@ namespace JFortran {
 
                 // Dump file?
                 if (_opts.Dump) {
-                    XmlDocument xmlTree = ParseTreeXml.Tree(_programDef);
+                    XmlDocument xmlTree = ParseTreeXml.Tree(_cg);
                     string outputFilename = Path.GetFileName(_opts.OutputFile);
                     outputFilename = Path.ChangeExtension(outputFilename, ".xml");
                     xmlTree.Save(outputFilename);
@@ -243,8 +241,8 @@ namespace JFortran {
         // Mark in the PROGRAM node whether or not this program is executable.
         // An executable program is one which has a PROGRAM statement.
         private void MarkExecutable() {
-            if (_programDef != null) {
-                _programDef.IsExecutable = _hasProgram;
+            if (_cg != null) {
+                _cg.IsExecutable = _hasProgram;
             }
         }
 

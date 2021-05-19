@@ -50,12 +50,11 @@ namespace JComal {
         }
 
         private readonly ComalOptions _opts;
-        private readonly BlockParseNode _ptree;
         private readonly string _entryPointName;
+        private readonly ProgramParseNode _program;
 
         private BlockState _state;
         private Lines _ls;
-        private ProgramDefinition _programDef;
         private SymbolCollection _importSymbols;
         private bool _hasReturn;
         private bool _hasProgram;
@@ -89,12 +88,25 @@ namespace JComal {
         /// </summary>
         /// <param name="opts">Compiler options</param>
         public Compiler(ComalOptions opts) {
+
             SymbolStack = new();
             Globals = new SymbolCollection("_GLOBALS");
             SymbolStack.Push(Globals);
 
             _importSymbols = null;
-            _ptree = new BlockParseNode();
+
+            string moduleName = Path.GetFileNameWithoutExtension(opts.OutputFile);
+            if (string.IsNullOrEmpty(moduleName)) {
+                moduleName = "Class";
+            }
+
+            // Top level parse node that defines the program
+            _program = new(opts);
+            _program.Name = moduleName;
+            _program.Globals = Globals;
+            _program.IsExecutable = true;
+            _program.Root = new BlockParseNode();
+
             Messages = new MessageCollection(opts) {
                 Interactive = opts.Interactive
             };
@@ -178,13 +190,9 @@ namespace JComal {
         /// <param name="lines">A Lines object representing the method body</param>
         public void CompileMethod(string methodName, Lines lines) {
 
-            if (_programDef == null) {
-                InitProgram();
-            }
-
             // Find an existing instance of this method
             ProcedureParseNode activeMethod = null;
-            foreach (ParseNode node in _programDef.Root.Nodes) {
+            foreach (ParseNode node in _program.Root.Nodes) {
                 if (node is ProcedureParseNode procNode && procNode.ProcedureSymbol.Name == methodName) {
                     activeMethod = procNode;
                     break;
@@ -205,7 +213,7 @@ namespace JComal {
                     ProcedureSymbol = method,
                 };
                 activeMethod.LocalSymbols.Add(localSymbols);
-                _programDef.Root.Nodes.Add(activeMethod);
+                _program.Root.Nodes.Add(activeMethod);
             }
 
             // Now compile the lines into the method body.
@@ -222,10 +230,9 @@ namespace JComal {
         /// </summary>
         public void Save() {
             try {
-                CodeGenerator codegen = new(_opts);
-                MarkExecutable();
-                codegen.GenerateCode(_programDef);
-                codegen.Save();
+                _program.IsExecutable = _hasProgram;
+                _program.Generate();
+                _program.Save();
             }
             catch (CodeGeneratorException e) {
                 Messages.Error(e.Filename, MessageCode.CODEGEN, e.Linenumber, e.Message);
@@ -250,10 +257,9 @@ namespace JComal {
         /// <param name="entryPointName">The name of the method to be called</param>
         /// <returns>An ExecutionResult object representing the result of the execution</returns>
         public ExecutionResult Execute(string entryPointName) {
-            CodeGenerator codegen = new(_opts);
-            MarkExecutable();
-            codegen.GenerateCode(_programDef);
-            return codegen.Run(entryPointName);
+            _program.IsExecutable = _hasProgram;
+            _program.Generate();
+            return _program.Run(entryPointName);
         }
 
         // Compile an array of source lines.
@@ -266,7 +272,7 @@ namespace JComal {
                 // Mark this file.
                 if (filename != null) {
                     Messages.Filename = filename;
-                    _ptree.Add(MarkFilename());
+                    _program.Root.Add(MarkFilename());
                 }
 
                 // Pre-scan to locate all PROC/FUNCs so we have their declaration
@@ -274,7 +280,7 @@ namespace JComal {
                 Pass0();
 
                 // Compile everything to the end of the file.
-                CompileBlock(_ptree, new[] { TokenID.ENDOFFILE });
+                CompileBlock(_program.Root, new[] { TokenID.ENDOFFILE });
 
                 // Warn about exported methods that are not defined
                 foreach (Symbol sym in Globals) {
@@ -286,7 +292,7 @@ namespace JComal {
 
                 // Dump file?
                 if (_opts.Dump) {
-                    XmlDocument xmlTree = ParseTreeXml.Tree(_programDef);
+                    XmlDocument xmlTree = ParseTreeXml.Tree(_program);
                     string outputFilename = Path.GetFileName(_opts.OutputFile);
                     outputFilename = Path.ChangeExtension(outputFilename, ".xml");
                     xmlTree.Save(outputFilename);
@@ -305,19 +311,6 @@ namespace JComal {
             _blockDepth = 0;
             _currentLineNumber = 0;
             _state = BlockState.NONE;
-
-            // Create the top-level program node.
-            if (_programDef == null) {
-                string moduleName = Path.GetFileNameWithoutExtension(_opts.OutputFile);
-                if (string.IsNullOrEmpty(moduleName)) {
-                    moduleName = "Class";
-                }
-                _programDef = new();
-                _programDef.Name = moduleName;
-                _programDef.Globals = Globals;
-                _programDef.IsExecutable = true;
-                _programDef.Root = _ptree;
-            }
 
             // Create special variables
             Globals.Add(new Symbol(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
@@ -471,14 +464,6 @@ namespace JComal {
         // are found during generation.
         private ParseNode MarkLine() {
             return new MarkLineParseNode {LineNumber = _currentLineNumber};
-        }
-
-        // Mark in the PROGRAM node whether or not this program is executable.
-        // An executable program is one which has a PROGRAM statement.
-        private void MarkExecutable() {
-            if (_programDef != null) {
-                _programDef.IsExecutable = _hasProgram;
-            }
         }
 
         // Retrieve the next token for the current line and check for any
@@ -647,7 +632,7 @@ namespace JComal {
         // Determine the type of a variable from its name. Integer variables end
         // with Consts.IntegerChar, string variable with Consts.StringChar.
         // Anything else is a floating point.
-        private SymFullType GetTypeFromName(string name) {
+        private static SymFullType GetTypeFromName(string name) {
             if (name.EndsWith(Consts.IntegerChar.ToString())) {
                 return new SymFullType(SymType.INTEGER);
             }
@@ -668,14 +653,14 @@ namespace JComal {
 
         // Create an ExtCallParseNode for the specified function in the FileManager
         // class with the inline flag set from the options.
-        private ExtCallParseNode GetFileManagerExtCallNode(string functionName) {
+        private static ExtCallParseNode GetFileManagerExtCallNode(string functionName) {
 
             return new("JComalLib.FileManager,jcomallib", functionName);
         }
 
         // Create an ExtCallParseNode for the specified function in the Runtime
         // class with the inline flag set from the options.
-        private ExtCallParseNode GetRuntimeExtCallNode(string functionName) {
+        private static ExtCallParseNode GetRuntimeExtCallNode(string functionName) {
 
             return new("JComLib.Runtime,jcomlib", functionName);
         }
@@ -854,7 +839,7 @@ namespace JComal {
         }
 
         // Returns the block state to which the specified token belongs.
-        private BlockState TokenToState(SimpleToken token) {
+        private static BlockState TokenToState(SimpleToken token) {
             BlockState state = BlockState.NONE;
             switch (token.ID) {
                 case TokenID.KMODULE:
@@ -991,13 +976,13 @@ namespace JComal {
         }
 
         // Validate an assignment of the exprNode to the specified identNode.
-        private bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
+        private static bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
             return ValidateAssignmentTypes(identNode.Type, exprNode.Type);
         }
 
         // Verify that the type on the right hand side of an assignment can be
         // assigned to the left hand side.
-        private bool ValidateAssignmentTypes(SymType toType, SymType fromType) {
+        private static bool ValidateAssignmentTypes(SymType toType, SymType fromType) {
             bool valid = false;
             
             switch (toType) {

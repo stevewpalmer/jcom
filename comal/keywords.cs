@@ -51,10 +51,10 @@ namespace JComal {
                 Messages.Error(MessageCode.MODULENAMEEXPECTED,
                                "Module name expected");
             } else {
-                _programDef.Name = identToken.Name;
+                _program.Name = identToken.Name;
                 ExpectEndOfLine();
             }
-            CompileBlock(_programDef.Root, new[] { TokenID.KENDMODULE });
+            CompileBlock(_program.Root, new[] { TokenID.KENDMODULE });
             return null;
         }
 

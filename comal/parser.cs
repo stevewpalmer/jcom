@@ -304,7 +304,7 @@ namespace JComal {
 
             _hasReturn = savedHasReturn;
 
-            _ptree.Add(node);
+            _program.Root.Add(node);
             return null;
         }
 
