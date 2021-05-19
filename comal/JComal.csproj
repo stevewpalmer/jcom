@@ -19,10 +19,12 @@
           <type>AfterBuild</type>
           <name>Publish</name>
           <command>cp ${TargetFile} /usr/local/lib/jcom</command>
+          <workingdir>${ProjectDir}</workingdir>
         </Command>
         <Command>
           <type>AfterBuild</type>
           <command>cp jcomal /usr/local/bin</command>
+          <workingdir>${ProjectDir}</workingdir>
         </Command>
       </CustomCommands>
     </CustomCommands>

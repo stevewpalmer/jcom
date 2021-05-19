@@ -19,6 +19,7 @@
         <Command>
           <type>AfterBuild</type>
           <command>cp ${TargetFile} /usr/local/lib/jcom</command>
+          <workingdir>${ProjectDir}</workingdir>
         </Command>
       </CustomCommands>
     </CustomCommands>
