@@ -39,7 +39,6 @@ namespace CCompiler {
     /// </summary>
     public class Program {
 
-        private readonly AssemblyBuilder _ab;
         private readonly ModuleBuilder _mb;
         private readonly Options _opts;
         private readonly bool _isExecutable;
@@ -54,6 +53,11 @@ namespace CCompiler {
         /// Return the current type.
         /// </summary>
         public JType CurrentType { get; set; }
+
+        /// <summary>
+        /// Return the current type.
+        /// </summary>
+        public AssemblyBuilder Builder { get; set; }
 
         /// <summary>
         /// Constructs a Program object with the given options and name. The name determines
@@ -87,21 +91,21 @@ namespace CCompiler {
 
             bool isSaveable = !string.IsNullOrEmpty(opts.OutputFile);
             AssemblyBuilderAccess access = isSaveable ? AssemblyBuilderAccess.RunAndSave : AssemblyBuilderAccess.Run;
-            _ab = ad.DefineDynamicAssembly(an, access);
+            Builder = ad.DefineDynamicAssembly(an, access);
 
             // Make this assembly debuggable if the debug option was specified.
             if (_opts.GenerateDebug) {
-                AddDebuggable(_ab);
+                AddDebuggable();
             }
 
             // Don't make the main class abstract if the program is being run from
             // memory as otherwise the caller will be unable to create an instance.
             TypeAttributes typeAttributes = TypeAttributes.Public;
             if (isSaveable) {
-                _mb = _ab.DefineDynamicModule(name, OutputFilename, true);
+                _mb = Builder.DefineDynamicModule(name, OutputFilename, true);
                 typeAttributes |= TypeAttributes.BeforeFieldInit | TypeAttributes.Sealed;
             } else {
-                _mb = _ab.DefineDynamicModule(name, true);
+                _mb = Builder.DefineDynamicModule(name, true);
             }
 
             // Create an implicit namespace using the output file name if
@@ -110,9 +114,9 @@ namespace CCompiler {
             if (!string.IsNullOrEmpty(opts.OutputFile)) {
                 className = string.Concat(opts.OutputFile.CapitaliseString(), ".");
             }
+            className = string.Concat(className, name);
 
             // Create the default type
-            className = string.Concat(className, name);
             CurrentType = new JType(_mb, className, typeAttributes);
         }
 
@@ -132,9 +136,9 @@ namespace CCompiler {
         /// <returns></returns>
         public Emitter GetConstructor() {
             if (_ctorEmitter == null) {
-                ConstructorBuilder cntb;
+                JMethod cntb;
                 cntb = CurrentType.CreateConstructor(MethodAttributes.Static, Array.Empty<Type>());
-                _ctorEmitter = new Emitter(cntb);
+                _ctorEmitter = new Emitter(cntb.CBuilder);
             }
             return _ctorEmitter;
         }
@@ -159,11 +163,11 @@ namespace CCompiler {
                 methodAttributes |= MethodAttributes.Public;
             }
 
-            MethodBuilder metb = CurrentType.CreateMethod(sym, methodAttributes);
+            JMethod metb = CurrentType.CreateMethod(sym, methodAttributes);
 
             sym.Info = metb;
             if (sym.Modifier.HasFlag(SymModifier.ENTRYPOINT)) {
-                _ab.SetEntryPoint(metb);
+                Builder.SetEntryPoint(metb.Builder);
             }
         }
 
@@ -197,13 +201,11 @@ namespace CCompiler {
         /// Save the program code to the executable.
         /// </summary>
         public void Save() {
-            AddCLSCompliant(_ab);
-            AddCOMVisiblity(_ab);
+            AddCLSCompliant();
+            AddCOMVisiblity();
 
-            if (_mainType == null) {
-                _mainType = GetMainType();
-            }
-            _ab.Save(OutputFilename);
+            _mainType = GetMainType();
+            Builder.Save(OutputFilename);
         }
 
         /// <summary>
@@ -221,29 +223,29 @@ namespace CCompiler {
         }
 
         // Make this assembly fully debuggable.
-        private static void AddDebuggable(AssemblyBuilder ab) {
+        private void AddDebuggable() {
             Type type = typeof(DebuggableAttribute);
             ConstructorInfo ctor = type.GetConstructor(new [] { typeof(DebuggableAttribute.DebuggingModes) } );
             CustomAttributeBuilder caBuilder = new(ctor, new object[] { 
                                                         DebuggableAttribute.DebuggingModes.DisableOptimizations | 
                                                         DebuggableAttribute.DebuggingModes.Default });
-            ab.SetCustomAttribute(caBuilder);
+            Builder.SetCustomAttribute(caBuilder);
         }
 
         // Mark this assembly as CLS Compliant.
-        private void AddCLSCompliant(AssemblyBuilder ab) {
+        private void AddCLSCompliant() {
             Type type = typeof(CLSCompliantAttribute);
             ConstructorInfo ctor = type.GetConstructor(new [] { typeof(bool) } );
             CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCLSCompliant });
-            ab.SetCustomAttribute(caBuilder);
+            Builder.SetCustomAttribute(caBuilder);
         }
 
         // Mark this assembly as COM Visible.
-        private void AddCOMVisiblity(AssemblyBuilder ab) {
+        private void AddCOMVisiblity() {
             Type type = typeof(ComVisibleAttribute);
             ConstructorInfo ctor = type.GetConstructor(new [] { typeof(bool) } );
             CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCOMVisible });
-            ab.SetCustomAttribute(caBuilder);
+            Builder.SetCustomAttribute(caBuilder);
         }
     }
 }

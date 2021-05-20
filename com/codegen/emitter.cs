@@ -372,6 +372,15 @@ namespace CCompiler {
         }
 
         /// <summary>
+        /// Creates a simple 1 dimensional array of the given type and using the
+        /// size on the top of the stack..
+        /// </summary>
+        /// <param name="itemsType">Type of the items in the array</param>
+        public void CreateArray(Type itemsType) {
+            Emit0(OpCodes.Newarr, itemsType);
+        }
+
+        /// <summary>
         /// Create an object of the specified type and with the given list of
         /// parameter types.
         /// </summary>
@@ -936,8 +945,8 @@ namespace CCompiler {
             if (sym == null) {
                 throw new ArgumentNullException(nameof(sym));
             }
-            if (sym.Info != null) {
-                Emit0(OpCodes.Ldftn, (MethodInfo)sym.Info);
+            if (sym.Info is JMethod method) {
+                Emit0(OpCodes.Ldftn, method.Builder);
             }
         }
 

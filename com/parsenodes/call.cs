@@ -114,9 +114,8 @@ namespace CCompiler {
                 cg.Emitter.CallIndirect(sym.Type, paramTypes);
                 thisType = sym.Type;
             } else {
-                if (sym.Info != null) {
-                    Debug.Assert(sym.Info is MethodInfo);
-                    cg.Emitter.Call((MethodInfo)sym.Info);
+                if (sym.Info is JMethod method) {
+                    cg.Emitter.Call(method.Builder);
                     thisType = sym.Type;
                 }
             }
