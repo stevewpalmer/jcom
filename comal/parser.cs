@@ -244,6 +244,9 @@ namespace JComal {
 
             if (methodName == _entryPointName) {
                 method.Modifier |= SymModifier.ENTRYPOINT;
+                if (_opts.Run) {
+                    method.Modifier |= SymModifier.EXPORTED;
+                }
                 _hasProgram = true;
             }
 

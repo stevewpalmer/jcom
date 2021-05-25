@@ -30,6 +30,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Numerics;
+using System.Reflection;
 using System.Text;
 using JComLib;
 
@@ -931,6 +932,94 @@ namespace CCompiler {
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        /// <summary>
+        /// Emit the code to generate the referenced symbols from the given symbol
+        /// collection. Where a value is specified, we also initialise the symbol
+        /// with the given value.
+        /// </summary>
+        /// <param name="symbols">Symbol collection</param>
+        public void GenerateSymbols(ProgramParseNode cg) {
+
+            bool needConstructor = false;
+            foreach (Symbol sym in this) {
+                if (sym.IsImported) {
+                    continue;
+                }
+
+                // Methods may be defined but not reference, but still need to be
+                // created as they may be exported. (Should we automatically set
+                // the reference flag on them?)
+                if (sym.IsMethod && sym.Defined && !sym.IsParameter) {
+
+                    // Don't make the entrypoint method public if we're saving this program
+                    // to a file. However make it public if the -run option is specified as
+                    // otherwise we can't access the entrypoint method internally.
+                    MethodAttributes methodAttributes = MethodAttributes.Static;
+                    if (!sym.Modifier.HasFlag(SymModifier.ENTRYPOINT) || sym.IsExported) {
+                        methodAttributes |= MethodAttributes.Public;
+                    }
+
+                    JMethod metb = cg.CurrentType.CreateMethod(sym, methodAttributes);
+
+                    sym.Info = metb;
+                    if (sym.Modifier.HasFlag(SymModifier.ENTRYPOINT)) {
+                        cg.SetEntryPoint(metb);
+                    }
+                    continue;
+                }
+                if (!sym.IsReferenced) {
+                    continue;
+                }
+                if (sym.IsArray) {
+                    cg.InitDynamicArray(sym);
+                }
+                switch (sym.Type) {
+                    case SymType.GENERIC:
+                        if (sym.IsStatic) {
+                            // Static array of objects
+                            sym.Info = cg.CurrentType.CreateField(sym);
+                            needConstructor = true;
+                        }
+                        break;
+
+                    case SymType.DOUBLE:
+                    case SymType.CHAR:
+                    case SymType.FIXEDCHAR:
+                    case SymType.INTEGER:
+                    case SymType.FLOAT:
+                    case SymType.COMPLEX:
+                    case SymType.BOOLEAN: {
+                            if (sym.IsLocal && !sym.IsIntrinsic && !sym.IsReferenceCommon && !sym.IsMethod) {
+                                if (sym.IsStatic) {
+                                    sym.Info = cg.CurrentType.CreateField(sym);
+                                    needConstructor = true;
+                                } else {
+                                    sym.Index = cg.Emitter.CreateLocal(sym);
+                                    cg.Emitter.InitialiseSymbol(sym);
+                                }
+                            }
+                            break;
+                        }
+
+                    case SymType.LABEL:
+                        sym.Info = cg.Emitter.CreateLabel();
+                        break;
+                }
+            }
+
+            // If we have any statics then we need a constructor to
+            // initialise those statics.
+            if (needConstructor) {
+
+                foreach (Symbol sym in this) {
+                    if (sym.IsStatic && sym.IsReferenced) {
+                        Emitter ctorEmitter = cg.CurrentType.DefaultConstructor.Emitter;
+                        ctorEmitter.InitialiseSymbol(sym);
+                    }
+                }
+            }
         }
     }
 

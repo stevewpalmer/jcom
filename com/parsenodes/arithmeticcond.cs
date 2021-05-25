@@ -51,9 +51,9 @@ namespace CCompiler {
                 throw new ArgumentNullException(nameof(cg));
             }
             SymType exprType = cg.GenerateExpression(SymType.NONE, ValueExpression);
-            Symbol label1 = cg.GetLabel(Nodes[0]);
-            Symbol label2 = cg.GetLabel(Nodes[1]);
-            Symbol label3 = cg.GetLabel(Nodes[2]);
+            Symbol label1 = ProgramParseNode.GetLabel(Nodes[0]);
+            Symbol label2 = ProgramParseNode.GetLabel(Nodes[1]);
+            Symbol label3 = ProgramParseNode.GetLabel(Nodes[2]);
             LocalDescriptor tempIndex = cg.Emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
             cg.Emitter.StoreLocal(tempIndex);
             cg.Emitter.LoadLocal(tempIndex);

@@ -101,7 +101,7 @@ namespace CCompiler {
                 throw new ArgumentNullException(nameof(cg));
             }
             if (ValueExpression == null) {
-                Symbol sym = cg.GetLabel(Nodes[0]);
+                Symbol sym = ProgramParseNode.GetLabel(Nodes[0]);
                 cg.Emitter.Branch((Label)sym.Info);
             } else {
                 Collection<ParseNode> labelNodes = Nodes;
@@ -112,7 +112,7 @@ namespace CCompiler {
 
                 Label [] jumpTable = new Label[labelNodes.Count];
                 for (int c = 0; c < labelNodes.Count; ++c) {
-                    Symbol sym = cg.GetLabel(labelNodes[c]);
+                    Symbol sym = ProgramParseNode.GetLabel(labelNodes[c]);
                     if (sym.Type == SymType.LABEL) {
                         jumpTable[c] = (Label)sym.Info;
                     }

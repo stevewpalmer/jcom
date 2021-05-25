@@ -48,13 +48,9 @@ namespace CCompiler {
         public ConstructorBuilder CBuilder { get; set; }
 
         /// <summary>
-        /// Constructs a method that belongs to the given type
+        /// Code emitter for this method
         /// </summary>
-        /// <param name="metd">Method builder</param>
-        public JMethod(MethodBuilder metd) {
-            OwningType = null;
-            Builder = metd;
-        }
+        public Emitter Emitter { get; set; }
 
         /// <summary>
         /// Constructs a method that belongs to the given type
@@ -64,6 +60,7 @@ namespace CCompiler {
         public JMethod(JType owningType, MethodBuilder metd) {
             OwningType = owningType;
             Builder = metd;
+            Emitter = new Emitter(metd);
         }
 
         /// <summary>
@@ -74,6 +71,7 @@ namespace CCompiler {
         public JMethod(JType owningType, ConstructorBuilder cntb) {
             OwningType = owningType;
             CBuilder = cntb;
+            Emitter = new Emitter(cntb);
         }
     }
 }

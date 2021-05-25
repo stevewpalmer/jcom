@@ -22,6 +22,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -35,11 +36,28 @@ namespace CCompiler {
     public class JType {
 
         private static int _staticIndex = 0;
+        private JMethod _defaultConstructor = null;
+        private Type _createdType = null;
 
         /// <summary>
         /// Type builder
         /// </summary>
         public TypeBuilder Builder { get; set; }
+
+        /// <summary>
+        /// The default constructor for this type
+        /// </summary>
+        public JMethod DefaultConstructor {
+            get {
+                if (_defaultConstructor == null) {
+                    ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
+                            CallingConventions.Standard,
+                            Array.Empty<Type>());
+                    _defaultConstructor = new JMethod(this, cntb);
+                }
+                return _defaultConstructor;
+            }
+        }
 
         /// <summary>
         /// Creates the specified type in the module.
@@ -49,6 +67,18 @@ namespace CCompiler {
         /// <param name="attributes">Type attributes</param>
         public JType(ModuleBuilder mb, string typeName, TypeAttributes attributes) {
             Builder = mb.DefineType(typeName, attributes);
+        }
+
+        /// <summary>
+        /// Create an instance of this type
+        /// </summary>
+        public Type CreateType {
+            get {
+                if (_createdType == null) {
+                    _createdType = Builder.CreateType();
+                }
+                return _createdType;
+            }
         }
 
         /// <summary>
@@ -72,17 +102,6 @@ namespace CCompiler {
         public FieldInfo TemporaryField(Type type) {
             string name = $"S{_staticIndex++}_Temp";
             return Builder.DefineField(name, type, FieldAttributes.Static);
-        }
-
-        /// <summary>
-        /// Creates a constructor for the type
-        /// </summary>
-        /// <param name="attributes">Constructor attributes</param>
-        /// <param name="paramTypes">Parameter types</param>
-        /// <returns></returns>
-        public JMethod CreateConstructor(MethodAttributes attributes, Type[] paramTypes) {
-            ConstructorBuilder cntb = Builder.DefineConstructor(attributes, CallingConventions.Standard, paramTypes);
-            return new JMethod(this, cntb);
         }
 
         /// <summary>

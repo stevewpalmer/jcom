@@ -86,7 +86,7 @@ namespace CCompiler {
             SymType exprType = cg.GenerateExpression(CompareExpression.Type, CompareExpression);
             if (switchCount == 1) {
                 cg.GenerateExpression(exprType, _caseList[0]);
-                Symbol sym = cg.GetLabel(_labelList[0]);
+                Symbol sym = ProgramParseNode.GetLabel(_labelList[0]);
                 cg.Emitter.BranchEqual((Label)sym.Info);
             } else {
                 LocalDescriptor index = cg.Emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
@@ -94,7 +94,7 @@ namespace CCompiler {
                 for (int switchIndex = 0; switchIndex < switchCount; ++switchIndex) {
                     cg.Emitter.LoadLocal(index);
                     cg.GenerateExpression(exprType, _caseList[switchIndex]);
-                    Symbol sym = cg.GetLabel(_labelList[switchIndex]);
+                    Symbol sym = ProgramParseNode.GetLabel(_labelList[switchIndex]);
                     cg.Emitter.BranchEqual((Label)sym.Info);
                 }
                 Emitter.ReleaseTemporary(index);

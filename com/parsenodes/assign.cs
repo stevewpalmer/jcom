@@ -143,7 +143,7 @@ namespace CCompiler {
         }
 
         // Emit code that saves the result of an expression to an array element.
-        private void GenerateSaveToArray(ProgramParseNode cg, IdentifierParseNode identifier, ParseNode valueExpression) {
+        private static void GenerateSaveToArray(ProgramParseNode cg, IdentifierParseNode identifier, ParseNode valueExpression) {
             Symbol sym = identifier.Symbol;
             
             Debug.Assert(sym.IsArray);
@@ -180,7 +180,7 @@ namespace CCompiler {
 
         // Generate the code to write an expression to a substring represented
         // by an identifier which should be fixed string type.
-        private void GenerateSaveSubstring(ProgramParseNode cg, IdentifierParseNode identifier, SymType charType) {
+        private static void GenerateSaveSubstring(ProgramParseNode cg, IdentifierParseNode identifier, SymType charType) {
             Type baseType = Symbol.SymTypeToSystemType(charType);
             
             // Optimise for constant start/end values
@@ -202,7 +202,7 @@ namespace CCompiler {
         }
 
         // Emit the appropriate store parameter index opcode.
-        private void GenerateStoreArgument(ProgramParseNode cg, ParseNode value, Symbol sym) {
+        private static void GenerateStoreArgument(ProgramParseNode cg, ParseNode value, Symbol sym) {
             switch (sym.Linkage) {
                 case SymLinkage.BYVAL:
                     cg.GenerateExpression(sym.Type, value);

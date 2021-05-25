@@ -172,9 +172,14 @@ namespace JFortran {
                         moduleName = "Class";
                     }
                     _cg = new ProgramParseNode(_opts) {
-                        Name = moduleName,
                         Globals = _globalSymbols,
-                        IsExecutable = true,
+                        AssemblyNode = new() {
+                            Name = moduleName,
+                            GenerateDebug = _opts.GenerateDebug,
+                            VersionString = _opts.VersionString,
+                            OutputFile = _opts.OutputFile,
+                            IsExecutable = true
+                        },
                         Root = _ptree
                     };
                 }
@@ -242,7 +247,7 @@ namespace JFortran {
         // An executable program is one which has a PROGRAM statement.
         private void MarkExecutable() {
             if (_cg != null) {
-                _cg.IsExecutable = _hasProgram;
+                _cg.AssemblyNode.IsExecutable = _hasProgram;
             }
         }
 

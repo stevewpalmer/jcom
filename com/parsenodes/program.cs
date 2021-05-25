@@ -29,6 +29,7 @@ using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace CCompiler {
 
@@ -36,7 +37,6 @@ namespace CCompiler {
     /// Specifies a parse node for a single program.
     /// </summary>
     public class ProgramParseNode : ParseNode {
-        private Program _prog;
         private readonly Options _opts;
         private string _filename;
         private int _lineno;
@@ -83,23 +83,22 @@ namespace CCompiler {
         public ProcedureParseNode CurrentProcedure { get; set; }
 
         /// <summary>
+        /// Gets or sets the current type being compiled.
+        /// </summary>
+        /// <value>The current method symbol entry</value>
+        public JType CurrentType { get; set; }
+
+        /// <summary>
         /// Gets or sets the global symbol table.
         /// </summary>
         /// <value>The globals.</value>
         public SymbolCollection Globals { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this program is executable.
-        /// An executable program has a Main method.
+        /// Gets or sets the assembly information.
         /// </summary>
-        /// <value><c>true</c> if this instance is executable; otherwise, <c>false</c>.</value>
-        public bool IsExecutable { get; set; }
-
-        /// <summary>
-        /// Gets or sets the program name.
-        /// </summary>
-        /// <value>A string that specifies the program name</value>
-        public string Name { get; set; }
+        /// <value>The globals.</value>
+        public AssemblyParseNode AssemblyNode { get; set; }
 
         /// <summary>
         /// Gets or sets the root of the parse tree.
@@ -114,8 +113,6 @@ namespace CCompiler {
         /// <param name="root">The parent XML node</param>
         public override void Dump(ParseNodeXml root) {
             ParseNodeXml blockNode = root.Node("Program");
-            blockNode.Attribute("Name", Name);
-            blockNode.Attribute("IsExecutable", IsExecutable.ToString());
             Globals.Dump(blockNode);
             Root.Dump(blockNode);
         }
@@ -127,15 +124,35 @@ namespace CCompiler {
         /// <param name="programDef">A program definition object</param>
         public void Generate() {
             try {
-                _prog = new Program(_opts, Name, IsExecutable);
+                AssemblyNode.Generate(this);
 
-                GenerateSymbols(Globals);
+                // Create an implicit namespace using the output file name if
+                // one is specified.
+                string className = string.Empty;
+                if (!string.IsNullOrEmpty(_opts.OutputFile)) {
+                    className = string.Concat(_opts.OutputFile.CapitaliseString(), ".");
+                }
+                className = string.Concat(className, AssemblyNode.Name.CapitaliseString());
 
+                // Create the default type
+                TypeAttributes typeAttributes = TypeAttributes.Public;
+                bool isSaveable = !string.IsNullOrEmpty(_opts.OutputFile);
+                if (isSaveable) {
+                    typeAttributes |= TypeAttributes.BeforeFieldInit | TypeAttributes.Sealed;
+                }
+                CurrentType = new JType(AssemblyNode.Builder, className, typeAttributes);
+
+                Globals.GenerateSymbols(this);
                 foreach (ParseNode node in Root.Nodes) {
                     node.Generate(this);
                 }
 
-                _prog.Finish();
+                // Close the constructor
+                Emitter ctorEmitter = CurrentType.DefaultConstructor.Emitter;
+                if (ctorEmitter != null) {
+                    ctorEmitter.Emit0(OpCodes.Ret);
+                    ctorEmitter.Save();
+                }
             }
             catch (Exception e) {
                 if (_opts.DevMode) {
@@ -151,10 +168,11 @@ namespace CCompiler {
         /// </summary>
         public void Save() {
             try {
-                _prog.Save();
+                _ = CurrentType.CreateType;
+                AssemblyNode.Save();
             }
             catch (IOException) {
-                Error($"Cannot write to output file {_prog.OutputFilename}");
+                Error($"Cannot write to output file {AssemblyNode.OutputFilename}");
             }
         }
 
@@ -170,7 +188,7 @@ namespace CCompiler {
                     Result = null
                 };
 
-                Type mainType = _prog.GetMainType();
+                Type mainType = CurrentType.CreateType;
                 if (mainType != null) {
                     MethodInfo mi = mainType.GetMethod(methodName);
                     if (mi != null) {
@@ -183,6 +201,14 @@ namespace CCompiler {
             catch (TargetInvocationException e) {
                 throw e.InnerException ?? e;
             }
+        }
+
+        /// <summary>
+        /// Sets the specified method as the program start method.
+        /// </summary>
+        /// <param name="method">Method object</param>
+        public void SetEntryPoint(JMethod method) {
+            AssemblyNode.SetEntryPoint(method.Builder);
         }
 
         /// <summary>
@@ -271,8 +297,8 @@ namespace CCompiler {
         /// </summary>
         /// <param name="filename">Name of the file to emit</param>
         public void MarkFile(string filename) {
-            if (_opts.GenerateDebug) {
-                _prog?.SetCurrentDocument(filename);
+            if (AssemblyNode.GenerateDebug) {
+                AssemblyNode.SetCurrentDocument(filename);
             }
             _filename = filename;
         }
@@ -282,8 +308,8 @@ namespace CCompiler {
         /// </summary>
         /// <param name="line">Line number to emit to the output</param>
         public void MarkLine(int line) {
-            if (_prog != null && Emitter != null) {
-                ISymbolDocumentWriter currentDoc = _prog.GetCurrentDocument();
+            if (Emitter != null) {
+                ISymbolDocumentWriter currentDoc = AssemblyNode.GetCurrentDocument();
                 if (_opts.GenerateDebug && currentDoc != null) {
                     Emitter.MarkLinenumber(currentDoc, line);
                 }
@@ -291,88 +317,10 @@ namespace CCompiler {
             _lineno = line;
         }
 
-        /// <summary>
-        /// Emit the code to generate the referenced symbols from the given symbol
-        /// collection. Where a value is specified, we also initialise the symbol
-        /// with the given value.
-        /// </summary>
-        /// <param name="symbols">Symbol collection</param>
-        public void GenerateSymbols(SymbolCollection symbols) {
-            if (symbols == null) {
-                throw new ArgumentNullException(nameof(symbols));
-            }
-            bool needConstructor = false;
-            foreach (Symbol sym in symbols) {
-                if (sym.IsImported) {
-                    continue;
-                }
-
-                // Methods may be defined but not reference, but still need to be
-                // created as they may be exported. (Should we automatically set
-                // the reference flag on them?)
-                if (sym.IsMethod && sym.Defined && !sym.IsParameter) {
-                    _prog.CreateMethod(sym);
-                    continue;
-                }
-                if (!sym.IsReferenced) {
-                    continue;
-                }
-                if (sym.IsArray) {
-                    InitDynamicArray(sym);
-                }
-                switch (sym.Type) {
-                    case SymType.GENERIC:
-                        if (sym.IsStatic) {
-                            // Static array of objects
-                            sym.Info = _prog.CurrentType.CreateField(sym);
-                            needConstructor = true;
-                        }
-                        break;
-
-                    case SymType.DOUBLE:
-                    case SymType.CHAR:
-                    case SymType.FIXEDCHAR:
-                    case SymType.INTEGER:
-                    case SymType.FLOAT:
-                    case SymType.COMPLEX:
-                    case SymType.BOOLEAN: {
-                        if (sym.IsLocal && !sym.IsIntrinsic && !sym.IsReferenceCommon && !sym.IsMethod) {
-                            if (sym.IsStatic) {
-                                sym.Info = _prog.CurrentType.CreateField(sym);
-                                needConstructor = true;
-                            } else {
-                                sym.Index = Emitter.CreateLocal(sym);
-                                Emitter.InitialiseSymbol(sym);
-                            }
-                        }
-                        break;
-                    }
-
-                    case SymType.LABEL:
-                        sym.Info = Emitter.CreateLabel();
-                        break;
-                }
-            }
-
-            // If we have any statics then we need a constructor to
-            // initialise those statics.
-            if (needConstructor) {
-                Emitter ctorEmitter = null;
-                foreach (Symbol sym in symbols) {
-                    if (sym.IsStatic && sym.IsReferenced) {
-                        if (ctorEmitter == null) {
-                            ctorEmitter = _prog.GetConstructor();
-                        }
-                        ctorEmitter.InitialiseSymbol(sym);
-                    }
-                }
-            }
-        }
-
         // Initialise a dynamic array.
         // If the array's dimensions are non-integral then we pre-calculate the dimension
         // bound and store locally, and set the dimension reference to that local element.
-        private void InitDynamicArray(Symbol sym) {
+        public void InitDynamicArray(Symbol sym) {
             foreach (SymDimension dim in sym.Dimensions) {
                 if (!dim.LowerBound.IsConstant) {
                     LocalDescriptor lowBound = Emitter.GetTemporary(typeof(int));
@@ -608,7 +556,7 @@ namespace CCompiler {
         /// </summary>
         /// <param name="node">A Label parse node</param>
         /// <returns>A symbol entry representing the label</returns>
-        public Symbol GetLabel(ParseNode node) {
+        public static Symbol GetLabel(ParseNode node) {
             if (node == null) {
                 return null;
             }

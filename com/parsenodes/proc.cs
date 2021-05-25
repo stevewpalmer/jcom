@@ -134,7 +134,7 @@ namespace CCompiler {
 
             // Generate all locals for this method
             foreach (SymbolCollection symbols in LocalSymbols) {
-                cg.GenerateSymbols(symbols);
+                symbols.GenerateSymbols(cg);
             }
 
             // Generate all the initialisation code
