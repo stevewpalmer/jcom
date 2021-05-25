@@ -135,7 +135,7 @@ namespace CCompiler {
                 }
                 if (sym.IsLocal) {
                     cg.GenerateExpression(sym.Type, valueExpression);
-                    cg.StoreLocal(sym);
+                    cg.Emitter.StoreLocal(sym);
                     continue;
                 }
                 GenerateStoreArgument(cg, valueExpression, sym);

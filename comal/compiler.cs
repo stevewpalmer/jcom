@@ -101,16 +101,14 @@ namespace JComal {
             }
 
             // Top level parse node that defines the program
-            _program = new(opts);
-            _program.Globals = Globals;
-            _program.Root = new BlockParseNode();
-
-            _program.AssemblyNode = new() {
+            _program = new ProgramParseNode(opts) {
+                Globals = Globals,
+                Root = new BlockParseNode(),
                 GenerateDebug = opts.GenerateDebug,
                 VersionString = opts.VersionString,
                 OutputFile = opts.OutputFile,
                 IsExecutable = true,
-                Name = moduleName,
+                Name = moduleName
             };
 
             Messages = new MessageCollection(opts) {
@@ -236,7 +234,7 @@ namespace JComal {
         /// </summary>
         public void Save() {
             try {
-                _program.AssemblyNode.IsExecutable = _hasProgram;
+                _program.IsExecutable = _hasProgram;
                 _program.Generate();
                 _program.Save();
             }
@@ -263,7 +261,7 @@ namespace JComal {
         /// <param name="entryPointName">The name of the method to be called</param>
         /// <returns>An ExecutionResult object representing the result of the execution</returns>
         public ExecutionResult Execute(string entryPointName) {
-            _program.AssemblyNode.IsExecutable = _hasProgram;
+            _program.IsExecutable = _hasProgram;
             _program.Generate();
             return _program.Run(entryPointName);
         }

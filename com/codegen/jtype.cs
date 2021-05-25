@@ -108,10 +108,10 @@ namespace CCompiler {
         /// Creates a method within this type.
         /// </summary>
         /// <param name="sym">Symbol representing the method</param>
-        /// <param name="atributes">Method attributes</param>
+        /// <param name="attributes">Method attributes</param>
         /// <param name="paramTypes">Parameter types</param>
         /// <returns></returns>
-        public JMethod CreateMethod(Symbol sym, MethodAttributes atributes) {
+        public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
 
             bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
             Type returnType;
@@ -141,7 +141,7 @@ namespace CCompiler {
             }
 
             MethodBuilder metb;
-            metb = Builder.DefineMethod(sym.Name, atributes, returnType, paramTypes);
+            metb = Builder.DefineMethod(sym.Name, attributes, returnType, paramTypes);
 
             int paramIndex = 0;
             if (isFunction) {

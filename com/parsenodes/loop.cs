@@ -233,11 +233,11 @@ namespace CCompiler {
             if (iterValue >= 0) {
                 if (sym.Type == SymType.INTEGER) {
                     cg.Emitter.LoadInteger(StartExpression.Value.IntValue);
-                    cg.StoreLocal(sym);
+                    cg.Emitter.StoreLocal(sym);
                 }
                 if (sym.Type == SymType.FLOAT) {
                     cg.Emitter.LoadFloat(StartExpression.Value.RealValue);
-                    cg.StoreLocal(sym);
+                    cg.Emitter.StoreLocal(sym);
                 }
                 if (iterValue == 0) {
                     return;
@@ -278,7 +278,7 @@ namespace CCompiler {
                 cg.Emitter.LoadLocal(stepVar);
             }
             cg.Emitter.Add(sym.Type);
-            cg.StoreLocal(sym);
+            cg.Emitter.StoreLocal(sym);
             cg.Emitter.LoadLocal(iterCount);
             cg.Emitter.LoadInteger(1);
             cg.Emitter.Sub(sym.Type);
@@ -297,11 +297,11 @@ namespace CCompiler {
             if (StartExpression.IsConstant && StartExpression.Value.IntValue == 0) {
                 // Start index is zero so no initial subtraction required.
                 cg.GenerateExpression(sym.Type, StartExpression);
-                cg.StoreLocal(sym);
+                cg.Emitter.StoreLocal(sym);
             } else {
                 cg.GenerateExpression(sym.Type, StartExpression);
                 cg.Emitter.Dup();
-                cg.StoreLocal(sym);
+                cg.Emitter.StoreLocal(sym);
                 cg.Emitter.Sub(sym.Type);
             }
             if (StepExpression.IsConstant) {

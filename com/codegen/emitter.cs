@@ -606,6 +606,76 @@ namespace CCompiler {
             return typeNeeded;
 		}
 
+        /// <summary>
+        /// Emit the code that loads an entire array. This is generally
+        /// emitting the base address of the array if useRef is specified, or
+        /// the array itself otherwise.
+        /// </summary>
+        /// <returns>The type of the array</returns>
+        /// <param name="identNode">An IdentifierParseNode object representing
+        /// the array variable.</param>
+        /// <param name="useRef">If set to <c>true</c> use emit the address of
+        /// the array</param>
+        public SymType GenerateLoadArray(IdentifierParseNode identNode, bool useRef) {
+            if (identNode == null) {
+                throw new ArgumentNullException(nameof(identNode));
+            }
+            Symbol sym = identNode.Symbol;
+
+            if (useRef) {
+                GenerateLoadAddress(sym);
+            } else if (sym.IsLocal) {
+                LoadSymbol(sym);
+            } else {
+                GenerateLoadArgument(sym);
+            }
+            return SymType.REF;
+        }
+
+        /// <summary>
+        /// Emit the appropriate load parameter index opcode.
+        /// </summary>
+        /// <param name="sym">Symbol from which to emit</param>
+        public void GenerateLoadArgument(Symbol sym) {
+            if (sym == null) {
+                throw new ArgumentNullException(nameof(sym));
+            }
+            switch (sym.Linkage) {
+                case SymLinkage.BYVAL:
+                    LoadParameter(sym.ParameterIndex);
+                    break;
+
+                case SymLinkage.BYREF:
+                    LoadParameter(sym.ParameterIndex);
+                    if (sym.IsArray) {
+                        LoadIndirect(SymType.REF);
+                        break;
+                    }
+                    if (sym.IsValueType) {
+                        LoadIndirect(sym.Type);
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Emit the load of an address of a simple symbol
+        /// </summary>
+        /// <param name="sym">Symbol to load</param>
+        public void GenerateLoadAddress(Symbol sym) {
+            if (sym.IsStatic) {
+                LoadStaticAddress((FieldInfo)sym.Info);
+            } else if (sym.IsMethod) {
+                LoadFunction(sym);
+            } else if (sym.IsLocal) {
+                LoadLocalAddress(sym.Index);
+            } else if (sym.IsParameter) {
+                LoadParameterAddress(sym.ParameterIndex);
+            } else {
+                Debug.Assert(false, $"Cannot load the address of {sym}");
+            }
+        }
+
         // Handle initialisation of a symbol using its default value if one
         // is specified. This works for all symbol types - local and static.
         //
@@ -657,8 +727,11 @@ namespace CCompiler {
             }
         }
 
-        // Generate the code to initialise a fixed string array by calling
-        // the Length on every element.
+        /// <summary>
+        /// Generate the code to initialise a fixed string array by calling
+        // the Length on every element
+        /// </summary>
+        /// <param name="sym">Fixed string array symbol</param>
         public void InitFixedStringArray(Symbol sym) {
             LocalDescriptor count = GetTemporary(typeof(int));
             Label loopStart = CreateLabel();
@@ -1008,6 +1081,29 @@ namespace CCompiler {
                     Debug.Assert(false, $"StoreIndirect: Unsupported type {type}");
                     break;
             }
+        }
+
+        /// <summary>
+        /// Emit the code to store a local variable onto the stack. Different code
+        /// is emitted depending on whether the variable is a static.
+        /// </summary>
+        /// <param name="sym">A Symbol object representing the variable</param>
+        /// <returns>The SymType of the variable loaded</returns>
+        public SymType StoreLocal(Symbol sym) {
+            if (sym == null) {
+                throw new ArgumentNullException(nameof(sym));
+            }
+            if (sym.IsInCommon) {
+                Symbol symCommon = sym.Common;
+                List<Symbol> commonList = (List<Symbol>)symCommon.Info;
+                sym = commonList[sym.CommonIndex];
+            }
+            if (sym.IsStatic) {
+                StoreStatic((FieldInfo)sym.Info);
+            } else {
+                StoreLocal(sym.Index);
+            }
+            return sym.Type;
         }
 
         /// <summary>

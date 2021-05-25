@@ -1,5 +1,5 @@
 // JCom Compiler Toolkit
-// Core code generation class
+// Top-level program builder
 //
 // Authors:
 //  Steve Palmer
@@ -24,12 +24,12 @@
 // under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 
 namespace CCompiler {
 
@@ -37,9 +37,16 @@ namespace CCompiler {
     /// Specifies a parse node for a single program.
     /// </summary>
     public class ProgramParseNode : ParseNode {
+
+        private readonly bool _isCOMVisible = true;
+        private readonly bool _isCLSCompliant = true;
         private readonly Options _opts;
+
         private string _filename;
         private int _lineno;
+
+        private AssemblyBuilder _ab;
+        private ISymbolDocumentWriter _currentDoc;
 
         /// <summary>
         /// Constructs a language neutral code generator object.
@@ -76,6 +83,11 @@ namespace CCompiler {
         public Emitter Emitter { get; set; }
 
         /// <summary>
+        /// Return the assembly's module builder.
+        /// </summary>
+        public ModuleBuilder Builder { get; set; }
+
+        /// <summary>
         /// Gets or sets the parse node of the current procedure being
         /// compiled.
         /// </summary>
@@ -95,10 +107,46 @@ namespace CCompiler {
         public SymbolCollection Globals { get; set; }
 
         /// <summary>
-        /// Gets or sets the assembly information.
+        /// Gets or sets a value indicating whether this program is executable.
+        /// An executable program has a Main method.
         /// </summary>
-        /// <value>The globals.</value>
-        public AssemblyParseNode AssemblyNode { get; set; }
+        /// <value><c>true</c> if this instance is executable; otherwise, <c>false</c>.</value>
+        public bool IsExecutable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the assembly version.
+        /// </summary>
+        /// <value>A string that specifies the assembly version</value>
+        public string VersionString { get; set; }
+
+        /// <summary>
+        /// Gets or sets the output file name.
+        /// </summary>
+        /// <value>A string that specifies the output file name</value>
+        public string OutputFile { get; set; }
+
+        /// <summary>
+        /// Specifies whether the assembly has debug information
+        /// </summary>
+        public bool GenerateDebug { get; set; }
+
+        /// <summary>
+        /// Gets or sets the program name.
+        /// </summary>
+        /// <value>A string that specifies the program name</value>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Return the .NET version of the program name
+        /// </summary>
+        public string DotNetName {
+            get {
+                if (!string.IsNullOrEmpty(Name)) {
+                    return Name.CapitaliseString();
+                }
+                return string.Empty;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the root of the parse tree.
@@ -113,6 +161,11 @@ namespace CCompiler {
         /// <param name="root">The parent XML node</param>
         public override void Dump(ParseNodeXml root) {
             ParseNodeXml blockNode = root.Node("Program");
+            blockNode.Attribute("Name", Name);
+            blockNode.Attribute("OutputFile", OutputFile);
+            blockNode.Attribute("VersionString", VersionString);
+            blockNode.Attribute("IsExecutable", IsExecutable.ToString());
+            blockNode.Attribute("GenerateDebug", GenerateDebug.ToString());
             Globals.Dump(blockNode);
             Root.Dump(blockNode);
         }
@@ -124,23 +177,47 @@ namespace CCompiler {
         /// <param name="programDef">A program definition object</param>
         public void Generate() {
             try {
-                AssemblyNode.Generate(this);
+                AppDomain ad = AppDomain.CurrentDomain;
+                AssemblyName an = new();
+
+                an.Name = DotNetName;
+                an.Version = new Version(VersionString);
+
+                bool isSaveable = !string.IsNullOrEmpty(OutputFile);
+                AssemblyBuilderAccess access = isSaveable ? AssemblyBuilderAccess.RunAndSave : AssemblyBuilderAccess.Run;
+                _ab = ad.DefineDynamicAssembly(an, access);
+
+                // Don't make the main class abstract if the program is being run from
+                // memory as otherwise the caller will be unable to create an instance.
+                if (isSaveable) {
+                    Builder = _ab.DefineDynamicModule(DotNetName, OutputFilename, GenerateDebug);
+                } else {
+                    Builder = _ab.DefineDynamicModule(DotNetName, GenerateDebug);
+                }
+
+                // Make this assembly debuggable if the debug option was specified.
+                if (GenerateDebug) {
+                    AddDebuggable();
+                }
+
+                // All code below here needs to move to a TypeParseNode that defines a
+                // single class/type. A TypeParseNode should be added as the child of a
+                // ProgramParseNode by the client.
 
                 // Create an implicit namespace using the output file name if
                 // one is specified.
                 string className = string.Empty;
-                if (!string.IsNullOrEmpty(_opts.OutputFile)) {
-                    className = string.Concat(_opts.OutputFile.CapitaliseString(), ".");
+                if (!string.IsNullOrEmpty(OutputFile)) {
+                    className = string.Concat(OutputFile.CapitaliseString(), ".");
                 }
-                className = string.Concat(className, AssemblyNode.Name.CapitaliseString());
+                className = string.Concat(className, DotNetName);
 
                 // Create the default type
                 TypeAttributes typeAttributes = TypeAttributes.Public;
-                bool isSaveable = !string.IsNullOrEmpty(_opts.OutputFile);
                 if (isSaveable) {
                     typeAttributes |= TypeAttributes.BeforeFieldInit | TypeAttributes.Sealed;
                 }
-                CurrentType = new JType(AssemblyNode.Builder, className, typeAttributes);
+                CurrentType = new JType(Builder, className, typeAttributes);
 
                 Globals.GenerateSymbols(this);
                 foreach (ParseNode node in Root.Nodes) {
@@ -168,11 +245,14 @@ namespace CCompiler {
         /// </summary>
         public void Save() {
             try {
+                AddCLSCompliant();
+                AddCOMVisiblity();
+
                 _ = CurrentType.CreateType;
-                AssemblyNode.Save();
+                _ab.Save(OutputFilename);
             }
             catch (IOException) {
-                Error($"Cannot write to output file {AssemblyNode.OutputFilename}");
+                Error($"Cannot write to output file {OutputFilename}");
             }
         }
 
@@ -208,7 +288,37 @@ namespace CCompiler {
         /// </summary>
         /// <param name="method">Method object</param>
         public void SetEntryPoint(JMethod method) {
-            AssemblyNode.SetEntryPoint(method.Builder);
+            _ab.SetEntryPoint(method.Builder);
+        }
+
+        /// <summary>
+        /// Sets the filename in the debug info.
+        /// </summary>
+        /// <param name="filename">Filename.</param>
+        public void SetCurrentDocument(string filename) {
+            _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);
+        }
+
+        /// <summary>
+        /// Retrieves the current document.
+        /// </summary>
+        /// <returns>The current document.</returns>
+        public ISymbolDocumentWriter GetCurrentDocument() {
+            return _currentDoc;
+        }
+
+        /// <summary>
+        /// Gets the output filename complete with extension.
+        /// </summary>
+        /// <value>The output filename.</value>
+        public string OutputFilename {
+            get {
+                string outputFilename = Path.GetFileName(OutputFile);
+                if (!Path.HasExtension(outputFilename)) {
+                    outputFilename = Path.ChangeExtension(outputFilename, IsExecutable ? "exe" : "dll");
+                }
+                return outputFilename;
+            }
         }
 
         /// <summary>
@@ -293,74 +403,46 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// Marks the file.
+        /// Sets the name of the file being compiled.
         /// </summary>
-        /// <param name="filename">Name of the file to emit</param>
+        /// <param name="filename">Name of the file being compiled</param>
         public void MarkFile(string filename) {
-            if (AssemblyNode.GenerateDebug) {
-                AssemblyNode.SetCurrentDocument(filename);
+            if (GenerateDebug) {
+                SetCurrentDocument(filename);
             }
             _filename = filename;
         }
 
         /// <summary>
-        /// Marks the line.
+        /// Sets the number of the line in the file being compiled.
         /// </summary>
         /// <param name="line">Line number to emit to the output</param>
         public void MarkLine(int line) {
-            if (Emitter != null) {
-                ISymbolDocumentWriter currentDoc = AssemblyNode.GetCurrentDocument();
-                if (_opts.GenerateDebug && currentDoc != null) {
+            if (GenerateDebug && Emitter != null) {
+                ISymbolDocumentWriter currentDoc = GetCurrentDocument();
+                if (currentDoc != null) {
                     Emitter.MarkLinenumber(currentDoc, line);
                 }
             }
             _lineno = line;
         }
 
-        // Initialise a dynamic array.
-        // If the array's dimensions are non-integral then we pre-calculate the dimension
-        // bound and store locally, and set the dimension reference to that local element.
-        public void InitDynamicArray(Symbol sym) {
-            foreach (SymDimension dim in sym.Dimensions) {
-                if (!dim.LowerBound.IsConstant) {
-                    LocalDescriptor lowBound = Emitter.GetTemporary(typeof(int));
-                    GenerateExpression(SymType.INTEGER, dim.LowerBound);
-                    Emitter.StoreLocal(lowBound);
-                    dim.LowerBound = new LocalParseNode(lowBound);
-                }
-                if (!dim.UpperBound.IsConstant) {
-                    LocalDescriptor upperBound = Emitter.GetTemporary(typeof(int));
-                    GenerateExpression(SymType.INTEGER, dim.UpperBound);
-                    Emitter.StoreLocal(upperBound);
-                    dim.UpperBound = new LocalParseNode(upperBound);
-                }
-            }
-        }
-
         /// <summary>
-        /// Emit the code that loads an entire array. This is generally
-        /// emitting the base address of the array if useRef is specified, or
-        /// the array itself otherwise.
+        /// Emit the load of an address of full symbol. This may either be
+        /// the address of a local object or the address of an array element.
         /// </summary>
-        /// <returns>The type of the array</returns>
-        /// <param name="identNode">An IdentifierParseNode object representing
-        /// the array variable.</param>
-        /// <param name="useRef">If set to <c>true</c> use emit the address of
-        /// the array</param>
-        public SymType GenerateLoadArray(IdentifierParseNode identNode, bool useRef) {
+        /// <param name="identNode">An IdentifierParseNode representing the variable
+        /// or array element whose address should be emitted.</param>
+        public void LoadAddress(IdentifierParseNode identNode) {
             if (identNode == null) {
                 throw new ArgumentNullException(nameof(identNode));
             }
             Symbol sym = identNode.Symbol;
-
-            if (useRef) {
-                GenerateLoadAddress(sym);
-            } else if (sym.IsLocal) {
-                Emitter.LoadSymbol(sym);
+            if (sym.IsArray) {
+                GenerateLoadFromArray(identNode, true);
             } else {
-                GenerateLoadArgument(sym);
+                Emitter.GenerateLoadAddress(sym);
             }
-            return SymType.REF;
         }
 
         /// <summary>
@@ -378,7 +460,7 @@ namespace CCompiler {
             // Handle loading the base array as opposed to an element
             Debug.Assert(sym.IsArray);
             if (identNode.IsArrayBase) {
-                return GenerateLoadArray(identNode, useRef);
+                return Emitter.GenerateLoadArray(identNode, useRef);
             }
 
             // OK, we're loading an array element.
@@ -405,7 +487,7 @@ namespace CCompiler {
             if (sym.IsLocal) {
                 Emitter.LoadSymbol(sym);
             } else {
-                GenerateLoadArgument(sym);
+                Emitter.GenerateLoadArgument(sym);
             }
             for (int c = 0; c < identNode.Indexes.Count; ++c) {
                 ParseNode indexNode = identNode.Indexes[c];
@@ -470,88 +552,6 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// Emit the code to store a local variable onto the stack. Different code
-        /// is emitted depending on whether the variable is a static.
-        /// </summary>
-        /// <param name="sym">A Symbol object representing the variable</param>
-        /// <returns>The SymType of the variable loaded</returns>
-        public SymType StoreLocal(Symbol sym) {
-            if (sym == null) {
-                throw new ArgumentNullException(nameof(sym));
-            }
-            if (sym.IsInCommon) {
-                Symbol symCommon = sym.Common;
-                List<Symbol> commonList = (List<Symbol>)symCommon.Info;
-                sym = commonList[sym.CommonIndex];
-            }
-            if (sym.IsStatic) {
-                Emitter.StoreStatic((FieldInfo)sym.Info);
-            } else {
-                Emitter.StoreLocal(sym.Index);
-            }
-            return sym.Type;
-        }
-
-        /// <summary>
-        /// Emit the load of an address of full symbol. This may either be
-        /// the address of a local object or the address of an array element.
-        /// </summary>
-        /// <param name="identNode">An IdentifierParseNode representing the variable
-        /// or array element whose address should be emitted.</param>
-        public void LoadAddress(IdentifierParseNode identNode) {
-            if (identNode == null) {
-                throw new ArgumentNullException(nameof(identNode));
-            }
-            Symbol sym = identNode.Symbol;
-            if (sym.IsArray) {
-                GenerateLoadFromArray(identNode, true);
-            } else {
-                GenerateLoadAddress(sym);
-            }
-        }
-
-        // Emit the load of an address of a simple symbol
-        private void GenerateLoadAddress(Symbol sym) {
-            if (sym.IsStatic) {
-                Emitter.LoadStaticAddress((FieldInfo)sym.Info);
-            } else if (sym.IsMethod) {
-                Emitter.LoadFunction(sym);
-            } else if (sym.IsLocal) {
-                Emitter.LoadLocalAddress(sym.Index);
-            } else if (sym.IsParameter) {
-                Emitter.LoadParameterAddress(sym.ParameterIndex);
-            } else {
-                Debug.Assert(false, $"Cannot load the address of {sym}");
-            }
-        }
-
-        /// <summary>
-        /// Emit the appropriate load parameter index opcode.
-        /// </summary>
-        /// <param name="sym">Symbol from which to emit</param>
-        public void GenerateLoadArgument(Symbol sym) {
-            if (sym == null) {
-                throw new ArgumentNullException(nameof(sym));
-            }
-            switch (sym.Linkage) {
-                case SymLinkage.BYVAL:
-                    Emitter.LoadParameter(sym.ParameterIndex);
-                    break;
-
-                case SymLinkage.BYREF:
-                    Emitter.LoadParameter(sym.ParameterIndex);
-                    if (sym.IsArray) {
-                        Emitter.LoadIndirect(SymType.REF);
-                        break;
-                    }
-                    if (sym.IsValueType) {
-                        Emitter.LoadIndirect(sym.Type);
-                    }
-                    break;
-            }
-        }
-
-        /// <summary>
         /// Retrieve the label value of a SymbolParseNode.
         /// </summary>
         /// <param name="node">A Label parse node</param>
@@ -563,6 +563,32 @@ namespace CCompiler {
             Debug.Assert(node is SymbolParseNode);
             SymbolParseNode identNode = (SymbolParseNode)node;
             return identNode.Symbol;
+        }
+
+        // Make this assembly fully debuggable.
+        private void AddDebuggable() {
+            Type type = typeof(DebuggableAttribute);
+            ConstructorInfo ctor = type.GetConstructor(new[] { typeof(DebuggableAttribute.DebuggingModes) });
+            CustomAttributeBuilder caBuilder = new(ctor, new object[] {
+                                                        DebuggableAttribute.DebuggingModes.DisableOptimizations |
+                                                        DebuggableAttribute.DebuggingModes.Default });
+            Builder.SetCustomAttribute(caBuilder);
+        }
+
+        // Mark this assembly as CLS Compliant.
+        private void AddCLSCompliant() {
+            Type type = typeof(CLSCompliantAttribute);
+            ConstructorInfo ctor = type.GetConstructor(new[] { typeof(bool) });
+            CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCLSCompliant });
+            Builder.SetCustomAttribute(caBuilder);
+        }
+
+        // Mark this assembly as COM Visible.
+        private void AddCOMVisiblity() {
+            Type type = typeof(ComVisibleAttribute);
+            ConstructorInfo ctor = type.GetConstructor(new[] { typeof(bool) });
+            CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCOMVisible });
+            Builder.SetCustomAttribute(caBuilder);
         }
     }
 }

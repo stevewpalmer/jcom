@@ -138,7 +138,7 @@ namespace CCompiler {
                 cg.Emitter.LoadFunction(sym);
                 thisType = SymType.INTEGER;
             } else if (sym.IsParameter) {
-                cg.GenerateLoadArgument(sym);
+                cg.Emitter.GenerateLoadArgument(sym);
                 thisType = sym.Type;
             } else if (sym.Class == SymClass.FUNCTION) {
                 cg.Emitter.LoadFunction(sym);

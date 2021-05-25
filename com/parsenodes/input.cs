@@ -159,7 +159,7 @@ namespace CCompiler {
 
                 cg.Emitter.LoadLocal(objIndex);
                 if (identNode.IsArrayBase) {
-                    cg.GenerateLoadArray(identNode, true);
+                    cg.Emitter.GenerateLoadArray(identNode, true);
                     readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeArrayType().MakeByRefType());
                 } else if (identNode.HasSubstring) {
                     cg.GenerateExpression(SymType.INTEGER, identNode.SubstringStart);

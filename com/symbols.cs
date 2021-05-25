@@ -973,7 +973,20 @@ namespace CCompiler {
                     continue;
                 }
                 if (sym.IsArray) {
-                    cg.InitDynamicArray(sym);
+                    foreach (SymDimension dim in sym.Dimensions) {
+                        if (!dim.LowerBound.IsConstant) {
+                            LocalDescriptor lowBound = cg.Emitter.GetTemporary(typeof(int));
+                            cg.GenerateExpression(SymType.INTEGER, dim.LowerBound);
+                            cg.Emitter.StoreLocal(lowBound);
+                            dim.LowerBound = new LocalParseNode(lowBound);
+                        }
+                        if (!dim.UpperBound.IsConstant) {
+                            LocalDescriptor upperBound = cg.Emitter.GetTemporary(typeof(int));
+                            cg.GenerateExpression(SymType.INTEGER, dim.UpperBound);
+                            cg.Emitter.StoreLocal(upperBound);
+                            dim.UpperBound = new LocalParseNode(upperBound);
+                        }
+                    }
                 }
                 switch (sym.Type) {
                     case SymType.GENERIC:

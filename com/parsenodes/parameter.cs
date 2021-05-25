@@ -158,7 +158,7 @@ namespace CCompiler {
 
                         // Passing an array by reference
                         if (symIdent.IsArray && !identNode.HasIndexes) {
-                            cg.GenerateLoadArray(identNode, false);
+                            cg.Emitter.GenerateLoadArray(identNode, false);
                             return symIdent.SystemType;
                         }
                         if (isByRef) {
@@ -210,7 +210,7 @@ namespace CCompiler {
         // given offset.
         private void GenerateLoadSubArray(ProgramParseNode cg, IdentifierParseNode identNode, Symbol symParam, Temporaries locals) {
             if (!identNode.HasIndexes) {
-                cg.GenerateLoadArray(identNode, symParam.IsByRef);
+                cg.Emitter.GenerateLoadArray(identNode, symParam.IsByRef);
                 return;
             }
             
