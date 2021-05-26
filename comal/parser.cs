@@ -165,7 +165,8 @@ namespace JComal {
 
         // Parse a PROC or FUNC definition including the declaration and the proc/func
         // body.
-        private ParseNode ParseProcFuncDefinition(SymClass klass, TokenID endToken, string methodName) {
+        private ParseNode ParseProcFuncDefinition(SymClass klass, TokenID endToken, string methodName,
+            SymbolCollection symbolTable) {
 
             ProcedureParseNode node = new();
             IdentifierToken identToken = null;
@@ -184,7 +185,7 @@ namespace JComal {
             }
 
             // Method should exist in _globalSymbols due to Pass 0.
-            Symbol method = Globals.Get(methodName);
+            Symbol method = GlobalMethods.Get(methodName);
             Debug.Assert(method != null);
             method.Defined = true;
             method.Class = klass;
@@ -193,12 +194,8 @@ namespace JComal {
             bool savedHasReturn = _hasReturn;
             _hasReturn = false;
 
-            // New local symbol table for this block
-            SymbolCollection localSymbols = null;
-            if (!isImplicit) {
-                localSymbols = new("Local");
-                SymbolStack.Push(localSymbols);
-            }
+            // Symbol table for this proc
+            SymbolStack.Push(symbolTable);
 
             // Parameter list.
             Collection<Symbol> parameters = null;
@@ -251,13 +248,13 @@ namespace JComal {
             }
 
             node.ProcedureSymbol = method;
-            if (localSymbols != null) {
-                node.LocalSymbols.Add(localSymbols);
-            }
+            node.Symbols.Add(symbolTable);
             node.LabelList = new Collection<ParseNode>();
 
             ProcedureParseNode savedCurrentProcedure = CurrentProcedure;
             CurrentProcedure = node;
+
+            _program.Root.Add(node);
 
             // Compile the body of the procedure
             ++_blockDepth;
@@ -306,8 +303,6 @@ namespace JComal {
             }
 
             _hasReturn = savedHasReturn;
-
-            _program.Root.Add(node);
             return null;
         }
 
@@ -386,7 +381,7 @@ namespace JComal {
             if (identToken != null) {
                 
                 // Ban any conflict with PROGRAM name or the current function
-                Symbol globalSym = Globals.Get(identToken.Name);
+                Symbol globalSym = GlobalMethods.Get(identToken.Name);
                 if (globalSym != null && globalSym.Type == SymType.PROGRAM) {
                     Messages.Error(MessageCode.IDENTIFIERISGLOBAL,
                         $"Identifier {identToken.Name} already has global declaration");

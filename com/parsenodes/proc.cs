@@ -39,7 +39,7 @@ namespace CCompiler {
         /// Constructor
         /// </summary>
         public ProcedureParseNode() : base(ParseID.PROCEDURE) {
-            LocalSymbols = new List<SymbolCollection>();
+            Symbols = new List<SymbolCollection>();
             Body = new();
         }
 
@@ -54,7 +54,7 @@ namespace CCompiler {
         /// There may be multiple symbol tables for each nested scope.
         /// </summary>
         /// <value>The local symbol table</value>
-        public List<SymbolCollection> LocalSymbols { get; set; }
+        public List<SymbolCollection> Symbols { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this procedure is the main program.
@@ -133,7 +133,7 @@ namespace CCompiler {
             ReturnLabel = cg.Emitter.CreateLabel();
 
             // Generate all locals for this method
-            foreach (SymbolCollection symbols in LocalSymbols) {
+            foreach (SymbolCollection symbols in Symbols) {
                 symbols.GenerateSymbols(cg);
             }
 
@@ -177,7 +177,7 @@ namespace CCompiler {
             blockNode.Attribute("AlternateReturnCount", AlternateReturnCount.ToString());
 
             ParseNodeXml localSymbols = blockNode.Node("LocalSymbols");
-            foreach (SymbolCollection symbols in LocalSymbols) {
+            foreach (SymbolCollection symbols in Symbols) {
                 symbols.Dump(localSymbols);
             }
 

@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using CCompiler;
 
@@ -34,6 +35,10 @@ namespace JComal {
         public static void Main(string[] args) {
             ComalOptions opts = new();
             MessageCollection messages = new(opts);
+
+        #if DEBUG
+            Debug.Listeners.Add(new CCompilerTraceListener());
+        #endif
 
             opts.Messages = messages;
             if (opts.Parse(args)) {

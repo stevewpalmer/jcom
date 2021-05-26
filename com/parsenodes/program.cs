@@ -171,10 +171,8 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// Generate the code for the entire parse tree as specified by the
-        /// given program definition.
+        /// Generate the code for the entire program from the root parse tree.
         /// </summary>
-        /// <param name="programDef">A program definition object</param>
         public void Generate() {
             try {
                 AppDomain ad = AppDomain.CurrentDomain;
@@ -190,7 +188,7 @@ namespace CCompiler {
                 // Don't make the main class abstract if the program is being run from
                 // memory as otherwise the caller will be unable to create an instance.
                 if (isSaveable) {
-                    Builder = _ab.DefineDynamicModule(DotNetName, OutputFilename, GenerateDebug);
+                    Builder = _ab.DefineDynamicModule(DotNetName, OutputFilename(OutputFile), GenerateDebug);
                 } else {
                     Builder = _ab.DefineDynamicModule(DotNetName, GenerateDebug);
                 }
@@ -223,13 +221,6 @@ namespace CCompiler {
                 foreach (ParseNode node in Root.Nodes) {
                     node.Generate(this);
                 }
-
-                // Close the constructor
-                Emitter ctorEmitter = CurrentType.DefaultConstructor.Emitter;
-                if (ctorEmitter != null) {
-                    ctorEmitter.Emit0(OpCodes.Ret);
-                    ctorEmitter.Save();
-                }
             }
             catch (Exception e) {
                 if (_opts.DevMode) {
@@ -244,15 +235,16 @@ namespace CCompiler {
         /// to have been previously set or this does nothing.
         /// </summary>
         public void Save() {
+            string filename = OutputFilename(OutputFile);
             try {
                 AddCLSCompliant();
                 AddCOMVisiblity();
 
                 _ = CurrentType.CreateType;
-                _ab.Save(OutputFilename);
+                _ab.Save(filename);
             }
             catch (IOException) {
-                Error($"Cannot write to output file {OutputFilename}");
+                Error($"Cannot write to output file {filename}");
             }
         }
 
@@ -289,36 +281,6 @@ namespace CCompiler {
         /// <param name="method">Method object</param>
         public void SetEntryPoint(JMethod method) {
             _ab.SetEntryPoint(method.Builder);
-        }
-
-        /// <summary>
-        /// Sets the filename in the debug info.
-        /// </summary>
-        /// <param name="filename">Filename.</param>
-        public void SetCurrentDocument(string filename) {
-            _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);
-        }
-
-        /// <summary>
-        /// Retrieves the current document.
-        /// </summary>
-        /// <returns>The current document.</returns>
-        public ISymbolDocumentWriter GetCurrentDocument() {
-            return _currentDoc;
-        }
-
-        /// <summary>
-        /// Gets the output filename complete with extension.
-        /// </summary>
-        /// <value>The output filename.</value>
-        public string OutputFilename {
-            get {
-                string outputFilename = Path.GetFileName(OutputFile);
-                if (!Path.HasExtension(outputFilename)) {
-                    outputFilename = Path.ChangeExtension(outputFilename, IsExecutable ? "exe" : "dll");
-                }
-                return outputFilename;
-            }
         }
 
         /// <summary>
@@ -589,6 +551,25 @@ namespace CCompiler {
             ConstructorInfo ctor = type.GetConstructor(new[] { typeof(bool) });
             CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCOMVisible });
             Builder.SetCustomAttribute(caBuilder);
+        }
+
+        // Sets the filename in the debug info.
+        private void SetCurrentDocument(string filename) {
+            _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);
+        }
+
+        // Retrieves the current document.
+        private ISymbolDocumentWriter GetCurrentDocument() {
+            return _currentDoc;
+        }
+
+        // Gets the output filename complete with extension.
+        private string OutputFilename(string outputFile) {
+            string outputFilename = Path.GetFileName(outputFile);
+            if (!Path.HasExtension(outputFilename)) {
+                outputFilename = Path.ChangeExtension(outputFilename, IsExecutable ? "exe" : "dll");
+            }
+            return outputFilename;
         }
     }
 }

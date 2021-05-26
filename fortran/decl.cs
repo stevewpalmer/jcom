@@ -434,7 +434,7 @@ namespace JFortran {
             }
             
             node.ProcedureSymbol = method;
-            node.LocalSymbols.Add(_localSymbols);
+            node.Symbols.Add(_localSymbols);
             node.LabelList = new Collection<ParseNode>();
 
             _currentProcedure = node;

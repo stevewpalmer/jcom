@@ -73,13 +73,13 @@ namespace JComal {
                                "Procedure or function name expected");
             } else {
                 string methodName = identToken.Name;
-                Symbol sym = Globals.Get(methodName);
+                Symbol sym = GlobalMethods.Get(methodName);
                 if (sym != null && sym.IsExported) {
                     Messages.Error(MessageCode.ALREADYEXPORTED,
                                    $"{methodName} already exported");
                 }
                 if (sym == null) {
-                    sym = Globals.Add(methodName,
+                    sym = GlobalMethods.Add(methodName,
                                              new SymFullType(),
                                              SymClass.SUBROUTINE,
                                              null,
@@ -228,7 +228,8 @@ namespace JComal {
         // ENDPROC <procedure_identifier> <eol>
         //
         private ParseNode KProc() {
-            return ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.KENDPROC, null);
+            SymbolCollection symbols = new("Locals");
+            return ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.KENDPROC, null, symbols);
         }
 
         // FUNC
@@ -238,7 +239,8 @@ namespace JComal {
         // ENDFUNC <function_identifier> <eol>
         //
         private ParseNode KFunc() {
-            return ParseProcFuncDefinition(SymClass.FUNCTION, TokenID.KENDFUNC, null);
+            SymbolCollection symbols = new("Locals");
+            return ParseProcFuncDefinition(SymClass.FUNCTION, TokenID.KENDFUNC, null, symbols);
         }
 
         // RETURN
@@ -292,7 +294,7 @@ namespace JComal {
                     if (identToken == null) {
                         break;
                     }
-                    Symbol sym = Globals.Get(identToken.Name);
+                    Symbol sym = GlobalMethods.Get(identToken.Name);
                     if (sym == null) {
                         Messages.Error(MessageCode.METHODNOTFOUND, $"{identToken.Name} not found");
                     }
@@ -617,8 +619,8 @@ namespace JComal {
             TrappableParseNode parseNode = new() {
                 Body = new BlockParseNode(),
                 Handler = new BlockParseNode(),
-                Err = Globals.Get(Consts.ErrName),
-                Message = Globals.Get(Consts.ErrText)
+                Err = GlobalMethods.Get(Consts.ErrName),
+                Message = GlobalMethods.Get(Consts.ErrText)
             };
             CompileBlock(parseNode.Body, new[] { TokenID.KENDTRAP, TokenID.KHANDLER });
             CompileBlock(parseNode.Handler, new[] { TokenID.KENDTRAP });
@@ -635,9 +637,9 @@ namespace JComal {
 
             // Need a new local symbol table as Comal FOR keywords are
             // local to the FOR block
-            SymbolCollection forSymbols = new("_LOCAL");
+            SymbolCollection forSymbols = new("ForSymbols");
             SymbolStack.Push(forSymbols);
-            CurrentProcedure.LocalSymbols.Add(forSymbols);
+            CurrentProcedure.Symbols.Add(forSymbols);
 
             // Control identifier
             IdentifierToken identToken = ParseIdentifier();
