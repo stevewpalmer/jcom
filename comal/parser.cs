@@ -165,8 +165,7 @@ namespace JComal {
 
         // Parse a PROC or FUNC definition including the declaration and the proc/func
         // body.
-        private ParseNode ParseProcFuncDefinition(SymClass klass, TokenID endToken, string methodName,
-            SymbolCollection symbolTable) {
+        private ParseNode ParseProcFuncDefinition(SymClass klass, TokenID endToken, string methodName) {
 
             ProcedureParseNode node = new();
             IdentifierToken identToken = null;
@@ -195,7 +194,8 @@ namespace JComal {
             _hasReturn = false;
 
             // Symbol table for this proc
-            SymbolStack.Push(symbolTable);
+            SymbolCollection symbols = new("Locals");
+            SymbolStack.Push(symbols);
 
             // Parameter list.
             Collection<Symbol> parameters = null;
@@ -248,7 +248,7 @@ namespace JComal {
             }
 
             node.ProcedureSymbol = method;
-            node.Symbols.Add(symbolTable);
+            node.Symbols.Add(symbols);
             node.LabelList = new Collection<ParseNode>();
 
             ProcedureParseNode savedCurrentProcedure = CurrentProcedure;

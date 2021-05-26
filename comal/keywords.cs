@@ -228,8 +228,7 @@ namespace JComal {
         // ENDPROC <procedure_identifier> <eol>
         //
         private ParseNode KProc() {
-            SymbolCollection symbols = new("Locals");
-            return ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.KENDPROC, null, symbols);
+            return ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.KENDPROC, null);
         }
 
         // FUNC
@@ -239,8 +238,7 @@ namespace JComal {
         // ENDFUNC <function_identifier> <eol>
         //
         private ParseNode KFunc() {
-            SymbolCollection symbols = new("Locals");
-            return ParseProcFuncDefinition(SymClass.FUNCTION, TokenID.KENDFUNC, null, symbols);
+            return ParseProcFuncDefinition(SymClass.FUNCTION, TokenID.KENDFUNC, null);
         }
 
         // RETURN

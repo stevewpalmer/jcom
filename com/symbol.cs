@@ -70,6 +70,7 @@ namespace CCompiler {
         EXTERNAL = 2,
         STATIC = 4,
         RETVAL = 8,
+        CONSTRUCTOR = 16,
         FLATARRAY = 32,
         ENTRYPOINT = 64,
         EXPORTED = 128
@@ -380,6 +381,9 @@ namespace CCompiler {
             if (IsParameter) {
                 str.Append("local ");
             }
+            if (Modifier.HasFlag(SymModifier.CONSTRUCTOR)) {
+                str.Append("constructor ");
+            }
             if (IsExternal) {
                 str.Append("external ");
                 if (!string.IsNullOrEmpty(ExternalLibrary)) {
@@ -400,8 +404,11 @@ namespace CCompiler {
             if (!Defined) {
                 str.Append(" (undef)");
             }
+            if (Index != null) {
+                str.AppendFormat(" [{0}]", Index.Index);
+            }
             if (Info != null) {
-                str.AppendFormat(" [{0}]", Index);
+                str.AppendFormat(" [{0}]", Info.ToString());
             }
             return str.ToString();
         }

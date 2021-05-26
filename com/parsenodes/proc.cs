@@ -127,7 +127,7 @@ namespace CCompiler {
 
             // Create the emitter for this method
             JMethod method = ProcedureSymbol.Info as JMethod;
-            cg.Emitter = new Emitter(method.Builder);
+            cg.Emitter = method.Emitter;
             cg.CurrentProcedure = this;
 
             ReturnLabel = cg.Emitter.CreateLabel();

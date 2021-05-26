@@ -293,7 +293,7 @@ namespace JComal {
                 Pass0();
 
                 // Create a Main program.
-                ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.ENDOFFILE, _entryPointName, GlobalVariables);
+                ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.ENDOFFILE, _entryPointName);
 
                 // Warn about exported methods that are not defined
                 foreach (Symbol sym in GlobalMethods) {
@@ -323,6 +323,17 @@ namespace JComal {
 
             GlobalVariables = new("GlobalVars");
             SymbolStack.Push(GlobalMethods);
+
+            // Constructor
+            ProcedureParseNode node = new() {
+                ProcedureSymbol = new Symbol(_program.Name, new SymFullType(), SymClass.SUBROUTINE, null, 0) {
+                    Modifier = SymModifier.CONSTRUCTOR,
+                    Defined = true
+                }
+            };
+            GlobalMethods.Add(node.ProcedureSymbol);
+            node.Symbols.Add(GlobalVariables);
+            _program.Root.Add(node);
 
             // Create special variables
             GlobalVariables.Add(new Symbol(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {

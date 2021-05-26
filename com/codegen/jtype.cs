@@ -97,6 +97,14 @@ namespace CCompiler {
         /// <returns></returns>
         public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
 
+            if (sym.Modifier.HasFlag(SymModifier.CONSTRUCTOR)) {
+
+                ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
+                                            CallingConventions.Standard,
+                                            Array.Empty<Type>());
+                return new JMethod(this, cntb);
+            }
+
             bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
             Type returnType;
 
