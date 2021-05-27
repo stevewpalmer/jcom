@@ -507,14 +507,14 @@ namespace JComal {
                     }
 
                 case TokenID.KERR: {
-                    Symbol errSymbol = GlobalMethods.Get(Consts.ErrName);
+                    Symbol errSymbol = GlobalVariables.Get(Consts.ErrName);
                     IdentifierParseNode node = new(errSymbol);
                     node.Symbol.IsReferenced = true;
                     return node;
                     }
 
                 case TokenID.KERRTEXT: {
-                    Symbol errSymbol = GlobalMethods.Get(Consts.ErrText);
+                    Symbol errSymbol = GlobalVariables.Get(Consts.ErrText);
                     IdentifierParseNode node = new(errSymbol);
                     node.Symbol.IsReferenced = true;
                     return node;

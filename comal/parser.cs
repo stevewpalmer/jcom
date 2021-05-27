@@ -193,9 +193,12 @@ namespace JComal {
             bool savedHasReturn = _hasReturn;
             _hasReturn = false;
 
-            // Symbol table for this proc
-            SymbolCollection symbols = new("Locals");
-            SymbolStack.Push(symbols);
+            // New local symbol table for this block
+            SymbolCollection localSymbols = null;
+            if (!isImplicit) {
+                localSymbols = new("Local");
+                SymbolStack.Push(localSymbols);
+            }
 
             // Parameter list.
             Collection<Symbol> parameters = null;
@@ -248,7 +251,9 @@ namespace JComal {
             }
 
             node.ProcedureSymbol = method;
-            node.Symbols.Add(symbols);
+            if (localSymbols != null) {
+                node.Symbols.Add(localSymbols);
+            }
             node.LabelList = new Collection<ParseNode>();
 
             ProcedureParseNode savedCurrentProcedure = CurrentProcedure;

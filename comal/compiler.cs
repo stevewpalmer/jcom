@@ -292,8 +292,8 @@ namespace JComal {
                 // ahead of their usage
                 Pass0();
 
-                // Create a Main program.
-                ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.ENDOFFILE, _entryPointName);
+                // Compile everything to the end of the file.
+                CompileBlock(_program.Root, new[] { TokenID.ENDOFFILE });
 
                 // Warn about exported methods that are not defined
                 foreach (Symbol sym in GlobalMethods) {
@@ -322,7 +322,7 @@ namespace JComal {
         private void CreateDefaultGlobals() {
 
             GlobalVariables = new("GlobalVars");
-            SymbolStack.Push(GlobalMethods);
+            SymbolStack.Push(GlobalVariables);
 
             // Constructor
             ProcedureParseNode node = new() {
@@ -577,13 +577,13 @@ namespace JComal {
 
         // Look up the symbol table for the specified identifier starting with the
         // current scope and working up to and including global/imports. If we're
-        // in a closed procedure, _globalSymbols is ignored and _importSymbols is
-        // used so that anything other than predefined 
+        // in a closed procedure, the global symbol tables are ignored and _importSymbols
+        // is used so that anything other than predefined 
         private Symbol GetSymbolForCurrentScope(string name) {
 
             Symbol sym = null;
             foreach (SymbolCollection symbols in SymbolStack.All) {
-                if (symbols == GlobalMethods && _importSymbols != null) {
+                if ((symbols == GlobalVariables || symbols == GlobalMethods) && _importSymbols != null) {
                     sym = _importSymbols.Get(name);
                 } else {
                     sym = symbols.Get(name);
@@ -775,6 +775,16 @@ namespace JComal {
             }
             if (newState != BlockState.UNORDERED) {
                 _state = newState;
+            }
+
+            // If we're in a statement but we haven't defined a procedure yet, create the
+            // default Main one.
+            if (newState == BlockState.STATEMENT) {
+                if (CurrentProcedure == null) {
+                    _ls.BackLine();
+                    ParseProcFuncDefinition(SymClass.SUBROUTINE, TokenID.ENDOFFILE, _entryPointName);
+                    return false;
+                }
             }
             return true;
         }

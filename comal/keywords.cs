@@ -617,8 +617,8 @@ namespace JComal {
             TrappableParseNode parseNode = new() {
                 Body = new BlockParseNode(),
                 Handler = new BlockParseNode(),
-                Err = GlobalMethods.Get(Consts.ErrName),
-                Message = GlobalMethods.Get(Consts.ErrText)
+                Err = GlobalVariables.Get(Consts.ErrName),
+                Message = GlobalVariables.Get(Consts.ErrText)
             };
             CompileBlock(parseNode.Body, new[] { TokenID.KENDTRAP, TokenID.KHANDLER });
             CompileBlock(parseNode.Handler, new[] { TokenID.KENDTRAP });
