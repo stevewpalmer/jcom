@@ -61,7 +61,7 @@ namespace CCompiler {
         /// Gets or sets the parsenode for the value to be assigned.
         /// </summary>
         /// <value>The value parse node</value>
-        public ParseNode [] ValueExpressions { get; set; }
+        public ParseNode[] ValueExpressions { get; set; }
 
         /// <summary>
         /// Dumps the contents of this parse node to the ParseNode XML
@@ -88,8 +88,9 @@ namespace CCompiler {
         ///   identifier(substring) = value
         /// 
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
@@ -103,116 +104,122 @@ namespace CCompiler {
                 }
                 ParseNode valueExpression = ValueExpressions[arrayIndex];
                 if (sym.IsArray) {
-                    GenerateSaveToArray(cg, Identifiers[arrayIndex], valueExpression);
+                    GenerateSaveToArray(emitter, cg, Identifiers[arrayIndex], valueExpression);
                     continue;
                 }
                 if (Identifiers[arrayIndex].HasSubstring) {
                     if (sym.IsParameter) {
-                        cg.Emitter.LoadParameter(sym.ParameterIndex);
+                        emitter.LoadParameter(sym.ParameterIndex);
                     } else {
-                        cg.Emitter.LoadSymbol(sym);
+                        emitter.LoadSymbol(sym);
                     }
-                    SymType exprType = cg.GenerateExpression(SymType.NONE, valueExpression);
-                    GenerateSaveSubstring(cg, Identifiers[arrayIndex], exprType);
+                    SymType exprType = cg.GenerateExpression(emitter, SymType.NONE, valueExpression);
+                    GenerateSaveSubstring(emitter, cg, Identifiers[arrayIndex], exprType);
                     continue;
                 }
                 if (!sym.IsValueType) {
                     if (sym.IsParameter) {
-                        cg.Emitter.LoadParameter(sym.ParameterIndex);
+                        emitter.LoadParameter(sym.ParameterIndex);
                     } else {
-                        cg.Emitter.LoadSymbol(sym);
+                        emitter.LoadSymbol(sym);
                     }
                     SymType wantedType = sym.Type;
                     if (wantedType == SymType.FIXEDCHAR && valueExpression.Type == SymType.CHAR) {
                         wantedType = SymType.CHAR;
                     }
-                    SymType exprType = cg.GenerateExpression(wantedType, valueExpression);
+                    SymType exprType = cg.GenerateExpression(emitter, wantedType, valueExpression);
                     if (sym.Type == SymType.FIXEDCHAR) {
                         MethodInfo meth = cg.GetMethodForType(typeof(FixedString), "Set", new[] { Symbol.SymTypeToSystemType(exprType) });
-                        cg.Emitter.Call(meth);
+                        emitter.Call(meth);
                     }
                     continue;
                 }
                 if (sym.IsLocal) {
-                    cg.GenerateExpression(sym.Type, valueExpression);
-                    cg.Emitter.StoreLocal(sym);
+                    cg.GenerateExpression(emitter, sym.Type, valueExpression);
+                    emitter.StoreLocal(sym);
                     continue;
                 }
-                GenerateStoreArgument(cg, valueExpression, sym);
+                GenerateStoreArgument(emitter, cg, valueExpression, sym);
             }
         }
 
         // Emit code that saves the result of an expression to an array element.
-        private static void GenerateSaveToArray(ProgramParseNode cg, IdentifierParseNode identifier, ParseNode valueExpression) {
+        private static void GenerateSaveToArray(Emitter emitter, ProgramParseNode cg, IdentifierParseNode identifier,
+            ParseNode valueExpression) {
+
             Symbol sym = identifier.Symbol;
             
             Debug.Assert(sym.IsArray);
             if (identifier.IsArrayBase) {
                 if (sym.IsParameter) {
-                    GenerateStoreArgument(cg, valueExpression, sym);
+                    GenerateStoreArgument(emitter, cg, valueExpression, sym);
                 } else {
-                    cg.GenerateExpression(SymType.NONE, valueExpression);
-                    cg.Emitter.StoreLocal(sym.Index);
+                    cg.GenerateExpression(emitter, SymType.NONE, valueExpression);
+                    emitter.StoreLocal(sym.Index);
                 }
                 return;
             }
-            cg.GenerateLoadArrayAddress(identifier);
+            cg.GenerateLoadArrayAddress(emitter, identifier);
             
             if (identifier.HasSubstring) {
-                cg.Emitter.LoadArrayElement(sym);
-                cg.GenerateExpression(SymType.FIXEDCHAR, valueExpression);
-                GenerateSaveSubstring(cg, identifier, SymType.FIXEDCHAR);
+                emitter.LoadArrayElement(sym);
+                cg.GenerateExpression(emitter, SymType.FIXEDCHAR, valueExpression);
+                GenerateSaveSubstring(emitter, cg, identifier, SymType.FIXEDCHAR);
                 return;
             }
             if (sym.Type == SymType.FIXEDCHAR) {
-                cg.Emitter.LoadArrayElement(sym);
-                cg.GenerateExpression(SymType.NONE, valueExpression);
-                cg.Emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set",
+                emitter.LoadArrayElement(sym);
+                cg.GenerateExpression(emitter, SymType.NONE, valueExpression);
+                emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set",
                     new[] {
                         Symbol.SymTypeToSystemType(valueExpression.Type)
                     }));
                 return;
             }
             
-            cg.GenerateExpression(sym.Type, valueExpression);
-            cg.Emitter.StoreArrayElement(sym);
+            cg.GenerateExpression(emitter, sym.Type, valueExpression);
+            emitter.StoreArrayElement(sym);
         }
 
         // Generate the code to write an expression to a substring represented
         // by an identifier which should be fixed string type.
-        private static void GenerateSaveSubstring(ProgramParseNode cg, IdentifierParseNode identifier, SymType charType) {
+        private static void GenerateSaveSubstring(Emitter emitter, ProgramParseNode cg,
+            IdentifierParseNode identifier, SymType charType) {
+
             Type baseType = Symbol.SymTypeToSystemType(charType);
             
             // Optimise for constant start/end values
             if (identifier.SubstringStart.IsConstant) {
-                cg.Emitter.LoadInteger(identifier.SubstringStart.Value.IntValue);
+                emitter.LoadInteger(identifier.SubstringStart.Value.IntValue);
             } else {
-                cg.GenerateExpression(SymType.INTEGER, identifier.SubstringStart);
+                cg.GenerateExpression(emitter, SymType.INTEGER, identifier.SubstringStart);
             }
             if (identifier.SubstringEnd == null) {
-                cg.Emitter.LoadInteger(identifier.Symbol.FullType.Width);
+                emitter.LoadInteger(identifier.Symbol.FullType.Width);
             } else {
                 if (identifier.SubstringEnd.IsConstant) {
-                    cg.Emitter.LoadInteger(identifier.SubstringEnd.Value.IntValue);
+                    emitter.LoadInteger(identifier.SubstringEnd.Value.IntValue);
                 } else {
-                    cg.GenerateExpression(SymType.INTEGER, identifier.SubstringEnd);
+                    cg.GenerateExpression(emitter, SymType.INTEGER, identifier.SubstringEnd);
                 }
             }
-            cg.Emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set", new [] { baseType, typeof(int), typeof(int) }));
+            emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set", new [] { baseType, typeof(int), typeof(int) }));
         }
 
         // Emit the appropriate store parameter index opcode.
-        private static void GenerateStoreArgument(ProgramParseNode cg, ParseNode value, Symbol sym) {
+        private static void GenerateStoreArgument(Emitter emitter, ProgramParseNode cg,
+            ParseNode value, Symbol sym) {
+
             switch (sym.Linkage) {
                 case SymLinkage.BYVAL:
-                    cg.GenerateExpression(sym.Type, value);
-                    cg.Emitter.StoreParameter(sym.ParameterIndex);
+                    cg.GenerateExpression(emitter, sym.Type, value);
+                    emitter.StoreParameter(sym.ParameterIndex);
                     break;
                     
                 case SymLinkage.BYREF:
-                    cg.Emitter.LoadParameter(sym.ParameterIndex);
-                    cg.GenerateExpression(sym.Type, value);
-                    cg.Emitter.StoreIndirect(sym.Type);
+                    emitter.LoadParameter(sym.ParameterIndex);
+                    cg.GenerateExpression(emitter, sym.Type, value);
+                    emitter.StoreIndirect(sym.Type);
                     break;
             }
         }

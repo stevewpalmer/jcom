@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Switch statement parse node
 //
 // Authors:
@@ -74,28 +74,29 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// 
+        /// Multiple branch statement parse node
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             int switchCount = _caseList.Count;
 
-            SymType exprType = cg.GenerateExpression(CompareExpression.Type, CompareExpression);
+            SymType exprType = cg.GenerateExpression(emitter, CompareExpression.Type, CompareExpression);
             if (switchCount == 1) {
-                cg.GenerateExpression(exprType, _caseList[0]);
+                cg.GenerateExpression(emitter, exprType, _caseList[0]);
                 Symbol sym = ProgramParseNode.GetLabel(_labelList[0]);
-                cg.Emitter.BranchEqual((Label)sym.Info);
+                emitter.BranchEqual((Label)sym.Info);
             } else {
-                LocalDescriptor index = cg.Emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
-                cg.Emitter.StoreLocal(index);
+                LocalDescriptor index = emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
+                emitter.StoreLocal(index);
                 for (int switchIndex = 0; switchIndex < switchCount; ++switchIndex) {
-                    cg.Emitter.LoadLocal(index);
-                    cg.GenerateExpression(exprType, _caseList[switchIndex]);
+                    emitter.LoadLocal(index);
+                    cg.GenerateExpression(emitter, exprType, _caseList[switchIndex]);
                     Symbol sym = ProgramParseNode.GetLabel(_labelList[switchIndex]);
-                    cg.Emitter.BranchEqual((Label)sym.Info);
+                    emitter.BranchEqual((Label)sym.Info);
                 }
                 Emitter.ReleaseTemporary(index);
             }

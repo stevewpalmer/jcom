@@ -79,38 +79,39 @@ namespace CCompiler {
         /// parse node must be specified which evaluates to the value to be
         /// written.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="node">A parse node for the WRITE identifier</param>
-        public override void Generate(ProgramParseNode cg, ParseNode node) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg, ParseNode node) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             if (node is LoopParseNode loopNode) {
                 loopNode.Callback = this;
-                loopNode.Generate(cg);
+                loopNode.Generate(emitter, cg);
             } else {
                 Type writeManagerType = typeof(WriteManager);
                 List<Type> writeParamTypes = new();
 
-                cg.Emitter.LoadLocal(WriteManagerIndex);
+                emitter.LoadLocal(WriteManagerIndex);
                 writeParamTypes.Add(writeManagerType);
 
                 if (WriteParamsNode != null) {
-                    writeParamTypes.AddRange(WriteParamsNode.Generate(cg));
+                    writeParamTypes.AddRange(WriteParamsNode.Generate(emitter, cg));
                 }
 
                 if (node != null) {
                     ParameterParseNode exprParam = new(node);
-                    writeParamTypes.Add(exprParam.Generate(cg));
+                    writeParamTypes.Add(exprParam.Generate(emitter, cg));
                 }
 
-                cg.Emitter.Call(cg.GetMethodForType(_libraryName, _name, writeParamTypes.ToArray()));
-                cg.Emitter.StoreLocal(ReturnIndex);
+                emitter.Call(cg.GetMethodForType(_libraryName, _name, writeParamTypes.ToArray()));
+                emitter.StoreLocal(ReturnIndex);
 
                 if (ErrLabel != null) {
-                    cg.Emitter.LoadLocal(ReturnIndex);
-                    cg.Emitter.LoadInteger(-1);
-                    cg.Emitter.BranchEqual((Label)ErrLabel.Symbol.Info);
+                    emitter.LoadLocal(ReturnIndex);
+                    emitter.LoadInteger(-1);
+                    emitter.BranchEqual((Label)ErrLabel.Symbol.Info);
                 }
             }
         }

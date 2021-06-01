@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // GOTO parse node
 //
 // Authors:
@@ -95,14 +95,15 @@ namespace CCompiler {
         /// <summary>
         /// Emit the code to generate a GOTO statement.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             if (ValueExpression == null) {
                 Symbol sym = ProgramParseNode.GetLabel(Nodes[0]);
-                cg.Emitter.Branch((Label)sym.Info);
+                emitter.Branch((Label)sym.Info);
             } else {
                 Collection<ParseNode> labelNodes = Nodes;
 
@@ -117,12 +118,12 @@ namespace CCompiler {
                         jumpTable[c] = (Label)sym.Info;
                     }
                 }
-                cg.GenerateExpression(SymType.INTEGER, ValueExpression);
+                cg.GenerateExpression(emitter, SymType.INTEGER, ValueExpression);
                 if (!IsZeroBased) {
-                    cg.Emitter.LoadInteger(1);
-                    cg.Emitter.Sub(SymType.INTEGER);
+                    emitter.LoadInteger(1);
+                    emitter.Sub(SymType.INTEGER);
                 }
-                cg.Emitter.Switch(jumpTable);
+                emitter.Switch(jumpTable);
             }
         }
     }

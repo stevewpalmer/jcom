@@ -26,6 +26,7 @@
 using System;
 
 namespace CCompiler {
+
     /// <summary>
     /// Specifies a null value parse node.
     /// </summary>
@@ -34,14 +35,15 @@ namespace CCompiler {
         /// <summary>
         /// Emit this code to load a null value to the stack.
         /// </summary>
-        /// <param name="cg">A CodeGenerator object</param>
+        /// <param name="emitter">Code emitter</param>
+        /// <param name="cg">Code generator</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
             }
-            cg.Emitter.LoadNull();
+            emitter.LoadNull();
             return Type;
         }
 

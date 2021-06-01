@@ -184,7 +184,7 @@ namespace JComal {
             }
 
             // Method should exist in _globalSymbols due to Pass 0.
-            Symbol method = GlobalMethods.Get(methodName);
+            Symbol method = Globals.Get(methodName);
             Debug.Assert(method != null);
             method.Defined = true;
             method.Class = klass;
@@ -194,11 +194,8 @@ namespace JComal {
             _hasReturn = false;
 
             // New local symbol table for this block
-            SymbolCollection localSymbols = null;
-            if (!isImplicit) {
-                localSymbols = new("Local");
-                SymbolStack.Push(localSymbols);
-            }
+            SymbolCollection localSymbols = new("Local");
+            SymbolStack.Push(localSymbols);
 
             // Parameter list.
             Collection<Symbol> parameters = null;
@@ -282,6 +279,7 @@ namespace JComal {
             foreach (Symbol sym in SymbolStack.Top) {
                 if (sym.IsLabel && !sym.Defined) {
                     Messages.Error(MessageCode.UNDEFINEDLABEL, sym.RefLine, $"Undefined label {sym.Name}");
+                    continue;
                 }
 
                 // For non-array characters, if there's no value, set the empty string
@@ -289,8 +287,8 @@ namespace JComal {
                     sym.Value = new Variant(string.Empty);
                 }
 
-                if (!sym.IsReferenced && !sym.IsLabel && !sym.Modifier.HasFlag(SymModifier.RETVAL)) {
-                    string scopeName = sym.IsParameter ? "parameter" : "variable";
+                if (!sym.IsReferenced && !sym.IsHidden && !sym.Modifier.HasFlag(SymModifier.RETVAL)) {
+                    string scopeName = sym.IsParameter ? "parameter" : sym.IsLabel ? "label" : "variable";
                     Messages.Warning(MessageCode.UNUSEDVARIABLE,
                                       3,
                                       sym.RefLine,
@@ -386,7 +384,7 @@ namespace JComal {
             if (identToken != null) {
                 
                 // Ban any conflict with PROGRAM name or the current function
-                Symbol globalSym = GlobalMethods.Get(identToken.Name);
+                Symbol globalSym = Globals.Get(identToken.Name);
                 if (globalSym != null && globalSym.Type == SymType.PROGRAM) {
                     Messages.Error(MessageCode.IDENTIFIERISGLOBAL,
                         $"Identifier {identToken.Name} already has global declaration");

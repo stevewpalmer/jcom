@@ -81,32 +81,33 @@ namespace CCompiler {
         /// <summary>
         /// Emit the code to generate a call to the READ library function.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
 
             Type readManagerType = typeof(ReadManager);
-            Type [] paramTypes = ReadManagerParamsNode.Generate(cg);
+            Type [] paramTypes = ReadManagerParamsNode.Generate(emitter, cg);
 
-            cg.Emitter.CreateObject(readManagerType, paramTypes);
-            LocalDescriptor objIndex = cg.Emitter.GetTemporary(readManagerType);
-            cg.Emitter.StoreLocal(objIndex);
+            emitter.CreateObject(readManagerType, paramTypes);
+            LocalDescriptor objIndex = emitter.GetTemporary(readManagerType);
+            emitter.StoreLocal(objIndex);
             
             if (EndLabel != null) {
-                cg.Emitter.LoadLocal(objIndex);
-                cg.Emitter.LoadInteger(1);
-                cg.Emitter.Call(readManagerType.GetMethod("set_HasEnd", new [] { typeof(bool) }));
+                emitter.LoadLocal(objIndex);
+                emitter.LoadInteger(1);
+                emitter.Call(readManagerType.GetMethod("set_HasEnd", new [] { typeof(bool) }));
             }
             
             if (ErrLabel != null) {
-                cg.Emitter.LoadLocal(objIndex);
-                cg.Emitter.LoadInteger(1);
-                cg.Emitter.Call(readManagerType.GetMethod("set_HasErr", new [] { typeof(bool) }));
+                emitter.LoadLocal(objIndex);
+                emitter.LoadInteger(1);
+                emitter.Call(readManagerType.GetMethod("set_HasErr", new [] { typeof(bool) }));
             }
             
-            LocalDescriptor index = cg.Emitter.GetTemporary(typeof(int));
+            LocalDescriptor index = emitter.GetTemporary(typeof(int));
 
             // Construct a parsenode that will be called for each item in the loop
             // including any implied DO loops.
@@ -121,16 +122,16 @@ namespace CCompiler {
                 int countOfArgs = ArgList.Nodes.Count;
                 
                 for (int c = 0; c < countOfArgs; ++c) {
-                    itemNode.Generate(cg, ArgList.Nodes[c]);
+                    itemNode.Generate(emitter, cg, ArgList.Nodes[c]);
                     ReadParamsNode.FreeLocalDescriptors();
                 }
             } else {
-                itemNode.Generate(cg, null);
+                itemNode.Generate(emitter, cg, null);
             }
 
             // Issue an EndRecord to complete this record read
-            cg.Emitter.LoadLocal(objIndex);
-            cg.Emitter.Call(cg.GetMethodForType(readManagerType, "EndRecord", System.Type.EmptyTypes));
+            emitter.LoadLocal(objIndex);
+            emitter.Call(cg.GetMethodForType(readManagerType, "EndRecord", System.Type.EmptyTypes));
             
             Emitter.ReleaseTemporary(index);
             Emitter.ReleaseTemporary(objIndex);

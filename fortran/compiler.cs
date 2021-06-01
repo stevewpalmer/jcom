@@ -1,4 +1,4 @@
-// JFortran Compiler
+﻿// JFortran Compiler
 // Main compiler class
 //
 // Authors:
@@ -462,7 +462,7 @@ namespace JFortran {
         // Returns the block state to which the specified token belongs. For example,
         // IMPLICIT must precede any declaration which must precede any executable
         // statement in the same program group.
-        private BlockState TokenToState(SimpleToken token) {
+        private static BlockState TokenToState(SimpleToken token) {
             BlockState state = BlockState.NONE;
             switch (token.ID) {
                 case TokenID.KPROGRAM:

@@ -86,60 +86,61 @@ namespace CCompiler {
         /// parse node must be provided which evaluates to the address of the
         /// identifier into which the data is read.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="node">A parse node for the READ identifier</param>
-        public override void Generate(ProgramParseNode cg, ParseNode node) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg, ParseNode node) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             if (node is LoopParseNode loopNode) {
                 loopNode.Callback = this;
-                loopNode.Generate(cg);
+                loopNode.Generate(emitter, cg);
             } else {
                 Type readManagerType = typeof(ReadManager);
                 List<Type> readParamTypes = new();
 
-                cg.Emitter.LoadLocal(ReadManagerIndex);
+                emitter.LoadLocal(ReadManagerIndex);
                 readParamTypes.Add(readManagerType);
 
-                readParamTypes.AddRange(ReadParamsNode.Generate(cg));
+                readParamTypes.AddRange(ReadParamsNode.Generate(emitter, cg));
 
                 if (node is IdentifierParseNode identNode) {
                     if (identNode.IsArrayBase) {
-                        cg.Emitter.LoadInteger(identNode.Symbol.ArraySize);
-                        identNode.Generate(cg);
+                        emitter.LoadInteger(identNode.Symbol.ArraySize);
+                        identNode.Generate(emitter, cg);
 
                         readParamTypes.Add(typeof(int));
                         readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeArrayType());
                     } else if (identNode.HasSubstring) {
-                        cg.GenerateExpression(SymType.INTEGER, identNode.SubstringStart);
+                        cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringStart);
                         if (identNode.SubstringEnd != null) {
-                            cg.GenerateExpression(SymType.INTEGER, identNode.SubstringEnd);
+                            cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringEnd);
                         } else {
-                            cg.Emitter.LoadInteger(-1);
+                            emitter.LoadInteger(-1);
                         }
-                        cg.LoadAddress(identNode);
+                        cg.LoadAddress(emitter, identNode);
                         readParamTypes.Add(typeof(int));
                         readParamTypes.Add(typeof(int));
                         readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
                     } else {
-                        cg.LoadAddress(identNode);
+                        cg.LoadAddress(emitter, identNode);
                         readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
                     }
                 }
 
-                cg.Emitter.Call(cg.GetMethodForType(LibraryName, Name, readParamTypes.ToArray()));
-                cg.Emitter.StoreLocal(ReturnIndex);
+                emitter.Call(cg.GetMethodForType(LibraryName, Name, readParamTypes.ToArray()));
+                emitter.StoreLocal(ReturnIndex);
 
                 if (EndLabel != null) {
-                    cg.Emitter.LoadLocal(ReturnIndex);
-                    cg.Emitter.LoadInteger(0);
-                    cg.Emitter.BranchEqual((Label)EndLabel.Symbol.Info);
+                    emitter.LoadLocal(ReturnIndex);
+                    emitter.LoadInteger(0);
+                    emitter.BranchEqual((Label)EndLabel.Symbol.Info);
                 }
                 if (ErrLabel != null) {
-                    cg.Emitter.LoadLocal(ReturnIndex);
-                    cg.Emitter.LoadInteger(-1);
-                    cg.Emitter.BranchEqual((Label)ErrLabel.Symbol.Info);
+                    emitter.LoadLocal(ReturnIndex);
+                    emitter.LoadInteger(-1);
+                    emitter.BranchEqual((Label)ErrLabel.Symbol.Info);
                 }
             }
         }

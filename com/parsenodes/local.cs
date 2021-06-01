@@ -57,14 +57,15 @@ namespace CCompiler {
         /// Implements the base code generator for the node to invoke a
         /// function implementation with a symbol type.
         /// </summary>
-        /// <param name="cg">The code generator object</param>
+        /// <param name="emitter">Code emitter</param>
+        /// <param name="cg">Code generator</param>
         /// <param name="returnType">The expected type of the return value</param>
         /// <returns>The computed type</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
             }
-            cg.Emitter.LoadLocal(_local);
+            emitter.LoadLocal(_local);
             return Symbol.SystemTypeToSymbolType(_local.Type);
         }
     }

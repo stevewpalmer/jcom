@@ -78,13 +78,14 @@ namespace CCompiler {
         /// blocks: the code within the try and the code within the handler that
         /// runs when a trappable error is raised from the try block.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            cg.Emitter.SetupTryCatchBlock();
-            Body.Generate(cg);
-            cg.Emitter.AddTryCatchHandlerBlock(Err, Message);
-            Handler.Generate(cg);
-            cg.Emitter.CloseTryCatchBlock();
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+            emitter.SetupTryCatchBlock();
+            Body.Generate(emitter, cg);
+            emitter.AddTryCatchHandlerBlock(Err, Message);
+            Handler.Generate(emitter, cg);
+            emitter.CloseTryCatchBlock();
         }
     }
 }

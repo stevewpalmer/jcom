@@ -112,9 +112,13 @@ namespace CCompiler {
         /// parse node must be provided which evaluates to the address of the
         /// identifier into which the data is read.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
-        /// <param name="node">A parse node for the READ identifier</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
+            }
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
@@ -123,61 +127,61 @@ namespace CCompiler {
 
             // Constructor arguments
             if (RowPosition != null && ColumnPosition != null) {
-                cg.GenerateExpression(SymType.INTEGER, RowPosition);
-                cg.GenerateExpression(SymType.INTEGER, ColumnPosition);
-                cg.GenerateExpression(SymType.INTEGER, MaximumWidth);
+                cg.GenerateExpression(emitter, SymType.INTEGER, RowPosition);
+                cg.GenerateExpression(emitter, SymType.INTEGER, ColumnPosition);
+                cg.GenerateExpression(emitter, SymType.INTEGER, MaximumWidth);
 
                 constructorTypes.Add(Symbol.SymTypeToSystemType(RowPosition.Type));
                 constructorTypes.Add(Symbol.SymTypeToSystemType(ColumnPosition.Type));
                 constructorTypes.Add(Symbol.SymTypeToSystemType(MaximumWidth.Type));
             }
 
-            cg.GenerateExpression(SymType.INTEGER, FileHandle);
+            cg.GenerateExpression(emitter, SymType.INTEGER, FileHandle);
             constructorTypes.Add(typeof(int));
 
             if (Prompt != null) {
-                cg.GenerateExpression(SymType.CHAR, Prompt);
-                cg.Emitter.LoadInteger((int)Terminator);
+                cg.GenerateExpression(emitter, SymType.CHAR, Prompt);
+                emitter.LoadInteger((int)Terminator);
 
                 constructorTypes.Add(typeof(string));
                 constructorTypes.Add(typeof(LineTerminator));
             }
 
             if (RecordNumber != null) {
-                cg.GenerateExpression(SymType.INTEGER, RecordNumber);
+                cg.GenerateExpression(emitter, SymType.INTEGER, RecordNumber);
                 constructorTypes.Add(Symbol.SymTypeToSystemType(RecordNumber.Type));
             }
 
             Type inputManagerType = typeof(InputManager);
-            cg.Emitter.CreateObject(inputManagerType, constructorTypes.ToArray());
-            LocalDescriptor objIndex = cg.Emitter.GetTemporary(inputManagerType);
-            cg.Emitter.StoreLocal(objIndex);
+            emitter.CreateObject(inputManagerType, constructorTypes.ToArray());
+            LocalDescriptor objIndex = emitter.GetTemporary(inputManagerType);
+            emitter.StoreLocal(objIndex);
 
             foreach (IdentifierParseNode identNode in Identifiers) {
 
                 List<Type> readParamTypes = new();
 
-                cg.Emitter.LoadLocal(objIndex);
+                emitter.LoadLocal(objIndex);
                 if (identNode.IsArrayBase) {
-                    cg.Emitter.GenerateLoadArray(identNode, true);
+                    emitter.GenerateLoadArray(identNode, true);
                     readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeArrayType().MakeByRefType());
                 } else if (identNode.HasSubstring) {
-                    cg.GenerateExpression(SymType.INTEGER, identNode.SubstringStart);
+                    cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringStart);
                     if (identNode.SubstringEnd != null) {
-                        cg.GenerateExpression(SymType.INTEGER, identNode.SubstringEnd);
+                        cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringEnd);
                     } else {
-                        cg.Emitter.LoadInteger(-1);
+                        emitter.LoadInteger(-1);
                     }
-                    cg.LoadAddress(identNode);
+                    cg.LoadAddress(emitter, identNode);
                     readParamTypes.Add(typeof(int));
                     readParamTypes.Add(typeof(int));
                     readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
                 } else {
-                    cg.LoadAddress(identNode);
+                    cg.LoadAddress(emitter, identNode);
                     readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
                 }
 
-                cg.Emitter.Call(cg.GetMethodForType(inputManagerType, "READ", readParamTypes.ToArray()));
+                emitter.Call(cg.GetMethodForType(inputManagerType, "READ", readParamTypes.ToArray()));
             }
         }
     }

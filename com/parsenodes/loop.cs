@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Loops parse node
 //
 // Authors:
@@ -152,57 +152,60 @@ namespace CCompiler {
         /// If there is no end expression, we generate a WHILE loop.
         /// Otherwise we generate a REPEAT loop.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (LoopVariable != null) {
-                GenerateForNextLoop(cg);
+                GenerateForNextLoop(emitter, cg);
             } else if (EndExpression == null) {
-                GenerateWhileLoop(cg);
+                GenerateWhileLoop(emitter, cg);
             } else {
-                GenerateRepeatLoop(cg);
+                GenerateRepeatLoop(emitter, cg);
             }
         }
 
         /// <summary>
         /// Emit the code to generate a while loop.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        private void GenerateWhileLoop(ProgramParseNode cg) {
-            Label loopStart = cg.Emitter.CreateLabel();
-            ExitLabel = cg.Emitter.CreateLabel();
+        private void GenerateWhileLoop(Emitter emitter, ProgramParseNode cg) {
+            Label loopStart = emitter.CreateLabel();
+            ExitLabel = emitter.CreateLabel();
 
             // Skip the loop if the expression is a constant false
             if (StartExpression.IsConstant && !StartExpression.Value.BoolValue) {
                 return;
             }
 
-            cg.Emitter.MarkLabel(loopStart);
+            emitter.MarkLabel(loopStart);
 
             // If this is a WHILE(true) loop, skip the initial test. 
             if (!(StartExpression.IsConstant && StartExpression.Value.BoolValue)) {
-                cg.GenerateExpression(SymType.BOOLEAN, StartExpression);
-                cg.Emitter.BranchIfFalse(ExitLabel);
+                cg.GenerateExpression(emitter, SymType.BOOLEAN, StartExpression);
+                emitter.BranchIfFalse(ExitLabel);
             }
 
-            LoopBody.Generate(cg);
+            LoopBody.Generate(emitter, cg);
 
-            cg.Emitter.Branch(loopStart);
-            cg.Emitter.MarkLabel(ExitLabel);
+            emitter.Branch(loopStart);
+            emitter.MarkLabel(ExitLabel);
         }
 
         /// <summary>
         /// Emit the code to generate a repeat loop.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        private void GenerateRepeatLoop(ProgramParseNode cg) {
-            Label loopStart = cg.Emitter.CreateLabel();
+        private void GenerateRepeatLoop(Emitter emitter, ProgramParseNode cg) {
+            Label loopStart = emitter.CreateLabel();
 
-            cg.Emitter.MarkLabel(loopStart);
+            emitter.MarkLabel(loopStart);
 
-            LoopBody.Generate(cg);
+            LoopBody.Generate(emitter, cg);
 
-            cg.GenerateExpression(SymType.BOOLEAN, EndExpression);
-            cg.Emitter.BranchIfFalse(loopStart);
+            cg.GenerateExpression(emitter, SymType.BOOLEAN, EndExpression);
+            emitter.BranchIfFalse(loopStart);
         }
 
         /// <summary>
@@ -215,15 +218,16 @@ namespace CCompiler {
         /// Thus we compute final-value, initial-value and step-size up-front so that if they
         /// reference a variable that changes within the loop body, we ignore those changes.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        private void GenerateForNextLoop(ProgramParseNode cg) {
+        private void GenerateForNextLoop(Emitter emitter, ProgramParseNode cg) {
             Symbol sym = LoopVariable.Symbol;
-            Label maxBranch = cg.Emitter.CreateLabel();
-            Label loopStart = cg.Emitter.CreateLabel();
-            Label loopEnd = cg.Emitter.CreateLabel();
+            Label maxBranch = emitter.CreateLabel();
+            Label loopStart = emitter.CreateLabel();
+            Label loopEnd = emitter.CreateLabel();
 
-            LocalDescriptor iterCount = cg.Emitter.GetTemporary(typeof(int));
-            LocalDescriptor stepVar = cg.Emitter.GetTemporary(sym.SystemType);
+            LocalDescriptor iterCount = emitter.GetTemporary(typeof(int));
+            LocalDescriptor stepVar = emitter.GetTemporary(sym.SystemType);
 
             // Check for constant start, end and step expressions and simplify
             // the loop if so. If the loop iterations evaluate to zero then we skip
@@ -232,95 +236,95 @@ namespace CCompiler {
             int iterValue = IterationCount();
             if (iterValue >= 0) {
                 if (sym.Type == SymType.INTEGER) {
-                    cg.Emitter.LoadInteger(StartExpression.Value.IntValue);
-                    cg.Emitter.StoreLocal(sym);
+                    emitter.LoadInteger(StartExpression.Value.IntValue);
+                    emitter.StoreLocal(sym);
                 }
                 if (sym.Type == SymType.FLOAT) {
-                    cg.Emitter.LoadFloat(StartExpression.Value.RealValue);
-                    cg.Emitter.StoreLocal(sym);
+                    emitter.LoadFloat(StartExpression.Value.RealValue);
+                    emitter.StoreLocal(sym);
                 }
                 if (iterValue == 0) {
                     return;
                 }
-                cg.Emitter.LoadInteger(iterValue);
+                emitter.LoadInteger(iterValue);
             } else {
-                GenerateLoopCount(cg, sym, stepVar);
-                cg.Emitter.Dup();
-                cg.Emitter.LoadInteger(0);
-                cg.Emitter.BranchGreater(maxBranch);
-                cg.Emitter.Pop();
-                cg.Emitter.Branch(loopEnd);
-                cg.Emitter.MarkLabel(maxBranch);
+                GenerateLoopCount(emitter, cg, sym, stepVar);
+                emitter.Dup();
+                emitter.LoadInteger(0);
+                emitter.BranchGreater(maxBranch);
+                emitter.Pop();
+                emitter.Branch(loopEnd);
+                emitter.MarkLabel(maxBranch);
             }
-            cg.Emitter.MarkLabel(loopStart);
-            cg.Emitter.StoreLocal(iterCount);
+            emitter.MarkLabel(loopStart);
+            emitter.StoreLocal(iterCount);
 
             // The loop value is generally used as part of an implied
             // DO loop where the expression uses the loop variable as one
             // of its factors.
             if (LoopValue != null) {
-                Callback.Generate(cg, LoopValue);
+                Callback.Generate(emitter, cg, LoopValue);
             }
 
             if (LoopBody != null) {
-                LoopBody.Generate(cg);
+                LoopBody.Generate(emitter, cg);
             }
 
-            cg.Emitter.LoadSymbol(sym);
+            emitter.LoadSymbol(sym);
             if (StepExpression.IsConstant) {
                 if (sym.Type == SymType.INTEGER) {
-                    cg.Emitter.LoadInteger(StepExpression.Value.IntValue);
+                    emitter.LoadInteger(StepExpression.Value.IntValue);
                 }
                 if (sym.Type == SymType.FLOAT) {
-                    cg.Emitter.LoadFloat(StepExpression.Value.RealValue);
+                    emitter.LoadFloat(StepExpression.Value.RealValue);
                 }
             } else {
-                cg.Emitter.LoadLocal(stepVar);
+                emitter.LoadLocal(stepVar);
             }
-            cg.Emitter.Add(sym.Type);
-            cg.Emitter.StoreLocal(sym);
-            cg.Emitter.LoadLocal(iterCount);
-            cg.Emitter.LoadInteger(1);
-            cg.Emitter.Sub(sym.Type);
-            cg.Emitter.Dup();
-            cg.Emitter.BranchIfTrue(loopStart);
-            cg.Emitter.Pop();
-            cg.Emitter.MarkLabel(loopEnd);
+            emitter.Add(sym.Type);
+            emitter.StoreLocal(sym);
+            emitter.LoadLocal(iterCount);
+            emitter.LoadInteger(1);
+            emitter.Sub(sym.Type);
+            emitter.Dup();
+            emitter.BranchIfTrue(loopStart);
+            emitter.Pop();
+            emitter.MarkLabel(loopEnd);
             Emitter.ReleaseTemporary(iterCount);
             Emitter.ReleaseTemporary(stepVar);
         }
 
         // Emit the code that computes the number of iterations that the
         // loop requires.
-        private void GenerateLoopCount(ProgramParseNode cg, Symbol sym, LocalDescriptor stepVar) {
-            cg.GenerateExpression(sym.Type, EndExpression);
+        private void GenerateLoopCount(Emitter emitter, ProgramParseNode cg, Symbol sym, LocalDescriptor stepVar) {
+            cg.GenerateExpression(emitter, sym.Type, EndExpression);
             if (StartExpression.IsConstant && StartExpression.Value.IntValue == 0) {
                 // Start index is zero so no initial subtraction required.
-                cg.GenerateExpression(sym.Type, StartExpression);
-                cg.Emitter.StoreLocal(sym);
+                cg.GenerateExpression(emitter, sym.Type, StartExpression);
+                emitter.StoreLocal(sym);
             } else {
-                cg.GenerateExpression(sym.Type, StartExpression);
-                cg.Emitter.Dup();
-                cg.Emitter.StoreLocal(sym);
-                cg.Emitter.Sub(sym.Type);
+                cg.GenerateExpression(emitter, sym.Type, StartExpression);
+                emitter.Dup();
+                emitter.StoreLocal(sym);
+                emitter.Sub(sym.Type);
             }
             if (StepExpression.IsConstant) {
                 int stepValue = StepExpression.Value.IntValue;
-                cg.Emitter.LoadValue(sym.Type, new Variant(stepValue));
-                cg.Emitter.Add(sym.Type);
+                emitter.LoadValue(sym.Type, new Variant(stepValue));
+                emitter.Add(sym.Type);
                 if (stepValue != 1) {
-                    cg.Emitter.LoadInteger(stepValue);
-                    cg.Emitter.Div(sym.Type);
+                    emitter.LoadInteger(stepValue);
+                    emitter.Div(sym.Type);
                 }
             } else {
-                cg.GenerateExpression(sym.Type, StepExpression);
-                cg.Emitter.Dup();
-                cg.Emitter.StoreLocal(stepVar);
-                cg.Emitter.Add(sym.Type);
-                cg.Emitter.LoadLocal(stepVar);
-                cg.Emitter.Div(sym.Type);
+                cg.GenerateExpression(emitter, sym.Type, StepExpression);
+                emitter.Dup();
+                emitter.StoreLocal(stepVar);
+                emitter.Add(sym.Type);
+                emitter.LoadLocal(stepVar);
+                emitter.Div(sym.Type);
             }
-            cg.Emitter.ConvertType(sym.Type, SymType.INTEGER);
+            emitter.ConvertType(sym.Type, SymType.INTEGER);
         }
     }
 }

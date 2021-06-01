@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Top-level program builder
 //
 // Authors:
@@ -75,12 +75,6 @@ namespace CCompiler {
         public void Error(string errorString) {
             throw new CodeGeneratorException(_lineno, _filename, errorString);
         }
-
-        /// <summary>
-        /// Return the current emitter.
-        /// </summary>
-        /// <value>The emitter.</value>
-        public Emitter Emitter { get; set; }
 
         /// <summary>
         /// Return the assembly's module builder.
@@ -217,7 +211,7 @@ namespace CCompiler {
                 }
                 CurrentType = new JType(Builder, className, typeAttributes);
 
-                Globals.GenerateSymbols(this);
+                Globals.GenerateSymbols(CurrentType.DefaultConstructor.Emitter, this);
                 foreach (ParseNode node in Root.Nodes) {
                     node.Generate(this);
                 }
@@ -379,11 +373,11 @@ namespace CCompiler {
         /// Sets the number of the line in the file being compiled.
         /// </summary>
         /// <param name="line">Line number to emit to the output</param>
-        public void MarkLine(int line) {
-            if (GenerateDebug && Emitter != null) {
+        public void MarkLine(Emitter emitter, int line) {
+            if (GenerateDebug && emitter != null) {
                 ISymbolDocumentWriter currentDoc = GetCurrentDocument();
                 if (currentDoc != null) {
-                    Emitter.MarkLinenumber(currentDoc, line);
+                    emitter.MarkLinenumber(currentDoc, line);
                 }
             }
             _lineno = line;
@@ -393,27 +387,29 @@ namespace CCompiler {
         /// Emit the load of an address of full symbol. This may either be
         /// the address of a local object or the address of an array element.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="identNode">An IdentifierParseNode representing the variable
         /// or array element whose address should be emitted.</param>
-        public void LoadAddress(IdentifierParseNode identNode) {
+        public void LoadAddress(Emitter emitter, IdentifierParseNode identNode) {
             if (identNode == null) {
                 throw new ArgumentNullException(nameof(identNode));
             }
             Symbol sym = identNode.Symbol;
             if (sym.IsArray) {
-                GenerateLoadFromArray(identNode, true);
+                GenerateLoadFromArray(emitter, identNode, true);
             } else {
-                Emitter.GenerateLoadAddress(sym);
+                emitter.GenerateLoadAddress(sym);
             }
         }
 
         /// <summary>
         /// Emit code that loads a value from an array. There are some special cases here.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="identNode">Ident parse node</param>
         /// <param name="useRef">If set to <c>true</c> load the element address</param>
         /// <returns>The symbol type of the array element</returns>
-        public SymType GenerateLoadFromArray(IdentifierParseNode identNode, bool useRef) {
+        public SymType GenerateLoadFromArray(Emitter emitter, IdentifierParseNode identNode, bool useRef) {
             if (identNode == null) {
                 throw new ArgumentNullException(nameof(identNode));
             }
@@ -422,15 +418,15 @@ namespace CCompiler {
             // Handle loading the base array as opposed to an element
             Debug.Assert(sym.IsArray);
             if (identNode.IsArrayBase) {
-                return Emitter.GenerateLoadArray(identNode, useRef);
+                return emitter.GenerateLoadArray(identNode, useRef);
             }
 
             // OK, we're loading an array element.
-            GenerateLoadArrayAddress(identNode);
+            GenerateLoadArrayAddress(emitter, identNode);
             if (useRef) {
-                Emitter.LoadArrayElementReference(sym);
+                emitter.LoadArrayElementReference(sym);
             } else {
-                Emitter.LoadArrayElement(sym);
+                emitter.LoadArrayElement(sym);
             }
             return sym.Type;
         }
@@ -439,61 +435,62 @@ namespace CCompiler {
         /// Emit the code that loads the base array and the offset of the
         /// indexed element to the top of the stack.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="identNode">Parse node for array identifier</param>
-        public void GenerateLoadArrayAddress(IdentifierParseNode identNode) {
+        public void GenerateLoadArrayAddress(Emitter emitter, IdentifierParseNode identNode) {
             if (identNode == null) {
                 throw new ArgumentNullException(nameof(identNode));
             }
 
             Symbol sym = identNode.Symbol;
             if (sym.IsLocal) {
-                Emitter.LoadSymbol(sym);
+                emitter.LoadSymbol(sym);
             } else {
-                Emitter.GenerateLoadArgument(sym);
+                emitter.GenerateLoadArgument(sym);
             }
             for (int c = 0; c < identNode.Indexes.Count; ++c) {
                 ParseNode indexNode = identNode.Indexes[c];
                 if (indexNode.IsConstant) {
                     NumberParseNode intNode = (NumberParseNode)indexNode;
                     if (sym.Dimensions[c].LowerBound.IsConstant) {
-                        Emitter.LoadInteger(0 - sym.Dimensions[c].LowerBound.Value.IntValue + intNode.Value.IntValue);
+                        emitter.LoadInteger(0 - sym.Dimensions[c].LowerBound.Value.IntValue + intNode.Value.IntValue);
                     } else {
-                        Emitter.LoadInteger(0);
-                        GenerateExpression(SymType.INTEGER, sym.Dimensions[c].LowerBound);
-                        Emitter.Sub(SymType.INTEGER);
-                        Emitter.LoadInteger(intNode.Value.IntValue);
-                        Emitter.Add(SymType.INTEGER);
+                        emitter.LoadInteger(0);
+                        GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[c].LowerBound);
+                        emitter.Sub(SymType.INTEGER);
+                        emitter.LoadInteger(intNode.Value.IntValue);
+                        emitter.Add(SymType.INTEGER);
                     }
                 } else {
-                    GenerateExpression(SymType.INTEGER, indexNode);
+                    GenerateExpression(emitter, SymType.INTEGER, indexNode);
                     if (sym.Dimensions[c].LowerBound.IsConstant) {
                         int lowBound = sym.Dimensions [c].LowerBound.Value.IntValue;
                         if (lowBound != 0) {
-                            Emitter.LoadInteger(0 - lowBound);
-                            Emitter.Add(SymType.INTEGER);
+                            emitter.LoadInteger(0 - lowBound);
+                            emitter.Add(SymType.INTEGER);
                         }
                     } else {
-                        Emitter.LoadInteger(0);
-                        GenerateExpression(SymType.INTEGER, sym.Dimensions[c].LowerBound);
-                        Emitter.Sub(SymType.INTEGER);
-                        Emitter.Add(SymType.INTEGER);
+                        emitter.LoadInteger(0);
+                        GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[c].LowerBound);
+                        emitter.Sub(SymType.INTEGER);
+                        emitter.Add(SymType.INTEGER);
                     }
                 }
                 if (sym.IsFlatArray && c > 0) {
                     for (int m = c - 1; m >= 0; --m) {
                         int arraySize = sym.Dimensions[m].Size;
                         if (arraySize >= 0) {
-                            Emitter.LoadInteger(arraySize);
+                            emitter.LoadInteger(arraySize);
                         } else {
-                            GenerateExpression(SymType.INTEGER, sym.Dimensions[m].UpperBound);
-                            GenerateExpression(SymType.INTEGER, sym.Dimensions[m].LowerBound);
-                            Emitter.Sub(SymType.INTEGER);
-                            Emitter.LoadInteger(1);
-                            Emitter.Add(SymType.INTEGER);
+                            GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[m].UpperBound);
+                            GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[m].LowerBound);
+                            emitter.Sub(SymType.INTEGER);
+                            emitter.LoadInteger(1);
+                            emitter.Add(SymType.INTEGER);
                         }
-                        Emitter.Mul(SymType.INTEGER);
+                        emitter.Mul(SymType.INTEGER);
                     }
-                    Emitter.Add(SymType.INTEGER);
+                    emitter.Add(SymType.INTEGER);
                 }
             }
         }
@@ -501,16 +498,17 @@ namespace CCompiler {
         /// <summary>
         /// Generate code for an expression tree.
         /// </summary>
+        /// <param name="emitter">Emitter to use</param>
         /// <param name="typeNeeded">The type to which the expression should be converted if it
         /// does not evaluate to that type natively.</param>
         /// <param name="rootNode">The ParseNode of the root of the expression tree.</param>
         /// <returns>The type of the generated expression</returns>
-        public SymType GenerateExpression(SymType typeNeeded, ParseNode rootNode) {
+        public SymType GenerateExpression(Emitter emitter, SymType typeNeeded, ParseNode rootNode) {
             if (rootNode == null) {
                 throw new ArgumentNullException(nameof(rootNode));
             }
-            SymType thisType = rootNode.Generate(this, typeNeeded);
-            return Emitter.ConvertType(thisType, typeNeeded);
+            SymType thisType = rootNode.Generate(emitter, this, typeNeeded);
+            return emitter.ConvertType(thisType, typeNeeded);
         }
 
         /// <summary>

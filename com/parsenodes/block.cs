@@ -74,10 +74,10 @@ namespace CCompiler {
         /// <summary>
         /// Emit the code to generate a block.
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter em, ProgramParseNode cg) {
 
             foreach (ParseNode t in Nodes) {
-                t.Generate(cg);
+                t.Generate(em, cg);
             }
         }
     }

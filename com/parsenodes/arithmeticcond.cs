@@ -45,24 +45,25 @@ namespace CCompiler {
         /// <summary>
         /// Emit the code to generate an arithmetic conditional block.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
-            SymType exprType = cg.GenerateExpression(SymType.NONE, ValueExpression);
+            SymType exprType = cg.GenerateExpression(emitter, SymType.NONE, ValueExpression);
             Symbol label1 = ProgramParseNode.GetLabel(Nodes[0]);
             Symbol label2 = ProgramParseNode.GetLabel(Nodes[1]);
             Symbol label3 = ProgramParseNode.GetLabel(Nodes[2]);
-            LocalDescriptor tempIndex = cg.Emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
-            cg.Emitter.StoreLocal(tempIndex);
-            cg.Emitter.LoadLocal(tempIndex);
-            cg.Emitter.LoadValue(exprType, new Variant(0));
-            cg.Emitter.BranchLess((Label)label1.Info);
-            cg.Emitter.LoadLocal(tempIndex);
-            cg.Emitter.LoadValue(exprType, new Variant(0));
-            cg.Emitter.BranchEqual((Label)label2.Info);
-            cg.Emitter.Branch((Label)label3.Info);
+            LocalDescriptor tempIndex = emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
+            emitter.StoreLocal(tempIndex);
+            emitter.LoadLocal(tempIndex);
+            emitter.LoadValue(exprType, new Variant(0));
+            emitter.BranchLess((Label)label1.Info);
+            emitter.LoadLocal(tempIndex);
+            emitter.LoadValue(exprType, new Variant(0));
+            emitter.BranchEqual((Label)label2.Info);
+            emitter.Branch((Label)label3.Info);
             Emitter.ReleaseTemporary(tempIndex);
         }
     }

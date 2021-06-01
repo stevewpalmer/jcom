@@ -1,0 +1,9 @@
+   10 count := 10
+   20 DIM a(count),b$(count) OF 20
+   30 FOR x:=1 TO count DO
+   40   a(x) := x
+   50   b$(x) := STR$(x)
+   60 ENDFOR x
+   70 FOR x:=1 TO count DO
+   80   PRINT a(x);"=";b$(x)
+   90 ENDFOR x

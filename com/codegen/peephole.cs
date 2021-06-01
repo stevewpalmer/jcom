@@ -71,6 +71,7 @@ namespace CCompiler {
             OptimiseBranch(code);
             OptimiseNotBranch(code);
             OptimiseReturn(code);
+            OptimiseLoadStore(code);
         }
 
         // Optimise a BRANCH to a label that is immediately following by removing
@@ -187,6 +188,39 @@ namespace CCompiler {
                         }
                     }
                     lifetimeSet = new Dictionary<int, Lifetime>();
+                }
+            }
+        }
+
+        // Look for a store and load and use a dup to avoid the second load.
+        //
+        //     Store to local X
+        //     Load from local X
+        //
+        // to:
+        //
+        //     Dup
+        //     Store to local X
+        //
+        //
+        private static void OptimiseLoadStore(Collection<Instruction> code) {
+            for (int c = 0; c < code.Count - 2; ++c) {
+                if (code[c].Code == OpCodes.Stloc && code[c + 1].Code == OpCodes.Ldloc) {
+                    InstructionLocal storeInt = (InstructionLocal)code[c];
+                    InstructionLocal loadInt = (InstructionLocal)code[c + 1];
+                    if (loadInt.Value.Index == storeInt.Value.Index) {
+                        code[c + 1] = code[c];
+                        code[c] = new Instruction(OpCodes.Dup);
+                    }
+                    return;
+                }
+                if (code[c].Code == OpCodes.Stsfld && code[c + 1].Code == OpCodes.Ldsfld) {
+                    InstructionField storeInt = (InstructionField)code[c];
+                    InstructionField loadInt = (InstructionField)code[c + 1];
+                    if (loadInt.Field == storeInt.Field) {
+                        code[c + 1] = code[c];
+                        code[c] = new Instruction(OpCodes.Dup);
+                    }
                 }
             }
         }

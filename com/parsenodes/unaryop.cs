@@ -67,41 +67,42 @@ namespace CCompiler {
         /// <summary>
         /// Emit this code to load the value to the stack.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             switch (ID) {
-                case ParseID.MINUS:     return GenerateMinus(cg);
-                case ParseID.NOT:       return GenerateNot(cg);
+                case ParseID.MINUS:     return GenerateMinus(emitter, cg);
+                case ParseID.NOT:       return GenerateNot(emitter, cg);
             }
             Debug.Assert(false, "Unsupported parse ID for UnaryOpParseNode");
             return Symbol.VariantTypeToSymbolType(Value.Type);
         }
 
         // Generate the code for a unary NOT logical operator
-        private SymType GenerateNot(ProgramParseNode cg) {
+        private SymType GenerateNot(Emitter emitter, ProgramParseNode cg) {
 
             // HANDLE a NOT on a fixed char by representing it as a call to the IsEmpty
             // property.
             if (Operand.Type == SymType.FIXEDCHAR) {
-                cg.GenerateExpression(SymType.FIXEDCHAR, Operand);
-                cg.Emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", new Type[] { }));
+                cg.GenerateExpression(emitter, SymType.FIXEDCHAR, Operand);
+                emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", new Type[] { }));
                 return SymType.BOOLEAN;
             }
-            cg.GenerateExpression(Type, Operand);
-            cg.Emitter.LoadInteger(0);
-            cg.Emitter.CompareEquals();
+            cg.GenerateExpression(emitter, Type, Operand);
+            emitter.LoadInteger(0);
+            emitter.CompareEquals();
             return Type;
         }
 
         // Generate the code for a unary minus operator
-        private SymType GenerateMinus(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Operand);
-            cg.Emitter.Neg(Type);
+        private SymType GenerateMinus(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Operand);
+            emitter.Neg(Type);
             return Type;
         }
     }

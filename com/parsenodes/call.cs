@@ -79,24 +79,26 @@ namespace CCompiler {
         /// Emit the code to call an internal function complete with
         /// parameters.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            InternalGenerate(cg, SymClass.SUBROUTINE, "subroutine");
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+            InternalGenerate(emitter, cg, SymClass.SUBROUTINE, "subroutine");
         }
 
         /// <summary>
         /// Emit the code to call an internal function complete with
         /// parameters.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
         /// <param name="returnType">The expected return type</param>
         /// <returns>The actual return type from the function</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
-            return InternalGenerate(cg, SymClass.FUNCTION, "function");
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+            return InternalGenerate(emitter, cg, SymClass.FUNCTION, "function");
         }
 
         // Internal generation logic for a subroutine or function call.
-        private SymType InternalGenerate(ProgramParseNode cg, SymClass callType, string callName) {
+        private SymType InternalGenerate(Emitter emitter, ProgramParseNode cg, SymClass callType, string callName) {
             Symbol sym = ProcName.Symbol;
             SymType thisType = SymType.NONE;
             
@@ -107,15 +109,15 @@ namespace CCompiler {
                 cg.Error(sym.RefLine, $"{sym.Name} is not a {callName}");
             }
             
-            Type[] paramTypes = Parameters.Generate(cg, sym);
+            Type[] paramTypes = Parameters.Generate(emitter, cg, sym);
             
             if (sym.IsParameter) {
-                ProcName.Generate(cg);
-                cg.Emitter.CallIndirect(sym.Type, paramTypes);
+                ProcName.Generate(emitter, cg);
+                emitter.CallIndirect(sym.Type, paramTypes);
                 thisType = sym.Type;
             } else {
                 if (sym.Info is JMethod method) {
-                    cg.Emitter.Call(method.Builder);
+                    emitter.Call(method.Builder);
                     thisType = sym.Type;
                 }
             }
@@ -133,9 +135,9 @@ namespace CCompiler {
                     Symbol symLabel = AlternateReturnLabels[c];
                     jumpTable[c] = (Label)symLabel.Info;
                 }
-                cg.Emitter.LoadInteger(1);
-                cg.Emitter.Sub(SymType.INTEGER);
-                cg.Emitter.Switch(jumpTable);
+                emitter.LoadInteger(1);
+                emitter.Sub(SymType.INTEGER);
+                emitter.Switch(jumpTable);
             }
 
             Parameters.FreeLocalDescriptors();

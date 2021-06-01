@@ -105,19 +105,21 @@ namespace CCompiler {
         /// Emit the code to call an external function complete with
         /// parameters that has no return value.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            Generate(cg, SymType.NONE);
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+            Generate(emitter, cg, SymType.NONE);
         }
 
         /// <summary>
         /// Emit the code to call an external function complete with
         /// parameters that returns the specified type.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A code generator object</param>
         /// <param name="returnType">The expected return type</param>
         /// <returns>The actual return type from the function</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
 
             Type argType = typeof(void);
             Type [] paramTypes;
@@ -125,7 +127,7 @@ namespace CCompiler {
             // It is the caller responsibility to set the parameter
             // node types to match the external function types.
             if (Parameters != null) {
-                paramTypes = Parameters.Generate(cg);
+                paramTypes = Parameters.Generate(emitter, cg);
                 if (paramTypes.Length > 0) {
                     argType = paramTypes[0];
                 }
@@ -143,7 +145,7 @@ namespace CCompiler {
                 // provided depending on the type.
                 meth = typeof(Inlined).GetMethod(Name, new [] { typeof(Emitter), typeof(Type) });
                 if (meth != null) {
-                    object [] ilParams = { cg.Emitter, argType };
+                    object [] ilParams = { emitter, argType };
                     meth.Invoke(null, ilParams);
                     return Type;
                 }
@@ -151,19 +153,19 @@ namespace CCompiler {
                 // Otherwise try the type-less variant.
                 meth = typeof(Inlined).GetMethod(Name, new [] { typeof(Emitter) });
                 if (meth != null) {
-                    object [] ilParams = { cg.Emitter };
+                    object [] ilParams = { emitter };
                     meth.Invoke(null, ilParams);
                     return Type;
                 }
             }
             
             meth = cg.GetMethodForType(LibraryName, Name, paramTypes);
-            cg.Emitter.Call(meth);
+            emitter.Call(meth);
             
             // If this method returns a value but we're invoking it as a
             // subroutine, discard the return value from the stack
             if (returnType == SymType.NONE && meth.ReturnType != typeof(void)) {
-                cg.Emitter.Pop();
+                emitter.Pop();
             }
             returnType = Symbol.SystemTypeToSymbolType(meth.ReturnType);
             if (Parameters != null) {

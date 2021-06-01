@@ -82,31 +82,32 @@ namespace CCompiler {
         /// <summary>
         /// Emit the code to read the next DATA item.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="node">A parse node for the READ identifier</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
 
-            Label endRead = cg.Emitter.CreateLabel();
+            Label endRead = emitter.CreateLabel();
 
             foreach (IdentifierParseNode identifier in Identifiers) {
 
                 // Check for READ past the end of DATA. (This should really
                 // result in an exception being thrown.)
-                cg.Emitter.LoadStatic((FieldInfo)DataIndex.Info);
-                cg.Emitter.LoadInteger(DataArray.ArraySize);
-                cg.Emitter.BranchEqual(endRead);
+                emitter.LoadStatic((FieldInfo)DataIndex.Info);
+                emitter.LoadInteger(DataArray.ArraySize);
+                emitter.BranchEqual(endRead);
 
                 // Store the data in the identifier
                 Symbol sym = identifier.Symbol;
 
                 if (sym.IsArray) {
-                    cg.GenerateLoadArrayAddress(identifier);
+                    cg.GenerateLoadArrayAddress(emitter, identifier);
                 }
-                cg.Emitter.LoadStatic((FieldInfo)DataArray.Info);
-                cg.Emitter.LoadStatic((FieldInfo)DataIndex.Info);
+                emitter.LoadStatic((FieldInfo)DataArray.Info);
+                emitter.LoadStatic((FieldInfo)DataIndex.Info);
 
                 // Numbers in DATA are always floats
                 SymType identifierType = identifier.Type;
@@ -116,33 +117,33 @@ namespace CCompiler {
                 if (identifierType == SymType.FIXEDCHAR) {
                     identifierType = SymType.CHAR;
                 }
-                cg.Emitter.LoadElementReference(identifierType);
-                cg.Emitter.ConvertType(identifierType, identifier.Type);
+                emitter.LoadElementReference(identifierType);
+                emitter.ConvertType(identifierType, identifier.Type);
                 if (sym.IsArray) {
-                    cg.Emitter.StoreArrayElement(sym);
+                    emitter.StoreArrayElement(sym);
                 }
                 else if (sym.IsLocal) {
-                    cg.Emitter.StoreSymbol(sym);
+                    emitter.StoreSymbol(sym);
                 }
 
                 // Advance the data index. If EndOfData is referenced then set
                 // that to 1 if the data index is equal to the array size, 0
                 // otherwise.
-                cg.Emitter.LoadStatic((FieldInfo)DataIndex.Info);
-                cg.Emitter.LoadInteger(1);
-                cg.Emitter.Add(DataIndex.Type);
+                emitter.LoadStatic((FieldInfo)DataIndex.Info);
+                emitter.LoadInteger(1);
+                emitter.Add(DataIndex.Type);
                 if (EndOfData.Info != null) {
-                    cg.Emitter.Dup();
-                    cg.Emitter.StoreStatic((FieldInfo)DataIndex.Info);
-                    cg.Emitter.LoadInteger(DataArray.ArraySize);
-                    cg.Emitter.Emit0(OpCodes.Ceq);
-                    cg.Emitter.StoreStatic((FieldInfo)EndOfData.Info);
+                    emitter.Dup();
+                    emitter.StoreStatic((FieldInfo)DataIndex.Info);
+                    emitter.LoadInteger(DataArray.ArraySize);
+                    emitter.Emit0(OpCodes.Ceq);
+                    emitter.StoreStatic((FieldInfo)EndOfData.Info);
                 } else {
-                    cg.Emitter.StoreStatic((FieldInfo)DataIndex.Info);
+                    emitter.StoreStatic((FieldInfo)DataIndex.Info);
                 }
             }
 
-            cg.Emitter.MarkLabel(endRead);
+            emitter.MarkLabel(endRead);
         }
     }
 }

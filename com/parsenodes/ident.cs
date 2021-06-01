@@ -111,47 +111,52 @@ namespace CCompiler {
         /// Implements the base code generator for the node to invoke a
         /// statement implementation.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">The code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            Generate(cg, Type);
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+            Generate(emitter, cg, Type);
         }
 
         /// <summary>
         /// Emit this code to load the identifier to the stack.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
+            }
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
             }
             Symbol sym = Symbol;
             SymType thisType;
             
             if (sym.Class == SymClass.INLINE) {
-                GenerateInline(cg);
+                GenerateInline(emitter, cg);
                 thisType = sym.Type;
             } else if (sym.IsArray) {
-                thisType = cg.GenerateLoadFromArray(this, false);
+                thisType = cg.GenerateLoadFromArray(emitter, this, false);
             } else if (sym.IsIntrinsic || sym.IsExternal) {
-                cg.Emitter.LoadFunction(sym);
+                emitter.LoadFunction(sym);
                 thisType = SymType.INTEGER;
             } else if (sym.IsParameter) {
-                cg.Emitter.GenerateLoadArgument(sym);
+                emitter.GenerateLoadArgument(sym);
                 thisType = sym.Type;
             } else if (sym.Class == SymClass.FUNCTION) {
-                cg.Emitter.LoadFunction(sym);
+                emitter.LoadFunction(sym);
                 thisType = SymType.INTEGER;
             } else if (sym.IsLocal) {
-                cg.Emitter.LoadSymbol(sym);
+                emitter.LoadSymbol(sym);
                 thisType = sym.Type;
             } else {
                 Debug.Assert(false, "Unknown identifier type (not local OR parameter)");
                 thisType = SymType.NONE;
             }
             if (HasSubstring) {
-                thisType = GenerateLoadSubstring(cg);
+                thisType = GenerateLoadSubstring(emitter, cg);
             }
             return thisType;
         }
@@ -181,23 +186,23 @@ namespace CCompiler {
 
         // Generate the code to extract a substring from the character string
         // at the top of the stack.
-        private SymType GenerateLoadSubstring(ProgramParseNode cg) {
+        private SymType GenerateLoadSubstring(Emitter emitter, ProgramParseNode cg) {
             Type charType = Symbol.SymTypeToSystemType(Type);
 
             if (SubstringStart.IsConstant) {
-                cg.Emitter.LoadInteger(SubstringStart.Value.IntValue);
+                emitter.LoadInteger(SubstringStart.Value.IntValue);
             } else {
-                cg.GenerateExpression(SymType.INTEGER, SubstringStart);
+                cg.GenerateExpression(emitter, SymType.INTEGER, SubstringStart);
             }
             if (SubstringEnd == null) {
-                cg.Emitter.Call(cg.GetMethodForType(charType, "Substring", new [] { typeof(int) }));
+                emitter.Call(cg.GetMethodForType(charType, "Substring", new [] { typeof(int) }));
             } else {
                 if (SubstringEnd.IsConstant) {
-                    cg.Emitter.LoadInteger(SubstringEnd.Value.IntValue);
+                    emitter.LoadInteger(SubstringEnd.Value.IntValue);
                 } else {
-                    cg.GenerateExpression(SymType.INTEGER, SubstringEnd);
+                    cg.GenerateExpression(emitter, SymType.INTEGER, SubstringEnd);
                 }
-                cg.Emitter.Call(cg.GetMethodForType(charType, "Substring", new [] { typeof(int), typeof(int) }));
+                emitter.Call(cg.GetMethodForType(charType, "Substring", new [] { typeof(int), typeof(int) }));
             }
             return Type;
         }
@@ -205,7 +210,7 @@ namespace CCompiler {
         // Emit the code to insert inline code from a symbol. If the identifier
         // represents an inline function then the parse tree for each argument is
         // assigned to its parameters.
-        private void GenerateInline(ProgramParseNode cg) {
+        private void GenerateInline(Emitter emitter, ProgramParseNode cg) {
             Symbol sym = Symbol;
             
             if (Indexes != null) {
@@ -225,7 +230,7 @@ namespace CCompiler {
             // on the assigned values, we now need to rescan the tree and
             // equalise and fix the types on the nodes.
             AdjustNodeType(sym.InlineValue);
-            cg.GenerateExpression(sym.Type, sym.InlineValue);
+            cg.GenerateExpression(emitter, sym.Type, sym.InlineValue);
         }
 
         // Scan the expression tree and adjust the node type to the type

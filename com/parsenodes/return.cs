@@ -53,8 +53,9 @@ namespace CCompiler {
         /// <summary>
         /// Generate the code to return from a procedure or GOSUB.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
@@ -65,13 +66,13 @@ namespace CCompiler {
                 Symbol retVal = cg.CurrentProcedure.ProcedureSymbol.RetVal;
                 if (retVal != null) {
                     if (ReturnExpression != null) {
-                        SymType thisType = cg.GenerateExpression(retVal.Type, ReturnExpression);
-                        cg.Emitter.ConvertType(thisType, retVal.Type);
+                        SymType thisType = cg.GenerateExpression(emitter, retVal.Type, ReturnExpression);
+                        emitter.ConvertType(thisType, retVal.Type);
                     } else {
                         if (retVal.Index == null) {
                             cg.Error($"Function {cg.CurrentProcedure.ProcedureSymbol.Name} does not return a value");
                         }
-                        cg.Emitter.LoadLocal(retVal.Index);
+                        emitter.LoadLocal(retVal.Index);
                     }
 
                     // For alternate return, if the method is marked as supporting
@@ -80,20 +81,20 @@ namespace CCompiler {
                     // (i.e. none of the labels specified are picked).
                 } else if (cg.CurrentProcedure.AlternateReturnCount > 0) {
                     if (ReturnExpression != null) {
-                        cg.GenerateExpression(SymType.INTEGER, ReturnExpression);
+                        cg.GenerateExpression(emitter, SymType.INTEGER, ReturnExpression);
                     } else {
-                        cg.Emitter.LoadInteger(0);
+                        emitter.LoadInteger(0);
                     }
                 }
 
                 // Otherwise process a straight RETURN <expression>
                 else if (ReturnExpression != null) {
-                    SymType thisType = cg.GenerateExpression(SymType.NONE, ReturnExpression);
+                    SymType thisType = cg.GenerateExpression(emitter, SymType.NONE, ReturnExpression);
                     retVal = cg.CurrentProcedure.ProcedureSymbol;
-                    cg.Emitter.ConvertType(thisType, retVal.Type);
+                    emitter.ConvertType(thisType, retVal.Type);
                 }
             }
-            cg.Emitter.Branch(cg.CurrentProcedure.ReturnLabel);
+            emitter.Branch(cg.CurrentProcedure.ReturnLabel);
         }
     }
 }

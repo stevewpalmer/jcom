@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Binary operator parse node
 //
 // Authors:
@@ -75,228 +75,229 @@ namespace CCompiler {
         /// <summary>
         /// Emit this code to load the value to the stack.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             switch (ID) {
-                case ParseID.ADD:       return GenerateAdd(cg);
-                case ParseID.EQV:       return GenerateEq(cg);
-                case ParseID.NEQV:      return GenerateNe(cg);
-                case ParseID.XOR:       return GenerateXor(cg);
-                case ParseID.OR:        return GenerateOr(cg);
-                case ParseID.AND:       return GenerateAnd(cg);
-                case ParseID.GT:        return GenerateGt(cg);
-                case ParseID.GE:        return GenerateGe(cg);
-                case ParseID.LE:        return GenerateLe(cg);
-                case ParseID.EQ:        return GenerateEq(cg);
-                case ParseID.NE:        return GenerateNe(cg);   
-                case ParseID.LT:        return GenerateLt(cg);
-                case ParseID.SUB:       return GenerateSub(cg);
-                case ParseID.MULT:      return GenerateMult(cg);
-                case ParseID.DIVIDE:    return GenerateDivide(cg);
-                case ParseID.IDIVIDE:   return GenerateIDivide(cg);
-                case ParseID.MOD:       return GenerateMod(cg);
-                case ParseID.CONCAT:    return GenerateConcat(cg);
-                case ParseID.MERGE:     return GenerateMerge(cg);
-                case ParseID.EXP:       return GenerateExp(cg);
+                case ParseID.ADD:       return GenerateAdd(emitter, cg);
+                case ParseID.EQV:       return GenerateEq(emitter, cg);
+                case ParseID.NEQV:      return GenerateNe(emitter, cg);
+                case ParseID.XOR:       return GenerateXor(emitter, cg);
+                case ParseID.OR:        return GenerateOr(emitter, cg);
+                case ParseID.AND:       return GenerateAnd(emitter, cg);
+                case ParseID.GT:        return GenerateGt(emitter, cg);
+                case ParseID.GE:        return GenerateGe(emitter, cg);
+                case ParseID.LE:        return GenerateLe(emitter, cg);
+                case ParseID.EQ:        return GenerateEq(emitter, cg);
+                case ParseID.NE:        return GenerateNe(emitter, cg);   
+                case ParseID.LT:        return GenerateLt(emitter, cg);
+                case ParseID.SUB:       return GenerateSub(emitter, cg);
+                case ParseID.MULT:      return GenerateMult(emitter, cg);
+                case ParseID.DIVIDE:    return GenerateDivide(emitter, cg);
+                case ParseID.IDIVIDE:   return GenerateIDivide(emitter, cg);
+                case ParseID.MOD:       return GenerateMod(emitter, cg);
+                case ParseID.CONCAT:    return GenerateConcat(emitter, cg);
+                case ParseID.MERGE:     return GenerateMerge(emitter, cg);
+                case ParseID.EXP:       return GenerateExp(emitter, cg);
             }
             Debug.Assert(false, "Unsupported parse ID for BinaryOpParseNode");
             return Symbol.VariantTypeToSymbolType(Value.Type);
         }
 
         // Generate the code for a binary addition operator
-        private SymType GenerateAdd(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.Add(Type);
+        private SymType GenerateAdd(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.Add(Type);
             return Type;
         }
 
         // Generate the code for a binary subtraction operator
-        private SymType GenerateSub(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.Sub(Type);
+        private SymType GenerateSub(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.Sub(Type);
             return Type;
         }
 
         // Generate the code for a binary multiplication operator
-        private SymType GenerateMult(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.Mul(Type);
+        private SymType GenerateMult(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.Mul(Type);
             return Type;
         }
 
         // Generate the code for a binary division operator
-        private SymType GenerateDivide(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.Div(Type);
+        private SymType GenerateDivide(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.Div(Type);
             return Type;
         }
 
         // Generate the code for a binary division operator
-        private SymType GenerateIDivide(ProgramParseNode cg) {
-            cg.GenerateExpression(SymType.INTEGER, Left);
-            cg.GenerateExpression(SymType.INTEGER, Right);
-            cg.Emitter.IDiv(SymType.INTEGER);
+        private SymType GenerateIDivide(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, SymType.INTEGER, Left);
+            cg.GenerateExpression(emitter, SymType.INTEGER, Right);
+            emitter.IDiv(SymType.INTEGER);
             return SymType.INTEGER;
         }
 
         // Generate the code for a binary MOD operator
-        private SymType GenerateMod(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.Mod(Type);
+        private SymType GenerateMod(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.Mod(Type);
             return Type;
         }
 
         // Generate the code for a binary exponentiation operator
-        private SymType GenerateExp(ProgramParseNode cg) {
-            cg.GenerateExpression(SymType.DOUBLE, Left);
-            cg.GenerateExpression(SymType.DOUBLE, Right);
-            cg.Emitter.Call(cg.GetMethodForType(typeof(Math), "Pow", new [] {typeof(double), typeof(double)}));
+        private SymType GenerateExp(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, SymType.DOUBLE, Left);
+            cg.GenerateExpression(emitter, SymType.DOUBLE, Right);
+            emitter.Call(cg.GetMethodForType(typeof(Math), "Pow", new [] {typeof(double), typeof(double)}));
             return SymType.DOUBLE;
         }
 
         // Generate the code for a string merge operator
-        private SymType GenerateMerge(ProgramParseNode cg) {
+        private SymType GenerateMerge(Emitter emitter, ProgramParseNode cg) {
             Type charType = typeof(FixedString);
 
-            cg.GenerateExpression(SymType.FIXEDCHAR, Left);
-            cg.GenerateExpression(SymType.FIXEDCHAR, Right);
+            cg.GenerateExpression(emitter, SymType.FIXEDCHAR, Left);
+            cg.GenerateExpression(emitter, SymType.FIXEDCHAR, Right);
 
-            cg.Emitter.Call(cg.GetMethodForType(charType, "Merge", new[] { charType, charType }));
+            emitter.Call(cg.GetMethodForType(charType, "Merge", new[] { charType, charType }));
             return SymType.FIXEDCHAR;
         }
 
         // Generate the code for a string concatenation operator
-        private SymType GenerateConcat(ProgramParseNode cg) {
+        private SymType GenerateConcat(Emitter emitter, ProgramParseNode cg) {
             Type charType = Symbol.SymTypeToSystemType(Left.Type);
             
-            cg.GenerateExpression(Left.Type, Left);
-            cg.GenerateExpression(Left.Type, Right);
+            cg.GenerateExpression(emitter, Left.Type, Left);
+            cg.GenerateExpression(emitter, Left.Type, Right);
             
-            cg.Emitter.Call(cg.GetMethodForType(charType, "Concat", new [] { charType, charType }));
+            emitter.Call(cg.GetMethodForType(charType, "Concat", new [] { charType, charType }));
             return Left.Type;
         }
 
         // Generate the code for a logical AND operator
-        private SymType GenerateAnd(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.And();
+        private SymType GenerateAnd(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.And();
             return Type;
         }
 
         // Generate the code for a logical OR operator
-        private SymType GenerateOr(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.Or();
+        private SymType GenerateOr(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.Or();
             return Type;
         }
 
         // Generate the code for an exclusive OR operator
-        private SymType GenerateXor(ProgramParseNode cg) {
-            cg.GenerateExpression(Type, Left);
-            cg.GenerateExpression(Type, Right);
-            cg.Emitter.Xor();
+        private SymType GenerateXor(Emitter emitter, ProgramParseNode cg) {
+            cg.GenerateExpression(emitter, Type, Left);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.Xor();
             return Type;
         }
 
         // Generate the code for a logical Less Than operator
-        private SymType GenerateLt(ProgramParseNode cg) {
+        private SymType GenerateLt(Emitter emitter, ProgramParseNode cg) {
             SymType neededType = TypePromotion(Left, Right);
-            cg.GenerateExpression(neededType, Left);
-            cg.GenerateExpression(neededType, Right);
+            cg.GenerateExpression(emitter, neededType, Left);
+            cg.GenerateExpression(emitter, neededType, Right);
             if (Symbol.IsCharType(neededType)) {
                 Type charType = Symbol.SymTypeToSystemType(neededType);
-                cg.Emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
-                cg.Emitter.LoadInteger(0);
+                emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+                emitter.LoadInteger(0);
             }
-            cg.Emitter.CompareLesser();
+            emitter.CompareLesser();
             return Type;
         }
 
         // Generate the code for a logical Less Than or Equals operator
-        private SymType GenerateLe(ProgramParseNode cg) {
+        private SymType GenerateLe(Emitter emitter, ProgramParseNode cg) {
             SymType neededType = TypePromotion(Left, Right);
-            cg.GenerateExpression(neededType, Left);
-            cg.GenerateExpression(neededType, Right);
+            cg.GenerateExpression(emitter, neededType, Left);
+            cg.GenerateExpression(emitter, neededType, Right);
             if (Symbol.IsCharType(neededType)) {
                 Type charType = Symbol.SymTypeToSystemType(neededType);
-                cg.Emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
-                cg.Emitter.LoadInteger(0);
+                emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+                emitter.LoadInteger(0);
             }
-            cg.Emitter.CompareGreater();
-            cg.Emitter.LoadInteger(1);
-            cg.Emitter.Xor();
+            emitter.CompareGreater();
+            emitter.LoadInteger(1);
+            emitter.Xor();
             return Type;
         }
 
         // Generate the code for a logical Greater Than operator
-        private SymType GenerateGt(ProgramParseNode cg) {
+        private SymType GenerateGt(Emitter emitter, ProgramParseNode cg) {
             SymType neededType = TypePromotion(Left, Right);
-            cg.GenerateExpression(neededType, Left);
-            cg.GenerateExpression(neededType, Right);
+            cg.GenerateExpression(emitter, neededType, Left);
+            cg.GenerateExpression(emitter, neededType, Right);
             if (Symbol.IsCharType(neededType)) {
                 Type charType = Symbol.SymTypeToSystemType(neededType);
-                cg.Emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
-                cg.Emitter.LoadInteger(0);
+                emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+                emitter.LoadInteger(0);
             }
-            cg.Emitter.CompareGreater();
+            emitter.CompareGreater();
             return Type;
         }
 
         // Generate the code for a logical Greater Than or Equals operator
-        private SymType GenerateGe(ProgramParseNode cg) {
+        private SymType GenerateGe(Emitter emitter, ProgramParseNode cg) {
             SymType neededType = TypePromotion(Left, Right);
-            cg.GenerateExpression(neededType, Left);
-            cg.GenerateExpression(neededType, Right);
+            cg.GenerateExpression(emitter, neededType, Left);
+            cg.GenerateExpression(emitter, neededType, Right);
             if (Symbol.IsCharType(neededType)) {
                 Type charType = Symbol.SymTypeToSystemType(neededType);
-                cg.Emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
-                cg.Emitter.LoadInteger(0);
+                emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+                emitter.LoadInteger(0);
             }
-            cg.Emitter.CompareLesser();
-            cg.Emitter.LoadInteger(1);
-            cg.Emitter.Xor();
+            emitter.CompareLesser();
+            emitter.LoadInteger(1);
+            emitter.Xor();
             return Type;
         }
 
         // Generate the code for a logical Equals operator
-        private SymType GenerateEq(ProgramParseNode cg) {
+        private SymType GenerateEq(Emitter emitter, ProgramParseNode cg) {
             SymType neededType = TypePromotion(Left, Right);
-            cg.GenerateExpression(neededType, Left);
-            cg.GenerateExpression(neededType, Right);
+            cg.GenerateExpression(emitter, neededType, Left);
+            cg.GenerateExpression(emitter, neededType, Right);
             if (Symbol.IsCharType(neededType)) {
                 Type charType = Symbol.SymTypeToSystemType(neededType);
-                cg.Emitter.Call(cg.GetMethodForType(charType, "op_Equality", new [] {charType, charType}));
+                emitter.Call(cg.GetMethodForType(charType, "op_Equality", new [] {charType, charType}));
             } else {
-                cg.Emitter.CompareEquals();
+                emitter.CompareEquals();
             }
             return Type;
         }
 
         // Generate the code for a logical Not Equals operator
-        private SymType GenerateNe(ProgramParseNode cg) {
+        private SymType GenerateNe(Emitter emitter, ProgramParseNode cg) {
             SymType neededType = TypePromotion(Left, Right);
-            cg.GenerateExpression(neededType, Left);
-            cg.GenerateExpression(neededType, Right);
+            cg.GenerateExpression(emitter, neededType, Left);
+            cg.GenerateExpression(emitter, neededType, Right);
             if (Symbol.IsCharType(neededType)) {
                 Type charType = Symbol.SymTypeToSystemType(neededType);
-                cg.Emitter.Call(cg.GetMethodForType(charType, "op_Equality", new [] {charType, charType}));
+                emitter.Call(cg.GetMethodForType(charType, "op_Equality", new [] {charType, charType}));
             } else {
-                cg.Emitter.CompareEquals();
+                emitter.CompareEquals();
             }
-            cg.Emitter.LoadInteger(1);
-            cg.Emitter.Xor();
+            emitter.LoadInteger(1);
+            emitter.Xor();
             return Type;
         }
 

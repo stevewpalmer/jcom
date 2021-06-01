@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Conditional parse node
 //
 // Authors:
@@ -83,15 +83,16 @@ namespace CCompiler {
         /// loop code generation terminated after that block. A constant
         /// false causes the block to be ignored.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             int index = 0;
 
-            Label labFalse = cg.Emitter.CreateLabel(); // Destination of false condition
-            Label labExit = cg.Emitter.CreateLabel();  // Exit from entire IF statement
+            Label labFalse = emitter.CreateLabel(); // Destination of false condition
+            Label labExit = emitter.CreateLabel();  // Exit from entire IF statement
 
             while (index < _exprList.Count) {
                 bool isLastBlock = index == _exprList.Count - 1;
@@ -106,25 +107,25 @@ namespace CCompiler {
                             skipBlock = true;
                         }
                     } else {
-                        cg.GenerateExpression(SymType.BOOLEAN, _exprList[index]);
-                        cg.Emitter.BranchIfFalse(isLastBlock ? labExit : labFalse);
+                        cg.GenerateExpression(emitter, SymType.BOOLEAN, _exprList[index]);
+                        emitter.BranchIfFalse(isLastBlock ? labExit : labFalse);
                     }
                 }
                 if (!skipBlock) {
-                    BodyList[index].Generate(cg);
+                    BodyList[index].Generate(emitter, cg);
                 }
                 if (!isLastBlock) {
                     if (!skipBlock) {
-                        cg.Emitter.Branch(labExit);
-                        cg.Emitter.MarkLabel(labFalse);
-                        labFalse = cg.Emitter.CreateLabel();
+                        emitter.Branch(labExit);
+                        emitter.MarkLabel(labFalse);
+                        labFalse = emitter.CreateLabel();
                     }
                 } else {
                     break;
                 }
                 ++index;
             }
-            cg.Emitter.MarkLabel(labExit);
+            emitter.MarkLabel(labExit);
         }
     }
 }

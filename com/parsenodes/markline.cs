@@ -56,7 +56,20 @@ namespace CCompiler {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
-            cg.MarkLine(LineNumber);
+            cg.MarkLine(null, LineNumber);
+        }
+
+        /// <summary>
+        /// Emit the code to mark the line number at the current position
+        /// in the generated code.
+        /// </summary>
+        /// <param name="emitter">Code emitter</param>
+        /// <param name="cg">A code generator object</param>
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+            if (cg == null) {
+                throw new ArgumentNullException(nameof(cg));
+            }
+            cg.MarkLine(emitter, LineNumber);
         }
 
         /// <summary>

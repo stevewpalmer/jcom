@@ -46,14 +46,15 @@ namespace CCompiler {
         /// <summary>
         /// Emit this code to load the value to the stack.
         /// </summary>
-        /// <param name="cg">A CodeGenerator object</param>
+        /// <param name="emitter">The emitter</param>
+        /// <param name="cg">Code generator</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
             }
-            return cg.Emitter.LoadSymbol(Symbol);
+            return emitter.LoadSymbol(Symbol);
         }
 
         /// <summary>

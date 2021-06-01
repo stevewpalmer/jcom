@@ -37,6 +37,7 @@ namespace CCompiler {
 
         private static int _staticIndex = 0;
         private Type _createdType = null;
+        private JMethod _defaultConstructor = null;
 
         /// <summary>
         /// Type builder
@@ -58,6 +59,10 @@ namespace CCompiler {
         /// </summary>
         public Type CreateType {
             get {
+                if (_defaultConstructor != null) {
+                    _defaultConstructor.Emitter.Emit0(OpCodes.Ret);
+                    _defaultConstructor.Emitter.Save();
+                }
                 if (_createdType == null) {
                     _createdType = Builder.CreateType();
                 }
@@ -66,16 +71,31 @@ namespace CCompiler {
         }
 
         /// <summary>
+        /// The default constructor for this type
+        /// </summary>
+        public JMethod DefaultConstructor {
+            get {
+                if (_defaultConstructor == null) {
+                    ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
+                            CallingConventions.Standard,
+                            Array.Empty<Type>());
+                    _defaultConstructor = new JMethod(this, cntb);
+                }
+                return _defaultConstructor;
+            }
+        }
+
+        /// <summary>
         /// Creates a field.
         /// </summary>
         /// <param name="sym">The symbol</param>
         /// <returns>The A FieldInfo representing the new field</returns>
-        public FieldInfo CreateField(Symbol sym) {
+        public void CreateField(Symbol sym) {
             if (sym == null) {
                 throw new ArgumentNullException(nameof(sym));
             }
             string name = $"S{_staticIndex++}_{sym.Name}";
-            return Builder.DefineField(name, sym.SystemType, FieldAttributes.Static);
+            sym.Info = Builder.DefineField(name, sym.SystemType, FieldAttributes.Static);
         }
 
         /// <summary>
@@ -96,14 +116,6 @@ namespace CCompiler {
         /// <param name="paramTypes">Parameter types</param>
         /// <returns></returns>
         public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
-
-            if (sym.Modifier.HasFlag(SymModifier.CONSTRUCTOR)) {
-
-                ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
-                                            CallingConventions.Standard,
-                                            Array.Empty<Type>());
-                return new JMethod(this, cntb);
-            }
 
             bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
             Type returnType;

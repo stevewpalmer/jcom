@@ -66,17 +66,18 @@ namespace CCompiler {
         /// and a break to the exit label on the scope occurs if the condition
         /// is true.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
 
             if (IsUnconditionalBreak) {
-                cg.Emitter.Branch(ScopeParseNode.ExitLabel);
+                emitter.Branch(ScopeParseNode.ExitLabel);
             } else {
-                cg.GenerateExpression(SymType.BOOLEAN, BreakExpression);
-                cg.Emitter.BranchIfTrue(ScopeParseNode.ExitLabel);
+                cg.GenerateExpression(emitter, SymType.BOOLEAN, BreakExpression);
+                emitter.BranchIfTrue(ScopeParseNode.ExitLabel);
             }
         }
 

@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Parse tree node classes
 //
 // Authors:
@@ -113,12 +113,23 @@ namespace CCompiler {
 
         /// <summary>
         /// Implements the base code generator for the node to invoke a
+        /// statement implementation.
+        /// </summary>
+        /// <param name="emitter">Code emitter</param>
+        /// <param name="cg">The code generator object</param>
+        public virtual void Generate(Emitter emitter, ProgramParseNode cg) {
+            throw new InvalidOperationException("ParseNode does not implement Generate");
+        }
+
+        /// <summary>
+        /// Implements the base code generator for the node to invoke a
         /// function implementation with a symbol type.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">The code generator object</param>
         /// <param name="returnType">The expected type of the return value</param>
         /// <returns>The computed type</returns>
-        public virtual SymType Generate(ProgramParseNode cg, SymType returnType) {
+        public virtual SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
             throw new InvalidOperationException("ParseNode does not implement Generate");
         }
 
@@ -126,10 +137,11 @@ namespace CCompiler {
         /// Implements the base code generator for the node to invoke a
         /// function implementation with a parse node value.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">The code generator object</param>
         /// <param name="node">A parse node supplied to the generator function</param>
         /// <returns>The computed type</returns>
-        public virtual void Generate(ProgramParseNode cg, ParseNode node) {
+        public virtual void Generate(Emitter emitter, ProgramParseNode cg, ParseNode node) {
             throw new InvalidOperationException("ParseNode does not implement Generate");
         }
 

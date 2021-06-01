@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Procedure parse node
 //
 // Authors:
@@ -127,20 +127,20 @@ namespace CCompiler {
 
             // Create the emitter for this method
             JMethod method = ProcedureSymbol.Info as JMethod;
-            cg.Emitter = method.Emitter;
+            Emitter emitter = method.Emitter;
             cg.CurrentProcedure = this;
 
-            ReturnLabel = cg.Emitter.CreateLabel();
+            ReturnLabel = emitter.CreateLabel();
 
             // Generate all locals for this method
             foreach (SymbolCollection symbols in Symbols) {
-                symbols.GenerateSymbols(cg);
+                symbols.GenerateSymbols(emitter, cg);
             }
 
             // Generate all the initialisation code
             if (InitList?.Nodes != null) {
                 foreach (ParseNode initNode in InitList.Nodes) {
-                    initNode.Generate(cg);
+                    initNode.Generate(emitter, cg);
                 }
             }
 
@@ -148,20 +148,20 @@ namespace CCompiler {
 
             // Generate the body of the procedure
             if (needTryBlock) {
-                cg.Emitter.SetupTryCatchBlock();
+                emitter.SetupTryCatchBlock();
             }
 
-            Body.Generate(cg);
+            Body.Generate(emitter, cg);
 
-            cg.Emitter.MarkLabel(ReturnLabel);
+            emitter.MarkLabel(ReturnLabel);
 
             if (needTryBlock) {
-                cg.Emitter.AddDefaultTryCatchHandlerBlock();
-                cg.Emitter.CloseTryCatchBlock();
+                emitter.AddDefaultTryCatchHandlerBlock();
+                emitter.CloseTryCatchBlock();
             }
 
-            cg.Emitter.Return();
-            cg.Emitter.Save();
+            emitter.Return();
+            emitter.Save();
         }
 
         /// <summary>

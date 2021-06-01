@@ -72,9 +72,10 @@ namespace CCompiler {
         /// This interface implements the statement version. Refer to the
         /// comments for the function version below for more details.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            Generate(cg, Type);
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+            Generate(emitter, cg, Type);
         }
 
         /// <summary>
@@ -88,39 +89,40 @@ namespace CCompiler {
         /// the function. If the returnType is not SymType.NONE then the return value is the
         /// type of the value on the top of the stack.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="returnType">The expected type of the returned value</param>
         /// <returns>The type of the value on the stack or SymType.NONE</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
 
             Type writeManagerType = typeof(WriteManager);
-            Type [] paramTypes = WriteManagerParamsNode.Generate(cg);
-            
-            cg.Emitter.CreateObject(writeManagerType, paramTypes);
-            LocalDescriptor objIndex = cg.Emitter.GetTemporary(writeManagerType);
-            cg.Emitter.StoreLocal(objIndex);
+            Type [] paramTypes = WriteManagerParamsNode.Generate(emitter, cg);
+
+            emitter.CreateObject(writeManagerType, paramTypes);
+            LocalDescriptor objIndex = emitter.GetTemporary(writeManagerType);
+            emitter.StoreLocal(objIndex);
             
             if (ErrLabel != null) {
-                cg.Emitter.LoadLocal(objIndex);
-                cg.Emitter.LoadInteger(1);
-                cg.Emitter.Call(writeManagerType.GetMethod("set_HasErr", new [] { typeof(bool) }));
+                emitter.LoadLocal(objIndex);
+                emitter.LoadInteger(1);
+                emitter.Call(writeManagerType.GetMethod("set_HasErr", new [] { typeof(bool) }));
             }
 
             if (FirstColumnSpecial) {
-                cg.Emitter.LoadLocal(objIndex);
-                cg.Emitter.LoadInteger(1);
-                cg.Emitter.Call(writeManagerType.GetMethod("SetFirstColumnSpecial", new [] { typeof(bool) }));
+                emitter.LoadLocal(objIndex);
+                emitter.LoadInteger(1);
+                emitter.Call(writeManagerType.GetMethod("SetFirstColumnSpecial", new [] { typeof(bool) }));
             }
 
             // Disable use of separators for BASIC output
-            cg.Emitter.LoadLocal(objIndex);
-            cg.Emitter.LoadInteger(0);
-            cg.Emitter.Call(writeManagerType.GetMethod("set_UseSeparators", new[] { typeof(bool) }));
+            emitter.LoadLocal(objIndex);
+            emitter.LoadInteger(0);
+            emitter.Call(writeManagerType.GetMethod("set_UseSeparators", new[] { typeof(bool) }));
 
-            LocalDescriptor index = cg.Emitter.GetTemporary(typeof(int));
+            LocalDescriptor index = emitter.GetTemporary(typeof(int));
 
             // Construct a parsenode that will be called for each item in the loop
             // including any implied DO loops.
@@ -133,20 +135,20 @@ namespace CCompiler {
             if (ArgList != null && ArgList.Nodes.Count > 0) {
                 int countOfArgs = ArgList.Nodes.Count;
                 for (int c = 0; c < countOfArgs; ++c) {
-                    itemNode.Generate(cg, ArgList.Nodes[c]);
+                    itemNode.Generate(emitter, cg, ArgList.Nodes[c]);
                     WriteParamsNode.FreeLocalDescriptors();
                 }
             } else {
-                itemNode.Generate(cg, null);
+                itemNode.Generate(emitter, cg, null);
             }
 
             // Issue an EndRecord to complete this record write
-            cg.Emitter.LoadLocal(objIndex);
-            cg.Emitter.Call(cg.GetMethodForType(writeManagerType, "EndRecord", System.Type.EmptyTypes));
+            emitter.LoadLocal(objIndex);
+            emitter.Call(cg.GetMethodForType(writeManagerType, "EndRecord", System.Type.EmptyTypes));
 
             // Discard the return value from the stack if we don't need it.
             if (returnType == SymType.NONE) {
-                cg.Emitter.Pop();
+                emitter.Pop();
             }
 
             Emitter.ReleaseTemporary(index);

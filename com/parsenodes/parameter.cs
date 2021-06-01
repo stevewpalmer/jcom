@@ -76,24 +76,26 @@ namespace CCompiler {
         /// Generate the code to push one parameter onto the caller stack using the
         /// symbol specified in the constructor.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <returns>The system type corresponding to this parameter.</returns>
-        public new Type Generate(ProgramParseNode cg) {
+        public new Type Generate(Emitter emitter, ProgramParseNode cg) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
-            return Generate(cg, _symbol, new Temporaries(cg.Emitter));
+            return Generate(emitter, cg, _symbol, new Temporaries(emitter));
         }
 
         /// <summary>
         /// Generate the code to push one parameter onto the caller stack using the
         /// symbol specified in the constructor.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="locals">A Temporaries collection for any local temporaries</param>
         /// <returns>The system type corresponding to this parameter.</returns>
-        public Type Generate(ProgramParseNode cg, Temporaries locals) {
-            return Generate(cg, _symbol, locals);
+        public Type Generate(Emitter emitter, ProgramParseNode cg, Temporaries locals) {
+            return Generate(emitter, cg, _symbol, locals);
         }
 
         /// <summary>
@@ -110,11 +112,12 @@ namespace CCompiler {
         ///    the stack.
         /// 
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="symParam">Symbol entry for the called function</param>
         /// <param name="locals">A Temporaries collection for any local temporaries</param>
         /// <returns>The system type corresponding to this parameter.</returns>
-        public Type Generate(ProgramParseNode cg, Symbol symParam, Temporaries locals) {
+        public Type Generate(Emitter emitter, ProgramParseNode cg, Symbol symParam, Temporaries locals) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
@@ -132,7 +135,7 @@ namespace CCompiler {
                 IdentifierParseNode identNode = (IdentifierParseNode)_paramNode;
                 Symbol symIdent = identNode.Symbol;
                 if (symIdent.IsArray) {
-                    GenerateLoadSubArray(cg, identNode, symParam, locals);
+                    GenerateLoadSubArray(emitter, cg, identNode, symParam, locals);
                     return symIdent.SystemType;
                 }
             }
@@ -150,28 +153,28 @@ namespace CCompiler {
                     // If we're passing an existing parameter, it is already
                     // a reference so don't double it up.
                     if (symIdent.IsParameter) {
-                        cg.Emitter.LoadParameter(symIdent.ParameterIndex);
+                        emitter.LoadParameter(symIdent.ParameterIndex);
                         if (!isByRef && symIdent.IsValueType && symIdent.IsByRef) {
-                            cg.Emitter.LoadIndirect(identType);
+                            emitter.LoadIndirect(identType);
                         }
                     } else {
 
                         // Passing an array by reference
                         if (symIdent.IsArray && !identNode.HasIndexes) {
-                            cg.Emitter.GenerateLoadArray(identNode, false);
+                            emitter.GenerateLoadArray(identNode, false);
                             return symIdent.SystemType;
                         }
                         if (isByRef) {
-                            cg.LoadAddress(identNode);
+                            cg.LoadAddress(emitter, identNode);
                         } else {
-                            identNode.Generate(cg);
+                            identNode.Generate(emitter, cg);
                             if (symParam != null) {
                                 if (!symParam.IsMethod) {
-                                    cg.Emitter.ConvertType(identNode.Type, symParam.Type);
+                                    emitter.ConvertType(identNode.Type, symParam.Type);
                                 }
                                 identType = symParam.Type;
                             } else {
-                                cg.Emitter.ConvertType(symIdent.Type, identType);
+                                emitter.ConvertType(symIdent.Type, identType);
                             }
                         }
                     }
@@ -190,15 +193,15 @@ namespace CCompiler {
             if (isByRef) {
                 LocalDescriptor index = locals.New(_paramNode.Type);
 
-                SymType exprType = cg.GenerateExpression(_paramNode.Type, _paramNode);
-                cg.Emitter.StoreLocal(index);
-                cg.Emitter.LoadLocalAddress(index);
+                SymType exprType = cg.GenerateExpression(emitter, _paramNode.Type, _paramNode);
+                emitter.StoreLocal(index);
+                emitter.LoadLocalAddress(index);
                 return Symbol.SymTypeToSystemType(exprType).MakeByRefType();
             }
 
             // Byval argument passing
             SymType neededType = (symParam != null) ? symParam.Type : Type;
-            SymType thisType = cg.GenerateExpression(neededType, _paramNode);
+            SymType thisType = cg.GenerateExpression(emitter, neededType, _paramNode);
             if (symParam != null) {
                 thisType = symParam.Type;
             }
@@ -208,22 +211,24 @@ namespace CCompiler {
         // Emit the code that loads part of an entire array by making a copy of
         // the array to the destination array dimensions and copying from the
         // given offset.
-        private void GenerateLoadSubArray(ProgramParseNode cg, IdentifierParseNode identNode, Symbol symParam, Temporaries locals) {
+        private void GenerateLoadSubArray(Emitter emitter, ProgramParseNode cg, IdentifierParseNode identNode,
+            Symbol symParam, Temporaries locals) {
+
             if (!identNode.HasIndexes) {
-                cg.Emitter.GenerateLoadArray(identNode, symParam.IsByRef);
+                emitter.GenerateLoadArray(identNode, symParam.IsByRef);
                 return;
             }
             
             LocalDescriptor index = locals.New(symParam.SystemType);
             
-            cg.GenerateLoadArrayAddress(identNode);
-            cg.Emitter.CreateSimpleArray(symParam.ArraySize, Symbol.SymTypeToSystemType(symParam.Type));
-            cg.Emitter.Dup();
-            cg.Emitter.StoreLocal(index);
-            cg.Emitter.LoadInteger(0);
-            cg.Emitter.LoadInteger(symParam.ArraySize);
-            cg.Emitter.Call(typeof(Array).GetMethod("Copy", new [] { typeof(Array), typeof(int), typeof(Array), typeof(int), typeof(int) }));
-            cg.Emitter.LoadLocal(index);
+            cg.GenerateLoadArrayAddress(emitter, identNode);
+            emitter.CreateSimpleArray(symParam.ArraySize, Symbol.SymTypeToSystemType(symParam.Type));
+            emitter.Dup();
+            emitter.StoreLocal(index);
+            emitter.LoadInteger(0);
+            emitter.LoadInteger(symParam.ArraySize);
+            emitter.Call(typeof(Array).GetMethod("Copy", new [] { typeof(Array), typeof(int), typeof(Array), typeof(int), typeof(int) }));
+            emitter.LoadLocal(index);
         }
     }
 }

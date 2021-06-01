@@ -476,7 +476,7 @@ namespace JComal {
             SimpleToken token = GetNextToken();
             switch (token.ID) {
                 case TokenID.LPAREN: {
-                    ParseNode node = Expression();
+                        ParseNode node = Expression();
                     ExpectToken(TokenID.RPAREN);
                     return node;
                     }
@@ -507,14 +507,14 @@ namespace JComal {
                     }
 
                 case TokenID.KERR: {
-                    Symbol errSymbol = GlobalVariables.Get(Consts.ErrName);
+                    Symbol errSymbol = Globals.Get(Consts.ErrName);
                     IdentifierParseNode node = new(errSymbol);
                     node.Symbol.IsReferenced = true;
                     return node;
                     }
 
                 case TokenID.KERRTEXT: {
-                    Symbol errSymbol = GlobalVariables.Get(Consts.ErrText);
+                    Symbol errSymbol = Globals.Get(Consts.ErrText);
                     IdentifierParseNode node = new(errSymbol);
                     node.Symbol.IsReferenced = true;
                     return node;
@@ -612,7 +612,7 @@ namespace JComal {
                     IdentifierToken identToken = (IdentifierToken)token;
 
                     // Function?
-                    Symbol sym = GlobalMethods.Get(identToken.Name);
+                    Symbol sym = Globals.Get(identToken.Name);
                     if (sym != null && sym.Class == SymClass.FUNCTION) {
                         return ExecWithIdentifier(identToken);
                     }

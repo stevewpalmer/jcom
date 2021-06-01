@@ -284,14 +284,13 @@ namespace CCompiler {
         /// index of the variable in the local index table.
         /// </summary>
         /// <param name="sym">Symbol</param>
-        /// <returns>The integer index of the new local</returns>
-        public LocalDescriptor CreateLocal(Symbol sym) {
+        public void CreateLocal(Symbol sym) {
             if (sym == null) {
                 throw new ArgumentNullException(nameof(sym));
             }
             LocalBuilder lb = _il.DeclareLocal(sym.SystemType);
             lb.SetLocalSymInfo(sym.Name);
-            return AssignLocal(sym.SystemType, lb.LocalIndex);
+            sym.Index = AssignLocal(sym.SystemType, lb.LocalIndex);
         }
 
         /// <summary>
@@ -328,34 +327,6 @@ namespace CCompiler {
             Type baseType = typeof(FixedString);
             LoadInteger(sym.FullType.Width);
             CreateObject(baseType, new [] { typeof(int) });
-        }
-
-        /// <summary>
-        /// Creates an array from the given symbol and save the reference
-        /// to the top of the stack.
-        /// </summary>
-        /// <param name="sym">Symbol</param>
-        public void CreateArray(Symbol sym) {
-            if (sym == null) {
-                throw new ArgumentNullException(nameof(sym));
-            }
-            if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
-                Type [] paramTypes = new Type[sym.Dimensions.Count];
-                Type baseType = sym.SystemType;
-                
-                for (int c = 0; c < sym.Dimensions.Count; ++c) {
-                    SymDimension dim = sym.Dimensions[c];
-                    int arraySize = dim.Size;
-                    if (arraySize < 0) {
-                        throw new InvalidOperationException("CreateArray does not support dynamic arrays");
-                    }
-                    LoadInteger(arraySize);
-                    paramTypes[c] = typeof(int);
-                }
-                CreateObject(baseType, paramTypes);
-            } else {
-                CreateSimpleArray(sym.ArraySize, Symbol.SymTypeToSystemType(sym.Type));
-            }
         }
 
         /// <summary>
@@ -676,63 +647,15 @@ namespace CCompiler {
             }
         }
 
-        // Handle initialisation of a symbol using its default value if one
-        // is specified. This works for all symbol types - local and static.
-        //
-        // Strings that aren't initialised with an explicit value are given
-        // an empty string here.
-        //
-        // Arrays are considered to require 'initialisation' as they need to be
-        // created in code to the specific size. So it is important to ensure that
-        // InitialiseSymbol is always called for arrays. In addition, arrays
-        // that have values in ArrayValues are also initialised here.
-        //
-        public void InitialiseSymbol(Symbol sym) {
-            if (sym.Type == SymType.CHAR && !sym.Value.HasValue) {
-                sym.Value = new Variant(string.Empty);
-            }
-            if (sym.IsArray) {
-                CreateArray(sym);
-                if (sym.ArrayValues?.Length > 0) {
-                    Debug.Assert(sym.ArrayValues.Length <= sym.ArraySize);
-                    int arrayIndex = 0;
-                    foreach (Variant value in sym.ArrayValues) {
-                        Emit0(OpCodes.Dup);
-                        LoadInteger(arrayIndex);
-                        LoadVariant(value);
-                        StoreElementReference(Symbol.VariantTypeToSymbolType(value.Type));
-                        arrayIndex++;
-                    }
-                }
-                StoreSymbol(sym);
-                if (sym.Type == SymType.FIXEDCHAR) {
-                    InitFixedStringArray(sym);
-                }
-                return;
-            }
-            if (sym.Type == SymType.FIXEDCHAR) {
-                CreateFixedString(sym);
-                StoreSymbol(sym);
-            }
-            if (sym.CanInitialise) {
-                if (sym.Type == SymType.FIXEDCHAR) {
-                    LoadSymbol(sym);
-                    LoadVariant(sym.Value);
-                    Emit0(OpCodes.Call, typeof(FixedString).GetMethod("Set", new[] { typeof(string) }));
-                } else {
-                    LoadVariant(sym.Value);
-                    ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
-                    StoreSymbol(sym);
-                }
-            }
-        }
-
         /// <summary>
         /// Generate the code to initialise a fixed string array by calling
-        // the Length on every element
+        /// the Length on every element. The size of the array must be on the
+        /// top of the stack on entry.
         /// </summary>
         /// <param name="sym">Fixed string array symbol</param>
         public void InitFixedStringArray(Symbol sym) {
+            LocalDescriptor total = GetTemporary(typeof(int));
+            StoreLocal(total);
             LocalDescriptor count = GetTemporary(typeof(int));
             Label loopStart = CreateLabel();
             LoadInteger(0);
@@ -748,7 +671,7 @@ namespace CCompiler {
             Add(SymType.INTEGER);
             StoreLocal(count);
             LoadLocal(count);
-            LoadInteger(sym.ArraySize);
+            LoadLocal(total);
             BranchLess(loopStart);
             ReleaseTemporary(count);
         }

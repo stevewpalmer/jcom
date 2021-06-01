@@ -67,6 +67,7 @@ namespace CCompiler {
     /// </summary>
     [Flags]
     public enum SymModifier {
+        HIDDEN = 1,
         EXTERNAL = 2,
         STATIC = 4,
         RETVAL = 8,
@@ -174,6 +175,11 @@ namespace CCompiler {
         /// arrays as special types then flat arrays are simulated as 1 dimensional arrays.
         /// </summary>
         public bool IsFlatArray => Modifier.HasFlag(SymModifier.FLATARRAY);
+
+        /// <summary>
+        /// Hidden symbols are those created by the compiler, not the user.
+        /// </summary>
+        public bool IsHidden => Modifier.HasFlag(SymModifier.HIDDEN);
 
         /// <summary>
         /// Returns whether the symbol is passed by reference.

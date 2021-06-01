@@ -44,13 +44,14 @@ namespace CCompiler {
         /// Emit the code to mark the label at the current position
         /// in the generated code.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
+        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
             }
             if (Label.Type == SymType.LABEL && Label.IsReferenced) {
-                cg.Emitter.MarkLabel((Label)Label.Info);
+                emitter.MarkLabel((Label)Label.Info);
             }
         }
 

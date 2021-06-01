@@ -116,20 +116,23 @@ namespace CCompiler {
         /// count or types), the number of parameters in the caller and callee
         /// must agree.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <returns>A list of system types corresponding to the computed parameters.</returns>
-        public new Type[] Generate(ProgramParseNode cg) {
-
+        public new Type[] Generate(Emitter emitter, ProgramParseNode cg) {
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
+            }
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
 
-            _locals = new Temporaries(cg.Emitter);
+            _locals = new Temporaries(emitter);
 
             Type[] paramTypes = new Type[Nodes.Count];
             for (int c = 0; c < Nodes.Count; ++c) {
                 ParameterParseNode paramNode = Nodes[c];
-                paramTypes[c] = paramNode.Generate(cg, _locals);
+                paramTypes[c] = paramNode.Generate(emitter, cg, _locals);
             }
             return paramTypes;
         }
@@ -144,7 +147,7 @@ namespace CCompiler {
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="sym">Symbol entry for the called function</param>
         /// <returns>A list of system types corresponding to the computed parameters.</returns>
-        public Type[] Generate(ProgramParseNode cg, Symbol sym) {
+        public Type[] Generate(Emitter emitter, ProgramParseNode cg, Symbol sym) {
 
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
@@ -160,13 +163,13 @@ namespace CCompiler {
                 cg.Error($"Parameter count mismatch for {sym.Name}");
             }
 
-            _locals = new Temporaries(cg.Emitter);
+            _locals = new Temporaries(emitter);
 
             Type[] paramTypes = new Type[callerParameterCount];
             for (int c = 0; c < Nodes.Count; ++c) {
                 ParameterParseNode paramNode = Nodes[c];
                 Symbol symParam = sym.Parameters?[c];
-                paramTypes[c] = paramNode.Generate(cg, symParam, _locals);
+                paramTypes[c] = paramNode.Generate(emitter, cg, symParam, _locals);
             }
             return paramTypes;
         }

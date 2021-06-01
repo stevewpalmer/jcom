@@ -29,6 +29,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using System.Reflection.Emit;
+using JComLib;
 
 namespace CCompiler {
 
@@ -203,10 +205,14 @@ namespace CCompiler {
         /// with the given value.
         /// </summary>
         /// <param name="symbols">Symbol collection</param>
-        public void GenerateSymbols(ProgramParseNode cg) {
+        public void GenerateSymbols(Emitter emitter, ProgramParseNode cg) {
 
             foreach (Symbol sym in this) {
-                if (sym.IsImported) {
+                bool initialise = false;
+
+                // Imported, intrinsic or common symbols are declarations and thus
+                // require no initialisation or creation.
+                if (sym.IsImported || sym.IsIntrinsic || sym.IsReferenceCommon) {
                     continue;
                 }
 
@@ -231,49 +237,20 @@ namespace CCompiler {
                     }
                     continue;
                 }
+
+                // Skip if the symbol has never been referenced
                 if (!sym.IsReferenced) {
                     continue;
                 }
-                Debug.Assert(cg.Emitter != null, "Emitter required for non-method symbols!");
-                if (sym.IsArray) {
-                    if (sym.IsStatic) {
-                        foreach (SymDimension dim in sym.Dimensions) {
-                            if (!dim.LowerBound.IsConstant) {
-                                FieldInfo lowBound = cg.CurrentType.TemporaryField(typeof(int));
-                                cg.GenerateExpression(SymType.INTEGER, dim.LowerBound);
-                                cg.Emitter.StoreStatic(lowBound);
-                                dim.LowerBound = new StaticParseNode(lowBound);
-                            }
-                            if (!dim.UpperBound.IsConstant) {
-                                FieldInfo upperBound = cg.CurrentType.TemporaryField(typeof(int));
-                                cg.GenerateExpression(SymType.INTEGER, dim.UpperBound);
-                                cg.Emitter.StoreStatic(upperBound);
-                                dim.UpperBound = new StaticParseNode(upperBound);
-                            }
-                        }
-                    } else {
-                        foreach (SymDimension dim in sym.Dimensions) {
-                            if (!dim.LowerBound.IsConstant) {
-                                LocalDescriptor lowBound = cg.Emitter.GetTemporary(typeof(int));
-                                cg.GenerateExpression(SymType.INTEGER, dim.LowerBound);
-                                cg.Emitter.StoreLocal(lowBound);
-                                dim.LowerBound = new LocalParseNode(lowBound);
-                            }
-                            if (!dim.UpperBound.IsConstant) {
-                                LocalDescriptor upperBound = cg.Emitter.GetTemporary(typeof(int));
-                                cg.GenerateExpression(SymType.INTEGER, dim.UpperBound);
-                                cg.Emitter.StoreLocal(upperBound);
-                                dim.UpperBound = new LocalParseNode(upperBound);
-                            }
-                        }
-                    }
-                }
+
                 switch (sym.Type) {
                     case SymType.GENERIC:
+
+                        // Static array of objects such as a DATA statement that
+                        // is initialised with constant data.
                         if (sym.IsStatic) {
-                            // Static array of objects
-                            sym.Info = cg.CurrentType.CreateField(sym);
-                            cg.Emitter.InitialiseSymbol(sym);
+                            cg.CurrentType.CreateField(sym);
+                            initialise = true;
                         }
                         break;
 
@@ -284,20 +261,80 @@ namespace CCompiler {
                     case SymType.FLOAT:
                     case SymType.COMPLEX:
                     case SymType.BOOLEAN: {
-                            if (sym.IsLocal && !sym.IsIntrinsic && !sym.IsReferenceCommon && !sym.IsMethod) {
+                            if (sym.IsLocal && !sym.IsMethod) {
                                 if (sym.IsStatic) {
-                                    sym.Info = cg.CurrentType.CreateField(sym);
+                                    cg.CurrentType.CreateField(sym);
                                 } else {
-                                    sym.Index = cg.Emitter.CreateLocal(sym);
+                                    emitter.CreateLocal(sym);
                                 }
-                                cg.Emitter.InitialiseSymbol(sym);
+                                initialise = true;
                             }
                             break;
                         }
 
                     case SymType.LABEL:
-                        sym.Info = cg.Emitter.CreateLabel();
+                        sym.Info = emitter.CreateLabel();
                         break;
+                }
+                if (initialise) {
+                    Emitter realEmitter = sym.IsStatic ? cg.CurrentType.DefaultConstructor.Emitter : emitter;
+                    if (sym.Type == SymType.CHAR && !sym.Value.HasValue) {
+                        sym.Value = new Variant(string.Empty);
+                    }
+                    if (sym.IsDynamicArray) {
+                        continue;
+                    }
+                    if (sym.IsArray) {
+
+                        if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
+                            Type[] paramTypes = new Type[sym.Dimensions.Count];
+                            Type baseType = sym.SystemType;
+
+                            for (int c = 0; c < sym.Dimensions.Count; ++c) {
+                                SymDimension dim = sym.Dimensions[c];
+                                realEmitter.LoadInteger(dim.UpperBound.Value.IntValue);
+                                realEmitter.LoadInteger(dim.LowerBound.Value.IntValue);
+                                realEmitter.Sub(SymType.INTEGER);
+                                paramTypes[c] = typeof(int);
+                            }
+                            realEmitter.CreateObject(baseType, paramTypes);
+                        } else {
+                            realEmitter.CreateSimpleArray(sym.ArraySize, Symbol.SymTypeToSystemType(sym.Type));
+                        }
+
+                        if (sym.ArrayValues?.Length > 0) {
+                            Debug.Assert(sym.ArrayValues.Length <= sym.ArraySize);
+                            int arrayIndex = 0;
+                            foreach (Variant value in sym.ArrayValues) {
+                                realEmitter.Emit0(OpCodes.Dup);
+                                realEmitter.LoadInteger(arrayIndex);
+                                realEmitter.LoadVariant(value);
+                                realEmitter.StoreElementReference(Symbol.VariantTypeToSymbolType(value.Type));
+                                arrayIndex++;
+                            }
+                        }
+                        realEmitter.StoreSymbol(sym);
+                        if (sym.Type == SymType.FIXEDCHAR) {
+                            realEmitter.LoadInteger(sym.ArraySize);
+                            realEmitter.InitFixedStringArray(sym);
+                        }
+                        continue;
+                    }
+                    if (sym.Type == SymType.FIXEDCHAR) {
+                        realEmitter.CreateFixedString(sym);
+                        realEmitter.StoreSymbol(sym);
+                    }
+                    if (sym.CanInitialise) {
+                        if (sym.Type == SymType.FIXEDCHAR) {
+                            realEmitter.LoadSymbol(sym);
+                            realEmitter.LoadVariant(sym.Value);
+                            realEmitter.Emit0(OpCodes.Call, typeof(FixedString).GetMethod("Set", new[] { typeof(string) }));
+                        } else {
+                            realEmitter.LoadVariant(sym.Value);
+                            realEmitter.ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
+                            realEmitter.StoreSymbol(sym);
+                        }
+                    }
                 }
             }
         }

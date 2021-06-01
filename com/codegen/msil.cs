@@ -220,7 +220,11 @@ namespace CCompiler {
     /// takes a FieldInfo parameter.
     /// </summary>
     public class InstructionField : Instruction {
-        private readonly FieldInfo _field;
+
+        /// <summary>
+        /// Field
+        /// </summary>
+        public FieldInfo Field { get; set; }
 
         /// <summary>
         /// Create an InstructionMethod object with the given opcode
@@ -232,7 +236,7 @@ namespace CCompiler {
             if (field == null) {
                 throw new ArgumentNullException(nameof(field));
             }
-            _field = field;
+            Field = field;
         }
         
         /// <summary>
@@ -247,7 +251,7 @@ namespace CCompiler {
             if (Deleted) {
                 return;
             }
-            il.Emit(Code, _field);
+            il.Emit(Code, Field);
         }
     }
 

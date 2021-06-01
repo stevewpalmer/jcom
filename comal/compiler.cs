@@ -1,4 +1,4 @@
-// JComal
+﻿// JComal
 // Main compiler class
 //
 // Authors:
@@ -76,12 +76,7 @@ namespace JComal {
         /// <summary>
         /// Global methods symbol table
         /// </summary>
-        public SymbolCollection GlobalMethods { get; set; }
-
-        /// <summary>
-        /// Global variables symbol table
-        /// </summary>
-        public SymbolCollection GlobalVariables { get; set; }
+        public SymbolCollection Globals { get; set; }
 
         /// <summary>
         /// Current procedure being parsed
@@ -95,8 +90,8 @@ namespace JComal {
         public Compiler(ComalOptions opts) {
 
             SymbolStack = new();
-            GlobalMethods = new SymbolCollection("GlobalMethods");
-            SymbolStack.Push(GlobalMethods);
+            Globals = new SymbolCollection("Globals");
+            SymbolStack.Push(Globals);
 
             _importSymbols = null;
 
@@ -107,7 +102,7 @@ namespace JComal {
 
             // Top level parse node that defines the program
             _program = new ProgramParseNode(opts) {
-                Globals = GlobalMethods,
+                Globals = Globals,
                 Root = new BlockParseNode(),
                 GenerateDebug = opts.GenerateDebug,
                 VersionString = opts.VersionString,
@@ -214,7 +209,7 @@ namespace JComal {
             if (activeMethod != null) {
                 activeMethod.Body.Clear();
             } else { 
-                Symbol method = GlobalMethods.Add(methodName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
+                Symbol method = Globals.Add(methodName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
                 method.Defined = true;
 
                 SymbolCollection localSymbols = new("Local");
@@ -296,7 +291,7 @@ namespace JComal {
                 CompileBlock(_program.Root, new[] { TokenID.ENDOFFILE });
 
                 // Warn about exported methods that are not defined
-                foreach (Symbol sym in GlobalMethods) {
+                foreach (Symbol sym in Globals) {
                     if (sym.IsExported && !sym.Defined) {
                         Messages.Warning(MessageCode.MISSINGEXPORT, 1,
                             $"{sym.Name} marked as EXPORT but not found in source file");
@@ -321,27 +316,13 @@ namespace JComal {
         // Create default globals
         private void CreateDefaultGlobals() {
 
-            GlobalVariables = new("GlobalVars");
-            SymbolStack.Push(GlobalVariables);
-
-            // Constructor
-            ProcedureParseNode node = new() {
-                ProcedureSymbol = new Symbol(_program.Name, new SymFullType(), SymClass.SUBROUTINE, null, 0) {
-                    Modifier = SymModifier.CONSTRUCTOR,
-                    Defined = true
-                }
-            };
-            GlobalMethods.Add(node.ProcedureSymbol);
-            node.Symbols.Add(GlobalVariables);
-            _program.Root.Add(node);
-
             // Create special variables
-            GlobalVariables.Add(new Symbol(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
-                Modifier = SymModifier.STATIC,
+            Globals.Add(new Symbol(Consts.ErrName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
+                Modifier = SymModifier.STATIC | SymModifier.HIDDEN,
                 Value = new Variant(0)
             });
-            GlobalVariables.Add(new Symbol(Consts.ErrText, new SymFullType(SymType.CHAR), SymClass.VAR, null, 0) {
-                Modifier = SymModifier.STATIC,
+            Globals.Add(new Symbol(Consts.ErrText, new SymFullType(SymType.CHAR), SymClass.VAR, null, 0) {
+                Modifier = SymModifier.STATIC | SymModifier.HIDDEN,
                 Value = new Variant(string.Empty)
             });
         }
@@ -355,8 +336,9 @@ namespace JComal {
             Stack<Symbol> parents = new(new Symbol [] { null });
 
             // Add implicit entrypoint subroutine name.
-            GlobalMethods.Add(_entryPointName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
-
+            Globals.Add(new Symbol(_entryPointName, new SymFullType(), SymClass.SUBROUTINE, null, 0) {
+                Modifier = SymModifier.HIDDEN
+            });
             foreach (Line line in _ls.AllLines) {
                 int lineNumber = 0;
 
@@ -378,7 +360,7 @@ namespace JComal {
 
                         // Check method name hasn't already been declared.
                         string methodName = identToken.Name;
-                        Symbol method = GlobalMethods.Get(methodName);
+                        Symbol method = Globals.Get(methodName);
                         if (method != null && method.Defined && !method.IsExternal) {
                             Messages.Error(MessageCode.SUBFUNCDEFINED, $"{methodName} already defined");
                             parents.Push(method);
@@ -395,7 +377,7 @@ namespace JComal {
 
                         // Add this method to the global symbol table now.
                         if (method == null) {
-                            method = GlobalMethods.Add(methodName, new SymFullType(), klass, null, lineNumber);
+                            method = Globals.Add(methodName, new SymFullType(), klass, null, lineNumber);
                         }
                         if (klass == SymClass.FUNCTION) {
                             method.FullType = GetTypeFromName(methodName);
@@ -421,7 +403,7 @@ namespace JComal {
         // is the specified symbol.
         private void AddChildSymbols(SymbolCollection symbols, Symbol parentSymbol) {
 
-            foreach (Symbol childSymbol in GlobalMethods) {
+            foreach (Symbol childSymbol in Globals) {
                 if (childSymbol.IsMethod && childSymbol.Parent == parentSymbol) {
                     symbols.Add(childSymbol);
                     AddChildSymbols(symbols, childSymbol);
@@ -535,13 +517,13 @@ namespace JComal {
         // Make sure we have an _EOD symbol, and create one otherwise.
         private Symbol GetMakeEODSymbol() {
 
-            Symbol symbol = GlobalVariables.Get(Consts.EODName);
+            Symbol symbol = Globals.Get(Consts.EODName);
             if (symbol == null) {
                 symbol = new(Consts.EODName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
                     Modifier = SymModifier.STATIC,
                     Value = new Variant(1)
                 };
-                GlobalVariables.Add(symbol);
+                Globals.Add(symbol);
             }
             return symbol;
         }
@@ -549,14 +531,14 @@ namespace JComal {
         // Make sure we have a _DATAINDEX for the READ statement, and create one otherwise.
         private Symbol GetMakeReadDataIndexSymbol() {
 
-            Symbol symbol = GlobalVariables.Get(Consts.DataIndexName);
+            Symbol symbol = Globals.Get(Consts.DataIndexName);
             if (symbol == null) {
                 symbol = new(Consts.DataIndexName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
                     Modifier = SymModifier.STATIC,
                     Value = new Variant(0),
                     IsReferenced = true
                 };
-                GlobalVariables.Add(symbol);
+                Globals.Add(symbol);
             }
             return symbol;
         }
@@ -564,13 +546,13 @@ namespace JComal {
         // Make sure we have a _DATA for the READ statement, and create one otherwise.
         private Symbol GetMakeReadDataSymbol() {
 
-            Symbol symbol = GlobalVariables.Get(Consts.DataName);
+            Symbol symbol = Globals.Get(Consts.DataName);
             if (symbol == null) {
                 symbol = new(Consts.DataName, new SymFullType(SymType.GENERIC), SymClass.VAR, null, 0) {
                     Modifier = SymModifier.STATIC | SymModifier.FLATARRAY,
                     IsReferenced = true
                 };
-                GlobalVariables.Add(symbol);
+                Globals.Add(symbol);
             }
             return symbol;
         }
@@ -583,7 +565,7 @@ namespace JComal {
 
             Symbol sym = null;
             foreach (SymbolCollection symbols in SymbolStack.All) {
-                if ((symbols == GlobalVariables || symbols == GlobalMethods) && _importSymbols != null) {
+                if ((symbols == Globals || symbols == Globals) && _importSymbols != null) {
                     sym = _importSymbols.Get(name);
                 } else {
                     sym = symbols.Get(name);
@@ -612,7 +594,7 @@ namespace JComal {
             Symbol sym;
 
             if (!CurrentProcedure.IsClosed) {
-                sym = MakeSymbolForScope(name, GlobalVariables);
+                sym = MakeSymbolForScope(name, Globals);
                 sym.Modifier |= SymModifier.STATIC;
             } else {
                 sym = MakeSymbolForScope(name, SymbolStack.Top);

@@ -73,13 +73,13 @@ namespace JComal {
                                "Procedure or function name expected");
             } else {
                 string methodName = identToken.Name;
-                Symbol sym = GlobalMethods.Get(methodName);
+                Symbol sym = Globals.Get(methodName);
                 if (sym != null && sym.IsExported) {
                     Messages.Error(MessageCode.ALREADYEXPORTED,
                                    $"{methodName} already exported");
                 }
                 if (sym == null) {
-                    sym = GlobalMethods.Add(methodName,
+                    sym = Globals.Add(methodName,
                                              new SymFullType(),
                                              SymClass.SUBROUTINE,
                                              null,
@@ -292,7 +292,7 @@ namespace JComal {
                     if (identToken == null) {
                         break;
                     }
-                    Symbol sym = GlobalMethods.Get(identToken.Name);
+                    Symbol sym = Globals.Get(identToken.Name);
                     if (sym == null) {
                         Messages.Error(MessageCode.METHODNOTFOUND, $"{identToken.Name} not found");
                     }
@@ -406,11 +406,24 @@ namespace JComal {
         // declare a variable assuming implicit type is permitted for the name.
         //
         private ParseNode KDim() {
+            BlockParseNode nodes = null;
             SymFullType fullType = new();
             SimpleToken token;
 
             do {
                 Symbol sym = ParseIdentifierDeclaration(fullType);
+                if (sym.IsDynamicArray) {
+                    ArrayParseNode node = new() {
+                        Symbol = sym,
+                        StartRange = 0,
+                        EndRange = -1,
+                        Redimension = true
+                    };
+                    if (nodes == null) {
+                        nodes = new BlockParseNode();
+                    }
+                    nodes.Add(node);
+                }
                 token = GetNextToken();
                 if (token.ID == TokenID.KOF) {
                     ParseNode intVal = IntegerExpression();
@@ -426,7 +439,7 @@ namespace JComal {
             } while (token.ID == TokenID.COMMA);
             _currentLine.PushToken(token);
             ExpectEndOfLine();
-            return null;
+            return nodes;
         }
 
         // CASE
@@ -617,8 +630,8 @@ namespace JComal {
             TrappableParseNode parseNode = new() {
                 Body = new BlockParseNode(),
                 Handler = new BlockParseNode(),
-                Err = GlobalVariables.Get(Consts.ErrName),
-                Message = GlobalVariables.Get(Consts.ErrText)
+                Err = Globals.Get(Consts.ErrName),
+                Message = Globals.Get(Consts.ErrText)
             };
             CompileBlock(parseNode.Body, new[] { TokenID.KENDTRAP, TokenID.KHANDLER });
             CompileBlock(parseNode.Handler, new[] { TokenID.KENDTRAP });

@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // String parse node
 //
 // Authors:
@@ -61,14 +61,15 @@ namespace CCompiler {
         /// <summary>
         /// Emit this code to load the value to the stack.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
             }
-            cg.Emitter.LoadString(Value.StringValue);
+            emitter.LoadString(Value.StringValue);
             return SymType.CHAR;
         }
 

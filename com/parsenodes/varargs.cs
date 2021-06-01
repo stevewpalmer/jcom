@@ -44,24 +44,25 @@ namespace CCompiler {
         /// and store each argument in the array. On exit, the address of the
         /// array is left on the top of the stack.
         /// </summary>
+        /// <param name="emitter">Code emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
             if (cg == null) {
                 throw new ArgumentNullException(nameof(cg));
             }
             int argCount = Nodes.Count;
-            cg.Emitter.CreateSimpleArray(argCount, typeof(object));
+            emitter.CreateSimpleArray(argCount, typeof(object));
             for (int c = 0; c < argCount; ++c) {
-                cg.Emitter.Dup();
-                cg.Emitter.LoadInteger(c);
+                emitter.Dup();
+                emitter.LoadInteger(c);
                 if (PassByRef) {
                     IdentifierParseNode identNode = (IdentifierParseNode)Nodes[c];
-                    cg.LoadAddress(identNode);
-                    cg.Emitter.StoreElementReference(identNode.Type);
+                    cg.LoadAddress(emitter, identNode);
+                    emitter.StoreElementReference(identNode.Type);
                 } else {
-                    cg.Emitter.StoreElementReference(cg.GenerateExpression(Nodes[c].Type, Nodes[c]));
+                    emitter.StoreElementReference(cg.GenerateExpression(emitter, Nodes[c].Type, Nodes[c]));
                 }
             }
             return SymType.VARARG;

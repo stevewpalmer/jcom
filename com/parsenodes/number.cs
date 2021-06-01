@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Number parse node
 //
 // Authors:
@@ -72,12 +72,13 @@ namespace CCompiler {
         /// <summary>
         /// Emit this code to load the value to the stack.
         /// </summary>
+        /// <param name="emitter">The emitter</param>
         /// <param name="cg">A CodeGenerator object</param>
         /// <param name="returnType">The type required by the caller</param>
         /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(ProgramParseNode cg, SymType returnType) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
+        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+            if (emitter == null) {
+                throw new ArgumentNullException(nameof(emitter));
             }
             Variant actualValue = Value;
             switch (returnType) {
@@ -85,7 +86,7 @@ namespace CCompiler {
                 case SymType.FLOAT:     actualValue = new Variant(Value.RealValue); break;
                 case SymType.DOUBLE:    actualValue = new Variant(Value.DoubleValue); break;
             }
-            cg.Emitter.LoadVariant(actualValue);
+            emitter.LoadVariant(actualValue);
             return Symbol.VariantTypeToSymbolType(actualValue.Type);
         }
 
