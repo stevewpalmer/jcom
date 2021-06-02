@@ -53,6 +53,11 @@ namespace CCompiler {
         /// </summary>
         public bool Redimension { get; set; }
 
+        /// <summary>
+        /// Specifies the array dimensions
+        /// </summary>
+        public SymDimension [] Dimensions { get; set; }
+
         /// <value>
         /// Gets or sets the start range for the array initialisation.
         /// </value>
@@ -92,7 +97,7 @@ namespace CCompiler {
                     return;
                 }
                 if (sym.IsStatic) {
-                    foreach (SymDimension dim in sym.Dimensions) {
+                    foreach (SymDimension dim in Dimensions) {
                         if (!dim.LowerBound.IsConstant) {
                             FieldInfo lowBound = cg.CurrentType.TemporaryField(typeof(int));
                             cg.GenerateExpression(emitter, SymType.INTEGER, dim.LowerBound);
@@ -107,7 +112,7 @@ namespace CCompiler {
                         }
                     }
                 } else {
-                    foreach (SymDimension dim in sym.Dimensions) {
+                    foreach (SymDimension dim in Dimensions) {
                         if (!dim.LowerBound.IsConstant) {
                             LocalDescriptor lowBound = emitter.GetTemporary(typeof(int));
                             cg.GenerateExpression(emitter, SymType.INTEGER, dim.LowerBound);
@@ -122,11 +127,11 @@ namespace CCompiler {
                         }
                     }
                 }
-                Type[] paramTypes = new Type[sym.Dimensions.Count];
+                Type[] paramTypes = new Type[Dimensions.Length];
                 Type baseType = sym.SystemType;
 
-                for (int c = 0; c < sym.Dimensions.Count; ++c) {
-                    SymDimension dim = sym.Dimensions[c];
+                for (int c = 0; c < Dimensions.Length; ++c) {
+                    SymDimension dim = Dimensions[c];
                     if (dim.UpperBound.IsConstant) {
                         emitter.LoadInteger(dim.UpperBound.Value.IntValue);
                     } else {
@@ -147,7 +152,7 @@ namespace CCompiler {
                 if (sym.Type == SymType.FIXEDCHAR) {
                     emitter.Dup();
                 }
-                if (sym.Dimensions.Count == 1) {
+                if (Dimensions.Length == 1) {
                     emitter.CreateArray(Symbol.SymTypeToSystemType(sym.Type));
                 } else {
                     emitter.CreateObject(baseType, paramTypes);

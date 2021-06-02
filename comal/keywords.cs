@@ -26,6 +26,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using CCompiler;
 using JComLib;
 
@@ -404,6 +405,8 @@ namespace JComal {
         //
         // Used to apply a dimension to a prior declared variable. Can be used to
         // declare a variable assuming implicit type is permitted for the name.
+        // Handles dynamic arrays by creating ArrayParseNode nodes that specify
+        // the allocation and initialisation of the arrays.
         //
         private ParseNode KDim() {
             BlockParseNode nodes = null;
@@ -417,6 +420,7 @@ namespace JComal {
                         Symbol = sym,
                         StartRange = 0,
                         EndRange = -1,
+                        Dimensions = sym.Dimensions.ToArray(),
                         Redimension = true
                     };
                     if (nodes == null) {

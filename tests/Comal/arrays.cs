@@ -117,6 +117,68 @@ namespace ComalTests {
             Utilities.Helper.HelperRunFloat(comp, "array'string'2d", 1);
         }
 
+        // Test 1D dynamic array
+        [Test]
+        public void Test1DDynamicArray() {
+            string code = @"
+                func array'dynamic'1d closed
+                  arysize := 13
+                  dim a(arysize)
+                  for x:=1 to arysize do
+                     a(x):=x*y
+                  endfor x
+                  for x:=1 to 13 do
+                    if a(x)<>x*y then return false
+                  endfor x
+                  return true
+                endfunc array'dynamic'1d
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'1d", 1);
+        }
+
+        // Test 1D dynamic string array
+        [Test]
+        public void Test1DDynamicStringArray() {
+            string code = @"
+                func array'dynamic'string'1d closed
+                  arysize := 13
+                  dim a$(arysize) of 5
+                  for x:=1 to arysize do
+                     a$(x):=str$(x*y)
+                  endfor x
+                  for x:=1 to 13 do
+                    if a$(x)<>str$(x*y) then return false
+                  endfor x
+                  return true
+                endfunc array'dynamic'string'1d
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
+            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'string'1d", 1);
+        }
+
+        // Test redimensioning 1D dynamic array
+        [Test]
+        public void Test1DRedimDynamicArray() {
+            string code = @"
+                func array'redim'dynamic'1d closed
+                  arysize := 13
+                  dim a(arysize)
+                  for x:=1 to arysize do
+                     a(x):=x*y
+                  endfor x
+                  arysize := 20
+                  dim a(arysize)
+                  for x:=1 to 20 do
+                    if a(x)<>0 then return false
+                  endfor x
+                  return true
+                endfunc array'redim'dynamic'1d
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "array'redim'dynamic'1d", 1);
+        }
+
         // Test catching inconsistent array dimensions
         [Test]
         public void TestInconsistentDimensions() {
