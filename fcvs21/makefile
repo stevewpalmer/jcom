@@ -8,9 +8,10 @@ all: $(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS)
 
 failures: $(FAILTESTS)
 
-run: $(ALLTESTS) $(ALLDATATESTS)
+run: $(ALLTESTS) $(ALLDATATESTS) $(BUGTESTS)
 	-rm run.out FORT.*
 	-for f in $(ALLTESTS); do mono ./$$f; done >>run.out
+	-for f in $(BUGTESTS); do mono ./$$f; done >>run.out
 	-for f in $(ALLDATATESTS); do mono ./$$f < ./$${f%.exe}.DAT; done>>run.out
 	-grep "\sFAIL\s" run.out
 

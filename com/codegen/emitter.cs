@@ -951,6 +951,9 @@ namespace CCompiler {
             if (sym.Info is JMethod method) {
                 Emit0(OpCodes.Ldftn, method.Builder);
             }
+            if (sym.Info is MethodInfo methodInfo) {
+                Emit0(OpCodes.Ldftn, methodInfo);
+            }
         }
 
         /// <summary>
