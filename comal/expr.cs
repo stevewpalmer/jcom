@@ -780,7 +780,7 @@ namespace JComal {
 
         // Cast the specified node to the given type. This will result in the code
         // generator adding the necessary type casting instructions if needed.
-        private ParseNode CastNodeToType(ParseNode node, SymType typeNeeded) {
+        private static ParseNode CastNodeToType(ParseNode node, SymType typeNeeded) {
 
             // For literal values, promote them to the required type by
             // doing variant conversion.
@@ -805,7 +805,7 @@ namespace JComal {
 
         // Cast the specified node to the given type. This will result in the code
         // generator adding the necessary type casting instructions if needed.
-        private BinaryOpParseNode CastNodeToType(BinaryOpParseNode node, SymType typeNeeded) {
+        private static BinaryOpParseNode CastNodeToType(BinaryOpParseNode node, SymType typeNeeded) {
             node.Type = typeNeeded;
             return node;
         }

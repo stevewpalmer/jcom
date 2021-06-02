@@ -260,7 +260,7 @@ namespace JComal {
         // List all programs in the current directory. If the optional string
         // constant is specified, all files are shown that match the string.
         //
-        private void KCat(Line ls) {
+        private static void KCat(Line ls) {
 
             string wildcard = "*";
             if (!ls.IsAtEndOfLine) {

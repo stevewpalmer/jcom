@@ -303,7 +303,7 @@ namespace CCompiler {
 
         // Given two parse nodes with types associated, this function returns the
         // largest type required for a consistent arithmetic operation between them.
-        private SymType TypePromotion(ParseNode p1, ParseNode p2) {
+        private static SymType TypePromotion(ParseNode p1, ParseNode p2) {
             return Symbol.LargestType(p1.Type, p2.Type);
         }
     }

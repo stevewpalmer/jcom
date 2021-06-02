@@ -169,12 +169,12 @@ namespace JComalLib {
                             if (args[argIndex] is string[] stringArray) {
                                 foreach (string stringElement in stringArray) {
                                     WriteValue(output, stringElement.ToString(), fieldWidth);
-                                    output.Append(" ");
+                                    output.Append(' ');
                                 }
                             } else if (args[argIndex] is FixedString[] fixedStringArray) {
                                 foreach (FixedString fixedStringElement in fixedStringArray) {
                                     WriteValue(output, fixedStringElement.ToString(), fieldWidth);
-                                    output.Append(" ");
+                                    output.Append(' ');
                                 }
                             } else {
                                 if (args[argIndex] is FixedString fixedString) {
@@ -193,7 +193,7 @@ namespace JComalLib {
                             else if (args[argIndex] is int[] intArray) {
                                 foreach (int intElement in intArray) {
                                     WriteValue(output, intElement, useHex, fieldWidth);
-                                    output.Append(" ");
+                                    output.Append(' ');
                                 }
                             }
                             argIndex++;
@@ -206,7 +206,7 @@ namespace JComalLib {
                             else if (args[argIndex] is float[] floatArray) {
                                 foreach (float floatElement in floatArray) {
                                     WriteValue(output, floatElement, useHex, fieldWidth);
-                                    output.Append(" ");
+                                    output.Append(' ');
                                 }
                             }
                             argIndex++;

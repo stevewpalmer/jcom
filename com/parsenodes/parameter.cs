@@ -211,7 +211,7 @@ namespace CCompiler {
         // Emit the code that loads part of an entire array by making a copy of
         // the array to the destination array dimensions and copying from the
         // given offset.
-        private void GenerateLoadSubArray(Emitter emitter, ProgramParseNode cg, IdentifierParseNode identNode,
+        private static void GenerateLoadSubArray(Emitter emitter, ProgramParseNode cg, IdentifierParseNode identNode,
             Symbol symParam, Temporaries locals) {
 
             if (!identNode.HasIndexes) {

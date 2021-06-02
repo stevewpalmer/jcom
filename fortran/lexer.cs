@@ -465,7 +465,7 @@ namespace JFortran {
 
         // Returns whether the specified character is valid in the given
         // number base.
-        private bool IsValidInBase(char ch, int numberBase) {
+        private static bool IsValidInBase(char ch, int numberBase) {
             switch (numberBase) {
                 case 2:     return ch == '0' || ch == '1';
                 case 8:     return ch >= '0' && ch <= '7';

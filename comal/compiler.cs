@@ -141,7 +141,7 @@ namespace JComal {
                 using StreamReader sr = new(filename);
                 while (sr.Peek() != -1) {
                     string sourceLine = sr.ReadLine();
-                    if (!string.IsNullOrEmpty(sourceLine)) {
+                    if (!string.IsNullOrWhiteSpace(sourceLine)) {
                         Line line = new(tokeniser.TokeniseLine(sourceLine));
                         lines.Add(line);
                     }

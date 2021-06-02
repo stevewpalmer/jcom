@@ -952,7 +952,7 @@ namespace JComal {
         // Clears the screen and puts the cursor at the top left corner (1,1). If output is to another device,
         // a CHR$(12) is sent (form feed).
         //
-        private ParseNode KPage() {
+        private static ParseNode KPage() {
             return GetRuntimeExtCallNode("CLS");
         }
 

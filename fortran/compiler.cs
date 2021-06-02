@@ -744,7 +744,7 @@ namespace JFortran {
         }
 
         // Return whether the specified token marks the end of an inner IF block
-        private bool IsEndOfIfBlock(TokenID id) {
+        private static bool IsEndOfIfBlock(TokenID id) {
             return id switch {
                 TokenID.KELSEIF or TokenID.KELSE or TokenID.KENDIF or TokenID.ENDOFFILE => true,
                 _ => false,
@@ -777,7 +777,7 @@ namespace JFortran {
         // Continue statement
         // Does nothing, really. It's just there so a label has something to follow it
         // in the absence of anything more useful.
-        private ParseNode KContinue() {
+        private static ParseNode KContinue() {
             return null;
         }
 
@@ -958,7 +958,7 @@ namespace JFortran {
 
         // Verify that the type on the right hand side of an assignment can be
         // assigned to the left hand side.
-        private bool ValidateAssignmentTypes(SymType toType, SymType fromType) {
+        private static bool ValidateAssignmentTypes(SymType toType, SymType fromType) {
             bool valid = false;
             
             switch (toType) {

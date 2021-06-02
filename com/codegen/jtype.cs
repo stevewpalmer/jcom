@@ -31,6 +31,28 @@ using System.Reflection.Emit;
 namespace CCompiler {
 
     /// <summary>
+    /// JType construction flags
+    /// </summary>
+    [Flags]
+    public enum JTypeAttributes {
+
+        /// <summary>
+        /// Type is public
+        /// </summary>
+        Public = 1,
+
+        /// <summary>
+        /// Type is sealed and cannot be inherited
+        /// </summary>
+        Sealed = 2,
+
+        /// <summary>
+        /// Type is debuggable
+        /// </summary>
+        Debuggable = 4
+    }
+
+    /// <summary>
     /// Defines a single assembly type.
     /// </summary>
     public class JType {
@@ -45,13 +67,28 @@ namespace CCompiler {
         public TypeBuilder Builder { get; set; }
 
         /// <summary>
+        /// True if type is debuggable
+        /// </summary>
+        public bool Debuggable { get; set; }
+
+        /// <summary>
         /// Creates the specified type in the module.
         /// </summary>
         /// <param name="mb">Module builder</param>
         /// <param name="typeName">Type name</param>
         /// <param name="attributes">Type attributes</param>
-        public JType(ModuleBuilder mb, string typeName, TypeAttributes attributes) {
-            Builder = mb.DefineType(typeName, attributes);
+        public JType(ModuleBuilder mb, string typeName, JTypeAttributes attributes) {
+            TypeAttributes attr = TypeAttributes.BeforeFieldInit;
+            if (attributes.HasFlag(JTypeAttributes.Public)) {
+                attr |= TypeAttributes.Public;
+            }
+            if (attributes.HasFlag(JTypeAttributes.Sealed)) {
+                attr |= TypeAttributes.Sealed;
+            }
+            if (attributes.HasFlag(JTypeAttributes.Debuggable)) {
+                Debuggable = true;
+            }
+            Builder = mb.DefineType(typeName, attr);
         }
 
         /// <summary>
@@ -161,7 +198,7 @@ namespace CCompiler {
                 if (param.Linkage == SymLinkage.BYREF) {
                     metb.DefineParameter(paramIndex++, ParameterAttributes.In | ParameterAttributes.Out, param.Name);
                 } else {
-                    metb.DefineParameter(paramIndex++, ParameterAttributes.In, param.Name);
+                    metb.DefineParameter(paramIndex++, ParameterAttributes.None, param.Name);
                 }
             }
 

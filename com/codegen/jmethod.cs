@@ -60,7 +60,9 @@ namespace CCompiler {
         public JMethod(JType owningType, MethodBuilder metd) {
             OwningType = owningType;
             Builder = metd;
-            Emitter = new Emitter(metd);
+            Emitter = new Emitter(metd) {
+                IsDebuggable = owningType.Debuggable
+            };
         }
 
         /// <summary>
@@ -71,7 +73,9 @@ namespace CCompiler {
         public JMethod(JType owningType, ConstructorBuilder cntb) {
             OwningType = owningType;
             CBuilder = cntb;
-            Emitter = new Emitter(cntb);
+            Emitter = new Emitter(cntb) {
+                IsDebuggable = owningType.Debuggable
+            };
         }
     }
 }

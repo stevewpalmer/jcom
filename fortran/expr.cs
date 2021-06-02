@@ -242,7 +242,7 @@ namespace JFortran {
         }
 
         // Return whether the node is a possible complex part
-        private bool IsComplexPart(ParseNode node) {
+        private static bool IsComplexPart(ParseNode node) {
             return node.ID == ParseID.NUMBER && (node.Type == SymType.INTEGER || node.Type == SymType.FLOAT);
         }
 

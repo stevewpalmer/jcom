@@ -396,7 +396,7 @@ namespace JFortranLib {
         }
 
         // Format a string as specified by an "A" record.
-        private string FormatString(string value, FormatRecord record) {
+        private static string FormatString(string value, FormatRecord record) {
             string svalue = value;
 
             if (record.FieldWidth > 0) {
@@ -413,7 +413,7 @@ namespace JFortranLib {
 
         // Make sure the value is valid for the given format record type. Throw
         // a run-time exception if there's a mismatch.
-        private void VerifyFormatMatch(FormatRecord record, object value) {
+        private static void VerifyFormatMatch(FormatRecord record, object value) {
             char ch = record.FormatChar;
             bool match = true;
             switch (ch) {

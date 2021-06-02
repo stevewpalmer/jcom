@@ -55,6 +55,11 @@ namespace CCompiler {
         private readonly Collection<Instruction> _code;
 
         /// <summary>
+        /// Specifies whether to generate debuggable code
+        /// </summary>
+        public bool IsDebuggable { get; set; }
+
+        /// <summary>
         /// Constructs an Emitter using the specified MethodBuilder.
         /// </summary>
         /// <param name="metb">MethodBuilder</param>
@@ -289,7 +294,9 @@ namespace CCompiler {
                 throw new ArgumentNullException(nameof(sym));
             }
             LocalBuilder lb = _il.DeclareLocal(sym.SystemType);
-            lb.SetLocalSymInfo(sym.Name);
+            if (IsDebuggable) {
+                lb.SetLocalSymInfo(sym.Name);
+            }
             sym.Index = AssignLocal(sym.SystemType, lb.LocalIndex);
         }
 
@@ -1128,6 +1135,8 @@ namespace CCompiler {
                 case SymType.FLOAT:
                 case SymType.DOUBLE:
                 case SymType.COMPLEX:
+                case SymType.FIXEDCHAR:
+                case SymType.CHAR:
                     Type sysType = Symbol.SymTypeToSystemType(type);
                     Emit0(OpCodes.Unbox_Any, sysType);
                     break;

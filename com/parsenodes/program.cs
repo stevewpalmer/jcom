@@ -205,9 +205,12 @@ namespace CCompiler {
                 className = string.Concat(className, DotNetName);
 
                 // Create the default type
-                TypeAttributes typeAttributes = TypeAttributes.Public;
+                JTypeAttributes typeAttributes = JTypeAttributes.Public;
                 if (isSaveable) {
-                    typeAttributes |= TypeAttributes.BeforeFieldInit | TypeAttributes.Sealed;
+                    typeAttributes |= JTypeAttributes.Sealed;
+                }
+                if (GenerateDebug) {
+                    typeAttributes |= JTypeAttributes.Debuggable;
                 }
                 CurrentType = new JType(Builder, className, typeAttributes);
 

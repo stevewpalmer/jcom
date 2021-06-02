@@ -90,7 +90,7 @@ namespace CCompiler {
             // property.
             if (Operand.Type == SymType.FIXEDCHAR) {
                 cg.GenerateExpression(emitter, SymType.FIXEDCHAR, Operand);
-                emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", new Type[] { }));
+                emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", Array.Empty<Type>()));
                 return SymType.BOOLEAN;
             }
             cg.GenerateExpression(emitter, Type, Operand);
