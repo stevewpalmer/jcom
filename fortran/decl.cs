@@ -372,8 +372,9 @@ namespace JFortran {
                 }
             }
 
-            // New local symbol table for this block
-            _localSymbols = new FortranSymbolCollection("Local");
+            // New local symbol table for this block, inheriting any IMPLICIT
+            // settings from the parent.
+            _localSymbols = new FortranSymbolCollection(_localSymbols);
             _hasReturn = false;
 
             // Parameter list allowed for subroutines and functions, but
@@ -739,12 +740,7 @@ namespace JFortran {
                                     }
                                 }
 
-                                // Check for duplicate definitions
                                 for (char chTmp = ch1; chTmp <= ch2; ++chTmp) {
-                                    if (_localSymbols.IsImplicitSet(chTmp)) {
-                                        Messages.Error(MessageCode.IMPLICITCHAREXISTS,
-                                            $"Character {chTmp} already specified in an IMPLICIT");
-                                    }
                                     _localSymbols.SetImplicit(chTmp);
                                 }
 

@@ -128,7 +128,6 @@ namespace CCompiler {
                     }
                 }
                 Type[] paramTypes = new Type[Dimensions.Length];
-                Type baseType = sym.SystemType;
 
                 for (int c = 0; c < Dimensions.Length; ++c) {
                     SymDimension dim = Dimensions[c];
@@ -147,16 +146,15 @@ namespace CCompiler {
                         emitter.LoadValue(SymType.INTEGER, new Variant(1));
                         emitter.Add(SymType.INTEGER);
                     }
+                    if (c > 0) {
+                        emitter.Mul(SymType.INTEGER);
+                    }
                     paramTypes[c] = typeof(int);
                 }
                 if (sym.Type == SymType.FIXEDCHAR) {
                     emitter.Dup();
                 }
-                if (Dimensions.Length == 1) {
-                    emitter.CreateArray(Symbol.SymTypeToSystemType(sym.Type));
-                } else {
-                    emitter.CreateObject(baseType, paramTypes);
-                }
+                emitter.CreateArray(Symbol.SymTypeToSystemType(sym.Type));
                 emitter.StoreSymbol(sym);
                 if (sym.Type == SymType.FIXEDCHAR) {
                     emitter.InitFixedStringArray(sym);

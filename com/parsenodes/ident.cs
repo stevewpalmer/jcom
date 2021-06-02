@@ -158,7 +158,7 @@ namespace CCompiler {
             if (HasSubstring) {
                 thisType = GenerateLoadSubstring(emitter, cg);
             }
-            return thisType;
+            return emitter.ConvertType(thisType, returnType);
         }
 
         /// <summary>

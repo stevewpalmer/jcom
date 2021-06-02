@@ -157,7 +157,8 @@ namespace ComalTests {
             Utilities.Helper.HelperRunFloat(comp, "array'dynamic'string'1d", 1);
         }
 
-        // Test redimensioning 1D dynamic array
+        // Test redimensioning 1D dynamic array. After redimensioning,
+        // all array elements will have been reset to 0.
         [Test]
         public void Test1DRedimDynamicArray() {
             string code = @"
@@ -165,7 +166,7 @@ namespace ComalTests {
                   arysize := 13
                   dim a(arysize)
                   for x:=1 to arysize do
-                     a(x):=x*y
+                     a(x):=x*x
                   endfor x
                   arysize := 20
                   dim a(arysize)
@@ -177,6 +178,31 @@ namespace ComalTests {
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
             Utilities.Helper.HelperRunFloat(comp, "array'redim'dynamic'1d", 1);
+        }
+
+        // Test 2D dynamic string array
+        [Test]
+        public void Test2DDynamicStringArray() {
+            string code = @"
+                func array'dynamic'string'2d closed
+                  max'x := 5
+                  max'y := 7
+                  dim a(max'x, max'y)
+                  for x:=1 to max'x do
+                     for y:=1 to max'y do
+                        a(x,y):=x*y
+                     endfor y
+                  endfor x
+                  for x:=1 to max'x do
+                     for y:=1 to max'y do
+                        if a(x,y)<>x*y then return false
+                     endfor y
+                  endfor x
+                  return true
+                endfunc array'dynamic'string'2d
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
+            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'string'2d", 1);
         }
 
         // Test catching inconsistent array dimensions

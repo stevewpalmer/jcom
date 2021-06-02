@@ -237,7 +237,7 @@ namespace JComal {
 
             // Don't catch run-time exceptions if we're running in
             // the interpreter.
-            node.CatchExceptions = !_opts.Interactive;
+            node.CatchExceptions = !_opts.Interactive && !_opts.DevMode;
 
             if (methodName == _entryPointName) {
                 method.Modifier |= SymModifier.ENTRYPOINT;
