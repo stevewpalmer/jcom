@@ -1,0 +1,13 @@
+   10 DIM foo$ OF 7
+   20 foo$:="HELLO"
+   30 PRINT lower$(foo$)
+   40 FUNC lower$(text$) CLOSED
+   50   FOR x:=1 TO LEN(text$) DO
+   60     num:=ORD(text$(x:x))
+   70     IF num>=65 AND num<=90 THEN
+   80       num:+32
+   90     ENDIF
+  100     text$(x:x):=CHR$(num)
+  110   ENDFOR x
+  120   RETURN text$
+  130 ENDFUNC lower$

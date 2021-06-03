@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jfor", "fortran\jfor.csproj", "{A36CF6D7-74E9-4316-A927-A7C38E337D0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jfor", "fortran\jfor.csproj", "{A36CF6D7-74E9-4316-A927-A7C38E337D0E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tests", "tests\tests.csproj", "{E5714391-D79D-4662-8968-37C4E32DC687}"
 EndProject
@@ -16,6 +16,56 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jcomlib", "lib\jcomlib.csproj", "{7847796C-E2D1-4402-A664-CF2EB2BD73C7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jcomal", "comal\jcomal.csproj", "{D359DB81-D0DF-48CC-95B0-BD161DA9B537}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A6F58576-DD4A-423E-A27C-F564EF3102A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fortran", "Fortran", "{9FF5FDA2-96E2-43C5-AD9C-04F134E42A1F}"
+	ProjectSection(SolutionItems) = preProject
+		samples\Fortran\cnsume.f = samples\Fortran\cnsume.f
+		samples\Fortran\curves.f = samples\Fortran\curves.f
+		samples\Fortran\date.f = samples\Fortran\date.f
+		samples\Fortran\datest.f = samples\Fortran\datest.f
+		samples\Fortran\euclid.f = samples\Fortran\euclid.f
+		samples\Fortran\f2ccalc.f = samples\Fortran\f2ccalc.f
+		samples\Fortran\heron.f = samples\Fortran\heron.f
+		samples\Fortran\loan.f = samples\Fortran\loan.f
+		samples\Fortran\makefile = samples\Fortran\makefile
+		samples\Fortran\petrol.f = samples\Fortran\petrol.f
+		samples\Fortran\reduce.f = samples\Fortran\reduce.f
+		samples\Fortran\stats.f = samples\Fortran\stats.f
+		samples\Fortran\triang.f = samples\Fortran\triang.f
+		samples\Fortran\vowels.f = samples\Fortran\vowels.f
+		samples\Fortran\bottles.f90 = samples\Fortran\bottles.f90
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39-BF1A-4D40-89E0-95655031D755}"
+	ProjectSection(SolutionItems) = preProject
+		samples\Comal\and2.lst = samples\Comal\and2.lst
+		samples\Comal\abs.lst = samples\Comal\abs.lst
+		samples\Comal\and.lst = samples\Comal\and.lst
+		samples\Comal\append.lst = samples\Comal\append.lst
+		samples\Comal\autorep.lst = samples\Comal\autorep.lst
+		samples\Comal\awaytofile1.lst = samples\Comal\awaytofile1.lst
+		samples\Comal\awaytofile2.lst = samples\Comal\awaytofile2.lst
+		samples\Comal\btree.lst = samples\Comal\btree.lst
+		samples\Comal\filetest.lst = samples\Comal\filetest.lst
+		samples\Comal\hammurabi.lst = samples\Comal\hammurabi.lst
+		samples\Comal\hello.lst = samples\Comal\hello.lst
+		samples\Comal\input.lst = samples\Comal\input.lst
+		samples\Comal\isprime.lst = samples\Comal\isprime.lst
+		samples\Comal\lower.lst = samples\Comal\lower.lst
+		samples\Comal\make.bat = samples\Comal\make.bat
+		samples\Comal\makefile = samples\Comal\makefile
+		samples\Comal\makefile.mak = samples\Comal\makefile.mak
+		samples\Comal\print.lst = samples\Comal\print.lst
+		samples\Comal\proc.lst = samples\Comal\proc.lst
+		samples\Comal\standard.lst = samples\Comal\standard.lst
+		samples\Comal\substrings.lst = samples\Comal\substrings.lst
+		samples\Comal\time.lst = samples\Comal\time.lst
+		samples\Comal\trap2.lst = samples\Comal\trap2.lst
+		samples\Comal\using.lst = samples\Comal\using.lst
+		samples\Comal\README.md = samples\Comal\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,5 +142,9 @@ Global
 		$0.VersionControlPolicy = $6
 		outputpath = .
 		version = 0.3
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9FF5FDA2-96E2-43C5-AD9C-04F134E42A1F} = {A6F58576-DD4A-423E-A27C-F564EF3102A9}
+		{BAC0DB39-BF1A-4D40-89E0-95655031D755} = {A6F58576-DD4A-423E-A27C-F564EF3102A9}
 	EndGlobalSection
 EndGlobal

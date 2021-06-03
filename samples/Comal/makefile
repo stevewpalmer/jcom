@@ -1,12 +1,12 @@
-JFLAGS=-w:2 -debug
-DROP=../drop
-JFOR=mono $(DROP)/jfor.exe $(JFLAGS)
+JFLAGS=-w:4
+DROP=../../drop
 JCOMAL=mono $(DROP)/jcomal.exe $(JFLAGS)
 
 SOURCES=append.exe and.exe and2.exe standard.dll substrings.exe filetest.exe using.exe \
-	isprime.exe btree.exe hammurabi.exe cnsume.exe autorep.exe
+	isprime.exe btree.exe hammurabi.exe autorep.exe abs.exe hello.exe input.exe \
+    lower.exe time.exe trap2.exe
 
-BINARIES=jcomlib.dll jcomallib.dll jforlib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll $(DROP)/jfor.exe
+BINARIES=jcomlib.dll jcomallib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll
 
 all: $(SOURCES)
 
@@ -15,19 +15,13 @@ $(SOURCES): $(BINARIES)
 jcomlib.dll: $(DROP)/jcomlib.dll
 	cp $(DROP)/jcomlib.dll .
 
-jforlib.dll: $(DROP)/jforlib.dll
-	cp $(DROP)/jforlib.dll .
-
 jcomallib.dll: $(DROP)/jcomallib.dll
 	cp $(DROP)/jcomallib.dll .
 
 %.dll %.exe : %.lst
 	$(JCOMAL) $<
 
-%.exe : %.f
-	$(JFOR) $<
-
 clean:
 	-rm *.exe *.dll *.pdb *.dll.mdb *.exe.mdb *.out 
-	-rm VISITORFILE FORT.*
+	-rm VISITORFILE
 

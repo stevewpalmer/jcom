@@ -1,5 +1,6 @@
        10 init
        20 FOR year:=1 TO 10 DO
+       25   thisyear := year
        30   begging'steward
        40   report'update
        50   buy'land
@@ -22,7 +23,7 @@
       220 ENDPROC
       230 PROC begging'steward
       240   PAGE
-      250   PRINT "Hammurabi, your humble steward begs to report that in Year";year;"of your reign:"
+      250   PRINT "Hammurabi, your humble steward begs to report that in Year";thisyear;"of your reign:"
       290   PRINT 
       300   IF num'dead=0 THEN
       310     PRINT "None of your loyal subjects perished,";
@@ -130,7 +131,7 @@
      1430 PROC starve'the'population
      1440   num'dead:=pop-INT(pop*(meals/20))
      1450   IF num'dead>0.45*pop THEN starved
-     1460   pop'pcnt:=((year-1)*pop'pcnt+num'dead*100/pop)/year
+     1460   pop'pcnt:=((thisyear-1)*pop'pcnt+num'dead*100/pop)/thisyear
      1470   pop:-num'dead
      1480   pcnt'dead:+num'dead
      1490 ENDPROC

@@ -26,7 +26,6 @@ mono_crash.*
 # Files I don't want to track
 FORT.*
 fcvs21/run.out
-samples/
 
 # Build results
 [Dd]ebug/

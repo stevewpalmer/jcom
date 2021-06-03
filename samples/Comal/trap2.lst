@@ -1,0 +1,5 @@
+   10 TRAP ESC+
+   20 WHILE NOT ESC DO
+   30 PRINT "Hello World!"
+   40 ENDWHILE
+   50 TRAP ESC-

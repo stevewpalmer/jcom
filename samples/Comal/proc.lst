@@ -1,0 +1,11 @@
+
+   10 FOR down := 6 TO 10 DO
+   20 EXEC starline
+   25 PRINT
+   30 ENDFOR down
+   35 STOP
+   40 PROC starline
+   50 FOR across := 21 TO 27 DO
+   60 PRINT "*",
+   70 ENDFOR across
+   80 ENDPROC starline
