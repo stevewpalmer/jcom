@@ -24,6 +24,7 @@
 // under the License.
 
 namespace CCompiler {
+
     /// <summary>
     /// Defines a single array dimension. Separate lower and upper bounds can
     /// be specifies for languages that support this.

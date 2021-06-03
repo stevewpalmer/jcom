@@ -25,6 +25,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Reflection.Emit;
 using JComLib;
 
 namespace CCompiler {
@@ -85,25 +86,27 @@ namespace CCompiler {
             }
             switch (ID) {
                 case ParseID.ADD:       return GenerateAdd(emitter, cg);
-                case ParseID.EQV:       return GenerateEq(emitter, cg);
-                case ParseID.NEQV:      return GenerateNe(emitter, cg);
-                case ParseID.XOR:       return GenerateXor(emitter, cg);
-                case ParseID.OR:        return GenerateOr(emitter, cg);
-                case ParseID.AND:       return GenerateAnd(emitter, cg);
-                case ParseID.GT:        return GenerateGt(emitter, cg);
-                case ParseID.GE:        return GenerateGe(emitter, cg);
-                case ParseID.LE:        return GenerateLe(emitter, cg);
-                case ParseID.EQ:        return GenerateEq(emitter, cg);
-                case ParseID.NE:        return GenerateNe(emitter, cg);   
-                case ParseID.LT:        return GenerateLt(emitter, cg);
-                case ParseID.SUB:       return GenerateSub(emitter, cg);
-                case ParseID.MULT:      return GenerateMult(emitter, cg);
-                case ParseID.DIVIDE:    return GenerateDivide(emitter, cg);
-                case ParseID.IDIVIDE:   return GenerateIDivide(emitter, cg);
-                case ParseID.MOD:       return GenerateMod(emitter, cg);
+                case ParseID.AND:       return GenerateBitwiseAnd(emitter, cg);
+                case ParseID.ANDTHEN:   return GenerateLogicalAnd(emitter, cg);
                 case ParseID.CONCAT:    return GenerateConcat(emitter, cg);
-                case ParseID.MERGE:     return GenerateMerge(emitter, cg);
+                case ParseID.DIVIDE:    return GenerateDivide(emitter, cg);
+                case ParseID.EQ:        return GenerateEq(emitter, cg);
+                case ParseID.EQV:       return GenerateEq(emitter, cg);
                 case ParseID.EXP:       return GenerateExp(emitter, cg);
+                case ParseID.GE:        return GenerateGe(emitter, cg);
+                case ParseID.GT:        return GenerateGt(emitter, cg);
+                case ParseID.IDIVIDE:   return GenerateIDivide(emitter, cg);
+                case ParseID.LE:        return GenerateLe(emitter, cg);
+                case ParseID.LT:        return GenerateLt(emitter, cg);
+                case ParseID.MERGE:     return GenerateMerge(emitter, cg);
+                case ParseID.MOD:       return GenerateMod(emitter, cg);
+                case ParseID.MULT:      return GenerateMult(emitter, cg);
+                case ParseID.NE:        return GenerateNe(emitter, cg);   
+                case ParseID.NEQV:      return GenerateNe(emitter, cg);
+                case ParseID.OR:        return GenerateBitwiseOr(emitter, cg);
+                case ParseID.ORTHEN:    return GenerateLogicalOr(emitter, cg);
+                case ParseID.SUB:       return GenerateSub(emitter, cg);
+                case ParseID.XOR:       return GenerateXor(emitter, cg);
             }
             Debug.Assert(false, "Unsupported parse ID for BinaryOpParseNode");
             return Symbol.VariantTypeToSymbolType(Value.Type);
@@ -187,19 +190,51 @@ namespace CCompiler {
             return Left.Type;
         }
 
-        // Generate the code for a logical AND operator
-        private SymType GenerateAnd(Emitter emitter, ProgramParseNode cg) {
+        // Generate the code for a bitwise AND operator
+        private SymType GenerateBitwiseAnd(Emitter emitter, ProgramParseNode cg) {
             cg.GenerateExpression(emitter, Type, Left);
             cg.GenerateExpression(emitter, Type, Right);
             emitter.And();
             return Type;
         }
 
-        // Generate the code for a logical OR operator
-        private SymType GenerateOr(Emitter emitter, ProgramParseNode cg) {
+        // Generate the code for a logical AND operator
+        private SymType GenerateLogicalAnd(Emitter emitter, ProgramParseNode cg) {
+            Label skipLabel = emitter.CreateLabel();
+            Label exitLabel = emitter.CreateLabel();
+            cg.GenerateExpression(emitter, Type, Left);
+            emitter.BranchIfFalse(skipLabel);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.BranchIfFalse(skipLabel);
+            emitter.LoadInteger(1);
+            emitter.Branch(exitLabel);
+            emitter.MarkLabel(skipLabel);
+            emitter.LoadInteger(0);
+            emitter.MarkLabel(exitLabel);
+            return Type;
+        }
+
+        // Generate the code for a bitwise OR operator
+        private SymType GenerateBitwiseOr(Emitter emitter, ProgramParseNode cg) {
             cg.GenerateExpression(emitter, Type, Left);
             cg.GenerateExpression(emitter, Type, Right);
             emitter.Or();
+            return Type;
+        }
+
+        // Generate the code for a logical OR operator
+        private SymType GenerateLogicalOr(Emitter emitter, ProgramParseNode cg) {
+            Label skipLabel = emitter.CreateLabel();
+            Label exitLabel = emitter.CreateLabel();
+            cg.GenerateExpression(emitter, Type, Left);
+            emitter.BranchIfTrue(skipLabel);
+            cg.GenerateExpression(emitter, Type, Right);
+            emitter.BranchIfTrue(skipLabel);
+            emitter.LoadInteger(0);
+            emitter.Branch(exitLabel);
+            emitter.MarkLabel(skipLabel);
+            emitter.LoadInteger(1);
+            emitter.MarkLabel(exitLabel);
             return Type;
         }
 

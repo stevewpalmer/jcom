@@ -125,16 +125,37 @@ namespace ComalTests {
                   arysize := 13
                   dim a(arysize)
                   for x:=1 to arysize do
-                     a(x):=x*y
+                     a(x):=x*x
                   endfor x
                   for x:=1 to 13 do
-                    if a(x)<>x*y then return false
+                    if a(x)<>x*x then return false
                   endfor x
                   return true
                 endfunc array'dynamic'1d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
             Utilities.Helper.HelperRunFloat(comp, "array'dynamic'1d", 1);
+        }
+
+        // Test 1D dynamic array with a range
+        [Test]
+        public void Test1DDynamicArrayWithRange() {
+            string code = @"
+                func array'dynamic'1d'range closed
+                  lowr := -5
+                  highr := 5
+                  dim a(lowr:highr)
+                  for x:=lowr to highr do
+                     a(x):=x*x
+                  endfor x
+                  for x:=lowr to highr do
+                    if a(x)<>x*x then return false
+                  endfor x
+                  return true
+                endfunc array'dynamic'1d'range
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'1d'range", 1);
         }
 
         // Test 1D dynamic string array
@@ -180,11 +201,11 @@ namespace ComalTests {
             Utilities.Helper.HelperRunFloat(comp, "array'redim'dynamic'1d", 1);
         }
 
-        // Test 2D dynamic string array
+        // Test 2D dynamic array
         [Test]
         public void Test2DDynamicStringArray() {
             string code = @"
-                func array'dynamic'string'2d closed
+                func array'dynamic'2d closed
                   max'x := 5
                   max'y := 7
                   dim a(max'x, max'y)
@@ -199,10 +220,37 @@ namespace ComalTests {
                      endfor y
                   endfor x
                   return true
-                endfunc array'dynamic'string'2d
+                endfunc array'dynamic'2d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
-            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'string'2d", 1);
+            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'2d", 1);
+        }
+
+        // Test 1D dynamic array with a range
+        [Test]
+        public void Test2DDynamicArrayWithRange() {
+            string code = @"
+                func array'dynamic'2d'range closed
+                  max'x'low := 0
+                  max'x'high := 20
+                  max'y'low := 10
+                  max'y'high := 17
+                  dim a(max'x'low:max'x'high, max'y'low:max'y'high)
+                  for x:=max'x'low to max'x'high do
+                     for y:=max'y'low to max'y'high do
+                        a(x,y):=x*y
+                     endfor y
+                  endfor x
+                  for x:=max'x'high to max'x'low step -1 do
+                     for y:=max'y'high to max'y'low step -1 do
+                        if a(x,y)<>x*y then return false
+                     endfor y
+                  endfor x
+                  return true
+                endfunc array'dynamic'2d'range
+            ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'2d'range", 1);
         }
 
         // Test catching inconsistent array dimensions

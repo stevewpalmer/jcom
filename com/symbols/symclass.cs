@@ -41,11 +41,6 @@ namespace CCompiler {
         VAR,
 
         /// <summary>
-        /// Fortran COMMON
-        /// </summary>
-        COMMON,
-
-        /// <summary>
         /// Function
         /// </summary>
         FUNCTION,
@@ -66,7 +61,7 @@ namespace CCompiler {
         INTRINSIC,
 
         /// <summary>
-        /// Inlined code
+        /// Inlined code (e.g. Fortran statement functions).
         /// </summary>
         INLINE
     }

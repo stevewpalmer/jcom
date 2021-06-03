@@ -606,6 +606,8 @@ namespace JFortran {
                 case ParseID.EQV:
                 case ParseID.NEQV:
                 case ParseID.EQUOP:
+                case ParseID.ANDTHEN:
+                case ParseID.ORTHEN:
                     return LogicalEqualise(node);
             }
             Debug.Assert(false, "Unhandled expression node token");

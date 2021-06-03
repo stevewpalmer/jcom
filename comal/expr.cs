@@ -415,6 +415,12 @@ namespace JComal {
                         done = true;
                         continue;
                 }
+                if (parseID == ParseID.AND && TestToken(TokenID.KTHEN)) {
+                    parseID = ParseID.ANDTHEN;
+                }
+                if (parseID == ParseID.OR && TestToken(TokenID.KTHEN)) {
+                    parseID = ParseID.ORTHEN;
+                }
                 if (level >= preced) {
                     _currentLine.PushToken(token);
                     done = true;
@@ -759,6 +765,8 @@ namespace JComal {
                 case ParseID.GT:
                 case ParseID.EQ:
                 case ParseID.NE:
+                case ParseID.ANDTHEN:
+                case ParseID.ORTHEN:
                     return CastNodeToType(CompareEqualise(node), SymType.INTEGER);
 
                 case ParseID.OR:

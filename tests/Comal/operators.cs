@@ -50,7 +50,7 @@ namespace ComalTests {
             Utilities.Helper.HelperRunFloat(comp, "test'assign", 1);
         }
 
-        // Test the AND operator.
+        // Test the bitwise AND operator.
         [Test]
         public void TestAnd() {
             string code = @"
@@ -112,6 +112,48 @@ namespace ComalTests {
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
             Utilities.Helper.HelperRunFloat(comp, "test'bitxor", 1);
+        }
+
+        // Verify logical AND operator
+        [Test]
+        public void TestLogicalAND() {
+            string code = @"
+                FUNC test'logical'and
+                    counter := 0
+                    p := 12 AND THEN inc'counter()
+                    IF counter <> 1 THEN RETURN FALSE
+                    p := 0 AND THEN inc'counter()
+                    IF counter <> 1 THEN RETURN FALSE
+                    RETURN TRUE
+                ENDFUNC test'logical'and
+                FUNC inc'counter
+                    counter :+ 1
+                    RETURN 1
+                ENDFUNC
+                ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "test'logical'and", 1);
+        }
+
+        // Verify logical OR operator
+        [Test]
+        public void TestLogicalOR() {
+            string code = @"
+                FUNC test'logical'or
+                    counter := 0
+                    p := 12 OR THEN inc'counter()
+                    IF counter <> 0 THEN RETURN FALSE
+                    p := 0 OR THEN inc'counter()
+                    IF counter <> 1 THEN RETURN FALSE
+                    RETURN TRUE
+                ENDFUNC test'logical'or
+                FUNC inc'counter
+                    counter :+ 1
+                    RETURN 1
+                ENDFUNC
+                ";
+            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+            Utilities.Helper.HelperRunFloat(comp, "test'logical'or", 1);
         }
     }
 }

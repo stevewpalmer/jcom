@@ -360,3 +360,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /standard/VISITORFILE
+tests/fcvs21/run.out

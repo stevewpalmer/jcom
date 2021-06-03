@@ -312,9 +312,10 @@ namespace CCompiler {
                 int stepValue = StepExpression.Value.IntValue;
                 emitter.LoadValue(sym.Type, new Variant(stepValue));
                 emitter.Add(sym.Type);
-                if (stepValue != 1) {
+                if (Math.Abs(stepValue) != 1) {
+                    emitter.ConvertType(sym.Type, SymType.INTEGER);
                     emitter.LoadInteger(stepValue);
-                    emitter.Div(sym.Type);
+                    emitter.Div(SymType.INTEGER);
                 }
             } else {
                 cg.GenerateExpression(emitter, sym.Type, StepExpression);

@@ -76,7 +76,7 @@ namespace JFortran {
                 if (isNewBlock) {
                     symCommon = _globalSymbols.Get(name);
                     if (symCommon == null) {
-                        symCommon = _globalSymbols.Add(name, new SymFullType(SymType.COMMON), SymClass.COMMON, null, _ls.LineNumber);
+                        symCommon = _globalSymbols.Add(name, new SymFullType(SymType.COMMON), SymClass.VAR, null, _ls.LineNumber);
                         commonSymbols = new List<Symbol>();
                         symCommon.Info = commonSymbols;
                         symCommon.CommonIndex = 0;

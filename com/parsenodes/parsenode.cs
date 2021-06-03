@@ -31,9 +31,11 @@ namespace CCompiler {
     /// <summary>
     /// List of valid parse IDs for ParseNode
     /// </summary>
-    public enum ParseID { ADD, AND, CONCAT, COND, DIVIDE, EQ, EQUOP, EQV, EXP, FILENAME, GE, BREAK,
-        GOTO, GT, IDENT, INSTR, LABEL, LE, LINENUMBER, LOOP, LT, MINUS, MULT, NE, NEQV, NOT, NUMBER,
-        OR, PLUS, STRING, SUB, UNKNOWN, XOR, MOD, IDIVIDE, MERGE, PROGRAM, PROCEDURE
+    public enum ParseID {
+        ADD, AND, ANDTHEN, BREAK, CONCAT, COND, DIVIDE, EQ, EQUOP, EQV, EXP, FILENAME,
+        GE, GOTO, GT, IDENT, IDIVIDE, INSTR, LABEL, LE, LINENUMBER, LOOP, LT, MERGE,
+        MINUS, MOD, MULT, NE, NEQV, NOT, NUMBER, OR, ORTHEN, PLUS, PROCEDURE, PROGRAM,
+        STRING, SUB, UNKNOWN, XOR
     }
 
     /// <summary>
