@@ -67,11 +67,11 @@ namespace CCompiler {
         /// <param name="code">A list of MSIL instructions.</param>
         public static void Optimise(Collection<Instruction> code) {
             //OptimiseLocalUsage(code);
-            OptimiseReturnTail(code);
             OptimiseBranch(code);
             OptimiseNotBranch(code);
             OptimiseReturn(code);
             OptimiseLoadStore(code);
+            OptimiseReturnTail(code);
         }
 
         // Optimise a BRANCH to a label that is immediately following by removing
@@ -242,6 +242,26 @@ namespace CCompiler {
             int indexLast2 = -1;
             for (int c = 0; c < code.Count; ++c) {
                 if (code[c].Code == OpCodes.Ret && indexLast1 > 0 && indexLast2 > 0) {
+                    if (code[indexLast2].Code == OpCodes.Stloc_0 && code[indexLast1].Code == OpCodes.Ldloc_0) {
+                        code[indexLast1].Deleted = true;
+                        code[indexLast2].Deleted = true;
+                        return;
+                    }
+                    if (code[indexLast2].Code == OpCodes.Stloc_1 && code[indexLast1].Code == OpCodes.Ldloc_1) {
+                        code[indexLast1].Deleted = true;
+                        code[indexLast2].Deleted = true;
+                        return;
+                    }
+                    if (code[indexLast2].Code == OpCodes.Stloc_2 && code[indexLast1].Code == OpCodes.Ldloc_2) {
+                        code[indexLast1].Deleted = true;
+                        code[indexLast2].Deleted = true;
+                        return;
+                    }
+                    if (code[indexLast2].Code == OpCodes.Stloc_3 && code[indexLast1].Code == OpCodes.Ldloc_3) {
+                        code[indexLast1].Deleted = true;
+                        code[indexLast2].Deleted = true;
+                        return;
+                    }
                     if (code[indexLast2].Code == OpCodes.Stloc && code[indexLast1].Code == OpCodes.Ldloc) {
                         InstructionLocal storeInt = (InstructionLocal)code[indexLast2];
                         InstructionLocal loadInt = (InstructionLocal)code[indexLast1];

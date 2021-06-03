@@ -146,7 +146,7 @@ namespace CCompiler {
                         emitter.LoadValue(SymType.INTEGER, new Variant(1));
                         emitter.Add(SymType.INTEGER);
                     }
-                    if (c > 0) {
+                    if (c > 0 && sym.IsFlatArray) {
                         emitter.Mul(SymType.INTEGER);
                     }
                     paramTypes[c] = typeof(int);
@@ -154,7 +154,11 @@ namespace CCompiler {
                 if (sym.Type == SymType.FIXEDCHAR) {
                     emitter.Dup();
                 }
-                emitter.CreateArray(Symbol.SymTypeToSystemType(sym.Type));
+                if (sym.IsFlatArray) {
+                    emitter.CreateArray(Symbol.SymTypeToSystemType(sym.Type));
+                } else {
+                    emitter.CreateObject(sym.SystemType, paramTypes);
+                }
                 emitter.StoreSymbol(sym);
                 if (sym.Type == SymType.FIXEDCHAR) {
                     emitter.InitFixedStringArray(sym);
