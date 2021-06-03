@@ -37,10 +37,44 @@
       </EnvironmentVariables>
     </EnvironmentVariables>
     <ConsolePause>False</ConsolePause>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp ${TargetFile} ../drop/</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp jfor /usr/local/bin</command>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <OutputPath>bin\Release</OutputPath>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp ${TargetFile} ../drop/</command>
+          <workingdir>${ProjectDir}</workingdir>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
+        </Command>
+        <Command>
+          <type>AfterBuild</type>
+          <command>cp jfor /usr/local/bin</command>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\lib\jcomlib.csproj" />

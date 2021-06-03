@@ -9,15 +9,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "tests", "tests\tests.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "com", "com\com.csproj", "{08429F49-D7FB-4482-AD4E-7AE1D495FEB1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jforlib", "fortranlib\jforlib.csproj", "{21240936-1600-4099-8C63-BA64CE8AB514}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jforlib", "fortranlib\jforlib.csproj", "{21240936-1600-4099-8C63-BA64CE8AB514}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jcomallib", "comallib\jcomallib.csproj", "{499AA4DA-E5E7-43AF-882B-F18067BD4E26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jcomallib", "comallib\jcomallib.csproj", "{499AA4DA-E5E7-43AF-882B-F18067BD4E26}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jcomlib", "lib\jcomlib.csproj", "{7847796C-E2D1-4402-A664-CF2EB2BD73C7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jcomal", "comal\jcomal.csproj", "{D359DB81-D0DF-48CC-95B0-BD161DA9B537}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A6F58576-DD4A-423E-A27C-F564EF3102A9}"
+	ProjectSection(SolutionItems) = preProject
+		samples\README.md = samples\README.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fortran", "Fortran", "{9FF5FDA2-96E2-43C5-AD9C-04F134E42A1F}"
 	ProjectSection(SolutionItems) = preProject
@@ -36,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fortran", "Fortran", "{9FF5
 		samples\Fortran\triang.f = samples\Fortran\triang.f
 		samples\Fortran\vowels.f = samples\Fortran\vowels.f
 		samples\Fortran\bottles.f90 = samples\Fortran\bottles.f90
+		samples\Fortran\README.md = samples\Fortran\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39-BF1A-4D40-89E0-95655031D755}"
@@ -65,6 +69,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39
 		samples\Comal\trap2.lst = samples\Comal\trap2.lst
 		samples\Comal\using.lst = samples\Comal\using.lst
 		samples\Comal\README.md = samples\Comal\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{58BCD580-AEDE-4B79-AB0B-F1B589E6F04C}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+		TODO.md = TODO.md
 	EndProjectSection
 EndProject
 Global
