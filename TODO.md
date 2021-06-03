@@ -5,6 +5,7 @@ decreasing order of priority.
 
 ## Work Items
 
+JFor
 * Assigned FORMAT label (FM111, FM252)
 * BLOCK DATA
 * Tokeniser (FM200, FM010, FM011)
@@ -12,10 +13,14 @@ decreasing order of priority.
 * EQUIVALENCE
 * Alternate ENTRY (FM519, FM507)
 
+JComal
+* CHAINing
+
 ## Bug Fixes
 
 JFor
 * Handle missing PROGRAM at start.
+* Fix failing ArrayVerifyDimensions1 unit test.
 
 JComal:
 * Finish dynamic array support.
@@ -40,6 +45,7 @@ JComal:
   * Idea - what if we passed IMPORTed variables as hidden parameters to the nested functions?
 
 Codegen:
+* Fix local lifetime optimisation.
 * Common sub-expression optimisation:
   - eg. ((B/20)*A)+((B/20)*C)
 * Peephole optimiser:
