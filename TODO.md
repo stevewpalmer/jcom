@@ -15,6 +15,8 @@ JFor
 
 JComal
 * CHAINing
+* Non-constant string lengths in DIM...OF
+* AND...THEN, OR...THEN expressions
 
 ## Bug Fixes
 
