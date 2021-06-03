@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <StartupObject>JFortran.Program</StartupObject>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <RootNamespace>JFortran</RootNamespace>
     <CustomCommands>
       <CustomCommands>
@@ -26,6 +26,8 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <LangVersion>9.0</LangVersion>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <Description>JFortran Compiler</Description>
+    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>

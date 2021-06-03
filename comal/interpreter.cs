@@ -81,8 +81,7 @@ namespace JComal {
         /// <param name="opts">Command line options</param>
         public void Run(ComalOptions opts) {
 
-            Version ver = Assembly.GetEntryAssembly().GetName().Version;
-            Console.WriteLine($"JComal v{ver.Major}.{ver.Minor}");
+            Console.WriteLine($"JComal {Options.AssemblyVersion}");
             Console.WriteLine();
 
             Lines oldLines = null;

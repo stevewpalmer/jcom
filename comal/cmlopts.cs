@@ -111,8 +111,8 @@ namespace JComal {
 
         // Display the compiler Help page
         private void DisplayHelp() {
-            Messages.Info(AssemblyDescription() + ", " + AssemblyCopyright()  + "\n" +
-                           ExecutableFilename() + " [options] source-files\n" +
+            Messages.Info(AssemblyDescription + " " + AssemblyVersion + " " + AssemblyCopyright+ "\n" +
+                           ExecutableFilename() + " [options] [source-files]\n" +
                            "   -debug              Generate debugging information\n" +
                            "   -help               Lists all compiler options (short: -?)\n" +
                            "   -noinline           Don't inline intrinsic calls\n" +
@@ -121,7 +121,10 @@ namespace JComal {
                            "   -strict             Enable strict mode\n" +
                            "   -version            Display compiler version (short: -v)\n" +
                            "   -warn:0-4           Sets warning level, the default is 4 (short -w:)\n" +
-                           "   -warnaserror        Treats all warnings as errors\n");
+                           "   -warnaserror        Treats all warnings as errors\n" +
+                           "\n" +
+                           "If no source files are specified, the compiler enters the interactive\n" +
+                           "interpreter mode. Use 'bye' to exit the interpreter\n");
         }
     }
 }

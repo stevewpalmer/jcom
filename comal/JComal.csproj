@@ -3,8 +3,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <Description>JComal Compiler and Interpreter</Description>
-    <Copyright>2013-21 Steven Palmer</Copyright>
+    <Description>JComal Compiler</Description>
+    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
     <RootNamespace>JComal</RootNamespace>
     <LangVersion>9.0</LangVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>

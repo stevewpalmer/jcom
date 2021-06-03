@@ -156,11 +156,11 @@ namespace JFortran {
 
         // Display the compiler Help page
         private void DisplayHelp() {
-            Messages.Info(AssemblyDescription() + ", " + AssemblyCopyright()  + "\n" +
+            Messages.Info(AssemblyDescription + " " + AssemblyVersion + " " + AssemblyCopyright+ "\n" +
                            ExecutableFilename() + " [options] source-files\n" +
                            "   -backslash          Permit C style escapes in strings\n" +
                            "   -debug              Generate debugging information\n" +
-                           "   -f77                Compile FORTRAN 77 source (default)\n" +
+                           "   -f77                Compile Fortran 77 source (default)\n" +
                            "   -f90                Compile Fortran 90 source\n" +
                            "   -help               Lists all compiler options (short: -?)\n" +
                            "   -noinline           Don't inline intrinsic calls\n" +

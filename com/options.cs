@@ -122,32 +122,42 @@ namespace CCompiler {
         }
 
         /// <summary>
-        /// Return the assembly copyright from the assemblyinfo module
+        /// Return the assembly copyright
         /// </summary>
-        /// <returns>Assembly copyright</returns>
-        public string AssemblyCopyright() {
-            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            Debug.Assert(attributes.Length > 0);
-            return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+        public static string AssemblyCopyright {
+            get {
+                object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+                Debug.Assert(attributes.Length > 0);
+                return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
+            }
         }
 
         /// <summary>
-        /// Return the assembly description from the assemblyinfo module
+        /// Return the assembly description
         /// </summary>
-        /// <returns>Assembly description</returns>
-        public string AssemblyDescription() {
-            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
-            Debug.Assert(attributes.Length > 0);
-            return ((AssemblyDescriptionAttribute)attributes[0]).Description;
+        public static string AssemblyDescription {
+            get {
+                object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
+                Debug.Assert(attributes.Length > 0);
+                return ((AssemblyDescriptionAttribute)attributes[0]).Description;
+            }
+        }
+
+        /// <summary>
+        /// Return the assembly version.
+        /// </summary>
+        public static string AssemblyVersion {
+            get {
+                Version ver = Assembly.GetEntryAssembly().GetName().Version;
+                return $"{ver.Major}.{ver.Minor}.{ver.Build}";
+            }
         }
 
         /// <summary>
         /// Return this executable filename.
         /// </summary>
         /// <returns>Executable filename string</returns>
-        public string ExecutableFilename() {
-            return Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
-        }
+        public static string ExecutableFilename() => Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
 
         /// <summary>
         /// Display the current version number
