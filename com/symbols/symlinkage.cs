@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Symbol Table management
 //
 // Authors:
 //  Steve Palmer
@@ -26,20 +26,18 @@
 namespace CCompiler {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// For parameters, indicates how the parameter is passed.
     /// </summary>
-    public class ExecutionResult {
+    public enum SymLinkage {
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// By reference
         /// </summary>
-        public bool Success { get; set; }
+        BYREF,
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// By value
         /// </summary>
-        public object Result { get; set; }
+        BYVAL
     }
 }

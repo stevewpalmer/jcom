@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Emitter for MSIL
 //
 // Authors:
 //  Steve Palmer
@@ -23,23 +23,43 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Reflection.Emit;
+
 namespace CCompiler {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// Defines an instruction class that represents a branch
+    /// destination point in the instruction sequence.
     /// </summary>
-    public class ExecutionResult {
+    public class InstructionLabelMarker : Instruction {
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// Target of label.
         /// </summary>
-        public bool Success { get; set; }
+        public Label Target { get; set; }
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// Create an InstructionLabelMarker object with the specified
+        /// label target.
         /// </summary>
-        public object Result { get; set; }
+        /// <param name="target">Label target</param>
+        public InstructionLabelMarker(Label target) {
+            Target = target;
+        }
+
+        /// <summary>
+        /// Generate MSIL code to emit a label marker.
+        /// </summary>
+        /// <param name="il">ILGenerator object</param>
+        public override void Generate(ILGenerator il) {
+            if (il == null) {
+                throw new ArgumentNullException(nameof(il));
+            }
+            if (Deleted) {
+                return;
+            }
+            il.MarkLabel(Target);
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Identifier parse node
+// Emitter for MSIL
 //
 // Authors:
 //  Steve Palmer
@@ -23,22 +23,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Collections.ObjectModel;
+using System;
+using System.Reflection.Emit;
 
 namespace CCompiler {
+
     /// <summary>
-    /// A single identifier definition
+    /// Defines an instruction class that constructs an opcode that takes
+    /// a Type parameter.
     /// </summary>
-    public class IdentifierDefinition {
+    public class InstructionType : Instruction {
+        private readonly Type _type;
 
         /// <summary>
-        /// Identifier name
+        /// Create an InstructionType object with the given opcode
+        /// and Type parameter.
         /// </summary>
-        public string Name { get; set; }
+        /// <param name="op">Opcode</param>
+        /// <param name="type">Type object</param>
+        public InstructionType(OpCode op, Type type) : base(op) {
+            _type = type;
+        }
 
         /// <summary>
-        /// Optional dimensions
+        /// Generate MSIL code to emit a opcode that takes a Type parameter.
         /// </summary>
-        public Collection<SymDimension> Dimensions { get; set; }
+        /// <param name="il">ILGenerator object</param>
+        public override void Generate(ILGenerator il) {
+            if (il == null) {
+                throw new ArgumentNullException(nameof(il));
+            }
+            if (Deleted) {
+                return;
+            }
+            il.Emit(Code, _type);
+        }
     }
 }

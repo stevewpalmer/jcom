@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Symbol Table management
 //
 // Authors:
 //  Steve Palmer
@@ -26,20 +26,23 @@
 namespace CCompiler {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// Defines the scope of a symbol
     /// </summary>
-    public class ExecutionResult {
+    public enum SymScope {
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// Local variable
         /// </summary>
-        public bool Success { get; set; }
+        LOCAL,
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// Parameter
         /// </summary>
-        public object Result { get; set; }
+        PARAMETER,
+
+        /// <summary>
+        /// Constant
+        /// </summary>
+        CONSTANT
     }
 }

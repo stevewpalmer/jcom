@@ -32,7 +32,17 @@ using JFortranLib;
 namespace CCompiler {
     
     /// <summary>
-    /// Fortran external intrinsics.
+    /// Inline-able functions. Each function generates the code that implements
+    /// itself as inlined code.
+    ///
+    /// Where typeWanted is specified, the function must ensure that the value
+    /// on top of the stack is of that given type.
+    ///
+    /// Note that the compiler has an option to disable inlining functions so
+    /// all functions here must have an instrinsic equivalent in JComLib that
+    /// will be used if inlining is disabled. Unit tests for functions will
+    /// generally test both methods to verify this is always the case.
+    /// 
     /// </summary>
     public static class Inlined {
         

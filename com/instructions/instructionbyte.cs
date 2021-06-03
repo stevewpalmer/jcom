@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Emitter for MSIL
 //
 // Authors:
 //  Steve Palmer
@@ -23,23 +23,40 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Reflection.Emit;
+
 namespace CCompiler {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// Defines an instruction class that constructs an opcode that
+    /// takes a byte parameter.
     /// </summary>
-    public class ExecutionResult {
+    public class InstructionByte : Instruction {
+        private readonly byte _offset;
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// Create an InstructionByte object with the given opcode
+        /// and byte offset.
         /// </summary>
-        public bool Success { get; set; }
+        /// <param name="op">Opcode</param>
+        /// <param name="offset">A byte offset value</param>
+        public InstructionByte(OpCode op, byte offset) : base(op) {
+            _offset = offset;
+        }
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// Generate MSIL code to emit a opcode that takes a byte parameter.
         /// </summary>
-        public object Result { get; set; }
+        /// <param name="il">ILGenerator object</param>
+        public override void Generate(ILGenerator il) {
+            if (il == null) {
+                throw new ArgumentNullException(nameof(il));
+            }
+            if (Deleted) {
+                return;
+            }
+            il.Emit(Code, _offset);
+        }
     }
 }

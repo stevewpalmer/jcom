@@ -33,8 +33,7 @@ namespace CCompiler {
 
     /// <summary>
     /// Class that encapsulates options used by all compilers. This class should
-    /// always be derived by the compiler with additional options specific to
-    /// that compiler.
+    /// always be inherited with additional options specific to that compiler.
     /// </summary>
     public class Options {
         private string _outputFile;

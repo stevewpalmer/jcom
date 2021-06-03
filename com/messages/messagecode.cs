@@ -1,4 +1,4 @@
-// JCom Compiler Toolkit
+﻿// JCom Compiler Toolkit
 // Compiler messages
 //
 // Authors:
@@ -23,95 +23,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Text;
-
 namespace CCompiler {
 
     /// <summary>
-    /// Enumerator that specifies the various types of messages:
-    /// info: this is a raw text string with no filename, code or line number.
-    /// error: a compiler error complete with error code and optional filename and line number.
-    /// warning: a compiler warning complete with error code and optional filename and line number.
-    /// </summary>
-    public enum MessageLevel { Info, Warning, Error }
-
-    /// <summary>
-    /// Represents a single compiler message.
-    /// </summary>
-    public class Message {
-
-        /// <summary>
-        /// Constructs a single message object.
-        /// </summary>
-        /// <param name="filename">Optional filename</param>
-        /// <param name="level">Required message level</param>
-        /// <param name="code">Optional numeric code identifying this message</param>
-        /// <param name="line">Optional source code line number for the message</param>
-        /// <param name="text">The required actual text of the message</param>
-        public Message(string filename, MessageLevel level, MessageCode code, int line, string text) {
-            Filename = filename;
-            Level = level;
-            Code = code;
-            Line = line;
-            Text = text;
-        }
-
-        /// <summary>
-        /// Returns the message formatted for output.
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString() {
-            StringBuilder str = new();
-            if (Level == MessageLevel.Info) {
-                str.Append(Text);
-            } else {
-                if (Filename != null) {
-                    str.Append(Filename);
-                }
-                if (Line != -1) {
-                    str.AppendFormat("({0}):", Line);
-                }
-                if (Code != MessageCode.NONE) {
-                    if (str.Length > 0) {
-                        str.Append(' ');
-                    }
-                    str.AppendFormat("{0} CF{1}: ", Level, (int)Code);
-                }
-                str.Append(Text);
-            }
-            return str.ToString();
-        }
-
-        /// <value>
-        /// Returns the name of the file associated with this message. May be null.
-        /// </value>
-        public string Filename { get; private set; }
-
-        /// <value>
-        /// Returns the level of this message as a <c>MessageLevel</c> type.
-        /// </value>
-        public MessageLevel Level { get; private set; }
-
-        /// <value>
-        /// Returns the code of this message, or MessageCode.NONE if no code is associated.
-        /// </value>
-        public MessageCode Code { get; private set; }
-
-        /// <value>
-        /// Returns the source code line number of this message.
-        /// </value>
-        public int Line { get; private set; }
-
-        /// <value>
-        /// Returns the text of the message.
-        /// </value>
-        public string Text { get; private set; }
-    }
-        
-    /// <summary>
-    /// Error and warning message codes.
+    /// Compiler error and warning message codes.
+    ///
+    /// There's a complete set of codes for all compilers since some errors are
+    /// usually consistent across many of them (such as TYPEMISMATCH). All codes
+    /// should start from 0x1000 onwards mainly so the code is always a fixed length
+    /// 4-digit number in the error message.
+    /// 
     /// Do NOT insert new codes in the middle. We have a unit test
-    /// that validates that the codes do not change.
+    /// that tries to validate that the codes do not change.
     /// </summary>
     public enum MessageCode {
         NONE = 0x0,

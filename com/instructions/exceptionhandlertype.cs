@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Emitter for MSIL
 //
 // Authors:
 //  Steve Palmer
@@ -26,20 +26,28 @@
 namespace CCompiler {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// Types of Emit exception handlers.
     /// </summary>
-    public class ExecutionResult {
+    public enum EmitExceptionHandlerType {
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// Try part of the exception handler
         /// </summary>
-        public bool Success { get; set; }
+        Try,
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// Catch part of the exception handler
         /// </summary>
-        public object Result { get; set; }
+        Catch,
+
+        /// <summary>
+        /// Default catch block
+        /// </summary>
+        DefaultCatch,
+
+        /// <summary>
+        /// End of the Try/Catch block
+        /// </summary>
+        EndCatch
     }
 }

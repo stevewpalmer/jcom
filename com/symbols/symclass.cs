@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Symbol Table management
 //
 // Authors:
 //  Steve Palmer
@@ -26,20 +26,48 @@
 namespace CCompiler {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// Defines the symbol storage class.
     /// </summary>
-    public class ExecutionResult {
+    public enum SymClass {
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// Program
         /// </summary>
-        public bool Success { get; set; }
+        PROGRAM,
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// Variable (includes parameters and constants)
         /// </summary>
-        public object Result { get; set; }
+        VAR,
+
+        /// <summary>
+        /// Fortran COMMON
+        /// </summary>
+        COMMON,
+
+        /// <summary>
+        /// Function
+        /// </summary>
+        FUNCTION,
+
+        /// <summary>
+        /// Subroutine (or void function)
+        /// </summary>
+        SUBROUTINE,
+
+        /// <summary>
+        /// Label
+        /// </summary>
+        LABEL,
+
+        /// <summary>
+        /// Built-in intrinsic
+        /// </summary>
+        INTRINSIC,
+
+        /// <summary>
+        /// Inlined code
+        /// </summary>
+        INLINE
     }
 }

@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Identifier parse node
 //
 // Authors:
 //  Steve Palmer
@@ -23,23 +23,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+using System.Collections.ObjectModel;
+using CCompiler;
+
+namespace JComal {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// A single identifier definition
     /// </summary>
-    public class ExecutionResult {
+    public class IdentifierDefinition {
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// Identifier name
         /// </summary>
-        public bool Success { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// Optional dimensions
         /// </summary>
-        public object Result { get; set; }
+        public Collection<SymDimension> Dimensions { get; set; }
     }
 }

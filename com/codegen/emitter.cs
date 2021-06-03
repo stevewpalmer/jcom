@@ -36,16 +36,6 @@ using JComLib;
 namespace CCompiler {
 
     /// <summary>
-    /// Types of Emit exception handlers.
-    /// </summary>
-    public enum EmitExceptionHandlerType {
-        Try,
-        Catch,
-        DefaultCatch,
-        EndCatch
-    }
-
-    /// <summary>
     /// Defines a class that emits MSIL opcodes and operands
     /// into a specific method or constructor.
     /// </summary>

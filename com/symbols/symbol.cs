@@ -34,50 +34,6 @@ using JComLib;
 namespace CCompiler {
 
     /// <summary>
-    /// Defines the symbol type.
-    /// </summary>
-    public enum SymType {
-        NONE, INTEGER, FLOAT, DOUBLE, BOOLEAN, LABEL, CHAR, FIXEDCHAR, REF,
-        VARARG, PROGRAM, COMMON, GENERIC, COMPLEX
-    }
-
-    /// <summary>
-    /// Defines the symbol storage class.
-    /// </summary>
-    public enum SymClass {
-        PROGRAM, VAR, COMMON, FUNCTION, SUBROUTINE, LABEL, INTRINSIC, INLINE
-    }
-
-    /// <summary>
-    /// Defines the scope of a symbol
-    /// </summary>
-    public enum SymScope {
-        LOCAL, PARAMETER, CONSTANT
-    }
-
-    /// <summary>
-    /// For parameters, indicates how the parameter is passed.
-    /// </summary>
-    public enum SymLinkage {
-        BYREF, BYVAL
-    }
-
-    /// <summary>
-    /// Defines a set of modifiers applied to the symbol.
-    /// </summary>
-    [Flags]
-    public enum SymModifier {
-        HIDDEN = 1,
-        EXTERNAL = 2,
-        STATIC = 4,
-        RETVAL = 8,
-        CONSTRUCTOR = 16,
-        FLATARRAY = 32,
-        ENTRYPOINT = 64,
-        EXPORTED = 128
-    }
-
-    /// <summary>
     /// Defines a single symbol.
     /// </summary>
     public class Symbol {

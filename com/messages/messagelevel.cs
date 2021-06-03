@@ -1,5 +1,5 @@
 ﻿// JCom Compiler Toolkit
-// Core code generation class
+// Compiler messages
 //
 // Authors:
 //  Steve Palmer
@@ -26,20 +26,23 @@
 namespace CCompiler {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// Enumerator that specifies the various types of messages:
     /// </summary>
-    public class ExecutionResult {
+    public enum MessageLevel {
 
         /// <summary>
-        /// Gets or sets whether the execution succeeded.
+        /// This is a raw text string with no filename, code or line number.
         /// </summary>
-        public bool Success { get; set; }
+        Info,
 
         /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
+        /// A compiler warning complete with error code and optional filename and line number
         /// </summary>
-        public object Result { get; set; }
+        Warning,
+
+        /// <summary>
+        /// A compiler error complete with error code and optional filename and line number.
+        /// </summary>
+        Error
     }
 }
