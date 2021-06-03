@@ -14,6 +14,6 @@ Comal is both an interactive compiler and full compiler for the Comal Standard l
 
 With both compilers, macOS support is via the Mono run-time and executables need to be run via the mono launcher:
 
-`mono hello.exe
+`mono hello.exe`
 
 This is not required on Windows.
