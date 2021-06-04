@@ -311,6 +311,11 @@ namespace JComal {
         public bool EndOfFile => _currentLine == _lines.Count;
 
         /// <summary>
+        /// Return the index of the current line
+        /// </summary>
+        public int Index => _currentLine;
+
+        /// <summary>
         /// Reset to start of lines.
         /// </summary>
         public void Reset() {

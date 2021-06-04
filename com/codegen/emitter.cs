@@ -294,16 +294,6 @@ namespace CCompiler {
         /// Create a local variable of the given type and return the index
         /// of the variable in the local index table.
         /// </summary>
-        /// <param name="type">SymType of the local</param>
-        /// <returns>The integer index of the new local</returns>
-        public LocalDescriptor CreateLocal(SymType type) {
-            return CreateLocal(Symbol.SymTypeToSystemType(type));
-        }
-
-        /// <summary>
-        /// Create a local variable of the given type and return the index
-        /// of the variable in the local index table.
-        /// </summary>
         /// <param name="type">Type of the local</param>
         /// <returns>The integer index of the new local</returns>
         public LocalDescriptor CreateLocal(Type type) {

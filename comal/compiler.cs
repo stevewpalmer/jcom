@@ -434,7 +434,9 @@ namespace JComal {
                     if (Array.IndexOf(endTokens, token.ID) >= 0) {
                         return token.ID;
                     }
-                    node.Add(MarkLine());
+                    if (_state != BlockState.NONE) {
+                        node.Add(MarkLine());
+                    }
                     CompileLine(token, node);
                 }
             }
@@ -468,7 +470,10 @@ namespace JComal {
         // filename to refer to the location in the source file if any errors
         // are found during generation.
         private ParseNode MarkLine() {
-            return new MarkLineParseNode {LineNumber = _currentLineNumber};
+            return new MarkLineParseNode {
+                LineNumber = _ls.Index,
+                DisplayableLineNumber = _currentLineNumber
+            };
         }
 
         // Retrieve the next token for the current line and check for any
@@ -1025,7 +1030,7 @@ namespace JComal {
 
                     case ParseID.LINENUMBER: {
                         MarkLineParseNode tokenNode = (MarkLineParseNode)node;
-                        line = tokenNode.LineNumber;
+                        line = tokenNode.DisplayableLineNumber;
                         break;
                     }
 

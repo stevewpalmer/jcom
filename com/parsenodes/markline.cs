@@ -48,6 +48,11 @@ namespace CCompiler {
         public int LineNumber { get; set; }
 
         /// <summary>
+        /// Get the displayable line number for languages such as BASIC or COMAL
+        /// </summary>
+        public int DisplayableLineNumber { get; set; }
+
+        /// <summary>
         /// Emit the code to mark the line number at the current position
         /// in the generated code.
         /// </summary>

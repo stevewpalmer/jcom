@@ -37,8 +37,7 @@ INTTESTS=FM001.exe FM109.exe FM257.exe FM258.exe FM259.exe \
 # basename is the same as the test executable name.
 INTDATATESTS=FM110.exe FM403.exe FM404.exe FM900.exe FM901.exe
 
-# These tests compile and run OK on Windows but crash in the Mono runtime.
-# So we skip these in Mono.
+# These tests compile but crash in the .NET runtime.
 BUGTESTS=FM317.exe FM328.exe
 
 # All of these fail to compile cleanly due to unfinished implementation

@@ -744,6 +744,7 @@ namespace JComal {
                 ExpectToken(TokenID.KUNTIL);
             } else {
                 CompileBlock(node.LoopBody, new[] { TokenID.KUNTIL });
+                node.LoopBody.Add(MarkLine());
             }
             node.EndExpression = IntegerExpression();
             return node;

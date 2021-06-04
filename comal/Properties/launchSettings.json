@@ -2,8 +2,8 @@
   "profiles": {
     "jcomal": {
       "commandName": "Project",
-      "commandLineArgs": "-run dim.lst",
-      "workingDirectory": "C:\\Source\\jcom\\standard"
+      "commandLineArgs": "-debug abs.lst",
+      "workingDirectory": "C:\\Source\\jcom\\samples\\Comal"
     }
   }
 }

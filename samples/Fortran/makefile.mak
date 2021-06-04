@@ -1,16 +1,12 @@
 JFLAGS=-w:2 -debug
-DROP=..\drop
-JFOR=$(DROP)/jfor.exe $(JFLAGS)
-JCOMAL=$(DROP)/jcomal.exe $(JFLAGS)
+DROP=..\..\drop
+JFOR=$(DROP)\jfor.exe $(JFLAGS)
 
-SOURCES=append.exe and.exe and2.exe standard.dll substrings.exe filetest.exe using.exe \
-	isprime.exe btree.exe hammurabi.exe
-
-BINARIES=jcomlib.dll jcomallib.dll jforlib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll $(DROP)/jfor.exe
+INCLUDE "fortran.mak"
 
 all: $(SOURCES)
 
-$(SOURCES): $(BINARIES)
+$(SOURCES): jcomlib.dll jforlib.dll $(DROP)/ccompiler.dll $(DROP)/jfor.exe
 
 jcomlib.dll: $(DROP)\jcomlib.dll
 	copy $(DROP)\jcomlib.dll .
@@ -18,13 +14,10 @@ jcomlib.dll: $(DROP)\jcomlib.dll
 jforlib.dll: $(DROP)\jforlib.dll
 	copy $(DROP)\jforlib.dll .
 
-jcomallib.dll: $(DROP)\jcomallib.dll
-	copy $(DROP)\jcomallib.dll .
+.f90.exe:
+	$(JFOR) $<
 
-%.dll %.exe : %.lst
-	$(JCOMAL) $<
-
-%.exe : %.FOR
+.f.exe:
 	$(JFOR) $<
 
 clean:

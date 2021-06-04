@@ -2,8 +2,7 @@ JFLAGS=-w:4
 DROP=../../drop
 JFOR=mono $(DROP)/jfor.exe $(JFLAGS)
 
-SOURCES=cnsume.exe curves.exe date.exe datest.exe euclid.exe f2ccalc.exe heron.exe \
-        loan.exe petrol.exe reduce.exe stats.exe triang.exe vowels.exe bottles.exe
+INCLUDE "fortran.mak"
 
 BINARIES=jcomlib.dll jforlib.dll $(DROP)/ccompiler.dll $(DROP)/jfor.exe
 
