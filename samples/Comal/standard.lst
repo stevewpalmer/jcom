@@ -46,6 +46,7 @@
      9410       f#:=FREEFILE
      9420       OPEN FILE f#, filename$, READ 
      9430       WHILE NOT(EOF(f#)) DO
+     9435         DIM a$ OF 1, reply$ OF 1
      9440         a$:=GET$(f#,1)
      9450         CASE ORD(a$) OF
      9460         WHEN 13  // cr
@@ -60,7 +61,7 @@
      9550           CLOSE FILE f#
      9560           PRINT 
      9570           RETURN 
-     9580         ELIF reply$>""  //any key to pause
+     9580         ELIF reply$>"" THEN  //any key to pause
      9590           waitkey
      9600         ENDIF
      9610       ENDWHILE
@@ -85,6 +86,7 @@
      9795     IMPORT clearkeys
      9800     clearkeys
      9810     REPEAT
+     9815       DIM reply$ OF 1
      9820       reply$:=KEY$
      9830     UNTIL reply$>CHR$(0)
      9840     RETURN reply$
@@ -94,6 +96,7 @@
      9875     IMPORT clearkeys
      9880     clearkeys
      9890     REPEAT
+     9895       DIM reply$ OF 1
      9900       reply$:=KEY$
      9910     UNTIL reply$ IN valid$
      9920     RETURN reply$
@@ -103,7 +106,7 @@
      9960     length:=LEN(text$)
      9970     IF text$=char$ THEN
      9980       RETURN ""
-     9990     ELIF text$(length:length)=char$
+     9990     ELIF text$(length:length)=char$ THEN
     10000       RETURN stripchar$(text$(:length-1), char$)
     10010     ELSE
     10020       RETURN text$
@@ -267,22 +270,22 @@
     11510
     11520   FUNC lower$(text$) CLOSED
     11530     FOR x:=1 to LEN(text$) DO
-    11540       num:=ORD(text$(x))
+    11540       num:=ORD(text$(x:x))
     11550       IF num>=65 AND num<=90 THEN
     11560         num:+32
     11570       ENDIF
-    11580       text$(x):=CHR$(num)
+    11580       text$(x:x):=CHR$(num)
     11590     ENDFOR x
     11600     RETURN text$
     11610   ENDFUNC lower$
     11620
     11630   FUNC upper$(text$) CLOSED
     11640     FOR x:=1 to LEN(text$) DO
-    11650       num:=ORD(text$(x))
+    11650       num:=ORD(text$(x:x))
     11660       IF num>=97 AND num<=122 THEN
     11670         num:-32
     11680       ENDIF
-    11690       text$(x):=CHR$(num)
+    11690       text$(x:x):=CHR$(num)
     11700     ENDFOR x
     11710     RETURN text$
     11720   ENDFUNC upper$    

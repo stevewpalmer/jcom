@@ -33,10 +33,10 @@ namespace ComalTests {
 
         // Validate the Tokens IDs are consistent.
         [Test]
-        public void ValidateMessageCodeTable() {
-            Assert.AreEqual((int)TokenID.KENDCASE, 38);
-            Assert.AreEqual((int)TokenID.KMOD, 75);
-            Assert.AreEqual((int)TokenID.KRESTORE, 136);
+        public void ValidateTokenEnums() {
+            Assert.AreEqual((int)TokenID.KENDCASE, 50);
+            Assert.AreEqual((int)TokenID.KMOD, 100);
+            Assert.AreEqual((int)TokenID.KRESTORE, 123);
         }
 
         // Verify that the default options are what we expect.

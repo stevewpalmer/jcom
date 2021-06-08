@@ -23,8 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
@@ -37,28 +35,6 @@ namespace CCompiler {
     public static class Peephole {
 
         /// <summary>
-        /// The Lifetime class is used to track local variable lifetime
-        /// when used with the OptimiseLocalUsage function.
-        /// </summary>
-        private sealed class Lifetime {
-
-            /// <summary>
-            /// Initialises a new Lifetime object using the specified local
-            /// variable and the start index in the code..
-            /// </summary>
-            /// <param name="localVar">Local variable.</param>
-            /// <param name="startIndex">Start index.</param>
-            public Lifetime(LocalDescriptor localVar, int startIndex) {
-                LocalVar = localVar;
-                StartIndex = startIndex;
-            }
-
-            public LocalDescriptor LocalVar { get; private set; }
-            public int StartIndex { get; private set; }
-            public int EndIndex { get; set; }
-        }
-
-        /// <summary>
         /// Perform a sequence of peephole (localised) optimisation on the code. The code
         /// is generally expected to be self contained, with its own locals and arguments
         /// and terminate with a return instruction. Globals are disregarded as we have no
@@ -66,7 +42,6 @@ namespace CCompiler {
         /// </summary>
         /// <param name="code">A list of MSIL instructions.</param>
         public static void Optimise(Collection<Instruction> code) {
-            //OptimiseLocalUsage(code);
             OptimiseBranch(code);
             OptimiseNotBranch(code);
             OptimiseReturn(code);
@@ -90,10 +65,11 @@ namespace CCompiler {
             }
         }
 
-        // Optimise a RETURN instruction that is the result of a comparision. This occurs when
-        // doing:
+        // Optimise a branch after the result of a comparison. This occurs when
+        // doing either of:
         //
-        //    IF expr1 <> expr2 RETURN
+        //    IF expr1 <> expr2 GOTO xx
+        //    IF !expr GOTO xx
         //
         // Here the <> evaluates to a CEQ followed by an XOR(1) to inverse the result. This
         // optimisation replaces this with a direct true branch if they are equal.
@@ -107,15 +83,33 @@ namespace CCompiler {
                     code[c + 3].Code == OpCodes.Conv_I1 &&
                     code[c + 4].Code == OpCodes.Brfalse) {
 
-                    InstructionLabel brFalse = (InstructionLabel)code[c + 4];
-                    code[c] = new InstructionLabel(OpCodes.Beq, brFalse.Target) {
-                        Code = OpCodes.Beq
-                    };
-                    code[c + 1].Deleted = true;
-                    code[c + 2].Deleted = true;
-                    code[c + 3].Deleted = true;
-                    code[c + 4].Deleted = true;
-                    c += 5;
+                    InstructionLabel brFalse = code[c + 4] as InstructionLabel;
+                    if (brFalse != null) {
+                        code[c] = new InstructionLabel(OpCodes.Beq, brFalse.Target);
+                        code[c + 1].Deleted = true;
+                        code[c + 2].Deleted = true;
+                        code[c + 3].Deleted = true;
+                        code[c + 4].Deleted = true;
+                        c += 5;
+                    }
+                }
+                if (code[c].Code == OpCodes.Conv_I4 &&
+                    code[c + 1].Code == OpCodes.Ldc_I4 &&
+                    code[c + 2].Code == OpCodes.Ceq &&
+                    code[c + 3].Code == OpCodes.Conv_I1 &&
+                    code[c + 4].Code == OpCodes.Brfalse) {
+
+                    InstructionInt intLoad = code[c + 1] as InstructionInt;
+                    InstructionLabel brFalse = code[c + 4] as InstructionLabel;
+
+                    if (intLoad != null && brFalse != null && intLoad.Value == 0) {
+                        code[c] = new InstructionLabel(OpCodes.Brtrue, brFalse.Target);
+                        code[c + 1].Deleted = true;
+                        code[c + 2].Deleted = true;
+                        code[c + 3].Deleted = true;
+                        code[c + 4].Deleted = true;
+                        c += 5;
+                    }
                 }
             }
         }
@@ -140,54 +134,6 @@ namespace CCompiler {
                     };
                     code[c + 1].Deleted = true;
                     c += 2;
-                }
-            }
-        }
-
-        // Look for non-overlapping local variable usage of the same type which implies we can
-        // reuse the storage rather than allocating more space.
-        //
-        // BUGBUG: This is turned off right now because it needs to handle branches which
-        // occur in loops, which extend the lifetime of all variables within the block to the
-        // end of that block.
-        //
-        private static void OptimiseLocalUsage(Collection<Instruction> code) {
-            Dictionary<int, Lifetime> lifetimeSet = new();
-
-            for (int c = 0; c < code.Count; ++c) {
-                if (code[c].Code == OpCodes.Stloc ||
-                    code[c].Code == OpCodes.Ldloc ||
-                    code[c].Code == OpCodes.Ldloca) {
-                    InstructionLocal loadInt = (InstructionLocal)code[c];
-                    LocalDescriptor localVar = loadInt.Value;
-                    Lifetime life;
-
-                    if (!lifetimeSet.ContainsKey(localVar.Index)) {
-                        life = new Lifetime(localVar, c);
-                        lifetimeSet.Add(localVar.Index, life);
-                    }
-
-                    life = lifetimeSet[localVar.Index];
-                    life.EndIndex = c;
-                }
-                if (code[c].Code == OpCodes.Ret) {
-                    List<Lifetime> sortedLifetimeList = new(lifetimeSet.Values);
-                    sortedLifetimeList.Sort(
-                        delegate(Lifetime a, Lifetime b) {
-                            return a.StartIndex.CompareTo(b.StartIndex);
-                    });
-
-                    // Now scan the sorted list. Any variable whose start index comes after
-                    // the end index of the preceding variable can be replaced with the
-                    // preceding variable index as long as types match.
-                    for (int m = 1; m < sortedLifetimeList.Count; ++m) {
-                        if (sortedLifetimeList[m].StartIndex > sortedLifetimeList[m-1].EndIndex &&
-                            sortedLifetimeList[m].LocalVar.Type == sortedLifetimeList[m-1].LocalVar.Type) {
-                            Console.WriteLine("Replaced local var {0} with {1}", sortedLifetimeList[m].LocalVar.Index, sortedLifetimeList[m-1].LocalVar.Index);
-                            sortedLifetimeList[m].LocalVar.Index = sortedLifetimeList[m-1].LocalVar.Index;
-                        }
-                    }
-                    lifetimeSet = new Dictionary<int, Lifetime>();
                 }
             }
         }

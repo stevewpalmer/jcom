@@ -821,6 +821,7 @@ namespace JComal {
                     case TokenID.KREPORT:           return KReport();
                     case TokenID.KSTOP:             return KStop();
                     case TokenID.KTRAP:             return KTrap();
+                    case TokenID.KUSE:              return KUse();
                     case TokenID.KWHILE:            return KWhile();
                     case TokenID.KWRITE:            return KWrite();
                     case TokenID.KZONE:             return KZone();
@@ -882,6 +883,7 @@ namespace JComal {
                 case TokenID.KRESTORE:
                 case TokenID.KSTOP:
                 case TokenID.KTRAP:
+                case TokenID.KUSE:
                 case TokenID.KWHILE:
                 case TokenID.KWRITE:
                 case TokenID.KZONE:
@@ -978,7 +980,13 @@ namespace JComal {
         }
 
         // Validate an assignment of the exprNode to the specified identNode.
-        private static bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
+        private bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
+            if (identNode.IsArrayBase) {
+                IdentifierParseNode exprIdentNode = exprNode as IdentifierParseNode;
+                if (exprIdentNode == null || !exprIdentNode.IsArrayBase) {
+                    return false;
+                }
+            }
             return ValidateAssignmentTypes(identNode.Type, exprNode.Type);
         }
 

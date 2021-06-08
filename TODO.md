@@ -16,12 +16,10 @@ JFor
 JComal
 * CHAINing
 * Non-constant string lengths in DIM...OF
-* AND...THEN, OR...THEN expressions
 
 ## Bug Fixes
 
 JFor
-* Handle missing PROGRAM at start.
 * Fix failing ArrayVerifyDimensions1 unit test.
 
 JComal:
@@ -29,6 +27,10 @@ JComal:
   * How can nested proc/func reference a parameter or variable in the parent method??
   * How do we deal with IMPORT from a PROC/FUNC we’re nested in?
   * Idea - what if we passed IMPORTed variables as hidden parameters to the nested functions?
+* Debug Info
+  * For some reason, local symbols don't show up in the VS Local pane.
+  * On Visual Studio Mac, the debugger is unable to find the source code.
+  * Single-stepping gets stuck on the first line for several steps in ABS.LST
 
 Codegen:
 * Fix local lifetime optimisation.

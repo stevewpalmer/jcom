@@ -457,7 +457,14 @@ namespace CCompiler {
             if (type == null) {
                 throw new ArgumentNullException(nameof(type));
             }
-            switch (type.Name.ToLower()) {
+            string typeName = type.Name.ToLower();
+            if (typeName.Contains("[]")) {
+                typeName = typeName.Replace("[]", "");
+            }
+            if (typeName.Contains("&")) {
+                typeName = typeName.Replace("&", "");
+            }
+            switch (typeName) {
                 case "int32":           return SymType.INTEGER;
                 case "float":           return SymType.FLOAT;
                 case "single":          return SymType.FLOAT;
@@ -469,7 +476,7 @@ namespace CCompiler {
                 case "complex":         return SymType.COMPLEX;
                 case "void":            return SymType.NONE;
             }
-            Debug.Assert(false, "No symbol type for "+type);
+            Debug.Assert(false, $"No symbol type for {typeName}");
             return SymType.NONE;
         }
 

@@ -1,8 +1,8 @@
-JFLAGS=-w:4
+JFLAGS=-w:4 -strict
 DROP=../../drop
 JCOMAL=mono $(DROP)/jcomal.exe $(JFLAGS)
 
-INCLUDE "comal.mak"
+include comal.mak
 
 BINARIES=jcomlib.dll jcomallib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll
 

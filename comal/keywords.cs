@@ -26,7 +26,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using CCompiler;
 using JComLib;
 
@@ -36,6 +38,67 @@ namespace JComal {
     /// Main compiler class.
     /// </summary>
     public partial class Compiler {
+
+        // USE
+        //
+        // Syntax: USE <string constant>
+        //
+        // Specifies an external library to be included in the compilation.
+        // Exported members of the library are added to the symbol table in
+        // the same way as PROC func(parms) EXTERNAL "library".
+        // 
+        private ParseNode KUse() {
+
+            SimpleToken token = GetNextToken();
+            if (token is not IdentifierToken identToken) {
+                Messages.Error(MessageCode.LIBRARYNAMEEXPECTED, "Library name expected");
+            } else {
+                string baseTypeName = identToken.Name;
+                string currentDirectory = Directory.GetCurrentDirectory();
+                string typeDllPath = Path.Combine(currentDirectory, baseTypeName);
+                if (string.IsNullOrEmpty(Path.GetExtension(typeDllPath))) {
+                    typeDllPath = Path.ChangeExtension(typeDllPath, ".dll");
+                }
+                Assembly dll = Assembly.LoadFile(typeDllPath);
+                if (dll == null) {
+                    Messages.Error(MessageCode.LIBRARYNOTFOUND, $"Library {baseTypeName} not found");
+                    return null;
+                }
+
+                // Enumerate all types in dll and add them to the globals.20
+                System.Type [] allTypes = dll.GetTypes();
+                foreach (System.Type thisType in allTypes) {
+                    string name = thisType.Name;
+
+                    // Enumerate all methods on type
+                    MethodInfo [] allMethods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+                    foreach (MethodInfo method in allMethods) {
+
+                        SymClass klass = method.ReturnType == typeof(void) ? SymClass.SUBROUTINE : SymClass.FUNCTION;
+                        SymFullType fullType = new(Symbol.SystemTypeToSymbolType(method.ReturnType));
+
+                        // Convert parameter types
+                        Collection<Symbol> parameters = new();
+                        foreach (ParameterInfo parameter in method.GetParameters()) {
+
+                            SymFullType paramType = new(Symbol.SystemTypeToSymbolType(parameter.ParameterType));
+                            SymLinkage linkage = parameter.ParameterType.IsByRef ? SymLinkage.BYREF : SymLinkage.BYVAL;
+                            parameters.Add(new Symbol(parameter.Name, paramType, SymClass.VAR, null, _currentLineNumber) {
+                                Scope = SymScope.PARAMETER,
+                                Linkage = linkage
+                            });
+                        }
+
+                        Globals.Add(new Symbol(method.Name, fullType, klass, null, _currentLineNumber) {
+                            Modifier = SymModifier.EXTERNAL,
+                            ExternalLibrary = thisType.AssemblyQualifiedName,
+                            Parameters = parameters
+                        });
+                    }
+                } 
+            }
+            return null;
+        }
 
         // MODULE
         //
