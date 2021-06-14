@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -59,10 +60,17 @@ namespace JComal {
                 if (string.IsNullOrEmpty(Path.GetExtension(typeDllPath))) {
                     typeDllPath = Path.ChangeExtension(typeDllPath, ".dll");
                 }
-                Assembly dll = Assembly.LoadFile(typeDllPath);
-                if (dll == null) {
-                    Messages.Error(MessageCode.LIBRARYNOTFOUND, $"Library {baseTypeName} not found");
-                    return null;
+
+                Assembly dll;
+                try {
+                    dll = Assembly.LoadFile(typeDllPath);
+                }
+                catch (Exception e) {
+                    if (e is FileNotFoundException || e is FileLoadException) {
+                        Messages.Error(MessageCode.LIBRARYNOTFOUND, $"Library {baseTypeName} not found");
+                        return null;
+                    }
+                    throw;
                 }
 
                 // Enumerate all types in dll and add them to the globals.20
