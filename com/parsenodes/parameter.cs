@@ -157,6 +157,7 @@ namespace CCompiler {
                         if (!isByRef && symIdent.IsValueType && symIdent.IsByRef) {
                             emitter.LoadIndirect(identType);
                         }
+                        emitter.ConvertType(symIdent.Type, identType);
                     } else {
 
                         // Passing an array by reference

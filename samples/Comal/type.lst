@@ -1,0 +1,66 @@
+ 100 type("makefile")
+
+ 9250 FUNC file'exists(filename$) CLOSED
+ 9260   TRAP
+ 9270     f:=FREEFILE
+ 9280     OPEN FILE f, filename$, READ
+ 9290     CLOSE FILE f
+ 9300     RETURN TRUE
+ 9310   HANDLER
+ 9320     TRAP
+ 9330       CLOSE FILE f
+ 9340     HANDLER
+ 9350       NULL
+ 9360     ENDTRAP
+ 9370     RETURN FALSE
+ 9380   ENDTRAP
+ 9390 ENDFUNC
+
+ 9410 PROC type(filename$) CLOSED
+ 9420   IMPORT waitkey
+ 9430   IMPORT file'exists
+ 9440   IF file'exists(filename$) THEN
+ 9450     f#:=FREEFILE
+ 9460     OPEN FILE f#, filename$, READ
+ 9470     WHILE NOT(EOF(f#)) DO
+ 9480       DIM a$ OF 1, reply$ OF 1
+ 9490       a$:=GET$(f#,1)
+ 9500       CASE ORD(a$) OF
+ 9510         WHEN 13 // cr
+ 9520         NULL // ignore them
+ 9530         WHEN 10 // lf
+ 9540         PRINT // go TO ENDFOR line
+ 9550         OTHERWISE
+ 9560         PRINT a$, // PRINT all other characters
+ 9570       ENDCASE
+ 9580       reply$:=KEY$
+ 9590       IF reply$=CHR$(27) THEN //ESC key TO END
+ 9600         CLOSE FILE f#
+ 9610         PRINT
+ 9620         RETURN
+ 9630       ELIF reply$>"" THEN //any key TO pause
+ 9640         waitkey
+ 9650       ENDIF
+ 9660     ENDWHILE
+ 9670     CLOSE FILE f#
+ 9680   ELSE
+ 9690     PRINT "File not found."
+ 9700   ENDIF
+ 9710 ENDPROC
+
+11600 PROC waitkey CLOSED
+11610   IMPORT pause
+11620   DIM msg$ OF 32
+11630   r:=CURROW; c:=CURCOL; msg$:=" << Press a key to continue >> "
+11640   PRINT msg$,
+11650   pause
+11660   IF r=CURROW AND CURCOL<c THEN r:-1 // screen scrolled
+11670   PRINT AT r,c: SPC$(LEN(msg$)), // overwrites msg
+11680   CURSOR r,c // back TO where we started
+11690 ENDPROC
+11700
+11710 PROC pause CLOSED
+11720   DIM k$ OF 1
+11730   k$:=KEY$
+11740 ENDPROC
+

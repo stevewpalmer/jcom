@@ -306,7 +306,7 @@ namespace JComal {
                     xmlTree.Save(outputFilename);
                 }
             } catch (Exception e) {
-                if (_opts.DevMode) {
+                if (_opts.DevMode || _opts.Interactive) {
                     throw;
                 }
                 Messages.Error(MessageCode.COMPILERFAILURE, $"Compiler error: {e.Message}");
