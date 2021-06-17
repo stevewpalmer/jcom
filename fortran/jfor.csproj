@@ -28,6 +28,8 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <Description>Fortran Compiler</Description>
     <Copyright>(c) 2013-21 Steven Palmer</Copyright>
+    <Authors>Steven Palmer</Authors>
+    <Product>Fortran Compiler</Product>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>

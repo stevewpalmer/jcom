@@ -6,6 +6,9 @@
     <RootNamespace>JComLib</RootNamespace>
     <Description>Common Language Runtime</Description>
     <Copyright>(c) 2013-21 Steven Palmer</Copyright>
+    <Authors>Steven Palmer</Authors>
+    <Company>Steven Palmer</Company>
+    <Product>Common Language Runtime</Product>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <LangVersion>9.0</LangVersion>

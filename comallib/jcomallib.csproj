@@ -23,6 +23,8 @@
       </CustomCommands>
     </CustomCommands>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <Authors>Steven Palmer</Authors>
+    <Product>Comal Runtime</Product>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>

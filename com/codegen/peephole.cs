@@ -82,9 +82,7 @@ namespace CCompiler {
                     code[c + 2].Code == OpCodes.Xor &&
                     code[c + 3].Code == OpCodes.Conv_I1 &&
                     code[c + 4].Code == OpCodes.Brfalse) {
-
-                    InstructionLabel brFalse = code[c + 4] as InstructionLabel;
-                    if (brFalse != null) {
+                    if (code[c + 4] is InstructionLabel brFalse) {
                         code[c] = new InstructionLabel(OpCodes.Beq, brFalse.Target);
                         code[c + 1].Deleted = true;
                         code[c + 2].Deleted = true;
@@ -99,10 +97,9 @@ namespace CCompiler {
                     code[c + 3].Code == OpCodes.Conv_I1 &&
                     code[c + 4].Code == OpCodes.Brfalse) {
 
-                    InstructionInt intLoad = code[c + 1] as InstructionInt;
-                    InstructionLabel brFalse = code[c + 4] as InstructionLabel;
+                    if (code[c + 1] is InstructionInt intLoad && 
+                        code[c + 4] is InstructionLabel brFalse && intLoad.Value == 0) {
 
-                    if (intLoad != null && brFalse != null && intLoad.Value == 0) {
                         code[c] = new InstructionLabel(OpCodes.Brtrue, brFalse.Target);
                         code[c + 1].Deleted = true;
                         code[c + 2].Deleted = true;
@@ -218,8 +215,7 @@ namespace CCompiler {
                         return;
                     }
                 }
-                InstructionTryCatch instructionTryCatch = code[c] as InstructionTryCatch;
-                if (instructionTryCatch != null && indexLast1 > 0) {
+                if (code[c] is InstructionTryCatch instructionTryCatch && indexLast1 > 0) {
                     InstructionTryCatch tryCatch = instructionTryCatch;
                     if (tryCatch.TryCatchType == EmitExceptionHandlerType.Catch && code[indexLast1].Code == OpCodes.Ret) {
                         code[indexLast1].Deleted = true;

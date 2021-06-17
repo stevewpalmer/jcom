@@ -29,6 +29,8 @@
       </CustomCommands>
     </CustomCommands>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Authors>Steven Palmer</Authors>
+    <Product>JComal Compiler</Product>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>

@@ -18,6 +18,9 @@ jcomallib.dll: $(DROP)\jcomallib.dll
 
 .lst.exe:
 	$(JCOMAL) $<
+	
+.lst.dll:
+	$(JCOMAL) $<
 
 clean:
 	-del /q *.exe *.dll *.pdb *.dll.mdb *.exe.mdb *.out 

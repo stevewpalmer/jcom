@@ -23,6 +23,8 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
+    <Authors>Steven Palmer</Authors>
+    <Product>Fortran Runtime</Product>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
