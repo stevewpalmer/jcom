@@ -142,7 +142,6 @@ namespace CCompiler {
                     il.Emit(OpCodes.Ldloc_S, tmp1);
                     il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Type"), null);
                     il.Emit(OpCodes.Ldc_I4, (int)JComRuntimeExceptionType.END);
-                    il.Emit(OpCodes.Beq, skipMessage);
 
                     il.Emit(OpCodes.Ldloc_S, tmp1);
                     il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message"), null);

@@ -20,6 +20,7 @@ JComal
 ## Bug Fixes
 
 JFor
+* GET$ is skipping over newlines.
 * Fix failing ArrayVerifyDimensions1 unit test.
 
 JComal:
