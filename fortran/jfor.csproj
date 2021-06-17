@@ -26,7 +26,7 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <LangVersion>9.0</LangVersion>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Description>JFortran Compiler</Description>
+    <Description>Fortran Compiler</Description>
     <Copyright>(c) 2013-21 Steven Palmer</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

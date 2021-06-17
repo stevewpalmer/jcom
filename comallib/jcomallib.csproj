@@ -5,6 +5,8 @@
     <ReleaseVersion>0.3</ReleaseVersion>
     <RootNamespace>JComalLib</RootNamespace>
     <LangVersion>9.0</LangVersion>
+    <Description>Comal Runtime</Description>
+    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <CustomCommands>
       <CustomCommands>

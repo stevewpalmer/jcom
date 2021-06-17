@@ -980,7 +980,7 @@ namespace JComal {
         }
 
         // Validate an assignment of the exprNode to the specified identNode.
-        private bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
+        private static bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
             if (identNode.IsArrayBase) {
                 IdentifierParseNode exprIdentNode = exprNode as IdentifierParseNode;
                 if (exprIdentNode == null || !exprIdentNode.IsArrayBase) {

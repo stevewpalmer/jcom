@@ -4,6 +4,8 @@
     <OutputType>Library</OutputType>
     <ReleaseVersion>0.3</ReleaseVersion>
     <RootNamespace>JComLib</RootNamespace>
+    <Description>Common Language Runtime</Description>
+    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <LangVersion>9.0</LangVersion>

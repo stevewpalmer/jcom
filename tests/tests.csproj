@@ -6,7 +6,9 @@
     <ReleaseVersion>0.3</ReleaseVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-  </PropertyGroup>
+    <Description>Unit Tests</Description>
+    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
+</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
