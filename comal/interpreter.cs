@@ -243,7 +243,7 @@ namespace JComal {
             int steps = 10;
             int startLine = Lines.MaxLine + steps;
 
-            GetCommandRange(ls, ref startLine, ref steps, TokenID.COMMA);
+            GetSequenceArguments(ls, ref startLine, ref steps);
             if (!ls.IsAtEndOfLine) {
                 SyntaxError();
             }
@@ -600,7 +600,7 @@ namespace JComal {
             int start = 10;
             int steps = 10;
 
-            GetCommandRange(ls, ref start, ref steps, TokenID.COMMA);
+            GetSequenceArguments(ls, ref start, ref steps);
             if (!ls.IsAtEndOfLine) {
                 SyntaxError();
             }
@@ -666,7 +666,7 @@ namespace JComal {
         // other commands. Alternatively a procedure or function name can be specified
         // in which case we return the start and end line numbers of the function or
         // procedure.
-        private void GetCommandRange(Line ls, ref int startLine, ref int endLine, TokenID separatorToken = TokenID.MINUS) {
+        private void GetCommandRange(Line ls, ref int startLine, ref int endLine) {
 
             if (!ls.IsAtEndOfLine) {
 
@@ -682,7 +682,7 @@ namespace JComal {
 
                         token = ls.GetToken();
                     }
-                    if (token.ID != separatorToken) {
+                    if (token.ID != TokenID.MINUS) {
                         ls.PushToken(token);
                         if (ls.IsAtEndOfLine) {
                             endLine = startLine;
@@ -693,6 +693,27 @@ namespace JComal {
                             IntegerToken endLineToken = token as IntegerToken;
                             endLine = endLineToken.Value;
                         }
+                    }
+                }
+            }
+        }
+
+        // Retrieve two values that serve as optional arguments to the AUTO and RENUMBER
+        // commands.
+        private static void GetSequenceArguments(Line ls, ref int startLine, ref int endLine) {
+
+            if (!ls.IsAtEndOfLine) {
+                SimpleToken token = ls.GetToken();
+                if (token.ID == TokenID.INTEGER) {
+                    IntegerToken startLineToken = token as IntegerToken;
+                    startLine = startLineToken.Value;
+                    token = ls.GetToken();
+                }
+                if (token.ID == TokenID.COMMA) {
+                    token = ls.GetToken();
+                    if (token.ID == TokenID.INTEGER) {
+                        IntegerToken endLineToken = token as IntegerToken;
+                        endLine = endLineToken.Value;
                     }
                 }
             }
