@@ -36,7 +36,7 @@ namespace FortranTests {
         public void ValidateMessageCodeTable() {
             Assert.AreEqual((int)MessageCode.NONE, 0);
             Assert.AreEqual((int)MessageCode.EXPECTEDTOKEN, 0x1000);
-            Assert.AreEqual((int)MessageCode.BADOPTION, 0x103F);
+            Assert.AreEqual((int)MessageCode.BADOPTION, 0x103E);
         }
 
         // Verify that the default options are what we expect.
@@ -59,10 +59,8 @@ namespace FortranTests {
             Assert.IsFalse(opts.Parse(args));
 
             Assert.IsTrue(opts.Backslash);
-            Assert.IsTrue(opts.GenerateDebug);
-            Assert.IsTrue(opts.Messages.Count == 2);
+            Assert.IsTrue(opts.Messages.Count == 1);
             Assert.IsTrue(opts.Messages[0].Code == MessageCode.BADOPTION);
-            Assert.IsTrue(opts.Messages[1].Code == MessageCode.MISSINGSOURCEFILE);
         }
 
         // Verify that input filenames are correctly parsed

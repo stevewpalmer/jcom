@@ -54,7 +54,9 @@ namespace JComal {
         /// <param name="arguments">Array of string arguments</param>
         /// <returns>True if the arguments are valid, false otherwise</returns>
         public override bool Parse(string[] arguments) {
-            base.Parse(arguments);
+            if (!base.Parse(arguments)) {
+                return false;
+            }
 
             for (int c = 0; c < SourceFiles.Count; c++) {
                 SourceFiles[c] = Utilities.AddExtensionIfMissing(SourceFiles[c], Consts.SourceFileExtension);

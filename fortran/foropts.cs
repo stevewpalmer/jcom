@@ -71,10 +71,17 @@ namespace JFortran {
         /// <param name="arguments">Array of string arguments</param>
         /// <returns>True if the arguments are valid, false otherwise</returns>
         public override bool Parse(string[] arguments) {
-            base.Parse(arguments);
+            if (!base.Parse(arguments)) {
+                return false;
+            }
 
             if (F77 && F90) {
                 Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both -f77 and -f90");
+                return false;
+            }
+
+            if (SourceFiles.Count == 0) {
+                Messages.Error(MessageCode.MISSINGSOURCEFILE, "Missing input source file");
                 return false;
             }
 

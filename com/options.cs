@@ -55,6 +55,11 @@ namespace CCompiler {
         public string Name { get; set; }
 
         /// <summary>
+        /// Option input short name
+        /// </summary>
+        public string ShortName { get; set; }
+
+        /// <summary>
         /// For options that take an argument, the name of the argument
         /// </summary>
         public string ArgName { get; set; }
@@ -112,7 +117,7 @@ namespace CCompiler {
         /// Sets and returns the compiler warning level where 0 means no warnings
         /// and 4 equates to all warnings.
         /// </value>
-        [OptionField("warn", MinRange=0, MaxRange = 4, Help = "Sets warning level, the default is 4 (short -w:)")]
+        [OptionField("warn", ShortName="w", ArgName="NUM", MinRange=0, MaxRange = 4, Help = "Sets warning level, the default is 4")]
         public int WarnLevel { get; set; }
 
         /// <value>
@@ -149,7 +154,6 @@ namespace CCompiler {
         /// <value>
         /// Sets and returns the version string to be embedded in the program.
         /// </value>
-        [OptionField("version", Help = "Display compiler version (short: -v)")]
         public string VersionString { get; set; }
 
         /// <value>
@@ -228,9 +232,6 @@ namespace CCompiler {
         /// <param name="arguments">Array of string arguments</param>
         /// <returns>True if the arguments are valid, false otherwise</returns>
         public virtual bool Parse(string[] arguments) {
-            bool success = true;
-            bool stopParse = false;
-
             PropertyInfo[] props = GetType().GetProperties();
 
             foreach (string optstring in arguments) {
@@ -253,56 +254,63 @@ namespace CCompiler {
                                     string optionDescription = da.Help;
                                     if (!string.IsNullOrEmpty(da.Help)) {
                                         string name = da.Name;
+                                        string helptext = da.Help;
                                         if (da.ArgName != null) {
                                             name += ":" + da.ArgName;
                                         }
-                                        help.AppendLine(string.Format("   -{0,-18} {1}", name, da.Help));
+                                        if (da.ShortName != null) {
+                                            helptext += $" (short: -{da.ShortName})";
+                                        }
+                                        help.AppendLine(string.Format("   -{0,-18} {1}", name, helptext));
                                     }
                                 }
                             }
                         }
                         Messages.Info(help.ToString());
-                        stopParse = true;
-                    } else if (opts[0] == "version" || opts[0] == "v") {
+                        return false;
+                    }
+                    if (opts[0] == "version" || opts[0] == "v") {
                         DisplayVersion();
-                        stopParse = true;
-                    } else {
-                        foreach (PropertyInfo prop in props) {
-                            if (Attribute.IsDefined(prop, typeof(OptionField))) {
-                                if (Attribute.GetCustomAttribute(prop, typeof(OptionField)) is OptionField da) {
-                                    if (opts[0] == da.Name) {
+                        return false;
+                    }
 
-                                        if (prop.PropertyType == typeof(bool)) {
-                                            prop.SetValue(this, true);
-                                        }
-                                        if (prop.PropertyType == typeof(int)) {
-                                            if (opts.Length < 2 || !int.TryParse(opts[1], out int value) || value < da.MinRange || value > da.MaxRange) {
-                                                Messages.Error(MessageCode.BADWARNLEVEL, "Missing or out of range warning level");
-                                            } else {
-                                                prop.SetValue(this, value);
-                                            }
-                                        }
-                                        if (prop.PropertyType == typeof(string)) {
-                                            if (opts.Length < 2 || string.IsNullOrEmpty(opts[1])) {
-                                                Messages.Error(MessageCode.NOOUTPUTFILE, "Missing output file name");
-                                                success = false;
-                                            } else {
-                                                prop.SetValue(this, opts[1]);
-                                            }
-                                        }
+                    bool validOption = false;
+                    foreach (PropertyInfo prop in props) {
+                        if (Attribute.IsDefined(prop, typeof(OptionField))) {
+                            if (Attribute.GetCustomAttribute(prop, typeof(OptionField)) is OptionField da) {
+                                if (opts[0] == da.Name || opts[0] == da.ShortName) {
+
+                                    if (prop.PropertyType == typeof(bool)) {
+                                        prop.SetValue(this, true);
                                     }
+                                    if (prop.PropertyType == typeof(int)) {
+                                        if (opts.Length < 2 || !int.TryParse(opts[1], out int value) || value < da.MinRange || value > da.MaxRange) {
+                                            Messages.Error(MessageCode.BADARGUMENTRANGE, $"Value for option {opts[0]} out of range {da.MinRange}-{da.MaxRange}");
+                                            return false;
+                                        }
+                                        prop.SetValue(this, value);
+                                    }
+                                    if (prop.PropertyType == typeof(string)) {
+                                        if (opts.Length < 2 || string.IsNullOrEmpty(opts[1])) {
+                                            Messages.Error(MessageCode.MISSINGOPTIONVALUE, $"Missing value for option {opts[0]}");
+                                            return false;
+                                        }
+                                        prop.SetValue(this, opts[1]);
+                                    }
+                                    validOption = true;
                                 }
                             }
                         }
                     }
+                    if (!validOption) {
+                        Messages.Error(MessageCode.BADOPTION, $"Invalid option -{opts[0]}");
+                        return false;
+                    }
                 } else {
                     SourceFiles.Add(optstring);
                 }
-                if (stopParse) {
-                    return false;
-                }
             }
-            return success;
+            return true;
         }
     }
 }
