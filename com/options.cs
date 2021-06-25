@@ -25,11 +25,55 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace CCompiler {
+
+    /// <summary>
+    /// Used to mark Option attributes
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class OptionField : Attribute {
+
+        // ReSharper disable UnusedMember.Global
+        public OptionField(string name) {
+            Name = name;
+        }
+        // ReSharper restore UnusedMember.Global
+
+        public OptionField() {
+            Name = string.Empty;
+        }
+
+        /// <summary>
+        /// Option input name
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// For options that take an argument, the name of the argument
+        /// </summary>
+        public string ArgName { get; set; }
+
+        /// <summary>
+        /// Help text
+        /// </summary>
+        public string Help { get; set; }
+
+        /// <summary>
+        /// Minimum range of argument
+        /// </summary>
+        public int MinRange { get; set; }
+
+        /// <summary>
+        /// Maximum range of argument
+        /// </summary>
+        public int MaxRange { get; set; }
+    }
 
     /// <summary>
     /// Class that encapsulates options used by all compilers. This class should
@@ -61,43 +105,51 @@ namespace CCompiler {
         /// <value>
         /// Sets and returns whether debuggable code is enabled.
         /// </value>
+        [OptionField("debug", Help= "Generate debugging information")]
         public bool GenerateDebug { get; set; }
-        
+
         /// <value>
         /// Sets and returns the compiler warning level where 0 means no warnings
         /// and 4 equates to all warnings.
         /// </value>
+        [OptionField("warn", MinRange=0, MaxRange = 4, Help = "Sets warning level, the default is 4 (short -w:)")]
         public int WarnLevel { get; set; }
 
         /// <value>
         /// Sets and returns whether warnings should be treated as errors.
         /// </value>
+        [OptionField("warnaserror", Help = "Treats all warnings as errors")]
         public bool WarnAsError { get; set; }
 
         /// <value>
         /// Sets and returns whether we dump compiler debugging information
         /// </value>
+        [OptionField("dump", Help = "Output compiler debugging information to a file")]
         public bool Dump { get; set; }
 
         /// <value>
         /// Sets and returns whether some intrinsic calls are inlined.
         /// </value>
+        [OptionField("noinline", Help = "Don't inline intrinsic calls")]
         public bool Inline { get; set; }
 
         /// <value>
         /// Sets and returns whether the generated program is to run after complication.
         /// </value>
+        [OptionField("run", Help = "Run the executable if no errors")]
         public bool Run { get; set; }
 
         /// <value>
         /// Sets and returns whether the compiler is operating in development mode (and
         /// thus doing diagnostic stuff to aid debugging).
         /// </value>
+        [OptionField("dev")]
         public bool DevMode { get; set; }
 
         /// <value>
         /// Sets and returns the version string to be embedded in the program.
         /// </value>
+        [OptionField("version", Help = "Display compiler version (short: -v)")]
         public string VersionString { get; set; }
 
         /// <value>
@@ -108,6 +160,7 @@ namespace CCompiler {
         /// <value>
         /// Gets or sets the output file name.
         /// </value>
+        [OptionField("out", ArgName="FILE", Help = "Specifies output executable name")]
         public string OutputFile {
             get {
                 if (_outputFile != null) {
@@ -165,6 +218,91 @@ namespace CCompiler {
         public void DisplayVersion() {
             Version ver = Assembly.GetEntryAssembly().GetName().Version;
             Messages.Info($"{ver.Major}.{ver.Minor}.{ver.Build}");
+        }
+
+        /// <summary>
+        /// Parse the specified command line array passed to the application.
+        /// Any errors are added to the error list. Also note that the first
+        /// argument in the list is assumed to be the application name.
+        /// </summary>
+        /// <param name="arguments">Array of string arguments</param>
+        /// <returns>True if the arguments are valid, false otherwise</returns>
+        public virtual bool Parse(string[] arguments) {
+            bool success = true;
+            bool stopParse = false;
+
+            PropertyInfo[] props = GetType().GetProperties();
+
+            foreach (string optstring in arguments) {
+                if (optstring.StartsWith("-")) {
+                    string[] opts = optstring.Substring(1).ToLower().Split(':');
+                    if (opts[0] == "help" || opts[0] == "?") {
+
+                        StringBuilder help = new();
+                        help.AppendLine(AssemblyDescription + " " + AssemblyVersion + " " + AssemblyCopyright);
+                        help.AppendLine(ExecutableFilename() + " [options] [source-files]");
+
+                        help.AppendLine("   -help               Lists all compiler options (short: -?)");
+                        help.AppendLine("   -version            Display compiler version (short: -v)");
+
+                        foreach (PropertyInfo prop in props) {
+
+                            if (Attribute.IsDefined(prop, typeof(OptionField))) {
+                                if (Attribute.GetCustomAttribute(prop, typeof(OptionField)) is OptionField da) {
+
+                                    string optionDescription = da.Help;
+                                    if (!string.IsNullOrEmpty(da.Help)) {
+                                        string name = da.Name;
+                                        if (da.ArgName != null) {
+                                            name += ":" + da.ArgName;
+                                        }
+                                        help.AppendLine(string.Format("   -{0,-18} {1}", name, da.Help));
+                                    }
+                                }
+                            }
+                        }
+                        Messages.Info(help.ToString());
+                        stopParse = true;
+                    } else if (opts[0] == "version" || opts[0] == "v") {
+                        DisplayVersion();
+                        stopParse = true;
+                    } else {
+                        foreach (PropertyInfo prop in props) {
+                            if (Attribute.IsDefined(prop, typeof(OptionField))) {
+                                if (Attribute.GetCustomAttribute(prop, typeof(OptionField)) is OptionField da) {
+                                    if (opts[0] == da.Name) {
+
+                                        if (prop.PropertyType == typeof(bool)) {
+                                            prop.SetValue(this, true);
+                                        }
+                                        if (prop.PropertyType == typeof(int)) {
+                                            if (opts.Length < 2 || !int.TryParse(opts[1], out int value) || value < da.MinRange || value > da.MaxRange) {
+                                                Messages.Error(MessageCode.BADWARNLEVEL, "Missing or out of range warning level");
+                                            } else {
+                                                prop.SetValue(this, value);
+                                            }
+                                        }
+                                        if (prop.PropertyType == typeof(string)) {
+                                            if (opts.Length < 2 || string.IsNullOrEmpty(opts[1])) {
+                                                Messages.Error(MessageCode.NOOUTPUTFILE, "Missing output file name");
+                                                success = false;
+                                            } else {
+                                                prop.SetValue(this, opts[1]);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    SourceFiles.Add(optstring);
+                }
+                if (stopParse) {
+                    return false;
+                }
+            }
+            return success;
         }
     }
 }
