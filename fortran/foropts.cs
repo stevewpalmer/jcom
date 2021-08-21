@@ -39,24 +39,28 @@ namespace JFortran {
         /// </summary>
         public FortranOptions() {
             Backslash = false;
+            F77 = true;
         }
 
         /// <value>
         /// Sets and returns whether backslashes are normal characters rather
         /// than an escape sequence delimiter.
         /// </value>
+        [OptionField("backslash", Help = "Permit C style escapes in strings")]
         public bool Backslash { get; set; }
-        
+
         /// <value>
         /// Sets and returns whether the source code should be compiled using
         /// the FORTRAN 77 compiler.
         /// </value>
+        [OptionField("f77", Help = "Compile Fortran 77 source (default)")]
         public bool F77 { get; set; }
-        
+
         /// <value>
         /// Sets and returns whether the source code should be compiled using
         /// the Fortran 90 compiler.
         /// </value>
+        [OptionField("f90", Help = "Compile Fortran 90 source")]
         public bool F90 { get; set; }
 
         /// <summary>
@@ -66,109 +70,37 @@ namespace JFortran {
         /// </summary>
         /// <param name="arguments">Array of string arguments</param>
         /// <returns>True if the arguments are valid, false otherwise</returns>
-        public bool Parse(string[] arguments) {
-            bool success = true;
-            bool possibleF90 = false;
-            bool stopParse = false;
-
-            foreach (string optstring in arguments) {
-                if (optstring.StartsWith("-")) {
-                    string [] opts = optstring.Substring(1).ToLower().Split(':');
-                    if (opts[0] == "backslash") {
-                        Backslash = true;
-                    } else if (opts[0] == "help" || opts[0] == "?") {
-                        DisplayHelp();
-                        stopParse = true;
-                    } else if (opts[0] == "debug") {
-                        GenerateDebug = true;
-                    } else if (opts[0] == "warnaserror") {
-                        WarnAsError = true;
-                    } else if (opts[0] == "warn" || opts[0] == "w") {
-                        if (opts.Length < 2 || !int.TryParse(opts[1], out int level) || level < 0 || level > 4) {
-                            Messages.Error(MessageCode.BADWARNLEVEL, "Missing or out of range warning level");
-                        } else {
-                            WarnLevel = level;
-                        }
-                    } else if (opts[0] == "dump") {
-                        Dump = true;
-                    } else if (opts[0] == "f77") {
-                        if (F90) {
-                            Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both -f77 and -f90");
-                        }
-                        F77 = true;
-                        F90 = false;
-                    } else if (opts[0] == "f90") {
-                        if (F77) {
-                            Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both -f77 and -f90");
-                        }
-                        F77 = false;
-                        F90 = true;
-                    } else if (opts[0] == "dev") {
-                        DevMode = (opts.Length < 2) || opts[1] == "1" || opts[1] == "yes";
-                    } else if (opts[0] == "run") {
-                        Run = true;
-                    } else if (opts[0] == "version" || opts[0] == "v") {
-                        DisplayVersion();
-                        stopParse = true;
-                    } else if (opts[0] == "noinline") {
-                        Inline = false;
-                    } else if (opts[0] == "out") {
-                        if (opts.Length < 2 || string.IsNullOrEmpty(opts[1])) {
-                            Messages.Error(MessageCode.NOOUTPUTFILE, "Missing output file name");
-                            success = false;
-                        } else {
-                            OutputFile = opts[1];
-                        }
-                    } else {
-                        Messages.Error(MessageCode.BADOPTION, $"Unknown option: {optstring}");
-                        success = false;
-                    }
-                } else {
-                    // It's a source file
-                    string ext = Path.GetExtension(optstring);
-                    string extLower = ext.ToLower();
-                    if (extLower != ".f" && extLower != ".for" && extLower != ".f90") {
-                        Messages.Error(MessageCode.BADEXTENSION, $"Source file {optstring} must have .f extension");
-                        success = false;
-                    }
-                    if (extLower == ".f90") {
-                        possibleF90 = true;
-                    }
-                    SourceFiles.Add(optstring);
-                }
-                if (stopParse) {
-                    return false;
-                }
+        public override bool Parse(string[] arguments) {
+            if (!base.Parse(arguments)) {
+                return false;
             }
+
+            if (F77 && F90) {
+                Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both -f77 and -f90");
+                return false;
+            }
+
             if (SourceFiles.Count == 0) {
                 Messages.Error(MessageCode.MISSINGSOURCEFILE, "Missing input source file");
-                success = false;
+                return false;
             }
-            if (!F77 && !F90) {
-                if (possibleF90) {
-                    F90 = true;
-                } else {
-                    F77 = true;
+
+            bool possibleF90 = F90;
+            foreach (string sourceFile in SourceFiles) {
+                string ext = Path.GetExtension(sourceFile);
+                string extLower = ext.ToLower();
+                if (extLower != ".f" && extLower != ".for" && extLower != ".f90") {
+                    Messages.Error(MessageCode.BADEXTENSION, $"Source file {sourceFile} must have .f extension");
+                    return false;
+                }
+                if (extLower == ".f90") {
+                    possibleF90 = true;
                 }
             }
-            return success;
-        }
-
-        // Display the compiler Help page
-        private void DisplayHelp() {
-            Messages.Info(AssemblyDescription + " " + AssemblyVersion + " " + AssemblyCopyright+ "\n" +
-                           ExecutableFilename() + " [options] source-files\n" +
-                           "   -backslash          Permit C style escapes in strings\n" +
-                           "   -debug              Generate debugging information\n" +
-                           "   -f77                Compile Fortran 77 source (default)\n" +
-                           "   -f90                Compile Fortran 90 source\n" +
-                           "   -help               Lists all compiler options (short: -?)\n" +
-                           "   -noinline           Don't inline intrinsic calls\n" +
-                           "   -out:FILE           Specifies output executable name\n" +
-                           "   -run                Run the executable if no errors\n" +
-                           "   -version            Display compiler version (short: -v)\n" +
-                           "   -warn:0-4           Sets warning level, the default is 4 (short -w:)\n" +
-                           "   -warnaserror        Treats all warnings as errors\n");
+            if (possibleF90) {
+                F90 = true;
+            }
+            return true;
         }
     }
 }

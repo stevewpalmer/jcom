@@ -6,11 +6,11 @@ decreasing order of priority.
 ## Work Items
 
 JFor:
+* BLOCK DATA (FM500, FM503, FM506)
 * Assigned FORMAT label (FM111, FM252)
-* BLOCK DATA
 * Tokeniser (FM200, FM010, FM011)
 * Substring assignment (FM903, FM710)
-* EQUIVALENCE
+* EQUIVALENCE - probably will never do this.
 * Alternate ENTRY (FM519, FM507)
 
 JComal:
