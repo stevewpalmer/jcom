@@ -5,7 +5,7 @@ decreasing order of priority.
 
 ## Work Items
 
-JFor
+JFor:
 * Assigned FORMAT label (FM111, FM252)
 * BLOCK DATA
 * Tokeniser (FM200, FM010, FM011)
@@ -13,17 +13,18 @@ JFor
 * EQUIVALENCE
 * Alternate ENTRY (FM519, FM507)
 
-JComal
+JComal:
 * CHAINing
 * Non-constant string lengths in DIM...OF
 
 ## Bug Fixes
 
-JFor
-* GET$ is skipping over newlines.
+JFor:
 * Fix failing ArrayVerifyDimensions1 unit test.
 
 JComal:
+* USE libraries not working on Windows.
+* GET$ is skipping over newlines.
 * Fix Nested PROC/FUNC.
   * How can nested proc/func reference a parameter or variable in the parent method??
   * How do we deal with IMPORT from a PROC/FUNC we’re nested in?

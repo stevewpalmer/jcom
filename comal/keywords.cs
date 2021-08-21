@@ -521,13 +521,11 @@ namespace JComal {
         //
         // Syntax: CASE <expression> OF...WHEN <expression>
         //
-        // Begins a CASE structure, allowing a multiple choice decision with as many specific WHEN sections as
-        // needed. A default OTHERWISE section may be included that is executed if none of -the WHEN sections match
         // Begins a CASE structure, allowing a multiple choice decision with as many specific WHEN sections as needed.
         // A default OTHERWISE section may be included that is executed if none of the WHEN sections match the
-        // condition (which can be either string or numeric). Statement blocks following each WHEN are indented
-        // when listed, but the CASE, WHEN and OTHERWISE statements are not}. The system will insert the word OF
-        // for you if you don't type it.
+        // condition (which can be either string or numeric).
+        //
+        // The system will insert the word OF for you if you don't type it.
         //
         private ParseNode KCase() {
 
@@ -636,7 +634,8 @@ namespace JComal {
         //
         // Syntax: IF <expression> THEN statements ELSE statements
         //
-        // Conditional statement evaluation.
+        // Conditional statement evaluation. Both single and multi line versions are
+        // handled.
         //
         private ParseNode KIf() {
             ConditionalParseNode node = new();
