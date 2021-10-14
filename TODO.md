@@ -10,12 +10,13 @@ JFor:
 * Assigned FORMAT label (FM111, FM252)
 * Tokeniser (FM200, FM010, FM011)
 * Substring assignment (FM903, FM710)
-* EQUIVALENCE - probably will never do this.
+* EQUIVALENCE - probably will never do this
 * Alternate ENTRY (FM519, FM507)
 
 JComal:
 * CHAINing
 * Non-constant string lengths in DIM...OF
+* Console error handling on Linux
 
 ## Bug Fixes
 
