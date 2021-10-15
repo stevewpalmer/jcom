@@ -8,6 +8,7 @@
     <RootNamespace>JComal</RootNamespace>
     <LangVersion>9.0</LangVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CustomCommands>
       <CustomCommands>
         <Command>
@@ -33,7 +34,7 @@
     <Product>JComal Compiler</Product>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <NoWarn>1701;1702;CA1062</NoWarn>
     <CustomCommands>
       <CustomCommands>
@@ -55,10 +56,11 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
-    <OutputPath>bin\Release</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <CustomCommands>
       <CustomCommands>
         <Command>
@@ -79,6 +81,7 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\com\com.csproj" />

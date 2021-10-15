@@ -119,6 +119,14 @@ namespace CCompiler {
                 }
                 throw new ApplicationException(errorString);
             }
+            if (ErrorCount == 100) {
+                _messages.Add(new Message(filename,
+                                          MessageLevel.Error,
+                                          MessageCode.TOOMANYCONTINUATION,
+                                          line,
+                                          "Too many errors. Compilation stopped"));
+                throw new ApplicationException();
+            }
             _messages.Add(new Message(filename, MessageLevel.Error, code, line, str));
             ++ErrorCount;
         }

@@ -9,6 +9,7 @@
     <Authors>Steven Palmer</Authors>
     <Company>Steven Palmer</Company>
     <Product>Common Language Runtime</Product>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <LangVersion>9.0</LangVersion>

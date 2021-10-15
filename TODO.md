@@ -18,6 +18,9 @@ JComal:
 * Non-constant string lengths in DIM...OF
 * Console error handling on Linux
 
+JCobol
+* Implement
+
 ## Bug Fixes
 
 JFor:
@@ -26,6 +29,7 @@ JFor:
 JComal:
 * USE libraries not working on Windows.
 * GET$ is skipping over newlines.
+* Fix USE statement on Windows
 * Fix Nested PROC/FUNC.
   * How can nested proc/func reference a parameter or variable in the parent method??
   * How do we deal with IMPORT from a PROC/FUNC we’re nested in?

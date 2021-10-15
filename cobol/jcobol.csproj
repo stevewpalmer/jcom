@@ -8,6 +8,7 @@
     <RootNamespace>JCobol</RootNamespace>
     <LangVersion>9.0</LangVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CustomCommands>
       <CustomCommands>
         <Command>
@@ -74,7 +75,7 @@
         </Command>
         <Command>
           <type>AfterBuild</type>
-          <command>cp jcomal /usr/local/bin</command>
+          <command>cp jcobol /usr/local/bin</command>
           <workingdir>${ProjectDir}</workingdir>
         </Command>
       </CustomCommands>

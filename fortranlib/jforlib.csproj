@@ -9,6 +9,7 @@
     <Description>Fortran Runtime</Description>
     <Copyright>(c) 2013-21 Steven Palmer</Copyright>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CustomCommands>
       <CustomCommands>
         <Command>

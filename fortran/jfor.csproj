@@ -30,11 +30,12 @@
     <Copyright>(c) 2013-21 Steven Palmer</Copyright>
     <Authors>Steven Palmer</Authors>
     <Product>Fortran Compiler</Product>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>TRACE;CODE_ANALYSIS;DEBUG;NETFRAMEWORK;NET48;</DefineConstants>
-    <Commandlineparameters>../../../samples/tiny.f -dump</Commandlineparameters>
+    <Commandlineparameters>../../../samples/Fortran/PLM82.FOR</Commandlineparameters>
     <EnvironmentVariables>
       <EnvironmentVariables>
         <Variable name="MONO_TRACE_LISTENER" value="Console.Error" />
