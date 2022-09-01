@@ -399,6 +399,7 @@ namespace JComal {
                 case TokenID.KASSIGN:       return ":=";
                 case TokenID.KINCADD:       return ":+";
                 case TokenID.KINCSUB:       return ":-";
+                case TokenID.STRING:        return "a string";
                 case TokenID.EOL:           return "<EOL>";
                 case TokenID.ENDOFFILE:     return "<EOF>";
             }
