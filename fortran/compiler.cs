@@ -621,9 +621,10 @@ namespace JFortran {
             }
             sym.IsReferenced = true;
 
-            CallParseNode node = new();
-            node.ProcName = new IdentifierParseNode(sym);
-            node.Parameters = new ParametersParseNode();
+            CallParseNode node = new() {
+                ProcName = new IdentifierParseNode(sym),
+                Parameters = new ParametersParseNode()
+            };
 
             bool hasAlternateReturn = false;
 
@@ -764,8 +765,9 @@ namespace JFortran {
 
         // Arithmetic IF
         private ParseNode KArithmeticIf(ParseNode expr) {
-            ArithmeticConditionalParseNode node = new();
-            node.ValueExpression = expr;
+            ArithmeticConditionalParseNode node = new() {
+                ValueExpression = expr
+            };
             node.Add(ParseLabel());
             ExpectToken(TokenID.COMMA);
             node.Add(ParseLabel());

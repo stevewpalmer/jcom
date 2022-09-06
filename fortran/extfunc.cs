@@ -63,9 +63,10 @@ namespace JFortran {
         public void Add(string name, SymType type, SymLinkage linkage, bool include = true) {
             FunctionDefinition definition = new() {
                 Name = name,
-                Symbol = new Symbol(name, new SymFullType(type), SymClass.VAR, null, 0)
+                Symbol = new Symbol(name, new SymFullType(type), SymClass.VAR, null, 0) {
+                    Linkage = linkage
+                }
             };
-            definition.Symbol.Linkage = linkage;
             definition.Include = include;
             _definitions.Add(definition);
             ParameterList.Add(name);

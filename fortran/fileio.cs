@@ -92,8 +92,9 @@ namespace JFortran {
 
             // Wrap into a conditional if an ERR label is specified.
             if (cilist.Has("ERR")) {
-                SwitchParseNode switchNode = new();
-                switchNode.CompareExpression = node;
+                SwitchParseNode switchNode = new() {
+                    CompareExpression = node
+                };
                 switchNode.Add(new NumberParseNode(-1), cilist["ERR"]);
                 return switchNode;
             }
@@ -207,9 +208,10 @@ namespace JFortran {
 
             InitFunctionNodes();
             
-            ControlList cilist = new();
-            cilist["FMT"] = ParseFormatSpecifier();
-            cilist["UNIT"] = new NumberParseNode(new Variant(IOConstant.Stdout));
+            ControlList cilist = new() {
+                ["FMT"] = ParseFormatSpecifier(),
+                ["UNIT"] = new NumberParseNode(new Variant(IOConstant.Stdout))
+            };
 
             // First column is special for F77 only
             node.FirstColumnSpecial = _opts.F77;

@@ -25,7 +25,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -261,7 +260,7 @@ namespace CCompiler {
                                         if (da.ShortName != null) {
                                             helptext += $" (short: -{da.ShortName})";
                                         }
-                                        help.AppendLine(string.Format("   -{0,-18} {1}", name, helptext));
+                                        help.AppendLine($"   -{name,-18} {helptext}");
                                     }
                                 }
                             }

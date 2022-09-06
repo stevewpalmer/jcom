@@ -35,7 +35,7 @@ namespace FortranTests {
         public static Compiler HelperCompile(string [] code, FortranOptions opts) {
             Compiler comp = new(opts);
             comp.CompileString(code);
-            Assert.AreEqual(0, comp.Messages.ErrorCount, string.Format("Compiler Errors : {0}", string.Join("\n", comp.Messages)));
+            Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
             return comp;
         }
     }

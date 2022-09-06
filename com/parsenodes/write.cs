@@ -126,11 +126,12 @@ namespace CCompiler {
 
             // Construct a parsenode that will be called for each item in the loop
             // including any implied DO loops.
-            WriteItemParseNode itemNode = new();
-            itemNode.ReturnIndex = index;
-            itemNode.ErrLabel = ErrLabel;
-            itemNode.WriteParamsNode = WriteParamsNode;
-            itemNode.WriteManagerIndex = objIndex;
+            WriteItemParseNode itemNode = new() {
+                ReturnIndex = index,
+                ErrLabel = ErrLabel,
+                WriteParamsNode = WriteParamsNode,
+                WriteManagerIndex = objIndex
+            };
 
             if (ArgList != null && ArgList.Nodes.Count > 0) {
                 int countOfArgs = ArgList.Nodes.Count;

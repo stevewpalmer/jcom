@@ -37,7 +37,7 @@ namespace ComalTests {
             opts.Run = true;
             Compiler comp = new(opts);
             comp.CompileString(code, true);
-            Assert.AreEqual(0, comp.Messages.ErrorCount, string.Format("Compiler Errors : {0}", string.Join("\n", comp.Messages)));
+            Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
             return comp;
         }
 

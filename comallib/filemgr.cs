@@ -88,10 +88,10 @@ namespace JComalLib {
                 throw new JComRuntimeException(JComRuntimeErrors.FILE_ALREADY_OPEN);
             }
             file = new IOFile(iodevice) {
-                Path = filename
+                Path = filename,
+                IsNew = mode == "w",
+                IsSequential = mode != "x"
             };
-            file.IsNew = mode == "w";
-            file.IsSequential = mode != "x";
             if ((mode == "w+" || mode == "x") && !File.Exists(filename)) {
                 file.IsNew = true;
             }

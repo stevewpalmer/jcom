@@ -78,8 +78,9 @@ namespace CCompiler {
             if (node == null) {
                 throw new ArgumentNullException(nameof(node));
             }
-            ParameterParseNode paramNode = new(node, symbol);
-            paramNode.Type = node.Type;
+            ParameterParseNode paramNode = new(node, symbol) {
+                Type = node.Type
+            };
             Nodes.Add(paramNode);
         }
 

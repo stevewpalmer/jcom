@@ -2,7 +2,7 @@
   "profiles": {
     "jcomal": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Source\\jcom\\samples\\Comal"
+      "workingDirectory": "C:\\Repos\\jcom\\samples\\Comal"
     }
   }
 }

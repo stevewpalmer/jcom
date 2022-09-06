@@ -1181,10 +1181,11 @@ namespace CCompiler {
         // Create a local descriptor for a local variable at the
         // given index and with the given type.
         private LocalDescriptor AssignLocal(Type type, int index) {
-            LocalDescriptor newTemp = new();
-            newTemp.Type = type;
-            newTemp.Index = index;
-            newTemp.InUse = true;
+            LocalDescriptor newTemp = new() {
+                Type = type,
+                Index = index,
+                InUse = true
+            };
             _temp.Add(newTemp);
             return newTemp;
         }

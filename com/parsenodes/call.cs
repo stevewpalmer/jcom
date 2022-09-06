@@ -25,8 +25,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Reflection;
 using System.Reflection.Emit;
 
 namespace CCompiler {

@@ -216,7 +216,7 @@ namespace JComLib {
                 } else {
                     sizeString = (size / (1024 * 1024)) + "M";
                 }
-                Console.WriteLine(string.Format("{0,-20} {1,5}", info.Name, sizeString));
+                Console.WriteLine($"{info.Name,-20} {sizeString,5}");
             }
         }
 

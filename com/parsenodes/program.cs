@@ -170,10 +170,10 @@ namespace CCompiler {
         public void Generate() {
             try {
                 AppDomain ad = AppDomain.CurrentDomain;
-                AssemblyName an = new();
-
-                an.Name = DotNetName;
-                an.Version = new Version(VersionString);
+                AssemblyName an = new() {
+                    Name = DotNetName,
+                    Version = new Version(VersionString)
+                };
 
                 bool isSaveable = !string.IsNullOrEmpty(OutputFile);
                 AssemblyBuilderAccess access = isSaveable ? AssemblyBuilderAccess.RunAndSave : AssemblyBuilderAccess.Run;

@@ -281,14 +281,15 @@ namespace JComal {
         //
         private ParseNode KRestore() {
 
-            AssignmentParseNode node = new();
-            node.Identifiers = new[] {
+            AssignmentParseNode node = new() {
+                Identifiers = new[] {
                 new IdentifierParseNode(GetMakeReadDataIndexSymbol()),
                 new IdentifierParseNode(GetMakeEODSymbol()),
-            };
-            node.ValueExpressions = new[] {
+            },
+                ValueExpressions = new[] {
                 new NumberParseNode(0),
                 new NumberParseNode(0)
+            }
             };
             return node;
         }
@@ -801,8 +802,9 @@ namespace JComal {
         // end of the loop.
         private ParseNode KRepeat() {
 
-            LoopParseNode node = new();
-            node.LoopBody = new();
+            LoopParseNode node = new() {
+                LoopBody = new()
+            };
 
             if (!_currentLine.IsAtEndOfLine) {
 
@@ -830,8 +832,9 @@ namespace JComal {
         //
         private ParseNode KWhile() {
 
-            LoopParseNode node = new();
-            node.StartExpression = IntegerExpression();
+            LoopParseNode node = new() {
+                StartExpression = IntegerExpression()
+            };
 
             InsertTokenIfMissing(TokenID.KDO);
 
@@ -888,8 +891,9 @@ namespace JComal {
             }
 
             // This is just a very simple break statement.
-            BreakParseNode parseNode = new();
-            parseNode.ScopeParseNode = _currentLoop;
+            BreakParseNode parseNode = new() {
+                ScopeParseNode = _currentLoop
+            };
             if (!_currentLine.IsAtEndOfStatement) {
                 ExpectToken(TokenID.KWHEN);
                 parseNode.BreakExpression = IntegerExpression();

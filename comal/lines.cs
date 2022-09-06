@@ -43,8 +43,6 @@ namespace JComal {
         /// <summary>
         /// Construct a Line object
         /// </summary>
-        /// <param name="messages">Message collection</param>
-        /// <param name="lineNumber">Line number</param>
         /// <param name="tokens">Tokens</param>
         public Line(SimpleToken[] tokens) {
             _tokens = tokens.ToList();
@@ -277,7 +275,7 @@ namespace JComal {
     public class Lines {
 
         private readonly List<Line> _lines;
-        private int _currentLine = 0;
+        private int _currentLine;
 
         /// <summary>
         /// Copy constructor

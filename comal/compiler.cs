@@ -164,12 +164,11 @@ namespace JComal {
             LineTokeniser tokeniser = new();
 
             // Auto-number the lines.
-            for (int index = 0; index < sourceLines.Length; index++ ) {
-
-                string sourceLine = sourceLines[index];
+            foreach (string t in sourceLines) {
+                string sourceLine = t;
                 if (!string.IsNullOrWhiteSpace(sourceLine)) {
                     if (autoNumber) {
-                        sourceLine = string.Format("{0} {1}", lineNumber, sourceLine.Trim());
+                        sourceLine = $"{lineNumber} {sourceLine.Trim()}";
                         lineNumber += 10;
                     }
                     Line line = new(tokeniser.TokeniseLine(sourceLine));

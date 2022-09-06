@@ -233,7 +233,6 @@ namespace JComal {
                         if (double.IsInfinity(interimValue)) {
                             throw new DivideByZeroException();
                         }
-                        node = new NumberParseNode((int)interimValue);
                     }
                     catch (DivideByZeroException) {
                         Messages.Error(MessageCode.DIVISIONBYZERO, "Division by zero");
@@ -292,10 +291,11 @@ namespace JComal {
             if (tokenNode.Right.IsNumber) {
                 Variant rightValue = tokenNode.Right.Value;
                 if (rightValue.Compare(-1)) {
-                    BinaryOpParseNode divNode = new(ParseID.DIVIDE);
-                    divNode.Left = new NumberParseNode(new Variant(1));
-                    divNode.Right = tokenNode.Left;
-                    divNode.Type = tokenNode.Left.Type;
+                    BinaryOpParseNode divNode = new(ParseID.DIVIDE) {
+                        Left = new NumberParseNode(new Variant(1)),
+                        Right = tokenNode.Left,
+                        Type = tokenNode.Left.Type
+                    };
                     return divNode;
                 }
                 if (rightValue.IsZero) {
@@ -471,9 +471,10 @@ namespace JComal {
             if (parseID == ParseID.ADD && opLeft.IsString && opRight.IsString) {
                 parseID = ParseID.CONCAT;
             }
-            BinaryOpParseNode op = new(parseID);
-            op.Left = opLeft;
-            op.Right = opRight;
+            BinaryOpParseNode op = new(parseID) {
+                Left = opLeft,
+                Right = opRight
+            };
             return TypeEqualise(op);
         }
 
@@ -488,9 +489,10 @@ namespace JComal {
                     }
 
                 case TokenID.KNOT: {
-                    UnaryOpParseNode node = new(ParseID.NOT);
-                    node.Operand = ParseExpression(4);
-                    return CastNodeToType(node, SymType.INTEGER);
+                        UnaryOpParseNode node = new(ParseID.NOT) {
+                            Operand = ParseExpression(4)
+                        };
+                        return CastNodeToType(node, SymType.INTEGER);
                     }
 
                 case TokenID.KTRUE:
@@ -514,15 +516,21 @@ namespace JComal {
 
                 case TokenID.KERR: {
                     Symbol errSymbol = Globals.Get(Consts.ErrName);
-                    IdentifierParseNode node = new(errSymbol);
-                    node.Symbol.IsReferenced = true;
+                    IdentifierParseNode node = new(errSymbol) {
+                        Symbol = {
+                            IsReferenced = true
+                        }
+                    };
                     return node;
                     }
 
                 case TokenID.KERRTEXT: {
                     Symbol errSymbol = Globals.Get(Consts.ErrText);
-                    IdentifierParseNode node = new(errSymbol);
-                    node.Symbol.IsReferenced = true;
+                    IdentifierParseNode node = new(errSymbol) {
+                        Symbol = {
+                            IsReferenced = true
+                        }
+                    };
                     return node;
                     }
 
@@ -554,8 +562,11 @@ namespace JComal {
 
                 case TokenID.KEOD: {
                     Symbol eodSymbol = GetMakeEODSymbol();
-                    IdentifierParseNode node = new(eodSymbol);
-                    node.Symbol.IsReferenced = true;
+                    IdentifierParseNode node = new(eodSymbol) {
+                        Symbol = {
+                            IsReferenced = true
+                        }
+                    };
                     return node;
                     }
 

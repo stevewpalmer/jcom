@@ -26,7 +26,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using CCompiler;
 using JComalLib;
 using JComLib;
@@ -742,8 +741,11 @@ namespace JComal {
         // Scan and execute the specified source lines.
         private static void ExecuteLines(ComalOptions opts, Lines lines) {
 
-            ActiveCompiler = new(opts);
-            ActiveCompiler.Messages.Interactive = opts.Interactive;
+            ActiveCompiler = new(opts) {
+                Messages = {
+                    Interactive = opts.Interactive
+                }
+            };
             ActiveCompiler.CompileLines(lines);
             ActiveCompiler.Execute();
             FileManager.CLOSE();
