@@ -46,21 +46,21 @@ namespace JFortran {
         /// Sets and returns whether backslashes are normal characters rather
         /// than an escape sequence delimiter.
         /// </value>
-        [OptionField("backslash", Help = "Permit C style escapes in strings")]
+        [OptionField("-backslash", Help = "Permit C style escapes in strings")]
         public bool Backslash { get; set; }
 
         /// <value>
         /// Sets and returns whether the source code should be compiled using
         /// the FORTRAN 77 compiler.
         /// </value>
-        [OptionField("f77", Help = "Compile Fortran 77 source (default)")]
+        [OptionField("-f77", Help = "Compile Fortran 77 source (default)")]
         public bool F77 { get; set; }
 
         /// <value>
         /// Sets and returns whether the source code should be compiled using
         /// the Fortran 90 compiler.
         /// </value>
-        [OptionField("f90", Help = "Compile Fortran 90 source")]
+        [OptionField("-f90", Help = "Compile Fortran 90 source")]
         public bool F90 { get; set; }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace JFortran {
             }
 
             if (F77 && F90) {
-                Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both -f77 and -f90");
+                Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both --f77 and --f90");
                 return false;
             }
 

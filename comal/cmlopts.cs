@@ -43,7 +43,7 @@ namespace JComal {
         /// <summary>
         /// Sets and returns whether the strict mode is enforced.
         /// </summary>
-        [OptionField("strict", Help = "Enable strict mode")]
+        [OptionField("-strict", Help = "Enable strict mode")]
         public bool Strict { get; set; }
 
         /// <summary>

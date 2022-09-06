@@ -110,45 +110,45 @@ namespace CCompiler {
         /// <value>
         /// Sets and returns whether debuggable code is enabled.
         /// </value>
-        [OptionField("debug", Help= "Generate debugging information")]
+        [OptionField("-debug", Help= "Generate debugging information")]
         public bool GenerateDebug { get; set; }
 
         /// <value>
         /// Sets and returns the compiler warning level where 0 means no warnings
         /// and 4 equates to all warnings.
         /// </value>
-        [OptionField("warn", ShortName="w", ArgName="NUM", MinRange=0, MaxRange = 4, Help = "Sets warning level, the default is 4")]
+        [OptionField("-warn", ShortName="w", ArgName="NUM", MinRange=0, MaxRange = 4, Help = "Sets warning level, the default is 4")]
         public int WarnLevel { get; set; }
 
         /// <value>
         /// Sets and returns whether warnings should be treated as errors.
         /// </value>
-        [OptionField("warnaserror", Help = "Treats all warnings as errors")]
+        [OptionField("-warnaserror", Help = "Treats all warnings as errors")]
         public bool WarnAsError { get; set; }
 
         /// <value>
         /// Sets and returns whether we dump compiler debugging information
         /// </value>
-        [OptionField("dump", Help = "Output compiler debugging information to a file")]
+        [OptionField("-dump", Help = "Output compiler debugging information to a file")]
         public bool Dump { get; set; }
 
         /// <value>
         /// Sets and returns whether some intrinsic calls are inlined.
         /// </value>
-        [OptionField("noinline", Help = "Don't inline intrinsic calls")]
+        [OptionField("-noinline", Help = "Don't inline intrinsic calls")]
         public bool Inline { get; set; }
 
         /// <value>
         /// Sets and returns whether the generated program is to run after complication.
         /// </value>
-        [OptionField("run", Help = "Run the executable if no errors")]
+        [OptionField("-run", Help = "Run the executable if no errors")]
         public bool Run { get; set; }
 
         /// <value>
         /// Sets and returns whether the compiler is operating in development mode (and
         /// thus doing diagnostic stuff to aid debugging).
         /// </value>
-        [OptionField("dev")]
+        [OptionField("-dev")]
         public bool DevMode { get; set; }
 
         /// <value>
@@ -164,7 +164,7 @@ namespace CCompiler {
         /// <value>
         /// Gets or sets the output file name.
         /// </value>
-        [OptionField("out", ArgName="FILE", Help = "Specifies output executable name")]
+        [OptionField("-out", ShortName = "o", ArgName = "FILE", Help = "Specifies output executable name")]
         public string OutputFile {
             get {
                 if (_outputFile != null) {
@@ -237,14 +237,14 @@ namespace CCompiler {
             foreach (string optstring in arguments) {
                 if (optstring.StartsWith("-")) {
                     string[] opts = optstring.Substring(1).ToLower().Split(':');
-                    if (opts[0] == "help" || opts[0] == "?") {
+                    if (opts[0] == "-help" || opts[0] == "h") {
 
                         StringBuilder help = new();
                         help.AppendLine(AssemblyDescription + " " + AssemblyVersion + " " + AssemblyCopyright);
                         help.AppendLine(ExecutableFilename() + " [options] [source-files]");
 
-                        help.AppendLine("   -help               Lists all compiler options (short: -?)");
-                        help.AppendLine("   -version            Display compiler version (short: -v)");
+                        help.AppendLine("   --help              Lists all compiler options (short: -h)");
+                        help.AppendLine("   --version           Display compiler version (short: -v)");
 
                         foreach (PropertyInfo prop in props) {
 
@@ -269,7 +269,7 @@ namespace CCompiler {
                         Messages.Info(help.ToString());
                         return false;
                     }
-                    if (opts[0] == "version" || opts[0] == "v") {
+                    if (opts[0] == "-version" || opts[0] == "v") {
                         DisplayVersion();
                         return false;
                     }
@@ -285,14 +285,14 @@ namespace CCompiler {
                                     }
                                     if (prop.PropertyType == typeof(int)) {
                                         if (opts.Length < 2 || !int.TryParse(opts[1], out int value) || value < da.MinRange || value > da.MaxRange) {
-                                            Messages.Error(MessageCode.BADARGUMENTRANGE, $"Value for option {opts[0]} out of range {da.MinRange}-{da.MaxRange}");
+                                            Messages.Error(MessageCode.BADARGUMENTRANGE, $"Value for option -{opts[0]} out of range {da.MinRange}-{da.MaxRange}");
                                             return false;
                                         }
                                         prop.SetValue(this, value);
                                     }
                                     if (prop.PropertyType == typeof(string)) {
                                         if (opts.Length < 2 || string.IsNullOrEmpty(opts[1])) {
-                                            Messages.Error(MessageCode.MISSINGOPTIONVALUE, $"Missing value for option {opts[0]}");
+                                            Messages.Error(MessageCode.MISSINGOPTIONVALUE, $"Missing value for option -{opts[0]}");
                                             return false;
                                         }
                                         prop.SetValue(this, opts[1]);
