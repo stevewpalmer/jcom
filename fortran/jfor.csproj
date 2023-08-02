@@ -24,10 +24,10 @@
       </CustomCommands>
     </CustomCommands>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <Description>Fortran Compiler</Description>
-    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
+    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
     <Authors>Steven Palmer</Authors>
     <Product>Fortran Compiler</Product>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
@@ -82,7 +82,6 @@
     </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\jcomlib.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
     <ProjectReference Include="..\fortranlib\jforlib.csproj" />
   </ItemGroup>

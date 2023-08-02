@@ -6,7 +6,7 @@
     <AssemblyName>ccompiler</AssemblyName>
     <ReleaseVersion>0.3</ReleaseVersion>
     <Description>Common Language Compiler</Description>
-    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
+    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -25,7 +25,7 @@
         </Command>
       </CustomCommands>
     </CustomCommands>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <Authors>Steven Palmer</Authors>
     <Product>Common Language Compiler</Product>
   </PropertyGroup>
@@ -64,7 +64,6 @@
     </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\jcomlib.csproj" />
     <ProjectReference Include="..\comallib\jcomallib.csproj" />
     <ProjectReference Include="..\fortranlib\jforlib.csproj" />
   </ItemGroup>

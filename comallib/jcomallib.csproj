@@ -4,9 +4,9 @@
     <OutputType>Library</OutputType>
     <ReleaseVersion>0.3</ReleaseVersion>
     <RootNamespace>JComalLib</RootNamespace>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <Description>Comal Runtime</Description>
-    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
+    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CustomCommands>
@@ -63,7 +63,7 @@
     </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\jcomlib.csproj" />
+    <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)'=='Windows_NT'">
     <Exec Command="copy $(TargetPath) ..\drop" />

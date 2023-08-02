@@ -1,0 +1,93 @@
+PL/M is a high-level programming language especially designed to
+simplify the task of system programming for the Intel 8-bit family
+of microcomputers--the 8008 and the 8080.  The files provided in
+this archive contain version 2.0 of Intel's PL/M cross compiler
+for the 8080.  The PL/M programming langauge is described in the
+Intel publication, 8008 and 8080 PL/M Programming Manual.  A second
+Intel publication, 8080 PL/M Compiler Operators Manual, describes
+the operation of the PL/M cross compiler.
+
+The Intel 8080 PL/M Cross Compiler is a two pass compiler written
+in ANSI FORTRAN.  PASS 1 reads a PL/M source program and converts
+it to an intermediate form on work files.  Optionally, a listing of
+the input source program may be obtained during this pass.  Errors
+in program syntax are detected at this stage, and appropriate error
+messages are sent to the list file.  PASS 2 processes the work files
+produced by PASS 1, and generates machine code for the MCS-80 CPU.
+This machine code, which may be in either BNPF or Hex format, may be
+loaded and executed directly on an INTELLEC 8/Mod 80 Microcomputer
+Development System, simulated using INTERP/80, a cross-simulator of
+the 8080 CPU, or used to program ROMs.  PASS 2 will optionally
+produce a symbol table and a mnemonic listing of the generated
+machine code. Certain errors may be detected during PASS 2 and are
+reported in the list file.
+
+The operation of each pass of the PL/M compiler is governed by a set
+of parameters know as compiler controls, each control is identified
+by a unique letter of the alphabet.  Each compiler control is provided
+with a default value which is used throughout the compilation unless
+explicitly altered by the user.  The commonly used compiler controls
+are described below and a complete list of compiler controls is given
+in Intel's 8080 PL/M Compiler Operators Manual.
+
+The value of the compiler controls may be changed at any time during
+PASS 1 or at the beginning of PASS 2 by entering a control record.
+Control records must begin with a dollar sign ($) and have the
+following form:
+
+     $<id>=<value> [ $<id>=<value> ] ...
+
+where <id> is the unique letter assigned to the compiler control
+that is to be changed and <value> is the new value.  Blanks may be
+included on either side of the equal sign (=) but not within the
+$<id> or <value>.  Two special control record formats are available
+to interrogate the current values of the compiler controls.  A
+specification like the following:
+
+     $$<id>
+
+will cause the current value of the compiler control represented
+by <id> to be listed, while a specification that consists of just
+two dollar signs will cause the values of all compiler controls to
+be listed.
+
+
+Control records may be included anywhere within the source input read
+by PASS 1 or in one or more input lines terminated with an all blank
+or null line to be read at the start of PASS 2.
+
+
+PASS 1 Compiler Controls
+
+    CONTROL VALUES DEFAULT    USE
+
+       L     1-79     1       Leftmargin.  Specifies the first
+                              character position processed on each
+                              input line.  All leading characters are
+                              ignored.
+       P      0,1     1       Echo input if 1, suppress echo if 0.
+       R     1-80    80       Rightmargin, ignore trailing characters
+                              on each input record.
+       W     1-120  120       Maximun number of characters per output
+                              line.
+
+PASS 2 Compiler Controls
+
+    CONTROL VALUES DEFAULT    USE
+
+       F      0,1     1       Display decoded memory initialization.
+       T      0,1     1       Display cross-reference table of
+                              approximate memory address versus
+                              source line number.
+       H              0       Header.  Decimal address at which
+                              generated code should start.  I.e.,
+                              the start of the program's ISA.
+       M      0,1     1       Display symbol table.
+       Q      0,1     1       If 1 then object file is written in
+                              BNPF, otherwise the object file is
+                              written in Hex format.
+       V              0       Page number of first page of the VSA.
+                              I.e., variable storage, stack, etc.
+                              If set to zero the first availabe page
+                              above the ISA is used.
+

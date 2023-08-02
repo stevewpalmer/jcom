@@ -1,0 +1,74 @@
+﻿// JCom Runtime Libary
+// Byte Writer class
+//
+// Authors:
+//  Steven Palmer
+//
+// Copyright (C) 2021 Steven Palmer
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+// # http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
+using System;
+using System.Collections.Generic;
+
+namespace JComLib {
+
+    public class ByteWriter {
+
+        private readonly List<byte> _buffer = new();
+
+        /// <summary>
+        /// Write an integer to the byte buffer
+        /// </summary>
+        /// <param name="intValue">Integer to write</param>
+        public void WriteInteger(int intValue) {
+            byte[] intBytes = BitConverter.GetBytes(intValue);
+            if (BitConverter.IsLittleEndian) {
+                Array.Reverse(intBytes);
+            }
+            _buffer.AddRange(intBytes);
+        }
+
+        /// <summary>
+        /// Write a floating point number to the byte buffer
+        /// </summary>
+        /// <param name="floatValue">Floating point number to write</param>
+        public void WriteFloat(float floatValue) {
+            byte[] floatBytes = BitConverter.GetBytes(floatValue);
+            _buffer.AddRange(floatBytes);
+        }
+
+        /// <summary>
+        /// Write a string to the byte buffer
+        /// </summary>
+        /// <param name="strValue">String to write</param>
+        public void WriteString(string strValue) {
+            WriteInteger(strValue.Length);
+
+            foreach (char ch in strValue.ToCharArray()) {
+                byte[] charBytes = BitConverter.GetBytes(ch);
+                _buffer.AddRange(charBytes);
+            }
+        }
+
+        /// <summary>
+        /// Return the byte buffer as a byte array
+        /// </summary>
+        public byte [] Buffer => _buffer.ToArray();
+    }
+}

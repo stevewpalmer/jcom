@@ -4,9 +4,9 @@
     <TargetFramework>net48</TargetFramework>
     <ReleaseVersion>0.3</ReleaseVersion>
     <Description>JComal Compiler</Description>
-    <Copyright>(c) 2013-21 Steven Palmer</Copyright>
+    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
     <RootNamespace>JComal</RootNamespace>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CustomCommands>
@@ -57,6 +57,7 @@
       </CustomCommands>
     </CustomCommands>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -82,10 +83,10 @@
       </CustomCommands>
     </CustomCommands>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\com\com.csproj" />
-    <ProjectReference Include="..\lib\jcomlib.csproj" />
     <ProjectReference Include="..\comallib\jcomallib.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)'=='Windows_NT'">
