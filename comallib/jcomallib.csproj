@@ -1,71 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <RootNamespace>JComalLib</RootNamespace>
-    <LangVersion>10.0</LangVersion>
-    <Description>Comal Runtime</Description>
-    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Authors>Steven Palmer</Authors>
-    <Product>Comal Runtime</Product>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug\</OutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <OutputPath>bin\Release\</OutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)'=='Windows_NT'">
-    <Exec Command="copy $(TargetPath) ..\drop" />
-  </Target>
 </Project>
