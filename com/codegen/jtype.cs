@@ -101,7 +101,7 @@ namespace CCompiler {
                     _defaultConstructor.Emitter.Save();
                 }
                 if (_createdType == null) {
-                    _createdType = Builder.CreateType();
+                    _createdType = Builder.CreateTypeInfo();
                 }
                 return _createdType;
             }

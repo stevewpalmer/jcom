@@ -284,9 +284,11 @@ namespace CCompiler {
                 throw new ArgumentNullException(nameof(sym));
             }
             LocalBuilder lb = _il.DeclareLocal(sym.SystemType);
+        #if GENERATE_NATIVE_BINARIES
             if (IsDebuggable) {
                 lb.SetLocalSymInfo(sym.Name);
             }
+        #endif
             sym.Index = AssignLocal(sym.SystemType, lb.LocalIndex);
         }
 

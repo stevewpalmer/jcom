@@ -37,7 +37,7 @@ namespace JComal {
             MessageCollection messages = new(opts);
 
         #if DEBUG
-            Debug.Listeners.Add(new CCompilerTraceListener());
+            //Debug.Listeners.Add(new CCompilerTraceListener());
         #endif
 
             opts.Messages = messages;

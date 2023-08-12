@@ -46,7 +46,7 @@ namespace CCompiler {
         private int _lineno;
 
         private AssemblyBuilder _ab;
-        private ISymbolDocumentWriter _currentDoc;
+        private ISymbolDocumentWriter _currentDoc = null;
 
         /// <summary>
         /// Constructs a language neutral code generator object.
@@ -176,16 +176,24 @@ namespace CCompiler {
                 };
 
                 bool isSaveable = !string.IsNullOrEmpty(OutputFile);
+            #if GENERATE_NATIVE_BINARIES
                 AssemblyBuilderAccess access = isSaveable ? AssemblyBuilderAccess.RunAndSave : AssemblyBuilderAccess.Run;
-                _ab = ad.DefineDynamicAssembly(an, access);
+            #else
+                AssemblyBuilderAccess access = AssemblyBuilderAccess.Run;
+            #endif
+                _ab = AssemblyBuilder.DefineDynamicAssembly(an, access);
 
                 // Don't make the main class abstract if the program is being run from
                 // memory as otherwise the caller will be unable to create an instance.
+            #if GENERATE_NATIVE_BINARIES
                 if (isSaveable) {
                     Builder = _ab.DefineDynamicModule(DotNetName, OutputFilename(OutputFile), GenerateDebug);
                 } else {
                     Builder = _ab.DefineDynamicModule(DotNetName, GenerateDebug);
                 }
+            #else
+                Builder = _ab.DefineDynamicModule(DotNetName);
+            #endif
 
                 // Make this assembly debuggable if the debug option was specified.
                 if (GenerateDebug) {
@@ -232,6 +240,7 @@ namespace CCompiler {
         /// to have been previously set or this does nothing.
         /// </summary>
         public void Save() {
+#if GENERATE_NATIVE_BINARIES
             string filename = OutputFilename(OutputFile);
             try {
                 AddCLSCompliant();
@@ -243,14 +252,15 @@ namespace CCompiler {
             catch (IOException) {
                 Error($"Cannot write to output file {filename}");
             }
+#endif
         }
 
-        /// <summary>
-        /// Execute the generated code and return the result.
-        /// </summary>
-        /// <param name="methodName">The name of the method to be invoked.</param>
-        /// <returns>The result as an object</returns>
-        public ExecutionResult Run(string methodName) {
+            /// <summary>
+            /// Execute the generated code and return the result.
+            /// </summary>
+            /// <param name="methodName">The name of the method to be invoked.</param>
+            /// <returns>The result as an object</returns>
+            public ExecutionResult Run(string methodName) {
             try {
                 ExecutionResult execResult = new() {
                     Success = false,
@@ -277,18 +287,20 @@ namespace CCompiler {
         /// </summary>
         /// <param name="method">Method object</param>
         public void SetEntryPoint(JMethod method) {
+#if GENERATE_NATIVE_BINARIES
             _ab.SetEntryPoint(method.Builder);
+#endif
         }
 
-        /// <summary>
-        /// Gets the MethodInfo for the given method name in the type and throws an error exception
-        /// if it is not found. The return value is thus guaranteed to be non-null.
-        /// </summary>
-        /// <param name="baseTypeName">The name of the type containing the method</param>
-        /// <param name="methodName">The method name</param>
-        /// <param name="paramTypes">An array of parameter types</param>
-        /// <returns>The method for the given base type</returns>
-        public MethodInfo GetMethodForType(string baseTypeName, string methodName, Type[] paramTypes) {
+            /// <summary>
+            /// Gets the MethodInfo for the given method name in the type and throws an error exception
+            /// if it is not found. The return value is thus guaranteed to be non-null.
+            /// </summary>
+            /// <param name="baseTypeName">The name of the type containing the method</param>
+            /// <param name="methodName">The method name</param>
+            /// <param name="paramTypes">An array of parameter types</param>
+            /// <returns>The method for the given base type</returns>
+            public MethodInfo GetMethodForType(string baseTypeName, string methodName, Type[] paramTypes) {
             if (baseTypeName == null) {
                 throw new ArgumentNullException(nameof(baseTypeName));
             }
@@ -556,11 +568,13 @@ namespace CCompiler {
 
         // Sets the filename in the debug info.
         private void SetCurrentDocument(string filename) {
+#if GENERATE_NATIVE_BINARIES
             _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);
+#endif
         }
 
-        // Retrieves the current document.
-        private ISymbolDocumentWriter GetCurrentDocument() {
+            // Retrieves the current document.
+            private ISymbolDocumentWriter GetCurrentDocument() {
             return _currentDoc;
         }
 

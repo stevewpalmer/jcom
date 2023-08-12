@@ -1,95 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>1701;1702;8600;8601;8602;8604;8618;8625;8603</NoWarn>
+    <LangVersion>11.0</LangVersion>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <Description>JComal Compiler</Description>
-    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
-    <RootNamespace>JComal</RootNamespace>
-    <LangVersion>10.0</LangVersion>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop/</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <name>Publish</name>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp jcomal /usr/local/bin</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Authors>Steven Palmer</Authors>
-    <Product>JComal Compiler</Product>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug\</OutputPath>
-    <NoWarn>1701;1702;CA1062</NoWarn>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop/</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <name>Publish</name>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp jcomal /usr/local/bin</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <LangVersion>10.0</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <OutputPath>bin\Release\</OutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop/</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <name>Publish</name>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp jcomal /usr/local/bin</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
     <ProjectReference Include="..\comallib\jcomallib.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)'=='Windows_NT'">
-    <Exec Command="copy $(TargetPath) ..\drop" />
-  </Target>
 </Project>

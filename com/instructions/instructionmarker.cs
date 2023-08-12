@@ -59,7 +59,9 @@ namespace CCompiler {
             if (Deleted) {
                 return;
             }
+        #if GENERATE_NATIVE_BINARIES
             il.MarkSequencePoint(_doc, _linenumber, 1, _linenumber, 100);
+        #endif
         }
     }
 }

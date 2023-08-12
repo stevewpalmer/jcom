@@ -1,8 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>9.0</LangVersion>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>11.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <NoWarn>1701;1702;8600;8601;8602;8604;8618;8625;8603</NoWarn>
+    <ReleaseVersion>0.3</ReleaseVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\jcomlib\jcomlib.csproj" />

@@ -27,6 +27,9 @@ mono_crash.*
 FORT.*
 fcvs21/run.out
 
+# Drop folder
+drop/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/

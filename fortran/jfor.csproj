@@ -1,91 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
     <OutputType>Exe</OutputType>
-    <StartupObject>JFortran.Program</StartupObject>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>1701;1702;8600;8601;8602;8604;8618;8625;8603</NoWarn>
+    <LangVersion>11.0</LangVersion>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <RootNamespace>JFortran</RootNamespace>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop/</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp jfor /usr/local/bin</command>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <LangVersion>10.0</LangVersion>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <Description>Fortran Compiler</Description>
-    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
-    <Authors>Steven Palmer</Authors>
-    <Product>Fortran Compiler</Product>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>TRACE;CODE_ANALYSIS;DEBUG;NETFRAMEWORK;NET48;</DefineConstants>
-    <Commandlineparameters>../../../samples/Fortran/PLM82.FOR</Commandlineparameters>
-    <EnvironmentVariables>
-      <EnvironmentVariables>
-        <Variable name="MONO_TRACE_LISTENER" value="Console.Error" />
-      </EnvironmentVariables>
-    </EnvironmentVariables>
-    <ConsolePause>False</ConsolePause>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop/</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp jfor /usr/local/bin</command>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <OutputPath>bin\Release</OutputPath>
-    <CustomCommands>
-      <CustomCommands>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} ../drop/</command>
-          <workingdir>${ProjectDir}</workingdir>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp ${TargetFile} /usr/local/lib/jcom</command>
-        </Command>
-        <Command>
-          <type>AfterBuild</type>
-          <command>cp jfor /usr/local/bin</command>
-        </Command>
-      </CustomCommands>
-    </CustomCommands>
-  </PropertyGroup>
+
   <ItemGroup>
+    <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
     <ProjectReference Include="..\fortranlib\jforlib.csproj" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(OS)'=='Windows_NT'">
-    <Exec Command="copy $(TargetPath) ..\drop" />
-  </Target>
 </Project>
