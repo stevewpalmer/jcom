@@ -36,10 +36,6 @@ namespace JCobol {
             CobolOptions opts = new();
             MessageCollection messages = new(opts);
 
-        #if DEBUG
-            //Debug.Listeners.Add(new CCompilerTraceListener());
-        #endif
-
             opts.Messages = messages;
             if (opts.Parse(args)) {
 
