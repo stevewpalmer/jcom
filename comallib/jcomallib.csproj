@@ -3,10 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <Nullable>enable</Nullable>
-    <NoWarn>1701;1702;8600;8601;8602;8604;8618;8625;8603</NoWarn>
+    <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>11.0</LangVersion>
-  </PropertyGroup>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+ </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
   </ItemGroup>

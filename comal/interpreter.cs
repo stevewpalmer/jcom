@@ -23,9 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Diagnostics;
-using System.IO;
 using CCompiler;
 using JComalLib;
 using JComLib;
@@ -124,7 +122,7 @@ namespace JComal {
                                     Console.Write("Program has not been saved. Are you sure (Y/N)? ");
                                     ConsoleKeyInfo key = Console.ReadKey(false);
                                     Console.WriteLine();
-                                    if (char.ToUpper(key.KeyChar) == 'N') {
+                                    if (char.ToUpper(key.KeyChar) != 'Y') {
                                         break;
                                     }
                                 }

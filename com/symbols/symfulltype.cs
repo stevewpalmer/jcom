@@ -23,9 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
-
 namespace CCompiler {
+
     /// <summary>
     /// Defines a full class representation complete with
     /// the width of the type.

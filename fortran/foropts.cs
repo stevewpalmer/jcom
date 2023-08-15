@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.IO;
 using CCompiler;
 
 namespace JFortran {

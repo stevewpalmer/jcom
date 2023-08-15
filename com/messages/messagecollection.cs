@@ -23,12 +23,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace CCompiler {
+
     /// <summary>
     /// A collection of all compiler issued messages including errors, warnings and
     /// informational messages.

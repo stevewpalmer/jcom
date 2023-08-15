@@ -11,9 +11,3 @@ JFor is a subset of Fortran 77 with various pieces not yet implemented. Conseque
 ## Comal
 
 Comal is both an interactive compiler and full compiler for the Comal Standard language. It can be run interactively and provides an input environment for writing, running, loading and saving simple Comal programs. The compiler is invoked by specifying either the source listing (.lst) or the tokenised file (.cml) as input and produces a stand-alone executable.
-
-With both compilers, macOS support is via the Mono run-time and executables need to be run via the mono launcher:
-
-`mono hello.exe`
-
-This is not required on Windows.

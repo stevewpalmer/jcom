@@ -23,10 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
-using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;

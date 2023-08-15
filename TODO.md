@@ -45,6 +45,3 @@ Codegen:
   - eg. ((B/20)*A)+((B/20)*C)
 * Peephole optimiser:
   - Add lifetime scan to optimise local storage usage.
-
-Documentation:
-* Begin writing description of architecture.
