@@ -1,5 +1,5 @@
 ﻿// JOs
-// COMAL command
+// TYPE command
 //
 // Authors:
 //  Steve Palmer
@@ -23,23 +23,24 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
-
 namespace jOS {
 
-	public partial class Commands {
+    public partial class Commands {
 
-        // Run the Comal interpreter/compiler.
-        static public bool CmdComal(CommandLine cmdLine) {
+        // TYPE command.
+        // Display file contents.
+        static public bool CmdType(CommandLine cmdLine) {
 
-            string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string josBinRoot = $"{homeFolder}/jos/bin";
-
-            Process process = new();
-            process.StartInfo.FileName = $"{josBinRoot}/comal";
-            process.StartInfo.Arguments = string.Join(' ', cmdLine.RestOfLine());
-            process.Start();
-            process.WaitForExit();
+            string[] matchfiles = cmdLine.RestOfLine();
+            if (!matchfiles.Any()) {
+                matchfiles = new string[] { "*" };
+            }
+            string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
+            allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
+            Array.Sort(allfiles);
+            foreach (string file in allfiles) {
+                Console.WriteLine(File.ReadAllText(file));
+            }
             return true;
         }
     }

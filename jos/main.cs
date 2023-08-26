@@ -32,12 +32,14 @@ static class Program {
     private static readonly Dictionary<string, Func<CommandLine, bool>> commandMap = new() {
         { "comal", Commands.CmdComal },
         { "fortran", Commands.CmdFortran },
-        { "dir", Commands.CmdDir }
+        { "dir", Commands.CmdDir },
+        { "type", Commands.CmdType },
     };
 
     static void Main(string[] args) {
 
-        Console.WriteLine("JOs v1.0");
+        Console.WriteLine($"{CCompiler.Options.AssemblyDescription} {CCompiler.Options.AssemblyVersion}");
+        Console.WriteLine($"{CCompiler.Options.AssemblyCopyright}");
         Console.WriteLine();
 
         // Ensure we have a home folder and set it as the default.
@@ -65,6 +67,7 @@ static class Program {
                     commandFunc(cmdLine);
                 } else {
                     Console.WriteLine($"Unknown command {command}");
+                    break;
                 }
                 command = cmdLine.NextWord();
             }

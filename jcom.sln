@@ -78,7 +78,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cobol", "cobol\cobol.csproj", "{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "jos", "jos\jos.csproj", "{120FDE33-3466-461D-B077-6F43DE3EB3DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shell", "jos\shell.csproj", "{120FDE33-3466-461D-B077-6F43DE3EB3DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comlib", "jcomlib\comlib.csproj", "{3A8C5A7C-72B0-4EE3-BF72-E589E4EA4A65}"
 EndProject

@@ -1,5 +1,5 @@
 ﻿// JOs
-// FORTRAN command
+// Program commands
 //
 // Authors:
 //  Steve Palmer
@@ -27,20 +27,30 @@ using System.Diagnostics;
 
 namespace jOS {
 
-    public partial class Commands {
+	public partial class Commands {
 
-        // Run the Fortran compiler.
-        static public bool CmdFortran(CommandLine cmdLine) {
+        // Run a program.
+        static internal bool RunProgram(string programName, CommandLine cmdLine) {
 
             string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             string josBinRoot = $"{homeFolder}/jos/bin";
 
             Process process = new();
-            process.StartInfo.FileName = $"{josBinRoot}/for";
+            process.StartInfo.FileName = $"{josBinRoot}/{programName}";
             process.StartInfo.Arguments = string.Join(' ', cmdLine.RestOfLine());
             process.Start();
             process.WaitForExit();
             return true;
+        }
+
+        // Run the Fortran compiler.
+        static public bool CmdFortran(CommandLine cmdLine) {
+            return RunProgram("for", cmdLine);
+        }
+
+        // Run the Comal interpreter/compiler.
+        static public bool CmdComal(CommandLine cmdLine) {
+            return RunProgram("comal", cmdLine);
         }
     }
 }

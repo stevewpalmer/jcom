@@ -31,6 +31,7 @@ namespace jOS {
         // The rest of the command line specifies the files to be
         // filtered.
         static public bool CmdDir(CommandLine cmdLine) {
+
             string[] matchfiles = cmdLine.RestOfLine();
             if (!matchfiles.Any()) {
                 matchfiles = new string[] { "*" };

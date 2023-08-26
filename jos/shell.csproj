@@ -8,7 +8,7 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <RootNamespace>jOS</RootNamespace>
+    <RootNamespace>shell</RootNamespace>
     <Description>Operating System</Description>
     <Copyright>(c) Steven Palmer 2013-2023</Copyright>
   </PropertyGroup>
