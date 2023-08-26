@@ -9,9 +9,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
-    <ProjectReference Include="..\fortranlib\jforlib.csproj" />
-    <ProjectReference Include="..\comallib\jcomallib.csproj" />
+    <ProjectReference Include="..\jcomlib\comlib.csproj" />
+    <ProjectReference Include="..\fortranlib\forlib.csproj" />
+    <ProjectReference Include="..\comallib\comallib.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />

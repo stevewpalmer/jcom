@@ -7,10 +7,13 @@
     <LangVersion>11.0</LangVersion>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Description>Fortran Compiler</Description>
+    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+    <ReleaseVersion>0.3</ReleaseVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
+    <ProjectReference Include="..\jcomlib\comlib.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
-    <ProjectReference Include="..\fortranlib\jforlib.csproj" />
+    <ProjectReference Include="..\fortranlib\forlib.csproj" />
   </ItemGroup>
 </Project>

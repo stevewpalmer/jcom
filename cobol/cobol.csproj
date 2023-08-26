@@ -10,7 +10,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\jcomlib\jcomlib.csproj" />
+    <ProjectReference Include="..\jcomlib\comlib.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
   </ItemGroup>
 </Project>

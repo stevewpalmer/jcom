@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>11.0</LangVersion>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <AssemblyName>JComLib</AssemblyName>
+    <AssemblyName>comlib</AssemblyName>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
