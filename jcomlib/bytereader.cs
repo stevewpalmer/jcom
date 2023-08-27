@@ -25,83 +25,82 @@
 
 using System.Text;
 
-namespace JComLib {
+namespace JComLib; 
+
+/// <summary>
+/// Classes for reading bytes from a buffer.
+/// </summary>
+public class ByteReader {
+    private int _index;
 
     /// <summary>
-    /// Classes for reading bytes from a buffer.
+    /// Initialise a ByteReader from a stream.
     /// </summary>
-    public class ByteReader {
-        private int _index = 0;
+    /// <param name="stream"></param>
+    public ByteReader(Stream stream) {
+        using BinaryReader writer = new(stream);
+        long size = stream.Length;
+        Buffer = new byte[size];
+        int offset = 0;
+        do {
+            int bytesToRead = size > int.MaxValue ? int.MaxValue : (int)size;
+            writer.Read(Buffer, offset, bytesToRead);
+            size -= bytesToRead;
+        } while (size > 0);
+        _index = 0;
+    }
 
-        /// <summary>
-        /// Initialise a ByteReader from a stream.
-        /// </summary>
-        /// <param name="stream"></param>
-        public ByteReader(Stream stream) {
-            using BinaryReader writer = new(stream);
-            long size = stream.Length;
-            Buffer = new byte[size];
-            int offset = 0;
-            do {
-                int bytesToRead = size > int.MaxValue ? int.MaxValue : (int)size;
-                writer.Read(Buffer, offset, bytesToRead);
-                size -= bytesToRead;
-            } while (size > 0);
-            _index = 0;
+    /// <summary>
+    /// Return whether we've reached the end of the buffer
+    /// </summary>
+    public bool End => _index == Buffer.Length;
+
+    /// <summary>
+    /// Return the byte buffer as a byte array
+    /// </summary>
+    public byte[] Buffer { get; }
+
+    /// <summary>
+    /// Read an integer from the byte buffer.
+    /// </summary>
+    /// <returns>Integer</returns>
+    public int ReadInteger() {
+        byte[] intBytes = new byte[sizeof(int)];
+        for (int index = 0; index < sizeof(int); index++) {
+            intBytes[index] = Buffer[_index + index];
         }
-
-        /// <summary>
-        /// Return whether we've reached the end of the buffer
-        /// </summary>
-        public bool End => _index == Buffer.Length;
-
-        /// <summary>
-        /// Return the byte buffer as a byte array
-        /// </summary>
-        public byte[] Buffer { get; } = null;
-
-        /// <summary>
-        /// Read an integer from the byte buffer.
-        /// </summary>
-        /// <returns>Integer</returns>
-        public int ReadInteger() {
-            byte[] intBytes = new byte[sizeof(int)];
-            for (int index = 0; index < sizeof(int); index++) {
-                intBytes[index] = Buffer[_index + index];
-            }
-            if (BitConverter.IsLittleEndian) {
-                Array.Reverse(intBytes);
-            }
-            _index += sizeof(int);
-            return BitConverter.ToInt32(intBytes, 0);
+        if (BitConverter.IsLittleEndian) {
+            Array.Reverse(intBytes);
         }
+        _index += sizeof(int);
+        return BitConverter.ToInt32(intBytes, 0);
+    }
 
-        /// <summary>
-        /// Read a floating point number from the byte buffer.
-        /// </summary>
-        /// <returns>Floating point number</returns>
-        public float ReadFloat() {
-            byte[] floatBytes = new byte[sizeof(float)];
-            for (int index = 0; index < sizeof(float); index++) {
-                floatBytes[index] = Buffer[_index + index];
-            }
-            _index += sizeof(float);
-            return BitConverter.ToSingle(floatBytes, 0);
+    /// <summary>
+    /// Read a floating point number from the byte buffer.
+    /// </summary>
+    /// <returns>Floating point number</returns>
+    public float ReadFloat() {
+        byte[] floatBytes = new byte[sizeof(float)];
+        for (int index = 0; index < sizeof(float); index++) {
+            floatBytes[index] = Buffer[_index + index];
         }
+        _index += sizeof(float);
+        return BitConverter.ToSingle(floatBytes, 0);
+    }
 
-        /// <summary>
-        /// Read a string from the byte buffer.
-        /// </summary>
-        /// <returns>String</returns>
-        public string ReadString() {
-            int length = ReadInteger();
-            StringBuilder str = new();
-            while (length-- > 0) {
-                char ch = BitConverter.ToChar(Buffer, _index);
-                _index += sizeof(char);
-                str.Append(ch);
-            }
-            return str.ToString();
+    /// <summary>
+    /// Read a string from the byte buffer.
+    /// </summary>
+    /// <returns>String</returns>
+    public string ReadString() {
+        int length = ReadInteger();
+        StringBuilder str = new();
+        while (length-- > 0) {
+            char ch = BitConverter.ToChar(Buffer, _index);
+            _index += sizeof(char);
+            str.Append(ch);
         }
+        return str.ToString();
     }
 }

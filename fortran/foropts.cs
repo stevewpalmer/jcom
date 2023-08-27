@@ -25,81 +25,80 @@
 
 using CCompiler;
 
-namespace JFortran {
+namespace JFortran; 
+
+/// <summary>
+/// Class that extends the <c>Options</c> class with additional
+/// options used by the Fortran compiler.
+/// </summary>
+public class FortranOptions : Options {
 
     /// <summary>
-    /// Class that extends the <c>Options</c> class with additional
-    /// options used by the Fortran compiler.
+    /// Initialises an instance of the <c>FortranOptions</c> class.
     /// </summary>
-    public class FortranOptions : Options {
+    public FortranOptions() {
+        Backslash = false;
+        F77 = true;
+    }
 
-        /// <summary>
-        /// Initialises an instance of the <c>FortranOptions</c> class.
-        /// </summary>
-        public FortranOptions() {
-            Backslash = false;
-            F77 = true;
+    /// <value>
+    /// Sets and returns whether backslashes are normal characters rather
+    /// than an escape sequence delimiter.
+    /// </value>
+    [OptionField("-backslash", Help = "Permit C style escapes in strings")]
+    public bool Backslash { get; set; }
+
+    /// <value>
+    /// Sets and returns whether the source code should be compiled using
+    /// the FORTRAN 77 compiler.
+    /// </value>
+    [OptionField("-f77", Help = "Compile Fortran 77 source (default)")]
+    public bool F77 { get; set; }
+
+    /// <value>
+    /// Sets and returns whether the source code should be compiled using
+    /// the Fortran 90 compiler.
+    /// </value>
+    [OptionField("-f90", Help = "Compile Fortran 90 source")]
+    public bool F90 { get; set; }
+
+    /// <summary>
+    /// Parse the specified command line array passed to the application.
+    /// Any errors are added to the error list. Also note that the first
+    /// argument in the list is assumed to be the application name.
+    /// </summary>
+    /// <param name="arguments">Array of string arguments</param>
+    /// <returns>True if the arguments are valid, false otherwise</returns>
+    public override bool Parse(string[] arguments) {
+        if (!base.Parse(arguments)) {
+            return false;
         }
 
-        /// <value>
-        /// Sets and returns whether backslashes are normal characters rather
-        /// than an escape sequence delimiter.
-        /// </value>
-        [OptionField("-backslash", Help = "Permit C style escapes in strings")]
-        public bool Backslash { get; set; }
-
-        /// <value>
-        /// Sets and returns whether the source code should be compiled using
-        /// the FORTRAN 77 compiler.
-        /// </value>
-        [OptionField("-f77", Help = "Compile Fortran 77 source (default)")]
-        public bool F77 { get; set; }
-
-        /// <value>
-        /// Sets and returns whether the source code should be compiled using
-        /// the Fortran 90 compiler.
-        /// </value>
-        [OptionField("-f90", Help = "Compile Fortran 90 source")]
-        public bool F90 { get; set; }
-
-        /// <summary>
-        /// Parse the specified command line array passed to the application.
-        /// Any errors are added to the error list. Also note that the first
-        /// argument in the list is assumed to be the application name.
-        /// </summary>
-        /// <param name="arguments">Array of string arguments</param>
-        /// <returns>True if the arguments are valid, false otherwise</returns>
-        public override bool Parse(string[] arguments) {
-            if (!base.Parse(arguments)) {
-                return false;
-            }
-
-            if (F77 && F90) {
-                Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both --f77 and --f90");
-                return false;
-            }
-
-            if (SourceFiles.Count == 0) {
-                Messages.Error(MessageCode.MISSINGSOURCEFILE, "Missing input source file");
-                return false;
-            }
-
-            bool possibleF90 = F90;
-            foreach (string sourceFile in SourceFiles) {
-                string ext = Path.GetExtension(sourceFile);
-                string extLower = ext.ToLower();
-                if (extLower != ".f" && extLower != ".for" && extLower != ".f90") {
-                    Messages.Error(MessageCode.BADEXTENSION, $"Source file {sourceFile} must have .f extension");
-                    return false;
-                }
-                if (extLower == ".f90") {
-                    possibleF90 = true;
-                }
-            }
-            if (possibleF90) {
-                F90 = true;
-            }
-            return true;
+        if (F77 && F90) {
+            Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both --f77 and --f90");
+            return false;
         }
+
+        if (SourceFiles.Count == 0) {
+            Messages.Error(MessageCode.MISSINGSOURCEFILE, "Missing input source file");
+            return false;
+        }
+
+        bool possibleF90 = F90;
+        foreach (string sourceFile in SourceFiles) {
+            string ext = Path.GetExtension(sourceFile);
+            string extLower = ext.ToLower();
+            if (extLower != ".f" && extLower != ".for" && extLower != ".f90") {
+                Messages.Error(MessageCode.BADEXTENSION, $"Source file {sourceFile} must have .f extension");
+                return false;
+            }
+            if (extLower == ".f90") {
+                possibleF90 = true;
+            }
+        }
+        if (possibleF90) {
+            F90 = true;
+        }
+        return true;
     }
 }

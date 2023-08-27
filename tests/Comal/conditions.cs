@@ -25,6 +25,7 @@
 
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -47,7 +48,7 @@ namespace ComalTests {
                 ENDFUNC test
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test IF and ELSE
@@ -70,7 +71,7 @@ namespace ComalTests {
                 ENDFUNC test
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 11);
+            Helper.HelperRunFloat(comp, "test", 11);
         }
 
         // Test IF, ELSE and ELIF
@@ -96,7 +97,7 @@ namespace ComalTests {
                 ENDFUNC test
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 20);
+            Helper.HelperRunFloat(comp, "test", 20);
         }
 
         // Test CASE
@@ -118,7 +119,7 @@ namespace ComalTests {
                 ENDFUNC test
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test CASE with strings
@@ -138,7 +139,7 @@ namespace ComalTests {
                 ENDFUNC test
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
     }
 }

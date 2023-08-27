@@ -23,66 +23,65 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that defines a line number marker.
+/// The line number marker specifies the line number of the original
+/// source file that corresponds to the subsequent parse nodes up
+/// until the end of the file or the next line number marker with
+/// a different line number.
+/// </summary>
+public sealed class MarkLineParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node that defines a line number marker.
-    /// The line number marker specifies the line number of the original
-    /// source file that corresponds to the subsequent parse nodes up
-    /// until the end of the file or the next line number marker with
-    /// a different line number.
+    /// Creates a line number marker parse node.
     /// </summary>
-    public sealed class MarkLineParseNode : ParseNode {
+    public MarkLineParseNode() : base(ParseID.LINENUMBER) { }
 
-        /// <summary>
-        /// Creates a line number marker parse node.
-        /// </summary>
-        public MarkLineParseNode() : base(ParseID.LINENUMBER) { }
+    /// <summary>
+    /// Gets or sets the line number marker.
+    /// </summary>
+    /// <value>An integer line number</value>
+    public int LineNumber { get; set; }
 
-        /// <summary>
-        /// Gets or sets the line number marker.
-        /// </summary>
-        /// <value>An integer line number</value>
-        public int LineNumber { get; set; }
+    /// <summary>
+    /// Get the displayable line number for languages such as BASIC or COMAL
+    /// </summary>
+    public int DisplayableLineNumber { get; set; }
 
-        /// <summary>
-        /// Get the displayable line number for languages such as BASIC or COMAL
-        /// </summary>
-        public int DisplayableLineNumber { get; set; }
-
-        /// <summary>
-        /// Emit the code to mark the line number at the current position
-        /// in the generated code.
-        /// </summary>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            cg.MarkLine(null, LineNumber);
+    /// <summary>
+    /// Emit the code to mark the line number at the current position
+    /// in the generated code.
+    /// </summary>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
+        cg.MarkLine(null, LineNumber);
+    }
 
-        /// <summary>
-        /// Emit the code to mark the line number at the current position
-        /// in the generated code.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            cg.MarkLine(emitter, LineNumber);
+    /// <summary>
+    /// Emit the code to mark the line number at the current position
+    /// in the generated code.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
+        cg.MarkLine(emitter, LineNumber);
+    }
 
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml subNode = root.Node("Line");
-            subNode.Attribute("Number", LineNumber.ToString());
-        }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml subNode = root.Node("Line");
+        subNode.Attribute("Number", LineNumber.ToString());
     }
 }

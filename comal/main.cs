@@ -25,50 +25,49 @@
 
 using CCompiler;
 
-namespace JComal {
+namespace JComal; 
 
-    public class Program {
+public class Program {
 
-        public static void Main(string[] args) {
-            ComalOptions opts = new();
-            MessageCollection messages = new(opts);
+    public static void Main(string[] args) {
+        ComalOptions opts = new();
+        MessageCollection messages = new(opts);
 
-            opts.Messages = messages;
-            if (opts.Parse(args)) {
+        opts.Messages = messages;
+        if (opts.Parse(args)) {
 
-                if (opts.Interactive) {
-                    Interpreter interpreter = new();
-                    interpreter.Run(opts);
-                } else {
-                    Compiler comp = new(opts) {
-                        Messages = messages
-                    };
+            if (opts.Interactive) {
+                Interpreter interpreter = new();
+                interpreter.Run(opts);
+            } else {
+                Compiler comp = new(opts) {
+                    Messages = messages
+                };
 
-                    foreach (string srcfile in opts.SourceFiles) {
-                        if (!File.Exists(srcfile)) {
-                            messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
-                            break;
-                        }
-                        comp.Compile(srcfile);
+                foreach (string srcfile in opts.SourceFiles) {
+                    if (!File.Exists(srcfile)) {
+                        messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
+                        break;
                     }
-                    if (messages.ErrorCount == 0) {
-                        comp.Save();
-                        if (opts.Run && messages.ErrorCount == 0) {
-                            comp.Execute();
-                        }
+                    comp.Compile(srcfile);
+                }
+                if (messages.ErrorCount == 0) {
+                    comp.Save();
+                    if (opts.Run && messages.ErrorCount == 0) {
+                        comp.Execute();
                     }
                 }
             }
-            foreach (Message msg in messages) {
-                if (msg.Level == MessageLevel.Error) {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
-                Console.WriteLine(msg);
-                Console.ResetColor();
+        }
+        foreach (Message msg in messages) {
+            if (msg.Level == MessageLevel.Error) {
+                Console.ForegroundColor = ConsoleColor.Red;
             }
-            if (messages.ErrorCount > 0) {
-                Console.WriteLine("*** {0} errors found. Compilation stopped.", messages.ErrorCount);
-            }
+            Console.WriteLine(msg);
+            Console.ResetColor();
+        }
+        if (messages.ErrorCount > 0) {
+            Console.WriteLine("*** {0} errors found. Compilation stopped.", messages.ErrorCount);
         }
     }
 }

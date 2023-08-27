@@ -26,6 +26,7 @@
 using CCompiler;
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -59,7 +60,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 123);
+            Helper.HelperRunInteger(comp, "ITEST", 123);
         }
 
         // Verify non 1-based array references.
@@ -75,7 +76,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 123);
+            Helper.HelperRunInteger(comp, "ITEST", 123);
         }
 
         // Verify passing arrays to functions
@@ -95,7 +96,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 4.2f);
+            Helper.HelperRunFloat(comp, "TEST", 4.2f);
         }
 
         // Verify passing arrays and dimensioning them in the
@@ -116,7 +117,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 4.2f);
+            Helper.HelperRunFloat(comp, "TEST", 4.2f);
         }
 
         // Make sure we error out with dynamic arrays in the main
@@ -158,7 +159,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 4.2f);
+            Helper.HelperRunFloat(comp, "TEST", 4.2f);
         }
 
         // Verify assumed sized arrays
@@ -177,7 +178,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 118);
+            Helper.HelperRunFloat(comp, "TEST", 118);
         }
     }
 }

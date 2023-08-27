@@ -23,26 +23,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines the scope of a symbol
+/// </summary>
+public enum SymScope {
 
     /// <summary>
-    /// Defines the scope of a symbol
+    /// Local variable
     /// </summary>
-    public enum SymScope {
+    LOCAL,
 
-        /// <summary>
-        /// Local variable
-        /// </summary>
-        LOCAL,
+    /// <summary>
+    /// Parameter
+    /// </summary>
+    PARAMETER,
 
-        /// <summary>
-        /// Parameter
-        /// </summary>
-        PARAMETER,
-
-        /// <summary>
-        /// Constant
-        /// </summary>
-        CONSTANT
-    }
+    /// <summary>
+    /// Constant
+    /// </summary>
+    CONSTANT
 }

@@ -25,6 +25,7 @@
 
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -42,7 +43,7 @@ namespace ComalTests {
                 DATA 15
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "read'simple'data", 15);
+            Helper.HelperRunFloat(comp, "read'simple'data", 15);
         }
 
         // Test multiple DATA reads
@@ -56,7 +57,7 @@ namespace ComalTests {
                 DATA 47,13,10,8
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "read'multiple'data", 120);
+            Helper.HelperRunFloat(comp, "read'multiple'data", 120);
         }
 
         // Test EOD
@@ -71,7 +72,7 @@ namespace ComalTests {
                 DATA 47,13,10,8
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'eod", 1);
+            Helper.HelperRunFloat(comp, "test'eod", 1);
         }
 
         // Test that EOD is 1 if there are no DATA statements
@@ -85,7 +86,7 @@ namespace ComalTests {
                 ENDFUNC test'default'eod
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'default'eod", 1);
+            Helper.HelperRunFloat(comp, "test'default'eod", 1);
         }
 
         // Test RESTORE
@@ -101,7 +102,7 @@ namespace ComalTests {
                 DATA 47,13,10,8
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'restore", 2040);
+            Helper.HelperRunFloat(comp, "test'restore", 2040);
         }
 
         // Test RESTORE resets EOD
@@ -117,7 +118,7 @@ namespace ComalTests {
                 DATA 47,13,10,8
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'restore'reset", 1);
+            Helper.HelperRunFloat(comp, "test'restore'reset", 1);
         }
     }
 }

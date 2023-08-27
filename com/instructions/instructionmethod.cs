@@ -26,41 +26,40 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that
+/// takes a MethodInfo parameter.
+/// </summary>
+public class InstructionMethod : Instruction {
+    private readonly MethodInfo _meth;
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that
-    /// takes a MethodInfo parameter.
+    /// Create an InstructionMethod object with the given opcode
+    /// and MethodInfo parameter.
     /// </summary>
-    public class InstructionMethod : Instruction {
-        private readonly MethodInfo _meth;
-
-        /// <summary>
-        /// Create an InstructionMethod object with the given opcode
-        /// and MethodInfo parameter.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="meth">MethodInfo object</param>
-        public InstructionMethod(OpCode op, MethodInfo meth) : base(op) {
-            if (meth == null) {
-                throw new ArgumentNullException(nameof(meth));
-            }
-            _meth = meth;
+    /// <param name="op">Opcode</param>
+    /// <param name="meth">MethodInfo object</param>
+    public InstructionMethod(OpCode op, MethodInfo meth) : base(op) {
+        if (meth == null) {
+            throw new ArgumentNullException(nameof(meth));
         }
+        _meth = meth;
+    }
 
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a MethodInfo
-        /// parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, _meth);
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a MethodInfo
+    /// parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
+        if (Deleted) {
+            return;
+        }
+        il.Emit(Code, _meth);
     }
 }

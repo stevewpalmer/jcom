@@ -23,22 +23,21 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JComal {
+namespace JComal; 
 
-    public class Utilities {
+public class Utilities {
 
-        /// <summary>
-        /// Add the specified extension to the filename is no extension was
-        /// already supplied.
-        /// </summary>
-        /// <param name="filename">Filename</param>
-        /// <param name="extension">Extension to supply</param>
-        /// <returns>Filename with an extension</returns>
-        public static string AddExtensionIfMissing(string filename, string extension) {
-            if (string.IsNullOrEmpty(Path.GetExtension(filename))) {
-                return Path.ChangeExtension(filename, extension);
-            }
-            return filename;
+    /// <summary>
+    /// Add the specified extension to the filename is no extension was
+    /// already supplied.
+    /// </summary>
+    /// <param name="filename">Filename</param>
+    /// <param name="extension">Extension to supply</param>
+    /// <returns>Filename with an extension</returns>
+    public static string AddExtensionIfMissing(string filename, string extension) {
+        if (string.IsNullOrEmpty(Path.GetExtension(filename))) {
+            return Path.ChangeExtension(filename, extension);
         }
+        return filename;
     }
 }

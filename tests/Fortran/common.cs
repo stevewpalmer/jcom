@@ -25,6 +25,7 @@
 
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -61,7 +62,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 60);
+            Helper.HelperRunInteger(comp, "ITEST", 60);
         }
 
         // COMMON test where the elements of a COMMON statement are built up
@@ -83,7 +84,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ICOMMONTEST", 187);
+            Helper.HelperRunInteger(comp, "ICOMMONTEST", 187);
         }
 
         // COMMON test where the elements of a COMMON statement are built up
@@ -107,7 +108,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ICOMMONTEST", 197);
+            Helper.HelperRunInteger(comp, "ICOMMONTEST", 197);
         }
     }
 }

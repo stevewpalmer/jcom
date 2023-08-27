@@ -23,8 +23,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using CCompiler;
 using JComLib;
-using jOS;
+
+namespace JShell;
 
 static class Program {
 
@@ -38,8 +40,8 @@ static class Program {
 
     static void Main(string[] args) {
 
-        Console.WriteLine($"{CCompiler.Options.AssemblyDescription} {CCompiler.Options.AssemblyVersion}");
-        Console.WriteLine($"{CCompiler.Options.AssemblyCopyright}");
+        Console.WriteLine($"{Options.AssemblyDescription} {Options.AssemblyVersion}");
+        Console.WriteLine($"{Options.AssemblyCopyright}");
         Console.WriteLine();
 
         // Ensure we have a home folder and set it as the default.

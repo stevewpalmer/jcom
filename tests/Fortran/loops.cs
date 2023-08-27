@@ -25,6 +25,7 @@
 
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -43,7 +44,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 55);
+            Helper.HelperRunInteger(comp, "ITEST", 55);
         }
 
         // Verify nested loop operation
@@ -59,7 +60,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 550);
+            Helper.HelperRunInteger(comp, "ITEST", 550);
         }
 
         // Verify loop control variable values at the end
@@ -76,7 +77,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 22);
+            Helper.HelperRunInteger(comp, "ITEST", 22);
         }
 
         // Verify altering loop start,end and step variables do
@@ -98,7 +99,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 5);
+            Helper.HelperRunInteger(comp, "ITEST", 5);
         }
 
         // Verify negative iterations.
@@ -116,7 +117,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 19);
+            Helper.HelperRunInteger(comp, "ITEST", 19);
         }
 
         // Verify zero loop execution when the end value is less
@@ -134,7 +135,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 0);
+            Helper.HelperRunInteger(comp, "ITEST", 0);
         }
 
         // Verify ENDDO to terminate the loop.
@@ -151,7 +152,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 20);
+            Helper.HelperRunInteger(comp, "ITEST", 20);
         }
 
         // Verify DO WHILE loop.
@@ -169,7 +170,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 20);
+            Helper.HelperRunInteger(comp, "ITEST", 20);
         }
 
         // Verify DO WHILE loop using a terminating label
@@ -188,7 +189,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 20);
+            Helper.HelperRunInteger(comp, "ITEST", 20);
         }
 
         // Verify zero start loop optimisation
@@ -204,7 +205,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 45);
+            Helper.HelperRunInteger(comp, "ITEST", 45);
         }
         
     }

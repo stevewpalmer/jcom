@@ -27,6 +27,7 @@ using System;
 using CCompiler;
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -49,7 +50,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test Simple 2D array
@@ -72,7 +73,7 @@ namespace ComalTests {
                 endfunc array'2d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'2d", 1);
+            Helper.HelperRunFloat(comp, "array'2d", 1);
         }
 
         // Test 1D string array
@@ -91,7 +92,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test 2D string array
@@ -114,7 +115,7 @@ namespace ComalTests {
                 endfunc array'string'2d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'string'2d", 1);
+            Helper.HelperRunFloat(comp, "array'string'2d", 1);
         }
 
         // Test 1D dynamic array
@@ -134,7 +135,7 @@ namespace ComalTests {
                 endfunc array'dynamic'1d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'1d", 1);
+            Helper.HelperRunFloat(comp, "array'dynamic'1d", 1);
         }
 
         // Test 1D dynamic array with a range
@@ -155,7 +156,7 @@ namespace ComalTests {
                 endfunc array'dynamic'1d'range
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'1d'range", 1);
+            Helper.HelperRunFloat(comp, "array'dynamic'1d'range", 1);
         }
 
         // Test 1D dynamic string array
@@ -175,7 +176,7 @@ namespace ComalTests {
                 endfunc array'dynamic'string'1d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
-            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'string'1d", 1);
+            Helper.HelperRunFloat(comp, "array'dynamic'string'1d", 1);
         }
 
         // Test redimensioning 1D dynamic array. After redimensioning,
@@ -198,7 +199,7 @@ namespace ComalTests {
                 endfunc array'redim'dynamic'1d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'redim'dynamic'1d", 1);
+            Helper.HelperRunFloat(comp, "array'redim'dynamic'1d", 1);
         }
 
         // Test 2D dynamic array
@@ -223,7 +224,7 @@ namespace ComalTests {
                 endfunc array'dynamic'2d
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
-            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'2d", 1);
+            Helper.HelperRunFloat(comp, "array'dynamic'2d", 1);
         }
 
         // Test 1D dynamic array with a range
@@ -250,7 +251,7 @@ namespace ComalTests {
                 endfunc array'dynamic'2d'range
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'dynamic'2d'range", 1);
+            Helper.HelperRunFloat(comp, "array'dynamic'2d'range", 1);
         }
 
         // Test catching inconsistent array dimensions
@@ -295,7 +296,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test catching out of bounds error
@@ -333,7 +334,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'byval", 1);
+            Helper.HelperRunFloat(comp, "array'byval", 1);
         }
 
         // Test calling a function with an array by reference.
@@ -358,7 +359,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "array'byref", 1);
+            Helper.HelperRunFloat(comp, "array'byref", 1);
         }
     }
 }

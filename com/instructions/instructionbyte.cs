@@ -25,37 +25,36 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that
+/// takes a byte parameter.
+/// </summary>
+public class InstructionByte : Instruction {
+    private readonly byte _offset;
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that
-    /// takes a byte parameter.
+    /// Create an InstructionByte object with the given opcode
+    /// and byte offset.
     /// </summary>
-    public class InstructionByte : Instruction {
-        private readonly byte _offset;
+    /// <param name="op">Opcode</param>
+    /// <param name="offset">A byte offset value</param>
+    public InstructionByte(OpCode op, byte offset) : base(op) {
+        _offset = offset;
+    }
 
-        /// <summary>
-        /// Create an InstructionByte object with the given opcode
-        /// and byte offset.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="offset">A byte offset value</param>
-        public InstructionByte(OpCode op, byte offset) : base(op) {
-            _offset = offset;
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a byte parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a byte parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, _offset);
+        if (Deleted) {
+            return;
         }
+        il.Emit(Code, _offset);
     }
 }

@@ -27,6 +27,7 @@ using System;
 using System.Numerics;
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -51,7 +52,7 @@ namespace FortranTests {
                     "      END"
                 };
                 Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-                Utilities.Helper.HelperRunDouble(comp, "INTRTEST", -0.8462204);
+                Helper.HelperRunDouble(comp, "INTRTEST", -0.8462204);
             }
         }
 
@@ -75,15 +76,15 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "IABS", 94);
-            Utilities.Helper.HelperRunDouble(comp, "DABS", 2.6);
-            Utilities.Helper.HelperRunFloat(comp, "RABS", 7.4f);
+            Helper.HelperRunInteger(comp, "IABS", 94);
+            Helper.HelperRunDouble(comp, "DABS", 2.6);
+            Helper.HelperRunFloat(comp, "RABS", 7.4f);
 
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "IABS", 94);
-            Utilities.Helper.HelperRunDouble(comp, "DABS", 2.6);
-            Utilities.Helper.HelperRunFloat(comp, "RABS", 7.4f);
+            Helper.HelperRunInteger(comp, "IABS", 94);
+            Helper.HelperRunDouble(comp, "DABS", 2.6);
+            Helper.HelperRunFloat(comp, "RABS", 7.4f);
         }
 
         // Verify ACOS().
@@ -104,12 +105,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Acos(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RACOS", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DACOS", expected);
+            Helper.HelperRunFloat(comp, "RACOS", (float)expected);
+            Helper.HelperRunDouble(comp, "DACOS", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RACOS", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DACOS", expected);
+            Helper.HelperRunFloat(comp, "RACOS", (float)expected);
+            Helper.HelperRunDouble(comp, "DACOS", expected);
         }
 
         // Verify AINT().
@@ -128,11 +129,11 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RAINT", 3);
-            Utilities.Helper.HelperRunDouble(comp, "DAINT", 9);
+            Helper.HelperRunFloat(comp, "RAINT", 3);
+            Helper.HelperRunDouble(comp, "DAINT", 9);
             opts.Inline = false;
-            Utilities.Helper.HelperRunFloat(comp, "RAINT", 3);
-            Utilities.Helper.HelperRunDouble(comp, "DAINT", 9);
+            Helper.HelperRunFloat(comp, "RAINT", 3);
+            Helper.HelperRunDouble(comp, "DAINT", 9);
         }
 
         // Verify ALOG().
@@ -147,10 +148,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
             float expected = (float)Math.Log(0.4);
-            Utilities.Helper.HelperRunFloat(comp, "RALOG", expected);
+            Helper.HelperRunFloat(comp, "RALOG", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RALOG", expected);
+            Helper.HelperRunFloat(comp, "RALOG", expected);
         }
 
         // Verify ALOG10() and LOG10().
@@ -171,14 +172,14 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Log10(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RALOG10", (float)expected);
-            Utilities.Helper.HelperRunFloat(comp, "RLOG10", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DDLOG10", expected);
+            Helper.HelperRunFloat(comp, "RALOG10", (float)expected);
+            Helper.HelperRunFloat(comp, "RLOG10", (float)expected);
+            Helper.HelperRunDouble(comp, "DDLOG10", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RALOG10", (float)expected);
-            Utilities.Helper.HelperRunFloat(comp, "RLOG10", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DDLOG10", expected);
+            Helper.HelperRunFloat(comp, "RALOG10", (float)expected);
+            Helper.HelperRunFloat(comp, "RLOG10", (float)expected);
+            Helper.HelperRunDouble(comp, "DDLOG10", expected);
         }
 
         // Verify AMOD().
@@ -192,10 +193,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             float expected = 97.75f % 4.75f;
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RAMOD", expected);
+            Helper.HelperRunFloat(comp, "RAMOD", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RAMOD", expected);
+            Helper.HelperRunFloat(comp, "RAMOD", expected);
         }
 
         // Verify ANINT() and DNINT().
@@ -219,14 +220,14 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RANINT", 3);
-            Utilities.Helper.HelperRunDouble(comp, "DANINT", -10);
-            Utilities.Helper.HelperRunDouble(comp, "DDNINT", -10);
+            Helper.HelperRunFloat(comp, "RANINT", 3);
+            Helper.HelperRunDouble(comp, "DANINT", -10);
+            Helper.HelperRunDouble(comp, "DDNINT", -10);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RANINT", 3);
-            Utilities.Helper.HelperRunDouble(comp, "DANINT", -10);
-            Utilities.Helper.HelperRunDouble(comp, "DDNINT", -10);
+            Helper.HelperRunFloat(comp, "RANINT", 3);
+            Helper.HelperRunDouble(comp, "DANINT", -10);
+            Helper.HelperRunDouble(comp, "DDNINT", -10);
         }
 
         // Verify ASIN().
@@ -247,12 +248,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Asin(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RASIN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DASIN", expected);
+            Helper.HelperRunFloat(comp, "RASIN", (float)expected);
+            Helper.HelperRunDouble(comp, "DASIN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RASIN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DASIN", expected);
+            Helper.HelperRunFloat(comp, "RASIN", (float)expected);
+            Helper.HelperRunDouble(comp, "DASIN", expected);
         }
 
         // Verify ATAN().
@@ -273,12 +274,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Atan(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RATAN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DATAN", expected);
+            Helper.HelperRunFloat(comp, "RATAN", (float)expected);
+            Helper.HelperRunDouble(comp, "DATAN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RATAN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DATAN", expected);
+            Helper.HelperRunFloat(comp, "RATAN", (float)expected);
+            Helper.HelperRunDouble(comp, "DATAN", expected);
         }
 
         // Verify ATAN2().
@@ -297,12 +298,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Atan2(-71.2,9.3);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RATAN2", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DATAN2", expected);
+            Helper.HelperRunFloat(comp, "RATAN2", (float)expected);
+            Helper.HelperRunDouble(comp, "DATAN2", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RATAN2", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DATAN2", expected);
+            Helper.HelperRunFloat(comp, "RATAN2", (float)expected);
+            Helper.HelperRunDouble(comp, "DATAN2", expected);
         }
 
         // Verify CABS()
@@ -317,10 +318,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             float expected = (float)Complex.Abs(new Complex(-12,3));
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RCABS", expected);
+            Helper.HelperRunFloat(comp, "RCABS", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RCABS", expected);
+            Helper.HelperRunFloat(comp, "RCABS", expected);
         }
 
         // Verify CCOS()
@@ -335,10 +336,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             Complex expected = Complex.Cos(new Complex(32,1));
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "RCCOS", expected);
+            Helper.HelperRunComplex(comp, "RCCOS", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "RCCOS", expected);
+            Helper.HelperRunComplex(comp, "RCCOS", expected);
         }
 
         // Verify CHAR()
@@ -353,10 +354,10 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunString(comp, "CCHAR", "A");
+            Helper.HelperRunString(comp, "CCHAR", "A");
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunString(comp, "CCHAR", "A");
+            Helper.HelperRunString(comp, "CCHAR", "A");
         }
 
         // Verify CLOG()
@@ -371,10 +372,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             Complex expected = Complex.Log(new Complex(32,1));
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "RCLOG", expected);
+            Helper.HelperRunComplex(comp, "RCLOG", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "RCLOG", expected);
+            Helper.HelperRunComplex(comp, "RCLOG", expected);
         }
 
         // Verify CMPLX()
@@ -389,10 +390,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             Complex expected = new(65,12);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "CCMPLX", expected);
+            Helper.HelperRunComplex(comp, "CCMPLX", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "CCMPLX", expected);
+            Helper.HelperRunComplex(comp, "CCMPLX", expected);
         }
 
         // Verify COS().
@@ -417,14 +418,14 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Cos(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RCOS", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DCOS", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CCOS", Complex.Cos(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RCOS", (float)expected);
+            Helper.HelperRunDouble(comp, "DCOS", expected);
+            Helper.HelperRunComplex(comp, "CCOS", Complex.Cos(new Complex(12,3)));
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RCOS", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DCOS", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CCOS", Complex.Cos(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RCOS", (float)expected);
+            Helper.HelperRunDouble(comp, "DCOS", expected);
+            Helper.HelperRunComplex(comp, "CCOS", Complex.Cos(new Complex(12,3)));
         }
 
         // Verify COSH().
@@ -444,12 +445,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Cosh(0.8);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RCOSH", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DCOSH", expected);
+            Helper.HelperRunFloat(comp, "RCOSH", (float)expected);
+            Helper.HelperRunDouble(comp, "DCOSH", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RCOSH", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DCOSH", expected);
+            Helper.HelperRunFloat(comp, "RCOSH", (float)expected);
+            Helper.HelperRunDouble(comp, "DCOSH", expected);
         }
 
         // Verify CSIN()
@@ -464,10 +465,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             Complex expected = Complex.Sin(new Complex(32,1));
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "CCSIN", expected);
+            Helper.HelperRunComplex(comp, "CCSIN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "CCSIN", expected);
+            Helper.HelperRunComplex(comp, "CCSIN", expected);
         }
 
         // Verify CSQRT()
@@ -482,10 +483,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             Complex expected = Complex.Sqrt(new Complex(49,5));
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "CCSQRT", expected);
+            Helper.HelperRunComplex(comp, "CCSQRT", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunComplex(comp, "CCSQRT", expected);
+            Helper.HelperRunComplex(comp, "CCSQRT", expected);
         }
 
         // Verify DABS()
@@ -501,10 +502,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Abs(-2.6);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDABS", expected);
+            Helper.HelperRunDouble(comp, "DDABS", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDABS", expected);
+            Helper.HelperRunDouble(comp, "DDABS", expected);
         }
 
         // Verify DACOS().
@@ -520,10 +521,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Acos(0.5);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDACOS", expected);
+            Helper.HelperRunDouble(comp, "DDACOS", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDACOS", expected);
+            Helper.HelperRunDouble(comp, "DDACOS", expected);
         }
 
         // Verify DASIN().
@@ -539,10 +540,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Asin(0.5);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDASIN", expected);
+            Helper.HelperRunDouble(comp, "DDASIN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDASIN", expected);
+            Helper.HelperRunDouble(comp, "DDASIN", expected);
         }
 
         // Verify DATAN().
@@ -558,10 +559,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Atan(0.5);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDATAN", expected);
+            Helper.HelperRunDouble(comp, "DDATAN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDATAN", expected);
+            Helper.HelperRunDouble(comp, "DDATAN", expected);
         }
 
         // Verify DATAN2().
@@ -576,10 +577,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Atan2(0.5,0.45);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDATAN2", expected);
+            Helper.HelperRunDouble(comp, "DDATAN2", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDATAN2", expected);
+            Helper.HelperRunDouble(comp, "DDATAN2", expected);
         }
 
         // Verify DBLE().
@@ -605,16 +606,16 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLEI", 12);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLER", 12.5);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLED", 1300);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLEC", 13);
+            Helper.HelperRunDouble(comp, "DDBLEI", 12);
+            Helper.HelperRunDouble(comp, "DDBLER", 12.5);
+            Helper.HelperRunDouble(comp, "DDBLED", 1300);
+            Helper.HelperRunDouble(comp, "DDBLEC", 13);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLEI", 12);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLER", 12.5);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLED", 1300);
-            Utilities.Helper.HelperRunDouble(comp, "DDBLEC", 13);
+            Helper.HelperRunDouble(comp, "DDBLEI", 12);
+            Helper.HelperRunDouble(comp, "DDBLER", 12.5);
+            Helper.HelperRunDouble(comp, "DDBLED", 1300);
+            Helper.HelperRunDouble(comp, "DDBLEC", 13);
         }
 
         // Verify DCOS().
@@ -630,10 +631,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Cos(0.5);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDCOS", expected);
+            Helper.HelperRunDouble(comp, "DDCOS", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDCOS", expected);
+            Helper.HelperRunDouble(comp, "DDCOS", expected);
         }
 
         // Verify DCOSH().
@@ -648,10 +649,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Cosh(0.147);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDCOSH", expected);
+            Helper.HelperRunDouble(comp, "DDCOSH", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDCOSH", expected);
+            Helper.HelperRunDouble(comp, "DDCOSH", expected);
         }
 
         // Verify EXP() and DEXP().
@@ -678,16 +679,16 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Exp(3.2);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "REXP", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DDEXP", expected);
-            Utilities.Helper.HelperRunDouble(comp, "RDEXP", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CCEXP", Complex.Exp(new Complex(3.2,0)));
+            Helper.HelperRunFloat(comp, "REXP", (float)expected);
+            Helper.HelperRunDouble(comp, "DDEXP", expected);
+            Helper.HelperRunDouble(comp, "RDEXP", expected);
+            Helper.HelperRunComplex(comp, "CCEXP", Complex.Exp(new Complex(3.2,0)));
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "REXP", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DDEXP", expected);
-            Utilities.Helper.HelperRunDouble(comp, "RDEXP", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CCEXP", Complex.Exp(new Complex(3.2,0)));
+            Helper.HelperRunFloat(comp, "REXP", (float)expected);
+            Helper.HelperRunDouble(comp, "DDEXP", expected);
+            Helper.HelperRunDouble(comp, "RDEXP", expected);
+            Helper.HelperRunComplex(comp, "CCEXP", Complex.Exp(new Complex(3.2,0)));
         }
 
         // Verify DINT().
@@ -701,10 +702,10 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDINT", 89);
+            Helper.HelperRunDouble(comp, "DDINT", 89);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDINT", 89);
+            Helper.HelperRunDouble(comp, "DDINT", 89);
         }
 
         // Verify DLOG().
@@ -720,10 +721,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Log(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "RDLOG", expected);
+            Helper.HelperRunDouble(comp, "RDLOG", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "RDLOG", expected);
+            Helper.HelperRunDouble(comp, "RDLOG", expected);
         }
 
         // Verify DLOG10().
@@ -739,10 +740,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Log10(3.72);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "RDLOG10", expected);
+            Helper.HelperRunDouble(comp, "RDLOG10", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "RDLOG10", expected);
+            Helper.HelperRunDouble(comp, "RDLOG10", expected);
         }
 
 
@@ -768,14 +769,14 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "IMODTEST", 10);
-            Utilities.Helper.HelperRunFloat(comp, "AMODTEST", 0.5f);
-            Utilities.Helper.HelperRunDouble(comp, "DMODTEST", 0.5);
+            Helper.HelperRunInteger(comp, "IMODTEST", 10);
+            Helper.HelperRunFloat(comp, "AMODTEST", 0.5f);
+            Helper.HelperRunDouble(comp, "DMODTEST", 0.5);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "IMODTEST", 10);
-            Utilities.Helper.HelperRunFloat(comp, "AMODTEST", 0.5f);
-            Utilities.Helper.HelperRunDouble(comp, "DMODTEST", 0.5);
+            Helper.HelperRunInteger(comp, "IMODTEST", 10);
+            Helper.HelperRunFloat(comp, "AMODTEST", 0.5f);
+            Helper.HelperRunDouble(comp, "DMODTEST", 0.5);
         }
 
         // Verify DPROD().
@@ -791,10 +792,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = 12.4 * 3.8;
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDPROD", expected);
+            Helper.HelperRunDouble(comp, "DDPROD", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDPROD", expected);
+            Helper.HelperRunDouble(comp, "DDPROD", expected);
         }
 
         // Verify DSIN().
@@ -810,10 +811,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Sin(0.5);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDSIN", expected);
+            Helper.HelperRunDouble(comp, "DDSIN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDSIN", expected);
+            Helper.HelperRunDouble(comp, "DDSIN", expected);
         }
         
         // Verify DSINH().
@@ -828,10 +829,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Sinh(0.147);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDSINH", expected);
+            Helper.HelperRunDouble(comp, "DDSINH", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDSINH", expected);
+            Helper.HelperRunDouble(comp, "DDSINH", expected);
         }
 
         // Verify DSQRT()
@@ -846,10 +847,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Sqrt(49);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDSQRT", expected);
+            Helper.HelperRunDouble(comp, "DDSQRT", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDSQRT", expected);
+            Helper.HelperRunDouble(comp, "DDSQRT", expected);
         }
 
         // Verify DTAN().
@@ -865,10 +866,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Tan(0.5);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDTAN", expected);
+            Helper.HelperRunDouble(comp, "DDTAN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDTAN", expected);
+            Helper.HelperRunDouble(comp, "DDTAN", expected);
         }
         
         // Verify DTANH().
@@ -883,10 +884,10 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Tanh(0.147);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDTANH", expected);
+            Helper.HelperRunDouble(comp, "DDTANH", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunDouble(comp, "DDTANH", expected);
+            Helper.HelperRunDouble(comp, "DDTANH", expected);
         }
 
         // Verify FLOAT().
@@ -899,10 +900,10 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RFLOATI", 12f);
+            Helper.HelperRunFloat(comp, "RFLOATI", 12f);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RFLOATI", 12f);
+            Helper.HelperRunFloat(comp, "RFLOATI", 12f);
         }
 
         // Verify IABS().
@@ -918,12 +919,12 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST1", 12);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 73);
+            Helper.HelperRunInteger(comp, "ITEST1", 12);
+            Helper.HelperRunInteger(comp, "ITEST2", 73);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST1", 12);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 73);
+            Helper.HelperRunInteger(comp, "ITEST1", 12);
+            Helper.HelperRunInteger(comp, "ITEST2", 73);
         }
 
         // Verify ICHAR().
@@ -941,12 +942,12 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST1", 102);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 72);
+            Helper.HelperRunInteger(comp, "ITEST1", 102);
+            Helper.HelperRunInteger(comp, "ITEST2", 72);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST1", 102);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 72);
+            Helper.HelperRunInteger(comp, "ITEST1", 102);
+            Helper.HelperRunInteger(comp, "ITEST2", 72);
         }
 
         // Verify IDINT().
@@ -959,10 +960,10 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 124);
+            Helper.HelperRunInteger(comp, "ITEST", 124);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 124);
+            Helper.HelperRunInteger(comp, "ITEST", 124);
         }
 
         // Verify IFIX() and INT().
@@ -978,12 +979,12 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 124);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 124);
+            Helper.HelperRunInteger(comp, "ITEST", 124);
+            Helper.HelperRunInteger(comp, "ITEST2", 124);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 124);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 124);
+            Helper.HelperRunInteger(comp, "ITEST", 124);
+            Helper.HelperRunInteger(comp, "ITEST2", 124);
         }
 
         // Verify INT().
@@ -1005,16 +1006,16 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "JINTI", 12);
-            Utilities.Helper.HelperRunInteger(comp, "JINTR", 12);
-            Utilities.Helper.HelperRunInteger(comp, "JINTD", 1300);
-            Utilities.Helper.HelperRunInteger(comp, "JINTC", 13);
+            Helper.HelperRunInteger(comp, "JINTI", 12);
+            Helper.HelperRunInteger(comp, "JINTR", 12);
+            Helper.HelperRunInteger(comp, "JINTD", 1300);
+            Helper.HelperRunInteger(comp, "JINTC", 13);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "JINTI", 12);
-            Utilities.Helper.HelperRunInteger(comp, "JINTR", 12);
-            Utilities.Helper.HelperRunInteger(comp, "JINTD", 1300);
-            Utilities.Helper.HelperRunInteger(comp, "JINTC", 13);
+            Helper.HelperRunInteger(comp, "JINTI", 12);
+            Helper.HelperRunInteger(comp, "JINTR", 12);
+            Helper.HelperRunInteger(comp, "JINTD", 1300);
+            Helper.HelperRunInteger(comp, "JINTC", 13);
         }
 
         // Verify LEN().
@@ -1035,14 +1036,14 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST1", 5);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 0);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST3", 4);
+            Helper.HelperRunInteger(comp, "ITEST1", 5);
+            Helper.HelperRunInteger(comp, "ITEST2", 0);
+            Helper.HelperRunInteger(comp, "ITEST3", 4);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST1", 5);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST2", 0);
-            Utilities.Helper.HelperRunInteger(comp, "ITEST3", 4);
+            Helper.HelperRunInteger(comp, "ITEST1", 5);
+            Helper.HelperRunInteger(comp, "ITEST2", 0);
+            Helper.HelperRunInteger(comp, "ITEST3", 4);
         }
 
         // Verify LOG().
@@ -1067,14 +1068,14 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Log(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RLOG", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DLOG", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CCLOG", Complex.Log(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RLOG", (float)expected);
+            Helper.HelperRunDouble(comp, "DLOG", expected);
+            Helper.HelperRunComplex(comp, "CCLOG", Complex.Log(new Complex(12,3)));
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RLOG", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DLOG", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CCLOG", Complex.Log(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RLOG", (float)expected);
+            Helper.HelperRunDouble(comp, "DLOG", expected);
+            Helper.HelperRunComplex(comp, "CCLOG", Complex.Log(new Complex(12,3)));
         }
 
         // Verify REAL().
@@ -1096,16 +1097,16 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "DREALI", 12);
-            Utilities.Helper.HelperRunFloat(comp, "DREALR", 12.5f);
-            Utilities.Helper.HelperRunFloat(comp, "DREALD", 1300);
-            Utilities.Helper.HelperRunFloat(comp, "DREALC", 13);
+            Helper.HelperRunFloat(comp, "DREALI", 12);
+            Helper.HelperRunFloat(comp, "DREALR", 12.5f);
+            Helper.HelperRunFloat(comp, "DREALD", 1300);
+            Helper.HelperRunFloat(comp, "DREALC", 13);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "DREALI", 12);
-            Utilities.Helper.HelperRunFloat(comp, "DREALR", 12.5f);
-            Utilities.Helper.HelperRunFloat(comp, "DREALD", 1300);
-            Utilities.Helper.HelperRunFloat(comp, "DREALC", 13);
+            Helper.HelperRunFloat(comp, "DREALI", 12);
+            Helper.HelperRunFloat(comp, "DREALR", 12.5f);
+            Helper.HelperRunFloat(comp, "DREALD", 1300);
+            Helper.HelperRunFloat(comp, "DREALC", 13);
         }
 
         // Verify SIN().
@@ -1130,14 +1131,14 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Sin(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RSIN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DSIN", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CSIN", Complex.Sin(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RSIN", (float)expected);
+            Helper.HelperRunDouble(comp, "DSIN", expected);
+            Helper.HelperRunComplex(comp, "CSIN", Complex.Sin(new Complex(12,3)));
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RSIN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DSIN", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CSIN", Complex.Sin(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RSIN", (float)expected);
+            Helper.HelperRunDouble(comp, "DSIN", expected);
+            Helper.HelperRunComplex(comp, "CSIN", Complex.Sin(new Complex(12,3)));
         }
         
         // Verify SINH().
@@ -1157,12 +1158,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Sinh(0.8);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RSINH", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DSINH", expected);
+            Helper.HelperRunFloat(comp, "RSINH", (float)expected);
+            Helper.HelperRunDouble(comp, "DSINH", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RSINH", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DSINH", expected);
+            Helper.HelperRunFloat(comp, "RSINH", (float)expected);
+            Helper.HelperRunDouble(comp, "DSINH", expected);
         }
 
         // Verify SNGL().
@@ -1175,10 +1176,10 @@ namespace FortranTests {
             };
             FortranOptions opts = new();
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RTEST", 12.45E1f);
+            Helper.HelperRunFloat(comp, "RTEST", 12.45E1f);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RTEST", 12.45E1f);
+            Helper.HelperRunFloat(comp, "RTEST", 12.45E1f);
         }
 
         // Verify SQRT().
@@ -1203,14 +1204,14 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Sqrt(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RSQRT", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DSQRT", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CSQRT", Complex.Sqrt(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RSQRT", (float)expected);
+            Helper.HelperRunDouble(comp, "DSQRT", expected);
+            Helper.HelperRunComplex(comp, "CSQRT", Complex.Sqrt(new Complex(12,3)));
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RSQRT", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DSQRT", expected);
-            Utilities.Helper.HelperRunComplex(comp, "CSQRT", Complex.Sqrt(new Complex(12,3)));
+            Helper.HelperRunFloat(comp, "RSQRT", (float)expected);
+            Helper.HelperRunDouble(comp, "DSQRT", expected);
+            Helper.HelperRunComplex(comp, "CSQRT", Complex.Sqrt(new Complex(12,3)));
         }
 
         // Verify TAN().
@@ -1231,12 +1232,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Tan(0.4);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RTAN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DTAN", expected);
+            Helper.HelperRunFloat(comp, "RTAN", (float)expected);
+            Helper.HelperRunDouble(comp, "DTAN", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RTAN", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DTAN", expected);
+            Helper.HelperRunFloat(comp, "RTAN", (float)expected);
+            Helper.HelperRunDouble(comp, "DTAN", expected);
         }
         
         // Verify TANH().
@@ -1256,12 +1257,12 @@ namespace FortranTests {
             FortranOptions opts = new();
             double expected = Math.Tanh(0.8);
             Compiler comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RTANH", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DTANH", expected);
+            Helper.HelperRunFloat(comp, "RTANH", (float)expected);
+            Helper.HelperRunDouble(comp, "DTANH", expected);
             opts.Inline = false;
             comp = FortranHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "RTANH", (float)expected);
-            Utilities.Helper.HelperRunDouble(comp, "DTANH", expected);
+            Helper.HelperRunFloat(comp, "RTANH", (float)expected);
+            Helper.HelperRunDouble(comp, "DTANH", expected);
         }
     }
 }

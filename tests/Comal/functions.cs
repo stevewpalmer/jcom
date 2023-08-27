@@ -25,6 +25,7 @@
 
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -45,10 +46,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'abs", 1);
+            Helper.HelperRunFloat(comp, "test'abs", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'abs", 1);
+            Helper.HelperRunFloat(comp, "test'abs", 1);
         }
 
         // Test Atn() function.
@@ -68,10 +69,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'atn", 1);
+            Helper.HelperRunFloat(comp, "test'atn", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'atn", 1);
+            Helper.HelperRunFloat(comp, "test'atn", 1);
         }
 
         // Test Sqr() function.
@@ -89,10 +90,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'sqr", 1);
+            Helper.HelperRunFloat(comp, "test'sqr", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'sqr", 1);
+            Helper.HelperRunFloat(comp, "test'sqr", 1);
         }
 
         // Test Cos() function.
@@ -111,10 +112,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'cos", 1);
+            Helper.HelperRunFloat(comp, "test'cos", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'cos", 1);
+            Helper.HelperRunFloat(comp, "test'cos", 1);
         }
 
         // Test Sin() function.
@@ -133,10 +134,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'sin", 1);
+            Helper.HelperRunFloat(comp, "test'sin", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'sin", 1);
+            Helper.HelperRunFloat(comp, "test'sin", 1);
         }
 
         // Test Ord() function.
@@ -151,10 +152,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'ord", 1);
+            Helper.HelperRunFloat(comp, "test'ord", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'ord", 1);
+            Helper.HelperRunFloat(comp, "test'ord", 1);
         }
 
         // Test Log() function.
@@ -172,10 +173,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'log", 1);
+            Helper.HelperRunFloat(comp, "test'log", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'log", 1);
+            Helper.HelperRunFloat(comp, "test'log", 1);
         }
 
         // Test RANDOMIZE
@@ -197,10 +198,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'randomize", 1);
+            Helper.HelperRunFloat(comp, "test'randomize", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'randomize", 1);
+            Helper.HelperRunFloat(comp, "test'randomize", 1);
         }
 
         // Test RND and RND(range)
@@ -219,10 +220,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'rnd'range", 1);
+            Helper.HelperRunFloat(comp, "test'rnd'range", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'rnd'range", 1);
+            Helper.HelperRunFloat(comp, "test'rnd'range", 1);
         }
 
         // Test SPC$
@@ -242,10 +243,10 @@ namespace ComalTests {
             ";
             ComalOptions opts = new();
             Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'spc", 1);
+            Helper.HelperRunFloat(comp, "test'spc", 1);
             opts.Inline = false;
             comp = ComalHelper.HelperCompile(code, opts);
-            Utilities.Helper.HelperRunFloat(comp, "test'spc", 1);
+            Helper.HelperRunFloat(comp, "test'spc", 1);
         }
     }
 }

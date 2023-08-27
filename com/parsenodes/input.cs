@@ -26,161 +26,160 @@
 using JComalLib;
 using JComLib;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that defines a single INPUT item.
+/// </summary>
+public sealed class InputManagerParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node that defines a single INPUT item.
+    /// Gets or sets the input prompt.
     /// </summary>
-    public sealed class InputManagerParseNode : ParseNode {
+    public ParseNode Prompt { get; set; }
 
-        /// <summary>
-        /// Gets or sets the input prompt.
-        /// </summary>
-        public ParseNode Prompt { get; set; }
+    /// <summary>
+    /// Parse node that computes the file handle
+    /// </summary>
+    public ParseNode FileHandle { get; set; }
 
-        /// <summary>
-        /// Parse node that computes the file handle
-        /// </summary>
-        public ParseNode FileHandle { get; set; }
+    /// <summary>
+    /// Parse node that computes the record number
+    /// </summary>
+    public ParseNode RecordNumber { get; set; }
 
-        /// <summary>
-        /// Parse node that computes the record number
-        /// </summary>
-        public ParseNode RecordNumber { get; set; }
+    /// <summary>
+    /// Parse node that computes the input row position
+    /// </summary>
+    public ParseNode RowPosition { get; set; }
 
-        /// <summary>
-        /// Parse node that computes the input row position
-        /// </summary>
-        public ParseNode RowPosition { get; set; }
+    /// <summary>
+    /// Parse node that computes the input column position
+    /// </summary>
+    public ParseNode ColumnPosition { get; set; }
 
-        /// <summary>
-        /// Parse node that computes the input column position
-        /// </summary>
-        public ParseNode ColumnPosition { get; set; }
+    /// <summary>
+    /// Parse node that computes the maximum input width
+    /// </summary>
+    public ParseNode MaximumWidth { get; set; }
 
-        /// <summary>
-        /// Parse node that computes the maximum input width
-        /// </summary>
-        public ParseNode MaximumWidth { get; set; }
+    /// <summary>
+    /// Gets or sets the end of input line termination behaviour.
+    /// </summary>
+    public LineTerminator Terminator { get; set; }
 
-        /// <summary>
-        /// Gets or sets the end of input line termination behaviour.
-        /// </summary>
-        public LineTerminator Terminator { get; set; }
+    /// <summary>
+    /// Gets or sets the list of identifiers for the input.
+    /// </summary>
+    /// <value>The read parameters node</value>
+    public IdentifierParseNode [] Identifiers { get; set; }
 
-        /// <summary>
-        /// Gets or sets the list of identifiers for the input.
-        /// </summary>
-        /// <value>The read parameters node</value>
-        public IdentifierParseNode [] Identifiers { get; set; }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("InputManager");
+        blockNode.Attribute("Terminator", Terminator.ToString());
+        if (ColumnPosition != null) {
+            ColumnPosition.Dump(blockNode);
+        }
+        if (RowPosition != null) {
+            RowPosition.Dump(blockNode);
+        }
+        if (MaximumWidth != null) {
+            MaximumWidth.Dump(blockNode);
+        }
+        if (FileHandle != null) {
+            FileHandle.Dump(blockNode);
+        }
+        if (RecordNumber != null) {
+            RecordNumber.Dump(blockNode);
+        }
+        if (Prompt != null) {
+            Prompt.Dump(blockNode);
+        }
+        foreach (IdentifierParseNode identNode in Identifiers) {
+            identNode.Dump(blockNode);
+        }
+    }
 
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("InputManager");
-            blockNode.Attribute("Terminator", Terminator.ToString());
-            if (ColumnPosition != null) {
-                ColumnPosition.Dump(blockNode);
-            }
-            if (RowPosition != null) {
-                RowPosition.Dump(blockNode);
-            }
-            if (MaximumWidth != null) {
-                MaximumWidth.Dump(blockNode);
-            }
-            if (FileHandle != null) {
-                FileHandle.Dump(blockNode);
-            }
-            if (RecordNumber != null) {
-                RecordNumber.Dump(blockNode);
-            }
-            if (Prompt != null) {
-                Prompt.Dump(blockNode);
-            }
-            foreach (IdentifierParseNode identNode in Identifiers) {
-                identNode.Dump(blockNode);
-            }
+    /// <summary>
+    /// Emit the code to generate a call to the InputManager library function. A
+    /// parse node must be provided which evaluates to the address of the
+    /// identifier into which the data is read.
+    /// </summary>
+    /// <param name="emitter">The emitter</param>
+    /// <param name="cg">A CodeGenerator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+
+        if (emitter == null) {
+            throw new ArgumentNullException(nameof(emitter));
+        }
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
 
-        /// <summary>
-        /// Emit the code to generate a call to the InputManager library function. A
-        /// parse node must be provided which evaluates to the address of the
-        /// identifier into which the data is read.
-        /// </summary>
-        /// <param name="emitter">The emitter</param>
-        /// <param name="cg">A CodeGenerator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        List<Type> constructorTypes = new();
 
-            if (emitter == null) {
-                throw new ArgumentNullException(nameof(emitter));
-            }
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
+        // Constructor arguments
+        if (RowPosition != null && ColumnPosition != null) {
+            cg.GenerateExpression(emitter, SymType.INTEGER, RowPosition);
+            cg.GenerateExpression(emitter, SymType.INTEGER, ColumnPosition);
+            cg.GenerateExpression(emitter, SymType.INTEGER, MaximumWidth);
 
-            List<Type> constructorTypes = new();
+            constructorTypes.Add(Symbol.SymTypeToSystemType(RowPosition.Type));
+            constructorTypes.Add(Symbol.SymTypeToSystemType(ColumnPosition.Type));
+            constructorTypes.Add(Symbol.SymTypeToSystemType(MaximumWidth.Type));
+        }
 
-            // Constructor arguments
-            if (RowPosition != null && ColumnPosition != null) {
-                cg.GenerateExpression(emitter, SymType.INTEGER, RowPosition);
-                cg.GenerateExpression(emitter, SymType.INTEGER, ColumnPosition);
-                cg.GenerateExpression(emitter, SymType.INTEGER, MaximumWidth);
+        cg.GenerateExpression(emitter, SymType.INTEGER, FileHandle);
+        constructorTypes.Add(typeof(int));
 
-                constructorTypes.Add(Symbol.SymTypeToSystemType(RowPosition.Type));
-                constructorTypes.Add(Symbol.SymTypeToSystemType(ColumnPosition.Type));
-                constructorTypes.Add(Symbol.SymTypeToSystemType(MaximumWidth.Type));
-            }
+        if (Prompt != null) {
+            cg.GenerateExpression(emitter, SymType.CHAR, Prompt);
+            emitter.LoadInteger((int)Terminator);
 
-            cg.GenerateExpression(emitter, SymType.INTEGER, FileHandle);
-            constructorTypes.Add(typeof(int));
+            constructorTypes.Add(typeof(string));
+            constructorTypes.Add(typeof(LineTerminator));
+        }
 
-            if (Prompt != null) {
-                cg.GenerateExpression(emitter, SymType.CHAR, Prompt);
-                emitter.LoadInteger((int)Terminator);
+        if (RecordNumber != null) {
+            cg.GenerateExpression(emitter, SymType.INTEGER, RecordNumber);
+            constructorTypes.Add(Symbol.SymTypeToSystemType(RecordNumber.Type));
+        }
 
-                constructorTypes.Add(typeof(string));
-                constructorTypes.Add(typeof(LineTerminator));
-            }
+        Type inputManagerType = typeof(InputManager);
+        emitter.CreateObject(inputManagerType, constructorTypes.ToArray());
+        LocalDescriptor objIndex = emitter.GetTemporary(inputManagerType);
+        emitter.StoreLocal(objIndex);
 
-            if (RecordNumber != null) {
-                cg.GenerateExpression(emitter, SymType.INTEGER, RecordNumber);
-                constructorTypes.Add(Symbol.SymTypeToSystemType(RecordNumber.Type));
-            }
+        foreach (IdentifierParseNode identNode in Identifiers) {
 
-            Type inputManagerType = typeof(InputManager);
-            emitter.CreateObject(inputManagerType, constructorTypes.ToArray());
-            LocalDescriptor objIndex = emitter.GetTemporary(inputManagerType);
-            emitter.StoreLocal(objIndex);
+            List<Type> readParamTypes = new();
 
-            foreach (IdentifierParseNode identNode in Identifiers) {
-
-                List<Type> readParamTypes = new();
-
-                emitter.LoadLocal(objIndex);
-                if (identNode.IsArrayBase) {
-                    emitter.GenerateLoadArray(identNode, true);
-                    readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeArrayType().MakeByRefType());
-                } else if (identNode.HasSubstring) {
-                    cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringStart);
-                    if (identNode.SubstringEnd != null) {
-                        cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringEnd);
-                    } else {
-                        emitter.LoadInteger(-1);
-                    }
-                    cg.LoadAddress(emitter, identNode);
-                    readParamTypes.Add(typeof(int));
-                    readParamTypes.Add(typeof(int));
-                    readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
+            emitter.LoadLocal(objIndex);
+            if (identNode.IsArrayBase) {
+                emitter.GenerateLoadArray(identNode, true);
+                readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeArrayType().MakeByRefType());
+            } else if (identNode.HasSubstring) {
+                cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringStart);
+                if (identNode.SubstringEnd != null) {
+                    cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringEnd);
                 } else {
-                    cg.LoadAddress(emitter, identNode);
-                    readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
+                    emitter.LoadInteger(-1);
                 }
-
-                emitter.Call(cg.GetMethodForType(inputManagerType, "READ", readParamTypes.ToArray()));
+                cg.LoadAddress(emitter, identNode);
+                readParamTypes.Add(typeof(int));
+                readParamTypes.Add(typeof(int));
+                readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
+            } else {
+                cg.LoadAddress(emitter, identNode);
+                readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
             }
+
+            emitter.Call(cg.GetMethodForType(inputManagerType, "READ", readParamTypes.ToArray()));
         }
     }
 }

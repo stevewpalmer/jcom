@@ -26,6 +26,7 @@
 using JComal;
 using JComLib;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -42,7 +43,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test ERR in trap handler
@@ -60,7 +61,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test ERRTEXT$ in trap handler
@@ -78,7 +79,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test trapping divisions by zero for both integer and
@@ -105,7 +106,7 @@ namespace ComalTests {
                 endfunc
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test", 1);
+            Helper.HelperRunFloat(comp, "test", 1);
         }
 
         // Test END doesn't get caught by trap handler since it raises its own

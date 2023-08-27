@@ -23,76 +23,75 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node for a return statement.
+/// </summary>
+public sealed class ReturnParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node for a return statement.
+    /// Gets or sets the return expression.
     /// </summary>
-    public sealed class ReturnParseNode : ParseNode {
+    /// <value>The return expression.</value>
+    public ParseNode ReturnExpression { get; set; }
 
-        /// <summary>
-        /// Gets or sets the return expression.
-        /// </summary>
-        /// <value>The return expression.</value>
-        public ParseNode ReturnExpression { get; set; }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("Return");
-            if (ReturnExpression != null) {
-                ReturnExpression.Dump(blockNode);
-            }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("Return");
+        if (ReturnExpression != null) {
+            ReturnExpression.Dump(blockNode);
         }
+    }
 
-        /// <summary>
-        /// Generate the code to return from a procedure or GOSUB.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A CodeGenerator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            if (cg.CurrentProcedure != null) {
+    /// <summary>
+    /// Generate the code to return from a procedure or GOSUB.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A CodeGenerator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
+        }
+        if (cg.CurrentProcedure != null) {
 
-                // Handle the case where we return via a procedure symbol (i.e. where
-                // the return value is stored in a local with the name of the procedure)
-                Symbol retVal = cg.CurrentProcedure.ProcedureSymbol.RetVal;
-                if (retVal != null) {
-                    if (ReturnExpression != null) {
-                        SymType thisType = cg.GenerateExpression(emitter, retVal.Type, ReturnExpression);
-                        emitter.ConvertType(thisType, retVal.Type);
-                    } else {
-                        if (retVal.Index == null) {
-                            cg.Error($"Function {cg.CurrentProcedure.ProcedureSymbol.Name} does not return a value");
-                        }
-                        emitter.LoadLocal(retVal.Index);
-                    }
-
-                    // For alternate return, if the method is marked as supporting
-                    // them then it will be compiled as a function. So it must always
-                    // have a return value. A value of 0 means the default behaviour
-                    // (i.e. none of the labels specified are picked).
-                } else if (cg.CurrentProcedure.AlternateReturnCount > 0) {
-                    if (ReturnExpression != null) {
-                        cg.GenerateExpression(emitter, SymType.INTEGER, ReturnExpression);
-                    } else {
-                        emitter.LoadInteger(0);
-                    }
-                }
-
-                // Otherwise process a straight RETURN <expression>
-                else if (ReturnExpression != null) {
-                    SymType thisType = cg.GenerateExpression(emitter, SymType.NONE, ReturnExpression);
-                    retVal = cg.CurrentProcedure.ProcedureSymbol;
+            // Handle the case where we return via a procedure symbol (i.e. where
+            // the return value is stored in a local with the name of the procedure)
+            Symbol retVal = cg.CurrentProcedure.ProcedureSymbol.RetVal;
+            if (retVal != null) {
+                if (ReturnExpression != null) {
+                    SymType thisType = cg.GenerateExpression(emitter, retVal.Type, ReturnExpression);
                     emitter.ConvertType(thisType, retVal.Type);
+                } else {
+                    if (retVal.Index == null) {
+                        cg.Error($"Function {cg.CurrentProcedure.ProcedureSymbol.Name} does not return a value");
+                    }
+                    emitter.LoadLocal(retVal.Index);
+                }
+
+                // For alternate return, if the method is marked as supporting
+                // them then it will be compiled as a function. So it must always
+                // have a return value. A value of 0 means the default behaviour
+                // (i.e. none of the labels specified are picked).
+            } else if (cg.CurrentProcedure.AlternateReturnCount > 0) {
+                if (ReturnExpression != null) {
+                    cg.GenerateExpression(emitter, SymType.INTEGER, ReturnExpression);
+                } else {
+                    emitter.LoadInteger(0);
                 }
             }
-            emitter.Branch(cg.CurrentProcedure.ReturnLabel);
+
+            // Otherwise process a straight RETURN <expression>
+            else if (ReturnExpression != null) {
+                SymType thisType = cg.GenerateExpression(emitter, SymType.NONE, ReturnExpression);
+                retVal = cg.CurrentProcedure.ProcedureSymbol;
+                emitter.ConvertType(thisType, retVal.Type);
+            }
         }
+        emitter.Branch(cg.CurrentProcedure.ReturnLabel);
     }
 }

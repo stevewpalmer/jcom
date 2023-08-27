@@ -25,50 +25,49 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines a single Instruction base class that constructs an opcode that
+/// takes no parameters.
+/// </summary>
+public class Instruction {
 
     /// <summary>
-    /// Defines a single Instruction base class that constructs an opcode that
-    /// takes no parameters.
+    /// Create an Instruction object with the given opcode.
     /// </summary>
-    public class Instruction {
-
-        /// <summary>
-        /// Create an Instruction object with the given opcode.
-        /// </summary>
-        /// <param name="op">An OpCode</param>
-        public Instruction(OpCode op) {
-            Code = op;
-        }
-
-        /// <summary>
-        /// Create an Instruction object that takes no opcode.
-        /// </summary>
-        public Instruction() { }
-
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes no parameters.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public virtual void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code);
-        }
-
-        /// <summary>
-        /// Get or set the instruction opcode.
-        /// </summary>
-        public OpCode Code { get; set; }
-
-        /// <summary>
-        /// Gets or sets a flag which indicates whether or not this
-        /// instruction should be omitted.
-        /// </summary>
-        public bool Deleted { get; set; }
+    /// <param name="op">An OpCode</param>
+    public Instruction(OpCode op) {
+        Code = op;
     }
+
+    /// <summary>
+    /// Create an Instruction object that takes no opcode.
+    /// </summary>
+    public Instruction() { }
+
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes no parameters.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public virtual void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
+        }
+        if (Deleted) {
+            return;
+        }
+        il.Emit(Code);
+    }
+
+    /// <summary>
+    /// Get or set the instruction opcode.
+    /// </summary>
+    public OpCode Code { get; set; }
+
+    /// <summary>
+    /// Gets or sets a flag which indicates whether or not this
+    /// instruction should be omitted.
+    /// </summary>
+    public bool Deleted { get; set; }
 }

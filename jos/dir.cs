@@ -23,37 +23,36 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace jOS {
+namespace JShell;
 
-	public partial class Commands {
+public partial class Commands {
 
-        // DIR command.
-        // The rest of the command line specifies the files to be
-        // filtered.
-        static public bool CmdDir(CommandLine cmdLine) {
+    // DIR command.
+    // The rest of the command line specifies the files to be
+    // filtered.
+    public static bool CmdDir(CommandLine cmdLine) {
 
-            string[] matchfiles = cmdLine.RestOfLine();
-            if (!matchfiles.Any()) {
-                matchfiles = new string[] { "*" };
-            }
-            string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
-            allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
-            Array.Sort(allfiles);
-            foreach (string file in allfiles) {
-                FileInfo info = new(file);
-                long size = info.Length;
-                string sizeString;
-                if (size < 1024) {
-                    sizeString = size + "B";
-                } else if (size < 1024 * 1024) {
-                    sizeString = (size / 1024) + "K";
-                } else {
-                    sizeString = (size / (1024 * 1024)) + "M";
-                }
-                Console.WriteLine(string.Format("{0,-20} {1,5}", info.Name, sizeString));
-            }
-            return true;
+        string[] matchfiles = cmdLine.RestOfLine();
+        if (!matchfiles.Any()) {
+            matchfiles = new[] { "*" };
         }
+        string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
+        allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
+        Array.Sort(allfiles);
+        foreach (string file in allfiles) {
+            FileInfo info = new(file);
+            long size = info.Length;
+            string sizeString;
+            if (size < 1024) {
+                sizeString = size + "B";
+            } else if (size < 1024 * 1024) {
+                sizeString = (size / 1024) + "K";
+            } else {
+                sizeString = (size / (1024 * 1024)) + "M";
+            }
+            Console.WriteLine("{0,-20} {1,5}", info.Name, sizeString);
+        }
+        return true;
     }
 }
 

@@ -26,41 +26,40 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that
+/// takes a ConstructorInfo parameter.
+/// </summary>
+public class InstructionCtor : Instruction {
+    private readonly ConstructorInfo _ctor;
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that
-    /// takes a ConstructorInfo parameter.
+    /// Create an InstructionMCtor object with the given opcode
+    /// and ConstructorInfo parameter.
     /// </summary>
-    public class InstructionCtor : Instruction {
-        private readonly ConstructorInfo _ctor;
-
-        /// <summary>
-        /// Create an InstructionMCtor object with the given opcode
-        /// and ConstructorInfo parameter.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="ctor">ConstructorInfo object</param>
-        public InstructionCtor(OpCode op, ConstructorInfo ctor) : base(op) {
-            if (ctor == null) {
-                throw new ArgumentNullException(nameof(ctor));
-            }
-            _ctor = ctor;
+    /// <param name="op">Opcode</param>
+    /// <param name="ctor">ConstructorInfo object</param>
+    public InstructionCtor(OpCode op, ConstructorInfo ctor) : base(op) {
+        if (ctor == null) {
+            throw new ArgumentNullException(nameof(ctor));
         }
+        _ctor = ctor;
+    }
 
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a ConstructorInfo
-        /// parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, _ctor);
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a ConstructorInfo
+    /// parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
+        if (Deleted) {
+            return;
+        }
+        il.Emit(Code, _ctor);
     }
 }

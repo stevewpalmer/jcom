@@ -26,104 +26,103 @@
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node for a GOTO statement.
+/// </summary>
+public sealed class GotoParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node for a GOTO statement.
+    /// Creates a goto parse node.
     /// </summary>
-    public sealed class GotoParseNode : ParseNode {
+    public GotoParseNode() : base(ParseID.GOTO) {
+        Nodes = new Collection<ParseNode>();
+    }
 
-        /// <summary>
-        /// Creates a goto parse node.
-        /// </summary>
-        public GotoParseNode() : base(ParseID.GOTO) {
-            Nodes = new Collection<ParseNode>();
+    /// <summary>
+    /// Creates a goto parse node with the specified label.
+    /// </summary>
+    public GotoParseNode(ParseNode label) : base(ParseID.GOTO) {
+        Nodes = new Collection<ParseNode> {
+            label
+        };
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the index into
+    /// the switch table is zero or 1 based.
+    /// </summary>
+    /// <value><c>true</c> if the index is zero based; otherwise, <c>false</c>.</value>
+    public bool IsZeroBased { get; set; }
+
+    /// <summary>
+    /// Gets or sets an expression for a computed GOTO.
+    /// </summary>
+    /// <value>The parse node for the expression</value>
+    public ParseNode ValueExpression { get; set; }
+
+    /// <summary>
+    /// Adds the given parsenode as a child of this token node.
+    /// </summary>
+    /// <param name="node">The Parsenode to add</param>
+    public void Add(ParseNode node) {
+        Nodes.Add(node);
+    }
+
+    /// <summary>
+    /// Returns a list of all child nodes.
+    /// </summary>
+    public Collection<ParseNode> Nodes { get; private set; }
+
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("Goto");
+        blockNode.Attribute("IsZeroBased", IsZeroBased.ToString());
+        if (ValueExpression != null) {
+            ValueExpression.Dump(blockNode);
         }
-
-        /// <summary>
-        /// Creates a goto parse node with the specified label.
-        /// </summary>
-        public GotoParseNode(ParseNode label) : base(ParseID.GOTO) {
-            Nodes = new Collection<ParseNode> {
-                label
-            };
+        foreach (ParseNode node in Nodes) {
+            node.Dump(blockNode);
         }
+    }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the index into
-        /// the switch table is zero or 1 based.
-        /// </summary>
-        /// <value><c>true</c> if the index is zero based; otherwise, <c>false</c>.</value>
-        public bool IsZeroBased { get; set; }
-
-        /// <summary>
-        /// Gets or sets an expression for a computed GOTO.
-        /// </summary>
-        /// <value>The parse node for the expression</value>
-        public ParseNode ValueExpression { get; set; }
-
-        /// <summary>
-        /// Adds the given parsenode as a child of this token node.
-        /// </summary>
-        /// <param name="node">The Parsenode to add</param>
-        public void Add(ParseNode node) {
-            Nodes.Add(node);
+    /// <summary>
+    /// Emit the code to generate a GOTO statement.
+    /// </summary>
+    /// <param name="emitter">The emitter</param>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
+        if (ValueExpression == null) {
+            Symbol sym = ProgramParseNode.GetLabel(Nodes[0]);
+            emitter.Branch((Label)sym.Info);
+        } else {
+            Collection<ParseNode> labelNodes = Nodes;
 
-        /// <summary>
-        /// Returns a list of all child nodes.
-        /// </summary>
-        public Collection<ParseNode> Nodes { get; private set; }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("Goto");
-            blockNode.Attribute("IsZeroBased", IsZeroBased.ToString());
-            if (ValueExpression != null) {
-                ValueExpression.Dump(blockNode);
+            if (labelNodes == null || labelNodes.Count == 0) {
+                labelNodes = cg.CurrentProcedure.LabelList;
             }
-            foreach (ParseNode node in Nodes) {
-                node.Dump(blockNode);
-            }
-        }
 
-        /// <summary>
-        /// Emit the code to generate a GOTO statement.
-        /// </summary>
-        /// <param name="emitter">The emitter</param>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            if (ValueExpression == null) {
-                Symbol sym = ProgramParseNode.GetLabel(Nodes[0]);
-                emitter.Branch((Label)sym.Info);
-            } else {
-                Collection<ParseNode> labelNodes = Nodes;
-
-                if (labelNodes == null || labelNodes.Count == 0) {
-                    labelNodes = cg.CurrentProcedure.LabelList;
+            Label [] jumpTable = new Label[labelNodes.Count];
+            for (int c = 0; c < labelNodes.Count; ++c) {
+                Symbol sym = ProgramParseNode.GetLabel(labelNodes[c]);
+                if (sym.Type == SymType.LABEL) {
+                    jumpTable[c] = (Label)sym.Info;
                 }
-
-                Label [] jumpTable = new Label[labelNodes.Count];
-                for (int c = 0; c < labelNodes.Count; ++c) {
-                    Symbol sym = ProgramParseNode.GetLabel(labelNodes[c]);
-                    if (sym.Type == SymType.LABEL) {
-                        jumpTable[c] = (Label)sym.Info;
-                    }
-                }
-                cg.GenerateExpression(emitter, SymType.INTEGER, ValueExpression);
-                if (!IsZeroBased) {
-                    emitter.LoadInteger(1);
-                    emitter.Sub(SymType.INTEGER);
-                }
-                emitter.Switch(jumpTable);
             }
+            cg.GenerateExpression(emitter, SymType.INTEGER, ValueExpression);
+            if (!IsZeroBased) {
+                emitter.LoadInteger(1);
+                emitter.Sub(SymType.INTEGER);
+            }
+            emitter.Switch(jumpTable);
         }
     }
 }

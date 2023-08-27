@@ -25,6 +25,7 @@
 
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -42,7 +43,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "INTEST", 0);
+            Helper.HelperRunFloat(comp, "INTEST", 0);
         }
 
         // Test substring manipulation.
@@ -60,7 +61,7 @@ namespace ComalTests {
                 ENDFUNC sub'test#
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "sub'test#", 1);
+            Helper.HelperRunInteger(comp, "sub'test#", 1);
         }
 
         // Test substring manipulation with no end range
@@ -77,7 +78,7 @@ namespace ComalTests {
                 ENDFUNC sub'test#
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "sub'test#", 1);
+            Helper.HelperRunInteger(comp, "sub'test#", 1);
         }
 
         // Test string concatenation and truncation
@@ -94,7 +95,7 @@ namespace ComalTests {
                 ENDFUNC concat
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "concat", 1);
+            Helper.HelperRunFloat(comp, "concat", 1);
         }
 
         // Test string concatenation where string is less than the
@@ -112,7 +113,7 @@ namespace ComalTests {
                 ENDFUNC concat
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "concat", 1);
+            Helper.HelperRunFloat(comp, "concat", 1);
         }
 
         // Test substring where string is shorter than the index
@@ -130,7 +131,7 @@ namespace ComalTests {
                 ENDFUNC sub'test#
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "sub'test#", 1);
+            Helper.HelperRunInteger(comp, "sub'test#", 1);
         }
 
         // Test array indexes and substrings together
@@ -150,7 +151,7 @@ namespace ComalTests {
                 ENDFUNC
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunString(comp, "array'and'substring$", "ABCDEFGHIJ");
+            Helper.HelperRunString(comp, "array'and'substring$", "ABCDEFGHIJ");
         }
 
         // Test boolean value of an empty string
@@ -167,7 +168,7 @@ namespace ComalTests {
                 ENDFUNC
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunString(comp, "emptyString", "1");
+            Helper.HelperRunString(comp, "emptyString", "1");
         }
     }
 }

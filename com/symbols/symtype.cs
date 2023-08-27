@@ -23,82 +23,81 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines the symbol type.
+/// </summary>
+public enum SymType {
 
     /// <summary>
-    /// Defines the symbol type.
+    /// None
     /// </summary>
-    public enum SymType {
+    NONE,
 
-        /// <summary>
-        /// None
-        /// </summary>
-        NONE,
+    /// <summary>
+    /// 32-bit integer
+    /// </summary>
+    INTEGER,
 
-        /// <summary>
-        /// 32-bit integer
-        /// </summary>
-        INTEGER,
+    /// <summary>
+    /// Single-precision floating point
+    /// </summary>
+    FLOAT,
 
-        /// <summary>
-        /// Single-precision floating point
-        /// </summary>
-        FLOAT,
+    /// <summary>
+    /// Double-precision floating point
+    /// </summary>
+    DOUBLE,
 
-        /// <summary>
-        /// Double-precision floating point
-        /// </summary>
-        DOUBLE,
+    /// <summary>
+    /// Boolean
+    /// </summary>
+    BOOLEAN,
 
-        /// <summary>
-        /// Boolean
-        /// </summary>
-        BOOLEAN,
+    /// <summary>
+    /// Source code label, such as the target of a GOTO
+    /// or a Fortran FORMAT statement.
+    /// </summary>
+    LABEL,
 
-        /// <summary>
-        /// Source code label, such as the target of a GOTO
-        /// or a Fortran FORMAT statement.
-        /// </summary>
-        LABEL,
+    /// <summary>
+    /// String
+    /// </summary>
+    CHAR,
 
-        /// <summary>
-        /// String
-        /// </summary>
-        CHAR,
+    /// <summary>
+    /// Fixed length string (implemented in JComLib)
+    /// </summary>
+    FIXEDCHAR,
 
-        /// <summary>
-        /// Fixed length string (implemented in JComLib)
-        /// </summary>
-        FIXEDCHAR,
+    /// <summary>
+    /// Reference type
+    /// </summary>
+    REF,
 
-        /// <summary>
-        /// Reference type
-        /// </summary>
-        REF,
+    /// <summary>
+    /// Variable argument list
+    /// </summary>
+    VARARG,
 
-        /// <summary>
-        /// Variable argument list
-        /// </summary>
-        VARARG,
+    /// <summary>
+    /// Top-level program
+    /// </summary>
+    PROGRAM,
 
-        /// <summary>
-        /// Top-level program
-        /// </summary>
-        PROGRAM,
+    /// <summary>
+    /// Fortran COMMON block
+    /// </summary>
+    COMMON,
 
-        /// <summary>
-        /// Fortran COMMON block
-        /// </summary>
-        COMMON,
+    /// <summary>
+    /// Generic type
+    /// </summary>
+    GENERIC,
 
-        /// <summary>
-        /// Generic type
-        /// </summary>
-        GENERIC,
-
-        /// <summary>
-        /// Complex number
-        /// </summary>
-        COMPLEX
-    }
+    /// <summary>
+    /// Complex number
+    /// </summary>
+    COMPLEX
 }

@@ -25,60 +25,59 @@
 
 using System.Collections.ObjectModel;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that defines a scoped block
+/// </summary>
+public class BlockParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node that defines a scoped block
+    /// Creates a BlockParseNode.
     /// </summary>
-    public class BlockParseNode : ParseNode {
+    public BlockParseNode() {
+        Nodes = new Collection<ParseNode>();
+    }
 
-        /// <summary>
-        /// Creates a BlockParseNode.
-        /// </summary>
-        public BlockParseNode() {
-            Nodes = new Collection<ParseNode>();
+    /// <summary>
+    /// Adds the given parsenode to the block.
+    /// </summary>
+    /// <param name="node">The Parsenode to add</param>
+    public void Add(ParseNode node) {
+        Nodes.Add(node);
+    }
+
+    /// <summary>
+    /// Clears all child nodes.
+    /// </summary>
+    public void Clear() {
+        Nodes.Clear();
+    }
+
+    /// <summary>
+    /// Returns a list of all child nodes.
+    /// </summary>
+    public Collection<ParseNode> Nodes { get; private set; }
+
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("Block");
+        foreach (ParseNode node in Nodes) {
+            node.Dump(blockNode);
         }
+    }
 
-        /// <summary>
-        /// Adds the given parsenode to the block.
-        /// </summary>
-        /// <param name="node">The Parsenode to add</param>
-        public void Add(ParseNode node) {
-            Nodes.Add(node);
-        }
+    /// <summary>
+    /// Emit the code to generate a block.
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(Emitter em, ProgramParseNode cg) {
 
-        /// <summary>
-        /// Clears all child nodes.
-        /// </summary>
-        public void Clear() {
-            Nodes.Clear();
-        }
-
-        /// <summary>
-        /// Returns a list of all child nodes.
-        /// </summary>
-        public Collection<ParseNode> Nodes { get; private set; }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("Block");
-            foreach (ParseNode node in Nodes) {
-                node.Dump(blockNode);
-            }
-        }
-
-        /// <summary>
-        /// Emit the code to generate a block.
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(Emitter em, ProgramParseNode cg) {
-
-            foreach (ParseNode t in Nodes) {
-                t.Generate(em, cg);
-            }
+        foreach (ParseNode t in Nodes) {
+            t.Generate(em, cg);
         }
     }
 }

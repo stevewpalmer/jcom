@@ -25,38 +25,37 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that takes
+/// a float parameter.
+/// </summary>
+public class InstructionFloat : Instruction {
+    private readonly float _value;
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that takes
-    /// a float parameter.
+    /// Create an InstructionFloat object with the given opcode
+    /// and float value.
     /// </summary>
-    public class InstructionFloat : Instruction {
-        private readonly float _value;
+    /// <param name="op">Opcode</param>
+    /// <param name="value">A float value</param>
+    public InstructionFloat(OpCode op, float value) : base(op) {
+        _value = value;
+    }
 
-        /// <summary>
-        /// Create an InstructionFloat object with the given opcode
-        /// and float value.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="value">A float value</param>
-        public InstructionFloat(OpCode op, float value) : base(op) {
-            _value = value;
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a float
+    /// parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a float
-        /// parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, _value);
+        if (Deleted) {
+            return;
         }
+        il.Emit(Code, _value);
     }
 }

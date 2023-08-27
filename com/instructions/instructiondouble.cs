@@ -25,38 +25,37 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that takes
+/// a double parameter.
+/// </summary>
+public class InstructionDouble : Instruction {
+    private readonly double _value;
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that takes
-    /// a double parameter.
+    /// Create an InstructionDouble object with the given opcode
+    /// and double value.
     /// </summary>
-    public class InstructionDouble : Instruction {
-        private readonly double _value;
+    /// <param name="op">Opcode</param>
+    /// <param name="value">A double value</param>
+    public InstructionDouble(OpCode op, double value) : base(op) {
+        _value = value;
+    }
 
-        /// <summary>
-        /// Create an InstructionDouble object with the given opcode
-        /// and double value.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="value">A double value</param>
-        public InstructionDouble(OpCode op, double value) : base(op) {
-            _value = value;
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a double
+    /// parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a double
-        /// parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, _value);
+        if (Deleted) {
+            return;
         }
+        il.Emit(Code, _value);
     }
 }

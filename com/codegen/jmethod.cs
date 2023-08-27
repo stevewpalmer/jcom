@@ -25,57 +25,56 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines a method within a type
+/// </summary>
+public class JMethod {
 
     /// <summary>
-    /// Defines a method within a type
+    /// Owning type
     /// </summary>
-    public class JMethod {
+    public JType OwningType { get; set; }
 
-        /// <summary>
-        /// Owning type
-        /// </summary>
-        public JType OwningType { get; set; }
+    /// <summary>
+    /// Method builder
+    /// </summary>
+    public MethodBuilder Builder { get; set; }
 
-        /// <summary>
-        /// Method builder
-        /// </summary>
-        public MethodBuilder Builder { get; set; }
+    /// <summary>
+    /// Constructor builder
+    /// </summary>
+    public ConstructorBuilder CBuilder { get; set; }
 
-        /// <summary>
-        /// Constructor builder
-        /// </summary>
-        public ConstructorBuilder CBuilder { get; set; }
+    /// <summary>
+    /// Code emitter for this method
+    /// </summary>
+    public Emitter Emitter { get; set; }
 
-        /// <summary>
-        /// Code emitter for this method
-        /// </summary>
-        public Emitter Emitter { get; set; }
+    /// <summary>
+    /// Constructs a method that belongs to the given type
+    /// </summary>
+    /// <param name="owningType">Method owner</param>
+    /// <param name="metd">Method builder</param>
+    public JMethod(JType owningType, MethodBuilder metd) {
+        OwningType = owningType;
+        Builder = metd;
+        Emitter = new Emitter(metd) {
+            IsDebuggable = owningType.Debuggable
+        };
+    }
 
-        /// <summary>
-        /// Constructs a method that belongs to the given type
-        /// </summary>
-        /// <param name="owningType">Method owner</param>
-        /// <param name="metd">Method builder</param>
-        public JMethod(JType owningType, MethodBuilder metd) {
-            OwningType = owningType;
-            Builder = metd;
-            Emitter = new Emitter(metd) {
-                IsDebuggable = owningType.Debuggable
-            };
-        }
-
-        /// <summary>
-        /// Constructs a method that belongs to the given type
-        /// </summary>
-        /// <param name="owningType">Method owner</param>
-        /// <param name="metd">Constructor builder</param>
-        public JMethod(JType owningType, ConstructorBuilder cntb) {
-            OwningType = owningType;
-            CBuilder = cntb;
-            Emitter = new Emitter(cntb) {
-                IsDebuggable = owningType.Debuggable
-            };
-        }
+    /// <summary>
+    /// Constructs a method that belongs to the given type
+    /// </summary>
+    /// <param name="owningType">Method owner</param>
+    /// <param name="metd">Constructor builder</param>
+    public JMethod(JType owningType, ConstructorBuilder cntb) {
+        OwningType = owningType;
+        CBuilder = cntb;
+        Emitter = new Emitter(cntb) {
+            IsDebuggable = owningType.Debuggable
+        };
     }
 }

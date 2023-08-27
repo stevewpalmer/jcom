@@ -25,6 +25,7 @@
 
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -49,7 +50,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 55);
+            Helper.HelperRunInteger(comp, "ITEST", 55);
         }
 
         // Verify the use of SAVE to save all local identifiers
@@ -71,7 +72,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 385);
+            Helper.HelperRunInteger(comp, "ITEST", 385);
         }
     }
 }

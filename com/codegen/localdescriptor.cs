@@ -23,28 +23,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines a structure that stores information about a single allocation
+/// in the local identifier list.
+/// </summary>
+public sealed class LocalDescriptor {
 
     /// <summary>
-    /// Defines a structure that stores information about a single allocation
-    /// in the local identifier list.
+    /// Index of this temporary in the list.
     /// </summary>
-    public sealed class LocalDescriptor {
+    public int Index { get; set; }
 
-        /// <summary>
-        /// Index of this temporary in the list.
-        /// </summary>
-        public int Index { get; set; }
+    /// <summary>
+    /// Type of this temporary.
+    /// </summary>
+    public Type Type { get; set; }
 
-        /// <summary>
-        /// Type of this temporary.
-        /// </summary>
-        public Type Type { get; set; }
-
-        /// <summary>
-        /// Specifies whether or not the temporary is currently
-        /// in use. False means it can be recycled.
-        /// </summary>
-        public bool InUse { get; set; }
-    }
+    /// <summary>
+    /// Specifies whether or not the temporary is currently
+    /// in use. False means it can be recycled.
+    /// </summary>
+    public bool InUse { get; set; }
 }

@@ -26,21 +26,20 @@
 using System.Collections.ObjectModel;
 using CCompiler;
 
-namespace JComal {
+namespace JComal; 
+
+/// <summary>
+/// A single identifier definition
+/// </summary>
+public class IdentifierDefinition {
 
     /// <summary>
-    /// A single identifier definition
+    /// Identifier name
     /// </summary>
-    public class IdentifierDefinition {
+    public string Name { get; set; }
 
-        /// <summary>
-        /// Identifier name
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Optional dimensions
-        /// </summary>
-        public Collection<SymDimension> Dimensions { get; set; }
-    }
+    /// <summary>
+    /// Optional dimensions
+    /// </summary>
+    public Collection<SymDimension> Dimensions { get; set; }
 }

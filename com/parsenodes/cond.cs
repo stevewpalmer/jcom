@@ -26,105 +26,104 @@
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that defines a conditional block.
+/// </summary>
+public sealed class ConditionalParseNode : ParseNode {
+
+    private readonly Collection<ParseNode> _exprList = new();
 
     /// <summary>
-    /// Specifies a parse node that defines a conditional block.
+    /// Creates a conditional parse node.
     /// </summary>
-    public sealed class ConditionalParseNode : ParseNode {
+    public ConditionalParseNode() : base(ParseID.COND) {}
 
-        private readonly Collection<ParseNode> _exprList = new();
+    /// <summary>
+    /// Return the list of block nodes for each conditional block.
+    /// </summary>
+    /// <value>The body list.</value>
+    public Collection<BlockParseNode> BodyList { get; } = new();
 
-        /// <summary>
-        /// Creates a conditional parse node.
-        /// </summary>
-        public ConditionalParseNode() : base(ParseID.COND) {}
+    /// <summary>
+    /// Adds a conditional and body.
+    /// </summary>
+    /// <param name="expr">Conditional expression node</param>
+    /// <param name="body">Statements to be executed</param>
+    public void Add(ParseNode expr, BlockParseNode body) {
+        _exprList.Add(expr);
+        BodyList.Add(body);
+    }
 
-        /// <summary>
-        /// Return the list of block nodes for each conditional block.
-        /// </summary>
-        /// <value>The body list.</value>
-        public Collection<BlockParseNode> BodyList { get; } = new();
-
-        /// <summary>
-        /// Adds a conditional and body.
-        /// </summary>
-        /// <param name="expr">Conditional expression node</param>
-        /// <param name="body">Statements to be executed</param>
-        public void Add(ParseNode expr, BlockParseNode body) {
-            _exprList.Add(expr);
-            BodyList.Add(body);
-        }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("Conditional");
-            for (int c = 0; c < _exprList.Count; ++c) {
-                ParseNode expr = _exprList[c];
-                if (expr != null) {
-                    expr.Dump(blockNode);
-                }
-                BlockParseNode body = BodyList[c];
-                if (body != null) {
-                    body.Dump(blockNode);
-                }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("Conditional");
+        for (int c = 0; c < _exprList.Count; ++c) {
+            ParseNode expr = _exprList[c];
+            if (expr != null) {
+                expr.Dump(blockNode);
+            }
+            BlockParseNode body = BodyList[c];
+            if (body != null) {
+                body.Dump(blockNode);
             }
         }
+    }
 
-        /// <summary>
-        /// Emit the code to generate a conditional block. Optimisation
-        /// is performed on the tests so that any conditional which is
-        /// a constant true causes the block to be executed and the whole
-        /// loop code generation terminated after that block. A constant
-        /// false causes the block to be ignored.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            int index = 0;
+    /// <summary>
+    /// Emit the code to generate a conditional block. Optimisation
+    /// is performed on the tests so that any conditional which is
+    /// a constant true causes the block to be executed and the whole
+    /// loop code generation terminated after that block. A constant
+    /// false causes the block to be ignored.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
+        }
+        int index = 0;
 
-            Label labFalse = emitter.CreateLabel(); // Destination of false condition
-            Label labExit = emitter.CreateLabel();  // Exit from entire IF statement
+        Label labFalse = emitter.CreateLabel(); // Destination of false condition
+        Label labExit = emitter.CreateLabel();  // Exit from entire IF statement
 
-            while (index < _exprList.Count) {
-                bool isLastBlock = index == _exprList.Count - 1;
-                bool skipBlock = false;
+        while (index < _exprList.Count) {
+            bool isLastBlock = index == _exprList.Count - 1;
+            bool skipBlock = false;
 
-                ParseNode expr = _exprList[index];
-                if (expr != null) {
-                    if (expr.IsConstant) {
-                        if (expr.Value.BoolValue) {
-                            isLastBlock = true;
-                        } else {
-                            skipBlock = true;
-                        }
+            ParseNode expr = _exprList[index];
+            if (expr != null) {
+                if (expr.IsConstant) {
+                    if (expr.Value.BoolValue) {
+                        isLastBlock = true;
                     } else {
-                        cg.GenerateExpression(emitter, SymType.BOOLEAN, _exprList[index]);
-                        emitter.BranchIfFalse(isLastBlock ? labExit : labFalse);
-                    }
-                }
-                if (!skipBlock) {
-                    BodyList[index].Generate(emitter, cg);
-                }
-                if (!isLastBlock) {
-                    if (!skipBlock) {
-                        emitter.Branch(labExit);
-                        emitter.MarkLabel(labFalse);
-                        labFalse = emitter.CreateLabel();
+                        skipBlock = true;
                     }
                 } else {
-                    break;
+                    cg.GenerateExpression(emitter, SymType.BOOLEAN, _exprList[index]);
+                    emitter.BranchIfFalse(isLastBlock ? labExit : labFalse);
                 }
-                ++index;
             }
-            emitter.MarkLabel(labExit);
+            if (!skipBlock) {
+                BodyList[index].Generate(emitter, cg);
+            }
+            if (!isLastBlock) {
+                if (!skipBlock) {
+                    emitter.Branch(labExit);
+                    emitter.MarkLabel(labFalse);
+                    labFalse = emitter.CreateLabel();
+                }
+            } else {
+                break;
+            }
+            ++index;
         }
+        emitter.MarkLabel(labExit);
     }
 }

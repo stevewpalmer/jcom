@@ -25,40 +25,39 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that represents a branch
+/// destination point in the instruction sequence.
+/// </summary>
+public class InstructionLabelMarker : Instruction {
 
     /// <summary>
-    /// Defines an instruction class that represents a branch
-    /// destination point in the instruction sequence.
+    /// Target of label.
     /// </summary>
-    public class InstructionLabelMarker : Instruction {
+    public Label Target { get; set; }
 
-        /// <summary>
-        /// Target of label.
-        /// </summary>
-        public Label Target { get; set; }
+    /// <summary>
+    /// Create an InstructionLabelMarker object with the specified
+    /// label target.
+    /// </summary>
+    /// <param name="target">Label target</param>
+    public InstructionLabelMarker(Label target) {
+        Target = target;
+    }
 
-        /// <summary>
-        /// Create an InstructionLabelMarker object with the specified
-        /// label target.
-        /// </summary>
-        /// <param name="target">Label target</param>
-        public InstructionLabelMarker(Label target) {
-            Target = target;
+    /// <summary>
+    /// Generate MSIL code to emit a label marker.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit a label marker.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.MarkLabel(Target);
+        if (Deleted) {
+            return;
         }
+        il.MarkLabel(Target);
     }
 }

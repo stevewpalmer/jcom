@@ -25,39 +25,38 @@
 
 using System.Diagnostics;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines a stack of symbol collections
+/// </summary>
+public class SymbolStack {
+
+    private readonly List<SymbolCollection> _stack = new();
 
     /// <summary>
-    /// Defines a stack of symbol collections
+    /// Return the symbol table at the top of the stack. 
     /// </summary>
-    public class SymbolStack {
+    public SymbolCollection Top => _stack[0];
 
-        private readonly List<SymbolCollection> _stack = new();
+    /// <summary>
+    /// Return all symbols ordered from top downwards.
+    /// </summary>
+    public SymbolCollection[] All => _stack.ToArray();
 
-        /// <summary>
-        /// Return the symbol table at the top of the stack. 
-        /// </summary>
-        public SymbolCollection Top => _stack[0];
+    /// <summary>
+    /// Add a new symbol table to the top of the stack
+    /// </summary>
+    public void Push(SymbolCollection symbols) {
+        _stack.Insert(0, symbols);
+    }
 
-        /// <summary>
-        /// Return all symbols ordered from top downwards.
-        /// </summary>
-        public SymbolCollection[] All => _stack.ToArray();
-
-        /// <summary>
-        /// Add a new symbol table to the top of the stack
-        /// </summary>
-        public void Push(SymbolCollection symbols) {
-            _stack.Insert(0, symbols);
-        }
-
-        /// <summary>
-        /// Removes the symbol table at the top of the stack. You cannot
-        /// remove the global symbol table.
-        /// </summary>
-        public void Pop() {
-            Debug.Assert(_stack.Count > 1);
-            _stack.RemoveAt(0);
-        }
+    /// <summary>
+    /// Removes the symbol table at the top of the stack. You cannot
+    /// remove the global symbol table.
+    /// </summary>
+    public void Pop() {
+        Debug.Assert(_stack.Count > 1);
+        _stack.RemoveAt(0);
     }
 }

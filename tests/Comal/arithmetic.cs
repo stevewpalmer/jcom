@@ -26,6 +26,7 @@
 using System;
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -44,7 +45,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "ITEST", 63);
+            Helper.HelperRunFloat(comp, "ITEST", 63);
         }
 
         // Verify basic addition expression generation
@@ -58,7 +59,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "TEST#", 40);
+            Helper.HelperRunInteger(comp, "TEST#", 40);
         }
 
         // Verify basic subtraction expression generation
@@ -72,7 +73,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "TEST#", 3759);
+            Helper.HelperRunInteger(comp, "TEST#", 3759);
         }
 
         // Verify basic multiplication expression generation
@@ -86,7 +87,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "TEST#", 4050);
+            Helper.HelperRunInteger(comp, "TEST#", 4050);
         }
 
         // Verify basic division expression generation
@@ -100,7 +101,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 20f);
+            Helper.HelperRunFloat(comp, "TEST", 20f);
         }
 
         // Verify implicit precedence
@@ -112,7 +113,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 34f);
+            Helper.HelperRunFloat(comp, "TEST", 34f);
         }
 
         // Verify implicit precedence
@@ -125,7 +126,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 2000f);
+            Helper.HelperRunFloat(comp, "TEST", 2000f);
         }
 
         // Verify divison by zero blows up the code
@@ -159,7 +160,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "SIMPLIFY1", 17.0625f);
+            Helper.HelperRunFloat(comp, "SIMPLIFY1", 17.0625f);
         }
 
         // Verify concatenation operator
@@ -171,7 +172,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunString(comp, "CONCATTEST$", "904534");
+            Helper.HelperRunString(comp, "CONCATTEST$", "904534");
         }
 
         // Verify DIV operator adheres to the Comal Common standard for
@@ -191,7 +192,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "DivTest#", 1);
+            Helper.HelperRunInteger(comp, "DivTest#", 1);
         }
 
         // Verify MOD operator
@@ -210,7 +211,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ModTest#", 1);
+            Helper.HelperRunInteger(comp, "ModTest#", 1);
         }
 
         // Verify incremental add operator
@@ -228,7 +229,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "IncrAdd#", 1);
+            Helper.HelperRunInteger(comp, "IncrAdd#", 1);
         }
 
         // Verify incremental subtraction operator
@@ -246,7 +247,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "IncrSub#", 1);
+            Helper.HelperRunInteger(comp, "IncrSub#", 1);
         }
     }
 }

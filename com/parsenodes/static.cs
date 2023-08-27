@@ -25,48 +25,47 @@
 
 using System.Reflection;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that stores the index of a local identifier.
+/// This parse node is used during optimisation and array initialisation
+/// and is not intended to be used during compilation.
+/// </summary>
+public class StaticParseNode : ParseNode {
+    private readonly FieldInfo _static;
 
     /// <summary>
-    /// Specifies a parse node that stores the index of a local identifier.
-    /// This parse node is used during optimisation and array initialisation
-    /// and is not intended to be used during compilation.
+    /// Creates a local parse node with the specified local index.
     /// </summary>
-    public class StaticParseNode : ParseNode {
-        private readonly FieldInfo _static;
+    /// <param name="local">The local identifier index</param>
+    public StaticParseNode(FieldInfo staticField) {
+        _static = staticField;
+    }
 
-        /// <summary>
-        /// Creates a local parse node with the specified local index.
-        /// </summary>
-        /// <param name="local">The local identifier index</param>
-        public StaticParseNode(FieldInfo staticField) {
-            _static = staticField;
-        }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml subNode = root.Node("Static");
+        subNode.Attribute("Info", _static.Name);
+    }
 
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml subNode = root.Node("Static");
-            subNode.Attribute("Info", _static.Name);
+    /// <summary>
+    /// Implements the base code generator for the node to invoke a
+    /// function implementation with a symbol type.
+    /// </summary>
+    /// <param name="emitter">The emitter</param>
+    /// <param name="cg">The code generator object</param>
+    /// <param name="returnType">The expected type of the return value</param>
+    /// <returns>The computed type</returns>
+    public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+        if (emitter == null) {
+            throw new ArgumentNullException(nameof(emitter));
         }
-
-        /// <summary>
-        /// Implements the base code generator for the node to invoke a
-        /// function implementation with a symbol type.
-        /// </summary>
-        /// <param name="emitter">The emitter</param>
-        /// <param name="cg">The code generator object</param>
-        /// <param name="returnType">The expected type of the return value</param>
-        /// <returns>The computed type</returns>
-        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-            if (emitter == null) {
-                throw new ArgumentNullException(nameof(emitter));
-            }
-            emitter.LoadStatic(_static);
-            return Symbol.SystemTypeToSymbolType(_static.FieldType);
-        }
+        emitter.LoadStatic(_static);
+        return Symbol.SystemTypeToSymbolType(_static.FieldType);
     }
 }

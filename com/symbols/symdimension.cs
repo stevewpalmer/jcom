@@ -23,47 +23,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines a single array dimension. Separate lower and upper bounds can
+/// be specifies for languages that support this.
+/// </summary>
+public class SymDimension {
+
+    /// <value>
+    /// Gets or set the array lower bound.
+    /// </value>
+    public ParseNode LowerBound { get; set; }
+
+    /// <value>
+    /// Gets or sets the array upper bound.
+    /// </value>
+    public ParseNode UpperBound { get; set; }
+
+    /// <value>
+    /// Returns the size, in units, of this dimension or -1
+    /// if the dimension is dynamic (ie. cannot be computed
+    /// until runtime).
+    /// </value>
+    public int Size {
+        get {
+            if (UpperBound.IsConstant && LowerBound.IsConstant) {
+                return UpperBound.Value.IntValue - LowerBound.Value.IntValue + 1;
+            }
+            return -1;
+        }
+    }
 
     /// <summary>
-    /// Defines a single array dimension. Separate lower and upper bounds can
-    /// be specifies for languages that support this.
+    /// Return the symbol dimension as a string..
     /// </summary>
-    public class SymDimension {
-
-        /// <value>
-        /// Gets or set the array lower bound.
-        /// </value>
-        public ParseNode LowerBound { get; set; }
-
-        /// <value>
-        /// Gets or sets the array upper bound.
-        /// </value>
-        public ParseNode UpperBound { get; set; }
-
-        /// <value>
-        /// Returns the size, in units, of this dimension or -1
-        /// if the dimension is dynamic (ie. cannot be computed
-        /// until runtime).
-        /// </value>
-        public int Size {
-            get {
-                if (UpperBound.IsConstant && LowerBound.IsConstant) {
-                    return UpperBound.Value.IntValue - LowerBound.Value.IntValue + 1;
-                }
-                return -1;
-            }
+    /// <returns>The symbol dimensions formatted as a string.</returns>
+    public override string ToString() {
+        if (LowerBound.IsConstant && LowerBound.Value.IntValue == 1) {
+            return UpperBound.ToString();
         }
-
-        /// <summary>
-        /// Return the symbol dimension as a string..
-        /// </summary>
-        /// <returns>The symbol dimensions formatted as a string.</returns>
-        public override string ToString() {
-            if (LowerBound.IsConstant && LowerBound.Value.IntValue == 1) {
-                return UpperBound.ToString();
-            }
-            return $"{LowerBound}:{UpperBound}";
-        }
+        return $"{LowerBound}:{UpperBound}";
     }
 }

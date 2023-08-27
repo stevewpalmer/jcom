@@ -25,43 +25,42 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that marks a label at the current
+/// point in the parse tree.
+/// </summary>
+public sealed class MarkLabelParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node that marks a label at the current
-    /// point in the parse tree.
+    /// Gets or sets the symbol representing the label.
     /// </summary>
-    public sealed class MarkLabelParseNode : ParseNode {
+    /// <value>Symbol table entry for the label</value>
+    public Symbol Label { get; set; }
 
-        /// <summary>
-        /// Gets or sets the symbol representing the label.
-        /// </summary>
-        /// <value>Symbol table entry for the label</value>
-        public Symbol Label { get; set; }
-
-        /// <summary>
-        /// Emit the code to mark the label at the current position
-        /// in the generated code.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
-            if (emitter == null) {
-                throw new ArgumentNullException(nameof(emitter));
-            }
-            if (Label.Type == SymType.LABEL && Label.IsReferenced) {
-                emitter.MarkLabel((Label)Label.Info);
-            }
+    /// <summary>
+    /// Emit the code to mark the label at the current position
+    /// in the generated code.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        if (emitter == null) {
+            throw new ArgumentNullException(nameof(emitter));
         }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml subNode = root.Node("Label");
-            subNode.Attribute("Name", Label.Name);
+        if (Label.Type == SymType.LABEL && Label.IsReferenced) {
+            emitter.MarkLabel((Label)Label.Info);
         }
+    }
+
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml subNode = root.Node("Label");
+        subNode.Attribute("Name", Label.Name);
     }
 }

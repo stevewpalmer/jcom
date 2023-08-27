@@ -27,181 +27,180 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// JType construction flags
+/// </summary>
+[Flags]
+public enum JTypeAttributes {
 
     /// <summary>
-    /// JType construction flags
+    /// Type is public
     /// </summary>
-    [Flags]
-    public enum JTypeAttributes {
+    Public = 1,
 
-        /// <summary>
-        /// Type is public
-        /// </summary>
-        Public = 1,
+    /// <summary>
+    /// Type is sealed and cannot be inherited
+    /// </summary>
+    Sealed = 2,
 
-        /// <summary>
-        /// Type is sealed and cannot be inherited
-        /// </summary>
-        Sealed = 2,
+    /// <summary>
+    /// Type is debuggable
+    /// </summary>
+    Debuggable = 4
+}
 
-        /// <summary>
-        /// Type is debuggable
-        /// </summary>
-        Debuggable = 4
+/// <summary>
+/// Defines a single assembly type.
+/// </summary>
+public class JType {
+
+    private static int _staticIndex;
+    private Type _createdType;
+    private JMethod _defaultConstructor;
+
+    /// <summary>
+    /// Type builder
+    /// </summary>
+    public TypeBuilder Builder { get; set; }
+
+    /// <summary>
+    /// True if type is debuggable
+    /// </summary>
+    public bool Debuggable { get; set; }
+
+    /// <summary>
+    /// Creates the specified type in the module.
+    /// </summary>
+    /// <param name="mb">Module builder</param>
+    /// <param name="typeName">Type name</param>
+    /// <param name="attributes">Type attributes</param>
+    public JType(ModuleBuilder mb, string typeName, JTypeAttributes attributes) {
+        TypeAttributes attr = TypeAttributes.BeforeFieldInit;
+        if (attributes.HasFlag(JTypeAttributes.Public)) {
+            attr |= TypeAttributes.Public;
+        }
+        if (attributes.HasFlag(JTypeAttributes.Sealed)) {
+            attr |= TypeAttributes.Sealed;
+        }
+        if (attributes.HasFlag(JTypeAttributes.Debuggable)) {
+            Debuggable = true;
+        }
+        Builder = mb.DefineType(typeName, attr);
     }
 
     /// <summary>
-    /// Defines a single assembly type.
+    /// Create an instance of this type
     /// </summary>
-    public class JType {
-
-        private static int _staticIndex = 0;
-        private Type _createdType = null;
-        private JMethod _defaultConstructor = null;
-
-        /// <summary>
-        /// Type builder
-        /// </summary>
-        public TypeBuilder Builder { get; set; }
-
-        /// <summary>
-        /// True if type is debuggable
-        /// </summary>
-        public bool Debuggable { get; set; }
-
-        /// <summary>
-        /// Creates the specified type in the module.
-        /// </summary>
-        /// <param name="mb">Module builder</param>
-        /// <param name="typeName">Type name</param>
-        /// <param name="attributes">Type attributes</param>
-        public JType(ModuleBuilder mb, string typeName, JTypeAttributes attributes) {
-            TypeAttributes attr = TypeAttributes.BeforeFieldInit;
-            if (attributes.HasFlag(JTypeAttributes.Public)) {
-                attr |= TypeAttributes.Public;
+    public Type CreateType {
+        get {
+            if (_defaultConstructor != null) {
+                _defaultConstructor.Emitter.Emit0(OpCodes.Ret);
+                _defaultConstructor.Emitter.Save();
             }
-            if (attributes.HasFlag(JTypeAttributes.Sealed)) {
-                attr |= TypeAttributes.Sealed;
+            if (_createdType == null) {
+                _createdType = Builder.CreateTypeInfo();
             }
-            if (attributes.HasFlag(JTypeAttributes.Debuggable)) {
-                Debuggable = true;
+            return _createdType;
+        }
+    }
+
+    /// <summary>
+    /// The default constructor for this type
+    /// </summary>
+    public JMethod DefaultConstructor {
+        get {
+            if (_defaultConstructor == null) {
+                ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
+                        CallingConventions.Standard,
+                        Array.Empty<Type>());
+                _defaultConstructor = new JMethod(this, cntb);
             }
-            Builder = mb.DefineType(typeName, attr);
+            return _defaultConstructor;
+        }
+    }
+
+    /// <summary>
+    /// Creates a field.
+    /// </summary>
+    /// <param name="sym">The symbol</param>
+    /// <returns>The A FieldInfo representing the new field</returns>
+    public void CreateField(Symbol sym) {
+        if (sym == null) {
+            throw new ArgumentNullException(nameof(sym));
+        }
+        string name = $"S{_staticIndex++}_{sym.Name}";
+        sym.Info = Builder.DefineField(name, sym.SystemType, FieldAttributes.Static);
+    }
+
+    /// <summary>
+    /// Creates a temporary field of the specified type.
+    /// </summary>
+    /// <param name="type">The symbol system type</param>
+    /// <returns>The A FieldInfo representing the new temporary field</returns>
+    public FieldInfo TemporaryField(Type type) {
+        string name = $"S{_staticIndex++}_Temp";
+        return Builder.DefineField(name, type, FieldAttributes.Static);
+    }
+
+    /// <summary>
+    /// Creates a method within this type.
+    /// </summary>
+    /// <param name="sym">Symbol representing the method</param>
+    /// <param name="attributes">Method attributes</param>
+    /// <param name="paramTypes">Parameter types</param>
+    /// <returns></returns>
+    public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
+
+        bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
+        Type returnType;
+
+        if (isFunction) {
+            returnType = Symbol.SymTypeToSystemType(sym.Type);
+        } else {
+            returnType = typeof(void);
         }
 
-        /// <summary>
-        /// Create an instance of this type
-        /// </summary>
-        public Type CreateType {
-            get {
-                if (_defaultConstructor != null) {
-                    _defaultConstructor.Emitter.Emit0(OpCodes.Ret);
-                    _defaultConstructor.Emitter.Save();
-                }
-                if (_createdType == null) {
-                    _createdType = Builder.CreateTypeInfo();
-                }
-                return _createdType;
+        int paramCount = (sym.Parameters != null) ? sym.Parameters.Count : 0;
+
+        Type[] paramTypes = new Type[paramCount];
+
+        for (int c = 0; c < paramCount; ++c) {
+            Symbol param = sym.Parameters[c];
+            if (param == null) {
+                throw new NullReferenceException("Parameters");
             }
-        }
-
-        /// <summary>
-        /// The default constructor for this type
-        /// </summary>
-        public JMethod DefaultConstructor {
-            get {
-                if (_defaultConstructor == null) {
-                    ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
-                            CallingConventions.Standard,
-                            Array.Empty<Type>());
-                    _defaultConstructor = new JMethod(this, cntb);
-                }
-                return _defaultConstructor;
+            Debug.Assert(param.IsParameter);
+            Type thisType = param.SystemType;
+            if (param.Linkage == SymLinkage.BYREF) {
+                thisType = thisType.MakeByRefType();
             }
+            paramTypes[c] = thisType;
+            param.ParameterIndex = c;
         }
 
-        /// <summary>
-        /// Creates a field.
-        /// </summary>
-        /// <param name="sym">The symbol</param>
-        /// <returns>The A FieldInfo representing the new field</returns>
-        public void CreateField(Symbol sym) {
-            if (sym == null) {
-                throw new ArgumentNullException(nameof(sym));
+        MethodBuilder metb;
+        metb = Builder.DefineMethod(sym.Name, attributes, returnType, paramTypes);
+
+        int paramIndex = 0;
+        if (isFunction) {
+            metb.DefineParameter(paramIndex++, ParameterAttributes.Retval, returnType.Name);
+        }
+
+        // For each parameter, set the actual name and type.
+        for (int c = 0; c < paramCount; ++c) {
+            Symbol param = sym.Parameters[c];
+            if (param == null) {
+                throw new NullReferenceException("Parameters");
             }
-            string name = $"S{_staticIndex++}_{sym.Name}";
-            sym.Info = Builder.DefineField(name, sym.SystemType, FieldAttributes.Static);
-        }
-
-        /// <summary>
-        /// Creates a temporary field of the specified type.
-        /// </summary>
-        /// <param name="type">The symbol system type</param>
-        /// <returns>The A FieldInfo representing the new temporary field</returns>
-        public FieldInfo TemporaryField(Type type) {
-            string name = $"S{_staticIndex++}_Temp";
-            return Builder.DefineField(name, type, FieldAttributes.Static);
-        }
-
-        /// <summary>
-        /// Creates a method within this type.
-        /// </summary>
-        /// <param name="sym">Symbol representing the method</param>
-        /// <param name="attributes">Method attributes</param>
-        /// <param name="paramTypes">Parameter types</param>
-        /// <returns></returns>
-        public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
-
-            bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
-            Type returnType;
-
-            if (isFunction) {
-                returnType = Symbol.SymTypeToSystemType(sym.Type);
+            if (param.Linkage == SymLinkage.BYREF) {
+                metb.DefineParameter(paramIndex++, ParameterAttributes.In | ParameterAttributes.Out, param.Name);
             } else {
-                returnType = typeof(void);
+                metb.DefineParameter(paramIndex++, ParameterAttributes.None, param.Name);
             }
-
-            int paramCount = (sym.Parameters != null) ? sym.Parameters.Count : 0;
-
-            Type[] paramTypes = new Type[paramCount];
-
-            for (int c = 0; c < paramCount; ++c) {
-                Symbol param = sym.Parameters[c];
-                if (param == null) {
-                    throw new NullReferenceException("Parameters");
-                }
-                Debug.Assert(param.IsParameter);
-                Type thisType = param.SystemType;
-                if (param.Linkage == SymLinkage.BYREF) {
-                    thisType = thisType.MakeByRefType();
-                }
-                paramTypes[c] = thisType;
-                param.ParameterIndex = c;
-            }
-
-            MethodBuilder metb;
-            metb = Builder.DefineMethod(sym.Name, attributes, returnType, paramTypes);
-
-            int paramIndex = 0;
-            if (isFunction) {
-                metb.DefineParameter(paramIndex++, ParameterAttributes.Retval, returnType.Name);
-            }
-
-            // For each parameter, set the actual name and type.
-            for (int c = 0; c < paramCount; ++c) {
-                Symbol param = sym.Parameters[c];
-                if (param == null) {
-                    throw new NullReferenceException("Parameters");
-                }
-                if (param.Linkage == SymLinkage.BYREF) {
-                    metb.DefineParameter(paramIndex++, ParameterAttributes.In | ParameterAttributes.Out, param.Name);
-                } else {
-                    metb.DefineParameter(paramIndex++, ParameterAttributes.None, param.Name);
-                }
-            }
-
-            return new JMethod(this, metb);
         }
+
+        return new JMethod(this, metb);
     }
 }

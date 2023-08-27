@@ -23,67 +23,66 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that defines a break statement.
+/// </summary>
+public sealed class BreakParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node that defines a break statement.
+    /// Optional break expression
     /// </summary>
-    public sealed class BreakParseNode : ParseNode {
+    public ParseNode BreakExpression { get; set; }
 
-        /// <summary>
-        /// Optional break expression
-        /// </summary>
-        public ParseNode BreakExpression { get; set; }
+    /// <summary>
+    /// Enclosing body parse node
+    /// </summary>
+    public LoopParseNode ScopeParseNode { get; set; }
 
-        /// <summary>
-        /// Enclosing body parse node
-        /// </summary>
-        public LoopParseNode ScopeParseNode { get; set; }
+    /// <summary>
+    /// Creates a break parse node.
+    /// </summary>
+    public BreakParseNode() : base(ParseID.BREAK) { }
 
-        /// <summary>
-        /// Creates a break parse node.
-        /// </summary>
-        public BreakParseNode() : base(ParseID.BREAK) { }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("Break");
-            if (BreakExpression != null) {
-                BreakExpression.Dump(blockNode);
-            }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("Break");
+        if (BreakExpression != null) {
+            BreakExpression.Dump(blockNode);
         }
-
-        /// <summary>
-        /// Emit the code to generate a break statement. If no condition
-        /// is specified, this does an immediate jump to the exit label on
-        /// the scope. If a condition is specified, the condition is evaluated
-        /// and a break to the exit label on the scope occurs if the condition
-        /// is true.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-
-            if (IsUnconditionalBreak) {
-                emitter.Branch(ScopeParseNode.ExitLabel);
-            } else {
-                cg.GenerateExpression(emitter, SymType.BOOLEAN, BreakExpression);
-                emitter.BranchIfTrue(ScopeParseNode.ExitLabel);
-            }
-        }
-
-        /// <summary>
-        /// Test whether this is an unconditional break
-        /// </summary>
-        public bool IsUnconditionalBreak => BreakExpression == null ||
-                                            (BreakExpression.IsConstant &&
-                                             BreakExpression.Value.BoolValue);
     }
+
+    /// <summary>
+    /// Emit the code to generate a break statement. If no condition
+    /// is specified, this does an immediate jump to the exit label on
+    /// the scope. If a condition is specified, the condition is evaluated
+    /// and a break to the exit label on the scope occurs if the condition
+    /// is true.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
+        }
+
+        if (IsUnconditionalBreak) {
+            emitter.Branch(ScopeParseNode.ExitLabel);
+        } else {
+            cg.GenerateExpression(emitter, SymType.BOOLEAN, BreakExpression);
+            emitter.BranchIfTrue(ScopeParseNode.ExitLabel);
+        }
+    }
+
+    /// <summary>
+    /// Test whether this is an unconditional break
+    /// </summary>
+    public bool IsUnconditionalBreak => BreakExpression == null ||
+                                        (BreakExpression.IsConstant &&
+                                         BreakExpression.Value.BoolValue);
 }

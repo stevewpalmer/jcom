@@ -25,50 +25,49 @@
 
 using CCompiler;
 
-namespace JCobol {
+namespace JCobol; 
+
+/// <summary>
+/// Main Cobol compiler class.
+/// </summary>
+public class Compiler : ICompiler {
+
+    private readonly CobolOptions _opts;
 
     /// <summary>
-    /// Main Cobol compiler class.
+    /// Constructs a Fortran compiler object with the given options.
     /// </summary>
-    public partial class Compiler : ICompiler {
+    /// <param name="opts">Compiler options</param>
+    public Compiler(CobolOptions opts) {
+        Messages = new MessageCollection(opts);
+        _opts = opts;
+    }
 
-        private readonly CobolOptions _opts;
+    /// <summary>
+    /// Return or set the list of compiler messages.
+    /// </summary>
+    public MessageCollection Messages { get; set; }
 
-        /// <summary>
-        /// Constructs a Fortran compiler object with the given options.
-        /// </summary>
-        /// <param name="opts">Compiler options</param>
-        public Compiler(CobolOptions opts) {
-            Messages = new MessageCollection(opts);
-            _opts = opts;
-        }
+    internal void Compile(string srcfile) {
+        throw new NotImplementedException();
+    }
 
-        /// <summary>
-        /// Return or set the list of compiler messages.
-        /// </summary>
-        public MessageCollection Messages { get; set; }
+    internal void Save() {
+        throw new NotImplementedException();
+    }
 
-        internal void Compile(string srcfile) {
-            throw new NotImplementedException();
-        }
+    internal void Execute() {
+        throw new NotImplementedException();
+    }
 
-        internal void Save() {
-            throw new NotImplementedException();
-        }
-
-        internal void Execute() {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Convert the parse tree to executable code and then execute the
-        /// resulting code. The return value from the specified entry point function
-        /// is returned as an object.
-        /// </summary>
-        /// <param name="entryPointName">The name of the method to be called</param>
-        /// <returns>An ExecutionResult object representing the result of the execution</returns>
-        public ExecutionResult Execute(string entryPointName) {
-            return null;
-        }
+    /// <summary>
+    /// Convert the parse tree to executable code and then execute the
+    /// resulting code. The return value from the specified entry point function
+    /// is returned as an object.
+    /// </summary>
+    /// <param name="entryPointName">The name of the method to be called</param>
+    /// <returns>An ExecutionResult object representing the result of the execution</returns>
+    public ExecutionResult Execute(string entryPointName) {
+        return null;
     }
 }

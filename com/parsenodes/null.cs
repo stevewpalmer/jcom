@@ -23,35 +23,34 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a null value parse node.
+/// </summary>
+public sealed class NullParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a null value parse node.
+    /// Emit this code to load a null value to the stack.
     /// </summary>
-    public sealed class NullParseNode : ParseNode {
-
-        /// <summary>
-        /// Emit this code to load a null value to the stack.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">Code generator</param>
-        /// <param name="returnType">The type required by the caller</param>
-        /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-            if (emitter == null) {
-                throw new ArgumentNullException(nameof(emitter));
-            }
-            emitter.LoadNull();
-            return Type;
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">Code generator</param>
+    /// <param name="returnType">The type required by the caller</param>
+    /// <returns>The symbol type of the value generated</returns>
+    public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+        if (emitter == null) {
+            throw new ArgumentNullException(nameof(emitter));
         }
+        emitter.LoadNull();
+        return Type;
+    }
 
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            root.Node("Null");
-        }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        root.Node("Null");
     }
 }

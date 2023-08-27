@@ -27,6 +27,7 @@ using System;
 using CCompiler;
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -295,7 +296,7 @@ namespace FortranTests {
             SimpleToken token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.DOUBLE);
             DoubleToken realToken = (DoubleToken)token;
-            Assert.IsTrue(Utilities.Helper.DoubleCompare(realToken.Value, 123.0976E4), "Expected 123.0976E4 but saw " + realToken.Value);
+            Assert.IsTrue(Helper.DoubleCompare(realToken.Value, 123.0976E4), "Expected 123.0976E4 but saw " + realToken.Value);
             
             Assert.IsTrue(ls.GetToken().ID == TokenID.IDENT);
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
@@ -303,7 +304,7 @@ namespace FortranTests {
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.DOUBLE);
             realToken = (DoubleToken)token;
-            Assert.IsTrue(Utilities.Helper.DoubleCompare(realToken.Value, 123.0976E-2), "Expected 123.0976E-2 but saw " + realToken.Value);
+            Assert.IsTrue(Helper.DoubleCompare(realToken.Value, 123.0976E-2), "Expected 123.0976E-2 but saw " + realToken.Value);
         }
 
         // Validate hexadecimal number parsing

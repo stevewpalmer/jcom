@@ -26,44 +26,43 @@
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that defines an arithmetic based conditional
+/// block such as a FORTRAN arithmetic IF.
+/// </summary>
+public sealed class ArithmeticConditionalParseNode : CollectionParseNode {
 
     /// <summary>
-    /// Specifies a parse node that defines an arithmetic based conditional
-    /// block such as a FORTRAN arithmetic IF.
+    /// Gets or sets the expression that is evaluated to determine
+    /// the condition.
     /// </summary>
-    public sealed class ArithmeticConditionalParseNode : CollectionParseNode {
+    /// <value>The value expression.</value>
+    public ParseNode ValueExpression { get; set; }
 
-        /// <summary>
-        /// Gets or sets the expression that is evaluated to determine
-        /// the condition.
-        /// </summary>
-        /// <value>The value expression.</value>
-        public ParseNode ValueExpression { get; set; }
-
-        /// <summary>
-        /// Emit the code to generate an arithmetic conditional block.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(Emitter emitter, ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            SymType exprType = cg.GenerateExpression(emitter, SymType.NONE, ValueExpression);
-            Symbol label1 = ProgramParseNode.GetLabel(Nodes[0]);
-            Symbol label2 = ProgramParseNode.GetLabel(Nodes[1]);
-            Symbol label3 = ProgramParseNode.GetLabel(Nodes[2]);
-            LocalDescriptor tempIndex = emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
-            emitter.StoreLocal(tempIndex);
-            emitter.LoadLocal(tempIndex);
-            emitter.LoadValue(exprType, new Variant(0));
-            emitter.BranchLess((Label)label1.Info);
-            emitter.LoadLocal(tempIndex);
-            emitter.LoadValue(exprType, new Variant(0));
-            emitter.BranchEqual((Label)label2.Info);
-            emitter.Branch((Label)label3.Info);
-            Emitter.ReleaseTemporary(tempIndex);
+    /// <summary>
+    /// Emit the code to generate an arithmetic conditional block.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
+        SymType exprType = cg.GenerateExpression(emitter, SymType.NONE, ValueExpression);
+        Symbol label1 = ProgramParseNode.GetLabel(Nodes[0]);
+        Symbol label2 = ProgramParseNode.GetLabel(Nodes[1]);
+        Symbol label3 = ProgramParseNode.GetLabel(Nodes[2]);
+        LocalDescriptor tempIndex = emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
+        emitter.StoreLocal(tempIndex);
+        emitter.LoadLocal(tempIndex);
+        emitter.LoadValue(exprType, new Variant(0));
+        emitter.BranchLess((Label)label1.Info);
+        emitter.LoadLocal(tempIndex);
+        emitter.LoadValue(exprType, new Variant(0));
+        emitter.BranchEqual((Label)label2.Info);
+        emitter.Branch((Label)label3.Info);
+        Emitter.ReleaseTemporary(tempIndex);
     }
 }

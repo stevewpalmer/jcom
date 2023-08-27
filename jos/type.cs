@@ -23,26 +23,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace jOS {
+namespace JShell; 
 
-    public partial class Commands {
+public partial class Commands {
 
-        // TYPE command.
-        // Display file contents.
-        static public bool CmdType(CommandLine cmdLine) {
+    // TYPE command.
+    // Display file contents.
+    public static bool CmdType(CommandLine cmdLine) {
 
-            string[] matchfiles = cmdLine.RestOfLine();
-            if (!matchfiles.Any()) {
-                matchfiles = new string[] { "*" };
-            }
-            string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
-            allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
-            Array.Sort(allfiles);
-            foreach (string file in allfiles) {
-                Console.WriteLine(File.ReadAllText(file));
-            }
-            return true;
+        string[] matchfiles = cmdLine.RestOfLine();
+        if (!matchfiles.Any()) {
+            matchfiles = new[] { "*" };
         }
+        string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
+        allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
+        Array.Sort(allfiles);
+        foreach (string file in allfiles) {
+            Console.WriteLine(File.ReadAllText(file));
+        }
+        return true;
     }
 }
 

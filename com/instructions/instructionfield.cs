@@ -26,45 +26,44 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that
+/// takes a FieldInfo parameter.
+/// </summary>
+public class InstructionField : Instruction {
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that
-    /// takes a FieldInfo parameter.
+    /// Field
     /// </summary>
-    public class InstructionField : Instruction {
+    public FieldInfo Field { get; set; }
 
-        /// <summary>
-        /// Field
-        /// </summary>
-        public FieldInfo Field { get; set; }
-
-        /// <summary>
-        /// Create an InstructionMethod object with the given opcode
-        /// and FieldInfo parameter.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="field">FieldInfo object</param>
-        public InstructionField(OpCode op, FieldInfo field) : base(op) {
-            if (field == null) {
-                throw new ArgumentNullException(nameof(field));
-            }
-            Field = field;
+    /// <summary>
+    /// Create an InstructionMethod object with the given opcode
+    /// and FieldInfo parameter.
+    /// </summary>
+    /// <param name="op">Opcode</param>
+    /// <param name="field">FieldInfo object</param>
+    public InstructionField(OpCode op, FieldInfo field) : base(op) {
+        if (field == null) {
+            throw new ArgumentNullException(nameof(field));
         }
+        Field = field;
+    }
 
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a FieldInfo
-        /// parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, Field);
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a FieldInfo
+    /// parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
+        if (Deleted) {
+            return;
+        }
+        il.Emit(Code, Field);
     }
 }

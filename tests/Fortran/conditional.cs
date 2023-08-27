@@ -25,6 +25,7 @@
 
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
 
@@ -41,7 +42,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 90);
+            Helper.HelperRunInteger(comp, "ITEST", 90);
         }
 
         // Arithmetic IF block validation
@@ -55,7 +56,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 88);
+            Helper.HelperRunInteger(comp, "ITEST", 88);
         }
 
         // Block IF block validation
@@ -70,7 +71,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 33);
+            Helper.HelperRunInteger(comp, "ITEST", 33);
         }
 
         // Block IF block validation
@@ -87,7 +88,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 67);
+            Helper.HelperRunInteger(comp, "ITEST", 67);
         }
 
         // Block IF block validation
@@ -106,7 +107,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 81);
+            Helper.HelperRunInteger(comp, "ITEST", 81);
         }
 
         // Block IF block validation
@@ -127,7 +128,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 81);
+            Helper.HelperRunInteger(comp, "ITEST", 81);
         }
 
         // Block IF block validation
@@ -146,7 +147,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 177);
+            Helper.HelperRunInteger(comp, "ITEST", 177);
         }
 
         // Block IF block validation
@@ -167,7 +168,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 94);
+            Helper.HelperRunInteger(comp, "ITEST", 94);
         }
     }
 }

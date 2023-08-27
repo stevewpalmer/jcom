@@ -23,31 +23,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Types of Emit exception handlers.
+/// </summary>
+public enum EmitExceptionHandlerType {
 
     /// <summary>
-    /// Types of Emit exception handlers.
+    /// Try part of the exception handler
     /// </summary>
-    public enum EmitExceptionHandlerType {
+    Try,
 
-        /// <summary>
-        /// Try part of the exception handler
-        /// </summary>
-        Try,
+    /// <summary>
+    /// Catch part of the exception handler
+    /// </summary>
+    Catch,
 
-        /// <summary>
-        /// Catch part of the exception handler
-        /// </summary>
-        Catch,
+    /// <summary>
+    /// Default catch block
+    /// </summary>
+    DefaultCatch,
 
-        /// <summary>
-        /// Default catch block
-        /// </summary>
-        DefaultCatch,
-
-        /// <summary>
-        /// End of the Try/Catch block
-        /// </summary>
-        EndCatch
-    }
+    /// <summary>
+    /// End of the Try/Catch block
+    /// </summary>
+    EndCatch
 }

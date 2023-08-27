@@ -26,44 +26,43 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an indirect all opcode with
+/// specified calling convention, return type and parameter types.
+/// </summary>
+public class InstructionCalli : Instruction {
+    private readonly CallingConventions _conv;
+    private readonly Type _returnType;
+    private readonly Type[] _parameterTypes;
 
     /// <summary>
-    /// Defines an instruction class that constructs an indirect all opcode with
-    /// specified calling convention, return type and parameter types.
+    /// Create an InstructionCalli object with the given opcode,
+    /// and function parameter definitions.
     /// </summary>
-    public class InstructionCalli : Instruction {
-        private readonly CallingConventions _conv;
-        private readonly Type _returnType;
-        private readonly Type[] _parameterTypes;
+    /// <param name="op">Opcode</param>
+    /// <param name="conv">The function calling convention</param>
+    /// <param name="returnType">The return type</param>
+    /// <param name="parameterTypes">An array of types for each parameter</param>
+    public InstructionCalli(OpCode op, CallingConventions conv, Type returnType, Type[] parameterTypes) : base(op) {
+        _conv = conv;
+        _returnType = returnType;
+        _parameterTypes = parameterTypes;
+    }
 
-        /// <summary>
-        /// Create an InstructionCalli object with the given opcode,
-        /// and function parameter definitions.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="conv">The function calling convention</param>
-        /// <param name="returnType">The return type</param>
-        /// <param name="parameterTypes">An array of types for each parameter</param>
-        public InstructionCalli(OpCode op, CallingConventions conv, Type returnType, Type[] parameterTypes) : base(op) {
-            _conv = conv;
-            _returnType = returnType;
-            _parameterTypes = parameterTypes;
+    /// <summary>
+    /// Generate MSIL code to emit a Calli indirect call with the given
+    /// calling convention, return type and array of parameter types.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit a Calli indirect call with the given
-        /// calling convention, return type and array of parameter types.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.EmitCalli(OpCodes.Calli, _conv, _returnType, _parameterTypes, null);
+        if (Deleted) {
+            return;
         }
+        il.EmitCalli(OpCodes.Calli, _conv, _returnType, _parameterTypes, null);
     }
 }

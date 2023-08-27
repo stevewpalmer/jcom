@@ -25,33 +25,32 @@
 
 using System.Diagnostics;
 
-namespace jOS {
+namespace JShell;
 
-	public partial class Commands {
+public partial class Commands {
 
-        // Run a program.
-        static internal bool RunProgram(string programName, CommandLine cmdLine) {
+    // Run a program.
+    internal static bool RunProgram(string programName, CommandLine cmdLine) {
 
-            string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string josBinRoot = $"{homeFolder}/jos/bin";
+        string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        string josBinRoot = $"{homeFolder}/jos/bin";
 
-            Process process = new();
-            process.StartInfo.FileName = $"{josBinRoot}/{programName}";
-            process.StartInfo.Arguments = string.Join(' ', cmdLine.RestOfLine());
-            process.Start();
-            process.WaitForExit();
-            return true;
-        }
+        Process process = new();
+        process.StartInfo.FileName = $"{josBinRoot}/{programName}";
+        process.StartInfo.Arguments = string.Join(' ', cmdLine.RestOfLine());
+        process.Start();
+        process.WaitForExit();
+        return true;
+    }
 
-        // Run the Fortran compiler.
-        static public bool CmdFortran(CommandLine cmdLine) {
-            return RunProgram("for", cmdLine);
-        }
+    // Run the Fortran compiler.
+    public static bool CmdFortran(CommandLine cmdLine) {
+        return RunProgram("for", cmdLine);
+    }
 
-        // Run the Comal interpreter/compiler.
-        static public bool CmdComal(CommandLine cmdLine) {
-            return RunProgram("comal", cmdLine);
-        }
+    // Run the Comal interpreter/compiler.
+    public static bool CmdComal(CommandLine cmdLine) {
+        return RunProgram("comal", cmdLine);
     }
 }
 

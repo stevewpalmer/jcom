@@ -26,41 +26,39 @@
 using System.Diagnostics.SymbolStore;
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs a source code marker.
+/// </summary>
+public class InstructionMarker : Instruction {
+    private readonly ISymbolDocumentWriter _doc;
+    private readonly int _linenumber;
 
     /// <summary>
-    /// Defines an instruction class that constructs a source code marker.
+    /// Create an InstructionMarker object to represent the source code
+    /// file and line number of the current point in the sequence.
     /// </summary>
-    public class InstructionMarker : Instruction {
-        private readonly ISymbolDocumentWriter _doc;
-        private readonly int _linenumber;
+    /// <param name="doc">An ISymbolDocumentWriter object</param>
+    /// <param name="linenumber">An integer line number</param>
+    public InstructionMarker(ISymbolDocumentWriter doc, int linenumber) {
+        _doc = doc;
+        _linenumber = linenumber;
+    }
 
-        /// <summary>
-        /// Create an InstructionMarker object to represent the source code
-        /// file and line number of the current point in the sequence.
-        /// </summary>
-        /// <param name="doc">An ISymbolDocumentWriter object</param>
-        /// <param name="linenumber">An integer line number</param>
-        public InstructionMarker(ISymbolDocumentWriter doc, int linenumber) {
-            _doc = doc;
-            _linenumber = linenumber;
+    /// <summary>
+    /// Generate MSIL code to emit an instruction marker at the current
+    /// sequence in the output.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit an instruction marker at the current
-        /// sequence in the output.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-        #if GENERATE_NATIVE_BINARIES
-            il.MarkSequencePoint(_doc, _linenumber, 1, _linenumber, 100);
-        #endif
+        if (Deleted) {
         }
+    #if GENERATE_NATIVE_BINARIES
+        il.MarkSequencePoint(_doc, _linenumber, 1, _linenumber, 100);
+    #endif
     }
 }

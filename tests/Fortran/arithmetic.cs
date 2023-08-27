@@ -26,6 +26,7 @@
 using System;
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -44,7 +45,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 314);
+            Helper.HelperRunInteger(comp, "ITEST", 314);
         }
         
         // Verify basic addition expression generation
@@ -59,7 +60,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 40f);
+            Helper.HelperRunFloat(comp, "TEST", 40f);
         }
 
         // Verify basic subtraction expression generation
@@ -74,7 +75,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 3759);
+            Helper.HelperRunInteger(comp, "ITEST", 3759);
         }
 
         // Verify basic multiplication expression generation
@@ -90,7 +91,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 4050);
+            Helper.HelperRunInteger(comp, "ITEST", 4050);
         }
 
         // Verify basic division expression generation
@@ -106,7 +107,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 20f);
+            Helper.HelperRunFloat(comp, "TEST", 20f);
         }
 
         // Verify implicit precedence
@@ -118,7 +119,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 34f);
+            Helper.HelperRunFloat(comp, "TEST", 34f);
         }
 
         // Verify implicit precedence
@@ -131,7 +132,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "TEST", 2000f);
+            Helper.HelperRunFloat(comp, "TEST", 2000f);
         }
 
         // Verify divison by zero blows up the code
@@ -166,7 +167,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunFloat(comp, "SIMPLIFY1", 17.0625f);
+            Helper.HelperRunFloat(comp, "SIMPLIFY1", 17.0625f);
         }
 
         // Verify concatenation operator
@@ -180,7 +181,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunString(comp, "CONCATTEST", "904534");
+            Helper.HelperRunString(comp, "CONCATTEST", "904534");
         }
 
         // Verify concatenation operator
@@ -196,7 +197,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "CONCATTEST", 15);
+            Helper.HelperRunInteger(comp, "CONCATTEST", 15);
         }
 
         // Verify concatenation operator
@@ -214,7 +215,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "CONCATTEST", 1);
+            Helper.HelperRunInteger(comp, "CONCATTEST", 1);
         }
     }
 }

@@ -23,48 +23,47 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that stores the index of a local identifier.
+/// This parse node is used during optimisation and array initialisation
+/// and is not intended to be used during compilation.
+/// </summary>
+public class LocalParseNode : ParseNode {
+    private readonly LocalDescriptor _local;
 
     /// <summary>
-    /// Specifies a parse node that stores the index of a local identifier.
-    /// This parse node is used during optimisation and array initialisation
-    /// and is not intended to be used during compilation.
+    /// Creates a local parse node with the specified local index.
     /// </summary>
-    public class LocalParseNode : ParseNode {
-        private readonly LocalDescriptor _local;
+    /// <param name="local">The local identifier index</param>
+    public LocalParseNode(LocalDescriptor local) {
+        _local = local;
+    }
 
-        /// <summary>
-        /// Creates a local parse node with the specified local index.
-        /// </summary>
-        /// <param name="local">The local identifier index</param>
-        public LocalParseNode(LocalDescriptor local) {
-            _local = local;
-        }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml subNode = root.Node("Local");
+        subNode.Attribute("Index", _local.Index.ToString());
+    }
 
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml subNode = root.Node("Local");
-            subNode.Attribute("Index", _local.Index.ToString());
+    /// <summary>
+    /// Implements the base code generator for the node to invoke a
+    /// function implementation with a symbol type.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">Code generator</param>
+    /// <param name="returnType">The expected type of the return value</param>
+    /// <returns>The computed type</returns>
+    public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+        if (emitter == null) {
+            throw new ArgumentNullException(nameof(emitter));
         }
-
-        /// <summary>
-        /// Implements the base code generator for the node to invoke a
-        /// function implementation with a symbol type.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">Code generator</param>
-        /// <param name="returnType">The expected type of the return value</param>
-        /// <returns>The computed type</returns>
-        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-            if (emitter == null) {
-                throw new ArgumentNullException(nameof(emitter));
-            }
-            emitter.LoadLocal(_local);
-            return Symbol.SystemTypeToSymbolType(_local.Type);
-        }
+        emitter.LoadLocal(_local);
+        return Symbol.SystemTypeToSymbolType(_local.Type);
     }
 }

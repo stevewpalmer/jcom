@@ -25,37 +25,36 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that takes
+/// a Type parameter.
+/// </summary>
+public class InstructionType : Instruction {
+    private readonly Type _type;
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that takes
-    /// a Type parameter.
+    /// Create an InstructionType object with the given opcode
+    /// and Type parameter.
     /// </summary>
-    public class InstructionType : Instruction {
-        private readonly Type _type;
+    /// <param name="op">Opcode</param>
+    /// <param name="type">Type object</param>
+    public InstructionType(OpCode op, Type type) : base(op) {
+        _type = type;
+    }
 
-        /// <summary>
-        /// Create an InstructionType object with the given opcode
-        /// and Type parameter.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="type">Type object</param>
-        public InstructionType(OpCode op, Type type) : base(op) {
-            _type = type;
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a Type parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a Type parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, _type);
+        if (Deleted) {
+            return;
         }
+        il.Emit(Code, _type);
     }
 }

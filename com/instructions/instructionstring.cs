@@ -25,53 +25,52 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that takes
+/// a string parameter.
+/// </summary>
+public class InstructionString : Instruction {
+    private readonly string _str;
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that takes
-    /// a string parameter.
+    /// Create an InstructionString object with the given opcode
+    /// and string value.
     /// </summary>
-    public class InstructionString : Instruction {
-        private readonly string _str;
-
-        /// <summary>
-        /// Create an InstructionString object with the given opcode
-        /// and string value.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="str">A string value</param>
-        public InstructionString(OpCode op, string str) : base(op) {
-            if (str == null) {
-                throw new ArgumentNullException(nameof(str));
-            }
-            _str = str;
+    /// <param name="op">Opcode</param>
+    /// <param name="str">A string value</param>
+    public InstructionString(OpCode op, string str) : base(op) {
+        if (str == null) {
+            throw new ArgumentNullException(nameof(str));
         }
+        _str = str;
+    }
 
-        /// <summary>
-        /// Generate MSIL code to emit a opcode that takes a string
-        /// parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            switch (Code.Name) {
-                case "ldstr":
-                    if (_str.Length == 0) {
-                        il.Emit(OpCodes.Ldsfld, typeof(string).GetField("Empty"));
-                    } else {
-                        il.Emit(OpCodes.Ldstr, _str);
-                    }
-                    break;
+    /// <summary>
+    /// Generate MSIL code to emit a opcode that takes a string
+    /// parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
+        }
+        if (Deleted) {
+            return;
+        }
+        switch (Code.Name) {
+            case "ldstr":
+                if (_str.Length == 0) {
+                    il.Emit(OpCodes.Ldsfld, typeof(string).GetField("Empty"));
+                } else {
+                    il.Emit(OpCodes.Ldstr, _str);
+                }
+                break;
 
-                default:
-                    il.Emit(Code, _str);
-                    break;
-            }
+            default:
+                il.Emit(Code, _str);
+                break;
         }
     }
 }

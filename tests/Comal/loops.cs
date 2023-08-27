@@ -25,6 +25,7 @@
 
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -46,7 +47,7 @@ namespace ComalTests {
                 ENDFUNC test1loop
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test1loop", 1);
+            Helper.HelperRunFloat(comp, "test1loop", 1);
         }
 
         // Test unconditional EXIT
@@ -62,7 +63,7 @@ namespace ComalTests {
                 ENDFUNC test2loop
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test2loop", 1);
+            Helper.HelperRunFloat(comp, "test2loop", 1);
         }
 
         // Test unconditional EXIT with GOTO
@@ -80,7 +81,7 @@ namespace ComalTests {
                 ENDFUNC test3loop
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test3loop", 0);
+            Helper.HelperRunFloat(comp, "test3loop", 0);
         }
 
         // Test WHILE loop with false condition at start
@@ -95,7 +96,7 @@ namespace ComalTests {
                 ENDFUNC test4loop
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test4loop", 1);
+            Helper.HelperRunFloat(comp, "test4loop", 1);
         }
 
         // Test WHILE loop
@@ -111,7 +112,7 @@ namespace ComalTests {
                 ENDFUNC test5loop#
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "test5loop#", 10);
+            Helper.HelperRunInteger(comp, "test5loop#", 10);
         }
 
         // Test single line REPEAT loop
@@ -125,7 +126,7 @@ namespace ComalTests {
                 ENDFUNC test6loop#
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "test6loop#", 10);
+            Helper.HelperRunInteger(comp, "test6loop#", 10);
         }
 
         // Test single line WHILE loop
@@ -139,7 +140,7 @@ namespace ComalTests {
                 ENDFUNC test7loop#
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunInteger(comp, "test7loop#", 10);
+            Helper.HelperRunInteger(comp, "test7loop#", 10);
         }
 
         // Test simple FOR loop
@@ -155,7 +156,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "for'test'1", 55);
+            Helper.HelperRunFloat(comp, "for'test'1", 55);
         }
 
         // Verify that the FOR loop variable is local
@@ -173,7 +174,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "for'var'test", 99);
+            Helper.HelperRunFloat(comp, "for'var'test", 99);
         }
 
         // Test FOR loop with STEP
@@ -189,7 +190,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "for'test'2", 2500);
+            Helper.HelperRunFloat(comp, "for'test'2", 2500);
         }
 
         // Test FOR loop with negative step
@@ -205,7 +206,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "for'test'3", 30);
+            Helper.HelperRunFloat(comp, "for'test'3", 30);
         }
 
         // Test nested FOR loops
@@ -223,7 +224,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "for'test'4", 3025);
+            Helper.HelperRunFloat(comp, "for'test'4", 3025);
         }
 
         // Test single line FOR loop
@@ -237,7 +238,7 @@ namespace ComalTests {
                 ENDFUNC
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "for'test'5", 15150);
+            Helper.HelperRunFloat(comp, "for'test'5", 15150);
         }
     }
 }

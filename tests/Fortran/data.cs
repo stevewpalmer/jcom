@@ -25,6 +25,7 @@
 
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -43,7 +44,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 54);
+            Helper.HelperRunInteger(comp, "ITEST", 54);
         }
 
         // Verify DATA syntax to use a repeat count to set
@@ -58,7 +59,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 68);
+            Helper.HelperRunInteger(comp, "ITEST", 68);
         }
 
         // Verify DATA syntax to use a repeat count to set
@@ -73,7 +74,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", -68);
+            Helper.HelperRunInteger(comp, "ITEST", -68);
         }
 
         // Verify DATA syntax to set an array.
@@ -87,7 +88,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 179);
+            Helper.HelperRunInteger(comp, "ITEST", 179);
         }
 
         // Verify DATA syntax to set an array using a repeat.
@@ -101,7 +102,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 260);
+            Helper.HelperRunInteger(comp, "ITEST", 260);
         }
 
         // Verify DATA syntax to set an array using separate repeats.
@@ -115,7 +116,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 154);
+            Helper.HelperRunInteger(comp, "ITEST", 154);
         }
 
         // Verify DATA syntax to set a specific array element. Note that
@@ -130,7 +131,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 200);
+            Helper.HelperRunInteger(comp, "ITEST", 200);
         }
 
         // Verify that explicitly setting a DATA element overrides the DATA
@@ -146,7 +147,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 583);
+            Helper.HelperRunInteger(comp, "ITEST", 583);
         }
 
         // For arrays with indexes in DATA, repeat applies to the individual
@@ -161,7 +162,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 231);
+            Helper.HelperRunInteger(comp, "ITEST", 231);
         }
 
         // DATA statement with a simple implied DO loop and a repeat
@@ -184,7 +185,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 215);
+            Helper.HelperRunInteger(comp, "ITEST", 215);
         }
 
         // DATA statement with a simple implied DO loop and a series of
@@ -206,7 +207,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 143);
+            Helper.HelperRunInteger(comp, "ITEST", 143);
         }
 
         // Test initialisation of a CHARACTER with DATA
@@ -220,7 +221,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunString(comp, "ITEST", "AAAAAAAAAAAAAAAAAAAA");
+            Helper.HelperRunString(comp, "ITEST", "AAAAAAAAAAAAAAAAAAAA");
         }
 
         // DATA statement with a nested implied DO loop

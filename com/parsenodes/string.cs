@@ -25,66 +25,65 @@
 
 using JComLib;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a string parse node that stores a simple string
+/// value.
+/// </summary>
+public sealed class StringParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a string parse node that stores a simple string
-    /// value.
+    /// Creates a string parse node with the specified string.
     /// </summary>
-    public sealed class StringParseNode : ParseNode {
-
-        /// <summary>
-        /// Creates a string parse node with the specified string.
-        /// </summary>
-        /// <param name="value">A string</param>
-        public StringParseNode(string value) : base(ParseID.STRING) {
-            Value = new Variant(value);
-            Type = SymType.CHAR;
-        }
-
-        /// <summary>
-        /// Creates a string parse node with the specified variant.
-        /// </summary>
-        /// <param name="value">A variant</param>
-        public StringParseNode(Variant value) : base(ParseID.STRING) {
-            Value = value;
-            Type = SymType.CHAR;
-        }
-
-        /// <summary>
-        /// Returns whether this parse node represents a constant.
-        /// </summary>
-        /// <value><c>true</c> if this instance is a constant; otherwise, <c>false</c>.</value>
-        public override bool IsConstant => true;
-
-        /// <summary>
-        /// Emit this code to load the value to the stack.
-        /// </summary>
-        /// <param name="emitter">The emitter</param>
-        /// <param name="cg">A CodeGenerator object</param>
-        /// <param name="returnType">The type required by the caller</param>
-        /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-            if (emitter == null) {
-                throw new ArgumentNullException(nameof(emitter));
-            }
-            emitter.LoadString(Value.StringValue);
-            return SymType.CHAR;
-        }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml subNode = root.Node("String");
-            subNode.Attribute("Value", Value.ToString());
-        }
-        
-        /// <summary>
-        /// Returns the string value of this node.
-        /// </summary>
-        public override Variant Value { get; set; }
+    /// <param name="value">A string</param>
+    public StringParseNode(string value) : base(ParseID.STRING) {
+        Value = new Variant(value);
+        Type = SymType.CHAR;
     }
+
+    /// <summary>
+    /// Creates a string parse node with the specified variant.
+    /// </summary>
+    /// <param name="value">A variant</param>
+    public StringParseNode(Variant value) : base(ParseID.STRING) {
+        Value = value;
+        Type = SymType.CHAR;
+    }
+
+    /// <summary>
+    /// Returns whether this parse node represents a constant.
+    /// </summary>
+    /// <value><c>true</c> if this instance is a constant; otherwise, <c>false</c>.</value>
+    public override bool IsConstant => true;
+
+    /// <summary>
+    /// Emit this code to load the value to the stack.
+    /// </summary>
+    /// <param name="emitter">The emitter</param>
+    /// <param name="cg">A CodeGenerator object</param>
+    /// <param name="returnType">The type required by the caller</param>
+    /// <returns>The symbol type of the value generated</returns>
+    public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+        if (emitter == null) {
+            throw new ArgumentNullException(nameof(emitter));
+        }
+        emitter.LoadString(Value.StringValue);
+        return SymType.CHAR;
+    }
+
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml subNode = root.Node("String");
+        subNode.Attribute("Value", Value.ToString());
+    }
+    
+    /// <summary>
+    /// Returns the string value of this node.
+    /// </summary>
+    public override Variant Value { get; set; }
 }

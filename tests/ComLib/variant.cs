@@ -27,6 +27,7 @@ using System;
 using System.Numerics;
 using JComLib;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComLibTests {
     [TestFixture]
@@ -53,7 +54,7 @@ namespace ComLibTests {
             Variant v1 = new(12.56f);
             Assert.AreEqual(12, v1.IntValue);
             Assert.AreEqual(12.56f, v1.RealValue);
-            Assert.IsTrue(Utilities.Helper.DoubleCompare(12.56d, v1.DoubleValue));
+            Assert.IsTrue(Helper.DoubleCompare(12.56d, v1.DoubleValue));
             Assert.AreEqual(true, v1.BoolValue);
             Assert.AreEqual("12.56", v1.StringValue);
             Assert.AreEqual(VariantType.FLOAT, v1.Type);
@@ -181,8 +182,8 @@ namespace ComLibTests {
         public void Variants13() {
             Variant v1 = new(8342f);
             Variant v2 = new(410f);
-            Assert.IsTrue(Utilities.Helper.FloatCompare((v1 / v2).RealValue, new Variant(20.34634).RealValue));
-            Assert.IsTrue(Utilities.Helper.FloatCompare((v1.Divide(v2)).RealValue, new Variant(20.34634).RealValue));
+            Assert.IsTrue(Helper.FloatCompare((v1 / v2).RealValue, new Variant(20.34634).RealValue));
+            Assert.IsTrue(Helper.FloatCompare((v1.Divide(v2)).RealValue, new Variant(20.34634).RealValue));
         }
 
         // Test simple variant modulus.

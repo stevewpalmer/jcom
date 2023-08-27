@@ -25,60 +25,59 @@
 
 using CCompiler;
 
-namespace JFortran {
+namespace JFortran; 
 
-    /// <summary>
-    /// This is the main driver file for the compiler and the only part that
-    /// interacts with the user directly. It constructs the compiler object
-    /// using options specified, compiles the files given and generates an
-    /// output file if no errors were found.
-    /// 
-    /// All output is controlled by a central MessageCollection created
-    /// here and donated to the Options and Compiler class.
-    /// 
-    /// Keep this module short and compact. It should really do as little
-    /// as possible.
-    /// </summary>
-    internal static class Program {
+/// <summary>
+/// This is the main driver file for the compiler and the only part that
+/// interacts with the user directly. It constructs the compiler object
+/// using options specified, compiles the files given and generates an
+/// output file if no errors were found.
+/// 
+/// All output is controlled by a central MessageCollection created
+/// here and donated to the Options and Compiler class.
+/// 
+/// Keep this module short and compact. It should really do as little
+/// as possible.
+/// </summary>
+internal static class Program {
 
-        private static void Main(string[] args) {
+    private static void Main(string[] args) {
 
-            FortranOptions opts = new();
-            MessageCollection messages = new(opts);
+        FortranOptions opts = new();
+        MessageCollection messages = new(opts);
 
-            opts.Messages = messages;
-            if (opts.Parse(args)) {
-                Compiler comp = new(opts) {
-                    Messages = messages
-                };
+        opts.Messages = messages;
+        if (opts.Parse(args)) {
+            Compiler comp = new(opts) {
+                Messages = messages
+            };
 
-                try {
-                    foreach (string srcfile in opts.SourceFiles) {
-                        if (!File.Exists(srcfile)) {
-                            messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
-                            break;
-                        }
-                        comp.Compile(srcfile);
+            try {
+                foreach (string srcfile in opts.SourceFiles) {
+                    if (!File.Exists(srcfile)) {
+                        messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
+                        break;
                     }
-                    if (messages.ErrorCount == 0) {
-                        comp.Save();
-                        if (opts.Run && messages.ErrorCount == 0) {
-                            comp.Execute();
-                        }
+                    comp.Compile(srcfile);
+                }
+                if (messages.ErrorCount == 0) {
+                    comp.Save();
+                    if (opts.Run && messages.ErrorCount == 0) {
+                        comp.Execute();
                     }
                 }
-                catch (Exception) { }
             }
-            foreach (Message msg in messages) {
-                if (msg.Level == MessageLevel.Error) {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
-                Console.WriteLine(msg);
-                Console.ResetColor();
+            catch (Exception) { }
+        }
+        foreach (Message msg in messages) {
+            if (msg.Level == MessageLevel.Error) {
+                Console.ForegroundColor = ConsoleColor.Red;
             }
-            if (messages.ErrorCount > 0) {
-                Console.WriteLine("*** {0} errors found. Compilation stopped.", messages.ErrorCount);
-            }
+            Console.WriteLine(msg);
+            Console.ResetColor();
+        }
+        if (messages.ErrorCount > 0) {
+            Console.WriteLine("*** {0} errors found. Compilation stopped.", messages.ErrorCount);
         }
     }
 }

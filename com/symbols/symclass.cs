@@ -23,46 +23,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines the symbol storage class.
+/// </summary>
+public enum SymClass {
 
     /// <summary>
-    /// Defines the symbol storage class.
+    /// Program
     /// </summary>
-    public enum SymClass {
+    PROGRAM,
 
-        /// <summary>
-        /// Program
-        /// </summary>
-        PROGRAM,
+    /// <summary>
+    /// Variable (includes parameters and constants)
+    /// </summary>
+    VAR,
 
-        /// <summary>
-        /// Variable (includes parameters and constants)
-        /// </summary>
-        VAR,
+    /// <summary>
+    /// Function
+    /// </summary>
+    FUNCTION,
 
-        /// <summary>
-        /// Function
-        /// </summary>
-        FUNCTION,
+    /// <summary>
+    /// Subroutine (or void function)
+    /// </summary>
+    SUBROUTINE,
 
-        /// <summary>
-        /// Subroutine (or void function)
-        /// </summary>
-        SUBROUTINE,
+    /// <summary>
+    /// Label
+    /// </summary>
+    LABEL,
 
-        /// <summary>
-        /// Label
-        /// </summary>
-        LABEL,
+    /// <summary>
+    /// Built-in intrinsic
+    /// </summary>
+    INTRINSIC,
 
-        /// <summary>
-        /// Built-in intrinsic
-        /// </summary>
-        INTRINSIC,
-
-        /// <summary>
-        /// Inlined code (e.g. Fortran statement functions).
-        /// </summary>
-        INLINE
-    }
+    /// <summary>
+    /// Inlined code (e.g. Fortran statement functions).
+    /// </summary>
+    INLINE
 }

@@ -23,26 +23,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Enumerator that specifies the various types of messages:
+/// </summary>
+public enum MessageLevel {
 
     /// <summary>
-    /// Enumerator that specifies the various types of messages:
+    /// This is a raw text string with no filename, code or line number.
     /// </summary>
-    public enum MessageLevel {
+    Info,
 
-        /// <summary>
-        /// This is a raw text string with no filename, code or line number.
-        /// </summary>
-        Info,
+    /// <summary>
+    /// A compiler warning complete with error code and optional filename and line number
+    /// </summary>
+    Warning,
 
-        /// <summary>
-        /// A compiler warning complete with error code and optional filename and line number
-        /// </summary>
-        Warning,
-
-        /// <summary>
-        /// A compiler error complete with error code and optional filename and line number.
-        /// </summary>
-        Error
-    }
+    /// <summary>
+    /// A compiler error complete with error code and optional filename and line number.
+    /// </summary>
+    Error
 }

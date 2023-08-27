@@ -23,21 +23,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// For parameters, indicates how the parameter is passed.
+/// </summary>
+public enum SymLinkage {
 
     /// <summary>
-    /// For parameters, indicates how the parameter is passed.
+    /// By reference
     /// </summary>
-    public enum SymLinkage {
+    BYREF,
 
-        /// <summary>
-        /// By reference
-        /// </summary>
-        BYREF,
-
-        /// <summary>
-        /// By value
-        /// </summary>
-        BYVAL
-    }
+    /// <summary>
+    /// By value
+    /// </summary>
+    BYVAL
 }

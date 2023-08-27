@@ -23,23 +23,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines a single execution result that holds the result
+/// of calling Execute on the generated code.
+/// </summary>
+public class ExecutionResult {
 
     /// <summary>
-    /// Defines a single execution result that holds the result
-    /// of calling Execute on the generated code.
+    /// Gets or sets whether the execution succeeded.
     /// </summary>
-    public class ExecutionResult {
+    public bool Success { get; set; }
 
-        /// <summary>
-        /// Gets or sets whether the execution succeeded.
-        /// </summary>
-        public bool Success { get; set; }
-
-        /// <summary>
-        /// Gets or sets an object representing the return value
-        /// of the method executed.
-        /// </summary>
-        public object Result { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets an object representing the return value
+    /// of the method executed.
+    /// </summary>
+    public object Result { get; set; }
 }

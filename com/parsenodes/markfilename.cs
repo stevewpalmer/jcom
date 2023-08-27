@@ -23,48 +23,47 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that defines a filename marker in
+/// the parse tree. A filename marker specifies the name of the
+/// original source file that produced the subsequent nodes in
+/// the parse tree up until the end or until a new filename
+/// marker with a different filename.
+/// </summary>
+public sealed class MarkFilenameParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node that defines a filename marker in
-    /// the parse tree. A filename marker specifies the name of the
-    /// original source file that produced the subsequent nodes in
-    /// the parse tree up until the end or until a new filename
-    /// marker with a different filename.
+    /// Creates a filename marker parse node.
     /// </summary>
-    public sealed class MarkFilenameParseNode : ParseNode {
+    public MarkFilenameParseNode() : base(ParseID.FILENAME) {}
 
-        /// <summary>
-        /// Creates a filename marker parse node.
-        /// </summary>
-        public MarkFilenameParseNode() : base(ParseID.FILENAME) {}
+    /// <summary>
+    /// Gets or sets the filename marker.
+    /// </summary>
+    /// <value>The filename string</value>
+    public string Filename { get; set; }
 
-        /// <summary>
-        /// Gets or sets the filename marker.
-        /// </summary>
-        /// <value>The filename string</value>
-        public string Filename { get; set; }
-
-        /// <summary>
-        /// Emit the code to mark the file name at the current position
-        /// in the generated code.
-        /// </summary>
-        /// <param name="cg">A code generator object</param>
-        public override void Generate(ProgramParseNode cg) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            cg.MarkFile(Filename);
+    /// <summary>
+    /// Emit the code to mark the file name at the current position
+    /// in the generated code.
+    /// </summary>
+    /// <param name="cg">A code generator object</param>
+    public override void Generate(ProgramParseNode cg) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
+        cg.MarkFile(Filename);
+    }
 
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml subNode = root.Node("Filename");
-            subNode.Attribute("Name", Filename);
-        }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml subNode = root.Node("Filename");
+        subNode.Attribute("Name", Filename);
     }
 }

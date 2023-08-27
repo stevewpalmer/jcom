@@ -25,78 +25,77 @@
 
 using System.Text;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Represents a single compiler message.
+/// </summary>
+public class Message {
 
     /// <summary>
-    /// Represents a single compiler message.
+    /// Constructs a single message object.
     /// </summary>
-    public class Message {
-
-        /// <summary>
-        /// Constructs a single message object.
-        /// </summary>
-        /// <param name="filename">Optional filename</param>
-        /// <param name="level">Required message level</param>
-        /// <param name="code">Optional numeric code identifying this message</param>
-        /// <param name="line">Optional source code line number for the message</param>
-        /// <param name="text">The required actual text of the message</param>
-        public Message(string filename, MessageLevel level, MessageCode code, int line, string text) {
-            Filename = filename;
-            Level = level;
-            Code = code;
-            Line = line;
-            Text = text;
-        }
-
-        /// <summary>
-        /// Returns the message formatted for output.
-        /// </summary>
-        /// <returns></returns>
-        public override string ToString() {
-            StringBuilder str = new();
-            if (Level == MessageLevel.Info) {
-                str.Append(Text);
-            } else {
-                if (Filename != null) {
-                    str.Append(Filename);
-                }
-                if (Line != -1) {
-                    str.AppendFormat("({0}):", Line);
-                }
-                if (Code != MessageCode.NONE) {
-                    if (str.Length > 0) {
-                        str.Append(' ');
-                    }
-                    str.AppendFormat("{0} C{1}: ", Level, (int)Code);
-                }
-                str.Append(Text);
-            }
-            return str.ToString();
-        }
-
-        /// <value>
-        /// Returns the name of the file associated with this message. May be null.
-        /// </value>
-        public string Filename { get; private set; }
-
-        /// <value>
-        /// Returns the level of this message as a <c>MessageLevel</c> type.
-        /// </value>
-        public MessageLevel Level { get; private set; }
-
-        /// <value>
-        /// Returns the code of this message, or MessageCode.NONE if no code is associated.
-        /// </value>
-        public MessageCode Code { get; private set; }
-
-        /// <value>
-        /// Returns the source code line number of this message.
-        /// </value>
-        public int Line { get; private set; }
-
-        /// <value>
-        /// Returns the text of the message.
-        /// </value>
-        public string Text { get; private set; }
+    /// <param name="filename">Optional filename</param>
+    /// <param name="level">Required message level</param>
+    /// <param name="code">Optional numeric code identifying this message</param>
+    /// <param name="line">Optional source code line number for the message</param>
+    /// <param name="text">The required actual text of the message</param>
+    public Message(string filename, MessageLevel level, MessageCode code, int line, string text) {
+        Filename = filename;
+        Level = level;
+        Code = code;
+        Line = line;
+        Text = text;
     }
+
+    /// <summary>
+    /// Returns the message formatted for output.
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() {
+        StringBuilder str = new();
+        if (Level == MessageLevel.Info) {
+            str.Append(Text);
+        } else {
+            if (Filename != null) {
+                str.Append(Filename);
+            }
+            if (Line != -1) {
+                str.AppendFormat("({0}):", Line);
+            }
+            if (Code != MessageCode.NONE) {
+                if (str.Length > 0) {
+                    str.Append(' ');
+                }
+                str.AppendFormat("{0} C{1}: ", Level, (int)Code);
+            }
+            str.Append(Text);
+        }
+        return str.ToString();
+    }
+
+    /// <value>
+    /// Returns the name of the file associated with this message. May be null.
+    /// </value>
+    public string Filename { get; private set; }
+
+    /// <value>
+    /// Returns the level of this message as a <c>MessageLevel</c> type.
+    /// </value>
+    public MessageLevel Level { get; private set; }
+
+    /// <value>
+    /// Returns the code of this message, or MessageCode.NONE if no code is associated.
+    /// </value>
+    public MessageCode Code { get; private set; }
+
+    /// <value>
+    /// Returns the source code line number of this message.
+    /// </value>
+    public int Line { get; private set; }
+
+    /// <value>
+    /// Returns the text of the message.
+    /// </value>
+    public string Text { get; private set; }
 }

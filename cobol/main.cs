@@ -25,22 +25,22 @@
 
 using CCompiler;
 
-namespace JCobol {
+namespace JCobol; 
 
-    public class Program {
+public class Program {
 
-        public static void Main(string[] args) {
-            CobolOptions opts = new();
-            MessageCollection messages = new(opts);
+    public static void Main(string[] args) {
+        CobolOptions opts = new();
+        MessageCollection messages = new(opts);
 
-            opts.Messages = messages;
-            if (opts.Parse(args)) {
+        opts.Messages = messages;
+        if (opts.Parse(args)) {
 
-                if (opts.SourceFiles.Count == 0) {
-                    messages.Error(MessageCode.MISSINGSOURCEFILE, "Missing input source file");
-                }
+            if (opts.SourceFiles.Count == 0) {
+                messages.Error(MessageCode.MISSINGSOURCEFILE, "Missing input source file");
+            }
 
-                Compiler comp = new(opts) {
+            Compiler comp = new(opts) {
 					Messages = messages
 				};
 
@@ -56,18 +56,17 @@ namespace JCobol {
 					if (opts.Run && messages.ErrorCount == 0) {
 						comp.Execute();
 					}
-                }
             }
-            foreach (Message msg in messages) {
-                if (msg.Level == MessageLevel.Error) {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                }
-                Console.WriteLine(msg);
-                Console.ResetColor();
+        }
+        foreach (Message msg in messages) {
+            if (msg.Level == MessageLevel.Error) {
+                Console.ForegroundColor = ConsoleColor.Red;
             }
-            if (messages.ErrorCount > 0) {
-                Console.WriteLine("*** {0} errors found. Compilation stopped.", messages.ErrorCount);
-            }
+            Console.WriteLine(msg);
+            Console.ResetColor();
+        }
+        if (messages.ErrorCount > 0) {
+            Console.WriteLine("*** {0} errors found. Compilation stopped.", messages.ErrorCount);
         }
     }
 }

@@ -25,83 +25,82 @@
 
 using JComLib;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a number parse node that stores a single constant number.
+/// For simplicity, all numbers are stored by the compiler as doubles which
+/// is the largest type that can store all number types. The Type on the
+/// node distinguishes between the actual type though.
+///
+/// Beware that doing this introduces some boundary cases for integers
+/// so be ready to handle those especially!
+/// </summary>
+public sealed class NumberParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a number parse node that stores a single constant number.
-    /// For simplicity, all numbers are stored by the compiler as doubles which
-    /// is the largest type that can store all number types. The Type on the
-    /// node distinguishes between the actual type though.
-    ///
-    /// Beware that doing this introduces some boundary cases for integers
-    /// so be ready to handle those especially!
+    /// Creates a number parse node with the specified value.
     /// </summary>
-    public sealed class NumberParseNode : ParseNode {
-
-        /// <summary>
-        /// Creates a number parse node with the specified value.
-        /// </summary>
-        /// <param name="value">A double value for the node</param>
-        public NumberParseNode(Variant value) : base(ParseID.NUMBER) {
-            Value = value;
-            Type = Symbol.VariantTypeToSymbolType(value.Type);
-        }
-
-        /// <summary>
-        /// Creates a number parse node with the specified value.
-        /// </summary>
-        /// <param name="value">A double value for the node</param>
-        public NumberParseNode(int value) : base(ParseID.NUMBER) {
-            Value = new Variant(value);
-            Type = SymType.INTEGER;
-        }
-
-        /// <summary>
-        /// Returns whether this parse node represents a number.
-        /// </summary>
-        /// <value><c>true</c> if this instance is a number; otherwise, <c>false</c>.</value>
-        public override bool IsNumber => true;
-
-        /// <summary>
-        /// Returns whether this parse node represents a constant.
-        /// </summary>
-        /// <value><c>true</c> if this instance is a constant; otherwise, <c>false</c>.</value>
-        public override bool IsConstant => true;
-
-        /// <summary>
-        /// Emit this code to load the value to the stack.
-        /// </summary>
-        /// <param name="emitter">The emitter</param>
-        /// <param name="cg">A CodeGenerator object</param>
-        /// <param name="returnType">The type required by the caller</param>
-        /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-            if (emitter == null) {
-                throw new ArgumentNullException(nameof(emitter));
-            }
-            Variant actualValue = Value;
-            switch (returnType) {
-                case SymType.INTEGER:   actualValue = new Variant(Value.IntValue); break;
-                case SymType.FLOAT:     actualValue = new Variant(Value.RealValue); break;
-                case SymType.DOUBLE:    actualValue = new Variant(Value.DoubleValue); break;
-            }
-            emitter.LoadVariant(actualValue);
-            return Symbol.VariantTypeToSymbolType(actualValue.Type);
-        }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml subNode = root.Node("Number");
-            subNode.Attribute("Value", Value.ToString());
-        }
-
-        /// <summary>
-        /// Returns the variant number value.
-        /// </summary>
-        public override Variant Value { get; set; }
+    /// <param name="value">A double value for the node</param>
+    public NumberParseNode(Variant value) : base(ParseID.NUMBER) {
+        Value = value;
+        Type = Symbol.VariantTypeToSymbolType(value.Type);
     }
+
+    /// <summary>
+    /// Creates a number parse node with the specified value.
+    /// </summary>
+    /// <param name="value">A double value for the node</param>
+    public NumberParseNode(int value) : base(ParseID.NUMBER) {
+        Value = new Variant(value);
+        Type = SymType.INTEGER;
+    }
+
+    /// <summary>
+    /// Returns whether this parse node represents a number.
+    /// </summary>
+    /// <value><c>true</c> if this instance is a number; otherwise, <c>false</c>.</value>
+    public override bool IsNumber => true;
+
+    /// <summary>
+    /// Returns whether this parse node represents a constant.
+    /// </summary>
+    /// <value><c>true</c> if this instance is a constant; otherwise, <c>false</c>.</value>
+    public override bool IsConstant => true;
+
+    /// <summary>
+    /// Emit this code to load the value to the stack.
+    /// </summary>
+    /// <param name="emitter">The emitter</param>
+    /// <param name="cg">A CodeGenerator object</param>
+    /// <param name="returnType">The type required by the caller</param>
+    /// <returns>The symbol type of the value generated</returns>
+    public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+        if (emitter == null) {
+            throw new ArgumentNullException(nameof(emitter));
+        }
+        Variant actualValue = Value;
+        switch (returnType) {
+            case SymType.INTEGER:   actualValue = new Variant(Value.IntValue); break;
+            case SymType.FLOAT:     actualValue = new Variant(Value.RealValue); break;
+            case SymType.DOUBLE:    actualValue = new Variant(Value.DoubleValue); break;
+        }
+        emitter.LoadVariant(actualValue);
+        return Symbol.VariantTypeToSymbolType(actualValue.Type);
+    }
+
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml subNode = root.Node("Number");
+        subNode.Attribute("Value", Value.ToString());
+    }
+
+    /// <summary>
+    /// Returns the variant number value.
+    /// </summary>
+    public override Variant Value { get; set; }
 }

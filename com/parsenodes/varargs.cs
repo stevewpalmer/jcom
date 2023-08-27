@@ -23,47 +23,46 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a variable argument parse node which encapsulates an
+/// variable size array of arguments for use by external functions.
+/// </summary>
+public sealed class VarArgParseNode : CollectionParseNode {
 
     /// <summary>
-    /// Specifies a variable argument parse node which encapsulates an
-    /// variable size array of arguments for use by external functions.
+    /// Whether the arguments are being passed by value or by reference.
+    /// If PassByRef is set, all arguments must be identifiers.
     /// </summary>
-    public sealed class VarArgParseNode : CollectionParseNode {
+    public bool PassByRef { get; set; }
 
-        /// <summary>
-        /// Whether the arguments are being passed by value or by reference.
-        /// If PassByRef is set, all arguments must be identifiers.
-        /// </summary>
-        public bool PassByRef { get; set; }
-
-        /// <summary>
-        /// Emit the code to create an array of variable arguments and evaluate
-        /// and store each argument in the array. On exit, the address of the
-        /// array is left on the top of the stack.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A CodeGenerator object</param>
-        /// <param name="returnType">The type required by the caller</param>
-        /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            int argCount = Nodes.Count;
-            emitter.CreateSimpleArray(argCount, typeof(object));
-            for (int c = 0; c < argCount; ++c) {
-                emitter.Dup();
-                emitter.LoadInteger(c);
-                if (PassByRef) {
-                    IdentifierParseNode identNode = (IdentifierParseNode)Nodes[c];
-                    cg.LoadAddress(emitter, identNode);
-                    emitter.StoreElementReference(identNode.Type);
-                } else {
-                    emitter.StoreElementReference(cg.GenerateExpression(emitter, Nodes[c].Type, Nodes[c]));
-                }
-            }
-            return SymType.VARARG;
+    /// <summary>
+    /// Emit the code to create an array of variable arguments and evaluate
+    /// and store each argument in the array. On exit, the address of the
+    /// array is left on the top of the stack.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A CodeGenerator object</param>
+    /// <param name="returnType">The type required by the caller</param>
+    /// <returns>The symbol type of the value generated</returns>
+    public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
+        int argCount = Nodes.Count;
+        emitter.CreateSimpleArray(argCount, typeof(object));
+        for (int c = 0; c < argCount; ++c) {
+            emitter.Dup();
+            emitter.LoadInteger(c);
+            if (PassByRef) {
+                IdentifierParseNode identNode = (IdentifierParseNode)Nodes[c];
+                cg.LoadAddress(emitter, identNode);
+                emitter.StoreElementReference(identNode.Type);
+            } else {
+                emitter.StoreElementReference(cg.GenerateExpression(emitter, Nodes[c].Type, Nodes[c]));
+            }
+        }
+        return SymType.VARARG;
     }
 }

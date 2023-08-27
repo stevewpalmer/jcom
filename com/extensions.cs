@@ -23,28 +23,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// A set of class extensions.
+/// </summary>
+public static class MyExtensions {
 
     /// <summary>
-    /// A set of class extensions.
+    /// Capitalises the string by making the first letter uppercase. The remaining
+    /// characters in the string are preserved.
     /// </summary>
-    public static class MyExtensions {
-
-        /// <summary>
-        /// Capitalises the string by making the first letter uppercase. The remaining
-        /// characters in the string are preserved.
-        /// </summary>
-        /// <param name="str">Input string</param>
-        /// <returns>The string with the initial letter uppercased.</returns>
-        public static string CapitaliseString(this string str) {
-            if (str == null) {
-                throw new ArgumentNullException(nameof(str));
-            }
-            if (str.Length > 0) {
-                char initialChar = char.ToUpper(str[0]);
-                return string.Concat(initialChar.ToString(), str.Substring(1));
-            }
-            return str;
+    /// <param name="str">Input string</param>
+    /// <returns>The string with the initial letter uppercased.</returns>
+    public static string CapitaliseString(this string str) {
+        if (str == null) {
+            throw new ArgumentNullException(nameof(str));
         }
-    }   
-}
+        if (str.Length > 0) {
+            char initialChar = char.ToUpper(str[0]);
+            return string.Concat(initialChar.ToString(), str.Substring(1));
+        }
+        return str;
+    }
+}   

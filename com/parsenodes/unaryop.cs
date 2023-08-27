@@ -26,83 +26,82 @@
 using System.Diagnostics;
 using JComLib;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a unary operator parse node which encapsulates
+/// an expression operator with a single operand.
+/// </summary>
+public sealed class UnaryOpParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a unary operator parse node which encapsulates
-    /// an expression operator with a single operand.
+    /// Creates a unary parse node of the specified type.
     /// </summary>
-    public sealed class UnaryOpParseNode : ParseNode {
+    /// <param name="id">The ID of the operator</param>
+    public UnaryOpParseNode(ParseID id) : base(id) {}
 
-        /// <summary>
-        /// Creates a unary parse node of the specified type.
-        /// </summary>
-        /// <param name="id">The ID of the operator</param>
-        public UnaryOpParseNode(ParseID id) : base(id) {}
+    /// <summary>
+    /// Returns whether this unary operator has a numeric operand.
+    /// </summary>
+    /// <value><c>true</c> if this instance is a number; otherwise, <c>false</c>.</value>
+    public override bool IsNumber => Operand.IsNumber;
 
-        /// <summary>
-        /// Returns whether this unary operator has a numeric operand.
-        /// </summary>
-        /// <value><c>true</c> if this instance is a number; otherwise, <c>false</c>.</value>
-        public override bool IsNumber => Operand.IsNumber;
+    /// <summary>
+    /// Gets or sets the operand.
+    /// </summary>
+    /// <value>The Parse node for the operand</value>
+    public ParseNode Operand { get; set; }
 
-        /// <summary>
-        /// Gets or sets the operand.
-        /// </summary>
-        /// <value>The Parse node for the operand</value>
-        public ParseNode Operand { get; set; }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("UnaryOp");
+        blockNode.Attribute("ID", ID.ToString());
+        Operand.Dump(blockNode);
+    }
 
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("UnaryOp");
-            blockNode.Attribute("ID", ID.ToString());
-            Operand.Dump(blockNode);
+    /// <summary>
+    /// Emit this code to load the value to the stack.
+    /// </summary>
+    /// <param name="emitter">Code emitter</param>
+    /// <param name="cg">A CodeGenerator object</param>
+    /// <param name="returnType">The type required by the caller</param>
+    /// <returns>The symbol type of the value generated</returns>
+    public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
+        if (cg == null) {
+            throw new ArgumentNullException(nameof(cg));
         }
-
-        /// <summary>
-        /// Emit this code to load the value to the stack.
-        /// </summary>
-        /// <param name="emitter">Code emitter</param>
-        /// <param name="cg">A CodeGenerator object</param>
-        /// <param name="returnType">The type required by the caller</param>
-        /// <returns>The symbol type of the value generated</returns>
-        public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-            if (cg == null) {
-                throw new ArgumentNullException(nameof(cg));
-            }
-            switch (ID) {
-                case ParseID.MINUS:     return GenerateMinus(emitter, cg);
-                case ParseID.NOT:       return GenerateNot(emitter, cg);
-            }
-            Debug.Assert(false, "Unsupported parse ID for UnaryOpParseNode");
-            return Symbol.VariantTypeToSymbolType(Value.Type);
+        switch (ID) {
+            case ParseID.MINUS:     return GenerateMinus(emitter, cg);
+            case ParseID.NOT:       return GenerateNot(emitter, cg);
         }
+        Debug.Assert(false, "Unsupported parse ID for UnaryOpParseNode");
+        return Symbol.VariantTypeToSymbolType(Value.Type);
+    }
 
-        // Generate the code for a unary NOT logical operator
-        private SymType GenerateNot(Emitter emitter, ProgramParseNode cg) {
+    // Generate the code for a unary NOT logical operator
+    private SymType GenerateNot(Emitter emitter, ProgramParseNode cg) {
 
-            // HANDLE a NOT on a fixed char by representing it as a call to the IsEmpty
-            // property.
-            if (Operand.Type == SymType.FIXEDCHAR) {
-                cg.GenerateExpression(emitter, SymType.FIXEDCHAR, Operand);
-                emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", Array.Empty<Type>()));
-                return SymType.BOOLEAN;
-            }
-            cg.GenerateExpression(emitter, Type, Operand);
-            emitter.LoadInteger(0);
-            emitter.CompareEquals();
-            return Type;
+        // HANDLE a NOT on a fixed char by representing it as a call to the IsEmpty
+        // property.
+        if (Operand.Type == SymType.FIXEDCHAR) {
+            cg.GenerateExpression(emitter, SymType.FIXEDCHAR, Operand);
+            emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", Array.Empty<Type>()));
+            return SymType.BOOLEAN;
         }
+        cg.GenerateExpression(emitter, Type, Operand);
+        emitter.LoadInteger(0);
+        emitter.CompareEquals();
+        return Type;
+    }
 
-        // Generate the code for a unary minus operator
-        private SymType GenerateMinus(Emitter emitter, ProgramParseNode cg) {
-            cg.GenerateExpression(emitter, Type, Operand);
-            emitter.Neg(Type);
-            return Type;
-        }
+    // Generate the code for a unary minus operator
+    private SymType GenerateMinus(Emitter emitter, ProgramParseNode cg) {
+        cg.GenerateExpression(emitter, Type, Operand);
+        emitter.Neg(Type);
+        return Type;
     }
 }

@@ -25,44 +25,43 @@
 
 using System.Collections.ObjectModel;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Specifies a parse node that stores a variable size list of
+/// sub-parse nodes.
+/// </summary>
+public class CollectionParseNode : ParseNode {
 
     /// <summary>
-    /// Specifies a parse node that stores a variable size list of
-    /// sub-parse nodes.
+    /// Creates a Token parse node with the specified parse ID.
     /// </summary>
-    public class CollectionParseNode : ParseNode {
+    public CollectionParseNode() {
+        Nodes = new Collection<ParseNode>();
+    }
 
-        /// <summary>
-        /// Creates a Token parse node with the specified parse ID.
-        /// </summary>
-        public CollectionParseNode() {
-            Nodes = new Collection<ParseNode>();
-        }
+    /// <summary>
+    /// Adds the given parsenode as a child of this token node.
+    /// </summary>
+    /// <param name="node">The Parsenode to add</param>
+    public void Add(ParseNode node) {
+        Nodes.Add(node);
+    }
 
-        /// <summary>
-        /// Adds the given parsenode as a child of this token node.
-        /// </summary>
-        /// <param name="node">The Parsenode to add</param>
-        public void Add(ParseNode node) {
-            Nodes.Add(node);
-        }
+    /// <summary>
+    /// Returns a list of all child nodes.
+    /// </summary>
+    public Collection<ParseNode> Nodes { get; private set; }
 
-        /// <summary>
-        /// Returns a list of all child nodes.
-        /// </summary>
-        public Collection<ParseNode> Nodes { get; private set; }
-
-        /// <summary>
-        /// Dumps the contents of this parse node to the ParseNode XML
-        /// output under the specified parent node.
-        /// </summary>
-        /// <param name="root">The parent XML node</param>
-        public override void Dump(ParseNodeXml root) {
-            ParseNodeXml blockNode = root.Node("Block");
-            foreach (ParseNode node in Nodes) {
-                node.Dump(blockNode);
-            }
+    /// <summary>
+    /// Dumps the contents of this parse node to the ParseNode XML
+    /// output under the specified parent node.
+    /// </summary>
+    /// <param name="root">The parent XML node</param>
+    public override void Dump(ParseNodeXml root) {
+        ParseNodeXml blockNode = root.Node("Block");
+        foreach (ParseNode node in Nodes) {
+            node.Dump(blockNode);
         }
     }
 }

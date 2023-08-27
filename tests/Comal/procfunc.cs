@@ -27,6 +27,7 @@ using CCompiler;
 using JComal;
 using JComLib;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -46,7 +47,7 @@ namespace ComalTests {
                 ENDPROC PROC1
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test1", 1);
+            Helper.HelperRunFloat(comp, "test1", 1);
         }
 
         // Test calling an open function.
@@ -61,7 +62,7 @@ namespace ComalTests {
                 ENDFUNC FUNC1
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test1", 1);
+            Helper.HelperRunFloat(comp, "test1", 1);
         }
 
         // Test calling a procedure with a reference parameter
@@ -82,7 +83,7 @@ namespace ComalTests {
                 ENDPROC PROC2
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test1", 1);
+            Helper.HelperRunFloat(comp, "test1", 1);
         }
 
         // Test calling a function
@@ -107,7 +108,7 @@ namespace ComalTests {
                 ENDFUNC lower$
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'lower", 1);
+            Helper.HelperRunFloat(comp, "test'lower", 1);
         }
 
         // Test using IMPORT in an open procedure is an error
@@ -168,7 +169,7 @@ namespace ComalTests {
                 ENDPROC testing
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunString(comp, "scopetest$", "happy");
+            Helper.HelperRunString(comp, "scopetest$", "happy");
         }
 
         // Test scope of a variable in an open procedure. This should succeed

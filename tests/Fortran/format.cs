@@ -25,6 +25,7 @@
 
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -44,7 +45,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunString(comp, "FMTTEST", "The sum of 12 and 36 is 48");
+            Helper.HelperRunString(comp, "FMTTEST", "The sum of 12 and 36 is 48");
         }
 
         // Array FORMAT verification
@@ -63,7 +64,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunString(comp, "FMTTEST", "    12    24    36");
+            Helper.HelperRunString(comp, "FMTTEST", "    12    24    36");
         }
 
         // Exponential format tests.
@@ -97,11 +98,11 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunString(comp, "EXPTEST1", ".68E+06");
-            Utilities.Helper.HelperRunString(comp, "EXPTEST2", "-0.68E+06");
-            Utilities.Helper.HelperRunString(comp, "EXPTEST3", "-0.68E+0006");
-            Utilities.Helper.HelperRunString(comp, "EXPTEST4", ".81+113");
-            Utilities.Helper.HelperRunString(comp, "EXPTEST5", "0.81E+04");
+            Helper.HelperRunString(comp, "EXPTEST1", ".68E+06");
+            Helper.HelperRunString(comp, "EXPTEST2", "-0.68E+06");
+            Helper.HelperRunString(comp, "EXPTEST3", "-0.68E+0006");
+            Helper.HelperRunString(comp, "EXPTEST4", ".81+113");
+            Helper.HelperRunString(comp, "EXPTEST5", "0.81E+04");
         }
     }
 }

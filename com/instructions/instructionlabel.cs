@@ -25,41 +25,40 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines an instruction class that constructs an opcode that takes
+/// a single label parameter.
+/// </summary>
+public class InstructionLabel : Instruction {
 
     /// <summary>
-    /// Defines an instruction class that constructs an opcode that takes
-    /// a single label parameter.
+    /// Target of label.
     /// </summary>
-    public class InstructionLabel : Instruction {
+    public Label Target { get; set; }
 
-        /// <summary>
-        /// Target of label.
-        /// </summary>
-        public Label Target { get; set; }
+    /// <summary>
+    /// Create an InstructionLabel object with the given opcode
+    /// and label target.
+    /// </summary>
+    /// <param name="op">Opcode</param>
+    /// <param name="target">Label target</param>
+    public InstructionLabel(OpCode op, Label target) : base(op) {
+        Target = target;
+    }
 
-        /// <summary>
-        /// Create an InstructionLabel object with the given opcode
-        /// and label target.
-        /// </summary>
-        /// <param name="op">Opcode</param>
-        /// <param name="target">Label target</param>
-        public InstructionLabel(OpCode op, Label target) : base(op) {
-            Target = target;
+    /// <summary>
+    /// Generate MSIL code to emit a opcode with a label parameter.
+    /// </summary>
+    /// <param name="il">ILGenerator object</param>
+    public override void Generate(ILGenerator il) {
+        if (il == null) {
+            throw new ArgumentNullException(nameof(il));
         }
-
-        /// <summary>
-        /// Generate MSIL code to emit a opcode with a label parameter.
-        /// </summary>
-        /// <param name="il">ILGenerator object</param>
-        public override void Generate(ILGenerator il) {
-            if (il == null) {
-                throw new ArgumentNullException(nameof(il));
-            }
-            if (Deleted) {
-                return;
-            }
-            il.Emit(Code, Target);
+        if (Deleted) {
+            return;
         }
+        il.Emit(Code, Target);
     }
 }

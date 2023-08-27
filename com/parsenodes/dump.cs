@@ -25,100 +25,99 @@
 
 using System.Xml;
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Defines a single parse tree dump node.
+/// </summary>
+public class ParseNodeXml {
+
+    private readonly XmlDocument _doc;
+    private readonly XmlNode _thisNode;
 
     /// <summary>
-    /// Defines a single parse tree dump node.
+    /// Initializes a new instance of the <see cref="ParseNodeXml"/> class.
     /// </summary>
-    public class ParseNodeXml {
-
-        private readonly XmlDocument _doc;
-        private readonly XmlNode _thisNode;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParseNodeXml"/> class.
-        /// </summary>
-        /// <param name="doc">The Xml root document</param>
-        /// <param name="node">The XmlNode associated with this node</param>
-        public ParseNodeXml(XmlDocument doc, XmlNode node) {
-            _doc = doc;
-            _thisNode = node;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParseNodeXml"/> class.
-        /// </summary>
-        /// <param name="doc">The Xml root document</param>
-        /// <param name="nodeName">The name of this node</param>
-        public ParseNodeXml(XmlDocument doc, string nodeName) {
-            _doc = doc;
-            _thisNode = _doc.CreateElement(nodeName);
-            _doc.AppendChild(_thisNode);
-        }
-
-        /// <summary>
-        /// Create a new node under this node with the given name.
-        /// </summary>
-        /// <param name="name">A name for the new node</param>
-        /// <returns>The new group node</returns>
-        public ParseNodeXml Node(string name) {
-            XmlNode newNode = _doc.CreateElement(name);
-            _thisNode.AppendChild(newNode);
-            return new ParseNodeXml(_doc, newNode);
-        }
-
-        /// <summary>
-        /// Add the specified attribute name and value to this node.
-        /// </summary>
-        /// <param name="attributeName">Attribute name</param>
-        /// <param name="attributeValue">Attribute value</param>
-        public void Attribute(string attributeName, string attributeValue) {
-            if (_thisNode == null) {
-                throw new InvalidOperationException("No parent node defined");
-            }
-            if (_thisNode.Attributes == null) {
-                throw new InvalidOperationException("No attributes on parent node");
-            }
-            XmlAttribute attr = _doc.CreateAttribute(attributeName);
-            attr.Value = attributeValue;
-            _thisNode.Attributes.Append(attr);
-        }
-
-        /// <summary>
-        /// Write the specified nodeName and value into this node.
-        /// </summary>
-        /// <param name="nodeName">Node name</param>
-        /// <param name="value">Node value</param>
-        public void Write(string nodeName, string value) {
-            if (_thisNode == null) {
-                throw new InvalidOperationException("No parent node defined");
-            }
-            XmlElement element = _doc.CreateElement(nodeName);
-            element.InnerText = value;
-            _thisNode.AppendChild(element);
-        }
+    /// <param name="doc">The Xml root document</param>
+    /// <param name="node">The XmlNode associated with this node</param>
+    public ParseNodeXml(XmlDocument doc, XmlNode node) {
+        _doc = doc;
+        _thisNode = node;
     }
 
     /// <summary>
-    /// Implements the static ParseTreeDump class which dumps the parse
-    /// tree to an XML document.
+    /// Initializes a new instance of the <see cref="ParseNodeXml"/> class.
     /// </summary>
-    public static class ParseTreeXml {
+    /// <param name="doc">The Xml root document</param>
+    /// <param name="nodeName">The name of this node</param>
+    public ParseNodeXml(XmlDocument doc, string nodeName) {
+        _doc = doc;
+        _thisNode = _doc.CreateElement(nodeName);
+        _doc.AppendChild(_thisNode);
+    }
 
-        /// <summary>
-        /// Generate and return an XmlDocument that represents the
-        /// parse tree from the given root node down.
-        /// </summary>
-        /// <param name="rootNode">Parse tree root node</param>
-        /// <returns>The XmlDocument for the root node</returns>
-        public static XmlDocument Tree(ParseNode rootNode) {
-            XmlDocument doc = new();
+    /// <summary>
+    /// Create a new node under this node with the given name.
+    /// </summary>
+    /// <param name="name">A name for the new node</param>
+    /// <returns>The new group node</returns>
+    public ParseNodeXml Node(string name) {
+        XmlNode newNode = _doc.CreateElement(name);
+        _thisNode.AppendChild(newNode);
+        return new ParseNodeXml(_doc, newNode);
+    }
 
-            XmlNode docNode = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-            doc.AppendChild(docNode);
-
-            rootNode.Dump(new ParseNodeXml(doc, "Root"));
-            return doc;
+    /// <summary>
+    /// Add the specified attribute name and value to this node.
+    /// </summary>
+    /// <param name="attributeName">Attribute name</param>
+    /// <param name="attributeValue">Attribute value</param>
+    public void Attribute(string attributeName, string attributeValue) {
+        if (_thisNode == null) {
+            throw new InvalidOperationException("No parent node defined");
         }
+        if (_thisNode.Attributes == null) {
+            throw new InvalidOperationException("No attributes on parent node");
+        }
+        XmlAttribute attr = _doc.CreateAttribute(attributeName);
+        attr.Value = attributeValue;
+        _thisNode.Attributes.Append(attr);
+    }
+
+    /// <summary>
+    /// Write the specified nodeName and value into this node.
+    /// </summary>
+    /// <param name="nodeName">Node name</param>
+    /// <param name="value">Node value</param>
+    public void Write(string nodeName, string value) {
+        if (_thisNode == null) {
+            throw new InvalidOperationException("No parent node defined");
+        }
+        XmlElement element = _doc.CreateElement(nodeName);
+        element.InnerText = value;
+        _thisNode.AppendChild(element);
+    }
+}
+
+/// <summary>
+/// Implements the static ParseTreeDump class which dumps the parse
+/// tree to an XML document.
+/// </summary>
+public static class ParseTreeXml {
+
+    /// <summary>
+    /// Generate and return an XmlDocument that represents the
+    /// parse tree from the given root node down.
+    /// </summary>
+    /// <param name="rootNode">Parse tree root node</param>
+    /// <returns>The XmlDocument for the root node</returns>
+    public static XmlDocument Tree(ParseNode rootNode) {
+        XmlDocument doc = new();
+
+        XmlNode docNode = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+        doc.AppendChild(docNode);
+
+        rootNode.Dump(new ParseNodeXml(doc, "Root"));
+        return doc;
     }
 }

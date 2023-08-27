@@ -25,6 +25,7 @@
 
 using JComal;
 using NUnit.Framework;
+using Utilities;
 
 namespace ComalTests {
     [TestFixture]
@@ -47,7 +48,7 @@ namespace ComalTests {
                 ENDFUNC test'assign
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'assign", 1);
+            Helper.HelperRunFloat(comp, "test'assign", 1);
         }
 
         // Test the bitwise AND operator.
@@ -63,7 +64,7 @@ namespace ComalTests {
                 ENDFUNC test'and
             ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'and", 1);
+            Helper.HelperRunFloat(comp, "test'and", 1);
         }
 
         // Verify BITOR operator
@@ -79,7 +80,7 @@ namespace ComalTests {
                 ENDFUNC test'bitor
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'bitor", 1);
+            Helper.HelperRunFloat(comp, "test'bitor", 1);
         }
 
         // Verify BITAND operator
@@ -95,7 +96,7 @@ namespace ComalTests {
                 ENDFUNC test'bitand
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'bitand", 1);
+            Helper.HelperRunFloat(comp, "test'bitand", 1);
         }
 
         // Verify BITXOR operator
@@ -111,7 +112,7 @@ namespace ComalTests {
                 ENDFUNC test'bitxor
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'bitxor", 1);
+            Helper.HelperRunFloat(comp, "test'bitxor", 1);
         }
 
         // Verify logical AND operator
@@ -132,7 +133,7 @@ namespace ComalTests {
                 ENDFUNC
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'logical'and", 1);
+            Helper.HelperRunFloat(comp, "test'logical'and", 1);
         }
 
         // Verify logical OR operator
@@ -153,7 +154,7 @@ namespace ComalTests {
                 ENDFUNC
                 ";
             Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Utilities.Helper.HelperRunFloat(comp, "test'logical'or", 1);
+            Helper.HelperRunFloat(comp, "test'logical'or", 1);
         }
     }
 }

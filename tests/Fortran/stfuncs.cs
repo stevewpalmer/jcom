@@ -25,6 +25,7 @@
 
 using JFortran;
 using NUnit.Framework;
+using Utilities;
 
 namespace FortranTests {
     [TestFixture]
@@ -44,7 +45,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 61);
+            Helper.HelperRunInteger(comp, "ITEST", 61);
         }
 
         // A statement function that calls another statement function.
@@ -60,7 +61,7 @@ namespace FortranTests {
                 "      END"
             };
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Utilities.Helper.HelperRunInteger(comp, "ITEST", 1221);
+            Helper.HelperRunInteger(comp, "ITEST", 1221);
         }
     }
 }

@@ -23,20 +23,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler {
+namespace CCompiler; 
+
+/// <summary>
+/// Compiler Interface
+/// </summary>
+public interface ICompiler {
 
     /// <summary>
-    /// Compiler Interface
+    /// Convert the parse tree to executable code and then execute the
+    /// resulting code. The return value from the specified entry point function
+    /// is returned as an object.
     /// </summary>
-    public interface ICompiler {
-
-        /// <summary>
-        /// Convert the parse tree to executable code and then execute the
-        /// resulting code. The return value from the specified entry point function
-        /// is returned as an object.
-        /// </summary>
-        /// <param name="entryPointName">The name of the method to be called</param>
-        /// <returns>An ExecutionResult object representing the result of the execution</returns>
-        public ExecutionResult Execute(string entryPointName);
-    }
+    /// <param name="entryPointName">The name of the method to be called</param>
+    /// <returns>An ExecutionResult object representing the result of the execution</returns>
+    public ExecutionResult Execute(string entryPointName);
 }
