@@ -41,21 +41,21 @@ public class Program {
             }
 
             Compiler comp = new(opts) {
-					Messages = messages
-				};
+               Messages = messages
+            };
 
-				foreach (string srcfile in opts.SourceFiles) {
-					if (!File.Exists(srcfile)) {
-						messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
-						break;
-					}
-					comp.Compile(srcfile);
-				}
-				if (messages.ErrorCount == 0) {
-					comp.Save();
-					if (opts.Run && messages.ErrorCount == 0) {
-						comp.Execute();
-					}
+            foreach (string srcfile in opts.SourceFiles) {
+                if (!File.Exists(srcfile)) {
+                    messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
+                    break;
+                }
+                comp.Compile(srcfile);
+            }
+            if (messages.ErrorCount == 0) {
+                comp.Save();
+                if (opts.Run && messages.ErrorCount == 0) {
+                    comp.Execute();
+                }
             }
         }
         foreach (Message msg in messages) {

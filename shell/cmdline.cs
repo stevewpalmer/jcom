@@ -1,4 +1,4 @@
-﻿// JOs
+﻿// JShell
 // Command line parsing
 //
 // Authors:
@@ -29,15 +29,15 @@ using System.Text;
 namespace JShell; 
 
 public class CommandLine {
-	private readonly string _line;
-	private int _index;
+    private readonly string _line;
+    private int _index;
     private char _pushedChar;
 
     private const char Eol = '\n';
 
     public CommandLine(string input) {
-		_line = input;
-		_index = 0;
+        _line = input;
+        _index = 0;
     }
 
     // Retrieve the remainder of the command line as a series of
@@ -56,7 +56,7 @@ public class CommandLine {
     // quote wraps all text up to the next matching quote or the
     // end of the line. Otherwise a word is delimited by any space
     // character.
-		public string NextWord() {
+    public string NextWord() {
 
         char ch = GetChar();
         while (ch != Eol) {
@@ -94,7 +94,7 @@ public class CommandLine {
             }
         }
         return null;
-		}
+    }
 
     /// Push back the last character read so that the next call to GetChar will
     /// retrieve that character.

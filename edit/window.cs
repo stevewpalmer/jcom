@@ -35,7 +35,7 @@ public class Window {
     /// <summary>
     /// Create an empty window
     /// </summary>
-	public Window() {
+    public Window() {
         Buffer = new Buffer(null);
     }
 
@@ -43,9 +43,9 @@ public class Window {
     /// Create a window for the specified buffer
     /// </summary>
     /// <param name="buffer">Associated buffer</param>
-	public Window(Buffer buffer)	{
+    public Window(Buffer buffer) {
         Buffer = buffer;
-	}
+    }
 
     /// <summary>
     /// Buffer associated with window

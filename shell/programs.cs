@@ -1,4 +1,4 @@
-﻿// JOs
+﻿// JShell
 // Program commands
 //
 // Authors:

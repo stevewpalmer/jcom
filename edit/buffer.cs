@@ -25,7 +25,7 @@
 
 namespace JEdit; 
 
-public class Buffer	{
+public class Buffer {
 
     /// <summary>
     /// Creates a buffer with the specified file.
@@ -36,8 +36,8 @@ public class Buffer	{
         if (!string.IsNullOrEmpty(filename) && File.Exists(filename)) {
             Lines = File.ReadAllLines(filename).ToList();
         } else {
-			Lines = new List<string> {""};
-		}
+            Lines = new List<string> {""};
+        }
         Filename = filename ?? string.Empty;
     }
 

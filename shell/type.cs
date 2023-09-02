@@ -1,4 +1,4 @@
-﻿// JOs
+﻿// JShell
 // TYPE command
 //
 // Authors:

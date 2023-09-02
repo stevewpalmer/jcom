@@ -562,7 +562,7 @@ public class Emitter {
             }
         }
         return typeNeeded;
-		}
+        }
 
     /// <summary>
     /// Emit the code that loads an entire array. This is generally
