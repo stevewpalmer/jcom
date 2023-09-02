@@ -29,7 +29,7 @@ using System.Xml;
 using CCompiler;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// Main compiler class.
@@ -63,22 +63,30 @@ public partial class Compiler : ICompiler {
     /// <summary>
     /// Return or set the list of compiler messages.
     /// </summary>
-    public MessageCollection Messages { get; set; }
+    public MessageCollection Messages {
+        get; set;
+    }
 
     /// <summary>
     /// Symbol table stack
     /// </summary>
-    public SymbolStack SymbolStack { get; set; }
+    public SymbolStack SymbolStack {
+        get; set;
+    }
 
     /// <summary>
     /// Global methods symbol table
     /// </summary>
-    public SymbolCollection Globals { get; set; }
+    public SymbolCollection Globals {
+        get; set;
+    }
 
     /// <summary>
     /// Current procedure being parsed
     /// </summary>
-    public ProcedureParseNode CurrentProcedure { get; set; }
+    public ProcedureParseNode CurrentProcedure {
+        get; set;
+    }
 
     /// <summary>
     /// Constructs a compiler object with the given options.
@@ -155,7 +163,7 @@ public partial class Compiler : ICompiler {
     public void CompileString(string source, bool autoNumber) {
 
         // Split the source
-        string [] sourceLines = source.Split('\n');
+        string[] sourceLines = source.Split('\n');
         Lines lines = new();
         int lineNumber = 100;
         LineTokeniser tokeniser = new();
@@ -204,7 +212,7 @@ public partial class Compiler : ICompiler {
         // program.
         if (activeMethod != null) {
             activeMethod.Body.Clear();
-        } else { 
+        } else {
             Symbol method = Globals.Add(methodName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
             method.Defined = true;
 
@@ -233,8 +241,7 @@ public partial class Compiler : ICompiler {
             _program.IsExecutable = _hasProgram;
             _program.Generate();
             _program.Save();
-        }
-        catch (CodeGeneratorException e) {
+        } catch (CodeGeneratorException e) {
             Messages.Error(e.Filename, MessageCode.CODEGEN, e.Linenumber, e.Message);
         }
     }
@@ -329,7 +336,7 @@ public partial class Compiler : ICompiler {
     // to the correct type, particularly for functions.
     private void Pass0() {
 
-        Stack<Symbol> parents = new(new Symbol [] { null });
+        Stack<Symbol> parents = new(new Symbol[] { null });
 
         // Add implicit entrypoint subroutine name.
         Globals.Add(new Symbol(_entryPointName, new SymFullType(), SymClass.SUBROUTINE, null, 0) {
@@ -410,7 +417,7 @@ public partial class Compiler : ICompiler {
     // Compile a block within a function or procedure, or within a structured statement
     // such as WHILE, REPEAT or CASE/WHEN. The endTokens list specify tokens that can
     // end the block.
-    private TokenID CompileBlock(BlockParseNode node, TokenID [] endTokens) {
+    private TokenID CompileBlock(BlockParseNode node, TokenID[] endTokens) {
 
         SimpleToken token = new(TokenID.EOL);
         while (!_ls.EndOfFile) {
@@ -458,7 +465,7 @@ public partial class Compiler : ICompiler {
     // code generator uses this to refer to the correct source file if any
     // errors are found during generation.
     private ParseNode MarkFilename() {
-        return new MarkFilenameParseNode {Filename = Messages.Filename};
+        return new MarkFilenameParseNode { Filename = Messages.Filename };
     }
 
     // Create a token node that marks the number of the current line being
@@ -644,7 +651,7 @@ public partial class Compiler : ICompiler {
     // class with the inline flag set from the options.
     private ExtCallParseNode GetIntrinsicExtCallNode(string functionName) {
 
-        return new("JComalLib.Intrinsics,jcomallib", functionName) {
+        return new("JComalLib.Intrinsics,comallib", functionName) {
             Inline = _opts.Inline
         };
     }
@@ -653,7 +660,7 @@ public partial class Compiler : ICompiler {
     // class with the inline flag set from the options.
     private static ExtCallParseNode GetFileManagerExtCallNode(string functionName) {
 
-        return new("JComalLib.FileManager,jcomallib", functionName);
+        return new("JComalLib.FileManager,comallib", functionName);
     }
 
     // Create an ExtCallParseNode for the specified function in the Runtime
@@ -691,7 +698,7 @@ public partial class Compiler : ICompiler {
                 Messages.Error(MessageCode.EXPECTEDTOKEN,
                     $"Expected '{Tokens.TokenIDToString(expectedID)}' not '{Tokens.TokenIDToString(token.ID)}'");
             }
-            _currentLine.InsertTokens(new [] {
+            _currentLine.InsertTokens(new[] {
                 new SimpleToken(TokenID.SPACE),
                 new SimpleToken(expectedID)
             });
@@ -781,47 +788,88 @@ public partial class Compiler : ICompiler {
         // First make sure this statement is allowed here.
         if (ChangeState(token)) {
             switch (token.ID) {
-                case TokenID.KCASE:             return KCase();
-                case TokenID.KCLOSE:            return KClose();
-                case TokenID.KCOLOUR:           return KColour();
-                case TokenID.KCREATE:           return KCreate();
-                case TokenID.KCURSOR:           return KCursor();
-                case TokenID.KDATA:             return KData();
-                case TokenID.KDELETE:           return KDelete();
-                case TokenID.KDIM:              return KDim();
-                case TokenID.KDIR:              return KDir();
-                case TokenID.KEND:              return KEnd();
-                case TokenID.KEXEC:             return KExec();
-                case TokenID.KEXIT:             return KExit();
-                case TokenID.KEXPORT:           return KExport();
-                case TokenID.KFOR:              return KFor();
-                case TokenID.KFUNC:             return KFunc();
-                case TokenID.KGOTO:             return KGoto();
-                case TokenID.KIF:               return KIf();
-                case TokenID.KIMPORT:           return KImport();
-                case TokenID.KINPUT:            return KInput();
-                case TokenID.KLABEL:            return KLabel();
-                case TokenID.KLET:              return KAssignment();
-                case TokenID.KLOOP:             return KLoop();
-                case TokenID.KMODULE:           return KModule();
-                case TokenID.KOPEN:             return KOpen();
-                case TokenID.KNULL:             return null;
-                case TokenID.KPAGE:             return KPage();
-                case TokenID.KPRINT:            return KPrint();
-                case TokenID.KPROC:             return KProc();
-                case TokenID.KRANDOMIZE:        return KRandomize();
-                case TokenID.KREAD:             return KRead();
-                case TokenID.KREPEAT:           return KRepeat();
-                case TokenID.KRESTORE:          return KRestore();
-                case TokenID.KRETURN:           return KReturn();
-                case TokenID.KREPORT:           return KReport();
-                case TokenID.KSTOP:             return KStop();
-                case TokenID.KTRAP:             return KTrap();
-                case TokenID.KUSE:              return KUse();
-                case TokenID.KWHILE:            return KWhile();
-                case TokenID.KWRITE:            return KWrite();
-                case TokenID.KZONE:             return KZone();
-                case TokenID.EOL:               return null;
+                case TokenID.KCASE:
+                    return KCase();
+                case TokenID.KCLOSE:
+                    return KClose();
+                case TokenID.KCOLOUR:
+                    return KColour();
+                case TokenID.KCREATE:
+                    return KCreate();
+                case TokenID.KCURSOR:
+                    return KCursor();
+                case TokenID.KDATA:
+                    return KData();
+                case TokenID.KDELETE:
+                    return KDelete();
+                case TokenID.KDIM:
+                    return KDim();
+                case TokenID.KDIR:
+                    return KDir();
+                case TokenID.KEND:
+                    return KEnd();
+                case TokenID.KEXEC:
+                    return KExec();
+                case TokenID.KEXIT:
+                    return KExit();
+                case TokenID.KEXPORT:
+                    return KExport();
+                case TokenID.KFOR:
+                    return KFor();
+                case TokenID.KFUNC:
+                    return KFunc();
+                case TokenID.KGOTO:
+                    return KGoto();
+                case TokenID.KIF:
+                    return KIf();
+                case TokenID.KIMPORT:
+                    return KImport();
+                case TokenID.KINPUT:
+                    return KInput();
+                case TokenID.KLABEL:
+                    return KLabel();
+                case TokenID.KLET:
+                    return KAssignment();
+                case TokenID.KLOOP:
+                    return KLoop();
+                case TokenID.KMODULE:
+                    return KModule();
+                case TokenID.KOPEN:
+                    return KOpen();
+                case TokenID.KNULL:
+                    return null;
+                case TokenID.KPAGE:
+                    return KPage();
+                case TokenID.KPRINT:
+                    return KPrint();
+                case TokenID.KPROC:
+                    return KProc();
+                case TokenID.KRANDOMIZE:
+                    return KRandomize();
+                case TokenID.KREAD:
+                    return KRead();
+                case TokenID.KREPEAT:
+                    return KRepeat();
+                case TokenID.KRESTORE:
+                    return KRestore();
+                case TokenID.KRETURN:
+                    return KReturn();
+                case TokenID.KREPORT:
+                    return KReport();
+                case TokenID.KSTOP:
+                    return KStop();
+                case TokenID.KTRAP:
+                    return KTrap();
+                case TokenID.KUSE:
+                    return KUse();
+                case TokenID.KWHILE:
+                    return KWhile();
+                case TokenID.KWRITE:
+                    return KWrite();
+                case TokenID.KZONE:
+                    return KZone();
+                case TokenID.EOL:
+                    return null;
 
                 case TokenID.IDENT:
                     _currentLine.PushToken(token);
@@ -990,13 +1038,13 @@ public partial class Compiler : ICompiler {
     // assigned to the left hand side.
     private static bool ValidateAssignmentTypes(SymType toType, SymType fromType) {
         bool valid = false;
-        
+
         switch (toType) {
             case SymType.CHAR:
             case SymType.FIXEDCHAR:
                 valid = Symbol.IsCharType(fromType);
                 break;
-                
+
             case SymType.INTEGER:
             case SymType.FLOAT:
                 valid = Symbol.IsNumberType(fromType);
@@ -1015,47 +1063,47 @@ public partial class Compiler : ICompiler {
         foreach (ParseNode node in blockNodes.Nodes) {
             switch (node.ID) {
                 case ParseID.COND: {
-                    // Block IF statement. One sub-block for each
-                    // IF...ELSE...ENDIF group.
-                    ConditionalParseNode tokenNode = (ConditionalParseNode)node;
-                    for (int m = 1; m < tokenNode.BodyList.Count; m += 2) {
-                        if (tokenNode.BodyList[m] != null) {
-                            ValidateBlock(level + 1, tokenNode.BodyList[m]);
+                        // Block IF statement. One sub-block for each
+                        // IF...ELSE...ENDIF group.
+                        ConditionalParseNode tokenNode = (ConditionalParseNode)node;
+                        for (int m = 1; m < tokenNode.BodyList.Count; m += 2) {
+                            if (tokenNode.BodyList[m] != null) {
+                                ValidateBlock(level + 1, tokenNode.BodyList[m]);
+                            }
                         }
+                        break;
                     }
-                    break;
-                }
 
                 case ParseID.FILENAME: {
-                    MarkFilenameParseNode tokenNode = (MarkFilenameParseNode)node;
-                    filename = tokenNode.Filename;
-                    break;
-                }
+                        MarkFilenameParseNode tokenNode = (MarkFilenameParseNode)node;
+                        filename = tokenNode.Filename;
+                        break;
+                    }
 
                 case ParseID.LINENUMBER: {
-                    MarkLineParseNode tokenNode = (MarkLineParseNode)node;
-                    line = tokenNode.DisplayableLineNumber;
-                    break;
-                }
+                        MarkLineParseNode tokenNode = (MarkLineParseNode)node;
+                        line = tokenNode.DisplayableLineNumber;
+                        break;
+                    }
 
                 case ParseID.LOOP:
                     ValidateBlock(level + 1, ((LoopParseNode)node).LoopBody);
                     break;
 
                 case ParseID.GOTO: {
-                    GotoParseNode tokenNode = (GotoParseNode)node;
-                    if (tokenNode.Nodes.Count > 0) {
-                        SymbolParseNode symNode = (SymbolParseNode)tokenNode.Nodes[0];
-                        Symbol sym = symNode.Symbol;
-                        if (sym.Depth > level) {
+                        GotoParseNode tokenNode = (GotoParseNode)node;
+                        if (tokenNode.Nodes.Count > 0) {
+                            SymbolParseNode symNode = (SymbolParseNode)tokenNode.Nodes[0];
+                            Symbol sym = symNode.Symbol;
+                            if (sym.Depth > level) {
                                 Messages.Error(filename,
                                                MessageCode.GOTOINTOBLOCK,
                                                line,
                                                "GOTO into an inner block");
+                            }
                         }
+                        break;
                     }
-                    break;
-                }
             }
         }
     }

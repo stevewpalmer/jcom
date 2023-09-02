@@ -4,18 +4,15 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11.0</LangVersion>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <RootNamespace>JShell</RootNamespace>
-    <Description>Operating System</Description>
+    <Description>Edit</Description>
     <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+    <RootNamespace>JEdit</RootNamespace>
+    <Title>Text Editor</Title>
+    <Authors>Steven Palmer</Authors>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\jcomlib\comlib.csproj" />
-    <ProjectReference Include="..\cobol\cobol.csproj" />
-    <ProjectReference Include="..\comal\comal.csproj" />
-    <ProjectReference Include="..\fortran\for.csproj" />
   </ItemGroup>
 </Project>

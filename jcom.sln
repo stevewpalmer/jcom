@@ -78,9 +78,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cobol", "cobol\cobol.csproj", "{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shell", "jos\shell.csproj", "{120FDE33-3466-461D-B077-6F43DE3EB3DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shell", "shell\shell.csproj", "{120FDE33-3466-461D-B077-6F43DE3EB3DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comlib", "jcomlib\comlib.csproj", "{3A8C5A7C-72B0-4EE3-BF72-E589E4EA4A65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "edit", "edit\edit.csproj", "{5A662A5A-EF69-4A87-A706-BAAD5B82C211}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,6 +145,13 @@ Global
 		{3A8C5A7C-72B0-4EE3-BF72-E589E4EA4A65}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{3A8C5A7C-72B0-4EE3-BF72-E589E4EA4A65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A8C5A7C-72B0-4EE3-BF72-E589E4EA4A65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -171,6 +180,29 @@ Global
 		$0.StandardHeader = $5
 		$5.Text = @Project title\nFile title\n\nAuthors:\n ${AuthorName}\n\nCopyright (C) ${Year} ${AuthorName}\n\nLicensed to the Apache Software Foundation (ASF) under one\nor more contributor license agreements.  See the NOTICE file\ndistributed with this work for additional information\nregarding copyright ownership.  The ASF licenses this file\nto you under the Apache License, Version 2.0 (the\n"License"); you may not use this file except in compliance\nwith the License.  You may obtain a copy of the License at\n \n# http://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing,\nsoftware distributed under the License is distributed on an\n"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\nKIND, either express or implied.  See the License for the\nspecific language governing permissions and limitations\nunder the License.
 		$0.VersionControlPolicy = $6
+		$0.TextStylePolicy = $7
+		$7.TabsToSpaces = True
+		$7.EolMarker = Unix
+		$7.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $8
+		$8.NewLinesForBracesInTypes = False
+		$8.NewLinesForBracesInMethods = False
+		$8.NewLinesForBracesInProperties = False
+		$8.NewLinesForBracesInAccessors = False
+		$8.NewLinesForBracesInAnonymousMethods = False
+		$8.NewLinesForBracesInControlBlocks = False
+		$8.NewLinesForBracesInAnonymousTypes = False
+		$8.NewLinesForBracesInObjectCollectionArrayInitializers = False
+		$8.NewLinesForBracesInLambdaExpressionBody = False
+		$8.NewLineForElse = False
+		$8.NewLineForCatch = False
+		$8.NewLineForFinally = False
+		$8.NewLineForMembersInObjectInit = False
+		$8.NewLineForMembersInAnonymousTypes = False
+		$8.NewLineForClausesInQuery = False
+		$8.WrappingPreserveSingleLine = False
+		$8.WrappingKeepStatementsOnSingleLine = False
+		$8.scope = text/x-csharp
 		outputpath = .
 		version = 0.3
 	EndGlobalSection

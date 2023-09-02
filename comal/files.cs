@@ -162,7 +162,7 @@ public partial class Compiler {
             }
         }
 
-        ExtCallParseNode node = new("JComalLib.FileManager,jcomallib", "WRITE");
+        ExtCallParseNode node = new("JComalLib.FileManager,comallib", "WRITE");
         ParametersParseNode paramsNode = new();
         paramsNode.Add(fileParseNode);
         paramsNode.Add(recnumParseNode);
@@ -402,7 +402,7 @@ public partial class Compiler {
                         return null;
                     }
 
-                    ExtCallParseNode usingFunc = new("JComalLib.Intrinsics,jcomallib", "USING");
+                    ExtCallParseNode usingFunc = new("JComalLib.Intrinsics,comallib", "USING");
                     ParametersParseNode usingParams = new();
                     usingFunc.Parameters = usingParams;
                     usingFunc.Type = SymType.CHAR;
@@ -481,7 +481,7 @@ public partial class Compiler {
             Messages.Error(MessageCode.ILLEGALATWITHFILE, "AT cannot be used with FILE");
         }
 
-        ExtCallParseNode node = new("JComalLib.PrintManager,jcomallib", "WRITE");
+        ExtCallParseNode node = new("JComalLib.PrintManager,comallib", "WRITE");
         ParametersParseNode paramsNode = new();
         if (rowPosition != null && columnPosition != null) {
             paramsNode.Add(rowPosition);

@@ -23,25 +23,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using CCompiler;
 using JComLib;
 
 namespace JShell;
 
 static class Program {
 
+    private record CommandDefinition {
+        public Func<CommandLine, bool> Function;
+        public string Description;
+    }
+
     // Command table
-    private static readonly Dictionary<string, Func<CommandLine, bool>> commandMap = new() {
-        { "comal", Commands.CmdComal },
-        { "fortran", Commands.CmdFortran },
-        { "dir", Commands.CmdDir },
-        { "type", Commands.CmdType },
+    private static readonly Dictionary<string, CommandDefinition> CommandMap = new() {
+        { "comal", new CommandDefinition { Function = Commands.CmdComal, Description = "Run the Comal compiler/interpreter" } },
+        { "fortran", new CommandDefinition { Function = Commands.CmdFortran, Description = "Run the Fortran compiler" } },
+        { "edit", new CommandDefinition { Function = Commands.CmdEdit, Description = "Create or edit a file" } },
+        { "dir", new CommandDefinition { Function = Commands.CmdDir, Description = "Display a list of files" } },
+        { "type", new CommandDefinition { Function = Commands.CmdType, Description = "Display the content of a file" } },
+        { "help", new CommandDefinition { Function = CmdHelp, Description = "Display this help" } }
     };
 
-    static void Main(string[] args) {
+    private static void Main() {
 
-        Console.WriteLine($"{Options.AssemblyDescription} {Options.AssemblyVersion}");
-        Console.WriteLine($"{Options.AssemblyCopyright}");
+        Console.WriteLine($"{AssemblySupport.AssemblyDescription} {AssemblySupport.AssemblyVersion}");
+        Console.WriteLine($"{AssemblySupport.AssemblyCopyright}");
         Console.WriteLine();
 
         // Ensure we have a home folder and set it as the default.
@@ -65,8 +71,8 @@ static class Program {
             string command = cmdLine.NextWord();
             while (command != null) {
 
-                if (commandMap.TryGetValue(command.ToLower(), out var commandFunc)) {
-                    commandFunc(cmdLine);
+                if (CommandMap.TryGetValue(command.ToLower(), out CommandDefinition commandFunc)) {
+                    commandFunc.Function(cmdLine);
                 } else {
                     Console.WriteLine($"Unknown command {command}");
                     break;
@@ -74,5 +80,16 @@ static class Program {
                 command = cmdLine.NextWord();
             }
         }
+    }
+
+    // HELP command.
+    // Display a list of all commands.
+    private static bool CmdHelp(CommandLine cmdLine) {
+
+        int maxLength = CommandMap.Keys.Max(k => k.Length);
+        foreach (string key in CommandMap.Keys.OrderBy(k => k)) {
+            Console.WriteLine(key.PadRight(maxLength) + " ... " + CommandMap[key].Description);
+        }
+        return true;
     }
 }

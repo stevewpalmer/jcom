@@ -28,7 +28,7 @@ using CCompiler;
 using JComalLib;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 public class Interpreter {
 
@@ -44,33 +44,45 @@ public class Interpreter {
     /// <summary>
     /// Active compiler instance
     /// </summary>
-    private static Compiler ActiveCompiler { get; set; }
+    private static Compiler ActiveCompiler {
+        get; set;
+    }
 
     /// <summary>
     /// Return whether we're in auto line numbering mode
     /// </summary>
-    private bool IsAutoMode { get; set; }
+    private bool IsAutoMode {
+        get; set;
+    }
 
     /// <summary>
     /// Current automatic line number
     /// </summary>
-    private int AutoLineNumber { get; set; }
+    private int AutoLineNumber {
+        get; set;
+    }
 
     /// <summary>
     /// Current automatic line number steps
     /// </summary>
-    private int AutoSteps { get; set; }
+    private int AutoSteps {
+        get; set;
+    }
 
     /// <summary>
     /// Return whether the current program in memory has been
     /// modified since it was last saved.
     /// </summary>
-    private bool IsModified { get; set; }
+    private bool IsModified {
+        get; set;
+    }
 
     /// <summary>
     /// Stored program lines in tokenised format
     /// </summary>
-    private Lines Lines { get; set; }
+    private Lines Lines {
+        get; set;
+    }
 
     /// <summary>
     /// Run the compiler as an interpreter.
@@ -78,7 +90,7 @@ public class Interpreter {
     /// <param name="opts">Command line options</param>
     public void Run(ComalOptions opts) {
 
-        Console.WriteLine($"JComal {Options.AssemblyVersion}");
+        Console.WriteLine($"JComal {AssemblySupport.AssemblyVersion}");
         Console.WriteLine();
 
         Lines oldLines = null;
@@ -217,8 +229,7 @@ public class Interpreter {
                         line.PushToken(token);
                     }
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 JComRuntimeException jce = JComRuntimeException.GeneralHandlerNoThrow(e);
                 if (!string.IsNullOrEmpty(jce.Message)) {
                     Console.WriteLine(jce.Message);

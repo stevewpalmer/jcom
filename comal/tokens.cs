@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.Globalization;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// Lexical tokens. New tokens MUST be added at the end and existing
@@ -205,7 +205,7 @@ public enum TokenID {
 /// analyser.
 /// </summary>
 public static class Tokens {
-    
+
     // List of reserved keywords and their token values
     private static readonly Dictionary<string, TokenID> _keywords = new() {
         { "abs",        TokenID.KABS        },
@@ -375,33 +375,60 @@ public static class Tokens {
     public static string TokenIDToString(TokenID id) {
 
         switch (id) {
-            case TokenID.RPAREN:        return ")";
-            case TokenID.LPAREN:        return "(";
-            case TokenID.COMMA:         return ",";
-            case TokenID.COLON:         return ":";
-            case TokenID.DIVIDE:        return "/";
-            case TokenID.PLUS:          return "+";
-            case TokenID.MINUS:         return "-";
-            case TokenID.MULTIPLY:      return "*";
-            case TokenID.COMMENT:       return "//";
-            case TokenID.SPACE:         return " ";
-            case TokenID.APOSTROPHE:    return "'";
-            case TokenID.SEMICOLON:     return ";";
-            case TokenID.EXP:           return "^";
-            case TokenID.TILDE:         return "~";
-            case TokenID.KEQ:           return "=";
-            case TokenID.KGT:           return ">";
-            case TokenID.KLT:           return "<";
-            case TokenID.KGE:           return ">=";
-            case TokenID.KLE:           return "<=";
-            case TokenID.KNE:           return "<>";
-            case TokenID.KASSIGN:       return ":=";
-            case TokenID.KINCADD:       return ":+";
-            case TokenID.KINCSUB:       return ":-";
-            case TokenID.STRING:        return "a string";
-            case TokenID.IDENT:         return "identifier";
-            case TokenID.EOL:           return "<EOL>";
-            case TokenID.ENDOFFILE:     return "<EOF>";
+            case TokenID.RPAREN:
+                return ")";
+            case TokenID.LPAREN:
+                return "(";
+            case TokenID.COMMA:
+                return ",";
+            case TokenID.COLON:
+                return ":";
+            case TokenID.DIVIDE:
+                return "/";
+            case TokenID.PLUS:
+                return "+";
+            case TokenID.MINUS:
+                return "-";
+            case TokenID.MULTIPLY:
+                return "*";
+            case TokenID.COMMENT:
+                return "//";
+            case TokenID.SPACE:
+                return " ";
+            case TokenID.APOSTROPHE:
+                return "'";
+            case TokenID.SEMICOLON:
+                return ";";
+            case TokenID.EXP:
+                return "^";
+            case TokenID.TILDE:
+                return "~";
+            case TokenID.KEQ:
+                return "=";
+            case TokenID.KGT:
+                return ">";
+            case TokenID.KLT:
+                return "<";
+            case TokenID.KGE:
+                return ">=";
+            case TokenID.KLE:
+                return "<=";
+            case TokenID.KNE:
+                return "<>";
+            case TokenID.KASSIGN:
+                return ":=";
+            case TokenID.KINCADD:
+                return ":+";
+            case TokenID.KINCSUB:
+                return ":-";
+            case TokenID.STRING:
+                return "a string";
+            case TokenID.IDENT:
+                return "identifier";
+            case TokenID.EOL:
+                return "<EOL>";
+            case TokenID.ENDOFFILE:
+                return "<EOF>";
         }
 
         // Anything else here is a keyword token
@@ -434,7 +461,9 @@ public class SimpleToken {
     /// <summary>
     /// Returns the token ID.
     /// </summary>
-    public TokenID ID { get; set; }
+    public TokenID ID {
+        get; set;
+    }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -460,12 +489,12 @@ public class SimpleToken {
 
         TokenID tokenID = (TokenID)byteReader.ReadInteger();
         return tokenID switch {
-            TokenID.ERROR =>    ErrorToken.Deserialize(byteReader),
-            TokenID.INTEGER =>  IntegerToken.Deserialize(byteReader),
-            TokenID.IDENT =>    IdentifierToken.Deserialize(byteReader),
-            TokenID.STRING =>   StringToken.Deserialize(byteReader),
-            TokenID.REAL =>     FloatToken.Deserialize(byteReader),
-            _ =>                new SimpleToken(tokenID),
+            TokenID.ERROR => ErrorToken.Deserialize(byteReader),
+            TokenID.INTEGER => IntegerToken.Deserialize(byteReader),
+            TokenID.IDENT => IdentifierToken.Deserialize(byteReader),
+            TokenID.STRING => StringToken.Deserialize(byteReader),
+            TokenID.REAL => FloatToken.Deserialize(byteReader),
+            _ => new SimpleToken(tokenID),
         };
     }
 }
@@ -478,12 +507,16 @@ public class ErrorToken : SimpleToken {
     /// <summary>
     /// Returns the error message.
     /// </summary>
-    public string Message { get; private set; }
+    public string Message {
+        get; private set;
+    }
 
     /// <summary>
     /// Actual string found in token stream
     /// </summary>
-    public string String { get; private set; }
+    public string String {
+        get; private set;
+    }
 
     /// <summary>
     /// Creates an error token with the specified string.
@@ -540,7 +573,9 @@ public class StringToken : SimpleToken {
     /// <summary>
     /// Returns the literal string value of the token.
     /// </summary>
-    public string String { get; set; }
+    public string String {
+        get; set;
+    }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -585,7 +620,9 @@ public class IntegerToken : SimpleToken {
     /// <summary>
     /// Returns the integer value of the token.
     /// </summary>
-    public int Value { get; set; }
+    public int Value {
+        get; set;
+    }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -631,7 +668,9 @@ public class FloatToken : SimpleToken {
     /// <summary>
     /// Returns the floating point value of the token.
     /// </summary>
-    public float Value { get; set; }
+    public float Value {
+        get; set;
+    }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -677,7 +716,9 @@ public class IdentifierToken : SimpleToken {
     /// <summary>
     /// Returns the identifier name.
     /// </summary>
-    public string Name { get; set; }
+    public string Name {
+        get; set;
+    }
 
     /// <summary>
     /// Returns the string equivalent of the token.

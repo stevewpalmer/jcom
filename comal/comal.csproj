@@ -10,6 +10,8 @@
     <Description>Comal Compiler</Description>
     <Copyright>(c) Steven Palmer 2013-2023</Copyright>
     <RootNamespace>JComal</RootNamespace>
+    <Title>Comal Compiler</Title>
+    <Authors>Steven Palmer</Authors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <WarningLevel>4</WarningLevel>

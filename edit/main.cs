@@ -1,5 +1,5 @@
-﻿// JOs
-// TYPE command
+﻿// JEdit
+// Main program
 //
 // Authors:
 //  Steve Palmer
@@ -23,25 +23,23 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JShell; 
+namespace JEdit;
 
-public partial class Commands {
+static class Program {
 
-    // TYPE command.
-    // Display file contents.
-    public static bool CmdType(CommandLine cmdLine) {
+    static void Main(string[] args) {
 
-        string[] matchfiles = cmdLine.RestOfLine();
-        if (!matchfiles.Any()) {
-            matchfiles = new[] { "*" };
+        Screen mainScreen = new();
+
+        if (args.Length == 0) {
+            mainScreen.AddWindow(new Window());
         }
-        string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
-        allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
-        Array.Sort(allfiles);
-        foreach (string file in allfiles) {
-            Console.WriteLine(File.ReadAllText(file));
+        foreach (string filename in args) {
+            mainScreen.AddWindow(new(new Buffer(filename)));
         }
-        return true;
+        mainScreen.SetActiveWindow(0);
+        mainScreen.Open();
+        mainScreen.StartKeyboardLoop();
+        Screen.Close();
     }
 }
-

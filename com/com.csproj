@@ -8,6 +8,10 @@
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RootNamespace>CCompiler</RootNamespace>
+    <Title>Core Compiler</Title>
+    <Authors>Steven Palmer</Authors>
+    <Description>Core Compiler</Description>
+    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\jcomlib\comlib.csproj" />

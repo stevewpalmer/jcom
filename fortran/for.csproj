@@ -10,6 +10,9 @@
     <Description>Fortran Compiler</Description>
     <Copyright>(c) Steven Palmer 2013-2023</Copyright>
     <ReleaseVersion>0.3</ReleaseVersion>
+    <RootNamespace>JFortran</RootNamespace>
+    <Title>Fortran Compiler</Title>
+    <Authors>Steven Palmer</Authors>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\jcomlib\comlib.csproj" />

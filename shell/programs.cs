@@ -27,10 +27,10 @@ using System.Diagnostics;
 
 namespace JShell;
 
-public partial class Commands {
+public static partial class Commands {
 
     // Run a program.
-    internal static bool RunProgram(string programName, CommandLine cmdLine) {
+    private static bool RunProgram(string programName, CommandLine cmdLine) {
 
         string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         string josBinRoot = $"{homeFolder}/jos/bin";
@@ -51,6 +51,11 @@ public partial class Commands {
     // Run the Comal interpreter/compiler.
     public static bool CmdComal(CommandLine cmdLine) {
         return RunProgram("comal", cmdLine);
+    }
+
+    // Run the editor.
+    public static  bool CmdEdit(CommandLine cmdLine) {
+        return RunProgram("edit", cmdLine);
     }
 }
 

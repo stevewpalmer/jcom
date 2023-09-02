@@ -28,17 +28,17 @@ using System.Text;
 
 namespace JShell; 
 
-	public class CommandLine {
-		private readonly string _line;
-		private int _index;
+public class CommandLine {
+	private readonly string _line;
+	private int _index;
     private char _pushedChar;
 
-    private const char EOL = '\n';
+    private const char Eol = '\n';
 
     public CommandLine(string input) {
-			_line = input;
-			_index = 0;
-		}
+		_line = input;
+		_index = 0;
+    }
 
     // Retrieve the remainder of the command line as a series of
     // delimited string arguments.
@@ -59,14 +59,14 @@ namespace JShell;
 		public string NextWord() {
 
         char ch = GetChar();
-        while (ch != EOL) {
+        while (ch != Eol) {
             while (char.IsWhiteSpace(ch)) {
                 ch = GetChar();
             }
             switch (ch) {
                 default: {
                     StringBuilder str = new();
-                    while (ch != EOL && !char.IsWhiteSpace(ch)) {
+                    while (ch != Eol && !char.IsWhiteSpace(ch)) {
                         str.Append(ch);
                         ch = GetChar();
                     }
@@ -74,7 +74,7 @@ namespace JShell;
                     return str.ToString();
                 }
 
-                case EOL:
+                case Eol:
                     break;
 
                 case '\'':
@@ -82,7 +82,7 @@ namespace JShell;
                     char endCh = ch;
                     StringBuilder str = new();
                     ch = GetChar();
-                    while (ch != EOL && ch != endCh) {
+                    while (ch != Eol && ch != endCh) {
                         str.Append(ch);
                         ch = GetChar();
                     }
@@ -119,7 +119,7 @@ namespace JShell;
             return ch;
         }
         if (AtLineEnd()) {
-            return EOL;
+            return Eol;
         }
         return _line[_index++];
     }

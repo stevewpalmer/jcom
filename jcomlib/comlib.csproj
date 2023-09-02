@@ -8,5 +8,10 @@
     <AssemblyName>comlib</AssemblyName>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>JComLib</RootNamespace>
+    <Title>Common Library</Title>
+    <Authors>Steven Palmer</Authors>
+    <Description>Common Library</Description>
+    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
   </PropertyGroup>
 </Project>

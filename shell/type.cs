@@ -1,5 +1,5 @@
 ﻿// JOs
-// DIR command
+// TYPE command
 //
 // Authors:
 //  Steve Palmer
@@ -23,14 +23,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JShell;
+namespace JShell; 
 
-public partial class Commands {
+public static partial class Commands {
 
-    // DIR command.
-    // The rest of the command line specifies the files to be
-    // filtered.
-    public static bool CmdDir(CommandLine cmdLine) {
+    // TYPE command.
+    // Display file contents.
+    public static bool CmdType(CommandLine cmdLine) {
 
         string[] matchfiles = cmdLine.RestOfLine();
         if (!matchfiles.Any()) {
@@ -40,17 +39,7 @@ public partial class Commands {
         allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
         Array.Sort(allfiles);
         foreach (string file in allfiles) {
-            FileInfo info = new(file);
-            long size = info.Length;
-            string sizeString;
-            if (size < 1024) {
-                sizeString = size + "B";
-            } else if (size < 1024 * 1024) {
-                sizeString = (size / 1024) + "K";
-            } else {
-                sizeString = (size / (1024 * 1024)) + "M";
-            }
-            Console.WriteLine("{0,-20} {1,5}", info.Name, sizeString);
+            Console.WriteLine(File.ReadAllText(file));
         }
         return true;
     }
