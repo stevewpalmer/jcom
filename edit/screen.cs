@@ -38,26 +38,27 @@ public class Screen {
     public void AddWindow(Window theWindow) {
         _windowList.Add(theWindow);
     }
-
-    /// <summary>
-    /// Set the index of the active window
-    /// </summary>
-    /// <param name="index"></param>
-    public void SetActiveWindow(int index) {
-        _activeWindow = _windowList[index];
-        _activeWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
-    }
-
+    
     /// <summary>
     /// Open the main window, rendering the frame, status bar and
     /// the active window.
     /// </summary>
     public void Open() {
         RenderFrame();
-        RenderTitle();
         _statusBar.InitialRender();
-        _activeWindow.Render();
-        UpdateCursorPosition();
+        ActivateWindow(0);
+    }
+
+    /// <summary>
+    /// Render the title at the top of the screen.
+    /// </summary>
+    public static void RenderTitle(string title) {
+        Console.SetCursorPosition(0, 0);
+        Console.Write('╒');
+        Console.Write(new string('═', Console.WindowWidth - 2));
+        Console.Write('╕');
+        Console.SetCursorPosition((Console.WindowWidth - title.Length - 2) / 2, 0);
+        Console.Write($" {title} ");
     }
 
     /// <summary>
@@ -75,6 +76,7 @@ public class Screen {
         RenderHint flags;
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
+            _statusBar.Message($"Modifiers={keyIn.Modifiers}, Key={keyIn.Key}, KeyChar={(int)keyIn.KeyChar}");
             KeyCommand commandId = KeyMap.MapKeyToCommand(keyIn);
             flags = Handle(commandId);
         } while (flags != RenderHint.EXIT);
@@ -87,10 +89,30 @@ public class Screen {
     /// <param name="commandId">Command ID</param>
     /// <returns>The rendering hint</returns>
     private RenderHint Handle(KeyCommand commandId) {
-        RenderHint flags;
+        RenderHint flags = RenderHint.NONE;
         switch (commandId) {
             case KeyCommand.KC_EXIT:
                 flags = ExitEditor();
+                break;
+            
+            case KeyCommand.KC_VERSION:
+                _statusBar.RenderVersion();
+                break;
+
+            case KeyCommand.KC_NEXTBUFFER:
+                flags = SelectWindow(1);                
+                break;
+
+            case KeyCommand.KC_PREVBUFFER:
+                flags = SelectWindow(-1);                
+                break;
+            
+            case KeyCommand.KC_CLOSE:
+                flags = CloseWindow();
+                break;
+
+            case KeyCommand.KC_DETAILS:
+                flags = ShowDetails();
                 break;
 
             default:
@@ -108,6 +130,75 @@ public class Screen {
     /// </summary>
     private void UpdateCursorPosition() {
         _statusBar.UpdateCursorPosition(_activeWindow.Buffer.LineIndex + 1, _activeWindow.Buffer.Offset + 1);
+    }
+
+    /// <summary>
+    /// Select the next window in the specified direction in the window list.
+    /// </summary>
+    /// <param name="direction">Direction</param>
+    /// <returns>Render hint</returns>
+    private RenderHint SelectWindow(int direction) {
+        if (_windowList.Count == 1) {
+            _statusBar.Message("No other buffers.");
+            return RenderHint.NONE;
+        }
+        int currentBufferIndex = _windowList.IndexOf(_activeWindow) + direction;
+        if (currentBufferIndex == _windowList.Count) {
+            currentBufferIndex = 0;
+        }
+        if (currentBufferIndex < 0) {
+            currentBufferIndex = _windowList.Count - 1;
+        }
+        ActivateWindow(currentBufferIndex);
+        return RenderHint.CURSOR_STATUS;
+    }
+
+    /// <summary>
+    /// Activate a window by its index
+    /// </summary>
+    /// <param name="index">Index of the window to be activated</param>
+    private void ActivateWindow(int index) {
+        _activeWindow = _windowList[index];
+        _activeWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
+        _activeWindow.SetActive();
+        UpdateCursorPosition();
+    }
+
+    /// <summary>
+    /// Close the current window. You cannot close the window if this is
+    /// the last window in the list.
+    /// </summary>
+    private RenderHint CloseWindow() {
+        if (_windowList.Count == 1) {
+            return RenderHint.NONE;
+        }
+        if (_activeWindow.Buffer.Modified) {
+            do {
+                ConsoleKey key = _statusBar.Prompt("This buffer has not been saved. Delete [ynw]?");
+                if (key == ConsoleKey.N || key == ConsoleKey.Escape || key == ConsoleKey.Enter) {
+                    return RenderHint.NONE;
+                }
+                if (key == ConsoleKey.Y) {
+                    break;
+                }
+                if (key == ConsoleKey.W) {
+                    _activeWindow.Buffer.Write();
+                    break;
+                }
+            } while (true);
+        }
+        Window currentWindow = _activeWindow;
+        RenderHint flags = SelectWindow(1);
+        _windowList.Remove(currentWindow);
+        return flags;
+    }
+
+    /// <summary>
+    /// Show details of the file in the buffer on the status bar.
+    /// </summary>
+    private RenderHint ShowDetails() {
+        _statusBar.Message(_activeWindow.Buffer.FullFilename + (_activeWindow.Buffer.Modified ? "*" : ""));
+        return RenderHint.NONE;
     }
 
     /// <summary>
@@ -160,16 +251,4 @@ public class Screen {
         Console.Write('╛');
     }
 
-    /// <summary>
-    /// Render the title bar
-    /// </summary>
-    private void RenderTitle() {
-        string title = _activeWindow.Buffer.Filename;
-        Console.SetCursorPosition(0, 0);
-        Console.Write('╒');
-        Console.Write(new string('═', Console.WindowWidth - 2));
-        Console.Write('╕');
-        Console.SetCursorPosition((Console.WindowWidth - title.Length - 2) / 2, 0);
-        Console.Write($" {title} ");
-    }
 }

@@ -42,6 +42,26 @@ public class Buffer {
     }
 
     /// <summary>
+    /// Return the fully qualified file name with path.
+    /// </summary>
+    public string FullFilename {
+        get {
+            FileInfo fileInfo = new FileInfo(Filename);
+            return fileInfo.FullName;
+        }
+    }
+    
+    /// <summary>
+    /// Return the base part of the filename.
+    /// </summary>
+    public string BaseFilename {
+        get {
+            FileInfo fileInfo = new FileInfo(Filename);
+            return fileInfo.Name;
+        }
+    }
+    
+    /// <summary>
     /// Buffer contents
     /// </summary>
     private List<string> Lines { get; set; }

@@ -37,7 +37,6 @@ static class Program {
         foreach (string filename in args) {
             mainScreen.AddWindow(new(new Buffer(filename)));
         }
-        mainScreen.SetActiveWindow(0);
         mainScreen.Open();
         mainScreen.StartKeyboardLoop();
         Screen.Close();

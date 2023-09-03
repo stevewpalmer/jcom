@@ -49,10 +49,18 @@ public class StatusBar {
         _displayWidth = Console.WindowWidth - (_timeWidth + _cursorPositionWidth);
         _timePosition = Console.WindowWidth - _timeWidth;
         _cursorPositionPosition = _timePosition - _cursorPositionWidth;
-        Display.WriteTo(0, _statusRow, _displayWidth, AppTitle);
+        RenderVersion();
         RenderTime();
     }
 
+    /// <summary>
+    /// Display a message on the status bar.
+    /// </summary>
+    /// <param name="message">Message string</param>
+    public void Message(string message) {
+        Display.WriteTo(0, _statusRow, _displayWidth, message);
+    }
+    
     /// <summary>
     /// Display a prompt on the status bar and prompt for a keystroke input.
     /// </summary>
@@ -73,6 +81,13 @@ public class StatusBar {
     public void UpdateCursorPosition(int line, int column) {
         string text = $"Line:{line} Col:{column}";
         Display.WriteTo(_cursorPositionPosition, _statusRow, _cursorPositionWidth, text);
+    }
+
+    /// <summary>
+    /// Display the program version.
+    /// </summary>
+    public void RenderVersion() {
+        Display.WriteTo(0, _statusRow, _displayWidth, AppTitle);
     }
 
     /// <summary>
