@@ -745,7 +745,7 @@ public partial class Compiler : ICompiler {
     private static bool IsEndOfIfBlock(TokenID id) {
         return id switch {
             TokenID.KELSEIF or TokenID.KELSE or TokenID.KENDIF or TokenID.ENDOFFILE => true,
-            _ => false,
+            _ => false
         };
     }
 

@@ -228,7 +228,7 @@ public partial class Compiler {
                 NumberParseNode op1 = (NumberParseNode)tokenNode.Left;
                 NumberParseNode op2 = (NumberParseNode)tokenNode.Right;
                 try {
-                    double interimValue = op1.Value.DoubleValue - (Math.Floor(op1.Value.DoubleValue / op2.Value.DoubleValue) * op1.Value.DoubleValue);
+                    double interimValue = op1.Value.DoubleValue - Math.Floor(op1.Value.DoubleValue / op2.Value.DoubleValue) * op1.Value.DoubleValue;
                     if (double.IsInfinity(interimValue)) {
                         throw new DivideByZeroException();
                     }
@@ -313,7 +313,7 @@ public partial class Compiler {
         tokenNode.Left = OptimiseExpressionTree(tokenNode.Left);
         tokenNode.Right = OptimiseExpressionTree(tokenNode.Right);
         
-        if ((tokenNode.Left.ID == ParseID.STRING) && (tokenNode.Right.ID == ParseID.STRING)) {
+        if (tokenNode.Left.ID == ParseID.STRING && tokenNode.Right.ID == ParseID.STRING) {
             StringParseNode op1 = (StringParseNode)tokenNode.Left;
             StringParseNode op2 = (StringParseNode)tokenNode.Right;
             node = new StringParseNode(op1.Value + op2.Value);

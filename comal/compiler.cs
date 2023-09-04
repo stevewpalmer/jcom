@@ -218,7 +218,7 @@ public partial class Compiler : ICompiler {
 
             SymbolCollection localSymbols = new("Local");
             activeMethod = new ProcedureParseNode {
-                ProcedureSymbol = method,
+                ProcedureSymbol = method
             };
             activeMethod.Symbols.Add(localSymbols);
             _program.Root.Nodes.Add(activeMethod);

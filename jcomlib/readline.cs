@@ -174,7 +174,7 @@ public class ReadLine {
 
             case LineTerminator.NEXTZONE:
                 if (Zone > 0) {
-                    int numberOfSpaces = Zone - ((cursorPosition + Zone) % Zone);
+                    int numberOfSpaces = Zone - (cursorPosition + Zone) % Zone;
                     while (numberOfSpaces > 0) {
                         Console.Write(" ");
                         numberOfSpaces--;

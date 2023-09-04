@@ -151,7 +151,6 @@ Global
 		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

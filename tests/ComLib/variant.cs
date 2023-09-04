@@ -154,7 +154,7 @@ namespace ComLibTests {
             Variant v2 = new(12);
             Assert.AreEqual(v1 + v2, new Variant(90f));
             Assert.AreEqual((v1 + v2).IntValue, 90);
-            Assert.AreEqual((v1 .Add(v2)).IntValue, 90);
+            Assert.AreEqual(v1 .Add(v2).IntValue, 90);
         }
 
         // Test simple variant subtraction.
@@ -164,7 +164,7 @@ namespace ComLibTests {
             Variant v2 = new(49);
             Assert.AreEqual(v1 - v2, new Variant(621));
             Assert.AreEqual((v1 - v2).IntValue, 621);
-            Assert.AreEqual((v1.Subtract(v2)).IntValue, 621);
+            Assert.AreEqual(v1.Subtract(v2).IntValue, 621);
         }
 
         // Test simple variant multiplication.
@@ -174,7 +174,7 @@ namespace ComLibTests {
             Variant v2 = new(6);
             Assert.AreEqual(v1 * v2, new Variant(270));
             Assert.AreEqual((v1 * v2).RealValue, 270);
-            Assert.AreEqual((v1.Multiply(v2)).RealValue, 270);
+            Assert.AreEqual(v1.Multiply(v2).RealValue, 270);
         }
 
         // Test simple variant division.
@@ -183,7 +183,7 @@ namespace ComLibTests {
             Variant v1 = new(8342f);
             Variant v2 = new(410f);
             Assert.IsTrue(Helper.FloatCompare((v1 / v2).RealValue, new Variant(20.34634).RealValue));
-            Assert.IsTrue(Helper.FloatCompare((v1.Divide(v2)).RealValue, new Variant(20.34634).RealValue));
+            Assert.IsTrue(Helper.FloatCompare(v1.Divide(v2).RealValue, new Variant(20.34634).RealValue));
         }
 
         // Test simple variant modulus.

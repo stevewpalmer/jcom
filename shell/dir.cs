@@ -46,9 +46,9 @@ public static partial class Commands {
             if (size < 1024) {
                 sizeString = size + "B";
             } else if (size < 1024 * 1024) {
-                sizeString = (size / 1024) + "K";
+                sizeString = size / 1024 + "K";
             } else {
-                sizeString = (size / (1024 * 1024)) + "M";
+                sizeString = size / (1024 * 1024) + "M";
             }
             Console.WriteLine("{0,-20} {1,5}", info.Name, sizeString);
         }

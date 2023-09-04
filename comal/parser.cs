@@ -120,9 +120,7 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
         
         while (token.ID == TokenID.LPAREN) {
-            if (indices == null) {
-                indices = new Collection<ParseNode>();
-            }
+            indices ??= new Collection<ParseNode>();
             if (_currentLine.PeekToken().ID != TokenID.RPAREN) {
                 do {
                     ParseNode item = null;
@@ -136,9 +134,7 @@ public partial class Compiler {
                     }
                     token = GetNextToken();
                     if (token.ID == TokenID.COLON) {
-                        if (item == null) {
-                            item = new NumberParseNode(1);
-                        }
+                        item ??= new NumberParseNode(1);
                         node.SubstringStart = item;
                         item = null;
                         token = GetNextToken();

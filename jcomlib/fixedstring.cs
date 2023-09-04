@@ -283,8 +283,8 @@ public class FixedString : IEquatable<FixedString> {
         }
         int length = Math.Max(s1.RealLength, s2.RealLength);
         for (int c = 0; c < length; ++c) {
-            char ch1 = (c < s1.Length) ? s1[c]: ' ';
-            char ch2 = (c < s2.Length) ? s2[c]: ' ';
+            char ch1 = c < s1.Length ? s1[c]: ' ';
+            char ch2 = c < s2.Length ? s2[c]: ' ';
             if (ch1 != ch2) {
                 return ch1 - ch2;
             }
@@ -383,7 +383,7 @@ public class FixedString : IEquatable<FixedString> {
     public override int GetHashCode() {
         unchecked {
             int hash = 17;
-            hash = (hash * 23) + _fixedString.GetHashCode();
+            hash = hash * 23 + _fixedString.GetHashCode();
             return hash;
         }
     }

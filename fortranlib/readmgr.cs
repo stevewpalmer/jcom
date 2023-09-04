@@ -716,7 +716,7 @@ public class ReadManager : IDisposable {
     // Returns whether this file has been opened for formatted read. For
     // internal reads, where _file is null, we always read formatted.
     private bool IsFormatted() {
-        return (_file == null) || _file.IsFormatted;
+        return _file == null || _file.IsFormatted;
     }
 
     // Read the next line from the input.

@@ -157,7 +157,7 @@ public class ParametersParseNode : ParseNode {
         }
 
         int callerParameterCount = Nodes.Count;
-        int calleeParameterCount = (sym.Parameters != null) ? sym.Parameters.Count : 0;
+        int calleeParameterCount = sym.Parameters != null ? sym.Parameters.Count : 0;
 
         if (!sym.IsParameter && callerParameterCount != calleeParameterCount) {
             cg.Error($"Parameter count mismatch for {sym.Name}");

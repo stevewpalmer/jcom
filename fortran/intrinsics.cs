@@ -83,7 +83,7 @@ public sealed class IntrDefinition {
             SymType.DOUBLE => (Types & D) != 0,
             SymType.BOOLEAN => (Types & L) != 0,
             SymType.COMPLEX => (Types & C) != 0,
-            _ => false,
+            _ => false
         };
     }
         
@@ -99,7 +99,7 @@ public sealed class IntrDefinition {
             L => SymType.BOOLEAN,
             S => SymType.FIXEDCHAR,
             C => SymType.COMPLEX,
-            _ => SymType.GENERIC,
+            _ => SymType.GENERIC
         };
     }
 

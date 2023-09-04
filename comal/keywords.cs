@@ -281,8 +281,8 @@ public partial class Compiler {
         AssignmentParseNode node = new() {
             Identifiers = new[] {
             new IdentifierParseNode(GetMakeReadDataIndexSymbol()),
-            new IdentifierParseNode(GetMakeEODSymbol()),
-        },
+            new IdentifierParseNode(GetMakeEODSymbol())
+            },
             ValueExpressions = new[] {
             new NumberParseNode(0),
             new NumberParseNode(0)

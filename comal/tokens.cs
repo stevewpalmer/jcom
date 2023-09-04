@@ -207,7 +207,7 @@ public enum TokenID {
 public static class Tokens {
 
     // List of reserved keywords and their token values
-    private static readonly Dictionary<string, TokenID> _keywords = new() {
+    private static readonly Dictionary<string, TokenID> Keywords = new() {
         { "abs",        TokenID.KABS        },
         { "and",        TokenID.KAND        },
         { "append",     TokenID.KAPPEND     },
@@ -352,19 +352,10 @@ public static class Tokens {
         if (str == null) {
             throw new ArgumentNullException(nameof(str));
         }
-        if (!_keywords.TryGetValue(str.ToLower(), out TokenID id)) {
+        if (!Keywords.TryGetValue(str.ToLower(), out TokenID id)) {
             id = TokenID.IDENT;
         }
         return id;
-    }
-
-    /// <summary>
-    /// Returns whether or not the given token is a keyword
-    /// </summary>
-    /// <param name="id">A token ID</param>
-    /// <returns>True if it is a keyword, false otherwise</returns>
-    public static bool IsKeyword(TokenID id) {
-        return _keywords.ContainsValue(id);
     }
 
     /// <summary>
@@ -432,7 +423,7 @@ public static class Tokens {
         }
 
         // Anything else here is a keyword token
-        foreach (KeyValuePair<string, TokenID> pair in _keywords) {
+        foreach (KeyValuePair<string, TokenID> pair in Keywords) {
             if (id.Equals(pair.Value)) {
                 return pair.Key.ToUpper();
             }
@@ -494,7 +485,7 @@ public class SimpleToken {
             TokenID.IDENT => IdentifierToken.Deserialize(byteReader),
             TokenID.STRING => StringToken.Deserialize(byteReader),
             TokenID.REAL => FloatToken.Deserialize(byteReader),
-            _ => new SimpleToken(tokenID),
+            _ => new SimpleToken(tokenID)
         };
     }
 }
@@ -508,14 +499,14 @@ public class ErrorToken : SimpleToken {
     /// Returns the error message.
     /// </summary>
     public string Message {
-        get; private set;
+        get;
     }
 
     /// <summary>
     /// Actual string found in token stream
     /// </summary>
     public string String {
-        get; private set;
+        get;
     }
 
     /// <summary>

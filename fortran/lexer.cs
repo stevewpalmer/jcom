@@ -709,7 +709,7 @@ public class Lexer {
                         $"Illegal character {ch} in statement label");
                     return true;
                 }
-                label = (label * 10) + (ch - '0');
+                label = label * 10 + (ch - '0');
             }
         }
         if (label > 0) {

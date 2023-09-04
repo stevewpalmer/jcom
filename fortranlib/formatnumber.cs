@@ -46,7 +46,7 @@ public sealed class FormatParser {
     /// <param name="record">The FormatRecord to use</param>
     public FormatParser(string buffer, FormatRecord record) {
         _buffer = buffer;
-        _blankAsZero = (record != null) && record.BlanksAsZero;
+        _blankAsZero = record != null && record.BlanksAsZero;
 
         // Skip initial whitespace in the buffer
         while (_index < _buffer.Length && char.IsWhiteSpace(_buffer[_index])) {
@@ -163,7 +163,7 @@ public static class FormatNumber {
                 throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_NUMBER,
                     $"Illegal character {ch} in number");
             }
-            intValue = (intValue * 10) + (ch - '0');
+            intValue = intValue * 10 + (ch - '0');
             ch = parser.Next();
         }
         return intValue * sign;
@@ -192,7 +192,7 @@ public static class FormatNumber {
         int fieldWidth = 0;
         
         do {
-            char ch = (char)((tempValue % 10) + 48);
+            char ch = (char)(tempValue % 10 + 48);
             str.Append(ch);
             tempValue /= 10;
             ++fieldWidth;
@@ -327,7 +327,7 @@ public static class FormatNumber {
                 if (!char.IsDigit(ch)) {
                     break;
                 }
-                mantissaPart = (mantissaPart * 10) + (ch - '0');
+                mantissaPart = mantissaPart * 10 + (ch - '0');
                 if (inFraction) {
                     --exponent;
                 }
@@ -356,7 +356,7 @@ public static class FormatNumber {
                     throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_NUMBER,
                         $"Illegal character {ch} in number");
                 }
-                exponentPart = (exponentPart * 10) + (ch - '0');
+                exponentPart = exponentPart * 10 + (ch - '0');
                 ch = parser.Next();
             }
             exponent += exponentSign * exponentPart;
@@ -470,7 +470,7 @@ public static class FormatNumber {
             'E' => FormatExponential(value.Real, 'E', tempRecordReal),
             'G' => FormatExponential(value.Real, 'E', tempRecordReal),
             _ => throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_FOR_COMPLEX,
-                        $"Invalid format specifier {recordReal.FormatChar} for COMPLEX"),
+                        $"Invalid format specifier {recordReal.FormatChar} for COMPLEX")
         };
         string imgPart = recordImg.FormatChar switch {
             'D' => FormatDouble(value.Imaginary, tempRecordImg),
@@ -478,7 +478,7 @@ public static class FormatNumber {
             'E' => FormatExponential(value.Imaginary, 'E', tempRecordImg),
             'G' => FormatExponential(value.Imaginary, 'E', tempRecordImg),
             _ => throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_FOR_COMPLEX,
-                        $"Invalid format specifier {recordImg.FormatChar} for COMPLEX"),
+                        $"Invalid format specifier {recordImg.FormatChar} for COMPLEX")
         };
         if (recordReal.FieldWidth > 0 || recordImg.FieldWidth > 0) {
             return FormatToWidth(recordReal.FieldWidth + recordImg.FieldWidth + 2, $"{realPart}  {imgPart}");
@@ -592,8 +592,8 @@ public static class FormatNumber {
     // Format the argument and verify it fits within the given width. If the size
     // exceeds the width then a string of asterisks is returned instead.
     private static string FormatToWidth(int width, string stringToFit) {
-        return (width == 0) ?                  stringToFit : 
-               (stringToFit.Length <= width) ? stringToFit.PadLeft(width):
+        return width == 0 ?                  stringToFit : 
+               stringToFit.Length <= width ? stringToFit.PadLeft(width):
                                                new string('*', width);
     }
 

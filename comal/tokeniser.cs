@@ -49,9 +49,8 @@ public class LineTokeniser {
 
         List<SimpleToken> tokens = new();
         bool endOfLine = false;
-        char ch;
         do {
-            ch = GetChar();
+            char ch = GetChar();
             switch (ch) {
                 case '0': case '1': case '2': case '3': case '4':
                 case '5': case '6': case '7': case '8': case '9':
@@ -248,7 +247,7 @@ public class LineTokeniser {
                 ch = GetChar();
             }
         }
-        if ((char.ToUpper(ch) == 'E') && !char.IsLetter(PeekChar())) {
+        if (char.ToUpper(ch) == 'E' && !char.IsLetter(PeekChar())) {
             isFloat = true;
             str.Append('E');
             ch = GetChar();

@@ -111,7 +111,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D7 },
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.OemMinus },
         new() { KeyCommand = KeyCommand.KC_DETAILS, KeyChar = 402 },
-        new() { KeyCommand = KeyCommand.KC_DETAILS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F },
+        new() { KeyCommand = KeyCommand.KC_DETAILS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F }
     };
 
     /// <summary>

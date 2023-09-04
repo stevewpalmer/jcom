@@ -970,7 +970,7 @@ public static class IO {
 
         // Consult the status to determine how to open the file. A missing status is treated
         // as UNKNOWN.
-        string fixedStatus = (status == null) ? "UNKNOWN" : status.ToUpper().Trim();
+        string fixedStatus = status == null ? "UNKNOWN" : status.ToUpper().Trim();
 
         if ((fixedStatus == "OLD" || fixedStatus == "NEW" || fixedStatus == "UNKNOWN") && filename != null) {
             bool fileExists = File.Exists(filename.Trim());

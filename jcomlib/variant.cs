@@ -161,7 +161,7 @@ public class Variant
             VariantType.FLOAT => new Variant(v1.RealValue + v2.RealValue),
             VariantType.COMPLEX => new Variant(v1.ComplexValue + v2.ComplexValue),
             VariantType.STRING => new Variant(v1.StringValue + v2.StringValue),
-            _ => throw new InvalidOperationException("Addition not permitted on type"),
+            _ => throw new InvalidOperationException("Addition not permitted on type")
         };
     }
 
@@ -194,7 +194,7 @@ public class Variant
             VariantType.INTEGER => new Variant(-v1.IntValue),
             VariantType.FLOAT => new Variant(-v1.RealValue),
             VariantType.COMPLEX => new Variant(-v1.ComplexValue),
-            _ => throw new InvalidOperationException("Unary minus not permitted on type"),
+            _ => throw new InvalidOperationException("Unary minus not permitted on type")
         };
     }
 
@@ -231,7 +231,7 @@ public class Variant
             VariantType.INTEGER => new Variant(v1.IntValue - v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue - v2.RealValue),
             VariantType.COMPLEX => new Variant(v1.ComplexValue - v2.ComplexValue),
-            _ => throw new InvalidOperationException("Subtraction not permitted on type"),
+            _ => throw new InvalidOperationException("Subtraction not permitted on type")
         };
     }
 
@@ -269,7 +269,7 @@ public class Variant
             VariantType.INTEGER => new Variant(v1.IntValue * v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue * v2.RealValue),
             VariantType.COMPLEX => new Variant(v1.ComplexValue * v2.ComplexValue),
-            _ => throw new InvalidOperationException("Multiplication not permitted on type"),
+            _ => throw new InvalidOperationException("Multiplication not permitted on type")
         };
     }
 
@@ -308,7 +308,7 @@ public class Variant
             VariantType.INTEGER => new Variant(v1.IntValue / v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue / v2.RealValue),
             VariantType.COMPLEX => new Variant(v1.ComplexValue / v2.ComplexValue),
-            _ => throw new InvalidOperationException("Division not permitted on type"),
+            _ => throw new InvalidOperationException("Division not permitted on type")
         };
     }
 
@@ -346,7 +346,7 @@ public class Variant
             VariantType.DOUBLE => new Variant(v1.DoubleValue % v2.DoubleValue),
             VariantType.INTEGER => new Variant(v1.IntValue % v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue % v2.RealValue),
-            _ => throw new InvalidOperationException("Modulo not permitted on type"),
+            _ => throw new InvalidOperationException("Modulo not permitted on type")
         };
     }
 
@@ -380,7 +380,7 @@ public class Variant
             VariantType.INTEGER => new Variant((int)Math.Pow(IntValue, v.IntValue)),
             VariantType.FLOAT => new Variant((float)Math.Pow(RealValue, v.RealValue)),
             VariantType.COMPLEX => new Variant(Complex.Pow(ComplexValue, v.ComplexValue)),
-            _ => throw new InvalidOperationException("Exponentiation not permitted on type"),
+            _ => throw new InvalidOperationException("Exponentiation not permitted on type")
         };
     }
 
@@ -524,7 +524,7 @@ public class Variant
         unchecked
         {
             int hash = 17;
-            hash = (hash * 23) + DoubleValue.GetHashCode();
+            hash = hash * 23 + DoubleValue.GetHashCode();
             return hash;
         }
     }
@@ -586,7 +586,7 @@ public class Variant
             VariantType.FLOAT => RealValue.CompareTo(v.RealValue) == 0,
             VariantType.DOUBLE => DoubleValue.CompareTo(v.DoubleValue) == 0,
             VariantType.COMPLEX => ComplexValue == v.ComplexValue,
-            _ => false,
+            _ => false
         };
     }
 

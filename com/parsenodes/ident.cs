@@ -90,7 +90,7 @@ public class IdentifierParseNode : ParseNode {
         get => _symbol;
         set {
             _symbol = value;
-            Type = (_symbol != null) ? _symbol.Type : SymType.NONE;
+            Type = _symbol != null ? _symbol.Type : SymType.NONE;
         }
     }
 

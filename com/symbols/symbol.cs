@@ -382,7 +382,7 @@ public class Symbol {
     /// <returns><c>true</c> if this instance is value type the specified type; otherwise, <c>false</c>.</returns>
     public bool IsValueType => Type switch {
         SymType.BOOLEAN or SymType.CHAR or SymType.DOUBLE or SymType.FLOAT or SymType.INTEGER or SymType.COMPLEX => true,
-        _ => false,
+        _ => false
     };
 
     /// <summary>

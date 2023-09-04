@@ -162,7 +162,7 @@ public class JType {
             returnType = typeof(void);
         }
 
-        int paramCount = (sym.Parameters != null) ? sym.Parameters.Count : 0;
+        int paramCount = sym.Parameters != null ? sym.Parameters.Count : 0;
 
         Type[] paramTypes = new Type[paramCount];
 

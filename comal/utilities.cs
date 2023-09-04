@@ -25,7 +25,7 @@
 
 namespace JComal; 
 
-public class Utilities {
+public static class Utilities {
 
     /// <summary>
     /// Add the specified extension to the filename is no extension was

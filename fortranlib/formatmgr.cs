@@ -403,7 +403,7 @@ public class FormatManager {
         if (char.IsDigit(ch)) {
             value = 0;
             do {
-                value = (value * 10) + (ch - '0');
+                value = value * 10 + (ch - '0');
                 ++_charIndex;
                 ch = NextChar();
             } while (char.IsDigit(ch));

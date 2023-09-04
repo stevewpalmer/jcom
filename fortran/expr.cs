@@ -202,7 +202,7 @@ public partial class Compiler {
         tokenNode.Left = OptimiseExpressionTree(tokenNode.Left);
         tokenNode.Right = OptimiseExpressionTree(tokenNode.Right);
         
-        if ((tokenNode.Left.ID == ParseID.STRING) && (tokenNode.Right.ID == ParseID.STRING)) {
+        if (tokenNode.Left.ID == ParseID.STRING && tokenNode.Right.ID == ParseID.STRING) {
             StringParseNode op1 = (StringParseNode)tokenNode.Left;
             StringParseNode op2 = (StringParseNode)tokenNode.Right;
             if (op1.Type == SymType.FIXEDCHAR || op2.Type == SymType.FIXEDCHAR) {
@@ -533,7 +533,7 @@ public partial class Compiler {
 
         // Set return type. GENERIC means use the type of the argument
         Debug.Assert(!(intrDefinition.ReturnType == SymType.GENERIC && argType == SymType.NONE), "argType cannot be null here!");
-        tokenNode.Type = (intrDefinition.ReturnType == SymType.GENERIC) ? argType : intrDefinition.ReturnType;
+        tokenNode.Type = intrDefinition.ReturnType == SymType.GENERIC ? argType : intrDefinition.ReturnType;
         tokenNode.Inline = _opts.Inline;
         return tokenNode;
     }

@@ -500,7 +500,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2</param>
     /// <returns>The positive difference of arg1 and arg2</returns>
     public static double DDIM(ref double arg1, ref double arg2) {
-        return (arg1 > arg2) ? (arg1 - arg2) : 0;
+        return arg1 > arg2 ? arg1 - arg2 : 0;
     }
 
     /// <summary>
@@ -520,7 +520,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2</param>
     /// <returns>The positive difference of arg1 and arg2</returns>
     public static double DIM(ref float arg1, ref float arg2) {
-        return (arg1 > arg2) ? (arg1 - arg2) : 0;
+        return arg1 > arg2 ? arg1 - arg2 : 0;
     }
 
     /// <summary>
@@ -531,7 +531,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2</param>
     /// <returns>The positive difference of arg1 and arg2</returns>
     public static double DIM(ref double arg1, ref double arg2) {
-        return (arg1 > arg2) ? (arg1 - arg2) : 0;
+        return arg1 > arg2 ? arg1 - arg2 : 0;
     }
 
     /// <summary>
@@ -628,7 +628,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2.</param>
     /// <returns>The absolute of arg1 if arg2 is zero or positive, otherwise the negative absolute of arg1</returns>
     public static double DSIGN(ref double arg1, ref double arg2) {
-        return (arg2 < 0) ? -Math.Abs(arg1) : Math.Abs(arg1);
+        return arg2 < 0 ? -Math.Abs(arg1) : Math.Abs(arg1);
     }
 
     /// <summary>
@@ -766,7 +766,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2</param>
     /// <returns>The positive difference of arg1 and arg2</returns>
     public static int IDIM(ref int arg1, ref int arg2) {
-        return (arg1 > arg2) ? (arg1 - arg2) : 0;
+        return arg1 > arg2 ? arg1 - arg2 : 0;
     }
 
     /// <summary>
@@ -940,7 +940,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2.</param>
     /// <returns>The absolute of arg1 if arg2 is zero or positive, otherwise the negative absolute of arg1</returns>
     public static int ISIGN(ref int arg1, ref int arg2) {
-        return (arg2 < 0) ? -Math.Abs(arg1) : Math.Abs(arg1);
+        return arg2 < 0 ? -Math.Abs(arg1) : Math.Abs(arg1);
     }
 
     /// <summary>
@@ -1352,7 +1352,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2.</param>
     /// <returns>The absolute of arg1 if arg2 is zero or positive, otherwise the negative absolute of arg1</returns>
     public static float SIGN(ref float arg1, ref float arg2) {
-        return (arg2 < 0) ? -Math.Abs(arg1) : Math.Abs(arg1);
+        return arg2 < 0 ? -Math.Abs(arg1) : Math.Abs(arg1);
     }
 
     /// <summary>
@@ -1363,7 +1363,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2.</param>
     /// <returns>The absolute of arg1 if arg2 is zero or positive, otherwise the negative absolute of arg1</returns>
     public static double SIGN(ref double arg1, ref double arg2) {
-        return (arg2 < 0) ? -Math.Abs(arg1) : Math.Abs(arg1);
+        return arg2 < 0 ? -Math.Abs(arg1) : Math.Abs(arg1);
     }
 
     /// <summary>
@@ -1374,7 +1374,7 @@ public static class Intrinsics {
     /// <param name="arg2">Arg2.</param>
     /// <returns>The absolute of arg1 if arg2 is zero or positive, otherwise the negative absolute of arg1</returns>
     public static int SIGN(ref int arg1, ref int arg2) {
-        return (arg2 < 0) ? -Math.Abs(arg1) : Math.Abs(arg1);
+        return arg2 < 0 ? -Math.Abs(arg1) : Math.Abs(arg1);
     }
 
     /// <summary>

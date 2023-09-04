@@ -162,7 +162,7 @@ public static partial class Intrinsics {
     /// <param name="right">Right operand</param>
     /// <returns>Integer division result</returns>
     public static int IMOD(float left, float right) {
-        return (int)(left - (Math.Floor(left / right) * right));
+        return (int)(left - Math.Floor(left / right) * right);
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ public static partial class Intrinsics {
     /// <param name="right">Right operand</param>
     /// <returns>Integer division result</returns>
     public static int IMOD(int left, int right) {
-        return (int)(left - (Math.Floor((float)left / right) * right));
+        return (int)(left - Math.Floor((float)left / right) * right);
     }
 
     /// <summary>
@@ -477,7 +477,7 @@ public static partial class Intrinsics {
     public static int TIME {
         get {
             DateTime now = DateTime.Now;
-            return ((((now.Hour * 60) + now.Minute) * 60) + now.Second) * 100;
+            return ((now.Hour * 60 + now.Minute) * 60 + now.Second) * 100;
         }
     }
 }

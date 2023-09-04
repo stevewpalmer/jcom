@@ -88,8 +88,8 @@ public class SymFullType : IEquatable<SymFullType> {
     public override int GetHashCode() {
         unchecked {
             int hash = 17;
-            hash = (hash * 23) + Type.GetHashCode();
-            hash = (hash * 23) + Width.GetHashCode();
+            hash = hash * 23 + Type.GetHashCode();
+            hash = hash * 23 + Width.GetHashCode();
             return hash;
         }
     }
