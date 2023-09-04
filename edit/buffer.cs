@@ -46,6 +46,9 @@ public class Buffer {
     /// </summary>
     public string FullFilename {
         get {
+            if (string.IsNullOrEmpty(Filename)) {
+                return string.Empty;
+            }
             FileInfo fileInfo = new FileInfo(Filename);
             return fileInfo.FullName;
         }
@@ -56,6 +59,9 @@ public class Buffer {
     /// </summary>
     public string BaseFilename {
         get {
+            if (string.IsNullOrEmpty(Filename)) {
+                return "New File";
+            }
             FileInfo fileInfo = new FileInfo(Filename);
             return fileInfo.Name;
         }

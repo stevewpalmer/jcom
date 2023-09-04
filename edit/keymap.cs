@@ -47,7 +47,8 @@ public enum KeyCommand {
     KC_PREVBUFFER,
     KC_VERSION,
     KC_CLOSE,
-    KC_DETAILS
+    KC_DETAILS,
+    KC_GOTO
 };
 
 public class KeyMap {
@@ -111,7 +112,9 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D7 },
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.OemMinus },
         new() { KeyCommand = KeyCommand.KC_DETAILS, KeyChar = 402 },
-        new() { KeyCommand = KeyCommand.KC_DETAILS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F }
+        new() { KeyCommand = KeyCommand.KC_DETAILS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F },
+        new() { KeyCommand = KeyCommand.KC_GOTO, KeyChar = 169 },
+        new() { KeyCommand = KeyCommand.KC_GOTO, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.G },
     };
 
     /// <summary>

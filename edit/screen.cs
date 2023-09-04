@@ -28,7 +28,18 @@ namespace JEdit;
 public class Screen {
     private readonly List<Window> _windowList = new();
     private Window _activeWindow;
-    private readonly StatusBar _statusBar = new();
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    public Screen() {
+        StatusBar = new StatusBar();
+    }
+        
+    /// <summary>
+    /// The status bar
+    /// </summary>
+    public static StatusBar StatusBar { get; private set; }
 
     /// <summary>
     /// Add a window to the window list. This will not make the window
@@ -45,7 +56,7 @@ public class Screen {
     /// </summary>
     public void Open() {
         RenderFrame();
-        _statusBar.InitialRender();
+        StatusBar.InitialRender();
         ActivateWindow(0);
     }
 
@@ -76,7 +87,7 @@ public class Screen {
         RenderHint flags;
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
-            _statusBar.Message($"Modifiers={keyIn.Modifiers}, Key={keyIn.Key}, KeyChar={(int)keyIn.KeyChar}");
+            StatusBar.Message($"Modifiers={keyIn.Modifiers}, Key={keyIn.Key}, KeyChar={(int)keyIn.KeyChar}");
             KeyCommand commandId = KeyMap.MapKeyToCommand(keyIn);
             flags = Handle(commandId);
         } while (flags != RenderHint.EXIT);
@@ -96,7 +107,7 @@ public class Screen {
                 break;
             
             case KeyCommand.KC_VERSION:
-                _statusBar.RenderVersion();
+                StatusBar.RenderVersion();
                 break;
 
             case KeyCommand.KC_NEXTBUFFER:
@@ -129,7 +140,7 @@ public class Screen {
     /// Render the current cursor position on the status bar.
     /// </summary>
     private void UpdateCursorPosition() {
-        _statusBar.UpdateCursorPosition(_activeWindow.Buffer.LineIndex + 1, _activeWindow.Buffer.Offset + 1);
+        StatusBar.UpdateCursorPosition(_activeWindow.Buffer.LineIndex + 1, _activeWindow.Buffer.Offset + 1);
     }
 
     /// <summary>
@@ -139,7 +150,7 @@ public class Screen {
     /// <returns>Render hint</returns>
     private RenderHint SelectWindow(int direction) {
         if (_windowList.Count == 1) {
-            _statusBar.Message("No other buffers.");
+            StatusBar.Message("No other buffers.");
             return RenderHint.NONE;
         }
         int currentBufferIndex = _windowList.IndexOf(_activeWindow) + direction;
@@ -173,19 +184,15 @@ public class Screen {
             return RenderHint.NONE;
         }
         if (_activeWindow.Buffer.Modified) {
-            do {
-                ConsoleKey key = _statusBar.Prompt("This buffer has not been saved. Delete [ynw]?");
-                if (key == ConsoleKey.N || key == ConsoleKey.Escape || key == ConsoleKey.Enter) {
+            char[] validInput = { 'y', 'n', 'w' }; 
+            if (StatusBar.Prompt("This buffer has not been saved. Delete @@?", validInput, 'n', out char inputChar)) {
+                if (inputChar == 'n') {
                     return RenderHint.NONE;
                 }
-                if (key == ConsoleKey.Y) {
-                    break;
-                }
-                if (key == ConsoleKey.W) {
+                if (inputChar == 'w') {
                     _activeWindow.Buffer.Write();
-                    break;
                 }
-            } while (true);
+            }
         }
         Window currentWindow = _activeWindow;
         RenderHint flags = SelectWindow(1);
@@ -197,7 +204,7 @@ public class Screen {
     /// Show details of the file in the buffer on the status bar.
     /// </summary>
     private RenderHint ShowDetails() {
-        _statusBar.Message(_activeWindow.Buffer.FullFilename + (_activeWindow.Buffer.Modified ? "*" : ""));
+        StatusBar.Message(_activeWindow.Buffer.FullFilename + (_activeWindow.Buffer.Modified ? "*" : ""));
         return RenderHint.NONE;
     }
 
@@ -208,21 +215,15 @@ public class Screen {
     private RenderHint ExitEditor() {
         int modifiedBuffers = _windowList.Count(w => w.Buffer.Modified);
         if (modifiedBuffers > 0) {
-            do {
-                ConsoleKey key = _statusBar.Prompt($"{modifiedBuffers} buffers have not been saved. Exit [ynw]?");
-                if (key == ConsoleKey.N) {
+            char[] validInput = { 'y', 'n', 'w' }; 
+            if (StatusBar.Prompt($"{modifiedBuffers} buffers have not been saved. Exit @@?", validInput, 'n', out char inputChar)) {
+                if (inputChar == 'n') {
                     return RenderHint.NONE;
                 }
-                if (key == ConsoleKey.Y) {
-                    break;
+                if (inputChar == 'w') {
+                    _activeWindow.Buffer.Write();
                 }
-                if (key == ConsoleKey.W) {
-                    foreach (Window window in _windowList) {
-                        window.Buffer.Write();
-                    }
-                    break;
-                }
-            } while(true);
+            }
         }
         return RenderHint.EXIT;
     }

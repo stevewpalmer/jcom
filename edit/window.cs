@@ -126,6 +126,10 @@ public class Window {
             case KeyCommand.KC_CWORDLEFT:
                 flags = WordLeft();
                 break;
+            
+            case KeyCommand.KC_GOTO:
+                flags = GoToLine();
+                break;
         }
         if (flags.HasFlag(RenderHint.REDRAW)) {
             Render();
@@ -136,6 +140,24 @@ public class Window {
             PlaceCursor();
             flags &= ~RenderHint.CURSOR;
             flags |= RenderHint.CURSOR_STATUS;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Go to input line.
+    /// </summary>
+    private RenderHint GoToLine() {
+        RenderHint flags = RenderHint.NONE;
+        if (Screen.StatusBar.PromptForNumber("Go to line: ", out int inputLine)) {
+            if (inputLine > Buffer.Length) {
+                inputLine = Buffer.Length;
+            }
+            if (inputLine < 1) {
+                inputLine = 1;
+            }
+            Buffer.LineIndex = inputLine - 1;
+            flags |= CursorFromLineIndex();
         }
         return flags;
     }
@@ -382,14 +404,39 @@ public class Window {
         }
         char[] text = Buffer.GetLine(Buffer.LineIndex).ToCharArray();
         int offset = Buffer.Offset;
-        while (offset > 0 && !char.IsWhiteSpace(text[offset])) {
+        while (offset > 0 && offset < text.Length && !char.IsWhiteSpace(text[offset])) {
             --offset;
         }
-        while (offset > 0 && char.IsWhiteSpace(text[offset])) {
+        while (offset > 0 && offset < text.Length && char.IsWhiteSpace(text[offset])) {
             --offset;
         }
         Buffer.Offset = offset;
         return flags | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Update the physical cursor position in the current viewport
+    /// based on the buffer line index.
+    /// </summary>
+    private RenderHint CursorFromLineIndex() {
+        RenderHint flags = RenderHint.NONE;
+        if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
+            flags |= EndOfCurrentLine();
+        }
+        _cursor.Y = Buffer.LineIndex;
+        if (_cursor.Y < _viewportOffset.Y) {
+            _viewportOffset.Y = _cursor.Y;
+            _cursor.Y = 0;
+            flags |= RenderHint.REDRAW;
+        }
+        else if (_cursor.Y >= _viewportBounds.Height) {
+            _viewportOffset.Y = _cursor.Y - (_viewportBounds.Height - 1);
+            _cursor.Y = _viewportBounds.Height - 1;
+            flags |= RenderHint.REDRAW;
+        } else {
+            flags |= RenderHint.CURSOR;
+        }
+        return flags;
     }
 
     /// <summary>

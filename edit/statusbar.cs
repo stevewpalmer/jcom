@@ -60,19 +60,59 @@ public class StatusBar {
     public void Message(string message) {
         Display.WriteTo(0, _statusRow, _displayWidth, message);
     }
-    
+
     /// <summary>
     /// Display a prompt on the status bar and prompt for a keystroke input.
     /// </summary>
-    /// <param name="prompt">Prompt string</param>
-    /// <returns>The console key input</returns>
-    public ConsoleKey Prompt(string prompt) {
+    /// <returns>True if a value was input, false if empty or cancelled</returns>
+    public bool Prompt(string prompt, char[] validInput, char defaultChar, out char inputValue) {
+
+        prompt = prompt.Replace("@@", $"[{string.Join("",validInput)}]");
         Point cursorPosition = Display.WriteToNc(0, _statusRow, _displayWidth, prompt);
         Display.SetCursor(new Point(prompt.Length, _statusRow));
-        ConsoleKey input = Console.ReadKey().Key;
-        Display.WriteTo(0, _statusRow, _displayWidth, _cachedText);
+        ConsoleKeyInfo input = Console.ReadKey(true);
+        while (!validInput.Contains(char.ToLower(input.KeyChar))) {
+            if (input.Key == ConsoleKey.Enter || input.Key == ConsoleKey.Escape) {
+                break;
+            }
+            input = Console.ReadKey(true);
+        }
+        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
         Display.SetCursor(cursorPosition);
-        return input;
+        inputValue = input.Key == ConsoleKey.Enter ? defaultChar : char.ToLower(input.KeyChar);
+        return input.Key != ConsoleKey.Escape;
+    }
+
+    /// <summary>
+    /// Display a prompt on the status bar and prompt for a numeric value.
+    /// </summary>
+    /// <param name="prompt">Prompt string</param>
+    /// <param name="inputValue">The input value</param>
+    /// <returns>True if a value was input, false if empty or cancelled</returns>
+    public bool PromptForNumber(string prompt, out int inputValue) {
+        Point cursorPosition = Display.WriteToNc(0, _statusRow, _displayWidth, prompt);
+        Display.SetCursor(new Point(prompt.Length, _statusRow));
+        ConsoleKeyInfo input = Console.ReadKey(true);
+        List<char> inputBuffer = new();
+        while (input.Key != ConsoleKey.Enter) {
+            if (input.Key == ConsoleKey.Escape) {
+                inputBuffer.Clear();
+                break;
+            }
+            if (input.Key == ConsoleKey.Backspace && inputBuffer.Count > 0) {
+                inputBuffer.RemoveAt(inputBuffer.Count - 1);
+                Console.Write("\b \b");
+            }
+            else if (char.IsDigit(input.KeyChar) && inputBuffer.Count < 6) {
+                inputBuffer.Add(input.KeyChar);
+                Console.Write(input.KeyChar);
+            }
+            input = Console.ReadKey(true);
+        }
+        inputValue =  inputBuffer.Count > 0 ? Convert.ToInt32(string.Join("", inputBuffer)) : 0;
+        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
+        Display.SetCursor(cursorPosition);
+        return inputBuffer.Count > 0;
     }
 
     /// <summary>
