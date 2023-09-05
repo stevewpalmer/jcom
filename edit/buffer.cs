@@ -70,13 +70,13 @@ public class Buffer {
     /// <summary>
     /// Buffer contents
     /// </summary>
-    private List<string> Lines { get; set; }
+    private List<string> Lines { get; }
 
     /// <summary>
     /// Name of file associated with buffer, or empty string
     /// if the buffer has not yet been saved to a file
     /// </summary>
-    public string Filename { get; set; }
+    private string Filename { get; }
 
     /// <summary>
     /// Whether the buffer has been modified since it was last
@@ -112,7 +112,7 @@ public class Buffer {
     /// Write the buffer back to disk.
     /// </summary>
     public void Write() {
-        
+        File.WriteAllLines(FullFilename, Lines);
     }
 }
 

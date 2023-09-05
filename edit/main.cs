@@ -25,9 +25,9 @@
 
 namespace JEdit;
 
-static class Program {
+internal static class Program {
 
-    static void Main(string[] args) {
+    private static void Main(string[] args) {
 
         Screen mainScreen = new();
 
@@ -35,7 +35,7 @@ static class Program {
             mainScreen.AddWindow(new Window());
         }
         foreach (string filename in args) {
-            mainScreen.AddWindow(new(new Buffer(filename)));
+            mainScreen.AddWindow(new Window(new Buffer(filename)));
         }
         mainScreen.Open();
         mainScreen.StartKeyboardLoop();

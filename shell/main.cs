@@ -27,7 +27,7 @@ using JComLib;
 
 namespace JShell;
 
-static class Program {
+internal static class Program {
 
     private record CommandDefinition {
         public Func<CommandLine, bool> Function;

@@ -50,7 +50,7 @@ public class Window {
     /// <summary>
     /// Buffer associated with window
     /// </summary>
-    public Buffer Buffer { get; set; }
+    public Buffer Buffer { get; }
 
     /// <summary>
     /// Set the viewport for the window.
@@ -77,60 +77,22 @@ public class Window {
     /// <param name="commandId">Command ID</param>
     /// <returns>Rendering hint</returns>
     public RenderHint Handle(KeyCommand commandId) {
-        RenderHint flags = RenderHint.NONE;
-        switch (commandId) {
-            case KeyCommand.KC_CDOWN:
-                flags = CursorDown();
-                break;
-
-            case KeyCommand.KC_CUP:
-                flags = CursorUp();
-                break;
-
-            case KeyCommand.KC_CLEFT:
-                flags = CursorLeft();
-                break;
-
-            case KeyCommand.KC_CRIGHT:
-                flags = CursorRight();
-                break;
-
-            case KeyCommand.KC_CLINESTART:
-                flags = StartOfCurrentLine();
-                break;
-
-            case KeyCommand.KC_CLINEEND:
-                flags = EndOfCurrentLine();
-                break;
-            
-            case KeyCommand.KC_CPAGEDOWN:
-                flags = PageDown();
-                break;
-            
-            case KeyCommand.KC_CFILESTART:
-                flags = FileStart();
-                break;
-            
-            case KeyCommand.KC_CFILEEND:
-                flags = FileEnd();
-                break;
-            
-            case KeyCommand.KC_CPAGEUP:
-                flags = PageUp();
-                break;
-            
-            case KeyCommand.KC_CWORDRIGHT:
-                flags = WordRight();
-                break;
-            
-            case KeyCommand.KC_CWORDLEFT:
-                flags = WordLeft();
-                break;
-            
-            case KeyCommand.KC_GOTO:
-                flags = GoToLine();
-                break;
-        }
+        RenderHint flags = commandId switch {
+            KeyCommand.KC_CDOWN => CursorDown(),
+            KeyCommand.KC_CUP => CursorUp(),
+            KeyCommand.KC_CLEFT => CursorLeft(),
+            KeyCommand.KC_CRIGHT => CursorRight(),
+            KeyCommand.KC_CLINESTART => StartOfCurrentLine(),
+            KeyCommand.KC_CLINEEND => EndOfCurrentLine(),
+            KeyCommand.KC_CPAGEDOWN => PageDown(),
+            KeyCommand.KC_CFILESTART => FileStart(),
+            KeyCommand.KC_CFILEEND => FileEnd(),
+            KeyCommand.KC_CPAGEUP => PageUp(),
+            KeyCommand.KC_CWORDRIGHT => WordRight(),
+            KeyCommand.KC_CWORDLEFT => WordLeft(),
+            KeyCommand.KC_GOTO => GoToLine(),
+            _ => RenderHint.NONE
+        };
         if (flags.HasFlag(RenderHint.REDRAW)) {
             Render();
             flags &= ~RenderHint.REDRAW;

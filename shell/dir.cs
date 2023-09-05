@@ -42,14 +42,11 @@ public static partial class Commands {
         foreach (string file in allfiles) {
             FileInfo info = new(file);
             long size = info.Length;
-            string sizeString;
-            if (size < 1024) {
-                sizeString = size + "B";
-            } else if (size < 1024 * 1024) {
-                sizeString = size / 1024 + "K";
-            } else {
-                sizeString = size / (1024 * 1024) + "M";
-            }
+            string sizeString = size switch {
+                < 1024 => size + "B",
+                < 1024 * 1024 => size / 1024 + "K",
+                _ => size / (1024 * 1024) + "M"
+            };
             Console.WriteLine("{0,-20} {1,5}", info.Name, sizeString);
         }
         return true;

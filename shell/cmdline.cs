@@ -118,10 +118,7 @@ public class CommandLine {
             _pushedChar = '\0';
             return ch;
         }
-        if (AtLineEnd()) {
-            return Eol;
-        }
-        return _line[_index++];
+        return AtLineEnd() ? Eol : _line[_index++];
     }
 }
 

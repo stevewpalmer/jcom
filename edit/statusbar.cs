@@ -72,7 +72,7 @@ public class StatusBar {
         Display.SetCursor(new Point(prompt.Length, _statusRow));
         ConsoleKeyInfo input = Console.ReadKey(true);
         while (!validInput.Contains(char.ToLower(input.KeyChar))) {
-            if (input.Key == ConsoleKey.Enter || input.Key == ConsoleKey.Escape) {
+            if (input.Key is ConsoleKey.Enter or ConsoleKey.Escape) {
                 break;
             }
             input = Console.ReadKey(true);
@@ -139,7 +139,7 @@ public class StatusBar {
     /// Render the time field of the status bar
     /// </summary>
     private static void RenderTime() {
-        Timer timer = new((e) => {
+        Timer _ = new(_ => {
             string timeString = DateTime.Now.ToString("h:mm tt");
             Display.WriteTo(_timePosition, _statusRow, _timeWidth, timeString);
         }, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));

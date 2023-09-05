@@ -118,6 +118,10 @@ public class Screen {
                 flags = SelectWindow(-1);                
                 break;
             
+            case KeyCommand.KC_EDIT:
+                flags = EditFile();
+                break;
+            
             case KeyCommand.KC_CLOSE:
                 flags = CloseWindow();
                 break;
@@ -176,6 +180,14 @@ public class Screen {
     }
 
     /// <summary>
+    /// Edit a file in a new window, or switch to the file in an existing window.
+    /// </summary>
+    private RenderHint EditFile() {
+        RenderHint flags = RenderHint.NONE;
+        return flags;
+    }
+
+    /// <summary>
     /// Close the current window. You cannot close the window if this is
     /// the last window in the list.
     /// </summary>
@@ -186,11 +198,12 @@ public class Screen {
         if (_activeWindow.Buffer.Modified) {
             char[] validInput = { 'y', 'n', 'w' }; 
             if (StatusBar.Prompt("This buffer has not been saved. Delete @@?", validInput, 'n', out char inputChar)) {
-                if (inputChar == 'n') {
-                    return RenderHint.NONE;
-                }
-                if (inputChar == 'w') {
-                    _activeWindow.Buffer.Write();
+                switch (inputChar) {
+                    case 'n':
+                        return RenderHint.NONE;
+                    case 'w':
+                        _activeWindow.Buffer.Write();
+                        break;
                 }
             }
         }
@@ -217,11 +230,12 @@ public class Screen {
         if (modifiedBuffers > 0) {
             char[] validInput = { 'y', 'n', 'w' }; 
             if (StatusBar.Prompt($"{modifiedBuffers} buffers have not been saved. Exit @@?", validInput, 'n', out char inputChar)) {
-                if (inputChar == 'n') {
-                    return RenderHint.NONE;
-                }
-                if (inputChar == 'w') {
-                    _activeWindow.Buffer.Write();
+                switch (inputChar) {
+                    case 'n':
+                        return RenderHint.NONE;
+                    case 'w':
+                        _activeWindow.Buffer.Write();
+                        break;
                 }
             }
         }

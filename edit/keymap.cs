@@ -46,10 +46,11 @@ public enum KeyCommand {
     KC_NEXTBUFFER,
     KC_PREVBUFFER,
     KC_VERSION,
+    KC_EDIT,
     KC_CLOSE,
     KC_DETAILS,
     KC_GOTO
-};
+}
 
 public class KeyMap {
 
@@ -115,6 +116,8 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_DETAILS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F },
         new() { KeyCommand = KeyCommand.KC_GOTO, KeyChar = 169 },
         new() { KeyCommand = KeyCommand.KC_GOTO, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.G },
+        new() { KeyCommand = KeyCommand.KC_EDIT, KeyChar = 180 },
+        new() { KeyCommand = KeyCommand.KC_EDIT, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.E }
     };
 
     /// <summary>
