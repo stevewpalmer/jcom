@@ -116,6 +116,66 @@ public class StatusBar {
     }
 
     /// <summary>
+    /// Display a prompt on the status bar and input text.
+    /// </summary>
+    /// <param name="prompt">Prompt string</param>
+    /// <param name="inputValue">The input value</param>
+    /// <returns>True if a value was input, false if empty or cancelled</returns>
+    public bool PromptForInput(string prompt, out string inputValue) {
+        Point cursorPosition = Display.WriteToNc(0, _statusRow, _displayWidth, prompt);
+        Display.SetCursor(new Point(prompt.Length, _statusRow));
+
+        ConsoleKeyInfo input = Console.ReadKey(true);
+        List<char> inputBuffer = new();
+        string[] allfiles = null;
+        int allfilesIndex = 0;
+        
+        while (input.Key != ConsoleKey.Enter) {
+            if (input.Key == ConsoleKey.Escape) {
+                inputBuffer.Clear();
+                break;
+            }
+            switch (input.Key) {
+                case ConsoleKey.Backspace when inputBuffer.Count > 0:
+                    inputBuffer.RemoveAt(inputBuffer.Count - 1);
+                    Console.Write("\b \b");
+                    break;
+                case ConsoleKey.Tab: {
+                    if (allfiles == null) {
+                        string partialName = string.Join("", inputBuffer) + "*";
+                        allfiles = Directory.GetFiles(".", partialName, SearchOption.TopDirectoryOnly);
+                        allfilesIndex = 0;
+                    }
+                    if (allfiles.Length > 0) {
+                        string completedName = Buffer.GetBaseFilename(allfiles[allfilesIndex++]);
+                        if (allfilesIndex == allfiles.Length) {
+                            allfilesIndex = 0;
+                        }
+                        inputBuffer = new List<char>(completedName.ToCharArray());
+                        Display.SetCursor(new Point(prompt.Length, _statusRow));
+                        Display.WriteToNc(prompt.Length, _statusRow, _displayWidth, completedName);
+                        Display.SetCursor(new Point(prompt.Length + completedName.Length, _statusRow));
+                    }
+                    break;
+                }
+                default: {
+                    if (!char.IsControl(input.KeyChar) && inputBuffer.Count < 80) {
+                        inputBuffer.Add(input.KeyChar);
+                        Console.Write(input.KeyChar);
+                        allfiles = null;
+                    }
+                    break;
+                }
+            }
+            input = Console.ReadKey(true);
+        }
+        inputValue =  inputBuffer.Count > 0 ? string.Join("", inputBuffer) : string.Empty;
+        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
+        Display.SetCursor(cursorPosition);
+        return inputBuffer.Count > 0;
+    }
+
+    /// <summary>
     /// Update the cursor position indicator on the status bar
     /// </summary>
     public void UpdateCursorPosition(int line, int column) {

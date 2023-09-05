@@ -112,11 +112,11 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_PREVBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.OemMinus },
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D7 },
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.OemMinus },
-        new() { KeyCommand = KeyCommand.KC_DETAILS, KeyChar = 402 },
+        new() { KeyCommand = KeyCommand.KC_DETAILS, KeyChar = 207 },
         new() { KeyCommand = KeyCommand.KC_DETAILS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F },
-        new() { KeyCommand = KeyCommand.KC_GOTO, KeyChar = 169 },
+        new() { KeyCommand = KeyCommand.KC_GOTO, KeyChar = 204 },
         new() { KeyCommand = KeyCommand.KC_GOTO, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.G },
-        new() { KeyCommand = KeyCommand.KC_EDIT, KeyChar = 180 },
+        new() { KeyCommand = KeyCommand.KC_EDIT, KeyChar = 8240 },
         new() { KeyCommand = KeyCommand.KC_EDIT, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.E }
     };
 

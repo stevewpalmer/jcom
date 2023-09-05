@@ -53,18 +53,21 @@ public class Buffer {
             return fileInfo.FullName;
         }
     }
-    
+
     /// <summary>
     /// Return the base part of the filename.
     /// </summary>
-    public string BaseFilename {
-        get {
-            if (string.IsNullOrEmpty(Filename)) {
-                return "New File";
-            }
-            FileInfo fileInfo = new FileInfo(Filename);
-            return fileInfo.Name;
-        }
+    public string BaseFilename => string.IsNullOrEmpty(Filename) ? "New File" : GetBaseFilename(Filename);
+
+    /// <summary>
+    /// Return the base filename given a fully or partially qualified
+    /// filename.
+    /// </summary>
+    /// <param name="filename">Input filename</param>
+    /// <returns>Base filename</returns>
+    public static string GetBaseFilename(string filename) {
+        FileInfo fileInfo = new FileInfo(filename);
+        return fileInfo.Name;
     }
     
     /// <summary>
@@ -113,6 +116,7 @@ public class Buffer {
     /// </summary>
     public void Write() {
         File.WriteAllLines(FullFilename, Lines);
+        Modified = false;
     }
 }
 

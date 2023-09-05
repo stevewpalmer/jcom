@@ -183,8 +183,21 @@ public class Screen {
     /// Edit a file in a new window, or switch to the file in an existing window.
     /// </summary>
     private RenderHint EditFile() {
-        RenderHint flags = RenderHint.NONE;
-        return flags;
+        if (StatusBar.PromptForInput("File:", out string inputValue)) {
+            FileInfo fileInfo = new FileInfo(inputValue);
+            inputValue = fileInfo.FullName;
+
+            Window newWindow = _windowList.FirstOrDefault(window => window.Buffer.FullFilename == inputValue);
+            if (newWindow == null) {
+                newWindow = new Window(new Buffer(inputValue));
+                _windowList.Add(newWindow);
+            }
+            _activeWindow = newWindow;
+            _activeWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
+            _activeWindow.SetActive();
+            UpdateCursorPosition();
+        }
+        return RenderHint.NONE;
     }
 
     /// <summary>
