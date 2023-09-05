@@ -4,17 +4,17 @@ JFOR=mono $(DROP)/jfor.exe $(JFLAGS)
 
 INCLUDE "fortran.mak"
 
-BINARIES=jcomlib.dll jforlib.dll $(DROP)/ccompiler.dll $(DROP)/jfor.exe
+BINARIES=comlib.dll forlib.dll $(DROP)/com.dll $(DROP)/for.exe
 
 all: $(SOURCES)
 
 $(SOURCES): $(BINARIES)
 
-jcomlib.dll: $(DROP)/jcomlib.dll
-	cp $(DROP)/jcomlib.dll .
+comlib.dll: $(DROP)/comlib.dll
+	cp $(DROP)/comlib.dll .
 
-jforlib.dll: $(DROP)/jforlib.dll
-	cp $(DROP)/jforlib.dll .
+forlib.dll: $(DROP)/forlib.dll
+	cp $(DROP)/forlib.dll .
 
 %.exe : %.f
 	$(JFOR) $<

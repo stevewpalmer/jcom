@@ -1,10 +1,10 @@
 JFLAGS=-w:4 -strict
 DROP=../../drop
-JCOMAL=mono $(DROP)/jcomal.exe $(JFLAGS)
+JCOMAL=mono $(DROP)/comal.exe $(JFLAGS)
 
 include comal.mak
 
-BINARIES=jcomlib.dll jcomallib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll
+BINARIES=comlib.dll comallib.dll $(DROP)/comal.exe $(DROP)/com.dll
 
 all: $(SOURCES)
 

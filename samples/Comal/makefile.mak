@@ -1,6 +1,6 @@
 JFLAGS=-w:2 -debug
 DROP=..\..\drop
-JCOMAL=$(DROP)\jcomal.exe $(JFLAGS)
+JCOMAL=$(DROP)\comal.exe $(JFLAGS)
 
 .SUFFIXES: .lst
 
@@ -8,13 +8,13 @@ INCLUDE "comal.mak"
 
 all: $(SOURCES)
 
-$(SOURCES): jcomlib.dll jcomallib.dll $(DROP)/jcomal.exe $(DROP)/ccompiler.dll
+$(SOURCES): comlib.dll comallib.dll $(DROP)/comal.exe $(DROP)/com.dll
 
-jcomlib.dll: $(DROP)\jcomlib.dll
-	copy $(DROP)\jcomlib.dll .
+comlib.dll: $(DROP)\comlib.dll
+	copy $(DROP)\comlib.dll .
 
-jcomallib.dll: $(DROP)\jcomallib.dll
-	copy $(DROP)\jcomallib.dll .
+comallib.dll: $(DROP)\comallib.dll
+	copy $(DROP)\comallib.dll .
 
 .lst.exe:
 	$(JCOMAL) $<

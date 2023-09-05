@@ -90,7 +90,7 @@ public class Interpreter {
     /// <param name="opts">Command line options</param>
     public void Run(ComalOptions opts) {
 
-        Console.WriteLine($"JComal {AssemblySupport.AssemblyVersion}");
+        Console.WriteLine($"{AssemblySupport.AssemblyDescription} {AssemblySupport.AssemblyVersion}");
         Console.WriteLine();
 
         Lines oldLines = null;

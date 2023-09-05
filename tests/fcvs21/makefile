@@ -22,13 +22,13 @@ runall: $(ALLTESTS) $(ALLDATATESTS) $(INTTESTS) $(INTDATATESTS)
 	-for f in $(INTDATATESTS); do mono ./$$f < ./$${f%.exe}.DAT; done
 	-grep "\sFAIL\s" run.out
 
-$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS): jcomlib.dll jforlib.dll  $(DROP)/ccompiler.dll $(DROP)/jfor.exe
+$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS): comlib.dll forlib.dll $(DROP)/com.dll $(DROP)/for.exe
 
-jcomlib.dll: $(DROP)/jcomlib.dll
-	cp $(DROP)/jcomlib.dll .
+comlib.dll: $(DROP)/comlib.dll
+	cp $(DROP)/comlib.dll .
 
-jforlib.dll: $(DROP)/jforlib.dll
-	cp $(DROP)/jforlib.dll .
+forlib.dll: $(DROP)/forlib.dll
+	cp $(DROP)/forlib.dll .
 
 %.exe : %.FOR
 	$(JFOR) $<

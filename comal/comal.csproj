@@ -7,7 +7,7 @@
     <NoWarn>1701;1702;8600;8601;8602;8604;8618;8625;8603</NoWarn>
     <LangVersion>11.0</LangVersion>
     <ReleaseVersion>0.3</ReleaseVersion>
-    <Description>Comal Compiler</Description>
+    <Description>Comal</Description>
     <Copyright>(c) Steven Palmer 2013-2023</Copyright>
     <RootNamespace>JComal</RootNamespace>
     <Title>Comal Compiler</Title>

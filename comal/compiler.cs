@@ -667,7 +667,7 @@ public partial class Compiler : ICompiler {
     // class with the inline flag set from the options.
     private static ExtCallParseNode GetRuntimeExtCallNode(string functionName) {
 
-        return new("JComLib.Runtime,jcomlib", functionName);
+        return new("JComLib.Runtime,comlib", functionName);
     }
 
     // Ensure that the next token in the input is the one expected and report an error otherwise.

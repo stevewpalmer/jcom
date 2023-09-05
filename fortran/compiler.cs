@@ -1222,7 +1222,7 @@ public partial class Compiler : ICompiler {
     // STOP keyword
     // Stop the program.
     private ParseNode KStop() {
-        ExtCallParseNode node = new("JComLib.Runtime,jcomlib", "STOP") {
+        ExtCallParseNode node = new("JComLib.Runtime,comlib", "STOP") {
             Parameters = new ParametersParseNode()
         };
         node.Parameters.Add(ParseStopPauseConstant());
@@ -1234,7 +1234,7 @@ public partial class Compiler : ICompiler {
     // Pauses the program and outputs the given string. Waits for user
     // input to continue.
     private ParseNode KPause() {
-        ExtCallParseNode node = new("JComLib.Runtime,jcomlib", "PAUSE") {
+        ExtCallParseNode node = new("JComLib.Runtime,comlib", "PAUSE") {
             Parameters = new ParametersParseNode()
         };
         node.Parameters.Add(ParseStopPauseConstant());

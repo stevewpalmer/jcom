@@ -1,6 +1,6 @@
 JFLAGS=-w:2 -debug
 DROP=..\..\drop
-JFOR=$(DROP)\jfor.exe $(JFLAGS)
+JFOR=$(DROP)\for.exe $(JFLAGS)
 
 INCLUDE "tests.mak"
 
@@ -22,13 +22,13 @@ runall: $(ALLTESTS) $(ALLDATATESTS) $(INTTESTS) $(INTDATATESTS) $(BUGTESTS)
 	-for %f in ($(INTDATATESTS)) do @%f < %~nf.DAT;
 	-findstr /c:" FAIL " run.out
 
-$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS) $(BUGTESTS): jcomlib.dll jforlib.dll  $(DROP)/ccompiler.dll $(DROP)/jfor.exe
+$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS) $(BUGTESTS): comlib.dll forlib.dll $(DROP)/com.dll $(DROP)/for.exe
 
-jcomlib.dll: $(DROP)/jcomlib.dll
-	copy $(DROP)\jcomlib.dll .
+comlib.dll: $(DROP)/comlib.dll
+	copy $(DROP)\comlib.dll .
 
-jforlib.dll: $(DROP)/jforlib.dll
-	copy $(DROP)\jforlib.dll .
+forlib.dll: $(DROP)/forlib.dll
+	copy $(DROP)\forlib.dll .
 
 .FOR.exe:
 	$(JFOR) $<
