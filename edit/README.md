@@ -14,11 +14,19 @@ Down : Down arrow
 
 Exit : Alt+X
 
+Write Buffer : Alt+W
+
+Write Buffers and Exit : Ctrl+X
+
+Change Output Filename : Alt+O
+
 Version : Alt+V
 
 Details : Shift+Alt+F
 
 Edit Buffer : Shift+Alt+E
+
+Repeat Command : Ctrl+R
 
 Command : F10
 

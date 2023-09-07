@@ -89,44 +89,20 @@ public class Screen {
     /// <param name="commandId">Command ID</param>
     /// <returns>The rendering hint</returns>
     private RenderHint Handle(KeyCommand commandId) {
-        RenderHint flags = RenderHint.NONE;
-        switch (commandId) {
-            case KeyCommand.KC_EXIT:
-                flags = ExitEditor();
-                break;
-            
-            case KeyCommand.KC_VERSION:
-                StatusBar.RenderVersion();
-                break;
-
-            case KeyCommand.KC_NEXTBUFFER:
-                flags = SelectWindow(1);                
-                break;
-
-            case KeyCommand.KC_PREVBUFFER:
-                flags = SelectWindow(-1);                
-                break;
-            
-            case KeyCommand.KC_EDIT:
-                flags = EditFile();
-                break;
-            
-            case KeyCommand.KC_CLOSE:
-                flags = CloseWindow();
-                break;
-
-            case KeyCommand.KC_DETAILS:
-                flags = ShowDetails();
-                break;
-
-            case KeyCommand.KC_COMMAND:
-                flags = RunCommand();
-                break;
-
-            default:
-                flags = _activeWindow.Handle(commandId);
-                break;
-        }
+        RenderHint flags = commandId switch {
+            KeyCommand.KC_CLOSE => CloseWindow(),
+            KeyCommand.KC_COMMAND => RunCommand(),
+            KeyCommand.KC_DETAILS => ShowDetails(),
+            KeyCommand.KC_EDIT => EditFile(),
+            KeyCommand.KC_EXIT => ExitEditor(true),
+            KeyCommand.KC_NEXTBUFFER => SelectWindow(1),
+            KeyCommand.KC_OUTPUTFILE => RenameOutputFile(),
+            KeyCommand.KC_PREVBUFFER => SelectWindow(-1),
+            KeyCommand.KC_REPEAT => Repeat(),
+            KeyCommand.KC_VERSION => Version(),
+            KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
+            _ => _activeWindow.Handle(commandId)
+        };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
             UpdateCursorPosition();
         }
@@ -144,7 +120,6 @@ public class Screen {
     /// Select the next window in the specified direction in the window list.
     /// </summary>
     /// <param name="direction">Direction</param>
-    /// <returns>Render hint</returns>
     private RenderHint SelectWindow(int direction) {
         if (_windowList.Count == 1) {
             StatusBar.Message("No other buffers.");
@@ -229,7 +204,6 @@ public class Screen {
     /// <summary>
     /// Run a user specified command with optional parameters
     /// </summary>
-    /// <returns></returns>
     private RenderHint RunCommand() {
         RenderHint flags = RenderHint.NONE;
         if (StatusBar.PromptForInput("Command:", out string inputValue, false)) {
@@ -245,23 +219,75 @@ public class Screen {
     }
 
     /// <summary>
-    /// Exit the editor, saving any buffers if required.
+    /// Show the editor version on the status bar.
     /// </summary>
-    /// <returns></returns>
-    private RenderHint ExitEditor() {
-        int modifiedBuffers = _windowList.Count(w => w.Buffer.Modified);
-        if (modifiedBuffers > 0) {
-            char[] validInput = { 'y', 'n', 'w' }; 
-            if (StatusBar.Prompt($"{modifiedBuffers} buffers have not been saved. Exit @@?", validInput, 'n', out char inputChar)) {
-                switch (inputChar) {
-                    case 'n':
-                        return RenderHint.NONE;
-                    case 'w':
-                        _activeWindow.Buffer.Write();
-                        break;
+    private static RenderHint Version() {
+        StatusBar.RenderVersion();
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Repeat a key command.
+    /// </summary>
+    private RenderHint Repeat() {
+        RenderHint flags = RenderHint.NONE;
+        if (StatusBar.PromptForRepeat(out int repeatCount, out KeyCommand commandId)) {
+            while (repeatCount-- > 0) {
+                flags |= Handle(commandId);
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Prompt for a new output file name for the current buffer. The new
+    /// name must not conflict with any existing buffer name otherwise an error
+    /// is displayed.
+    /// </summary>
+    private RenderHint RenameOutputFile() {
+        if (StatusBar.PromptForInput("Enter new output file name:", out string outputFileName, false)) {
+            string fullFilename = Buffer.GetFullFilename(outputFileName);
+            if (_windowList.Any(window => fullFilename.Equals(window.Buffer.FullFilename, StringComparison.OrdinalIgnoreCase))) {
+                StatusBar.Message("Invalid output filename");
+                return RenderHint.NONE;
+            }
+            _activeWindow.Buffer.Filename = outputFileName;
+            foreach (Window window in _windowList.Where(window => window.Buffer == _activeWindow.Buffer)) {
+                window.ApplyRenderHint(RenderHint.TITLE);
+            }
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Exit the editor, saving any buffers if required. If prompt is
+    /// TRUE, we prompt whether to save or exit without saving. If prompt
+    /// is FALSE, we just save all modified buffers and exit.
+    /// </summary>
+    private RenderHint ExitEditor(bool prompt) {
+        RenderHint flags = RenderHint.EXIT;
+        bool writeBuffers = !prompt;
+        Buffer [] modifiedBuffers = _windowList.Where(w => w.Buffer.Modified).Select(b => b.Buffer).ToArray();
+        if (prompt) {
+            if (modifiedBuffers.Any()) {
+                char[] validInput = { 'y', 'n', 'w' };
+                if (StatusBar.Prompt($"{modifiedBuffers} buffers have not been saved. Exit @@?", validInput, 'n', out char inputChar)) {
+                    switch (inputChar) {
+                        case 'n':
+                            flags = RenderHint.NONE;
+                            break;
+                        case 'w':
+                            writeBuffers = true;
+                            break;
+                    }
                 }
             }
         }
-        return RenderHint.EXIT;
+        if (writeBuffers) {
+            foreach (Buffer buffer in modifiedBuffers) {
+                buffer.Write();
+            }
+        }
+        return flags;
     }
 }

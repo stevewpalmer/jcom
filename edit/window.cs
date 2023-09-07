@@ -67,7 +67,7 @@ public class Window {
     /// </summary>
     public void SetActive() {
         RenderFrame();
-        RenderTitle(Buffer.BaseFilename);
+        RenderTitle();
         Render();
     }
 
@@ -93,8 +93,19 @@ public class Window {
             KeyCommand.KC_CWORDRIGHT => WordRight(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
             KeyCommand.KC_GOTO => GoToLine(),
+            KeyCommand.KC_WRITEBUFFER => WriteBuffer(),
             _ => RenderHint.NONE
         };
+        return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
+    /// Apply rendering hints to the current window. For those that
+    /// are applied, we clear the flag before returning.
+    /// </summary>
+    /// <param name="flags">Render flags to apply</param>
+    /// <returns>Render flags that were not applied</returns>
+    public RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REDRAW)) {
             Render();
             flags &= ~RenderHint.REDRAW;
@@ -104,6 +115,10 @@ public class Window {
             PlaceCursor();
             flags &= ~RenderHint.CURSOR;
             flags |= RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.TITLE)) {
+            RenderTitle();
+            flags &= ~RenderHint.TITLE;
         }
         return flags;
     }
@@ -126,6 +141,14 @@ public class Window {
         return flags;
     }
 
+    /// <summary>
+    /// Write the current buffer to disk.
+    /// </summary>
+    /// <returns></returns>
+    private RenderHint WriteBuffer() {
+        Buffer.Write();
+        return RenderHint.NONE;
+    }
 
     /// <summary>
     /// Draw the window frame
@@ -152,17 +175,20 @@ public class Window {
     }
 
     /// <summary>
-    /// Render the title at the top of the window.
+    /// Render the buffer filename at the top of the window.
     /// </summary>
-    private void RenderTitle(string title) {
+    private void RenderTitle() {
+        string title = Buffer.BaseFilename;
         Rectangle frameRect = _viewportBounds;
         frameRect.Inflate(1, 1);
+        (int savedLeft, int savedTop) = Console.GetCursorPosition();
         Console.SetCursorPosition(frameRect.Left, frameRect.Top);
         Console.Write('╒');
         Console.Write(new string('═', frameRect.Width - 2));
         Console.Write('╕');
         Console.SetCursorPosition((frameRect.Width - title.Length - 2) / 2, 0);
         Console.Write($" {title} ");
+        Console.SetCursorPosition(savedLeft, savedTop);
     }
 
     /// <summary>

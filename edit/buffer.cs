@@ -72,6 +72,17 @@ public class Buffer {
     }
     
     /// <summary>
+    /// Return the full filename given a fully or partially qualified
+    /// filename.
+    /// </summary>
+    /// <param name="filename">Input filename</param>
+    /// <returns>Full filename</returns>
+    public static string GetFullFilename(string filename) {
+        FileInfo fileInfo = new FileInfo(filename);
+        return fileInfo.FullName;
+    }
+
+    /// <summary>
     /// Buffer contents
     /// </summary>
     private List<string> Lines { get; }
@@ -80,7 +91,7 @@ public class Buffer {
     /// Name of file associated with buffer, or empty string
     /// if the buffer has not yet been saved to a file
     /// </summary>
-    private string Filename { get; }
+    public string Filename { get; set; }
 
     /// <summary>
     /// Whether the buffer has been modified since it was last

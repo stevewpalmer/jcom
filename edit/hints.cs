@@ -51,5 +51,10 @@ public enum RenderHint {
     /// <summary>
     /// Exit the program
     /// </summary>
-    EXIT = 8
+    EXIT = 8,
+
+    /// <summary>
+    /// Update the current window title bar
+    /// </summary>
+    TITLE = 16
 }

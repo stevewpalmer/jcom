@@ -85,6 +85,47 @@ public class StatusBar {
     }
 
     /// <summary>
+    /// Display a prompt to repeat a command a given number of times.
+    /// </summary>
+    /// <param name="repeatCount">Set to the repeat count</param>
+    /// <param name="commandId">Set to the command Id</param>
+    /// <returns>True if a repeat count and command were entered, false if cancelled</returns>
+    public bool PromptForRepeat(out int repeatCount, out KeyCommand commandId) {
+        repeatCount = 1;
+        commandId = KeyCommand.KC_NONE;
+
+        Point cursorPosition;
+        List<char> inputBuffer = new();
+
+        while (true) {
+            string prompt = $"Repeat count = {repeatCount}: type count or command.";
+            cursorPosition = Display.WriteToNc(0, _statusRow, _displayWidth, prompt);
+            Display.SetCursor(new Point(prompt.Length, _statusRow));
+            ConsoleKeyInfo input = Console.ReadKey(true);
+            if (input.Key == ConsoleKey.Escape) {
+                repeatCount = 0;
+                break;
+            }
+            if (input.Key == ConsoleKey.R && input.Modifiers.HasFlag(ConsoleModifiers.Control)) {
+                repeatCount *= 4;
+                continue;
+            }
+            if (char.IsDigit(input.KeyChar) && inputBuffer.Count < 3) {
+                inputBuffer.Add(input.KeyChar);
+                repeatCount = Convert.ToInt32(string.Join("", inputBuffer));
+                continue;
+            }
+            commandId = KeyMap.MapKeyToCommand(input);
+            if (commandId != KeyCommand.KC_NONE) {
+                break;
+            }
+        }
+        Display.WriteTo(0, _statusRow, _displayWidth, repeatCount == 0 ? "Command cancelled." : _cachedText);
+        Display.SetCursor(cursorPosition);
+        return repeatCount > 0;
+    }
+
+    /// <summary>
     /// Display a prompt on the status bar and prompt for a numeric value.
     /// </summary>
     /// <param name="prompt">Prompt string</param>
