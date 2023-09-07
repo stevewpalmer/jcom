@@ -26,7 +26,7 @@
 using System.Drawing;
 using JComLib;
 
-namespace JEdit; 
+namespace JEdit;
 
 public class StatusBar {
     private static int _statusRow;
@@ -36,6 +36,7 @@ public class StatusBar {
     private int _displayWidth;
     private static int _timePosition;
     private int _cursorPositionPosition;
+    private string _cachedTextInput;
 
     /// <summary>
     /// Default render of status bar. Show the application title and start
@@ -92,13 +93,21 @@ public class StatusBar {
     public bool PromptForNumber(string prompt, out int inputValue) {
         Point cursorPosition = Display.WriteToNc(0, _statusRow, _displayWidth, prompt);
         Display.SetCursor(new Point(prompt.Length, _statusRow));
-        ConsoleKeyInfo input = Console.ReadKey(true);
+
+        History history = History.Get(prompt);
         List<char> inputBuffer = new();
+
+        ConsoleKeyInfo input = Console.ReadKey(true);
         while (input.Key != ConsoleKey.Enter) {
             if (input.Key == ConsoleKey.Escape) {
                 inputBuffer.Clear();
                 break;
             }
+            string readyText = input.Key switch {
+                ConsoleKey.UpArrow => history.Next(),
+                ConsoleKey.DownArrow => history.Previous(),
+                _ => null
+            };
             if (input.Key == ConsoleKey.Backspace && inputBuffer.Count > 0) {
                 inputBuffer.RemoveAt(inputBuffer.Count - 1);
                 Console.Write("\b \b");
@@ -107,9 +116,19 @@ public class StatusBar {
                 inputBuffer.Add(input.KeyChar);
                 Console.Write(input.KeyChar);
             }
+            if (readyText != null) {
+                inputBuffer = new List<char>(readyText.ToCharArray());
+                Display.SetCursor(new Point(prompt.Length, _statusRow));
+                Display.WriteToNc(prompt.Length, _statusRow, _displayWidth - prompt.Length, readyText);
+                Display.SetCursor(new Point(prompt.Length + readyText.Length, _statusRow));
+                readyText = null;
+            }
             input = Console.ReadKey(true);
         }
         inputValue =  inputBuffer.Count > 0 ? Convert.ToInt32(string.Join("", inputBuffer)) : 0;
+        if (inputBuffer.Count > 0) {
+            history.Add(inputBuffer);
+        }
         Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
         Display.SetCursor(cursorPosition);
         return inputBuffer.Count > 0;
@@ -120,27 +139,41 @@ public class StatusBar {
     /// </summary>
     /// <param name="prompt">Prompt string</param>
     /// <param name="inputValue">The input value</param>
+    /// <param name="allowFilenameCompletion">True to allow filename completion</param>
     /// <returns>True if a value was input, false if empty or cancelled</returns>
-    public bool PromptForInput(string prompt, out string inputValue) {
+    public bool PromptForInput(string prompt, out string inputValue, bool allowFilenameCompletion) {
         Point cursorPosition = Display.WriteToNc(0, _statusRow, _displayWidth, prompt);
         Display.SetCursor(new Point(prompt.Length, _statusRow));
 
-        ConsoleKeyInfo input = Console.ReadKey(true);
         List<char> inputBuffer = new();
+        History history = History.Get(prompt);
         string[] allfiles = null;
         int allfilesIndex = 0;
-        
+
+        ConsoleKeyInfo input = Console.ReadKey(true);
         while (input.Key != ConsoleKey.Enter) {
             if (input.Key == ConsoleKey.Escape) {
                 inputBuffer.Clear();
                 break;
             }
-            switch (input.Key) {
+            string readyText = input.Key switch {
+                ConsoleKey.UpArrow => history.Next(),
+                ConsoleKey.DownArrow => history.Previous(),
+                _ => null
+            };
+            if (input.KeyChar == 172) {
+                readyText = _cachedTextInput;
+            }
+            else switch (input.Key) {
                 case ConsoleKey.Backspace when inputBuffer.Count > 0:
                     inputBuffer.RemoveAt(inputBuffer.Count - 1);
                     Console.Write("\b \b");
                     break;
+
                 case ConsoleKey.Tab: {
+                    if (!allowFilenameCompletion) {
+                        break;
+                    }
                     if (allfiles == null) {
                         string partialName = string.Join("", inputBuffer) + "*";
                         allfiles = Directory.GetFiles(".", partialName, SearchOption.TopDirectoryOnly);
@@ -151,10 +184,7 @@ public class StatusBar {
                         if (allfilesIndex == allfiles.Length) {
                             allfilesIndex = 0;
                         }
-                        inputBuffer = new List<char>(completedName.ToCharArray());
-                        Display.SetCursor(new Point(prompt.Length, _statusRow));
-                        Display.WriteToNc(prompt.Length, _statusRow, _displayWidth, completedName);
-                        Display.SetCursor(new Point(prompt.Length + completedName.Length, _statusRow));
+                        readyText = completedName;
                     }
                     break;
                 }
@@ -167,9 +197,20 @@ public class StatusBar {
                     break;
                 }
             }
+            if (readyText != null) {
+                inputBuffer = new List<char>(readyText.ToCharArray());
+                Display.SetCursor(new Point(prompt.Length, _statusRow));
+                Display.WriteToNc(prompt.Length, _statusRow, _displayWidth - prompt.Length, readyText);
+                Display.SetCursor(new Point(prompt.Length + readyText.Length, _statusRow));
+                readyText = null;
+            }
             input = Console.ReadKey(true);
         }
         inputValue =  inputBuffer.Count > 0 ? string.Join("", inputBuffer) : string.Empty;
+        if (inputValue.Length > 0) {
+            _cachedTextInput = inputValue;
+            history.Add(inputBuffer);
+        }
         Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
         Display.SetCursor(cursorPosition);
         return inputBuffer.Count > 0;

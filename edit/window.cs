@@ -30,8 +30,7 @@ namespace JEdit;
 public class Window {
     private Rectangle _viewportBounds;
     private Point _viewportOffset;
-    private Point _cursor;
-    
+
     /// <summary>
     /// Create an empty window
     /// </summary>
@@ -67,7 +66,8 @@ public class Window {
     /// Make this window active
     /// </summary>
     public void SetActive() {
-        Screen.RenderTitle(Buffer.BaseFilename);
+        RenderFrame();
+        RenderTitle(Buffer.BaseFilename);
         Render();
     }
 
@@ -87,6 +87,8 @@ public class Window {
             KeyCommand.KC_CPAGEDOWN => PageDown(),
             KeyCommand.KC_CFILESTART => FileStart(),
             KeyCommand.KC_CFILEEND => FileEnd(),
+            KeyCommand.KC_CWINDOWTOP => WindowTop(),
+            KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
             KeyCommand.KC_CPAGEUP => PageUp(),
             KeyCommand.KC_CWORDRIGHT => WordRight(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
@@ -124,6 +126,45 @@ public class Window {
         return flags;
     }
 
+
+    /// <summary>
+    /// Draw the window frame
+    /// </summary>
+    private void RenderFrame() {
+        Rectangle frameRect = _viewportBounds;
+        frameRect.Inflate(1, 1);
+        Console.SetCursorPosition(frameRect.Left, frameRect.Top);
+        Console.Write('╒');
+        Console.Write(new string('═', frameRect.Width - 2));
+        Console.Write('╕');
+
+        for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
+            Console.SetCursorPosition(frameRect.Left, c);
+            Console.Write('│');
+            Console.SetCursorPosition(frameRect.Width - 1, c);
+            Console.Write('│');
+        }
+
+        Console.SetCursorPosition(frameRect.Left, frameRect.Height - 1);
+        Console.Write('╘');
+        Console.Write(new string('═', frameRect.Width - 2));
+        Console.Write('╛');
+    }
+
+    /// <summary>
+    /// Render the title at the top of the window.
+    /// </summary>
+    private void RenderTitle(string title) {
+        Rectangle frameRect = _viewportBounds;
+        frameRect.Inflate(1, 1);
+        Console.SetCursorPosition(frameRect.Left, frameRect.Top);
+        Console.Write('╒');
+        Console.Write(new string('═', frameRect.Width - 2));
+        Console.Write('╕');
+        Console.SetCursorPosition((frameRect.Width - title.Length - 2) / 2, 0);
+        Console.Write($" {title} ");
+    }
+
     /// <summary>
     /// Update this window
     /// </summary>
@@ -136,7 +177,9 @@ public class Window {
         Point savedCursor = Display.GetCursor();
         string line = Buffer.GetLine(i);
         while (line != null && y < _viewportBounds.Bottom) {
-            Display.WriteToNc(_viewportBounds.Left, y++, w, line.Substring(_viewportOffset.X, Math.Min(w, line.Length)));
+            int left = Math.Min(_viewportOffset.X, line.Length);
+            int length = Math.Min(w, line.Length - left);
+            Display.WriteToNc(_viewportBounds.Left, y++, w, line.Substring(left, length));
             line = Buffer.GetLine(++i);
         }
         while (y < _viewportBounds.Bottom) {
@@ -156,8 +199,7 @@ public class Window {
             if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
                 flags |= EndOfCurrentLine();
             }
-            if (_cursor.Y < _viewportBounds.Height - 1) {
-                ++_cursor.Y;
+            if (CursorRowInViewport < _viewportBounds.Height) {
                 flags |= RenderHint.CURSOR;
             } else {
                 ++_viewportOffset.Y;
@@ -177,8 +219,7 @@ public class Window {
             if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
                 flags |= EndOfCurrentLine();
             }
-            if (_cursor.Y > 0) {
-                --_cursor.Y;
+            if (CursorRowInViewport >= 0) {
                 flags |= RenderHint.CURSOR;
             } else {
                 --_viewportOffset.Y;
@@ -219,9 +260,7 @@ public class Window {
         RenderHint flags = RenderHint.NONE;
         if (Buffer.LineIndex < Buffer.Length - 1) {
             ++Buffer.LineIndex;
-            if (_cursor.Y < _viewportBounds.Height - 1) {
-                ++_cursor.Y;
-            } else {
+            if (CursorRowInViewport >= _viewportBounds.Height - 1) {
                 ++_viewportOffset.Y;
                 flags |= RenderHint.REDRAW;
             }
@@ -243,9 +282,7 @@ public class Window {
         RenderHint flags = RenderHint.NONE;
         if (Buffer.LineIndex > 0) {
             --Buffer.LineIndex;
-            if (_cursor.Y > 0) {
-                --_cursor.Y;
-            } else {
+            if (CursorRowInViewport < 0) {
                 --_viewportOffset.Y;
                 flags |= RenderHint.REDRAW;
             }
@@ -311,21 +348,50 @@ public class Window {
     }
 
     /// <summary>
-    /// Move to the start of the file.
+    /// Move to the start of the buffer.
     /// </summary>
     private RenderHint FileStart() {
-        Buffer.LineIndex = 0;
-        Buffer.Offset = 0;
-        return CursorFromOffset();
+        RenderHint flags = RenderHint.NONE;
+        if (Buffer.LineIndex > 0 || Buffer.Offset > 0) {
+            Buffer.LineIndex = 0;
+            Buffer.Offset = 0;
+            if (_viewportOffset.Y > 0 || _viewportOffset.X > 0) {
+                _viewportOffset.X = 0;
+                _viewportOffset.Y = 0;
+                flags |= RenderHint.REDRAW;
+            } else {
+                flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
     }
     
     /// <summary>
-    /// Move to the end of the file.
+    /// Move to the end of the buffer.
     /// </summary>
     private RenderHint FileEnd() {
         Buffer.LineIndex = Buffer.Length - 1;
-        Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
-        return CursorFromOffset();
+        Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
+        return CursorFromLineIndex();
+    }
+
+    /// <summary>
+    /// Move to the top of the window
+    /// </summary>
+    private RenderHint WindowTop() {
+        Buffer.LineIndex -= CursorRowInViewport;
+        return CursorFromLineIndex();
+    }
+
+    /// <summary>
+    /// Move to the bottom of the window
+    /// </summary>
+    private RenderHint WindowBottom() {
+        Buffer.LineIndex += _viewportBounds.Height - 1;
+        if (Buffer.LineIndex >= Buffer.Length) {
+            Buffer.LineIndex = Buffer.Length - 1;
+        }
+        return CursorFromLineIndex();
     }
 
     /// <summary>
@@ -385,15 +451,12 @@ public class Window {
         if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
             flags |= EndOfCurrentLine();
         }
-        _cursor.Y = Buffer.LineIndex;
-        if (_cursor.Y < _viewportOffset.Y) {
-            _viewportOffset.Y = _cursor.Y;
-            _cursor.Y = 0;
+        if (Buffer.LineIndex < _viewportOffset.Y) {
+            _viewportOffset.Y = Buffer.LineIndex;
             flags |= RenderHint.REDRAW;
         }
-        else if (_cursor.Y >= _viewportBounds.Height) {
-            _viewportOffset.Y = _cursor.Y - (_viewportBounds.Height - 1);
-            _cursor.Y = _viewportBounds.Height - 1;
+        else if (Buffer.LineIndex >= _viewportBounds.Height) {
+            _viewportOffset.Y = Buffer.LineIndex - (_viewportBounds.Height - 1);
             flags |= RenderHint.REDRAW;
         } else {
             flags |= RenderHint.CURSOR;
@@ -405,18 +468,14 @@ public class Window {
     /// Update the physical cursor position in the current viewport
     /// based on the buffer offset.
     /// </summary>
-    /// <returns></returns>
     private RenderHint CursorFromOffset() {
         RenderHint flags = RenderHint.NONE;
-        _cursor.X = Buffer.Offset;
-        if (_cursor.X > _viewportBounds.Width) {
-            _viewportOffset.X = _viewportBounds.Width - _cursor.X;
-            _cursor.X = _viewportBounds.Width - 1;
+        if (Buffer.Offset < _viewportOffset.X) {
+            _viewportOffset.X = Buffer.Offset;
             flags |= RenderHint.REDRAW;
         }
-        else if (_cursor.X < _viewportBounds.Left) {
-            _viewportOffset.X = 0;
-            _cursor.X = 0;
+        else if (Buffer.Offset >= _viewportOffset.X + _viewportBounds.Width - 1) {
+            _viewportOffset.X = Buffer.Offset - (_viewportBounds.Width - 1);
             flags |= RenderHint.REDRAW;
         } else {
             flags |= RenderHint.CURSOR;
@@ -425,11 +484,23 @@ public class Window {
     }
 
     /// <summary>
+    /// Return the cursor row position within the viewport (where 0 is the
+    /// top row).
+    /// </summary>
+    private int CursorRowInViewport => Buffer.LineIndex - _viewportOffset.Y;
+
+    /// <summary>
+    /// Return the cursor column position within the viewport (where 0 is the
+    /// left-most column)
+    /// </summary>
+    private int CursorColumnInViewport => Buffer.Offset - _viewportOffset.X;
+
+    /// <summary>
     /// Place the cursor on screen if it is visible.
     /// </summary>
     private void PlaceCursor() {
-        int column = _cursor.X + _viewportBounds.Left;
-        int row = _cursor.Y + _viewportBounds.Top;
+        int column = CursorColumnInViewport + _viewportBounds.Left;
+        int row = CursorRowInViewport + _viewportBounds.Top;
         if (_viewportBounds.Contains(column, row)) {
             Console.SetCursorPosition(column, row);
         }

@@ -39,6 +39,8 @@ public enum KeyCommand {
     KC_CLINEEND,
     KC_CFILESTART,
     KC_CFILEEND,
+    KC_CWINDOWTOP,
+    KC_CWINDOWBOTTOM,
     KC_CPAGEUP,
     KC_CPAGEDOWN,
     KC_CWORDLEFT,
@@ -49,10 +51,56 @@ public enum KeyCommand {
     KC_EDIT,
     KC_CLOSE,
     KC_DETAILS,
-    KC_GOTO
+    KC_GOTO,
+    KC_COMMAND
+}
+
+/// <summary>
+/// Mapping of command names and their IDs
+/// </summary>
+public class KeyCommands {
+
+    /// <summary>
+    /// Command name
+    /// </summary>
+    public string CommandName { get; init; }
+
+    /// <summary>
+    /// Associated command ID
+    /// </summary>
+    public KeyCommand CommandId { get; init; }
 }
 
 public class KeyMap {
+
+    /// <summary>
+    /// Table of commands and their default keystrokes
+    /// </summary>
+    private static readonly KeyCommands[] CommandTable = {
+        new() { CommandName = "exit", CommandId = KeyCommand.KC_EXIT },
+        new() { CommandName = "down", CommandId = KeyCommand.KC_CDOWN },
+        new() { CommandName = "up", CommandId = KeyCommand.KC_CUP },
+        new() { CommandName = "prev_char", CommandId = KeyCommand.KC_CLEFT },
+        new() { CommandName = "next_char", CommandId = KeyCommand.KC_CRIGHT },
+        new() { CommandName = "beginning_of_line", CommandId = KeyCommand.KC_CLINESTART },
+        new() { CommandName = "end_of_line", CommandId = KeyCommand.KC_CLINEEND },
+        new() { CommandName = "top_of_buffer", CommandId = KeyCommand.KC_CFILESTART },
+        new() { CommandName = "end_of_buffer", CommandId = KeyCommand.KC_CFILEEND },
+        new() { CommandName = "top_of_window", CommandId = KeyCommand.KC_CWINDOWTOP },
+        new() { CommandName = "end_of_window", CommandId = KeyCommand.KC_CWINDOWBOTTOM },
+        new() { CommandName = "page_up", CommandId = KeyCommand.KC_CPAGEUP },
+        new() { CommandName = "page_down", CommandId = KeyCommand.KC_CPAGEDOWN },
+        new() { CommandName = "previous_word", CommandId = KeyCommand.KC_CWORDLEFT },
+        new() { CommandName = "next_word", CommandId = KeyCommand.KC_CWORDRIGHT },
+        new() { CommandName = "edit_next_buffer", CommandId = KeyCommand.KC_NEXTBUFFER },
+        new() { CommandName = "edit_prev_buffer", CommandId = KeyCommand.KC_PREVBUFFER },
+        new() { CommandName = "version", CommandId = KeyCommand.KC_VERSION },
+        new() { CommandName = "edit_file", CommandId = KeyCommand.KC_EDIT },
+        new() { CommandName = "delete_curr_buffer", CommandId = KeyCommand.KC_CLOSE },
+        new() { CommandName = "display_file_name", CommandId = KeyCommand.KC_DETAILS },
+        new() { CommandName = "goto_line", CommandId = KeyCommand.KC_GOTO },
+        new() { CommandName = "execute_macro", CommandId = KeyCommand.KC_COMMAND }
+    };
 
     /// <summary>
     /// Key command
@@ -106,6 +154,8 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CPAGEDOWN, Key = ConsoleKey.PageDown },
         new() { KeyCommand = KeyCommand.KC_CWORDRIGHT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.RightArrow },
         new() { KeyCommand = KeyCommand.KC_CWORDLEFT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.LeftArrow },
+        new() { KeyCommand = KeyCommand.KC_CWINDOWTOP, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.Home },
+        new() { KeyCommand = KeyCommand.KC_CWINDOWBOTTOM, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.End },
         new() { KeyCommand = KeyCommand.KC_NEXTBUFFER, KeyChar = 710 },
         new() { KeyCommand = KeyCommand.KC_NEXTBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.N },
         new() { KeyCommand = KeyCommand.KC_PREVBUFFER, KeyChar = 305 },
@@ -117,8 +167,20 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_GOTO, KeyChar = 204 },
         new() { KeyCommand = KeyCommand.KC_GOTO, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.G },
         new() { KeyCommand = KeyCommand.KC_EDIT, KeyChar = 8240 },
-        new() { KeyCommand = KeyCommand.KC_EDIT, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.E }
+        new() { KeyCommand = KeyCommand.KC_EDIT, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.E },
+        new() { KeyCommand = KeyCommand.KC_COMMAND, Key = ConsoleKey.F10 },
     };
+
+    /// <summary>
+    /// Map a command name to its corresponding command.
+    /// </summary>
+    /// <param name="input">Command name</param>
+    /// <returns>KeyCommand equivalent, or KC_NONE if there's no mapping</returns>
+    public static KeyCommand MapCommandNameToCommand(string input) {
+        return CommandTable.Where(ct => ct.CommandName == input)
+               .Select(ct => ct.CommandId)
+               .FirstOrDefault();
+    }
 
     /// <summary>
     /// Map a keyboard input to its corresponding command.

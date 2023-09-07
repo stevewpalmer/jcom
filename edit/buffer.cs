@@ -37,6 +37,7 @@ public class Buffer {
             Lines = File.ReadAllLines(filename).ToList();
         } else {
             Lines = new List<string> {""};
+            NewFile = true;
         }
         Filename = filename ?? string.Empty;
     }
@@ -88,6 +89,12 @@ public class Buffer {
     public bool Modified { get; set; }
 
     /// <summary>
+    /// Is this a new file (i.e. the file has a name but does not
+    /// currently exist on disk).
+    /// </summary>
+    public bool NewFile { get; set; }
+
+    /// <summary>
     /// Number of lines in the buffer
     /// </summary>
     public int Length => Lines.Count;
@@ -117,6 +124,7 @@ public class Buffer {
     public void Write() {
         File.WriteAllLines(FullFilename, Lines);
         Modified = false;
+        NewFile = false;
     }
 }
 

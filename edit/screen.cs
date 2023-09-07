@@ -47,29 +47,19 @@ public class Screen {
     /// </summary>
     /// <param name="theWindow"></param>
     public void AddWindow(Window theWindow) {
+        if (theWindow.Buffer.NewFile) {
+            StatusBar.Message($"New file (unable to open file {theWindow.Buffer.BaseFilename})");
+        }
         _windowList.Add(theWindow);
+        theWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
     }
     
     /// <summary>
-    /// Open the main window, rendering the frame, status bar and
-    /// the active window.
+    /// Open the main window.
     /// </summary>
-    public void Open() {
-        RenderFrame();
+    public static void Open() {
+        Console.Clear();
         StatusBar.InitialRender();
-        ActivateWindow(0);
-    }
-
-    /// <summary>
-    /// Render the title at the top of the screen.
-    /// </summary>
-    public static void RenderTitle(string title) {
-        Console.SetCursorPosition(0, 0);
-        Console.Write('╒');
-        Console.Write(new string('═', Console.WindowWidth - 2));
-        Console.Write('╕');
-        Console.SetCursorPosition((Console.WindowWidth - title.Length - 2) / 2, 0);
-        Console.Write($" {title} ");
     }
 
     /// <summary>
@@ -87,7 +77,6 @@ public class Screen {
         RenderHint flags;
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
-            StatusBar.Message($"Modifiers={keyIn.Modifiers}, Key={keyIn.Key}, KeyChar={(int)keyIn.KeyChar}");
             KeyCommand commandId = KeyMap.MapKeyToCommand(keyIn);
             flags = Handle(commandId);
         } while (flags != RenderHint.EXIT);
@@ -128,6 +117,10 @@ public class Screen {
 
             case KeyCommand.KC_DETAILS:
                 flags = ShowDetails();
+                break;
+
+            case KeyCommand.KC_COMMAND:
+                flags = RunCommand();
                 break;
 
             default:
@@ -172,9 +165,8 @@ public class Screen {
     /// Activate a window by its index
     /// </summary>
     /// <param name="index">Index of the window to be activated</param>
-    private void ActivateWindow(int index) {
+    public void ActivateWindow(int index) {
         _activeWindow = _windowList[index];
-        _activeWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
         _activeWindow.SetActive();
         UpdateCursorPosition();
     }
@@ -183,14 +175,14 @@ public class Screen {
     /// Edit a file in a new window, or switch to the file in an existing window.
     /// </summary>
     private RenderHint EditFile() {
-        if (StatusBar.PromptForInput("File:", out string inputValue)) {
+        if (StatusBar.PromptForInput("File:", out string inputValue, true)) {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
             Window newWindow = _windowList.FirstOrDefault(window => window.Buffer.FullFilename == inputValue);
             if (newWindow == null) {
                 newWindow = new Window(new Buffer(inputValue));
-                _windowList.Add(newWindow);
+                AddWindow(newWindow);
             }
             _activeWindow = newWindow;
             _activeWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
@@ -235,6 +227,24 @@ public class Screen {
     }
 
     /// <summary>
+    /// Run a user specified command with optional parameters
+    /// </summary>
+    /// <returns></returns>
+    private RenderHint RunCommand() {
+        RenderHint flags = RenderHint.NONE;
+        if (StatusBar.PromptForInput("Command:", out string inputValue, false)) {
+            KeyCommand commandId = KeyMap.MapCommandNameToCommand(inputValue);
+            if (commandId == KeyCommand.KC_NONE) {
+                StatusBar.Message("Unknown command");
+            }
+            else {
+                flags = Handle(commandId);
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
     /// Exit the editor, saving any buffers if required.
     /// </summary>
     /// <returns></returns>
@@ -254,29 +264,4 @@ public class Screen {
         }
         return RenderHint.EXIT;
     }
-
-    /// <summary>
-    /// Draw the editor window frame
-    /// </summary>
-    private static void RenderFrame() {
-        Console.Clear();
-
-        Console.SetCursorPosition(0, 0);
-        Console.Write('╒');
-        Console.Write(new string('═', Console.WindowWidth - 2));
-        Console.Write('╕');
-
-        for (int c = 1; c < Console.WindowHeight - 2; c++) {
-            Console.SetCursorPosition(0, c);
-            Console.Write('│');
-            Console.SetCursorPosition(Console.WindowWidth - 1, c);
-            Console.Write('│');
-        }
-
-        Console.SetCursorPosition(0, Console.WindowHeight - 2);
-        Console.Write('╘');
-        Console.Write(new string('═', Console.WindowWidth - 2));
-        Console.Write('╛');
-    }
-
 }
