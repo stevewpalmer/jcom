@@ -154,7 +154,7 @@ public class Window {
             --_viewportOffset.Y;
             flags = RenderHint.REDRAW;
         }
-        return flags;
+        return flags | CursorFromOffset();
     }
 
     /// <summary>
@@ -167,7 +167,7 @@ public class Window {
             ++_viewportOffset.Y;
             flags = RenderHint.REDRAW;
         }
-        return flags;
+        return flags | CursorFromOffset();
     }
 
     /// <summary>
