@@ -1,4 +1,4 @@
-﻿// JShell
+﻿// JCom Runtime Library
 // Command line parsing
 //
 // Authors:
@@ -26,16 +26,19 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace JShell; 
+namespace JComLib;
 
-public class CommandLine {
+public class Parser {
     private readonly string _line;
     private int _index;
     private char _pushedChar;
-
     private const char Eol = '\n';
 
-    public CommandLine(string input) {
+    /// <summary>
+    /// Create an instance with the specified string
+    /// </summary>
+    /// <param name="input">String to parse</param>
+    public Parser(string input) {
         _line = input;
         _index = 0;
     }

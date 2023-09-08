@@ -28,6 +28,7 @@ namespace JEdit;
 public class Screen {
     private readonly List<Window> _windowList = new();
     private Window _activeWindow;
+    private Macro _parser = new();
 
     /// <summary>
     /// Constructor
@@ -101,7 +102,7 @@ public class Screen {
             KeyCommand.KC_REPEAT => Repeat(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
-            _ => _activeWindow.Handle(commandId)
+            _ => _activeWindow.Handle(_parser, commandId)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
             UpdateCursorPosition();
@@ -150,7 +151,7 @@ public class Screen {
     /// Edit a file in a new window, or switch to the file in an existing window.
     /// </summary>
     private RenderHint EditFile() {
-        if (StatusBar.PromptForInput("File:", out string inputValue, true)) {
+        if (_parser.GetFilename("File:", out string inputValue)) {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
@@ -207,7 +208,8 @@ public class Screen {
     private RenderHint RunCommand() {
         RenderHint flags = RenderHint.NONE;
         if (StatusBar.PromptForInput("Command:", out string inputValue, false)) {
-            KeyCommand commandId = KeyMap.MapCommandNameToCommand(inputValue);
+            _parser = new Macro(inputValue);
+            KeyCommand commandId = KeyMap.MapCommandNameToCommand(_parser.NextWord());
             if (commandId == KeyCommand.KC_NONE) {
                 StatusBar.Message("Unknown command");
             }
@@ -245,7 +247,7 @@ public class Screen {
     /// is displayed.
     /// </summary>
     private RenderHint RenameOutputFile() {
-        if (StatusBar.PromptForInput("Enter new output file name:", out string outputFileName, false)) {
+        if (_parser.GetFilename("Enter new output file name:", out string outputFileName)) {
             string fullFilename = Buffer.GetFullFilename(outputFileName);
             if (_windowList.Any(window => fullFilename.Equals(window.Buffer.FullFilename, StringComparison.OrdinalIgnoreCase))) {
                 StatusBar.Message("Invalid output filename");

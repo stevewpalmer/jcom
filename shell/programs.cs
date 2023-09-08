@@ -24,13 +24,14 @@
 // under the License.
 
 using System.Diagnostics;
+using JComLib;
 
 namespace JShell;
 
 public static partial class Commands {
 
     // Run a program.
-    private static bool RunProgram(string programName, CommandLine cmdLine) {
+    private static bool RunProgram(string programName, Parser cmdLine) {
 
         string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         string josBinRoot = $"{homeFolder}/jos/bin";
@@ -44,17 +45,17 @@ public static partial class Commands {
     }
 
     // Run the Fortran compiler.
-    public static bool CmdFortran(CommandLine cmdLine) {
+    public static bool CmdFortran(Parser cmdLine) {
         return RunProgram("for", cmdLine);
     }
 
     // Run the Comal interpreter/compiler.
-    public static bool CmdComal(CommandLine cmdLine) {
+    public static bool CmdComal(Parser cmdLine) {
         return RunProgram("comal", cmdLine);
     }
 
     // Run the editor.
-    public static  bool CmdEdit(CommandLine cmdLine) {
+    public static  bool CmdEdit(Parser cmdLine) {
         return RunProgram("edit", cmdLine);
     }
 }

@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JComLib;
+
 namespace JShell;
 
 public static partial class Commands {
@@ -30,7 +32,7 @@ public static partial class Commands {
     // DIR command.
     // The rest of the command line specifies the files to be
     // filtered.
-    public static bool CmdDir(CommandLine cmdLine) {
+    public static bool CmdDir(Parser cmdLine) {
 
         string[] matchfiles = cmdLine.RestOfLine();
         if (!matchfiles.Any()) {

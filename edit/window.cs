@@ -74,9 +74,10 @@ public class Window {
     /// <summary>
     /// Handle a keyboard command.
     /// </summary>
+    /// <param name="parser">Macro parser</param>
     /// <param name="commandId">Command ID</param>
     /// <returns>Rendering hint</returns>
-    public RenderHint Handle(KeyCommand commandId) {
+    public RenderHint Handle(Macro parser, KeyCommand commandId) {
         RenderHint flags = commandId switch {
             KeyCommand.KC_CDOWN => CursorDown(),
             KeyCommand.KC_CUP => CursorUp(),
@@ -92,7 +93,7 @@ public class Window {
             KeyCommand.KC_CPAGEUP => PageUp(),
             KeyCommand.KC_CWORDRIGHT => WordRight(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
-            KeyCommand.KC_GOTO => GoToLine(),
+            KeyCommand.KC_GOTO => GoToLine(parser),
             KeyCommand.KC_SCREENDOWN => ScreenDown(),
             KeyCommand.KC_SCREENUP => ScreenUp(),
             KeyCommand.KC_WRITEBUFFER => WriteBuffer(),
@@ -128,9 +129,9 @@ public class Window {
     /// <summary>
     /// Go to input line.
     /// </summary>
-    private RenderHint GoToLine() {
+    private RenderHint GoToLine(Macro parser) {
         RenderHint flags = RenderHint.NONE;
-        if (Screen.StatusBar.PromptForNumber("Go to line: ", out int inputLine)) {
+        if (parser.GetNumber("Go to line: ", out int inputLine)) {
             if (inputLine > Buffer.Length) {
                 inputLine = Buffer.Length;
             }

@@ -30,7 +30,7 @@ namespace JShell;
 internal static class Program {
 
     private record CommandDefinition {
-        public Func<CommandLine, bool> Function;
+        public Func<Parser, bool> Function;
         public string Description;
     }
 
@@ -67,7 +67,7 @@ internal static class Program {
             if (inputLine == null) {
                 continue;
             }
-            CommandLine cmdLine = new(inputLine);
+            Parser cmdLine = new(inputLine);
             string command = cmdLine.NextWord();
             while (command != null) {
 
@@ -84,7 +84,7 @@ internal static class Program {
 
     // HELP command.
     // Display a list of all commands.
-    private static bool CmdHelp(CommandLine cmdLine) {
+    private static bool CmdHelp(Parser cmdLine) {
 
         int maxLength = CommandMap.Keys.Max(k => k.Length);
         foreach (string key in CommandMap.Keys.OrderBy(k => k)) {

@@ -23,13 +23,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JShell; 
+using JComLib;
+
+namespace JShell;
 
 public static partial class Commands {
 
     // TYPE command.
     // Display file contents.
-    public static bool CmdType(CommandLine cmdLine) {
+    public static bool CmdType(Parser cmdLine) {
 
         string[] matchfiles = cmdLine.RestOfLine();
         if (!matchfiles.Any()) {

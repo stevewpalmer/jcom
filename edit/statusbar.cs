@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Drawing;
+using System.Runtime.InteropServices;
 using JComLib;
 
 namespace JEdit;
@@ -45,7 +46,7 @@ public class StatusBar {
     public void InitialRender() {
         _statusRow = Console.WindowHeight - 1;
         _cachedText = string.Empty;
-        _timeWidth = 8;
+        _timeWidth = 11;
         _cursorPositionWidth = 18;
         _displayWidth = Console.WindowWidth - (_timeWidth + _cursorPositionWidth);
         _timePosition = Console.WindowWidth - _timeWidth;
@@ -167,7 +168,7 @@ public class StatusBar {
             input = Console.ReadKey(true);
         }
         inputValue =  inputBuffer.Count > 0 ? Convert.ToInt32(string.Join("", inputBuffer)) : 0;
-        if (inputBuffer.Count > 0) {
+        if (inputBuffer.Count > 1) {
             history.Add(inputBuffer);
         }
         Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
@@ -248,7 +249,7 @@ public class StatusBar {
             input = Console.ReadKey(true);
         }
         inputValue =  inputBuffer.Count > 0 ? string.Join("", inputBuffer) : string.Empty;
-        if (inputValue.Length > 0) {
+        if (inputValue.Length > 1) {
             _cachedTextInput = inputValue;
             history.Add(inputBuffer);
         }
@@ -261,7 +262,7 @@ public class StatusBar {
     /// Update the cursor position indicator on the status bar
     /// </summary>
     public void UpdateCursorPosition(int line, int column) {
-        string text = $"Line:{line} Col:{column}";
+        string text = $"Line: {line,-3} Col: {column,-3}";
         Display.WriteTo(_cursorPositionPosition, _statusRow, _cursorPositionWidth, text);
     }
 
@@ -282,8 +283,12 @@ public class StatusBar {
     /// </summary>
     private static void RenderTime() {
         Timer _ = new(_ => {
-            string timeString = DateTime.Now.ToString("h:mm tt");
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            char numLockEnabled = isWindows && Console.NumberLock ? '#' : ' ';
+            char capsLockEnabled = isWindows && Console.CapsLock ? '\u2191' : ' ';
+            char separatorChar = DateTime.Now.Second % 2 == 0 ? ' ' : ':';
+            string timeString = DateTime.Now.ToString($"{capsLockEnabled}{numLockEnabled} h{separatorChar}mm tt");
             Display.WriteTo(_timePosition, _statusRow, _timeWidth, timeString);
-        }, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
 }
