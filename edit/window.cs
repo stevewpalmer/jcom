@@ -93,6 +93,8 @@ public class Window {
             KeyCommand.KC_CWORDRIGHT => WordRight(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
             KeyCommand.KC_GOTO => GoToLine(),
+            KeyCommand.KC_SCREENDOWN => ScreenDown(),
+            KeyCommand.KC_SCREENUP => ScreenUp(),
             KeyCommand.KC_WRITEBUFFER => WriteBuffer(),
             _ => RenderHint.NONE
         };
@@ -137,6 +139,32 @@ public class Window {
             }
             Buffer.LineIndex = inputLine - 1;
             flags |= CursorFromLineIndex();
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Scroll the screen down one line, keeping the cursor in the same
+    /// column.
+    /// </summary>
+    private RenderHint ScreenDown() {
+        RenderHint flags = RenderHint.NONE;
+        if (_viewportOffset.Y > 0) {
+            --_viewportOffset.Y;
+            flags = RenderHint.REDRAW;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Scroll the screen up one line, keeping the cursor in the same
+    /// column.
+    /// </summary>
+    private RenderHint ScreenUp() {
+        RenderHint flags = RenderHint.NONE;
+        if (_viewportOffset.Y < Buffer.Length - 2) {
+            ++_viewportOffset.Y;
+            flags = RenderHint.REDRAW;
         }
         return flags;
     }

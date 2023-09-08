@@ -1,13 +1,45 @@
-# JCom Compilers
+# JCom
 
-This repository contains the source code for simple Fortran and Comal compilers.
+This repository contains the source code for a simple console
+based operating system similar to those from the 1970s and 80s. It
+includes a basic shell interface, a text editor, a Comal compiler
+and interpreter and a Fortran compiler. Other features are being
+added over time.
 
-JCom is an experiment in creating a compiler for various pre-1980s languages in C# using the .NET Reflection classes to emit the output code and to define a single back-end and run-time for all these languages. Currently only Fortran and Comal are implemented but the plan is to add support for further languages starting with C and BCPL.
+This is very much a personal project by one who grew up during
+the 1980s and for who my first experience with computers was via
+the rudimentary console based interfaces. Compared with modern
+operating systems this is extremely basic and limited but I still
+feel that this is a good way for those unused to computers to get
+started with learning to write simple programs. In addition, by
+eliminating network access, it avoids almost all the security
+issues inherent in today's systems.
 
-## Fortran
+The solution currently includes four projects:
 
-JFor is a subset of Fortran 77 with various pieces not yet implemented. Consequently this is very much a work in progress. See the TODO.md for more details.
+### Shell
 
-## Comal
+This is the start-up project and implements a very simple console
+based command line shell similar to MS-DOS. At the moment is only
+provides a means for running the other programs but I hope to
+expand it gradually while still keeping it very simple.
 
-Comal is both an interactive compiler and full compiler for the Comal Standard language. It can be run interactively and provides an input environment for writing, running, loading and saving simple Comal programs. The compiler is invoked by specifying either the source listing (.lst) or the tokenised file (.cml) as input and produces a stand-alone executable.
+### Edit
+
+This folder contains the source files for a simple text editor
+based on the DOS Brief editor from the 1990s.
+
+### Fortran
+
+This is a subset of Fortran 77 with various pieces not yet 
+implemented. Consequently this is very much a work in progress. 
+See the TODO.md for more details.
+
+### Comal
+
+Comal is both an interactive compiler and full compiler 
+for the Comal Standard language. It can be run interactively 
+and provides an input environment for writing, running, 
+loading and saving simple Comal programs. The compiler is 
+invoked by specifying either the source listing (.lst) or 
+the tokenised file (.cml) as input.

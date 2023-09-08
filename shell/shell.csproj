@@ -13,6 +13,7 @@
     <Copyright>(c) Steven Palmer 2013-2023</Copyright>
     <Title>Shell</Title>
     <Authors>Steven Palmer</Authors>
+    <UserSecretsId>0f1ae6ac-5f87-4a98-9792-6aad52d36a17</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\jcomlib\comlib.csproj" />

@@ -5,7 +5,14 @@ decreasing order of priority.
 
 ## Work Items
 
-JFor:
+### Editor
+* Editing capability.
+* Split windows.
+* Block marking, cut, copy and paste.
+* Search and replace.
+* Help.
+
+### Fortran
 * BLOCK DATA (FM500, FM503, FM506)
 * Assigned FORMAT label (FM111, FM252)
 * Tokeniser (FM200, FM010, FM011)
@@ -13,20 +20,20 @@ JFor:
 * EQUIVALENCE - probably will never do this
 * Alternate ENTRY (FM519, FM507)
 
-JComal:
+### Comal
 * CHAINing
 * Non-constant string lengths in DIM...OF
 * Console error handling on Linux
 
-JCobol
+### Cobol
 * Implement
 
 ## Bug Fixes
 
-JFor:
+### Fortran
 * Fix failing ArrayVerifyDimensions1 unit test.
 
-JComal:
+### Comal
 * USE libraries not working on Windows.
 * GET$ is skipping over newlines.
 * Fix USE statement on Windows
@@ -39,7 +46,7 @@ JComal:
   * On Visual Studio Mac, the debugger is unable to find the source code.
   * Single-stepping gets stuck on the first line for several steps in ABS.LST
 
-Codegen:
+### Code Generation
 * Fix local lifetime optimisation.
 * Common sub-expression optimisation:
   - eg. ((B/20)*A)+((B/20)*C)
