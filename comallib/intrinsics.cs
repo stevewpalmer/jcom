@@ -354,7 +354,7 @@ public static partial class Intrinsics {
     /// <param name="seed">Seed value</param>
     /// <returns>The next random number for the given seed</returns>
     public static void RANDOMIZE() {
-        _rand = new();
+        _rand = new Random();
     }
 
     /// <summary>
@@ -364,7 +364,7 @@ public static partial class Intrinsics {
     /// <param name="seed">Seed value</param>
     /// <returns>The next random number for the given seed</returns>
     public static void RANDOMIZE(int seed) {
-        _rand = new(seed);
+        _rand = new Random(seed);
     }
 
     /// <summary>

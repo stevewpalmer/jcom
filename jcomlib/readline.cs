@@ -205,7 +205,7 @@ public class ReadLine {
 
     // Set the current input buffer from the specified string
     private void SetBuffer(string newString) {
-        buffer = new(newString);
+        buffer = new StringBuilder(newString);
         cursorPosition = Console.CursorLeft;
         bufferIndex = 0;
         if (!string.IsNullOrEmpty(newString)) {

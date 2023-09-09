@@ -210,10 +210,7 @@ public class Line {
     /// <summary>
     /// Tokenised line
     /// </summary>
-    public SimpleToken [] Tokens {
-        get => _tokens.ToArray();
-        set => _tokens = new List<SimpleToken>(value);
-    }
+    private SimpleToken [] Tokens => _tokens.ToArray();
 
     /// <summary>
     /// Return printable version of line
@@ -280,7 +277,7 @@ public class Lines {
     /// </summary>
     /// <param name="source">Original lines</param>
     public Lines() {
-        _lines = new();
+        _lines = new List<Line>();
     }
 
     /// <summary>
@@ -297,7 +294,7 @@ public class Lines {
     /// </summary>
     /// <param name="source">Original lines</param>
     public Lines(Line line) {
-        _lines = new() { line };
+        _lines = new List<Line> { line };
         _currentLine = 0;
     }
 

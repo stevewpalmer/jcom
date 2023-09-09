@@ -235,9 +235,6 @@ public class FixedString : IEquatable<FixedString> {
         if (start < 1 || end < start) {
             throw new IndexOutOfRangeException(nameof(start));
         }
-        if (end < 1) {
-            throw new IndexOutOfRangeException(nameof(end));
-        }
         InternalSet(newString.ToCharArray(), start - 1, end - 1);
     }
 
@@ -256,9 +253,6 @@ public class FixedString : IEquatable<FixedString> {
         }
         if (start < 1 || end < start) {
             throw new IndexOutOfRangeException(nameof(start));
-        }
-        if (end < 1) {
-            throw new IndexOutOfRangeException(nameof(end));
         }
         InternalSet(newString.ToCharArray(), start - 1, end - 1);
     }

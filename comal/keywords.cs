@@ -72,7 +72,6 @@ public partial class Compiler {
             // Enumerate all types in dll and add them to the globals.20
             Type [] allTypes = dll.GetTypes();
             foreach (Type thisType in allTypes) {
-                string name = thisType.Name;
 
                 // Enumerate all methods on type
                 MethodInfo [] allMethods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static);
@@ -369,7 +368,7 @@ public partial class Compiler {
                 else if (_importSymbols.Get(identToken.Name) != null) {
                     Messages.Error(MessageCode.ALREADYIMPORTED, $"{identToken.Name} is already IMPORTed");
                 }
-                else if (sym != null) {
+                else {
                     _importSymbols.Add(sym);
                 }
                 if (_currentLine.IsAtEndOfLine) {
@@ -608,7 +607,7 @@ public partial class Compiler {
     //
     private ParseNode KZone() {
         ExtCallParseNode node = GetFileManagerExtCallNode("set_Zone");
-        node.Parameters = new();
+        node.Parameters = new ParametersParseNode();
         node.Parameters.Add(IntegerExpression(), false);
         return node;
     }
@@ -623,7 +622,7 @@ public partial class Compiler {
 
         ExtCallParseNode node = GetIntrinsicExtCallNode("RANDOMIZE");
         if (!_currentLine.IsAtEndOfStatement) {
-            node.Parameters = new();
+            node.Parameters = new ParametersParseNode();
             node.Parameters.Add(IntegerExpression(), false);
         }
         return node;
@@ -647,13 +646,13 @@ public partial class Compiler {
 
             // Single line IF
             SimpleToken token = GetNextToken();
-            statements = new();
+            statements = new BlockParseNode();
             CompileLine(token, statements);
             node.Add(expr, statements);
         } else {
             TokenID endToken;
             do {
-                statements = new();
+                statements = new BlockParseNode();
                 endToken = CompileBlock(statements, new[] { TokenID.KENDIF, TokenID.KELIF, TokenID.KELSE });
                 node.Add(expr, statements);
                 if (endToken == TokenID.KELIF) {
@@ -764,7 +763,7 @@ public partial class Compiler {
         // DO keyword
         InsertTokenIfMissing(TokenID.KDO);
 
-        node.LoopBody = new();
+        node.LoopBody = new BlockParseNode();
         if (!_currentLine.IsAtEndOfLine) {
 
             // Short format
@@ -801,7 +800,7 @@ public partial class Compiler {
     private ParseNode KRepeat() {
 
         LoopParseNode node = new() {
-            LoopBody = new()
+            LoopBody = new BlockParseNode()
         };
 
         if (!_currentLine.IsAtEndOfLine) {
@@ -836,7 +835,7 @@ public partial class Compiler {
 
         InsertTokenIfMissing(TokenID.KDO);
 
-        node.LoopBody = new();
+        node.LoopBody = new BlockParseNode();
         if (!_currentLine.IsAtEndOfLine) {
 
             SimpleToken token = GetNextToken();
@@ -864,7 +863,7 @@ public partial class Compiler {
         LoopParseNode node = new();
         LoopParseNode previousLoop = _currentLoop;
         _currentLoop = node;
-        node.LoopBody = new();
+        node.LoopBody = new BlockParseNode();
         CompileBlock(node.LoopBody, new[] { TokenID.KENDLOOP });
 
         node.StartExpression = new NumberParseNode(new Variant(1));

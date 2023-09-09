@@ -24,7 +24,6 @@
 // under the License.
 
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using JComLib;
@@ -42,10 +41,6 @@ public sealed class OptionField : Attribute {
         Name = name;
     }
     // ReSharper restore UnusedMember.Global
-
-    public OptionField() {
-        Name = string.Empty;
-    }
 
     /// <summary>
     /// Option input name
@@ -88,7 +83,7 @@ public class Options {
     /// <summary>
     /// Initialises an instance of the <c>Options</c> class.
     /// </summary>
-    public Options() {
+    protected Options() {
         GenerateDebug = false;
         WarnLevel = 2;
         WarnAsError = false;
@@ -179,8 +174,8 @@ public class Options {
     /// <summary>
     /// Display the current version number
     /// </summary>
-    public void DisplayVersion() {
-        Version ver = Assembly.GetEntryAssembly().GetName().Version;
+    private void DisplayVersion() {
+        Version ver = Assembly.GetEntryAssembly()?.GetName().Version;
         Messages.Info($"{ver.Major}.{ver.Minor}.{ver.Build}");
     }
 

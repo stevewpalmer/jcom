@@ -244,9 +244,7 @@ public partial class Compiler {
         }
 
         node.ProcedureSymbol = method;
-        if (localSymbols != null) {
-            node.Symbols.Add(localSymbols);
-        }
+        node.Symbols.Add(localSymbols);
         node.LabelList = new Collection<ParseNode>();
 
         ProcedureParseNode savedCurrentProcedure = CurrentProcedure;

@@ -460,7 +460,7 @@ public class Symbol {
         if (typeName.Contains("[]")) {
             typeName = typeName.Replace("[]", "");
         }
-        if (typeName.Contains("&")) {
+        if (typeName.Contains('&')) {
             typeName = typeName.Replace("&", "");
         }
         switch (typeName) {
@@ -488,17 +488,6 @@ public class Symbol {
     public static bool IsNumberType(SymType type) {
         return type == SymType.DOUBLE ||
                type == SymType.INTEGER ||
-               type == SymType.COMPLEX ||
-               type == SymType.FLOAT;
-    }
-
-    /// <summary>
-    /// Returns whether the specified type is a floating point (non-integral) type.
-    /// </summary>
-    /// <param name="type">The symbol type to check</param>
-    /// <returns><c>true</c> if type is a floating point type; otherwise, <c>false</c>.</returns>
-    public static bool IsFloatingPointType(SymType type) {
-        return type == SymType.DOUBLE ||
                type == SymType.COMPLEX ||
                type == SymType.FLOAT;
     }

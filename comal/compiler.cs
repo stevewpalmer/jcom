@@ -94,7 +94,7 @@ public partial class Compiler : ICompiler {
     /// <param name="opts">Compiler options</param>
     public Compiler(ComalOptions opts) {
 
-        SymbolStack = new();
+        SymbolStack = new SymbolStack();
         Globals = new SymbolCollection("Globals");
         SymbolStack.Push(Globals);
 
@@ -252,8 +252,8 @@ public partial class Compiler : ICompiler {
     /// main function is returned as an object.
     /// </summary>
     /// <returns>An ExecutionResult object representing the result of the execution</returns>
-    public ExecutionResult Execute() {
-        return Execute(_entryPointName);
+    public void Execute() {
+        Execute(_entryPointName);
     }
 
     /// <summary>
@@ -527,7 +527,7 @@ public partial class Compiler : ICompiler {
 
         Symbol symbol = Globals.Get(Consts.EODName);
         if (symbol == null) {
-            symbol = new(Consts.EODName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
+            symbol = new Symbol(Consts.EODName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
                 Modifier = SymModifier.STATIC,
                 Value = new Variant(1)
             };
@@ -541,7 +541,7 @@ public partial class Compiler : ICompiler {
 
         Symbol symbol = Globals.Get(Consts.DataIndexName);
         if (symbol == null) {
-            symbol = new(Consts.DataIndexName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
+            symbol = new Symbol(Consts.DataIndexName, new SymFullType(SymType.INTEGER), SymClass.VAR, null, 0) {
                 Modifier = SymModifier.STATIC,
                 Value = new Variant(0),
                 IsReferenced = true
@@ -556,7 +556,7 @@ public partial class Compiler : ICompiler {
 
         Symbol symbol = Globals.Get(Consts.DataName);
         if (symbol == null) {
-            symbol = new(Consts.DataName, new SymFullType(SymType.GENERIC), SymClass.VAR, null, 0) {
+            symbol = new Symbol(Consts.DataName, new SymFullType(SymType.GENERIC), SymClass.VAR, null, 0) {
                 Modifier = SymModifier.STATIC | SymModifier.FLATARRAY,
                 IsReferenced = true
             };
@@ -651,7 +651,7 @@ public partial class Compiler : ICompiler {
     // class with the inline flag set from the options.
     private ExtCallParseNode GetIntrinsicExtCallNode(string functionName) {
 
-        return new("JComalLib.Intrinsics,comallib", functionName) {
+        return new ExtCallParseNode("JComalLib.Intrinsics,comallib", functionName) {
             Inline = _opts.Inline
         };
     }
@@ -660,14 +660,14 @@ public partial class Compiler : ICompiler {
     // class with the inline flag set from the options.
     private static ExtCallParseNode GetFileManagerExtCallNode(string functionName) {
 
-        return new("JComalLib.FileManager,comallib", functionName);
+        return new ExtCallParseNode("JComalLib.FileManager,comallib", functionName);
     }
 
     // Create an ExtCallParseNode for the specified function in the Runtime
     // class with the inline flag set from the options.
     private static ExtCallParseNode GetRuntimeExtCallNode(string functionName) {
 
-        return new("JComLib.Runtime,comlib", functionName);
+        return new ExtCallParseNode("JComLib.Runtime,comlib", functionName);
     }
 
     // Ensure that the next token in the input is the one expected and report an error otherwise.
@@ -690,7 +690,7 @@ public partial class Compiler : ICompiler {
     }
 
     // Ensure that the next token in the input is the one expected and report an error otherwise.
-    private SimpleToken InsertTokenIfMissing(TokenID expectedID) {
+    private void InsertTokenIfMissing(TokenID expectedID) {
         SimpleToken token = _currentLine.PeekToken();
         if (token.ID != expectedID) {
 
@@ -704,7 +704,7 @@ public partial class Compiler : ICompiler {
             });
             GetNextToken();
         }
-        return GetNextToken();
+        GetNextToken();
     }
 
     // Eat the input to the end of the line. Useful when we hit a syntax error and want

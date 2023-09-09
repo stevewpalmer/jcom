@@ -207,7 +207,7 @@ public partial class Compiler {
             if (node.ID == ParseID.IDIVIDE) {
 
                 ExtCallParseNode modFunc = GetIntrinsicExtCallNode("IDIV");
-                modFunc.Parameters = new();
+                modFunc.Parameters = new ParametersParseNode();
                 modFunc.Parameters.Add(CastNodeToType(tokenNode.Left, SymType.INTEGER));
                 modFunc.Parameters.Add(CastNodeToType(tokenNode.Right, SymType.INTEGER));
                 CastNodeToType(modFunc, SymType.INTEGER);
@@ -241,7 +241,7 @@ public partial class Compiler {
             // Comal MOD behaves differently to the built-in MOD operator so we need
             // to correct this by calling the IMOD intrinsic instead.
             ExtCallParseNode modFunc = GetIntrinsicExtCallNode("IMOD");
-            modFunc.Parameters = new();
+            modFunc.Parameters = new ParametersParseNode();
             modFunc.Parameters.Add(CastNodeToType(tokenNode.Left, SymType.INTEGER));
             modFunc.Parameters.Add(CastNodeToType(tokenNode.Right, SymType.INTEGER));
             CastNodeToType(modFunc, SymType.INTEGER);
@@ -711,7 +711,7 @@ public partial class Compiler {
         ExpectToken(TokenID.RPAREN);
 
         ExtCallParseNode node = GetFileManagerExtCallNode("GET");
-        node.Parameters = new();
+        node.Parameters = new ParametersParseNode();
         node.Parameters.Add(fileParseNode);
         node.Parameters.Add(countNode);
         node.Type = SymType.CHAR;

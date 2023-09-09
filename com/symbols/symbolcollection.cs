@@ -116,17 +116,6 @@ public class SymbolCollection : IEnumerable<Symbol> {
     }
 
     /// <summary>
-    /// Remove the specified name from the symbol table.
-    /// </summary>
-    /// <param name="type">Symbol type to be removed</param>
-    public void Clear(string name) {
-
-        if (_symbols.ContainsKey(name)) {
-            _symbols.Remove(name);
-        }
-    }
-
-    /// <summary>
     /// Add the specified symbol to this symbol table.
     /// </summary>
     /// <param name="sym">Symbol to be added</param>
@@ -154,20 +143,14 @@ public class SymbolCollection : IEnumerable<Symbol> {
     /// </summary>
     /// <param name="sym">Symbol to be removed</param>
     /// <returns>True if the symbol was successfully removed, false otherwise.</returns>
-    public bool Remove(Symbol sym) {
-        bool success;
-
+    public void Remove(Symbol sym) {
         if (_symbols.ContainsValue(sym)) {
             string name = sym.Name;
             if (!CaseSensitive) {
                 name = name.ToUpper();
             }
             _symbols.Remove(name);
-            success = true;
-        } else {
-            success = false;
         }
-        return success;
     }
 
     /// <summary>

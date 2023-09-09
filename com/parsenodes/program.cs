@@ -36,8 +36,10 @@ namespace CCompiler;
 /// </summary>
 public class ProgramParseNode : ParseNode {
 
+#if GENERATE_NATIVE_BINARIES
     private readonly bool _isCOMVisible = true;
     private readonly bool _isCLSCompliant = true;
+#endif
     private readonly Options _opts;
 
     private string _filename;
@@ -167,7 +169,6 @@ public class ProgramParseNode : ParseNode {
     /// </summary>
     public void Generate() {
         try {
-            AppDomain ad = AppDomain.CurrentDomain;
             AssemblyName an = new() {
                 Name = DotNetName,
                 Version = new Version(VersionString)
@@ -306,7 +307,7 @@ public class ProgramParseNode : ParseNode {
             throw new ArgumentNullException(nameof(methodName));
         }
         Type baseType;
-        if (!baseTypeName.Contains(",")) {
+        if (!baseTypeName.Contains(',')) {
 
             // This is a Comal external library so, for the purpose of simplifying
             // the syntax, we make some assumptions:
@@ -549,20 +550,24 @@ public class ProgramParseNode : ParseNode {
     }
 
     // Mark this assembly as CLS Compliant.
+#if GENERATE_NATIVE_BINARIES
     private void AddCLSCompliant() {
         Type type = typeof(CLSCompliantAttribute);
         ConstructorInfo ctor = type.GetConstructor(new[] { typeof(bool) });
         CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCLSCompliant });
         Builder.SetCustomAttribute(caBuilder);
     }
+#endif
 
     // Mark this assembly as COM Visible.
+#if GENERATE_NATIVE_BINARIES
     private void AddCOMVisiblity() {
         Type type = typeof(ComVisibleAttribute);
         ConstructorInfo ctor = type.GetConstructor(new[] { typeof(bool) });
         CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCOMVisible });
         Builder.SetCustomAttribute(caBuilder);
     }
+#endif
 
     // Sets the filename in the debug info.
     private void SetCurrentDocument(string filename) {
@@ -571,12 +576,13 @@ public class ProgramParseNode : ParseNode {
 #endif
     }
 
-        // Retrieves the current document.
-        private ISymbolDocumentWriter GetCurrentDocument() {
+    // Retrieves the current document.
+    private ISymbolDocumentWriter GetCurrentDocument() {
         return _currentDoc;
     }
 
     // Gets the output filename complete with extension.
+#if GENERATE_NATIVE_BINARIES
     private string OutputFilename(string outputFile) {
         string outputFilename = Path.GetFileName(outputFile);
         if (!Path.HasExtension(outputFilename)) {
@@ -584,4 +590,5 @@ public class ProgramParseNode : ParseNode {
         }
         return outputFilename;
     }
+#endif
 }

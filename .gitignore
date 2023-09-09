@@ -25,7 +25,7 @@ mono_crash.*
 
 # Files I don't want to track
 FORT.*
-fcvs21/run.out
+tests/fcvs21/run.out
 
 # Drop folder
 drop/
@@ -363,4 +363,6 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 /standard/VISITORFILE
-tests/fcvs21/run.out
+
+# Rider files and folders
+.idea

@@ -37,7 +37,7 @@ public class Interpreter {
     /// </summary>
     public Interpreter() {
         IsAutoMode = false;
-        Lines = new();
+        Lines = new Lines();
         ActiveCompiler = null;
     }
 
@@ -329,7 +329,7 @@ public class Interpreter {
         ReadLine readLine = new();
         string editedLine = readLine.Read(line.PrintableLine(0, false));
 
-        line = new(tokeniser.TokeniseLine(line.LineNumber + editedLine));
+        line = new Line(tokeniser.TokeniseLine(line.LineNumber + editedLine));
         Lines.Add(line);
         Lines.Reset();
 
@@ -656,7 +656,7 @@ public class Interpreter {
             WarnLevel = 4
         };
         MessageCollection messages = new(localOpts);
-        ActiveCompiler = new(localOpts);
+        ActiveCompiler = new Compiler(localOpts);
         Lines.Reset();
         ActiveCompiler.CompileLines(Lines);
         foreach (Message msg in messages) {
@@ -738,7 +738,7 @@ public class Interpreter {
     private static void ExecuteStatement(ComalOptions opts, Line line) {
 
         if (ActiveCompiler == null) {
-            ActiveCompiler = new(opts);
+            ActiveCompiler = new Compiler(opts);
         }
         ActiveCompiler.Messages.Interactive = opts.Interactive;
         ActiveCompiler.Messages.Clear();
@@ -750,7 +750,7 @@ public class Interpreter {
     // Scan and execute the specified source lines.
     private static void ExecuteLines(ComalOptions opts, Lines lines) {
 
-        ActiveCompiler = new(opts) {
+        ActiveCompiler = new Compiler(opts) {
             Messages = {
                 Interactive = opts.Interactive
             }

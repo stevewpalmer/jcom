@@ -38,7 +38,7 @@ public sealed class ProcedureParseNode : ParseNode {
     /// </summary>
     public ProcedureParseNode() : base(ParseID.PROCEDURE) {
         Symbols = new List<SymbolCollection>();
-        Body = new();
+        Body = new BlockParseNode();
     }
 
     /// <summary>
@@ -79,12 +79,6 @@ public sealed class ProcedureParseNode : ParseNode {
     /// </summary>
     /// <value>The label collection</value>
     public Collection<ParseNode> LabelList { get; set; }
-
-    /// <summary>
-    /// Gets or sets the optional return value expression
-    /// </summary>
-    /// <value>The parse node for the return value</value>
-    public ParseNode ValueExpression { get; set; }
 
     /// <value>
     /// Gets or sets the alternate return count.

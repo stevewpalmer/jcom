@@ -40,18 +40,6 @@ public class SymFullType : IEquatable<SymFullType> {
     }
 
     /// <summary>
-    /// Initialises a copy of the specified SymFullType.
-    /// </summary>
-    /// <param name="copy">A SymFullType object to copy</param>
-    public SymFullType(SymFullType copy) {
-        if (copy == null) {
-            throw new ArgumentNullException(nameof(copy));
-        }
-        Type = copy.Type;
-        Width = copy.Width;
-    }
-
-    /// <summary>
     /// Returns whether this object is identical to the given object.
     /// </summary>
     /// <param name="obj">The <see cref="object"/> to compare with the 

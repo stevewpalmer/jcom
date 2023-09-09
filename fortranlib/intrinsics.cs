@@ -1297,7 +1297,7 @@ public static class Intrinsics {
     /// <param name="seed">Seed value</param>
     /// <returns>The next random number for the given seed</returns>
     public static double RAND(ref int seed) {
-        _rand = new(seed);
+        _rand = new Random(seed);
         return _rand.NextDouble();
     }
 

@@ -163,7 +163,6 @@ public class StatusBar {
                 Display.SetCursor(new Point(prompt.Length, _statusRow));
                 Display.WriteToNc(prompt.Length, _statusRow, _displayWidth - prompt.Length, readyText);
                 Display.SetCursor(new Point(prompt.Length + readyText.Length, _statusRow));
-                readyText = null;
             }
             input = Console.ReadKey(true);
         }
@@ -244,7 +243,6 @@ public class StatusBar {
                 Display.SetCursor(new Point(prompt.Length, _statusRow));
                 Display.WriteToNc(prompt.Length, _statusRow, _displayWidth - prompt.Length, readyText);
                 Display.SetCursor(new Point(prompt.Length + readyText.Length, _statusRow));
-                readyText = null;
             }
             input = Console.ReadKey(true);
         }
