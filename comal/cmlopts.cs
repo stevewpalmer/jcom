@@ -24,6 +24,7 @@
 // under the License.
 
 using CCompiler;
+using JComLib;
 
 namespace JComal; 
 

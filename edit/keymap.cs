@@ -50,10 +50,14 @@ public enum KeyCommand {
     KC_EDIT,
     KC_EXIT,
     KC_GOTO,
+    KC_LOADKEYSTROKES,
     KC_NEXTBUFFER,
     KC_OUTPUTFILE,
+    KC_PLAYBACK,
     KC_PREVBUFFER,
+    KC_REMEMBER,
     KC_REPEAT,
+    KC_SAVEKEYSTROKES,
     KC_SCREENDOWN,
     KC_SCREENUP,
     KC_VERSION,
@@ -96,14 +100,18 @@ public class KeyMap {
         new() { CommandName = "execute_macro", CommandId = KeyCommand.KC_COMMAND },
         new() { CommandName = "exit", CommandId = KeyCommand.KC_EXIT },
         new() { CommandName = "goto_line", CommandId = KeyCommand.KC_GOTO },
+        new() { CommandName = "load_keystroke_macro", CommandId = KeyCommand.KC_LOADKEYSTROKES },
         new() { CommandName = "next_char", CommandId = KeyCommand.KC_CRIGHT },
         new() { CommandName = "next_word", CommandId = KeyCommand.KC_CWORDRIGHT },
         new() { CommandName = "output_file", CommandId = KeyCommand.KC_OUTPUTFILE },
         new() { CommandName = "page_down", CommandId = KeyCommand.KC_CPAGEDOWN },
         new() { CommandName = "page_up", CommandId = KeyCommand.KC_CPAGEUP },
+        new() { CommandName = "playback", CommandId = KeyCommand.KC_PLAYBACK },
         new() { CommandName = "prev_char", CommandId = KeyCommand.KC_CLEFT },
         new() { CommandName = "previous_word", CommandId = KeyCommand.KC_CWORDLEFT },
+        new() { CommandName = "remember", CommandId = KeyCommand.KC_REMEMBER },
         new() { CommandName = "repeat", CommandId = KeyCommand.KC_REPEAT },
+        new() { CommandName = "save_keystroke_macro", CommandId = KeyCommand.KC_SAVEKEYSTROKES },
         new() { CommandName = "screen_down", CommandId = KeyCommand.KC_SCREENDOWN },
         new() { CommandName = "screen_up", CommandId = KeyCommand.KC_SCREENUP },
         new() { CommandName = "top_of_buffer", CommandId = KeyCommand.KC_CFILESTART },
@@ -175,13 +183,19 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_EXIT, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.X },
         new() { KeyCommand = KeyCommand.KC_GOTO, KeyChar = 204 },
         new() { KeyCommand = KeyCommand.KC_GOTO, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.G },
+        new() { KeyCommand = KeyCommand.KC_LOADKEYSTROKES, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F7 },
+        new() { KeyCommand = KeyCommand.KC_LOADKEYSTROKES, Key = ConsoleKey.F12 },
         new() { KeyCommand = KeyCommand.KC_NEXTBUFFER, KeyChar = 710 },
         new() { KeyCommand = KeyCommand.KC_NEXTBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.N },
         new() { KeyCommand = KeyCommand.KC_OUTPUTFILE, KeyChar = 248 },
         new() { KeyCommand = KeyCommand.KC_OUTPUTFILE, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.O },
+        new() { KeyCommand = KeyCommand.KC_PLAYBACK, Key = ConsoleKey.F8 },
         new() { KeyCommand = KeyCommand.KC_PREVBUFFER, KeyChar = 305 },
         new() { KeyCommand = KeyCommand.KC_PREVBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.OemMinus },
+        new() { KeyCommand = KeyCommand.KC_REMEMBER, Key = ConsoleKey.F7 },
         new() { KeyCommand = KeyCommand.KC_REPEAT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.R },
+        new() { KeyCommand = KeyCommand.KC_SAVEKEYSTROKES, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F8 },
+        new() { KeyCommand = KeyCommand.KC_SAVEKEYSTROKES, Key = ConsoleKey.F13 },
         new() { KeyCommand = KeyCommand.KC_SCREENDOWN, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D },
         new() { KeyCommand = KeyCommand.KC_SCREENUP, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.E },
         new() { KeyCommand = KeyCommand.KC_VERSION, KeyChar = 8730 },
@@ -210,6 +224,30 @@ public class KeyMap {
 
         KeyMap match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
         return match?.KeyCommand ?? KeyCommand.KC_NONE;
+    }
+
+    /// <summary>
+    /// Map a command to its corresponding command name.
+    /// </summary>
+    /// <param name="commandId">Command ID</param>
+    /// <returns>Command name equivalent</returns>
+    public static string MapCommandToCommandName(KeyCommand commandId) {
+        return CommandTable.Where(ct => ct.CommandId == commandId)
+            .Select(ct => ct.CommandName).First();
+    }
+
+    /// <summary>
+    /// Return whether the given command can be added to the keystroke buffer.
+    /// </summary>
+    /// <param name="commandId">Command ID</param>
+    /// <returns>True if command can be recorded. False otherwise</returns>
+    public static bool IsRecordable(KeyCommand commandId) {
+        return commandId switch {
+            KeyCommand.KC_REPEAT => false,
+            KeyCommand.KC_REMEMBER => false,
+            KeyCommand.KC_SAVEKEYSTROKES => false,
+            _ => true
+        };
     }
 }
 

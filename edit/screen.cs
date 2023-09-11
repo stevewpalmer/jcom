@@ -23,12 +23,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JEdit.Resources;
+
 namespace JEdit;
 
 public class Screen {
     private readonly List<Window> _windowList = new();
     private Window _activeWindow;
-    private Macro _parser = new();
+    private readonly Recorder _recorder = new();
 
     /// <summary>
     /// Constructor
@@ -49,7 +51,7 @@ public class Screen {
     /// <param name="theWindow"></param>
     public void AddWindow(Window theWindow) {
         if (theWindow.Buffer.NewFile) {
-            StatusBar.Message($"New file (unable to open file {theWindow.Buffer.BaseFilename})");
+            StatusBar.Message(string.Format(Edit.NewFileWarning, theWindow.Buffer.BaseFilename));
         }
         _windowList.Add(theWindow);
         theWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
@@ -79,7 +81,8 @@ public class Screen {
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
             KeyCommand commandId = KeyMap.MapKeyToCommand(keyIn);
-            flags = Handle(commandId);
+            Macro parser = new Macro();
+            flags = Handle(parser, commandId);
         } while (flags != RenderHint.EXIT);
     }
 
@@ -89,20 +92,27 @@ public class Screen {
     /// </summary>
     /// <param name="commandId">Command ID</param>
     /// <returns>The rendering hint</returns>
-    private RenderHint Handle(KeyCommand commandId) {
+    private RenderHint Handle(Macro parser, KeyCommand commandId) {
+        if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING && KeyMap.IsRecordable(commandId)) {
+            _recorder.RememberKeystroke(commandId, parser.RestOfLine());
+        }
         RenderHint flags = commandId switch {
             KeyCommand.KC_CLOSE => CloseWindow(),
             KeyCommand.KC_COMMAND => RunCommand(),
             KeyCommand.KC_DETAILS => ShowDetails(),
-            KeyCommand.KC_EDIT => EditFile(),
+            KeyCommand.KC_EDIT => EditFile(parser),
             KeyCommand.KC_EXIT => ExitEditor(true),
+            KeyCommand.KC_LOADKEYSTROKES => LoadRecording(),
             KeyCommand.KC_NEXTBUFFER => SelectWindow(1),
-            KeyCommand.KC_OUTPUTFILE => RenameOutputFile(),
+            KeyCommand.KC_OUTPUTFILE => RenameOutputFile(parser),
+            KeyCommand.KC_PLAYBACK => Playback(),
             KeyCommand.KC_PREVBUFFER => SelectWindow(-1),
+            KeyCommand.KC_REMEMBER => StartStopRecording(),
             KeyCommand.KC_REPEAT => Repeat(),
+            KeyCommand.KC_SAVEKEYSTROKES => SaveRecording(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
-            _ => _activeWindow.Handle(_parser, commandId)
+            _ => _activeWindow.Handle(parser, commandId)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
             UpdateCursorPosition();
@@ -123,7 +133,7 @@ public class Screen {
     /// <param name="direction">Direction</param>
     private RenderHint SelectWindow(int direction) {
         if (_windowList.Count == 1) {
-            StatusBar.Message("No other buffers.");
+            StatusBar.Message(Edit.NoOtherBuffers);
             return RenderHint.NONE;
         }
         int currentBufferIndex = _windowList.IndexOf(_activeWindow) + direction;
@@ -150,8 +160,8 @@ public class Screen {
     /// <summary>
     /// Edit a file in a new window, or switch to the file in an existing window.
     /// </summary>
-    private RenderHint EditFile() {
-        if (_parser.GetFilename("File:", out string inputValue)) {
+    private RenderHint EditFile(Macro parser) {
+        if (parser.GetFilename(Edit.File, out string inputValue)) {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
@@ -178,7 +188,7 @@ public class Screen {
         }
         if (_activeWindow.Buffer.Modified) {
             char[] validInput = { 'y', 'n', 'w' }; 
-            if (StatusBar.Prompt("This buffer has not been saved. Delete @@?", validInput, 'n', out char inputChar)) {
+            if (StatusBar.Prompt(Edit.ThisBufferHasNotBeenSaved, validInput, 'n', out char inputChar)) {
                 switch (inputChar) {
                     case 'n':
                         return RenderHint.NONE;
@@ -207,14 +217,14 @@ public class Screen {
     /// </summary>
     private RenderHint RunCommand() {
         RenderHint flags = RenderHint.NONE;
-        if (StatusBar.PromptForInput("Command:", out string inputValue, false)) {
-            _parser = new Macro(inputValue);
-            KeyCommand commandId = KeyMap.MapCommandNameToCommand(_parser.NextWord());
+        if (StatusBar.PromptForInput(Edit.CommandPrompt, out string inputValue, false)) {
+            Macro parser = new Macro(inputValue);
+            KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
             if (commandId == KeyCommand.KC_NONE) {
-                StatusBar.Message("Unknown command");
+                StatusBar.Message(Edit.UnknownCommand);
             }
             else {
-                flags = Handle(commandId);
+                flags = Handle(parser, commandId);
             }
         }
         return flags;
@@ -229,13 +239,96 @@ public class Screen {
     }
 
     /// <summary>
+    /// Start or stop keystroke recording.
+    /// </summary>
+    private RenderHint StartStopRecording() {
+        if (StatusBar.KeystrokesMode == KeystrokesMode.NONE && _recorder.HasKeystrokeMacro) {
+            char[] validInput = { 'y', 'n' };
+            if (!StatusBar.Prompt(Edit.OverwriteExistingKeystrokeMacro, validInput, 'n', out char inputChar)) {
+                return RenderHint.NONE;
+            }
+            if (inputChar == 'n') {
+                return RenderHint.NONE;
+            }
+        }
+        if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING) {
+            StatusBar.KeystrokesMode = KeystrokesMode.NONE;
+            StatusBar.Message(Edit.DefiningKeystrokeMacro);
+        }
+        else {
+            StatusBar.KeystrokesMode = KeystrokesMode.RECORDING;
+            StatusBar.Message(Edit.KeystrokeMacroDefined);
+        }
+        return RenderHint.CURSOR_STATUS;
+    }
+
+    /// <summary>
+    /// Play back a recorded macro.
+    /// </summary>
+    /// <returns></returns>
+    private RenderHint Playback() {
+        RenderHint flags = RenderHint.NONE;
+        if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING) {
+            StatusBar.Error(Edit.CannotPlayback);
+        }
+        else if (!_recorder.HasKeystrokeMacro) {
+            StatusBar.Error(Edit.NothingToPlayback);
+        }
+        else {
+            StatusBar.KeystrokesMode = KeystrokesMode.PLAYBACK;
+            foreach (string commandString in _recorder.Keystrokes) {
+                Macro parser = new Macro(commandString);
+                KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
+                if (commandId != KeyCommand.KC_NONE) {
+                    flags |= Handle(parser, commandId);
+                }
+            }
+            StatusBar.KeystrokesMode = KeystrokesMode.NONE;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Load a keystroke macro from a file.
+    /// </summary>
+    private RenderHint LoadRecording() {
+        if (_recorder.HasKeystrokeMacro) {
+            char[] validInput = { 'y', 'n' };
+            if (!StatusBar.Prompt(Edit.OverwriteExistingKeystrokeMacro, validInput, 'n', out char inputChar)) {
+                return RenderHint.NONE;
+            }
+            if (inputChar == 'n') {
+                return RenderHint.NONE;
+            }
+        }
+        if (StatusBar.PromptForInput(Edit.KeystrokeMacroFile, out string inputValue, true)) {
+            if (!_recorder.LoadKeystrokes(inputValue)) {
+                StatusBar.Error(Edit.KeystrokeMacroNotFound);
+            } else {
+                StatusBar.Message(Edit.LoadKeystrokeMacroSuccessful);
+            }
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Save the current keystroke macro to a file.
+    /// </summary>
+    private RenderHint SaveRecording() {
+        if (StatusBar.PromptForInput(Edit.SaveKeystrokesAs, out string inputValue, true)) {
+            _recorder.SaveKeystrokes(inputValue);
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
     /// Repeat a key command.
     /// </summary>
     private RenderHint Repeat() {
         RenderHint flags = RenderHint.NONE;
         if (StatusBar.PromptForRepeat(out int repeatCount, out KeyCommand commandId)) {
             while (repeatCount-- > 0) {
-                flags |= Handle(commandId);
+                flags |= Handle(new Macro(), commandId);
             }
         }
         return flags;
@@ -246,11 +339,11 @@ public class Screen {
     /// name must not conflict with any existing buffer name otherwise an error
     /// is displayed.
     /// </summary>
-    private RenderHint RenameOutputFile() {
-        if (_parser.GetFilename("Enter new output file name:", out string outputFileName)) {
+    private RenderHint RenameOutputFile(Macro parser) {
+        if (parser.GetFilename(Edit.EnterNewOutputFileName, out string outputFileName)) {
             string fullFilename = Buffer.GetFullFilename(outputFileName);
             if (_windowList.Any(window => fullFilename.Equals(window.Buffer.FullFilename, StringComparison.OrdinalIgnoreCase))) {
-                StatusBar.Message("Invalid output filename");
+                StatusBar.Message(Edit.InvalidOutputFilename);
                 return RenderHint.NONE;
             }
             _activeWindow.Buffer.Filename = outputFileName;
@@ -273,7 +366,7 @@ public class Screen {
         if (prompt) {
             if (modifiedBuffers.Any()) {
                 char[] validInput = { 'y', 'n', 'w' };
-                if (StatusBar.Prompt($"{modifiedBuffers} buffers have not been saved. Exit @@?", validInput, 'n', out char inputChar)) {
+                if (StatusBar.Prompt(string.Format(Edit.ModifiedBuffers, modifiedBuffers.Length), validInput, 'n', out char inputChar)) {
                     switch (inputChar) {
                         case 'n':
                             flags = RenderHint.NONE;

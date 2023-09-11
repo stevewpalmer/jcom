@@ -229,7 +229,7 @@ public class JComRuntimeException : Exception {
     /// the specified error code.
     /// </summary>
     /// <param name="errorCode">The error code.</param>
-    public JComRuntimeException(JComRuntimeErrors errorCode) : base(GetEnumDescription(errorCode)) {
+    public JComRuntimeException(JComRuntimeErrors errorCode) : base(Utilities.GetEnumDescription(errorCode)) {
         ErrorCode = errorCode;
         Type = JComRuntimeExceptionType.FAILURE;
     }
@@ -302,17 +302,5 @@ public class JComRuntimeException : Exception {
     /// <param name="info">A SerializationInfo object.</param>
     /// <param name="context">A StreamingContext object.</param>
     protected JComRuntimeException(SerializationInfo info, StreamingContext context) : base(info, context) {
-    }
-
-    // Helper function that returns a description on an enum.
-    private static string GetEnumDescription(Enum value) {
-
-        FieldInfo fi = value.GetType().GetField(value.ToString());
-        if (fi != null && fi.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attributes) {
-            if (attributes != null && attributes.Any()) {
-                return attributes.First().Description;
-            }
-        }
-        return value.ToString();
     }
 }

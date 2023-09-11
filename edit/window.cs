@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Drawing;
+using JEdit.Resources;
 
 namespace JEdit;
 
@@ -131,7 +132,7 @@ public class Window {
     /// </summary>
     private RenderHint GoToLine(Macro parser) {
         RenderHint flags = RenderHint.NONE;
-        if (parser.GetNumber("Go to line: ", out int inputLine)) {
+        if (parser.GetNumber(Edit.GoToLine, out int inputLine)) {
             if (inputLine > Buffer.Length) {
                 inputLine = Buffer.Length;
             }

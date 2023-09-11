@@ -26,6 +26,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using JComLib;
+using JEdit.Resources;
 
 namespace JEdit;
 
@@ -33,11 +34,14 @@ public class StatusBar {
     private static int _statusRow;
     private string _cachedText;
     private static int _timeWidth;
+    private int _modeWidth;
     private int _cursorPositionWidth;
     private int _displayWidth;
     private static int _timePosition;
+    private int _modePosition;
     private int _cursorPositionPosition;
     private string _cachedTextInput;
+    private KeystrokesMode _keystrokesMode;
 
     /// <summary>
     /// Default render of status bar. Show the application title and start
@@ -46,13 +50,26 @@ public class StatusBar {
     public void InitialRender() {
         _statusRow = Console.WindowHeight - 1;
         _cachedText = string.Empty;
-        _timeWidth = 11;
+        _modeWidth = 3;
+        _timeWidth = 8;
         _cursorPositionWidth = 18;
         _displayWidth = Console.WindowWidth - (_timeWidth + _cursorPositionWidth);
         _timePosition = Console.WindowWidth - _timeWidth;
-        _cursorPositionPosition = _timePosition - _cursorPositionWidth;
+        _modePosition = Console.WindowWidth - _timeWidth - _modeWidth;
+        _cursorPositionPosition = _modePosition - _cursorPositionWidth;
         RenderVersion();
         RenderTime();
+    }
+
+    /// <summary>
+    /// Specifies the keystroke recording/playback mode indicator
+    /// </summary>
+    public KeystrokesMode KeystrokesMode {
+        get => _keystrokesMode;
+        set {
+            _keystrokesMode = value;
+            RenderModeIndicator();
+        }
     }
 
     /// <summary>
@@ -61,6 +78,17 @@ public class StatusBar {
     /// <param name="message">Message string</param>
     public void Message(string message) {
         Display.WriteTo(0, _statusRow, _displayWidth, message);
+    }
+
+    /// <summary>
+    /// Display a message on the status bar.
+    /// </summary>
+    /// <param name="message">Message string</param>
+    public void Error(string message) {
+        ConsoleColor savedColor = Console.ForegroundColor;
+        Console.ForegroundColor = ConsoleColor.Red;
+        Display.WriteTo(0, _statusRow, _displayWidth, message);
+        Console.ForegroundColor = savedColor;
     }
 
     /// <summary>
@@ -79,7 +107,7 @@ public class StatusBar {
             }
             input = Console.ReadKey(true);
         }
-        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
+        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? Edit.CommandCancelled : _cachedText);
         Display.SetCursor(cursorPosition);
         inputValue = input.Key == ConsoleKey.Enter ? defaultChar : char.ToLower(input.KeyChar);
         return input.Key != ConsoleKey.Escape;
@@ -99,7 +127,7 @@ public class StatusBar {
         List<char> inputBuffer = new();
 
         while (true) {
-            string prompt = $"Repeat count = {repeatCount}: type count or command.";
+            string prompt = string.Format(Edit.RepeatCount, repeatCount);
             cursorPosition = Display.WriteToNc(0, _statusRow, _displayWidth, prompt);
             Display.SetCursor(new Point(prompt.Length, _statusRow));
             ConsoleKeyInfo input = Console.ReadKey(true);
@@ -121,7 +149,7 @@ public class StatusBar {
                 break;
             }
         }
-        Display.WriteTo(0, _statusRow, _displayWidth, repeatCount == 0 ? "Command cancelled." : _cachedText);
+        Display.WriteTo(0, _statusRow, _displayWidth, repeatCount == 0 ? Edit.CommandCancelled : _cachedText);
         Display.SetCursor(cursorPosition);
         return repeatCount > 0;
     }
@@ -170,7 +198,7 @@ public class StatusBar {
         if (inputBuffer.Count > 1) {
             history.Add(inputBuffer);
         }
-        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
+        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? Edit.CommandCancelled : _cachedText);
         Display.SetCursor(cursorPosition);
         return inputBuffer.Count > 0;
     }
@@ -251,7 +279,7 @@ public class StatusBar {
             _cachedTextInput = inputValue;
             history.Add(inputBuffer);
         }
-        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? "Command cancelled." : _cachedText);
+        Display.WriteTo(0, _statusRow, _displayWidth, input.Key == ConsoleKey.Escape ? Edit.CommandCancelled : _cachedText);
         Display.SetCursor(cursorPosition);
         return inputBuffer.Count > 0;
     }
@@ -272,6 +300,23 @@ public class StatusBar {
     }
 
     /// <summary>
+    /// Render the mode indicator field
+    /// </summary>
+    private void RenderModeIndicator() {
+        string modeField;
+        if (KeystrokesMode != KeystrokesMode.NONE) {
+            modeField = Utilities.GetEnumDescription(KeystrokesMode);
+        }
+        else {
+            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+            char numLockEnabled = isWindows && Console.NumberLock ? '#' : ' ';
+            char capsLockEnabled = isWindows && Console.CapsLock ? '\u2191' : ' ';
+            modeField = $"{numLockEnabled}{capsLockEnabled}";
+        }
+        Display.WriteTo(_modePosition, _statusRow, _modeWidth, modeField);
+    }
+
+    /// <summary>
     /// Return the application title string
     /// </summary>
     private static string AppTitle => $"{AssemblySupport.AssemblyDescription} v{AssemblySupport.AssemblyVersion} - {AssemblySupport.AssemblyCopyright}";
@@ -281,11 +326,8 @@ public class StatusBar {
     /// </summary>
     private static void RenderTime() {
         Timer _ = new(_ => {
-            bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            char numLockEnabled = isWindows && Console.NumberLock ? '#' : ' ';
-            char capsLockEnabled = isWindows && Console.CapsLock ? '\u2191' : ' ';
             char separatorChar = DateTime.Now.Second % 2 == 0 ? ' ' : ':';
-            string timeString = DateTime.Now.ToString($"{capsLockEnabled}{numLockEnabled} h{separatorChar}mm tt");
+            string timeString = DateTime.Now.ToString($"h{separatorChar}mm tt");
             Display.WriteTo(_timePosition, _statusRow, _timeWidth, timeString);
         }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
