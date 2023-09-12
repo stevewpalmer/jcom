@@ -218,7 +218,7 @@ public class Window {
         Console.Write('╕');
         Console.SetCursorPosition((frameRect.Width - title.Length - 2) / 2, 0);
         Console.ForegroundColor = Screen.Colours.SelectedTitleColour;
-        Console.Write($" {title} ");
+        Console.Write($@" {title} ");
         Console.ForegroundColor = Screen.Colours.ForegroundColour;
         Console.SetCursorPosition(savedLeft, savedTop);
     }
@@ -233,15 +233,17 @@ public class Window {
         int w = _viewportBounds.Width;
 
         Point savedCursor = Display.GetCursor();
+        ConsoleColor bg = Screen.Colours.BackgroundColour;
+        ConsoleColor fg = Screen.Colours.ForegroundColour;
         string line = Buffer.GetLine(i);
         while (line != null && y < _viewportBounds.Bottom) {
             int left = Math.Min(_viewportOffset.X, line.Length);
             int length = Math.Min(w, line.Length - left);
-            Display.WriteToNc(_viewportBounds.Left, y++, w, line.Substring(left, length));
+            Display.WriteToNc(_viewportBounds.Left, y++, w, bg, fg, line.Substring(left, length));
             line = Buffer.GetLine(++i);
         }
         while (y < _viewportBounds.Bottom) {
-            Display.WriteToNc(_viewportBounds.Left, y++, w, string.Empty);
+            Display.WriteToNc(_viewportBounds.Left, y++, w, bg, fg, string.Empty);
         }
         Display.SetCursor(savedCursor);
         PlaceCursor();

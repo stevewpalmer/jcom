@@ -200,5 +200,23 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("ErrorTextColourNumber", resourceCulture);
             }
         }
+        
+        internal static string InvalidColour {
+            get {
+                return ResourceManager.GetString("InvalidColour", resourceCulture);
+            }
+        }
+        
+        internal static string InvalidColourIndex {
+            get {
+                return ResourceManager.GetString("InvalidColourIndex", resourceCulture);
+            }
+        }
+        
+        internal static string MaximumKeystrokes {
+            get {
+                return ResourceManager.GetString("MaximumKeystrokes", resourceCulture);
+            }
+        }
     }
 }

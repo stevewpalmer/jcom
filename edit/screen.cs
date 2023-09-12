@@ -55,21 +55,8 @@ public class Screen {
     /// <summary>
     /// Configuration
     /// </summary>
-    public static Config Config { get; private set; }
+    private static Config Config { get; set; }
 
-    /// <summary>
-    /// Add a window to the window list. This will not make the window
-    /// active.
-    /// </summary>
-    /// <param name="theWindow"></param>
-    public void AddWindow(Window theWindow) {
-        if (theWindow.Buffer.NewFile) {
-            StatusBar.Message(string.Format(Edit.NewFileWarning, theWindow.Buffer.BaseFilename));
-        }
-        _windowList.Add(theWindow);
-        theWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
-    }
-    
     /// <summary>
     /// Open the main window.
     /// </summary>
@@ -111,11 +98,16 @@ public class Screen {
     /// Handle keystrokes at the screen level and pass on any unhandled
     /// ones to the active window.
     /// </summary>
+    /// <param name="parser">Parser object</param>
     /// <param name="commandId">Command ID</param>
     /// <returns>The rendering hint</returns>
     private RenderHint Handle(Macro parser, KeyCommand commandId) {
         if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING && KeyMap.IsRecordable(commandId)) {
-            _recorder.RememberKeystroke(commandId, parser.RestOfLine());
+            if (!_recorder.RememberKeystroke(commandId, parser.RestOfLine())) {
+                StatusBar.Error(Edit.MaximumKeystrokes);
+                StatusBar.KeystrokesMode = KeystrokesMode.NONE;
+                return RenderHint.CURSOR_STATUS;
+            }
         }
         RenderHint flags = commandId switch {
             KeyCommand.KC_CLOSE => CloseWindow(),
@@ -163,6 +155,18 @@ public class Screen {
     /// </summary>
     private void UpdateCursorPosition() {
         StatusBar.UpdateCursorPosition(_activeWindow.Buffer.LineIndex + 1, _activeWindow.Buffer.Offset + 1);
+    }
+
+    /// <summary>
+    /// Add a window to the window list. This will not make the window
+    /// active.
+    /// </summary>
+    public void AddWindow(Window theWindow) {
+        if (theWindow.Buffer.NewFile) {
+            StatusBar.Message(string.Format(Edit.NewFileWarning, theWindow.Buffer.BaseFilename));
+        }
+        _windowList.Add(theWindow);
+        theWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
     }
 
     /// <summary>
@@ -245,20 +249,24 @@ public class Screen {
     /// <summary>
     /// Change the colour configuration.
     /// </summary>
-    private RenderHint ConfigureColours(Macro parser) {
-        if (!parser.GetNumber(Edit.BackgroundColourNumber, out int backgroundColour)) {
+    private static RenderHint ConfigureColours(Macro parser) {
+        if (!GetColourInput(parser, Edit.BackgroundColourNumber, out int backgroundColour)) {
             return RenderHint.NONE;
         }
-        if (!parser.GetNumber(Edit.ForegroundColourNumber, out int foregroundColour)) {
+        if (!GetColourInput(parser, Edit.ForegroundColourNumber, out int foregroundColour)) {
             return RenderHint.NONE;
         }
-        if (!parser.GetNumber(Edit.SelectedTitleColourNumber, out int selectedTitleColour)) {
+        if (foregroundColour == backgroundColour) {
+            StatusBar.Error(Edit.InvalidColour);
             return RenderHint.NONE;
         }
-        if (!parser.GetNumber(Edit.NormalTextColourNumber, out int normalMessageColour)) {
+        if (!GetColourInput(parser, Edit.SelectedTitleColourNumber, out int selectedTitleColour)) {
             return RenderHint.NONE;
         }
-        if (!parser.GetNumber(Edit.ErrorTextColourNumber, out int errorMessageColour)) {
+        if (!GetColourInput(parser, Edit.NormalTextColourNumber, out int normalMessageColour)) {
+            return RenderHint.NONE;
+        }
+        if (!GetColourInput(parser, Edit.ErrorTextColourNumber, out int errorMessageColour)) {
             return RenderHint.NONE;
         }
         Config.BackgroundColour = backgroundColour.ToString();
@@ -268,6 +276,24 @@ public class Screen {
         Config.ErrorMessageColour = errorMessageColour.ToString();
         Config.Save();
         return RenderHint.REFRESH;
+    }
+
+    /// <summary>
+    /// Input a colour index as part of the colour command.
+    /// </summary>
+    /// <param name="parser">Command parser</param>
+    /// <param name="prompt">Prompt to display</param>
+    /// <param name="colourValue">Output value</param>
+    /// <returns>True if the output value is valid, false otherwise.</returns>
+    private static bool GetColourInput(Macro parser, string prompt, out int colourValue) {
+        if (!parser.GetNumber(prompt, out colourValue)) {
+            return false;
+        }
+        if (colourValue < 0 || colourValue > Colours.MaxColourIndex) {
+            StatusBar.Error(string.Format(Edit.InvalidColourIndex, Colours.MaxColourIndex));
+            return false;
+        }
+        return true;
     }
 
     /// <summary>

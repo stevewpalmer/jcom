@@ -97,13 +97,13 @@ public class Buffer {
     /// Whether the buffer has been modified since it was last
     /// changed.
     /// </summary>
-    public bool Modified { get; set; }
+    public bool Modified { get; private set; }
 
     /// <summary>
     /// Is this a new file (i.e. the file has a name but does not
     /// currently exist on disk).
     /// </summary>
-    public bool NewFile { get; set; }
+    public bool NewFile { get; private set; }
 
     /// <summary>
     /// Number of lines in the buffer

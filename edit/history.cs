@@ -28,7 +28,6 @@ namespace JEdit;
 public class History {
 
     private static readonly Dictionary<string, History> PromptHistory = new();
-    private const int MaxHistory = 10;
     private int _historyIndex;
 
     /// <summary>
@@ -58,7 +57,7 @@ public class History {
     /// </summary>
     /// <param name="newItem">New string to be added</param>
     public void Add(IEnumerable<char> newItem) {
-        if (Items.Count == MaxHistory) {
+        if (Items.Count == Consts.MaxCommandHistory) {
             Items.RemoveAt(Items.Count - 1);
         }
         string newString = string.Join("", newItem);

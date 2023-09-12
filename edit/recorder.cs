@@ -54,16 +54,21 @@ public class Recorder {
 
     /// <summary>
     /// Add the specified command and arguments to the keystroke buffer
-    /// list.
+    /// list if room.
     /// </summary>
     /// <param name="commandId">Command Id</param>
     /// <param name="arguments">Argument list</param>
-    public void RememberKeystroke(KeyCommand commandId, string [] arguments) {
-        string line = KeyMap.MapCommandToCommandName(commandId);
-        if (arguments.Length > 0) {
-            line += $" {string.Join(", ", arguments)}";
+    public bool RememberKeystroke(KeyCommand commandId, string [] arguments) {
+        bool success = false;
+        if (_keystrokeBuffer.Count < Consts.MaxKeystrokes) {
+            string line = KeyMap.MapCommandToCommandName(commandId);
+            if (arguments.Length > 0) {
+                line += $" {string.Join(", ", arguments)}";
+            }
+            _keystrokeBuffer.Add(line);
+            success = true;
         }
-        _keystrokeBuffer.Add(line);
+        return success;
     }
 
     /// <summary>
@@ -83,7 +88,7 @@ public class Recorder {
     public bool LoadKeystrokes(string filename) {
         bool success = false;
         if (File.Exists(filename)) {
-            filename = Utilities.AddExtensionIfMissing(filename, ".km");
+            filename = Utilities.AddExtensionIfMissing(filename, Consts.MacroExtension);
             _keystrokeBuffer = File.ReadAllLines(filename).ToList();
             success = true;
         }
@@ -94,7 +99,7 @@ public class Recorder {
     /// Save keystrokes to the specified file.
     /// </summary>
     public void SaveKeystrokes(string filename) {
-        filename = Utilities.AddExtensionIfMissing(filename, ".km");
+        filename = Utilities.AddExtensionIfMissing(filename, Consts.MacroExtension);
         File.WriteAllLines(filename, _keystrokeBuffer);
     }
 }

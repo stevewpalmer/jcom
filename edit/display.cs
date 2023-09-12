@@ -28,7 +28,8 @@ using System.Drawing;
 namespace JEdit; 
 
 public static class Display {
-    
+    private static readonly object LockObj = new();
+
     /// <summary>
     /// Write to the console at the specified position, padding out to the width
     /// with spaces if required. The previous cursor position is saved and then
@@ -37,11 +38,15 @@ public static class Display {
     /// <param name="x">Zero based column of output</param>
     /// <param name="y">Zero based line of output</param>
     /// <param name="width">Width of area to write to</param>
+    /// <param name="bg">Background colour</param>
+    /// <param name="fg">Foreground colour</param>
     /// <param name="str">String to output</param>
-    public static void WriteTo(int x, int y, int width, string str) {
-        SetCursor(WriteToNc(x, y, width, str));
+    public static void WriteTo(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
+        (int savedLeft, int savedTop) = Console.GetCursorPosition();
+        WriteToNc(x, y, width, bg, fg, str);
+        Console.SetCursorPosition(savedLeft, savedTop);
     }
-    
+
     /// <summary>
     /// Write to the console at the specified position, padding out to the width
     /// with spaces if required. The cursor position is left at the end of the
@@ -50,12 +55,20 @@ public static class Display {
     /// <param name="x">Zero based column of output</param>
     /// <param name="y">Zero based line of output</param>
     /// <param name="width">Width of area to write to</param>
+    /// <param name="bg">Background colour</param>
+    /// <param name="fg">Foreground colour</param>
     /// <param name="str">String to output</param>
-    public static Point WriteToNc(int x, int y, int width, string str) {
-        (int savedLeft, int savedTop) = Console.GetCursorPosition();
-        Console.SetCursorPosition(x, y);
-        Console.Write(str.PadRight(width));
-        return new Point(savedLeft, savedTop);
+    public static void WriteToNc(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
+        lock (LockObj) {
+            ConsoleColor fgSaved = Console.ForegroundColor;
+            ConsoleColor bgSaved = Console.BackgroundColor;
+            Console.ForegroundColor = fg;
+            Console.BackgroundColor = bg;
+            Console.SetCursorPosition(x, y);
+            Console.Write(str.PadRight(width));
+            Console.ForegroundColor = fgSaved;
+            Console.BackgroundColor = bgSaved;
+        }
     }
 
     /// <summary>

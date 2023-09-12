@@ -37,8 +37,8 @@ public class Config {
     /// </summary>
     public static Config Load() {
         Config fileConfig = new Config();
-        if (File.Exists("edit.json")) {
-            using FileStream stream = File.OpenRead("edit.json");
+        if (File.Exists(Consts.ConfigurationFilename)) {
+            using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
             fileConfig = JsonSerializer.Deserialize<Config>(stream);
         }
         return fileConfig;
@@ -48,8 +48,8 @@ public class Config {
     /// Save configurations back to the config file.
     /// </summary>
     public void Save() {
-        using FileStream stream = File.OpenWrite("edit.json");
-        JsonSerializer.Serialize<Config>(stream, this);
+        using FileStream stream = File.OpenWrite(Consts.ConfigurationFilename);
+        JsonSerializer.Serialize(stream, this);
     }
 
     /// <summary>

@@ -25,7 +25,7 @@
 
 namespace JComal; 
 
-public class Consts {
+public static class Consts {
 
     /// <summary>
     /// Character used to suffix an integer variable

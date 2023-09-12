@@ -32,19 +32,22 @@ namespace JEdit;
 
 public class StatusBar {
     private static int _statusRow;
-    private string _cachedText;
     private static int _timeWidth;
-    private int _modeWidth;
-    private int _cursorPositionWidth;
-    private int _displayWidth;
     private static int _timePosition;
-    private int _modePosition;
-    private int _cursorPositionPosition;
+    private readonly string _cachedText;
+    private readonly int _modeWidth;
+    private readonly int _cursorPositionWidth;
+    private readonly int _displayWidth;
+    private readonly int _modePosition;
+    private readonly int _cursorPositionPosition;
     private string _cachedTextInput;
     private KeystrokesMode _keystrokesMode;
     private string _currentMessage;
+    private bool _timerStarted;
     private int _cursorRow;
     private int _cursorColumn;
+    private ConsoleColor _bgColor;
+    private ConsoleColor _fgColor;
 
     /// <summary>
     /// Construct a status bar object.
@@ -69,10 +72,15 @@ public class StatusBar {
     /// Refresh the status bar.
     /// </summary>
     public void Refresh() {
+        if (!_timerStarted) {
+            StartTimer();
+            _timerStarted = true;
+        }
+        _fgColor = Screen.Colours.NormalMessageColour;
+        _bgColor = Screen.Colours.BackgroundColour;
         RenderMessage();
         RenderCursorPosition();
         RenderModeIndicator();
-        RenderTime();
     }
 
     /// <summary>
@@ -195,7 +203,7 @@ public class StatusBar {
             };
             if (input.Key == ConsoleKey.Backspace && inputBuffer.Count > 0) {
                 inputBuffer.RemoveAt(inputBuffer.Count - 1);
-                Console.Write("\b \b");
+                Console.Write(@" ");
             }
             else if (char.IsDigit(input.KeyChar) && inputBuffer.Count < 6) {
                 inputBuffer.Add(input.KeyChar);
@@ -251,7 +259,7 @@ public class StatusBar {
             else switch (input.Key) {
                 case ConsoleKey.Backspace when inputBuffer.Count > 0:
                     inputBuffer.RemoveAt(inputBuffer.Count - 1);
-                    Console.Write("\b \b");
+                    Console.Write(@" ");
                     break;
 
                 case ConsoleKey.Tab: {
@@ -310,7 +318,7 @@ public class StatusBar {
     /// <summary>
     /// Start the background timer that updates the time on the status bar.
     /// </summary>
-    private static void StartTimer() {
+    private void StartTimer() {
         Timer _ = new(_ => {
             RenderTime();
         }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
@@ -348,7 +356,7 @@ public class StatusBar {
     /// <summary>
     /// Render the time field of the status bar
     /// </summary>
-    private static void RenderTime() {
+    private void RenderTime() {
         char separatorChar = DateTime.Now.Second % 2 == 0 ? ' ' : ':';
         string timeString = DateTime.Now.ToString($"h{separatorChar}mm tt");
         RenderText(_timePosition, _statusRow, _timeWidth, timeString);
@@ -357,10 +365,7 @@ public class StatusBar {
     /// <summary>
     /// Write text to the status bar in the normal text colour.
     /// </summary>
-    private static void RenderText(int x, int y, int w, string text) {
-        ConsoleColor savedColor = Console.ForegroundColor;
-        Console.ForegroundColor = Screen.Colours.NormalMessageColour;
-        Display.WriteTo(x, y, w, text);
-        Console.ForegroundColor = savedColor;
+    private void RenderText(int x, int y, int w, string text) {
+        Display.WriteTo(x, y, w, _bgColor, _fgColor, text);
     }
 }

@@ -96,4 +96,13 @@
     <data name="ErrorTextColourNumber" xml:space="preserve">
         <value>Enter error message colour number:</value>
     </data>
+    <data name="InvalidColour" xml:space="preserve">
+        <value>Invalid colour: same as background.</value>
+    </data>
+    <data name="InvalidColourIndex" xml:space="preserve">
+        <value>Invalid color: must be 0-{0}}.</value>
+    </data>
+    <data name="MaximumKeystrokes" xml:space="preserve">
+        <value>Maximum keystroke length reached.</value>
+    </data>
 </root>

@@ -26,6 +26,10 @@ own buffer.
 | Details                | Shift+Alt+F              |
 | Edit Buffer            | Shift+Alt+E              |
 | Repeat Command         | Ctrl+R                   |
+| Record Keystrokes      | F7                       |
+| Playback Recording     | F8                       |
+| Save Recording         | Alt+F8                   |
+| Load Recording         | Alt+F7                   |
 | Command                | F10                      |
 | Go To Line             | Shift+Alt+G              |
 | Start of Line          | Alt+Command+Left arrow   |
