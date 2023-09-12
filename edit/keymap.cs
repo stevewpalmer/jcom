@@ -37,6 +37,7 @@ public enum KeyCommand {
     KC_CLINEEND,
     KC_CLINESTART,
     KC_CLOSE,
+    KC_COLOUR,
     KC_COMMAND,
     KC_CPAGEDOWN,
     KC_CPAGEUP,
@@ -88,6 +89,8 @@ public class KeyMap {
     /// </summary>
     private static readonly KeyCommands[] CommandTable = {
         new() { CommandName = "beginning_of_line", CommandId = KeyCommand.KC_CLINESTART },
+        new() { CommandName = "colour", CommandId = KeyCommand.KC_COLOUR },
+        new() { CommandName = "color", CommandId = KeyCommand.KC_COLOUR },
         new() { CommandName = "delete_curr_buffer", CommandId = KeyCommand.KC_CLOSE },
         new() { CommandName = "display_file_name", CommandId = KeyCommand.KC_DETAILS },
         new() { CommandName = "down", CommandId = KeyCommand.KC_CDOWN },

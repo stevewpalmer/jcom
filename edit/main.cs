@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Text.Json;
+
 namespace JEdit;
 
 internal static class Program {
@@ -30,7 +32,7 @@ internal static class Program {
     private static void Main(string[] args) {
 
         Screen mainScreen = new();
-        Screen.Open();
+        mainScreen.Open();
         if (args.Length == 0) {
             mainScreen.AddWindow(new Window());
         }
@@ -39,6 +41,6 @@ internal static class Program {
         }
         mainScreen.ActivateWindow(0);
         mainScreen.StartKeyboardLoop();
-        Screen.Close();
+        mainScreen.Close();
     }
 }

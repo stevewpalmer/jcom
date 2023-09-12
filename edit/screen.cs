@@ -24,6 +24,10 @@
 // under the License.
 
 using JEdit.Resources;
+using JEdit.Resources;
+using JEdit.Resources;
+using JEdit.Resources;
+using JEdit.Resources;
 
 namespace JEdit;
 
@@ -31,6 +35,8 @@ public class Screen {
     private readonly List<Window> _windowList = new();
     private Window _activeWindow;
     private readonly Recorder _recorder = new();
+    private ConsoleColor _savedBackgroundColour;
+    private ConsoleColor _savedForegroundColour;
 
     /// <summary>
     /// Constructor
@@ -43,6 +49,16 @@ public class Screen {
     /// The status bar
     /// </summary>
     public static StatusBar StatusBar { get; private set; }
+
+    /// <summary>
+    /// Configured colours
+    /// </summary>
+    public static Colours Colours { get; private set; }
+
+    /// <summary>
+    /// Configuration
+    /// </summary>
+    public static Config Config { get; private set; }
 
     /// <summary>
     /// Add a window to the window list. This will not make the window
@@ -60,7 +76,15 @@ public class Screen {
     /// <summary>
     /// Open the main window.
     /// </summary>
-    public static void Open() {
+    public void Open() {
+        _savedBackgroundColour = Console.BackgroundColor;
+        _savedForegroundColour = Console.ForegroundColor;
+
+        Config = Config.Load();
+        Colours = new Colours(Config);
+        Console.BackgroundColor = Colours.BackgroundColour;
+        Console.ForegroundColor = Colours.ForegroundColour;
+
         Console.Clear();
         StatusBar.InitialRender();
     }
@@ -68,7 +92,9 @@ public class Screen {
     /// <summary>
     /// Close the main screen when the editor is closed.
     /// </summary>
-    public static void Close() {
+    public void Close() {
+        Console.BackgroundColor = _savedBackgroundColour;
+        Console.ForegroundColor = _savedForegroundColour;
         Console.Clear();
     }
 
@@ -98,6 +124,7 @@ public class Screen {
         }
         RenderHint flags = commandId switch {
             KeyCommand.KC_CLOSE => CloseWindow(),
+            KeyCommand.KC_COLOUR => ConfigureColours(),
             KeyCommand.KC_COMMAND => RunCommand(),
             KeyCommand.KC_DETAILS => ShowDetails(),
             KeyCommand.KC_EDIT => EditFile(parser),
@@ -205,6 +232,34 @@ public class Screen {
     }
 
     /// <summary>
+    /// Change the colour configuration.
+    /// </summary>
+    private RenderHint ConfigureColours() {
+        if (!StatusBar.PromptForNumber(Edit.BackgroundColourNumber, out int backgroundColour)) {
+            return RenderHint.NONE;
+        }
+        if (!StatusBar.PromptForNumber(Edit.ForegroundColourNumber, out int foregroundColour)) {
+            return RenderHint.NONE;
+        }
+        if (!StatusBar.PromptForNumber(Edit.SelectedTitleColourNumber, out int selectedTitleColour)) {
+            return RenderHint.NONE;
+        }
+        if (!StatusBar.PromptForNumber(Edit.NormalTextColourNumber, out int normalMessageColour)) {
+            return RenderHint.NONE;
+        }
+        if (!StatusBar.PromptForNumber(Edit.ErrorTextColourNumber, out int errorMessageColour)) {
+            return RenderHint.NONE;
+        }
+        Config.BackgroundColour = backgroundColour.ToString();
+        Config.ForegroundColour = foregroundColour.ToString();
+        Config.SelectedTitleColour = selectedTitleColour.ToString();
+        Config.NormalMessageColour = normalMessageColour.ToString();
+        Config.ErrorMessageColour = errorMessageColour.ToString();
+        Config.Save();
+        return RenderHint.REDRAW;
+    }
+
+    /// <summary>
     /// Show details of the file in the buffer on the status bar.
     /// </summary>
     private RenderHint ShowDetails() {
@@ -253,11 +308,11 @@ public class Screen {
         }
         if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING) {
             StatusBar.KeystrokesMode = KeystrokesMode.NONE;
-            StatusBar.Message(Edit.DefiningKeystrokeMacro);
+            StatusBar.Message(Edit.KeystrokeMacroDefined);
         }
         else {
             StatusBar.KeystrokesMode = KeystrokesMode.RECORDING;
-            StatusBar.Message(Edit.KeystrokeMacroDefined);
+            StatusBar.Message(Edit.DefiningKeystrokeMacro);
         }
         return RenderHint.CURSOR_STATUS;
     }

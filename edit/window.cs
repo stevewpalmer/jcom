@@ -217,7 +217,9 @@ public class Window {
         Console.Write(new string('═', frameRect.Width - 2));
         Console.Write('╕');
         Console.SetCursorPosition((frameRect.Width - title.Length - 2) / 2, 0);
+        Console.ForegroundColor = Screen.Colours.SelectedTitleColour;
         Console.Write($" {title} ");
+        Console.ForegroundColor = Screen.Colours.ForegroundColour;
         Console.SetCursorPosition(savedLeft, savedTop);
     }
 

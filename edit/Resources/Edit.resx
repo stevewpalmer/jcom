@@ -81,4 +81,19 @@
     <data name="CannotPlayback" xml:space="preserve">
         <value>Can't play back while remembering.</value>
     </data>
+    <data name="BackgroundColourNumber" xml:space="preserve">
+        <value>Enter background colour number:</value>
+    </data>
+    <data name="ForegroundColourNumber" xml:space="preserve">
+        <value>Enter foreground colour number:</value>
+    </data>
+    <data name="SelectedTitleColourNumber" xml:space="preserve">
+        <value>Enter selected title colour number:</value>
+    </data>
+    <data name="NormalTextColourNumber" xml:space="preserve">
+        <value>Enter normal message colour number:</value>
+    </data>
+    <data name="ErrorTextColourNumber" xml:space="preserve">
+        <value>Enter error message colour number:</value>
+    </data>
 </root>

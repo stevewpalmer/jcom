@@ -170,5 +170,35 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("CannotPlayback", resourceCulture);
             }
         }
+        
+        internal static string BackgroundColourNumber {
+            get {
+                return ResourceManager.GetString("BackgroundColourNumber", resourceCulture);
+            }
+        }
+        
+        internal static string ForegroundColourNumber {
+            get {
+                return ResourceManager.GetString("ForegroundColourNumber", resourceCulture);
+            }
+        }
+        
+        internal static string SelectedTitleColourNumber {
+            get {
+                return ResourceManager.GetString("SelectedTitleColourNumber", resourceCulture);
+            }
+        }
+        
+        internal static string NormalTextColourNumber {
+            get {
+                return ResourceManager.GetString("NormalTextColourNumber", resourceCulture);
+            }
+        }
+        
+        internal static string ErrorTextColourNumber {
+            get {
+                return ResourceManager.GetString("ErrorTextColourNumber", resourceCulture);
+            }
+        }
     }
 }
