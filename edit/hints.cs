@@ -34,7 +34,7 @@ public enum RenderHint {
     NONE = 0,
 
     /// <summary>
-    /// Full screen render needed
+    /// Update the current window
     /// </summary>
     REDRAW = 1,
 
@@ -56,5 +56,10 @@ public enum RenderHint {
     /// <summary>
     /// Update the current window title bar
     /// </summary>
-    TITLE = 16
+    TITLE = 16,
+
+    /// <summary>
+    /// Refresh the entire screen
+    /// </summary>
+    REFRESH = 32
 }

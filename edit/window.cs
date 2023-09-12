@@ -64,9 +64,9 @@ public class Window {
     }
 
     /// <summary>
-    /// Make this window active
+    /// Refresh this window with a full redraw on screen.
     /// </summary>
-    public void SetActive() {
+    public void Refresh() {
         RenderFrame();
         RenderTitle();
         Render();

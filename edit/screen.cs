@@ -23,10 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using JEdit.Resources;
-using JEdit.Resources;
-using JEdit.Resources;
-using JEdit.Resources;
+using JComLib;
 using JEdit.Resources;
 
 namespace JEdit;
@@ -82,11 +79,9 @@ public class Screen {
 
         Config = Config.Load();
         Colours = new Colours(Config);
-        Console.BackgroundColor = Colours.BackgroundColour;
-        Console.ForegroundColor = Colours.ForegroundColour;
 
-        Console.Clear();
-        StatusBar.InitialRender();
+        Refresh();
+        Version();
     }
 
     /// <summary>
@@ -124,7 +119,7 @@ public class Screen {
         }
         RenderHint flags = commandId switch {
             KeyCommand.KC_CLOSE => CloseWindow(),
-            KeyCommand.KC_COLOUR => ConfigureColours(),
+            KeyCommand.KC_COLOUR => ConfigureColours(parser),
             KeyCommand.KC_COMMAND => RunCommand(),
             KeyCommand.KC_DETAILS => ShowDetails(),
             KeyCommand.KC_EDIT => EditFile(parser),
@@ -143,8 +138,24 @@ public class Screen {
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
             UpdateCursorPosition();
+            flags &= ~RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.REFRESH)) {
+            Refresh();
+            _activeWindow.Refresh();
+            flags &= ~RenderHint.REFRESH;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Refresh the screen
+    /// </summary>
+    private static void Refresh() {
+        Console.BackgroundColor = Colours.BackgroundColour;
+        Console.ForegroundColor = Colours.ForegroundColour;
+        Console.Clear();
+        StatusBar.Refresh();
     }
 
     /// <summary>
@@ -180,7 +191,7 @@ public class Screen {
     /// <param name="index">Index of the window to be activated</param>
     public void ActivateWindow(int index) {
         _activeWindow = _windowList[index];
-        _activeWindow.SetActive();
+        _activeWindow.Refresh();
         UpdateCursorPosition();
     }
 
@@ -199,7 +210,7 @@ public class Screen {
             }
             _activeWindow = newWindow;
             _activeWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
-            _activeWindow.SetActive();
+            _activeWindow.Refresh();
             UpdateCursorPosition();
         }
         return RenderHint.NONE;
@@ -234,20 +245,20 @@ public class Screen {
     /// <summary>
     /// Change the colour configuration.
     /// </summary>
-    private RenderHint ConfigureColours() {
-        if (!StatusBar.PromptForNumber(Edit.BackgroundColourNumber, out int backgroundColour)) {
+    private RenderHint ConfigureColours(Macro parser) {
+        if (!parser.GetNumber(Edit.BackgroundColourNumber, out int backgroundColour)) {
             return RenderHint.NONE;
         }
-        if (!StatusBar.PromptForNumber(Edit.ForegroundColourNumber, out int foregroundColour)) {
+        if (!parser.GetNumber(Edit.ForegroundColourNumber, out int foregroundColour)) {
             return RenderHint.NONE;
         }
-        if (!StatusBar.PromptForNumber(Edit.SelectedTitleColourNumber, out int selectedTitleColour)) {
+        if (!parser.GetNumber(Edit.SelectedTitleColourNumber, out int selectedTitleColour)) {
             return RenderHint.NONE;
         }
-        if (!StatusBar.PromptForNumber(Edit.NormalTextColourNumber, out int normalMessageColour)) {
+        if (!parser.GetNumber(Edit.NormalTextColourNumber, out int normalMessageColour)) {
             return RenderHint.NONE;
         }
-        if (!StatusBar.PromptForNumber(Edit.ErrorTextColourNumber, out int errorMessageColour)) {
+        if (!parser.GetNumber(Edit.ErrorTextColourNumber, out int errorMessageColour)) {
             return RenderHint.NONE;
         }
         Config.BackgroundColour = backgroundColour.ToString();
@@ -256,7 +267,7 @@ public class Screen {
         Config.NormalMessageColour = normalMessageColour.ToString();
         Config.ErrorMessageColour = errorMessageColour.ToString();
         Config.Save();
-        return RenderHint.REDRAW;
+        return RenderHint.REFRESH;
     }
 
     /// <summary>
@@ -289,7 +300,7 @@ public class Screen {
     /// Show the editor version on the status bar.
     /// </summary>
     private static RenderHint Version() {
-        StatusBar.RenderVersion();
+        StatusBar.Message($"{AssemblySupport.AssemblyDescription} v{AssemblySupport.AssemblyVersion} - {AssemblySupport.AssemblyCopyright}");
         return RenderHint.NONE;
     }
 
