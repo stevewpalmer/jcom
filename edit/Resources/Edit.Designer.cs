@@ -218,5 +218,17 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("MaximumKeystrokes", resourceCulture);
             }
         }
+        
+        internal static string UnableToSaveConfig {
+            get {
+                return ResourceManager.GetString("UnableToSaveConfig", resourceCulture);
+            }
+        }
+        
+        internal static string UnableToReadConfig {
+            get {
+                return ResourceManager.GetString("UnableToReadConfig", resourceCulture);
+            }
+        }
     }
 }

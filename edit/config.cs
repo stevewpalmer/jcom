@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Text.Json;
+using JEdit.Resources;
 
 namespace JEdit;
 
@@ -38,8 +39,13 @@ public class Config {
     public static Config Load() {
         Config fileConfig = new Config();
         if (File.Exists(Consts.ConfigurationFilename)) {
-            using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
-            fileConfig = JsonSerializer.Deserialize<Config>(stream);
+            try {
+                using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
+                fileConfig = JsonSerializer.Deserialize<Config>(stream);
+            }
+            catch (Exception) {
+                Screen.StatusBar.Error(string.Format(Edit.UnableToReadConfig, Consts.ConfigurationFilename));
+            }
         }
         return fileConfig;
     }
@@ -48,8 +54,15 @@ public class Config {
     /// Save configurations back to the config file.
     /// </summary>
     public void Save() {
-        using FileStream stream = File.OpenWrite(Consts.ConfigurationFilename);
-        JsonSerializer.Serialize(stream, this);
+        try {
+            using FileStream stream = File.OpenWrite(Consts.ConfigurationFilename);
+            JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
+                WriteIndented = true
+            });
+        }
+        catch (Exception) {
+            Screen.StatusBar.Error(string.Format(Edit.UnableToSaveConfig, Consts.ConfigurationFilename));
+        }
     }
 
     /// <summary>

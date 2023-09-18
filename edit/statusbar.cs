@@ -46,21 +46,22 @@ public class StatusBar {
     private bool _timerStarted;
     private int _cursorRow;
     private int _cursorColumn;
-    private ConsoleColor _bgColor;
-    private ConsoleColor _fgColor;
+    private ConsoleColor _bgColour;
+    private ConsoleColor _fgColour;
+    private ConsoleColor _errColour;
 
     /// <summary>
     /// Construct a status bar object.
     /// </summary>
     public StatusBar() {
-        _statusRow = Console.WindowHeight - 1;
+        _statusRow = Terminal.Height - 1;
         _cachedText = string.Empty;
         _modeWidth = 3;
         _timeWidth = 8;
         _cursorPositionWidth = 18;
-        _displayWidth = Console.WindowWidth - (_timeWidth + _cursorPositionWidth + _modeWidth);
-        _timePosition = Console.WindowWidth - _timeWidth;
-        _modePosition = Console.WindowWidth - _timeWidth - _modeWidth;
+        _displayWidth = Terminal.Width - (_timeWidth + _cursorPositionWidth + _modeWidth);
+        _timePosition = Terminal.Width - _timeWidth;
+        _modePosition = Terminal.Width - _timeWidth - _modeWidth;
         _cursorPositionPosition = _modePosition - _cursorPositionWidth;
         _currentMessage = string.Empty;
         _keystrokesMode = KeystrokesMode.NONE;
@@ -76,8 +77,9 @@ public class StatusBar {
             StartTimer();
             _timerStarted = true;
         }
-        _fgColor = Screen.Colours.NormalMessageColour;
-        _bgColor = Screen.Colours.BackgroundColour;
+        _fgColour = Screen.Colours.NormalMessageColour;
+        _bgColour = Screen.Colours.BackgroundColour;
+        _errColour = Screen.Colours.ErrorMessageColour;
         RenderMessage();
         RenderCursorPosition();
         RenderModeIndicator();
@@ -109,7 +111,7 @@ public class StatusBar {
     /// <param name="message">Message string</param>
     public void Error(string message) {
         _currentMessage = message;
-        RenderMessage();
+        RenderText(0, _statusRow, _displayWidth, _currentMessage, _errColour);
     }
 
     /// <summary>
@@ -118,10 +120,10 @@ public class StatusBar {
     /// <returns>True if a value was input, false if empty or cancelled</returns>
     public bool Prompt(string prompt, char[] validInput, char defaultChar, out char inputValue) {
 
-        Point cursorPosition = Display.GetCursor();
+        Point cursorPosition = Terminal.GetCursor();
         prompt = prompt.Replace("@@", $"[{string.Join("",validInput)}]");
         Message(prompt);
-        Display.SetCursor(new Point(prompt.Length, _statusRow));
+        Terminal.SetCursor(prompt.Length, _statusRow);
         ConsoleKeyInfo input = Console.ReadKey(true);
         while (!validInput.Contains(char.ToLower(input.KeyChar))) {
             if (input.Key is ConsoleKey.Enter or ConsoleKey.Escape) {
@@ -130,7 +132,7 @@ public class StatusBar {
             input = Console.ReadKey(true);
         }
         Message(input.Key == ConsoleKey.Escape ? Edit.CommandCancelled : _cachedText);
-        Display.SetCursor(cursorPosition);
+        Terminal.SetCursor(cursorPosition);
         inputValue = input.Key == ConsoleKey.Enter ? defaultChar : char.ToLower(input.KeyChar);
         return input.Key != ConsoleKey.Escape;
     }
@@ -145,13 +147,13 @@ public class StatusBar {
         repeatCount = 1;
         commandId = KeyCommand.KC_NONE;
 
-        Point cursorPosition = Display.GetCursor();
+        Point cursorPosition = Terminal.GetCursor();
         List<char> inputBuffer = new();
 
         while (true) {
             string prompt = string.Format(Edit.RepeatCount, repeatCount);
             Message(prompt);
-            Display.SetCursor(new Point(prompt.Length, _statusRow));
+            Terminal.SetCursor(prompt.Length, _statusRow);
             ConsoleKeyInfo input = Console.ReadKey(true);
             if (input.Key == ConsoleKey.Escape) {
                 repeatCount = 0;
@@ -172,7 +174,7 @@ public class StatusBar {
             }
         }
         Message(repeatCount == 0 ? Edit.CommandCancelled : _cachedText);
-        Display.SetCursor(cursorPosition);
+        Terminal.SetCursor(cursorPosition);
         return repeatCount > 0;
     }
 
@@ -183,9 +185,9 @@ public class StatusBar {
     /// <param name="inputValue">The input value</param>
     /// <returns>True if a value was input, false if empty or cancelled</returns>
     public bool PromptForNumber(string prompt, out int inputValue) {
-        Point cursorPosition = Display.GetCursor();
+        Point cursorPosition = Terminal.GetCursor();
         Message(prompt);
-        Display.SetCursor(new Point(prompt.Length, _statusRow));
+        Terminal.SetCursor(prompt.Length, _statusRow);
 
         History history = History.Get(prompt);
         List<char> inputBuffer = new();
@@ -203,16 +205,16 @@ public class StatusBar {
             };
             if (input.Key == ConsoleKey.Backspace && inputBuffer.Count > 0) {
                 inputBuffer.RemoveAt(inputBuffer.Count - 1);
-                Console.Write(@" ");
+                Terminal.Write(@" ");
             }
             else if (char.IsDigit(input.KeyChar) && inputBuffer.Count < 6) {
                 inputBuffer.Add(input.KeyChar);
-                Console.Write(input.KeyChar);
+                Terminal.Write(_bgColour, _fgColour, input.KeyChar);
             }
             if (readyText != null) {
                 inputBuffer = new List<char>(readyText.ToCharArray());
                 Message(prompt + readyText);
-                Display.SetCursor(new Point(prompt.Length + readyText.Length, _statusRow));
+                Terminal.SetCursor(prompt.Length + readyText.Length, _statusRow);
             }
             input = Console.ReadKey(true);
         }
@@ -221,7 +223,7 @@ public class StatusBar {
             history.Add(inputBuffer);
         }
         Message(input.Key == ConsoleKey.Escape ? Edit.CommandCancelled : _cachedText);
-        Display.SetCursor(cursorPosition);
+        Terminal.SetCursor(cursorPosition);
         return inputBuffer.Count > 0;
     }
 
@@ -233,9 +235,9 @@ public class StatusBar {
     /// <param name="allowFilenameCompletion">True to allow filename completion</param>
     /// <returns>True if a value was input, false if empty or cancelled</returns>
     public bool PromptForInput(string prompt, out string inputValue, bool allowFilenameCompletion) {
-        Point cursorPosition = Display.GetCursor();
+        Point cursorPosition = Terminal.GetCursor();
         Message(prompt);
-        Display.SetCursor(new Point(prompt.Length, _statusRow));
+        Terminal.SetCursor(prompt.Length, _statusRow);
 
         List<char> inputBuffer = new();
         History history = History.Get(prompt);
@@ -259,7 +261,7 @@ public class StatusBar {
             else switch (input.Key) {
                 case ConsoleKey.Backspace when inputBuffer.Count > 0:
                     inputBuffer.RemoveAt(inputBuffer.Count - 1);
-                    Console.Write(@" ");
+                    Terminal.Write(@" ");
                     break;
 
                 case ConsoleKey.Tab: {
@@ -283,7 +285,7 @@ public class StatusBar {
                 default: {
                     if (!char.IsControl(input.KeyChar) && inputBuffer.Count < 80) {
                         inputBuffer.Add(input.KeyChar);
-                        Console.Write(input.KeyChar);
+                        Terminal.Write(_bgColour, _fgColour, input.KeyChar);
                         allfiles = null;
                     }
                     break;
@@ -292,7 +294,7 @@ public class StatusBar {
             if (readyText != null) {
                 inputBuffer = new List<char>(readyText.ToCharArray());
                 Message(prompt + readyText);
-                Display.SetCursor(new Point(prompt.Length + readyText.Length, _statusRow));
+                Terminal.SetCursor(prompt.Length + readyText.Length, _statusRow);
             }
             input = Console.ReadKey(true);
         }
@@ -302,7 +304,7 @@ public class StatusBar {
             history.Add(inputBuffer);
         }
         Message(input.Key == ConsoleKey.Escape ? Edit.CommandCancelled : _cachedText);
-        Display.SetCursor(cursorPosition);
+        Terminal.SetCursor(cursorPosition);
         return inputBuffer.Count > 0;
     }
 
@@ -328,12 +330,12 @@ public class StatusBar {
     /// Display the current status bar message.
     /// </summary>
     private void RenderMessage() {
-        RenderText(0, _statusRow, _displayWidth, _currentMessage);
+        RenderText(0, _statusRow, _displayWidth, _currentMessage, _fgColour);
     }
 
     private void RenderCursorPosition() {
         string text = $"Line: {_cursorRow,-3} Col: {_cursorColumn,-3}";
-        RenderText(_cursorPositionPosition, _statusRow, _cursorPositionWidth, text);
+        RenderText(_cursorPositionPosition, _statusRow, _cursorPositionWidth, text, _fgColour);
     }
 
     /// <summary>
@@ -350,7 +352,7 @@ public class StatusBar {
             char capsLockEnabled = isWindows && Console.CapsLock ? '\u2191' : ' ';
             modeField = $"{numLockEnabled}{capsLockEnabled}";
         }
-        RenderText(_modePosition, _statusRow, _modeWidth, modeField);
+        RenderText(_modePosition, _statusRow, _modeWidth, modeField, _fgColour);
     }
 
     /// <summary>
@@ -359,13 +361,13 @@ public class StatusBar {
     private void RenderTime() {
         char separatorChar = DateTime.Now.Second % 2 == 0 ? ' ' : ':';
         string timeString = DateTime.Now.ToString($"h{separatorChar}mm tt");
-        RenderText(_timePosition, _statusRow, _timeWidth, timeString);
+        RenderText(_timePosition, _statusRow, _timeWidth, timeString, _fgColour);
     }
 
     /// <summary>
     /// Write text to the status bar in the normal text colour.
     /// </summary>
-    private void RenderText(int x, int y, int w, string text) {
-        Display.WriteTo(x, y, w, _bgColor, _fgColor, text);
+    private void RenderText(int x, int y, int w, string text, ConsoleColor fgColor) {
+        Terminal.WriteTo(x, y, w, _bgColour, fgColor, text);
     }
 }

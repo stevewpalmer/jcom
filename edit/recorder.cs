@@ -74,7 +74,7 @@ public class Recorder {
     /// <summary>
     /// Return the keystroke buffer as an array.
     /// </summary>
-    public string[] Keystrokes => _keystrokeBuffer.ToArray();
+    public IEnumerable<string> Keystrokes => _keystrokeBuffer.ToArray();
 
     /// <summary>
     /// Return whether there is an existing keystroke macro.

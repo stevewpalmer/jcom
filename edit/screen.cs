@@ -32,8 +32,6 @@ public class Screen {
     private readonly List<Window> _windowList = new();
     private Window _activeWindow;
     private readonly Recorder _recorder = new();
-    private ConsoleColor _savedBackgroundColour;
-    private ConsoleColor _savedForegroundColour;
 
     /// <summary>
     /// Constructor
@@ -61,13 +59,12 @@ public class Screen {
     /// Open the main window.
     /// </summary>
     public void Open() {
-        _savedBackgroundColour = Console.BackgroundColor;
-        _savedForegroundColour = Console.ForegroundColor;
+        Terminal.Open();
 
         Config = Config.Load();
         Colours = new Colours(Config);
 
-        Refresh();
+        StatusBar.Refresh();
         Version();
     }
 
@@ -75,9 +72,7 @@ public class Screen {
     /// Close the main screen when the editor is closed.
     /// </summary>
     public void Close() {
-        Console.BackgroundColor = _savedBackgroundColour;
-        Console.ForegroundColor = _savedForegroundColour;
-        Console.Clear();
+        Terminal.Close();
     }
 
     /// <summary>
@@ -133,21 +128,11 @@ public class Screen {
             flags &= ~RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.REFRESH)) {
-            Refresh();
+            StatusBar.Refresh();
             _activeWindow.Refresh();
             flags &= ~RenderHint.REFRESH;
         }
         return flags;
-    }
-
-    /// <summary>
-    /// Refresh the screen
-    /// </summary>
-    private static void Refresh() {
-        Console.BackgroundColor = Colours.BackgroundColour;
-        Console.ForegroundColor = Colours.ForegroundColour;
-        Console.Clear();
-        StatusBar.Refresh();
     }
 
     /// <summary>
@@ -166,7 +151,7 @@ public class Screen {
             StatusBar.Message(string.Format(Edit.NewFileWarning, theWindow.Buffer.BaseFilename));
         }
         _windowList.Add(theWindow);
-        theWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
+        theWindow.SetViewportBounds(1, 1, Terminal.Width - 2, Terminal.Height - 3);
     }
 
     /// <summary>
@@ -213,7 +198,7 @@ public class Screen {
                 AddWindow(newWindow);
             }
             _activeWindow = newWindow;
-            _activeWindow.SetViewportBounds(1, 1, Console.WindowWidth - 2, Console.WindowHeight - 3);
+            _activeWindow.SetViewportBounds(1, 1, Terminal.Width - 2, Terminal.Height - 3);
             _activeWindow.Refresh();
             UpdateCursorPosition();
         }

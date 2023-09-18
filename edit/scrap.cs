@@ -1,5 +1,5 @@
 // JEdit
-// Render hint flags
+// Scrap management
 //
 // Authors:
 //  Steve Palmer
@@ -23,48 +23,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JEdit; 
+namespace JEdit;
 
-[Flags]
-public enum RenderHint {
-
-    /// <summary>
-    /// No changes needed
-    /// </summary>
-    NONE = 0,
+public static class Scrapboard {
 
     /// <summary>
-    /// Update the current window
+    /// Get or set the scrapboard text.
     /// </summary>
-    REDRAW = 1,
-
-    /// <summary>
-    /// Cursor position update needed
-    /// </summary>
-    CURSOR = 2,
-    
-    /// <summary>
-    /// Cursor position on the status bar needs updating
-    /// </summary>
-    CURSOR_STATUS = 4,
-    
-    /// <summary>
-    /// Exit the program
-    /// </summary>
-    EXIT = 8,
-
-    /// <summary>
-    /// Update the current window title bar
-    /// </summary>
-    TITLE = 16,
-
-    /// <summary>
-    /// Refresh the entire screen
-    /// </summary>
-    REFRESH = 32,
-
-    /// <summary>
-    /// Update a marked block
-    /// </summary>
-    BLOCK = 64
+    public static string Scrap { get; set; }
 }

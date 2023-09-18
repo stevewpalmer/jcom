@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Drawing;
+using System.Text;
 using JEdit.Resources;
 
 namespace JEdit;
@@ -31,6 +32,9 @@ namespace JEdit;
 public class Window {
     private Rectangle _viewportBounds;
     private Point _viewportOffset;
+    private MarkMode _markMode;
+    private Point _markAnchor;
+    private Point _lastMarkPoint;
 
     /// <summary>
     /// Create an empty window
@@ -69,7 +73,7 @@ public class Window {
     public void Refresh() {
         RenderFrame();
         RenderTitle();
-        Render();
+        Render(RenderHint.REDRAW);
     }
 
     /// <summary>
@@ -92,9 +96,13 @@ public class Window {
             KeyCommand.KC_CWINDOWTOP => WindowTop(),
             KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
             KeyCommand.KC_CPAGEUP => PageUp(),
+            KeyCommand.KC_COPY => Copy(),
             KeyCommand.KC_CWORDRIGHT => WordRight(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
             KeyCommand.KC_GOTO => GoToLine(parser),
+            KeyCommand.KC_MARK => Mark(MarkMode.CHARACTER),
+            KeyCommand.KC_MARKCOLUMN => Mark(MarkMode.COLUMN),
+            KeyCommand.KC_MARKLINE => Mark(MarkMode.LINE),
             KeyCommand.KC_SCREENDOWN => ScreenDown(),
             KeyCommand.KC_SCREENUP => ScreenUp(),
             KeyCommand.KC_WRITEBUFFER => WriteBuffer(),
@@ -103,15 +111,14 @@ public class Window {
         return ApplyRenderHint(flags);
     }
 
-    /// <summary>
-    /// Apply rendering hints to the current window. For those that
-    /// are applied, we clear the flag before returning.
-    /// </summary>
-    /// <param name="flags">Render flags to apply</param>
-    /// <returns>Render flags that were not applied</returns>
     public RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REDRAW)) {
-            Render();
+            Render(RenderHint.REDRAW);
+            flags &= ~RenderHint.REDRAW|RenderHint.BLOCK;
+            flags |= RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.BLOCK)) {
+            Render(RenderHint.BLOCK);
             flags &= ~RenderHint.REDRAW;
             flags |= RenderHint.CURSOR_STATUS;
         }
@@ -129,6 +136,7 @@ public class Window {
 
     /// <summary>
     /// Go to input line.
+    /// TODO: What if we're in mark mode?
     /// </summary>
     private RenderHint GoToLine(Macro parser) {
         RenderHint flags = RenderHint.NONE;
@@ -143,6 +151,51 @@ public class Window {
             flags |= CursorFromLineIndex();
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Start or end a block mark.
+    /// </summary>
+    private RenderHint Mark(MarkMode markMode) {
+        if (_markMode != MarkMode.NONE) {
+            _markMode = MarkMode.NONE;
+        }
+        else {
+            _markMode = markMode;
+            _markAnchor = new Point(Buffer.Offset, Buffer.LineIndex);
+            _lastMarkPoint = _markAnchor;
+        }
+        return RenderHint.BLOCK;
+    }
+
+    /// <summary>
+    /// Copy a marked block to the scrapboard.
+    /// </summary>
+    private RenderHint Copy() {
+
+        (Point markStart, Point markEnd) = GetOrderedMarkRange();
+
+        StringBuilder copyText = new();
+        for (int l = markStart.Y; l <= markEnd.Y; l++) {
+            copyText.AppendLine(Buffer.GetLine(l));
+        }
+        Scrapboard.Scrap = copyText.ToString();
+
+        _markMode = MarkMode.NONE;
+        return RenderHint.BLOCK;
+    }
+
+    /// <summary>
+    /// Return the mark range as two Point tuples where the first tuple is guaranteed
+    /// to be earlier in the range than the second.
+    /// </summary>
+    private (Point, Point) GetOrderedMarkRange() {
+        Point cursorPoint = new Point(Buffer.Offset, Buffer.LineIndex);
+        if (_markMode == MarkMode.NONE) {
+            return (cursorPoint, cursorPoint);
+        }
+        Point [] points = new[] { cursorPoint, _markAnchor }.OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
+        return (points[0], points[1]);
     }
 
     /// <summary>
@@ -186,22 +239,18 @@ public class Window {
     private void RenderFrame() {
         Rectangle frameRect = _viewportBounds;
         frameRect.Inflate(1, 1);
-        Console.SetCursorPosition(frameRect.Left, frameRect.Top);
-        Console.Write('╒');
-        Console.Write(new string('═', frameRect.Width - 2));
-        Console.Write('╕');
+        Terminal.SetCursor(frameRect.Left, frameRect.Top);
+        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
+        Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
 
         for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
-            Console.SetCursorPosition(frameRect.Left, c);
-            Console.Write('│');
-            Console.SetCursorPosition(frameRect.Width - 1, c);
-            Console.Write('│');
+            Terminal.SetCursor(frameRect.Left, c);
+            Terminal.Write($"\u2502{new string(' ', frameRect.Width - 2)}\u2502");
         }
 
-        Console.SetCursorPosition(frameRect.Left, frameRect.Height - 1);
-        Console.Write('╘');
-        Console.Write(new string('═', frameRect.Width - 2));
-        Console.Write('╛');
+        Terminal.SetCursor(frameRect.Left, frameRect.Height - 1);
+        Terminal.Write($"\u2558{new string('═', frameRect.Width - 2)}\u255b");
     }
 
     /// <summary>
@@ -211,49 +260,101 @@ public class Window {
         string title = Buffer.BaseFilename;
         Rectangle frameRect = _viewportBounds;
         frameRect.Inflate(1, 1);
-        (int savedLeft, int savedTop) = Console.GetCursorPosition();
-        Console.SetCursorPosition(frameRect.Left, frameRect.Top);
-        Console.Write('╒');
-        Console.Write(new string('═', frameRect.Width - 2));
-        Console.Write('╕');
-        Console.SetCursorPosition((frameRect.Width - title.Length - 2) / 2, 0);
-        Console.ForegroundColor = Screen.Colours.SelectedTitleColour;
-        Console.Write($@" {title} ");
-        Console.ForegroundColor = Screen.Colours.ForegroundColour;
-        Console.SetCursorPosition(savedLeft, savedTop);
+        Point savedCursor = Terminal.GetCursor();
+
+        Terminal.SetCursor(frameRect.Left, frameRect.Top);
+        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
+        Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
+
+        Terminal.SetCursor((frameRect.Width - title.Length - 2) / 2, 0);
+        Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
+        Terminal.Write($@" {title} ");
+
+        Terminal.SetCursor(savedCursor);
     }
 
     /// <summary>
     /// Update this window
     /// </summary>
-    private void Render() {
+    private void Render(RenderHint flags) {
 
         int i = _viewportOffset.Y;
-        int y = _viewportBounds.Top;
+        int b = i + _viewportBounds.Height;
         int w = _viewportBounds.Width;
 
-        Point savedCursor = Display.GetCursor();
+        Point savedCursor = Terminal.GetCursor();
         ConsoleColor bg = Screen.Colours.BackgroundColour;
         ConsoleColor fg = Screen.Colours.ForegroundColour;
+
+        // Order the start and end of the mark area.
+        (Point markStart, Point markEnd) = GetOrderedMarkRange();
+
+        // Order the points to determine the extent of the update when rendering
+        // marked areas in block render mode.
+        Point [] points = new[] {
+            new Point(Buffer.Offset, Buffer.LineIndex) ,
+            _markAnchor,
+            _lastMarkPoint
+        }.OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
+
+        Point blockStart = points[0];
+        Point blockEnd = points[2];
+        if (flags.HasFlag(RenderHint.BLOCK)) {
+            i = Math.Max(blockStart.Y, i);
+            b = Math.Min(blockEnd.Y + 1, b);
+        }
+
         string line = Buffer.GetLine(i);
-        while (line != null && y < _viewportBounds.Bottom) {
+        while (line != null && i < b) {
+
+            int y = _viewportBounds.Top + (i - _viewportOffset.Y);
+
+            switch (_markMode) {
+                case MarkMode.LINE:
+                    if (i >= markStart.Y && i <= markEnd.Y) {
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                    }
+                    break;
+            }
+
             int left = Math.Min(_viewportOffset.X, line.Length);
             int length = Math.Min(w, line.Length - left);
-            Display.WriteToNc(_viewportBounds.Left, y++, w, bg, fg, line.Substring(left, length));
+            Terminal.WriteToNc(_viewportBounds.Left, y, w, bg, fg, line.Substring(left, length));
+
             line = Buffer.GetLine(++i);
+
+            bg = Screen.Colours.BackgroundColour;
+            fg = Screen.Colours.ForegroundColour;
         }
-        while (y < _viewportBounds.Bottom) {
-            Display.WriteToNc(_viewportBounds.Left, y++, w, bg, fg, string.Empty);
+        while (i < b) {
+            int y = _viewportBounds.Top + (i - _viewportOffset.Y);
+            Terminal.WriteToNc(_viewportBounds.Left, y, w, bg, fg, string.Empty);
+            i++;
         }
-        Display.SetCursor(savedCursor);
+        Terminal.SetCursor(savedCursor);
         PlaceCursor();
+    }
+
+    /// <summary>
+    /// If we're marking, save the current cursor position before we update
+    /// it so that we maintain a last mark point to compute the extent of the
+    /// area to render when we update the window.
+    /// </summary>
+    private RenderHint SaveLastMarkPoint() {
+        if (_markMode != MarkMode.NONE) {
+            _lastMarkPoint = new Point(Buffer.Offset, Buffer.LineIndex);
+            return RenderHint.BLOCK;
+        }
+        return RenderHint.NONE;
     }
 
     /// <summary>
     /// Move the cursor down if possible.
     /// </summary>
     private RenderHint CursorDown() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex < Buffer.Length - 1) {
             ++Buffer.LineIndex;
             if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
@@ -273,7 +374,7 @@ public class Window {
     /// Move the cursor up if possible.
     /// </summary>
     private RenderHint CursorUp() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0) {
             --Buffer.LineIndex;
             if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
@@ -293,22 +394,21 @@ public class Window {
     /// Move the cursor left.
     /// </summary>
     private RenderHint CursorLeft() {
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.Offset == 0) {
             return EndOfPreviousLine();
         }
         --Buffer.Offset;
-        return CursorFromOffset();
+        return flags | CursorFromOffset();
     }
 
     /// <summary>
     /// Move the cursor right.
     /// </summary>
     private RenderHint CursorRight() {
-        if (Buffer.Offset == Buffer.GetLine(Buffer.LineIndex).Length) {
-            return StartOfNextLine();
-        }
+        RenderHint flags = SaveLastMarkPoint();
         ++Buffer.Offset;
-        return CursorFromOffset();
+        return flags | CursorFromOffset();
     }
 
     /// <summary>
@@ -317,7 +417,7 @@ public class Window {
     /// scroll the viewport to bring it into focus if necessary.
     /// </summary>
     private RenderHint StartOfNextLine() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex < Buffer.Length - 1) {
             ++Buffer.LineIndex;
             if (CursorRowInViewport >= _viewportBounds.Height - 1) {
@@ -339,7 +439,7 @@ public class Window {
     /// it into view.
     /// </summary>
     private RenderHint EndOfPreviousLine() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0) {
             --Buffer.LineIndex;
             if (CursorRowInViewport < 0) {
@@ -358,28 +458,31 @@ public class Window {
     /// Move the cursor to the start of the current line.
     /// </summary>
     private RenderHint StartOfCurrentLine() {
+        RenderHint flags = SaveLastMarkPoint();
         Buffer.Offset = 0;
-        return CursorFromOffset();
+        return flags | CursorFromOffset();
     }
 
     /// <summary>
     /// Move the cursor to the end of the current line.
     /// </summary>
     private RenderHint EndOfCurrentLine() {
+        RenderHint flags = SaveLastMarkPoint();
         Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
-        return CursorFromOffset();
+        return flags | CursorFromOffset();
     }
 
     /// <summary>
     /// Move the cursor down one page.
     /// </summary>
     private RenderHint PageDown() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         int previousLineIndex = Buffer.LineIndex;
         Buffer.LineIndex = Math.Min(Buffer.LineIndex + _viewportBounds.Height, Buffer.Length - 1);
         if (Buffer.LineIndex != previousLineIndex) {
             if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
-                flags |= EndOfCurrentLine();
+                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
+                flags |= CursorFromOffset();
             }
             _viewportOffset.Y += Buffer.LineIndex - previousLineIndex;
             flags |= RenderHint.REDRAW;
@@ -391,12 +494,13 @@ public class Window {
     /// Move the cursor up one page.
     /// </summary>
     private RenderHint PageUp() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         int previousLineIndex = Buffer.LineIndex;
         Buffer.LineIndex = Math.Max(Buffer.LineIndex - _viewportBounds.Height, 0);
         if (Buffer.LineIndex != previousLineIndex) {
             if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
-                flags |= EndOfCurrentLine();
+                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
+                flags |= CursorFromOffset();
             }
             _viewportOffset.Y -= previousLineIndex - Buffer.LineIndex;
             if (_viewportOffset.Y < 0) {
@@ -411,7 +515,7 @@ public class Window {
     /// Move to the start of the buffer.
     /// </summary>
     private RenderHint FileStart() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0 || Buffer.Offset > 0) {
             Buffer.LineIndex = 0;
             Buffer.Offset = 0;
@@ -430,28 +534,31 @@ public class Window {
     /// Move to the end of the buffer.
     /// </summary>
     private RenderHint FileEnd() {
+        RenderHint flags = SaveLastMarkPoint();
         Buffer.LineIndex = Buffer.Length - 1;
         Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
-        return CursorFromLineIndex();
+        return flags | CursorFromLineIndex();
     }
 
     /// <summary>
     /// Move to the top of the window
     /// </summary>
     private RenderHint WindowTop() {
+        RenderHint flags = SaveLastMarkPoint();
         Buffer.LineIndex -= CursorRowInViewport;
-        return CursorFromLineIndex();
+        return flags | CursorFromLineIndex();
     }
 
     /// <summary>
     /// Move to the bottom of the window
     /// </summary>
     private RenderHint WindowBottom() {
+        RenderHint flags = SaveLastMarkPoint();
         Buffer.LineIndex += _viewportBounds.Height - 1;
         if (Buffer.LineIndex >= Buffer.Length) {
             Buffer.LineIndex = Buffer.Length - 1;
         }
-        return CursorFromLineIndex();
+        return flags | CursorFromLineIndex();
     }
 
     /// <summary>
@@ -462,7 +569,7 @@ public class Window {
     /// moves to the start of the first word on the next line.
     /// </summary>
     private RenderHint WordRight() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.Offset == Buffer.GetLine(Buffer.LineIndex).Length) {
             flags = StartOfNextLine();
         }
@@ -486,7 +593,7 @@ public class Window {
     /// previous line.
     /// </summary>
     private RenderHint WordLeft() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.Offset == 0) {
             flags = EndOfPreviousLine();
         }
@@ -562,7 +669,7 @@ public class Window {
         int column = CursorColumnInViewport + _viewportBounds.Left;
         int row = CursorRowInViewport + _viewportBounds.Top;
         if (_viewportBounds.Contains(column, row)) {
-            Console.SetCursorPosition(column, row);
+            Terminal.SetCursor(column, row);
         }
     }
 }

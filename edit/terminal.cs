@@ -27,8 +27,54 @@ using System.Drawing;
 
 namespace JEdit; 
 
-public static class Display {
+public static class Terminal {
     private static readonly object LockObj = new();
+    private static ConsoleColor _savedBackgroundColour;
+    private static ConsoleColor _savedForegroundColour;
+
+    /// <summary>
+    /// Initialise the display.
+    /// </summary>
+    public static void Open() {
+        _savedBackgroundColour = Console.BackgroundColor;
+        _savedForegroundColour = Console.ForegroundColor;
+        Console.TreatControlCAsInput = true;
+    }
+
+    /// <summary>
+    /// Close down the display.
+    /// </summary>
+    public static void Close() {
+        Console.BackgroundColor = _savedBackgroundColour;
+        Console.ForegroundColor = _savedForegroundColour;
+        Console.Clear();
+    }
+
+    /// <summary>
+    /// Return the display width
+    /// </summary>
+    public static int Width => Console.WindowWidth;
+
+    /// <summary>
+    /// Return the display width
+    /// </summary>
+    public static int Height => Console.WindowHeight;
+
+    /// <summary>
+    /// Get and set the current foreground colour
+    /// </summary>
+    public static ConsoleColor ForegroundColour {
+        get => Console.ForegroundColor;
+        set => Console.ForegroundColor = value;
+    }
+
+    /// <summary>
+    /// Get and set the current background colour
+    /// </summary>
+    public static ConsoleColor BackgroundColour {
+        get => Console.BackgroundColor;
+        set => Console.BackgroundColor = value;
+    }
 
     /// <summary>
     /// Write to the console at the specified position, padding out to the width
@@ -60,15 +106,63 @@ public static class Display {
     /// <param name="str">String to output</param>
     public static void WriteToNc(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
         lock (LockObj) {
+            Console.SetCursorPosition(x, y);
+            Write(bg, fg, str.PadRight(width));
+        }
+    }
+
+    /// <summary>
+    /// Write the specified text at the current cursor position
+    /// </summary>
+    /// <param name="bg">Background colour</param>
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="str">String to output</param>
+    public static void Write(ConsoleColor bg, ConsoleColor fg, string str) {
+        lock (LockObj) {
             ConsoleColor fgSaved = Console.ForegroundColor;
             ConsoleColor bgSaved = Console.BackgroundColor;
             Console.ForegroundColor = fg;
             Console.BackgroundColor = bg;
-            Console.SetCursorPosition(x, y);
-            Console.Write(str.PadRight(width));
+            Console.Write(str);
             Console.ForegroundColor = fgSaved;
             Console.BackgroundColor = bgSaved;
         }
+    }
+
+    /// <summary>
+    /// Write the specified text at the current cursor position
+    /// </summary>
+    /// <param name="str">String to output</param>
+    public static void Write(string str) {
+        Console.Write(str);
+    }
+
+    /// <summary>
+    /// Write the specified character at the current cursor position
+    /// </summary>
+    /// <param name="bg">Background colour</param>
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="ch">Character to output</param>
+    public static void Write(ConsoleColor bg, ConsoleColor fg, char ch) {
+        lock (LockObj) {
+            ConsoleColor fgSaved = Console.ForegroundColor;
+            ConsoleColor bgSaved = Console.BackgroundColor;
+            Console.ForegroundColor = fg;
+            Console.BackgroundColor = bg;
+            Console.Write(ch);
+            Console.ForegroundColor = fgSaved;
+            Console.BackgroundColor = bgSaved;
+        }
+    }
+
+    /// <summary>
+    /// Set the cursor position. Positions are zero based offsets with
+    /// row 0 at the top of the console screen.
+    /// </summary>
+    /// <param name="x">Cursor column</param>
+    /// <param name="y">Cursor row</param>
+    public static void SetCursor(int x, int y) {
+        Console.SetCursorPosition(x, y);
     }
 
     /// <summary>

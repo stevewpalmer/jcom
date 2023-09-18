@@ -105,4 +105,10 @@
     <data name="MaximumKeystrokes" xml:space="preserve">
         <value>Maximum keystroke length reached.</value>
     </data>
+    <data name="UnableToSaveConfig" xml:space="preserve">
+        <value>Unable to save settings file {0}.</value>
+    </data>
+    <data name="UnableToReadConfig" xml:space="preserve">
+        <value>Unable to read settings file {0}.</value>
+    </data>
 </root>
