@@ -1,5 +1,5 @@
 // JEdit
-// Global constants
+// Line terminator types
 //
 // Authors:
 //  Steve Palmer
@@ -25,30 +25,28 @@
 
 namespace JEdit;
 
-public static class Consts {
+public enum LineTerminator {
 
     /// <summary>
-    /// Maximum number of keystrokes that can be recorded.
+    /// No line terminator determined.
     /// </summary>
-    public const int MaxKeystrokes = 350;
+    NONE,
 
     /// <summary>
-    /// File extension for macro files.
+    /// Carriage return terminator
+    /// (Typically Mac System text files)
     /// </summary>
-    public const string MacroExtension = ".km";
+    CR,
 
     /// <summary>
-    /// Configuration filename.
+    /// Linefeed terminator
+    /// (Typically Unix/Linux text files)
     /// </summary>
-    public const string ConfigurationFilename = "edit.json";
+    LF,
 
     /// <summary>
-    /// Maximum number of commands remembered in history
+    /// Carriage return and linefeed terminator.
+    /// (Typically Windows text files)
     /// </summary>
-    public const int MaxCommandHistory = 10;
-
-    /// <summary>
-    /// Internal end-of-line character.
-    /// </summary>
-    public const char EndOfLine = '\n';
+    CRLF
 }

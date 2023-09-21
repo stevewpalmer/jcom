@@ -195,6 +195,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_GOTO, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.G },
         new() { KeyCommand = KeyCommand.KC_LOADKEYSTROKES, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F7 },
         new() { KeyCommand = KeyCommand.KC_LOADKEYSTROKES, Key = ConsoleKey.F12 },
+        new() { KeyCommand = KeyCommand.KC_MARK, KeyChar = 181 },
         new() { KeyCommand = KeyCommand.KC_MARK, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.M },
         new() { KeyCommand = KeyCommand.KC_MARKCOLUMN, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.C },
         new() { KeyCommand = KeyCommand.KC_MARKLINE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.L },

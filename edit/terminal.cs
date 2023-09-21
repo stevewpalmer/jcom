@@ -39,6 +39,7 @@ public static class Terminal {
         _savedBackgroundColour = Console.BackgroundColor;
         _savedForegroundColour = Console.ForegroundColor;
         Console.TreatControlCAsInput = true;
+        Console.Clear();
     }
 
     /// <summary>
@@ -64,7 +65,6 @@ public static class Terminal {
     /// Get and set the current foreground colour
     /// </summary>
     public static ConsoleColor ForegroundColour {
-        get => Console.ForegroundColor;
         set => Console.ForegroundColor = value;
     }
 
@@ -72,7 +72,6 @@ public static class Terminal {
     /// Get and set the current background colour
     /// </summary>
     public static ConsoleColor BackgroundColour {
-        get => Console.BackgroundColor;
         set => Console.BackgroundColor = value;
     }
 
@@ -89,8 +88,50 @@ public static class Terminal {
     /// <param name="str">String to output</param>
     public static void WriteTo(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
         (int savedLeft, int savedTop) = Console.GetCursorPosition();
-        WriteToNc(x, y, width, bg, fg, str);
+        Write(x, y, width, bg, fg, str);
         Console.SetCursorPosition(savedLeft, savedTop);
+    }
+
+    /// <summary>
+    /// Write to the console at the specified position. The cursor position
+    /// is left at the end of the string.
+    /// </summary>
+    /// <param name="x">Zero based column of output</param>
+    /// <param name="y">Zero based line of output</param>
+    /// <param name="bg">Background colour</param>
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="str">String to output</param>
+    public static void Write(int x, int y, ConsoleColor bg, ConsoleColor fg, string str) {
+        lock (LockObj) {
+            Console.SetCursorPosition(x, y);
+            ConsoleColor fgSaved = Console.ForegroundColor;
+            ConsoleColor bgSaved = Console.BackgroundColor;
+            Console.ForegroundColor = fg;
+            Console.BackgroundColor = bg;
+            Console.Write(str);
+            Console.ForegroundColor = fgSaved;
+            Console.BackgroundColor = bgSaved;
+        }
+    }
+
+    /// <summary>
+    /// Write a line to the specified output. Any newline character at the end of the line is
+    /// replaced with a space.
+    /// </summary>
+    /// <param name="x">Zero based column of output</param>
+    /// <param name="y">Zero based line of output</param>
+    /// <param name="width">Width of area to write to</param>
+    /// <param name="bg">Background colour</param>
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="str">String to output</param>
+    public static void WriteLine(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
+        lock (LockObj) {
+            string rawStr = str;
+            if (rawStr.EndsWith(Consts.EndOfLine)) {
+                rawStr = rawStr[..^1] + ' ';
+            }
+            Write(x, y, width, bg, fg, rawStr);
+        }
     }
 
     /// <summary>
@@ -104,26 +145,14 @@ public static class Terminal {
     /// <param name="bg">Background colour</param>
     /// <param name="fg">Foreground colour</param>
     /// <param name="str">String to output</param>
-    public static void WriteToNc(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
+    public static void Write(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
         lock (LockObj) {
             Console.SetCursorPosition(x, y);
-            Write(bg, fg, str.PadRight(width));
-        }
-    }
-
-    /// <summary>
-    /// Write the specified text at the current cursor position
-    /// </summary>
-    /// <param name="bg">Background colour</param>
-    /// <param name="fg">Foreground colour</param>
-    /// <param name="str">String to output</param>
-    public static void Write(ConsoleColor bg, ConsoleColor fg, string str) {
-        lock (LockObj) {
             ConsoleColor fgSaved = Console.ForegroundColor;
             ConsoleColor bgSaved = Console.BackgroundColor;
             Console.ForegroundColor = fg;
             Console.BackgroundColor = bg;
-            Console.Write(str);
+            Console.Write(str.PadRight(width));
             Console.ForegroundColor = fgSaved;
             Console.BackgroundColor = bgSaved;
         }

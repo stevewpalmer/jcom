@@ -177,7 +177,7 @@ public class Window {
 
         StringBuilder copyText = new();
         for (int l = markStart.Y; l <= markEnd.Y; l++) {
-            copyText.AppendLine(Buffer.GetLine(l));
+            copyText.Append(Buffer.GetLine(l));
         }
         Scrapboard.Scrap = copyText.ToString();
 
@@ -254,7 +254,8 @@ public class Window {
     }
 
     /// <summary>
-    /// Render the buffer filename at the top of the window.
+    /// Render the buffer filename at the top of the window. If the window
+    /// is narrower than the title then we truncate the title to fit.
     /// </summary>
     private void RenderTitle() {
         string title = Buffer.BaseFilename;
@@ -267,9 +268,10 @@ public class Window {
         Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
         Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
 
-        Terminal.SetCursor((frameRect.Width - title.Length - 2) / 2, 0);
+        int realLength = Math.Min(title.Length, frameRect.Width - 4);
+        Terminal.SetCursor((frameRect.Width - realLength - 2) / 2, 0);
         Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
-        Terminal.Write($@" {title} ");
+        Terminal.Write($@" {title.Substring(0, realLength)} ");
 
         Terminal.SetCursor(savedCursor);
     }
@@ -281,7 +283,6 @@ public class Window {
 
         int i = _viewportOffset.Y;
         int b = i + _viewportBounds.Height;
-        int w = _viewportBounds.Width;
 
         Point savedCursor = Terminal.GetCursor();
         ConsoleColor bg = Screen.Colours.BackgroundColour;
@@ -309,6 +310,10 @@ public class Window {
         while (line != null && i < b) {
 
             int y = _viewportBounds.Top + (i - _viewportOffset.Y);
+            int x = _viewportBounds.Left;
+            int w = _viewportBounds.Width;
+            int left = Math.Min(_viewportOffset.X, line.Length);
+            int length = Math.Min(w, line.Length - left);
 
             switch (_markMode) {
                 case MarkMode.LINE:
@@ -317,12 +322,41 @@ public class Window {
                         fg = Screen.Colours.BackgroundColour;
                     }
                     break;
+
+                case MarkMode.CHARACTER:
+                    if (i == markStart.Y) {
+                        if (markStart.X > 0 && markStart.X > _viewportOffset.X) {
+                            Terminal.Write(x, y, bg, fg, line.Substring(left, markStart.X));
+                            x += markStart.X;
+                            left += markStart.X;
+                            w -= markStart.X;
+                            length -= markStart.X;
+                        }
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                    }
+                    if (i > markStart.Y && i < markEnd.Y) {
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                    }
+                    if (i == markEnd.Y) {
+                        length = markEnd.X - left + 1;
+                        if (length >= 0) {
+                            bg = Screen.Colours.ForegroundColour;
+                            fg = Screen.Colours.BackgroundColour;
+                            Terminal.Write(x, y, bg, fg, line.Substring(left, length));
+                        }
+                        x += length;
+                        left = markEnd.X + 1;
+                        w -= length;
+                        length = Math.Min(w, line.Length - left);
+                        bg = Screen.Colours.BackgroundColour;
+                        fg = Screen.Colours.ForegroundColour;
+                    }
+                    break;
             }
 
-            int left = Math.Min(_viewportOffset.X, line.Length);
-            int length = Math.Min(w, line.Length - left);
-            Terminal.WriteToNc(_viewportBounds.Left, y, w, bg, fg, line.Substring(left, length));
-
+            Terminal.WriteLine(x, y, w, bg, fg, line.Substring(left, length));
             line = Buffer.GetLine(++i);
 
             bg = Screen.Colours.BackgroundColour;
@@ -330,7 +364,7 @@ public class Window {
         }
         while (i < b) {
             int y = _viewportBounds.Top + (i - _viewportOffset.Y);
-            Terminal.WriteToNc(_viewportBounds.Left, y, w, bg, fg, string.Empty);
+            Terminal.Write(_viewportBounds.Left, y, _viewportBounds.Width, bg, fg, string.Empty);
             i++;
         }
         Terminal.SetCursor(savedCursor);
@@ -357,7 +391,7 @@ public class Window {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex < Buffer.Length - 1) {
             ++Buffer.LineIndex;
-            if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
+            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
                 flags |= EndOfCurrentLine();
             }
             if (CursorRowInViewport < _viewportBounds.Height) {
@@ -377,7 +411,7 @@ public class Window {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0) {
             --Buffer.LineIndex;
-            if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
+            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
                 flags |= EndOfCurrentLine();
             }
             if (CursorRowInViewport >= 0) {
@@ -407,7 +441,9 @@ public class Window {
     /// </summary>
     private RenderHint CursorRight() {
         RenderHint flags = SaveLastMarkPoint();
-        ++Buffer.Offset;
+        if (++Buffer.Offset == Buffer.GetLine(Buffer.LineIndex).Length) {
+            return StartOfNextLine();
+        }
         return flags | CursorFromOffset();
     }
 
@@ -468,7 +504,7 @@ public class Window {
     /// </summary>
     private RenderHint EndOfCurrentLine() {
         RenderHint flags = SaveLastMarkPoint();
-        Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
+        Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
         return flags | CursorFromOffset();
     }
 
@@ -480,8 +516,8 @@ public class Window {
         int previousLineIndex = Buffer.LineIndex;
         Buffer.LineIndex = Math.Min(Buffer.LineIndex + _viewportBounds.Height, Buffer.Length - 1);
         if (Buffer.LineIndex != previousLineIndex) {
-            if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
-                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
+            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
+                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
                 flags |= CursorFromOffset();
             }
             _viewportOffset.Y += Buffer.LineIndex - previousLineIndex;
@@ -498,8 +534,8 @@ public class Window {
         int previousLineIndex = Buffer.LineIndex;
         Buffer.LineIndex = Math.Max(Buffer.LineIndex - _viewportBounds.Height, 0);
         if (Buffer.LineIndex != previousLineIndex) {
-            if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
-                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
+            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
+                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
                 flags |= CursorFromOffset();
             }
             _viewportOffset.Y -= previousLineIndex - Buffer.LineIndex;
@@ -536,7 +572,7 @@ public class Window {
     private RenderHint FileEnd() {
         RenderHint flags = SaveLastMarkPoint();
         Buffer.LineIndex = Buffer.Length - 1;
-        Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length;
+        Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
         return flags | CursorFromLineIndex();
     }
 
@@ -570,7 +606,7 @@ public class Window {
     /// </summary>
     private RenderHint WordRight() {
         RenderHint flags = SaveLastMarkPoint();
-        if (Buffer.Offset == Buffer.GetLine(Buffer.LineIndex).Length) {
+        if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
             flags = StartOfNextLine();
         }
         char[] text = Buffer.GetLine(Buffer.LineIndex).ToCharArray();
@@ -615,7 +651,7 @@ public class Window {
     /// </summary>
     private RenderHint CursorFromLineIndex() {
         RenderHint flags = RenderHint.NONE;
-        if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
+        if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
             flags |= EndOfCurrentLine();
         }
         if (Buffer.LineIndex < _viewportOffset.Y) {

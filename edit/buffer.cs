@@ -23,20 +23,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JEdit; 
+namespace JEdit;
 
 public class Buffer {
+    private readonly LineTerminator _terminatorType;
 
     /// <summary>
-    /// Creates a buffer with the specified file.
+    /// Creates a buffer with the specified file. The end of each line is represented
+    /// by a single linefeed (ASCII 10) character for consistency but we determine and
+    /// record the detected line terminator in the original file so that we can write
+    /// out the correct terminator when the buffer is saved.
     /// </summary>
     /// <param name="filename">Name of file</param>
     public Buffer(string filename) {
 
         if (!string.IsNullOrEmpty(filename) && File.Exists(filename)) {
-            Lines = File.ReadAllLines(filename).ToList();
+            string allText = File.ReadAllText(filename);
+            _terminatorType = DetermineLineTerminator(allText);
+            Lines = allText
+                .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+                .Select(l => l + Consts.EndOfLine)
+                .ToList();
         } else {
-            Lines = new List<string> {""};
+            Lines = new List<string> {"\n"};
             NewFile = true;
         }
         Filename = filename ?? string.Empty;
@@ -133,9 +142,42 @@ public class Buffer {
     /// Write the buffer back to disk.
     /// </summary>
     public void Write() {
-        File.WriteAllLines(FullFilename, Lines);
+        string lineTerminator = _terminatorType switch {
+            LineTerminator.CR => "\r",
+            LineTerminator.LF => "\n",
+            LineTerminator.CRLF => "\r\n",
+            _ => ""
+        };
+        File.WriteAllText(FullFilename, string.Join(lineTerminator, Lines));
         Modified = false;
         NewFile = false;
+    }
+
+    /// <summary>
+    /// Determine the line terminator type by scanning for newlines in the
+    /// text. If multiple terminators are found, use the first one.
+    /// </summary>
+    private static LineTerminator DetermineLineTerminator(string text) {
+
+        LineTerminator terminator = LineTerminator.NONE;
+        foreach (char ch in text) {
+            if (ch == '\n') {
+                if (terminator == LineTerminator.CR) {
+                    terminator = LineTerminator.CRLF;
+                    break;
+                }
+                terminator = LineTerminator.LF;
+                break;
+            }
+            if (ch == '\r') {
+                terminator = LineTerminator.CR;
+                continue;
+            }
+            if (terminator != LineTerminator.NONE) {
+                break;
+            }
+        }
+        return terminator;
     }
 }
 
