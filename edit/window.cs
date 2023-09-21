@@ -136,10 +136,12 @@ public class Window {
 
     /// <summary>
     /// Go to input line.
-    /// TODO: What if we're in mark mode?
     /// </summary>
     private RenderHint GoToLine(Macro parser) {
         RenderHint flags = RenderHint.NONE;
+        if (_markMode != MarkMode.NONE) {
+            flags |= RenderHint.BLOCK;
+        }
         if (parser.GetNumber(Edit.GoToLine, out int inputLine)) {
             if (inputLine > Buffer.Length) {
                 inputLine = Buffer.Length;
@@ -157,13 +159,15 @@ public class Window {
     /// Start or end a block mark.
     /// </summary>
     private RenderHint Mark(MarkMode markMode) {
-        if (_markMode != MarkMode.NONE) {
+        if (_markMode == markMode) {
             _markMode = MarkMode.NONE;
         }
         else {
+            if (_markMode == MarkMode.NONE) {
+                _markAnchor = new Point(Buffer.Offset, Buffer.LineIndex);
+                _lastMarkPoint = _markAnchor;
+            }
             _markMode = markMode;
-            _markAnchor = new Point(Buffer.Offset, Buffer.LineIndex);
-            _lastMarkPoint = _markAnchor;
         }
         return RenderHint.BLOCK;
     }
@@ -177,9 +181,24 @@ public class Window {
 
         StringBuilder copyText = new();
         for (int l = markStart.Y; l <= markEnd.Y; l++) {
-            copyText.Append(Buffer.GetLine(l));
+            string line = Buffer.GetLine(l);
+            int startIndex = 0;
+            int length = line.Length;
+            switch (_markMode) {
+                case MarkMode.CHARACTER:
+                    if (l == markStart.Y) {
+                        startIndex = markStart.X;
+                        length -= startIndex;
+                    }
+                    if (l == markEnd.Y) {
+                        length = markEnd.X - startIndex + 1;
+                    }
+                    break;
+            }
+            copyText.Append(line.AsSpan(startIndex, length));
         }
         Scrapboard.Scrap = copyText.ToString();
+        Screen.StatusBar.Message(Edit.CopiedToScrap);
 
         _markMode = MarkMode.NONE;
         return RenderHint.BLOCK;
@@ -326,11 +345,12 @@ public class Window {
                 case MarkMode.CHARACTER:
                     if (i == markStart.Y) {
                         if (markStart.X > 0 && markStart.X > _viewportOffset.X) {
-                            Terminal.Write(x, y, bg, fg, line.Substring(left, markStart.X));
-                            x += markStart.X;
-                            left += markStart.X;
-                            w -= markStart.X;
-                            length -= markStart.X;
+                            int diff = markStart.X - _viewportOffset.X;
+                            Terminal.Write(x, y, bg, fg, line.Substring(left, diff));
+                            x += diff;
+                            w -= diff;
+                            left += diff;
+                            length -= diff;
                         }
                         bg = Screen.Colours.ForegroundColour;
                         fg = Screen.Colours.BackgroundColour;
@@ -340,16 +360,16 @@ public class Window {
                         fg = Screen.Colours.BackgroundColour;
                     }
                     if (i == markEnd.Y) {
-                        length = markEnd.X - left + 1;
-                        if (length >= 0) {
+                        int diff = markEnd.X - left + 1;
+                        if (diff > 0) {
                             bg = Screen.Colours.ForegroundColour;
                             fg = Screen.Colours.BackgroundColour;
-                            Terminal.Write(x, y, bg, fg, line.Substring(left, length));
+                            Terminal.Write(x, y, bg, fg, line.Substring(left, diff));
+                            x += diff;
+                            w -= diff;
+                            left = markEnd.X + 1;
+                            length = Math.Min(w, line.Length - left);
                         }
-                        x += length;
-                        left = markEnd.X + 1;
-                        w -= length;
-                        length = Math.Min(w, line.Length - left);
                         bg = Screen.Colours.BackgroundColour;
                         fg = Screen.Colours.ForegroundColour;
                     }

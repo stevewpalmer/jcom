@@ -111,4 +111,7 @@
     <data name="UnableToReadConfig" xml:space="preserve">
         <value>Unable to read settings file {0}.</value>
     </data>
+    <data name="CopiedToScrap" xml:space="preserve">
+        <value>Block copied to scrap.</value>
+    </data>
 </root>

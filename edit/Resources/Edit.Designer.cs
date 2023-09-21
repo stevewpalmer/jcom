@@ -230,5 +230,11 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("UnableToReadConfig", resourceCulture);
             }
         }
+        
+        internal static string CopiedToScrap {
+            get {
+                return ResourceManager.GetString("CopiedToScrap", resourceCulture);
+            }
+        }
     }
 }
