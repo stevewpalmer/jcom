@@ -56,6 +56,11 @@ public class Screen {
     private static Config Config { get; set; }
 
     /// <summary>
+    /// Scrap buffer
+    /// </summary>
+    public static Buffer ScrapBuffer { get; set; }
+
+    /// <summary>
     /// Open the main window.
     /// </summary>
     public void Open() {
@@ -63,6 +68,7 @@ public class Screen {
 
         Config = Config.Load();
         Colours = new Colours(Config);
+        ScrapBuffer = new Buffer();
 
         StatusBar.Refresh();
         Version();
@@ -72,6 +78,7 @@ public class Screen {
     /// Close the main screen when the editor is closed.
     /// </summary>
     public void Close() {
+        Config.Save();
         Terminal.Close();
     }
 
@@ -105,9 +112,11 @@ public class Screen {
             }
         }
         RenderHint flags = commandId switch {
+            KeyCommand.KC_CD => ChangeDirectory(parser),
             KeyCommand.KC_CLOSE => CloseWindow(),
             KeyCommand.KC_COLOUR => ConfigureColours(parser),
             KeyCommand.KC_COMMAND => RunCommand(),
+            KeyCommand.KC_DELFILE => DeleteFile(parser),
             KeyCommand.KC_DETAILS => ShowDetails(),
             KeyCommand.KC_EDIT => EditFile(parser),
             KeyCommand.KC_EXIT => ExitEditor(true),
@@ -198,7 +207,6 @@ public class Screen {
                 AddWindow(newWindow);
             }
             _activeWindow = newWindow;
-            _activeWindow.SetViewportBounds(1, 1, Terminal.Width - 2, Terminal.Height - 3);
             _activeWindow.Refresh();
             UpdateCursorPosition();
         }
@@ -421,11 +429,45 @@ public class Screen {
             string fullFilename = Buffer.GetFullFilename(outputFileName);
             if (_windowList.Any(window => fullFilename.Equals(window.Buffer.FullFilename, StringComparison.OrdinalIgnoreCase))) {
                 StatusBar.Message(Edit.InvalidOutputFilename);
-                return RenderHint.NONE;
             }
-            _activeWindow.Buffer.Filename = outputFileName;
-            foreach (Window window in _windowList.Where(window => window.Buffer == _activeWindow.Buffer)) {
-                window.ApplyRenderHint(RenderHint.TITLE);
+            else {
+                _activeWindow.Buffer.Filename = outputFileName;
+                foreach (Window window in _windowList.Where(window => window.Buffer == _activeWindow.Buffer)) {
+                    window.ApplyRenderHint(RenderHint.TITLE);
+                }
+            }
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Delete a file.
+    /// </summary>
+    private static RenderHint DeleteFile(Macro parser) {
+        string filename = parser.NextWord();
+        if (!string.IsNullOrEmpty(filename)) {
+            try {
+                File.Delete(filename);
+            } catch(Exception e) {
+                StatusBar.Error(e.Message);
+            }
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Change the current working directory.
+    /// </summary>
+    private static RenderHint ChangeDirectory(Macro parser) {
+        string newDirectory = parser.NextWord();
+        if (string.IsNullOrEmpty(newDirectory)) {
+            StatusBar.Message(Directory.GetCurrentDirectory());
+        }
+        else {
+            try {
+                Directory.SetCurrentDirectory(newDirectory);
+            } catch(Exception e) {
+                StatusBar.Error(e.Message);
             }
         }
         return RenderHint.NONE;

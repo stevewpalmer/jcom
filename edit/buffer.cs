@@ -23,10 +23,20 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Runtime.InteropServices;
+
 namespace JEdit;
 
 public class Buffer {
     private readonly LineTerminator _terminatorType;
+    private List<string> _lines;
+
+    /// <summary>
+    /// Create a new empty buffer not associated with any file.
+    /// </summary>
+    public Buffer() {
+        NewFile = true;
+    }
 
     /// <summary>
     /// Creates a buffer with the specified file. The end of each line is represented
@@ -40,15 +50,35 @@ public class Buffer {
         if (!string.IsNullOrEmpty(filename) && File.Exists(filename)) {
             string allText = File.ReadAllText(filename);
             _terminatorType = DetermineLineTerminator(allText);
-            Lines = allText
-                .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
-                .Select(l => l + Consts.EndOfLine)
-                .ToList();
+            Content = allText;
         } else {
-            Lines = new List<string> {"\n"};
+            _terminatorType = DefaultLineTerminator();
+            _lines = new List<string> {Consts.EndOfLine.ToString()};
             NewFile = true;
         }
         Filename = filename ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Get or set the content of the buffer to the specified string. All existing
+    /// content is replaced, even if modified.
+    /// </summary>
+    public string Content {
+        set {
+            _lines = value
+                .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+                .Select(l => l + Consts.EndOfLine)
+                .ToList();
+        }
+        get {
+            string lineTerminator = _terminatorType switch {
+                LineTerminator.CR => "\r",
+                LineTerminator.LF => "\n",
+                LineTerminator.CRLF => "\r\n",
+                _ => ""
+            };
+            return string.Join(lineTerminator, _lines);
+        }
     }
 
     /// <summary>
@@ -92,11 +122,6 @@ public class Buffer {
     }
 
     /// <summary>
-    /// Buffer contents
-    /// </summary>
-    private List<string> Lines { get; }
-
-    /// <summary>
     /// Name of file associated with buffer, or empty string
     /// if the buffer has not yet been saved to a file
     /// </summary>
@@ -117,7 +142,7 @@ public class Buffer {
     /// <summary>
     /// Number of lines in the buffer
     /// </summary>
-    public int Length => Lines.Count;
+    public int Length => _lines.Count;
 
     /// <summary>
     /// Index of line being edited
@@ -135,22 +160,23 @@ public class Buffer {
     /// <param name="index">Zero based index</param>
     /// <returns>Line, or null if the index is out of range</returns>
     public string GetLine(int index) {
-        return index >= 0 && index < Lines.Count ? Lines[index] : null;
+        return index >= 0 && index < _lines.Count ? _lines[index] : null;
     }
 
     /// <summary>
     /// Write the buffer back to disk.
     /// </summary>
     public void Write() {
-        string lineTerminator = _terminatorType switch {
-            LineTerminator.CR => "\r",
-            LineTerminator.LF => "\n",
-            LineTerminator.CRLF => "\r\n",
-            _ => ""
-        };
-        File.WriteAllText(FullFilename, string.Join(lineTerminator, Lines));
+        File.WriteAllText(FullFilename, Content);
         Modified = false;
         NewFile = false;
+    }
+
+    /// <summary>
+    /// Determine the default line terminator for the system.
+    /// </summary>
+    private static LineTerminator DefaultLineTerminator() {
+        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? LineTerminator.CRLF : LineTerminator.LF;
     }
 
     /// <summary>

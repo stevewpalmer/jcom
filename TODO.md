@@ -8,7 +8,7 @@ decreasing order of priority.
 ### Editor
 * Editing capability.
 * Split windows.
-* Block marking, cut, copy and paste.
+* Block cut and paste.
 * Search and replace.
 * Help.
 

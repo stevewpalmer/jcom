@@ -30,7 +30,9 @@ namespace JEdit;
 /// </summary>
 public enum KeyCommand {
     KC_NONE,
+    KC_CD,
     KC_CDOWN,
+    KC_CENTRE,
     KC_CFILEEND,
     KC_CFILESTART,
     KC_CLEFT,
@@ -48,6 +50,7 @@ public enum KeyCommand {
     KC_CWINDOWTOP,
     KC_CWORDLEFT,
     KC_CWORDRIGHT,
+    KC_DELFILE,
     KC_DETAILS,
     KC_EDIT,
     KC_EXIT,
@@ -93,9 +96,13 @@ public class KeyMap {
     /// </summary>
     private static readonly KeyCommands[] CommandTable = {
         new() { CommandName = "beginning_of_line", CommandId = KeyCommand.KC_CLINESTART },
+        new() { CommandName = "cd", CommandId = KeyCommand.KC_CD },
+        new() { CommandName = "center_line", CommandId = KeyCommand.KC_CENTRE },
+        new() { CommandName = "centre_line", CommandId = KeyCommand.KC_CENTRE },
         new() { CommandName = "colour", CommandId = KeyCommand.KC_COLOUR },
         new() { CommandName = "color", CommandId = KeyCommand.KC_COLOUR },
         new() { CommandName = "copy", CommandId = KeyCommand.KC_COPY },
+        new() { CommandName = "del", CommandId = KeyCommand.KC_DELFILE },
         new() { CommandName = "delete_curr_buffer", CommandId = KeyCommand.KC_CLOSE },
         new() { CommandName = "display_file_name", CommandId = KeyCommand.KC_DETAILS },
         new() { CommandName = "down", CommandId = KeyCommand.KC_CDOWN },
@@ -166,6 +173,7 @@ public class KeyMap {
     /// </summary>
     private static readonly KeyMap[] KeyMaps = {
         new() { KeyCommand = KeyCommand.KC_CDOWN, Key = ConsoleKey.DownArrow },
+        new() { KeyCommand = KeyCommand.KC_CENTRE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.C },
         new() { KeyCommand = KeyCommand.KC_CFILEEND, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.End },
         new() { KeyCommand = KeyCommand.KC_CFILESTART, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.Home },
         new() { KeyCommand = KeyCommand.KC_CLEFT, Key = ConsoleKey.LeftArrow },
@@ -176,7 +184,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D7 },
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.OemMinus },
         new() { KeyCommand = KeyCommand.KC_COMMAND, Key = ConsoleKey.F10 },
-        new() { KeyCommand = KeyCommand.KC_COPY, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.C },
+        new() { KeyCommand = KeyCommand.KC_COPY, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.OemPlus },
         new() { KeyCommand = KeyCommand.KC_CPAGEDOWN, Key = ConsoleKey.PageDown },
         new() { KeyCommand = KeyCommand.KC_CPAGEUP, Key = ConsoleKey.PageUp },
         new() { KeyCommand = KeyCommand.KC_CRIGHT, Key = ConsoleKey.RightArrow },
@@ -197,6 +205,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_LOADKEYSTROKES, Key = ConsoleKey.F12 },
         new() { KeyCommand = KeyCommand.KC_MARK, KeyChar = 181 },
         new() { KeyCommand = KeyCommand.KC_MARK, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.M },
+        new() { KeyCommand = KeyCommand.KC_MARKCOLUMN, KeyChar = 231 },
         new() { KeyCommand = KeyCommand.KC_MARKCOLUMN, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.C },
         new() { KeyCommand = KeyCommand.KC_MARKLINE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.L },
         new() { KeyCommand = KeyCommand.KC_NEXTBUFFER, KeyChar = 710 },

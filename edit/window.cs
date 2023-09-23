@@ -25,6 +25,7 @@
 
 using System.Drawing;
 using System.Text;
+using JComLib;
 using JEdit.Resources;
 
 namespace JEdit;
@@ -72,7 +73,6 @@ public class Window {
     /// </summary>
     public void Refresh() {
         RenderFrame();
-        RenderTitle();
         Render(RenderHint.REDRAW);
     }
 
@@ -85,20 +85,21 @@ public class Window {
     public RenderHint Handle(Macro parser, KeyCommand commandId) {
         RenderHint flags = commandId switch {
             KeyCommand.KC_CDOWN => CursorDown(),
-            KeyCommand.KC_CUP => CursorUp(),
-            KeyCommand.KC_CLEFT => CursorLeft(),
-            KeyCommand.KC_CRIGHT => CursorRight(),
-            KeyCommand.KC_CLINESTART => StartOfCurrentLine(),
-            KeyCommand.KC_CLINEEND => EndOfCurrentLine(),
-            KeyCommand.KC_CPAGEDOWN => PageDown(),
-            KeyCommand.KC_CFILESTART => FileStart(),
+            KeyCommand.KC_CENTRE => CenterWindow(),
             KeyCommand.KC_CFILEEND => FileEnd(),
-            KeyCommand.KC_CWINDOWTOP => WindowTop(),
-            KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
-            KeyCommand.KC_CPAGEUP => PageUp(),
+            KeyCommand.KC_CFILESTART => FileStart(),
+            KeyCommand.KC_CLEFT => CursorLeft(),
+            KeyCommand.KC_CLINEEND => EndOfCurrentLine(),
+            KeyCommand.KC_CLINESTART => StartOfCurrentLine(),
             KeyCommand.KC_COPY => Copy(),
-            KeyCommand.KC_CWORDRIGHT => WordRight(),
+            KeyCommand.KC_CPAGEDOWN => PageDown(),
+            KeyCommand.KC_CPAGEUP => PageUp(),
+            KeyCommand.KC_CRIGHT => CursorRight(),
+            KeyCommand.KC_CUP => CursorUp(),
+            KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
+            KeyCommand.KC_CWINDOWTOP => WindowTop(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
+            KeyCommand.KC_CWORDRIGHT => WordRight(),
             KeyCommand.KC_GOTO => GoToLine(parser),
             KeyCommand.KC_MARK => Mark(MarkMode.CHARACTER),
             KeyCommand.KC_MARKCOLUMN => Mark(MarkMode.COLUMN),
@@ -111,6 +112,10 @@ public class Window {
         return ApplyRenderHint(flags);
     }
 
+    /// <summary>
+    /// Apply the render hint flags to the current window. On completion,
+    /// return just the flags that were not applied.
+    /// </summary>
     public RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REDRAW)) {
             Render(RenderHint.REDRAW);
@@ -156,6 +161,20 @@ public class Window {
     }
 
     /// <summary>
+    /// Center the cursor in the window
+    /// </summary>
+    private RenderHint CenterWindow() {
+        RenderHint flags = RenderHint.NONE;
+        int diff = (_viewportBounds.Height / 2) - CursorRowInViewport;
+        int newOffset = Math.Max(0, _viewportOffset.Y - diff);
+        if (newOffset != _viewportOffset.Y) {
+            _viewportOffset.Y = newOffset;
+            flags = RenderHint.REDRAW;
+        }
+        return flags;
+    }
+
+    /// <summary>
     /// Start or end a block mark.
     /// </summary>
     private RenderHint Mark(MarkMode markMode) {
@@ -185,6 +204,11 @@ public class Window {
             int startIndex = 0;
             int length = line.Length;
             switch (_markMode) {
+                case MarkMode.COLUMN:
+                    startIndex = Math.Min(length, markStart.X);
+                    length = Math.Min(length - startIndex, markEnd.X - startIndex + 1);
+                    break;
+
                 case MarkMode.CHARACTER:
                     if (l == markStart.Y) {
                         startIndex = markStart.X;
@@ -195,9 +219,12 @@ public class Window {
                     }
                     break;
             }
-            copyText.Append(line.AsSpan(startIndex, length));
+            copyText.Append(Utilities.SpanBound(line, startIndex, length));
+            if (copyText.Length > 0 && copyText[^1] != Consts.EndOfLine) {
+                copyText.Append(Consts.EndOfLine);
+            }
         }
-        Scrapboard.Scrap = copyText.ToString();
+        Screen.ScrapBuffer.Content = copyText.ToString();
         Screen.StatusBar.Message(Edit.CopiedToScrap);
 
         _markMode = MarkMode.NONE;
@@ -258,10 +285,10 @@ public class Window {
     private void RenderFrame() {
         Rectangle frameRect = _viewportBounds;
         frameRect.Inflate(1, 1);
-        Terminal.SetCursor(frameRect.Left, frameRect.Top);
+
+        RenderTitle();
+
         Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
-        Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
 
         for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
             Terminal.SetCursor(frameRect.Left, c);
@@ -342,11 +369,35 @@ public class Window {
                     }
                     break;
 
+                case MarkMode.COLUMN:
+                    if (markStart.X > 0 && markStart.X > _viewportOffset.X) {
+                        int diff = markStart.X - _viewportOffset.X;
+                        Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                        x += diff;
+                        w -= diff;
+                        left += diff;
+                        length -= diff;
+                    }
+                    if (markEnd.X > _viewportOffset.X) {
+                        int diff = Math.Min(markEnd.X - markStart.X + 1, line.Length - left);
+                        int diff2 = markEnd.X - markStart.X + 1;
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                        Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
+                        x += diff2;
+                        w -= diff2;
+                        left += diff;
+                        length -= diff;
+                    }
+                    bg = Screen.Colours.BackgroundColour;
+                    fg = Screen.Colours.ForegroundColour;
+                    break;
+
                 case MarkMode.CHARACTER:
                     if (i == markStart.Y) {
                         if (markStart.X > 0 && markStart.X > _viewportOffset.X) {
                             int diff = markStart.X - _viewportOffset.X;
-                            Terminal.Write(x, y, bg, fg, line.Substring(left, diff));
+                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
                             x += diff;
                             w -= diff;
                             left += diff;
@@ -360,11 +411,11 @@ public class Window {
                         fg = Screen.Colours.BackgroundColour;
                     }
                     if (i == markEnd.Y) {
-                        int diff = markEnd.X - left + 1;
+                        int diff = Math.Min(markEnd.X - left + 1, line.Length - left);
                         if (diff > 0) {
                             bg = Screen.Colours.ForegroundColour;
                             fg = Screen.Colours.BackgroundColour;
-                            Terminal.Write(x, y, bg, fg, line.Substring(left, diff));
+                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
                             x += diff;
                             w -= diff;
                             left = markEnd.X + 1;
@@ -376,7 +427,7 @@ public class Window {
                     break;
             }
 
-            Terminal.WriteLine(x, y, w, bg, fg, line.Substring(left, length));
+            Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, length));
             line = Buffer.GetLine(++i);
 
             bg = Screen.Colours.BackgroundColour;
@@ -411,9 +462,6 @@ public class Window {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex < Buffer.Length - 1) {
             ++Buffer.LineIndex;
-            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
-                flags |= EndOfCurrentLine();
-            }
             if (CursorRowInViewport < _viewportBounds.Height) {
                 flags |= RenderHint.CURSOR;
             } else {
@@ -431,9 +479,6 @@ public class Window {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0) {
             --Buffer.LineIndex;
-            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
-                flags |= EndOfCurrentLine();
-            }
             if (CursorRowInViewport >= 0) {
                 flags |= RenderHint.CURSOR;
             } else {
@@ -461,9 +506,7 @@ public class Window {
     /// </summary>
     private RenderHint CursorRight() {
         RenderHint flags = SaveLastMarkPoint();
-        if (++Buffer.Offset == Buffer.GetLine(Buffer.LineIndex).Length) {
-            return StartOfNextLine();
-        }
+        ++Buffer.Offset;
         return flags | CursorFromOffset();
     }
 
@@ -536,10 +579,6 @@ public class Window {
         int previousLineIndex = Buffer.LineIndex;
         Buffer.LineIndex = Math.Min(Buffer.LineIndex + _viewportBounds.Height, Buffer.Length - 1);
         if (Buffer.LineIndex != previousLineIndex) {
-            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
-                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
-                flags |= CursorFromOffset();
-            }
             _viewportOffset.Y += Buffer.LineIndex - previousLineIndex;
             flags |= RenderHint.REDRAW;
         }
@@ -554,10 +593,6 @@ public class Window {
         int previousLineIndex = Buffer.LineIndex;
         Buffer.LineIndex = Math.Max(Buffer.LineIndex - _viewportBounds.Height, 0);
         if (Buffer.LineIndex != previousLineIndex) {
-            if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
-                Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
-                flags |= CursorFromOffset();
-            }
             _viewportOffset.Y -= previousLineIndex - Buffer.LineIndex;
             if (_viewportOffset.Y < 0) {
                 _viewportOffset.Y = 0;
@@ -671,9 +706,6 @@ public class Window {
     /// </summary>
     private RenderHint CursorFromLineIndex() {
         RenderHint flags = RenderHint.NONE;
-        if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
-            flags |= EndOfCurrentLine();
-        }
         if (Buffer.LineIndex < _viewportOffset.Y) {
             _viewportOffset.Y = Buffer.LineIndex;
             flags |= RenderHint.REDRAW;

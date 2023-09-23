@@ -55,4 +55,24 @@ public static class Utilities {
         }
         return value.ToString();
     }
+
+    /// <summary>
+    /// Return a section of the specified string starting from the given index
+    /// and for the specified length. If the index and length are outside the
+    /// string range, we return an empty string.
+    /// </summary>
+    /// <param name="str">String to span</param>
+    /// <param name="index">Zero based start index</param>
+    /// <param name="length">Length to return</param>
+    /// <returns>The substring indexed and of the given length or an empty string</returns>
+    public static string SpanBound(string str, int index, int length) {
+        if (index >= str.Length) {
+            index = 0;
+            length = 0;
+        }
+        if (index + length > str.Length) {
+            length = str.Length - index;
+        }
+        return str.Substring(index, length);
+    }
 }
