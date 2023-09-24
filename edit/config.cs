@@ -40,7 +40,7 @@ public class Config {
         Config fileConfig = new Config();
         if (File.Exists(Consts.ConfigurationFilename)) {
             try {
-                using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
+                using FileStream stream = File.Create(Consts.ConfigurationFilename);
                 fileConfig = JsonSerializer.Deserialize<Config>(stream);
             }
             catch (Exception) {
