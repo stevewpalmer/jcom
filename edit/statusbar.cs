@@ -31,6 +31,7 @@ using JEdit.Resources;
 namespace JEdit;
 
 public class StatusBar {
+    private static readonly object LockObj = new();
     private static int _statusRow;
     private static int _timeWidth;
     private static int _timePosition;
@@ -234,7 +235,7 @@ public class StatusBar {
     /// <param name="inputValue">The input value</param>
     /// <param name="allowFilenameCompletion">True to allow filename completion</param>
     /// <returns>True if a value was input, false if empty or cancelled</returns>
-    public bool PromptForInput(string prompt, out string inputValue, bool allowFilenameCompletion) {
+    public bool PromptForInput(string prompt, ref string inputValue, bool allowFilenameCompletion) {
         Point cursorPosition = Terminal.GetCursor();
         Message(prompt);
         Terminal.SetCursor(prompt.Length, _statusRow);
@@ -243,14 +244,29 @@ public class StatusBar {
         History history = History.Get(prompt);
         string[] allfiles = null;
         int allfilesIndex = 0;
+        string readyText = inputValue;
+        bool selection = false;
+        ConsoleKeyInfo input;
 
-        ConsoleKeyInfo input = Console.ReadKey(true);
-        while (input.Key != ConsoleKey.Enter) {
+        do {
+            if (!string.IsNullOrEmpty(readyText)) {
+                int totalWidth = prompt.Length + readyText.Length;
+                inputBuffer = new List<char>(readyText.ToCharArray());
+                Selected(prompt.Length, _statusRow, _displayWidth - totalWidth, readyText);
+                Selected(prompt.Length, _statusRow, _displayWidth - totalWidth, readyText);
+                Terminal.SetCursor(totalWidth, _statusRow);
+                selection = true;
+            }
+
+            input = Console.ReadKey(true);
+            if (input.Key == ConsoleKey.Enter) {
+                break;
+            }
             if (input.Key == ConsoleKey.Escape) {
                 inputBuffer.Clear();
                 break;
             }
-            string readyText = input.Key switch {
+            readyText = input.Key switch {
                 ConsoleKey.UpArrow => history.Next(),
                 ConsoleKey.DownArrow => history.Previous(),
                 _ => null
@@ -258,46 +274,54 @@ public class StatusBar {
             if (input.KeyChar == 172) {
                 readyText = _cachedTextInput;
             }
-            else switch (input.Key) {
-                case ConsoleKey.Backspace when inputBuffer.Count > 0:
-                    inputBuffer.RemoveAt(inputBuffer.Count - 1);
-                    Terminal.Write(@" ");
-                    break;
-
-                case ConsoleKey.Tab: {
-                    if (!allowFilenameCompletion) {
+            else
+                switch (input.Key) {
+                    case ConsoleKey.Backspace when inputBuffer.Count > 0:
+                        int count = selection ? inputBuffer.Count : 1;
+                        while (count-- > 0) {
+                            inputBuffer.RemoveAt(inputBuffer.Count - 1);
+                            Terminal.Write(@" ");
+                        }
+                        selection = false;
                         break;
-                    }
-                    if (allfiles == null) {
-                        string partialName = string.Join("", inputBuffer) + "*";
-                        allfiles = Directory.GetFiles(".", partialName, SearchOption.TopDirectoryOnly);
-                        allfilesIndex = 0;
-                    }
-                    if (allfiles.Length > 0) {
-                        string completedName = Buffer.GetBaseFilename(allfiles[allfilesIndex++]);
-                        if (allfilesIndex == allfiles.Length) {
+
+                    case ConsoleKey.Tab: {
+                        if (!allowFilenameCompletion) {
+                            break;
+                        }
+                        if (allfiles == null) {
+                            string partialName = string.Join("", inputBuffer) + "*";
+                            allfiles = Directory.GetFiles(".", partialName, SearchOption.TopDirectoryOnly);
                             allfilesIndex = 0;
                         }
-                        readyText = completedName;
+                        if (allfiles.Length > 0) {
+                            string completedName = Buffer.GetBaseFilename(allfiles[allfilesIndex++]);
+                            if (allfilesIndex == allfiles.Length) {
+                                allfilesIndex = 0;
+                            }
+                            readyText = completedName;
+                        }
+                        break;
                     }
-                    break;
-                }
-                default: {
-                    if (!char.IsControl(input.KeyChar) && inputBuffer.Count < 80) {
-                        inputBuffer.Add(input.KeyChar);
-                        Terminal.Write(_bgColour, _fgColour, input.KeyChar);
-                        allfiles = null;
+
+                    default: {
+                        if (!char.IsControl(input.KeyChar) && inputBuffer.Count < 80) {
+                            if (selection) {
+                                count = inputBuffer.Count;
+                                while (count-- > 0) {
+                                    inputBuffer.RemoveAt(inputBuffer.Count - 1);
+                                    Terminal.Write(@" ");
+                                }
+                                selection = false;
+                            }
+                            inputBuffer.Add(input.KeyChar);
+                            Terminal.Write(_bgColour, _fgColour, input.KeyChar);
+                            allfiles = null;
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
-            if (readyText != null) {
-                inputBuffer = new List<char>(readyText.ToCharArray());
-                Message(prompt + readyText);
-                Terminal.SetCursor(prompt.Length + readyText.Length, _statusRow);
-            }
-            input = Console.ReadKey(true);
-        }
+        } while (true);
         inputValue =  inputBuffer.Count > 0 ? string.Join("", inputBuffer) : string.Empty;
         if (inputValue.Length > 1) {
             _cachedTextInput = inputValue;
@@ -333,6 +357,9 @@ public class StatusBar {
         RenderText(0, _statusRow, _displayWidth, _currentMessage, _fgColour);
     }
 
+    /// <summary>
+    /// Display the current cursor position.
+    /// </summary>
     private void RenderCursorPosition() {
         string text = $"Line: {_cursorRow,-3} Col: {_cursorColumn,-3}";
         RenderText(_cursorPositionPosition, _statusRow, _cursorPositionWidth, text, _fgColour);
@@ -368,6 +395,19 @@ public class StatusBar {
     /// Write text to the status bar in the normal text colour.
     /// </summary>
     private void RenderText(int x, int y, int w, string text, ConsoleColor fgColor) {
-        Terminal.WriteTo(x, y, w, _bgColour, fgColor, text);
+        lock (LockObj) {
+            (int savedLeft, int savedTop) = Console.GetCursorPosition();
+            Terminal.Write(x, y, w, _bgColour, fgColor, text);
+            Console.SetCursorPosition(savedLeft, savedTop);
+        }
+    }
+
+    /// <summary>
+    /// Write text to the status bar in selected colours where the foreground colour
+    /// is used for the background and the background colour for the text.
+    /// </summary>
+    private void Selected(int x, int y, int w, string text) {
+        Terminal.Write(x, y, text.Length, _fgColour, _bgColour, text);
+        Terminal.Write(x + text.Length, y, w - text.Length, _bgColour, _fgColour, " ");
     }
 }

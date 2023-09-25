@@ -236,5 +236,35 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("CopiedToScrap", resourceCulture);
             }
         }
+        
+        internal static string SearchFor {
+            get {
+                return ResourceManager.GetString("SearchFor", resourceCulture);
+            }
+        }
+        
+        internal static string PatternNotFound {
+            get {
+                return ResourceManager.GetString("PatternNotFound", resourceCulture);
+            }
+        }
+        
+        internal static string SearchCompleted {
+            get {
+                return ResourceManager.GetString("SearchCompleted", resourceCulture);
+            }
+        }
+        
+        internal static string CaseSensitivityOn {
+            get {
+                return ResourceManager.GetString("CaseSensitivityOn", resourceCulture);
+            }
+        }
+        
+        internal static string CaseSensitivityOff {
+            get {
+                return ResourceManager.GetString("CaseSensitivityOff", resourceCulture);
+            }
+        }
     }
 }

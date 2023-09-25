@@ -32,6 +32,7 @@ public class Screen {
     private readonly List<Window> _windowList = new();
     private Window _activeWindow;
     private readonly Recorder _recorder = new();
+    private Search _search;
 
     /// <summary>
     /// Constructor
@@ -58,7 +59,7 @@ public class Screen {
     /// <summary>
     /// Scrap buffer
     /// </summary>
-    public static Buffer ScrapBuffer { get; set; }
+    public static Buffer ScrapBuffer { get; private set; }
 
     /// <summary>
     /// Open the main window.
@@ -128,6 +129,10 @@ public class Screen {
             KeyCommand.KC_REMEMBER => StartStopRecording(),
             KeyCommand.KC_REPEAT => Repeat(),
             KeyCommand.KC_SAVEKEYSTROKES => SaveRecording(),
+            KeyCommand.KC_SEARCHAGAIN => SearchAgain(),
+            KeyCommand.KC_SEARCHBACK => Search(parser, false),
+            KeyCommand.KC_SEARCHCASE => SearchCaseToggle(),
+            KeyCommand.KC_SEARCHFORWARD => Search(parser, true),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
             _ => _activeWindow.Handle(parser, commandId)
@@ -302,7 +307,8 @@ public class Screen {
     /// </summary>
     private RenderHint RunCommand() {
         RenderHint flags = RenderHint.NONE;
-        if (StatusBar.PromptForInput(Edit.CommandPrompt, out string inputValue, false)) {
+        string inputValue = string.Empty;
+        if (StatusBar.PromptForInput(Edit.CommandPrompt, ref inputValue, false)) {
             Macro parser = new Macro(inputValue);
             KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
             if (commandId == KeyCommand.KC_NONE) {
@@ -386,7 +392,8 @@ public class Screen {
                 return RenderHint.NONE;
             }
         }
-        if (StatusBar.PromptForInput(Edit.KeystrokeMacroFile, out string inputValue, true)) {
+        string inputValue = string.Empty;
+        if (StatusBar.PromptForInput(Edit.KeystrokeMacroFile, ref inputValue, true)) {
             if (!_recorder.LoadKeystrokes(inputValue)) {
                 StatusBar.Error(Edit.KeystrokeMacroNotFound);
             } else {
@@ -400,9 +407,53 @@ public class Screen {
     /// Save the current keystroke macro to a file.
     /// </summary>
     private RenderHint SaveRecording() {
-        if (StatusBar.PromptForInput(Edit.SaveKeystrokesAs, out string inputValue, true)) {
+        string inputValue = string.Empty;
+        if (StatusBar.PromptForInput(Edit.SaveKeystrokesAs, ref inputValue, true)) {
             _recorder.SaveKeystrokes(inputValue);
         }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Search in the active window
+    /// </summary>
+    /// <param name="parser">Command parser instance</param>
+    /// <param name="forward">True if we search forward</param>
+    private RenderHint Search(Macro parser, bool forward) {
+        RenderHint flags = RenderHint.NONE;
+        string inputValue = Config.LastSearchString;
+        string prompt = string.Format(Edit.SearchFor, forward ? "\u2193" : "\u2191");
+        if (parser.GetInput(prompt, ref inputValue)) {
+            _search = new Search {
+                SearchString = inputValue,
+                CaseInsensitive = Config.SearchCaseInsensitive,
+                Buffer = _activeWindow.Buffer,
+                Forward = forward
+            };
+            Config.LastSearchString = inputValue;
+            flags |= SearchAgain();
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Repeat the previous search.
+    /// </summary>
+    private RenderHint SearchAgain() {
+        RenderHint flags = RenderHint.NONE;
+        if (_search != null) {
+            flags |= _activeWindow.Search(_search);
+            StatusBar.Message(flags == RenderHint.NONE ? Edit.PatternNotFound : Edit.SearchCompleted);
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Toggle search case sensitivity
+    /// </summary>
+    private RenderHint SearchCaseToggle() {
+        Config.SearchCaseInsensitive = !Config.SearchCaseInsensitive;
+        StatusBar.Message(Config.SearchCaseInsensitive ? Edit.CaseSensitivityOff : Edit.CaseSensitivityOn);
         return RenderHint.NONE;
     }
 

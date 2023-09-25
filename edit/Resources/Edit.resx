@@ -114,4 +114,19 @@
     <data name="CopiedToScrap" xml:space="preserve">
         <value>Block copied to scrap.</value>
     </data>
+    <data name="SearchFor" xml:space="preserve">
+        <value>{0} Search for: </value>
+    </data>
+    <data name="PatternNotFound" xml:space="preserve">
+        <value>Pattern not found.</value>
+    </data>
+    <data name="SearchCompleted" xml:space="preserve">
+        <value>Search completed.</value>
+    </data>
+    <data name="CaseSensitivityOn" xml:space="preserve">
+        <value>Case sensitivity on.</value>
+    </data>
+    <data name="CaseSensitivityOff" xml:space="preserve">
+        <value>Case sensitivity off.</value>
+    </data>
 </root>

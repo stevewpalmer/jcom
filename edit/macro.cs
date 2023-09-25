@@ -67,9 +67,29 @@ public class Macro : Parser {
     public bool GetFilename(string prompt, out string inputValue) {
         inputValue = NextWord();
         if (string.IsNullOrEmpty(inputValue)) {
-            if (!Screen.StatusBar.PromptForInput(prompt, out inputValue, true)) {
+            if (!Screen.StatusBar.PromptForInput(prompt, ref inputValue, true)) {
                 return false;
             }
+        }
+        return true;
+    }
+
+    /// <summary>
+    /// Read input from the command line. If none present then prompt
+    /// for the input.
+    /// </summary>
+    /// <param name="prompt">Prompt to display if input is required</param>
+    /// <param name="inputValue">Input value</param>
+    /// <returns>True if string retrieved, false if the input was cancelled</returns>
+    public bool GetInput(string prompt, ref string inputValue) {
+        string nextWord = NextWord();
+        if (string.IsNullOrEmpty(nextWord)) {
+            if (!Screen.StatusBar.PromptForInput(prompt, ref inputValue, false)) {
+                return false;
+            }
+        }
+        else {
+            inputValue = nextWord;
         }
         return true;
     }

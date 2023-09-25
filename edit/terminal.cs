@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace JEdit; 
 
@@ -31,6 +32,7 @@ public static class Terminal {
     private static readonly object LockObj = new();
     private static ConsoleColor _savedBackgroundColour;
     private static ConsoleColor _savedForegroundColour;
+    private static bool _isWindows;
 
     /// <summary>
     /// Initialise the display.
@@ -38,8 +40,10 @@ public static class Terminal {
     public static void Open() {
         _savedBackgroundColour = Console.BackgroundColor;
         _savedForegroundColour = Console.ForegroundColor;
+        _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         Console.TreatControlCAsInput = true;
         Console.Clear();
+        SetDefaultCursor();
     }
 
     /// <summary>
@@ -76,20 +80,26 @@ public static class Terminal {
     }
 
     /// <summary>
-    /// Write to the console at the specified position, padding out to the width
-    /// with spaces if required. The previous cursor position is saved and then
-    /// restored at the end.
+    /// Set the default cursor.
     /// </summary>
-    /// <param name="x">Zero based column of output</param>
-    /// <param name="y">Zero based line of output</param>
-    /// <param name="width">Width of area to write to</param>
-    /// <param name="bg">Background colour</param>
-    /// <param name="fg">Foreground colour</param>
-    /// <param name="str">String to output</param>
-    public static void WriteTo(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
-        (int savedLeft, int savedTop) = Console.GetCursorPosition();
-        Write(x, y, width, bg, fg, str);
-        Console.SetCursorPosition(savedLeft, savedTop);
+    public static void SetDefaultCursor() {
+        if (_isWindows) {
+            #pragma warning disable CA1416
+            Console.CursorSize = 10;
+            #pragma warning restore CA1416
+        }
+    }
+
+    /// <summary>
+    /// Set the virtual cursor which indicates that the user
+    /// is within the virtual editing space.
+    /// </summary>
+    public static void SetVirtualCursor() {
+        if (_isWindows) {
+            #pragma warning disable CA1416
+            Console.CursorSize = 50;
+            #pragma warning restore CA1416
+        }
     }
 
     /// <summary>

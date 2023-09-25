@@ -89,4 +89,14 @@ public class Config {
     /// Status bar error message colour
     /// </summary>
     public string ErrorMessageColour { get; set; }
+
+    /// <summary>
+    /// Last search string
+    /// </summary>
+    public string LastSearchString { get; set; }
+
+    /// <summary>
+    /// Whether or not the search is case sensitive
+    /// </summary>
+    public bool SearchCaseInsensitive { get; set; }
 }

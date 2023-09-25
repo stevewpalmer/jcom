@@ -140,6 +140,21 @@ public class Window {
     }
 
     /// <summary>
+    /// Perform a search for the text specified in searchData and update the
+    /// cursor to the first match.
+    /// </summary>
+    /// <param name="searchData">A search object</param>
+    public RenderHint Search(Search searchData) {
+        RenderHint flags = RenderHint.NONE;
+        if (searchData.Next()) {
+            Buffer.LineIndex = searchData.Row;
+            Buffer.Offset = searchData.Column;
+            flags |= CursorFromLineIndex();
+        }
+        return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
     /// Go to input line.
     /// </summary>
     private RenderHint GoToLine(Macro parser) {
@@ -317,7 +332,7 @@ public class Window {
         int realLength = Math.Min(title.Length, frameRect.Width - 4);
         Terminal.SetCursor((frameRect.Width - realLength - 2) / 2, 0);
         Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
-        Terminal.Write($@" {title.Substring(0, realLength)} ");
+        Terminal.Write($@" {title[..realLength]} ");
 
         Terminal.SetCursor(savedCursor);
     }
@@ -757,6 +772,11 @@ public class Window {
         int column = CursorColumnInViewport + _viewportBounds.Left;
         int row = CursorRowInViewport + _viewportBounds.Top;
         if (_viewportBounds.Contains(column, row)) {
+            if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
+                Terminal.SetVirtualCursor();
+            } else {
+                Terminal.SetDefaultCursor();
+            }
             Terminal.SetCursor(column, row);
         }
     }
