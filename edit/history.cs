@@ -64,7 +64,7 @@ public class History {
         if (Items.Count == 0 || Items.Count > 0 && Items[0] != newString) {
             Items.Insert(0, string.Join("", newString));
         }
-        _historyIndex = 0;
+        _historyIndex = -1;
     }
 
     /// <summary>
@@ -73,10 +73,11 @@ public class History {
     /// </summary>
     public string Next() {
         if (Items.Count > 0) {
-            if (_historyIndex == Items.Count - 1) {
-                _historyIndex = -1;
+            ++_historyIndex;
+            if (_historyIndex == Items.Count) {
+                _historyIndex = 0;
             }
-            return Items[++_historyIndex];
+            return Items[_historyIndex];
         }
         return string.Empty;
     }
@@ -87,10 +88,11 @@ public class History {
     /// </summary>
     public string Previous() {
         if (Items.Count > 0) {
-            if (_historyIndex == 0) {
-                _historyIndex = Items.Count;
+            --_historyIndex;
+            if (_historyIndex < 0) {
+                _historyIndex = Items.Count - 1;
             }
-            return Items[--_historyIndex];
+            return Items[_historyIndex];
         }
         return string.Empty;
     }

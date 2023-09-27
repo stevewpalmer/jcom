@@ -30,6 +30,7 @@ namespace JEdit;
 /// </summary>
 public enum KeyCommand {
     KC_NONE,
+    KC_ASSIGNTOKEY,
     KC_CD,
     KC_CDOWN,
     KC_CENTRE,
@@ -38,6 +39,7 @@ public enum KeyCommand {
     KC_CLEFT,
     KC_CLINEEND,
     KC_CLINESTART,
+    KC_CLOCK,
     KC_CLOSE,
     KC_COLOUR,
     KC_COMMAND,
@@ -99,6 +101,7 @@ public class KeyMap {
     /// Table of commands and their default keystrokes
     /// </summary>
     private static readonly KeyCommands[] CommandTable = {
+        new() { CommandName = "assign_to_key", CommandId = KeyCommand.KC_ASSIGNTOKEY },
         new() { CommandName = "beginning_of_line", CommandId = KeyCommand.KC_CLINESTART },
         new() { CommandName = "cd", CommandId = KeyCommand.KC_CD },
         new() { CommandName = "center_line", CommandId = KeyCommand.KC_CENTRE },
@@ -138,6 +141,7 @@ public class KeyMap {
         new() { CommandName = "search_back", CommandId = KeyCommand.KC_SEARCHBACK },
         new() { CommandName = "search_case", CommandId = KeyCommand.KC_SEARCHCASE },
         new() { CommandName = "search_fwd", CommandId = KeyCommand.KC_SEARCHFORWARD },
+        new() { CommandName = "show_clock", CommandId = KeyCommand.KC_CLOCK },
         new() { CommandName = "top_of_buffer", CommandId = KeyCommand.KC_CFILESTART },
         new() { CommandName = "top_of_window", CommandId = KeyCommand.KC_CWINDOWTOP },
         new() { CommandName = "up", CommandId = KeyCommand.KC_CUP },
@@ -154,17 +158,17 @@ public class KeyMap {
     /// <summary>
     /// Modifier keys
     /// </summary>
-    private ConsoleModifiers Modifiers { get; init; }
+    private ConsoleModifiers Modifiers { get; set; }
 
     /// <summary>
     /// The key code
     /// </summary>
-    private ConsoleKey Key { get; init; }
+    private ConsoleKey Key { get; set; }
 
     /// <summary>
     /// The key code
     /// </summary>
-    private int KeyChar { get; init; }
+    private int KeyChar { get; set; }
 
     /// <summary>
     /// Match the ConsoleKeyInfo with this KeyMap.
@@ -174,6 +178,53 @@ public class KeyMap {
     private bool Match(ConsoleKeyInfo keyIn) {
         return Modifiers == keyIn.Modifiers &&
                ((Key != 0 && Key == keyIn.Key) || (KeyChar != 0 && KeyChar == keyIn.KeyChar));
+    }
+
+    /// <summary>
+    /// Compare this keymap with another.
+    /// </summary>
+    /// <param name="other">KeyMap to compare</param>
+    /// <returns>True if match, false otherwise</returns>
+    private bool Compare(KeyMap other) {
+        return Modifiers == other.Modifiers &&
+               ((Key != 0 && Key == other.Key) || (KeyChar != 0 && KeyChar == other.KeyChar));
+    }
+
+    /// <summary>
+    /// Parse a string that defines a keystroke and creates a KeyMap instance
+    /// for that key with the command ID left empty.
+    /// </summary>
+    private static KeyMap Parse(string keydef) {
+        KeyMap newKeymap = new KeyMap();
+        bool validKeymap = false;
+        foreach (string part in keydef.Split('-', '+').Select(s => s.Trim().ToLower())) {
+            switch (part) {
+                case "ctrl":
+                case "ctl":
+                    newKeymap.Modifiers |= ConsoleModifiers.Control;
+                    break;
+                case "shift":
+                    newKeymap.Modifiers |= ConsoleModifiers.Shift;
+                    break;
+                case "alt":
+                case "opt":
+                case "option":
+                    newKeymap.Modifiers |= ConsoleModifiers.Alt;
+                    break;
+                default:
+                    if (part.StartsWith('#') && int.TryParse(part[1..], out int keycharCode)) {
+                        newKeymap.KeyChar = keycharCode;
+                        validKeymap = true;
+                        continue;
+                    }
+                    if (Enum.TryParse(part.ToUpper(), out ConsoleKey key)) {
+                        newKeymap.Key = key;
+                        validKeymap = true;
+                    }
+                    break;
+            }
+        }
+        return validKeymap ? newKeymap : null;
     }
 
     /// <summary>
@@ -260,6 +311,37 @@ public class KeyMap {
 
         KeyMap match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
         return match?.KeyCommand ?? KeyCommand.KC_NONE;
+    }
+
+    /// <summary>
+    /// Remap a keystroke to the specified command. The keystroke must be a
+    /// valid string of the format:
+    ///
+    /// [modifier]+[keyname]
+    ///
+    /// where modifier can be Ctrl,Shift or Alt, and may be combined as
+    /// needed. Keyname must be a letter or function key name.
+    /// </summary>
+    public static bool RemapKeyToCommand(string keystroke, string command) {
+        KeyCommand commandId = MapCommandNameToCommand(command);
+        KeyMap keyMap = Parse(keystroke);
+        bool success = false;
+        if (commandId != KeyCommand.KC_NONE && keyMap != null) {
+            foreach (KeyMap km in KeyMaps) {
+                if (km.Compare(keyMap)) {
+                    km.Key = 0;
+                    km.Modifiers = 0;
+                    km.KeyChar = 0;
+                }
+                if (km.KeyCommand == commandId) {
+                    km.Key = keyMap.Key;
+                    km.Modifiers = keyMap.Modifiers;
+                    km.KeyChar = keyMap.KeyChar;
+                    success = true;
+                }
+            }
+        }
+        return success;
     }
 
     /// <summary>

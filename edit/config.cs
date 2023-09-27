@@ -40,7 +40,7 @@ public class Config {
         Config fileConfig = new Config();
         if (File.Exists(Consts.ConfigurationFilename)) {
             try {
-                using FileStream stream = File.Create(Consts.ConfigurationFilename);
+                using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
                 fileConfig = JsonSerializer.Deserialize<Config>(stream);
             }
             catch (Exception) {
@@ -55,7 +55,7 @@ public class Config {
     /// </summary>
     public void Save() {
         try {
-            using FileStream stream = File.OpenWrite(Consts.ConfigurationFilename);
+            using FileStream stream = File.Create(Consts.ConfigurationFilename);
             JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
                 WriteIndented = true
             });
@@ -99,4 +99,9 @@ public class Config {
     /// Whether or not the search is case sensitive
     /// </summary>
     public bool SearchCaseInsensitive { get; set; }
+
+    /// <summary>
+    /// Whether or not we show the clock on the status bar
+    /// </summary>
+    public bool ShowClock { get; set; }
 }

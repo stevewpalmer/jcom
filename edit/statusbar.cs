@@ -38,9 +38,9 @@ public class StatusBar {
     private readonly string _cachedText;
     private readonly int _modeWidth;
     private readonly int _cursorPositionWidth;
-    private readonly int _displayWidth;
-    private readonly int _modePosition;
-    private readonly int _cursorPositionPosition;
+    private int _displayWidth;
+    private int _modePosition;
+    private int _cursorPositionPosition;
     private string _cachedTextInput;
     private KeystrokesMode _keystrokesMode;
     private string _currentMessage;
@@ -50,6 +50,8 @@ public class StatusBar {
     private ConsoleColor _bgColour;
     private ConsoleColor _fgColour;
     private ConsoleColor _errColour;
+    private bool _showClock;
+    private Timer _clockTimer;
 
     /// <summary>
     /// Construct a status bar object.
@@ -59,11 +61,12 @@ public class StatusBar {
         _cachedText = string.Empty;
         _modeWidth = 3;
         _timeWidth = 8;
+        _showClock = false;
         _cursorPositionWidth = 18;
-        _displayWidth = Terminal.Width - (_timeWidth + _cursorPositionWidth + _modeWidth);
         _timePosition = Terminal.Width - _timeWidth;
-        _modePosition = Terminal.Width - _timeWidth - _modeWidth;
+        _modePosition = Terminal.Width - _modeWidth;
         _cursorPositionPosition = _modePosition - _cursorPositionWidth;
+        _displayWidth = Terminal.Width - (_cursorPositionWidth + _modeWidth);
         _currentMessage = string.Empty;
         _keystrokesMode = KeystrokesMode.NONE;
         _cursorRow = 1;
@@ -74,7 +77,7 @@ public class StatusBar {
     /// Refresh the status bar.
     /// </summary>
     public void Refresh() {
-        if (!_timerStarted) {
+        if (!_timerStarted && _showClock) {
             StartTimer();
             _timerStarted = true;
         }
@@ -94,6 +97,27 @@ public class StatusBar {
         set {
             _keystrokesMode = value;
             RenderModeIndicator();
+        }
+    }
+
+    /// <summary>
+    /// Whether or not we show the clock on the status bar.
+    /// </summary>
+    public bool ShowClock {
+        get => _showClock;
+        set {
+            if (_showClock != value) {
+                _showClock = value;
+                int timeWidth = _showClock ? _timeWidth : 0;
+                _modePosition = Terminal.Width - timeWidth - _modeWidth;
+                _cursorPositionPosition = _modePosition - _cursorPositionWidth;
+                _displayWidth = Terminal.Width - (timeWidth + _cursorPositionWidth + _modeWidth);
+                if (!_showClock) {
+                    _clockTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                }
+                _timerStarted = false;
+                Refresh();
+            }
         }
     }
 
@@ -246,6 +270,7 @@ public class StatusBar {
         int allfilesIndex = 0;
         string readyText = inputValue;
         bool selection = false;
+        int index = 0;
         ConsoleKeyInfo input;
 
         do {
@@ -253,8 +278,8 @@ public class StatusBar {
                 int totalWidth = prompt.Length + readyText.Length;
                 inputBuffer = new List<char>(readyText.ToCharArray());
                 Selected(prompt.Length, _statusRow, _displayWidth - totalWidth, readyText);
-                Selected(prompt.Length, _statusRow, _displayWidth - totalWidth, readyText);
                 Terminal.SetCursor(totalWidth, _statusRow);
+                index = readyText.Length;
                 selection = true;
             }
 
@@ -274,15 +299,22 @@ public class StatusBar {
             if (input.KeyChar == 172) {
                 readyText = _cachedTextInput;
             }
-            else
+            else {
                 switch (input.Key) {
                     case ConsoleKey.Backspace when inputBuffer.Count > 0:
                         int count = selection ? inputBuffer.Count : 1;
+                        index -= count;
                         while (count-- > 0) {
                             inputBuffer.RemoveAt(inputBuffer.Count - 1);
-                            Terminal.Write(@" ");
                         }
-                        selection = false;
+                        break;
+
+                    case ConsoleKey.RightArrow when index < inputBuffer.Count:
+                        ++index;
+                        break;
+
+                    case ConsoleKey.LeftArrow when index > 0:
+                        --index;
                         break;
 
                     case ConsoleKey.Tab: {
@@ -307,20 +339,21 @@ public class StatusBar {
                     default: {
                         if (!char.IsControl(input.KeyChar) && inputBuffer.Count < 80) {
                             if (selection) {
-                                count = inputBuffer.Count;
-                                while (count-- > 0) {
-                                    inputBuffer.RemoveAt(inputBuffer.Count - 1);
-                                    Terminal.Write(@" ");
-                                }
-                                selection = false;
+                                inputBuffer.Clear();
+                                index = 0;
                             }
-                            inputBuffer.Add(input.KeyChar);
-                            Terminal.Write(_bgColour, _fgColour, input.KeyChar);
+                            inputBuffer.Insert(index++, input.KeyChar);
                             allfiles = null;
                         }
                         break;
                     }
                 }
+
+                string text = string.Join("", inputBuffer);
+                RenderText(prompt.Length, _statusRow, _displayWidth - prompt.Length, text, _fgColour);
+                Terminal.SetCursor(prompt.Length + index, _statusRow);
+                selection = false;
+            }
         } while (true);
         inputValue =  inputBuffer.Count > 0 ? string.Join("", inputBuffer) : string.Empty;
         if (inputValue.Length > 1) {
@@ -345,7 +378,7 @@ public class StatusBar {
     /// Start the background timer that updates the time on the status bar.
     /// </summary>
     private void StartTimer() {
-        Timer _ = new(_ => {
+        _clockTimer = new(_ => {
             RenderTime();
         }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }
@@ -386,9 +419,11 @@ public class StatusBar {
     /// Render the time field of the status bar
     /// </summary>
     private void RenderTime() {
-        char separatorChar = DateTime.Now.Second % 2 == 0 ? ' ' : ':';
-        string timeString = DateTime.Now.ToString($"h{separatorChar}mm tt");
-        RenderText(_timePosition, _statusRow, _timeWidth, timeString, _fgColour);
+        if (_showClock) {
+            char separatorChar = DateTime.Now.Second % 2 == 0 ? ' ' : ':';
+            string timeString = DateTime.Now.ToString($"h{separatorChar}mm tt");
+            RenderText(_timePosition, _statusRow, _timeWidth, timeString, _fgColour);
+        }
     }
 
     /// <summary>

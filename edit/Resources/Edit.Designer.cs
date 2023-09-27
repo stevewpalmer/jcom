@@ -266,5 +266,17 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("CaseSensitivityOff", resourceCulture);
             }
         }
+        
+        internal static string EnterKey {
+            get {
+                return ResourceManager.GetString("EnterKey", resourceCulture);
+            }
+        }
+        
+        internal static string EnterMacroName {
+            get {
+                return ResourceManager.GetString("EnterMacroName", resourceCulture);
+            }
+        }
     }
 }
