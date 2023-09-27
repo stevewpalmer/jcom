@@ -71,6 +71,7 @@ public class Screen {
         Colours = new Colours(Config);
         ScrapBuffer = new Buffer();
 
+        StatusBar.ShowClock = Config.ShowClock;
         StatusBar.Refresh();
         Version();
     }
@@ -113,7 +114,9 @@ public class Screen {
             }
         }
         RenderHint flags = commandId switch {
+            KeyCommand.KC_ASSIGNTOKEY => AssignToKey(parser),
             KeyCommand.KC_CD => ChangeDirectory(parser),
+            KeyCommand.KC_CLOCK => ToggleClock(),
             KeyCommand.KC_CLOSE => CloseWindow(),
             KeyCommand.KC_COLOUR => ConfigureColours(parser),
             KeyCommand.KC_COMMAND => RunCommand(),
@@ -243,6 +246,15 @@ public class Screen {
         RenderHint flags = SelectWindow(1);
         _windowList.Remove(currentWindow);
         return flags;
+    }
+
+    /// <summary>
+    /// Toggle display of the clock on the status bar.
+    /// </summary>
+    private static RenderHint ToggleClock() {
+        StatusBar.ShowClock = !StatusBar.ShowClock;
+        Config.ShowClock = StatusBar.ShowClock;
+        return RenderHint.NONE;
     }
 
     /// <summary>
@@ -513,6 +525,22 @@ public class Screen {
             } catch(Exception e) {
                 StatusBar.Error(e.Message);
             }
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Assign a command to a key.
+    /// </summary>
+    private static RenderHint AssignToKey(Macro parser) {
+        if (!parser.GetFilename(Edit.EnterKey, out string keystroke)) {
+            return RenderHint.NONE;
+        }
+        if (!parser.GetFilename(Edit.EnterMacroName, out string commandName)) {
+            return RenderHint.NONE;
+        }
+        if (!KeyMap.RemapKeyToCommand(keystroke, commandName)) {
+            StatusBar.Error("Invalid keystroke or command name");
         }
         return RenderHint.NONE;
     }

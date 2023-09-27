@@ -22,7 +22,7 @@
         <value>Overwrite existing keystroke macro @@?</value>
     </data>
     <data name="KeystrokeMacroFile" xml:space="preserve">
-        <value>Keystroke macro file: </value>
+        <value>Keystroke macro file : </value>
     </data>
     <data name="KeystrokeMacroNotFound" xml:space="preserve">
         <value>Keystroke macro not found.</value>
@@ -31,10 +31,10 @@
         <value>Load keystroke macro successful.</value>
     </data>
     <data name="SaveKeystrokesAs" xml:space="preserve">
-        <value>Save keystrokes as: </value>
+        <value>Save keystrokes as : </value>
     </data>
     <data name="EnterNewOutputFileName" xml:space="preserve">
-        <value>Enter new output file name: </value>
+        <value>Enter new output file name:</value>
     </data>
     <data name="InvalidOutputFilename" xml:space="preserve">
         <value>Invalid output filename</value>
@@ -43,7 +43,7 @@
         <value>This buffer has not been saved. Delete @@?</value>
     </data>
     <data name="File" xml:space="preserve">
-        <value>File: </value>
+        <value>File:</value>
     </data>
     <data name="UnknownCommand" xml:space="preserve">
         <value>Unknown command</value>
@@ -82,19 +82,19 @@
         <value>Can't play back while remembering.</value>
     </data>
     <data name="BackgroundColourNumber" xml:space="preserve">
-        <value>Enter background colour number: </value>
+        <value>Enter background colour number:</value>
     </data>
     <data name="ForegroundColourNumber" xml:space="preserve">
-        <value>Enter foreground colour number: </value>
+        <value>Enter foreground colour number:</value>
     </data>
     <data name="SelectedTitleColourNumber" xml:space="preserve">
-        <value>Enter selected title colour number: </value>
+        <value>Enter selected title colour number:</value>
     </data>
     <data name="NormalTextColourNumber" xml:space="preserve">
-        <value>Enter normal message colour number: </value>
+        <value>Enter normal message colour number:</value>
     </data>
     <data name="ErrorTextColourNumber" xml:space="preserve">
-        <value>Enter error message colour number: </value>
+        <value>Enter error message colour number:</value>
     </data>
     <data name="InvalidColour" xml:space="preserve">
         <value>Invalid colour: same as background.</value>
@@ -115,7 +115,7 @@
         <value>Block copied to scrap.</value>
     </data>
     <data name="SearchFor" xml:space="preserve">
-        <value>{0} Search {1}for: </value>
+        <value>{0} Search for: </value>
     </data>
     <data name="PatternNotFound" xml:space="preserve">
         <value>Pattern not found.</value>
@@ -128,14 +128,5 @@
     </data>
     <data name="CaseSensitivityOff" xml:space="preserve">
         <value>Case sensitivity off.</value>
-    </data>
-    <data name="RegExpOn" xml:space="preserve">
-        <value>Regular expressions on.</value>
-    </data>
-    <data name="RegExpOff" xml:space="preserve">
-        <value>Regular expressions off.</value>
-    </data>
-    <data name="RegExpOffStatus" xml:space="preserve">
-        <value>(RE Off) </value>
     </data>
 </root>
