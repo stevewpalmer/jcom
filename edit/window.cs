@@ -180,7 +180,7 @@ public class Window {
     /// </summary>
     private RenderHint CenterWindow() {
         RenderHint flags = RenderHint.NONE;
-        int diff = (_viewportBounds.Height / 2) - CursorRowInViewport;
+        int diff = _viewportBounds.Height / 2 - CursorRowInViewport;
         int newOffset = Math.Max(0, _viewportOffset.Y - diff);
         if (newOffset != _viewportOffset.Y) {
             _viewportOffset.Y = newOffset;
@@ -265,6 +265,9 @@ public class Window {
     /// </summary>
     private RenderHint ScreenDown() {
         RenderHint flags = RenderHint.NONE;
+        if (CursorRowInViewport == _viewportBounds.Bottom - 1) {
+            flags |= CursorUp();
+        }
         if (_viewportOffset.Y > 0) {
             --_viewportOffset.Y;
             flags = RenderHint.REDRAW;
@@ -278,6 +281,9 @@ public class Window {
     /// </summary>
     private RenderHint ScreenUp() {
         RenderHint flags = RenderHint.NONE;
+        if (CursorRowInViewport == 0) {
+            flags |= CursorDown();
+        }
         if (_viewportOffset.Y < Buffer.Length - 2) {
             ++_viewportOffset.Y;
             flags = RenderHint.REDRAW;

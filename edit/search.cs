@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Text.RegularExpressions;
+
 namespace JEdit;
 
 public class Search {
@@ -66,6 +68,11 @@ public class Search {
     public bool Forward { get; init; }
 
     /// <summary>
+    /// True if we perform a regular expression search.
+    /// </summary>
+    public bool RegExp { get; init; }
+
+    /// <summary>
     /// Return the next instance of the search string in the buffer. If a match
     /// is found then matchPoint is set to the (column, row) of the matching string
     /// in offset and lineIndex coordinates, and the function returns true. If no
@@ -89,8 +96,17 @@ public class Search {
                 ++Row;
                 continue;
             }
-            StringComparison type = CaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            int matchIndex = line.IndexOf(SearchString, Column, type);
+            int matchIndex;
+            if (RegExp) {
+                RegexOptions options = CaseInsensitive ? RegexOptions.IgnoreCase : RegexOptions.None;
+                Regex regex = new Regex(SearchString, options);
+                Match m = regex.Match(line, Column);
+                matchIndex = m.Success ? m.Index : -1;
+            }
+            else {
+                StringComparison type = CaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                matchIndex = line.IndexOf(SearchString, Column, type);
+            }
             if (matchIndex >= 0) {
                 Column = matchIndex;
                 foundMatch = true;
@@ -118,8 +134,17 @@ public class Search {
                 Column = -1;
                 continue;
             }
-            StringComparison type = CaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            int matchIndex = line.LastIndexOf(SearchString, Column, Column + 1, type);
+            int matchIndex;
+            if (RegExp) {
+                RegexOptions options = CaseInsensitive ? RegexOptions.IgnoreCase : RegexOptions.None;
+                Regex regex = new Regex(SearchString, options | RegexOptions.RightToLeft);
+                Match m = regex.Match(line, 0, Column);
+                matchIndex = m.Success ? m.Index : -1;
+            }
+            else {
+                StringComparison type = CaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+                matchIndex = line.LastIndexOf(SearchString, Column, Column + 1, type);
+            }
             if (matchIndex >= 0) {
                 Column = matchIndex;
                 foundMatch = true;

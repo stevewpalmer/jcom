@@ -133,6 +133,7 @@ public class Screen {
             KeyCommand.KC_SEARCHBACK => Search(parser, false),
             KeyCommand.KC_SEARCHCASE => SearchCaseToggle(),
             KeyCommand.KC_SEARCHFORWARD => Search(parser, true),
+            KeyCommand.KC_REGEXP => RegExpToggle(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
             _ => _activeWindow.Handle(parser, commandId)
@@ -298,7 +299,7 @@ public class Screen {
     /// Show details of the file in the buffer on the status bar.
     /// </summary>
     private RenderHint ShowDetails() {
-        StatusBar.Message(_activeWindow.Buffer.FullFilename + (_activeWindow.Buffer.Modified ? "*" : ""));
+        StatusBar.Message(Edit.File + _activeWindow.Buffer.FullFilename + (_activeWindow.Buffer.Modified ? "*" : ""));
         return RenderHint.NONE;
     }
 
@@ -422,10 +423,11 @@ public class Screen {
     private RenderHint Search(Macro parser, bool forward) {
         RenderHint flags = RenderHint.NONE;
         string inputValue = Config.LastSearchString;
-        string prompt = string.Format(Edit.SearchFor, forward ? "\u2193" : "\u2191");
+        string prompt = string.Format(Edit.SearchFor, forward ? "\u2193" : "\u2191", Config.RegExpOff ? Edit.RegExpOffStatus : "");
         if (parser.GetInput(prompt, ref inputValue)) {
             _search = new Search {
                 SearchString = inputValue,
+                RegExp = !Config.RegExpOff,
                 CaseInsensitive = Config.SearchCaseInsensitive,
                 Buffer = _activeWindow.Buffer,
                 Forward = forward
@@ -451,9 +453,18 @@ public class Screen {
     /// <summary>
     /// Toggle search case sensitivity
     /// </summary>
-    private RenderHint SearchCaseToggle() {
+    private static RenderHint SearchCaseToggle() {
         Config.SearchCaseInsensitive = !Config.SearchCaseInsensitive;
         StatusBar.Message(Config.SearchCaseInsensitive ? Edit.CaseSensitivityOff : Edit.CaseSensitivityOn);
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Toggle regular expressions in search strings
+    /// </summary>
+    private static RenderHint RegExpToggle() {
+        Config.RegExpOff = !Config.RegExpOff;
+        StatusBar.Message(Config.RegExpOff ? Edit.RegExpOff : Edit.RegExpOn);
         return RenderHint.NONE;
     }
 

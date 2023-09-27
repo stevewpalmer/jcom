@@ -99,4 +99,9 @@ public class Config {
     /// Whether or not the search is case sensitive
     /// </summary>
     public bool SearchCaseInsensitive { get; set; }
+
+    /// <summary>
+    /// Whether or not regular expressions are enabled in search strings
+    /// </summary>
+    public bool RegExpOff { get; set; }
 }

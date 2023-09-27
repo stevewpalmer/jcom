@@ -12,41 +12,47 @@ own buffer.
 
 ### Keyboard
 
-| Command                 | Keystroke                |
-|-------------------------|--------------------------|
-| Left                    | Left arrow               |
-| Right                   | Right arrow              |
-| Up                      | Up arrow                 |
-| Down                    | Down arrow               |
-| Exit                    | Alt+X                    |
-| Write Buffer            | Alt+W                    |
-| Write Buffers and Exit  | Ctrl+X                   |
-| Change Output Filename  | Alt+O                    |
-| Version                 | Alt+V                    |
-| Details                 | Shift+Alt+F              |
-| Edit Buffer             | Shift+Alt+E              |
-| Repeat Command          | Ctrl+R                   |
-| Record Keystrokes       | F7                       |
-| Playback Recording      | F8                       |
-| Save Recording          | Alt+F8                   |
-| Load Recording          | Alt+F7                   |
-| Command                 | F10                      |
-| Go To Line              | Shift+Alt+G              |
-| Start of Line           | Alt+Command+Left arrow   |
-| End of Line             | Alt+Command+Right arrow  |
-| Start of Buffer         |                          |
-| End of Buffer           |                          |
-| Top of Window           |                          |
-| Bottom of Window        |                          |
-| Next Word               | Ctrl+Command+Right arrow |
-| Previous Word           | Ctrl+Command+Left arrow  |
-| Page Down               | PgDn key                 |
-| Page Up                 | PgUp key                 |
-| Screen Down             | Ctrl+D                   |
-| Screen Up               | Ctrl+E                   |
-| Mark                    | Alt+M                    |
-| Mark Line               | Ctrl+L                   |
-| Mark Column             | Alt+C                    |
-| Copy to Scrap           | Ctrl+C                   |
-| Next Buffer             | Shift+Alt+N              |
-| Previous Buffer         | Shift+Alt+               |
+| Command                | Windows                  | Unix                     |
+|------------------------|--------------------------|--------------------------|
+| Left                   | Left arrow               | Left arrow               |
+| Right                  | Right arrow              | Right arrow              |
+| Up                     | Up arrow                 | Up arrow                 |
+| Down                   | Down arrow               | Down arrow               |
+| Exit                   | Alt+X                    | Alt+X                    |
+| Write Buffer           | Alt+W                    | Alt+W                    |
+| Write Buffers and Exit | Ctrl+X                   | Alt+W                    |
+| Change Output Filename | Alt+O                    | Alt+O                    |
+| Version                | Alt+V                    | Alt+V                    |
+| Details                | Alt+F                    | Shift+Alt+F              |
+| Edit Buffer            | Alt+E                    | Shift+Alt+E              |
+| Repeat Command         | Ctrl+R                   | Ctrl+R                   |
+| Record Keystrokes      | F7                       | F7                       |
+| Playback Recording     | F8                       | F8                       |
+| Save Recording         | Alt+F8                   | Alt+F8                   |
+| Load Recording         | Alt+F7                   | Alt+F7                   |
+| Command                | F10                      | F10                      |
+| Go To Line             | Alt+G                    | Shift+Alt+G              |
+| Start of Line          | Home                     | Home                     |
+| End of Line            | End                      | End                      |
+| Start of Buffer        | Alt+Home                 |                          |
+| End of Buffer          | Alt+End                  |                          |
+| Top of Window          | Ctrl+Home                |                          |
+| Bottom of Window       | Ctrl+End                 |                          |
+| Next Word              | Ctrl+Command+Right arrow | Ctrl+Command+Right arrow |
+| Previous Word          | Ctrl+Command+Left arrow  | Ctrl+Command+Left arrow  |
+| Page Down              | PgDn                     | PgDn                     |
+| Page Up                | PgUp                     | PgUp                     |
+| Screen Down            | Ctrl+D                   | Ctrl+D                   |
+| Screen Up              | Ctrl+E                   | Ctrl+E                   |
+| Centre Screen          | Ctrl+C                   | Ctrl+C                   |
+| Mark                   | Alt+M                    | Alt+M                    |
+| Mark Line              | Alt+L                    | Alt+L                    |
+| Mark Column            | Alt+C                    | Alt+C                    |
+| Copy to Scrap          | Ctrl+OemPlus             |                          |
+| Next Buffer            | Shift+Alt+N              |                          |
+| Previous Buffer        | Shift+Alt+               |                          |
+| Search Forward         | F5 or Alt+S              | F5 or Alt+S              |
+| Search Backward        | Alt+F5                   |                          |
+| Search Again           | Shift+F5                 |                          |
+| Toggle Case Search     | Ctrl+F5                  |                          |
+| Toggle RegEx Search    | Ctrl+F6                  |                          |

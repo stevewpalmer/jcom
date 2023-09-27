@@ -266,5 +266,23 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("CaseSensitivityOff", resourceCulture);
             }
         }
+        
+        internal static string RegExpOn {
+            get {
+                return ResourceManager.GetString("RegExpOn", resourceCulture);
+            }
+        }
+        
+        internal static string RegExpOff {
+            get {
+                return ResourceManager.GetString("RegExpOff", resourceCulture);
+            }
+        }
+        
+        internal static string RegExpOffStatus {
+            get {
+                return ResourceManager.GetString("RegExpOffStatus", resourceCulture);
+            }
+        }
     }
 }

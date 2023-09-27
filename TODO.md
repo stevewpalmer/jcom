@@ -9,7 +9,7 @@ decreasing order of priority.
 * Editing capability.
 * Split windows.
 * Block cut and paste.
-* Search and replace.
+* Replace.
 * Help.
 
 ### Fortran
