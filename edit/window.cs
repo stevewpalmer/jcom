@@ -95,6 +95,8 @@ public class Window {
             KeyCommand.KC_CPAGEDOWN => PageDown(),
             KeyCommand.KC_CPAGEUP => PageUp(),
             KeyCommand.KC_CRIGHT => CursorRight(),
+            KeyCommand.KC_CTOBOTTOM => LineToBottom(),
+            KeyCommand.KC_CTOTOP => LineToTop(),
             KeyCommand.KC_CUP => CursorUp(),
             KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
             KeyCommand.KC_CWINDOWTOP => WindowTop(),
@@ -176,11 +178,35 @@ public class Window {
     }
 
     /// <summary>
+    /// Move the line containing the cursor to the bottom of the
+    /// current window.
+    /// </summary>
+    private RenderHint LineToBottom() {
+        return ShiftInWindow(_viewportBounds.Height - 1);
+    }
+
+    /// <summary>
+    /// Move the line containing the cursor to the top of the
+    /// current window.
+    /// </summary>
+    private RenderHint LineToTop() {
+        return ShiftInWindow(0);
+    }
+
+    /// <summary>
     /// Center the cursor in the window
     /// </summary>
     private RenderHint CenterWindow() {
+        return ShiftInWindow(_viewportBounds.Height / 2);
+    }
+
+    /// <summary>
+    /// Shift the cursor in the current window by the specified offset
+    /// by scrolling the window up or down as required.
+    /// </summary>
+    private RenderHint ShiftInWindow(int offset) {
         RenderHint flags = RenderHint.NONE;
-        int diff = _viewportBounds.Height / 2 - CursorRowInViewport;
+        int diff = offset - CursorRowInViewport;
         int newOffset = Math.Max(0, _viewportOffset.Y - diff);
         if (newOffset != _viewportOffset.Y) {
             _viewportOffset.Y = newOffset;
