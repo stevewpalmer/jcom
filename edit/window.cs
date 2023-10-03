@@ -82,7 +82,7 @@ public class Window {
     /// <param name="parser">Macro parser</param>
     /// <param name="commandId">Command ID</param>
     /// <returns>Rendering hint</returns>
-    public RenderHint Handle(Macro parser, KeyCommand commandId) {
+    public RenderHint HandleCommand(Macro parser, KeyCommand commandId) {
         RenderHint flags = commandId switch {
             KeyCommand.KC_CDOWN => CursorDown(),
             KeyCommand.KC_CENTRE => CenterWindow(),
@@ -115,6 +115,20 @@ public class Window {
     }
 
     /// <summary>
+    /// Handle an editing action at the screen level.
+    /// </summary>
+    /// <param name="keyInfo">Console key info</param>
+    /// <returns>The rendering hint</returns>
+    public RenderHint HandleEditing(ConsoleKeyInfo keyInfo) {
+        RenderHint flags = RenderHint.BLOCK;
+        if (!char.IsControl(keyInfo.KeyChar)) {
+            Buffer.Insert(keyInfo.KeyChar);
+            flags |= CursorFromOffset();
+        }
+        return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
     /// Apply the render hint flags to the current window. On completion,
     /// return just the flags that were not applied.
     /// </summary>
@@ -126,7 +140,7 @@ public class Window {
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
             Render(RenderHint.BLOCK);
-            flags &= ~RenderHint.REDRAW;
+            flags &= ~RenderHint.BLOCK;
             flags |= RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.CURSOR)) {
@@ -154,6 +168,169 @@ public class Window {
             flags |= CursorFromLineIndex();
         }
         return ApplyRenderHint(flags);
+    }
+
+        /// <summary>
+    /// Draw the window frame
+    /// </summary>
+    private void RenderFrame() {
+        Rectangle frameRect = _viewportBounds;
+        frameRect.Inflate(1, 1);
+
+        RenderTitle();
+
+        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+
+        for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
+            Terminal.SetCursor(frameRect.Left, c);
+            Terminal.Write($"\u2502{new string(' ', frameRect.Width - 2)}\u2502");
+        }
+
+        Terminal.SetCursor(frameRect.Left, frameRect.Height - 1);
+        Terminal.Write($"\u2558{new string('═', frameRect.Width - 2)}\u255b");
+    }
+
+    /// <summary>
+    /// Render the buffer filename at the top of the window. If the window
+    /// is narrower than the title then we truncate the title to fit.
+    /// </summary>
+    private void RenderTitle() {
+        string title = Buffer.BaseFilename;
+        Rectangle frameRect = _viewportBounds;
+        frameRect.Inflate(1, 1);
+        Point savedCursor = Terminal.GetCursor();
+
+        Terminal.SetCursor(frameRect.Left, frameRect.Top);
+        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
+        Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
+
+        int realLength = Math.Min(title.Length, frameRect.Width - 4);
+        Terminal.SetCursor((frameRect.Width - realLength - 2) / 2, 0);
+        Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
+        Terminal.Write($@" {title[..realLength]} ");
+
+        Terminal.SetCursor(savedCursor);
+    }
+
+    /// <summary>
+    /// Update this window
+    /// </summary>
+    private void Render(RenderHint flags) {
+
+        Point savedCursor = Terminal.GetCursor();
+        ConsoleColor bg = Screen.Colours.BackgroundColour;
+        ConsoleColor fg = Screen.Colours.ForegroundColour;
+
+        // Determine the extent of the window to update.
+        Extent renderExtent = new Extent()
+            .Add(new Point(0, _viewportOffset.Y))
+            .Add(new Point(0, _viewportOffset.Y + _viewportBounds.Height - 1));
+
+        Extent markExtent = new Extent()
+            .Add(_markAnchor)
+            .Add(Buffer.Cursor);
+
+        if (flags.HasFlag(RenderHint.BLOCK)) {
+            Extent blockExtent = new Extent()
+                .Add(_markAnchor)
+                .Add(Buffer.Cursor)
+                .Add(_lastMarkPoint);
+            renderExtent.Subtract(blockExtent.Start, blockExtent.End);
+        }
+
+        int i = renderExtent.Start.Y;
+        string line = Buffer.GetLine(i);
+        while (line != null && i <= renderExtent.End.Y) {
+
+            int y = _viewportBounds.Top + (i - _viewportOffset.Y);
+            int x = _viewportBounds.Left;
+            int w = _viewportBounds.Width;
+            int left = Math.Min(_viewportOffset.X, line.Length);
+            int length = Math.Min(w, line.Length - left);
+
+            switch (_markMode) {
+                case MarkMode.LINE:
+                    if (i >= markExtent.Start.Y && i <= markExtent.End.Y) {
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                    }
+                    break;
+
+                case MarkMode.COLUMN:
+                    if (markExtent.Start.X > 0 && markExtent.Start.X > _viewportOffset.X) {
+                        int diff = markExtent.Start.X - _viewportOffset.X;
+                        Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                        x += diff;
+                        w -= diff;
+                        left += diff;
+                        length -= diff;
+                    }
+                    if (markExtent.End.X > _viewportOffset.X) {
+                        int diff = Math.Min(markExtent.End.X - markExtent.Start.X + 1, line.Length - left);
+                        int diff2 = markExtent.End.X - markExtent.Start.X + 1;
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                        Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
+                        x += diff2;
+                        w -= diff2;
+                        left += diff;
+                        length -= diff;
+                    }
+                    bg = Screen.Colours.BackgroundColour;
+                    fg = Screen.Colours.ForegroundColour;
+                    break;
+
+                case MarkMode.CHARACTER:
+                    if (i == markExtent.Start.Y) {
+                        if (markExtent.Start.X > 0 && markExtent.Start.X > _viewportOffset.X) {
+                            int diff = markExtent.Start.X - _viewportOffset.X;
+                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                            x += diff;
+                            w -= diff;
+                            left += diff;
+                            length -= diff;
+                        }
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                    }
+                    if (i > markExtent.Start.Y && i < markExtent.End.Y) {
+                        bg = Screen.Colours.ForegroundColour;
+                        fg = Screen.Colours.BackgroundColour;
+                    }
+                    if (i == markExtent.End.Y) {
+                        int diff = Math.Min(markExtent.End.X - left + 1, line.Length - left);
+                        if (diff > 0) {
+                            bg = Screen.Colours.ForegroundColour;
+                            fg = Screen.Colours.BackgroundColour;
+                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                            x += diff;
+                            w -= diff;
+                            left = markExtent.End.X + 1;
+                            length = Math.Min(w, line.Length - left);
+                        }
+                        bg = Screen.Colours.BackgroundColour;
+                        fg = Screen.Colours.ForegroundColour;
+                    }
+                    break;
+            }
+
+            Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, length));
+            line = Buffer.GetLine(++i);
+
+            bg = Screen.Colours.BackgroundColour;
+            fg = Screen.Colours.ForegroundColour;
+        }
+        while (i <= renderExtent.End.Y) {
+            int y = _viewportBounds.Top + (i - _viewportOffset.Y);
+            Terminal.Write(_viewportBounds.Left, y, _viewportBounds.Width, bg, fg, string.Empty);
+            i++;
+        }
+
+        Buffer.InvalidateExtent.Clear();
+
+        Terminal.SetCursor(savedCursor);
+        PlaceCursor();
     }
 
     /// <summary>
@@ -224,7 +401,7 @@ public class Window {
         }
         else {
             if (_markMode == MarkMode.NONE) {
-                _markAnchor = new Point(Buffer.Offset, Buffer.LineIndex);
+                _markAnchor = Buffer.Cursor;
                 _lastMarkPoint = _markAnchor;
             }
             _markMode = markMode;
@@ -277,12 +454,11 @@ public class Window {
     /// to be earlier in the range than the second.
     /// </summary>
     private (Point, Point) GetOrderedMarkRange() {
-        Point cursorPoint = new Point(Buffer.Offset, Buffer.LineIndex);
-        if (_markMode == MarkMode.NONE) {
-            return (cursorPoint, cursorPoint);
+        Extent markExtent = new Extent().Add(Buffer.Cursor);
+        if (_markMode != MarkMode.NONE) {
+            markExtent.Add(_markAnchor);
         }
-        Point [] points = new[] { cursorPoint, _markAnchor }.OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
-        return (points[0], points[1]);
+        return (markExtent.Start, markExtent.End);
     }
 
     /// <summary>
@@ -327,176 +503,13 @@ public class Window {
     }
 
     /// <summary>
-    /// Draw the window frame
-    /// </summary>
-    private void RenderFrame() {
-        Rectangle frameRect = _viewportBounds;
-        frameRect.Inflate(1, 1);
-
-        RenderTitle();
-
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-
-        for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
-            Terminal.SetCursor(frameRect.Left, c);
-            Terminal.Write($"\u2502{new string(' ', frameRect.Width - 2)}\u2502");
-        }
-
-        Terminal.SetCursor(frameRect.Left, frameRect.Height - 1);
-        Terminal.Write($"\u2558{new string('═', frameRect.Width - 2)}\u255b");
-    }
-
-    /// <summary>
-    /// Render the buffer filename at the top of the window. If the window
-    /// is narrower than the title then we truncate the title to fit.
-    /// </summary>
-    private void RenderTitle() {
-        string title = Buffer.BaseFilename;
-        Rectangle frameRect = _viewportBounds;
-        frameRect.Inflate(1, 1);
-        Point savedCursor = Terminal.GetCursor();
-
-        Terminal.SetCursor(frameRect.Left, frameRect.Top);
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
-        Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
-
-        int realLength = Math.Min(title.Length, frameRect.Width - 4);
-        Terminal.SetCursor((frameRect.Width - realLength - 2) / 2, 0);
-        Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
-        Terminal.Write($@" {title[..realLength]} ");
-
-        Terminal.SetCursor(savedCursor);
-    }
-
-    /// <summary>
-    /// Update this window
-    /// </summary>
-    private void Render(RenderHint flags) {
-
-        int i = _viewportOffset.Y;
-        int b = i + _viewportBounds.Height;
-
-        Point savedCursor = Terminal.GetCursor();
-        ConsoleColor bg = Screen.Colours.BackgroundColour;
-        ConsoleColor fg = Screen.Colours.ForegroundColour;
-
-        // Order the start and end of the mark area.
-        (Point markStart, Point markEnd) = GetOrderedMarkRange();
-
-        // Order the points to determine the extent of the update when rendering
-        // marked areas in block render mode.
-        Point [] points = new[] {
-            new Point(Buffer.Offset, Buffer.LineIndex) ,
-            _markAnchor,
-            _lastMarkPoint
-        }.OrderBy(p => p.Y).ThenBy(p => p.X).ToArray();
-
-        Point blockStart = points[0];
-        Point blockEnd = points[2];
-        if (flags.HasFlag(RenderHint.BLOCK)) {
-            i = Math.Max(blockStart.Y, i);
-            b = Math.Min(blockEnd.Y + 1, b);
-        }
-
-        string line = Buffer.GetLine(i);
-        while (line != null && i < b) {
-
-            int y = _viewportBounds.Top + (i - _viewportOffset.Y);
-            int x = _viewportBounds.Left;
-            int w = _viewportBounds.Width;
-            int left = Math.Min(_viewportOffset.X, line.Length);
-            int length = Math.Min(w, line.Length - left);
-
-            switch (_markMode) {
-                case MarkMode.LINE:
-                    if (i >= markStart.Y && i <= markEnd.Y) {
-                        bg = Screen.Colours.ForegroundColour;
-                        fg = Screen.Colours.BackgroundColour;
-                    }
-                    break;
-
-                case MarkMode.COLUMN:
-                    if (markStart.X > 0 && markStart.X > _viewportOffset.X) {
-                        int diff = markStart.X - _viewportOffset.X;
-                        Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
-                        x += diff;
-                        w -= diff;
-                        left += diff;
-                        length -= diff;
-                    }
-                    if (markEnd.X > _viewportOffset.X) {
-                        int diff = Math.Min(markEnd.X - markStart.X + 1, line.Length - left);
-                        int diff2 = markEnd.X - markStart.X + 1;
-                        bg = Screen.Colours.ForegroundColour;
-                        fg = Screen.Colours.BackgroundColour;
-                        Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
-                        x += diff2;
-                        w -= diff2;
-                        left += diff;
-                        length -= diff;
-                    }
-                    bg = Screen.Colours.BackgroundColour;
-                    fg = Screen.Colours.ForegroundColour;
-                    break;
-
-                case MarkMode.CHARACTER:
-                    if (i == markStart.Y) {
-                        if (markStart.X > 0 && markStart.X > _viewportOffset.X) {
-                            int diff = markStart.X - _viewportOffset.X;
-                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
-                            x += diff;
-                            w -= diff;
-                            left += diff;
-                            length -= diff;
-                        }
-                        bg = Screen.Colours.ForegroundColour;
-                        fg = Screen.Colours.BackgroundColour;
-                    }
-                    if (i > markStart.Y && i < markEnd.Y) {
-                        bg = Screen.Colours.ForegroundColour;
-                        fg = Screen.Colours.BackgroundColour;
-                    }
-                    if (i == markEnd.Y) {
-                        int diff = Math.Min(markEnd.X - left + 1, line.Length - left);
-                        if (diff > 0) {
-                            bg = Screen.Colours.ForegroundColour;
-                            fg = Screen.Colours.BackgroundColour;
-                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
-                            x += diff;
-                            w -= diff;
-                            left = markEnd.X + 1;
-                            length = Math.Min(w, line.Length - left);
-                        }
-                        bg = Screen.Colours.BackgroundColour;
-                        fg = Screen.Colours.ForegroundColour;
-                    }
-                    break;
-            }
-
-            Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, length));
-            line = Buffer.GetLine(++i);
-
-            bg = Screen.Colours.BackgroundColour;
-            fg = Screen.Colours.ForegroundColour;
-        }
-        while (i < b) {
-            int y = _viewportBounds.Top + (i - _viewportOffset.Y);
-            Terminal.Write(_viewportBounds.Left, y, _viewportBounds.Width, bg, fg, string.Empty);
-            i++;
-        }
-        Terminal.SetCursor(savedCursor);
-        PlaceCursor();
-    }
-
-    /// <summary>
     /// If we're marking, save the current cursor position before we update
     /// it so that we maintain a last mark point to compute the extent of the
     /// area to render when we update the window.
     /// </summary>
     private RenderHint SaveLastMarkPoint() {
         if (_markMode != MarkMode.NONE) {
-            _lastMarkPoint = new Point(Buffer.Offset, Buffer.LineIndex);
+            _lastMarkPoint = Buffer.Cursor;
             return RenderHint.BLOCK;
         }
         return RenderHint.NONE;

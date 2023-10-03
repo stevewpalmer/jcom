@@ -378,7 +378,7 @@ public class StatusBar {
     /// Start the background timer that updates the time on the status bar.
     /// </summary>
     private void StartTimer() {
-        _clockTimer = new(_ => {
+        _clockTimer = new Timer(_ => {
             RenderTime();
         }, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
     }

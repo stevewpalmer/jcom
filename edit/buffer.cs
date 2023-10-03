@@ -23,7 +23,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace JEdit;
 
@@ -53,7 +55,7 @@ public class Buffer {
             Content = allText;
         } else {
             _terminatorType = DefaultLineTerminator();
-            _lines = new List<string> {Consts.EndOfLine.ToString()};
+            Content = Consts.EndOfLine.ToString();
             NewFile = true;
         }
         Filename = filename ?? string.Empty;
@@ -69,6 +71,7 @@ public class Buffer {
                 .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
                 .Select(l => l + Consts.EndOfLine)
                 .ToList();
+            Invalidate(0, 0, _lines[^1].Length - 1, _lines.Count - 1);
         }
         get {
             string lineTerminator = _terminatorType switch {
@@ -77,9 +80,19 @@ public class Buffer {
                 LineTerminator.CRLF => "\r\n",
                 _ => ""
             };
-            return string.Join(lineTerminator, _lines);
+            StringBuilder lines = new StringBuilder();
+            foreach (string line in _lines) {
+                lines.Append(line.Trim(Consts.EndOfLine) + lineTerminator);
+            }
+            return lines.ToString();
         }
     }
+
+    /// <summary>
+    /// Return the extent of the block that has been invalidated by
+    /// recent editing actions.
+    /// </summary>
+    public Extent InvalidateExtent { get; } = new();
 
     /// <summary>
     /// Return the fully qualified file name with path.
@@ -155,6 +168,11 @@ public class Buffer {
     public int Offset { get; set; }
 
     /// <summary>
+    /// Return the current buffer cursor position.
+    /// </summary>
+    public Point Cursor => new(Offset, LineIndex);
+
+    /// <summary>
     /// Retrieve the line at the specified index.
     /// </summary>
     /// <param name="index">Zero based index</param>
@@ -164,12 +182,31 @@ public class Buffer {
     }
 
     /// <summary>
+    /// Insert the specified character at the current offset.
+    /// </summary>
+    public void Insert(char ch) {
+        StringBuilder line = new StringBuilder(_lines[LineIndex]);
+        line.Insert(Offset++, ch);
+        _lines[LineIndex] = line.ToString();
+        Invalidate(0, LineIndex, Offset, LineIndex);
+        Modified = true;
+    }
+
+    /// <summary>
     /// Write the buffer back to disk.
     /// </summary>
     public void Write() {
         File.WriteAllText(FullFilename, Content);
         Modified = false;
         NewFile = false;
+    }
+
+    /// <summary>
+    /// Add the specified area to the invalidate extent.
+    /// </summary>
+    private void Invalidate(int x1, int y1, int x2, int y2) {
+        InvalidateExtent.Add(new Point(x1, y1));
+        InvalidateExtent.Add(new Point(x2, y2));
     }
 
     /// <summary>

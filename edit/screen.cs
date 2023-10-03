@@ -93,19 +93,23 @@ public class Screen {
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
             KeyCommand commandId = KeyMap.MapKeyToCommand(keyIn);
-            Macro parser = new Macro();
-            flags = Handle(parser, commandId);
+            if (commandId == KeyCommand.KC_NONE) {
+                flags = HandleEditing(keyIn);
+            } else {
+                Macro parser = new Macro();
+                flags = HandleCommand(parser, commandId);
+            }
         } while (flags != RenderHint.EXIT);
     }
 
     /// <summary>
-    /// Handle keystrokes at the screen level and pass on any unhandled
+    /// Handle commands at the screen level and pass on any unhandled
     /// ones to the active window.
     /// </summary>
     /// <param name="parser">Parser object</param>
     /// <param name="commandId">Command ID</param>
     /// <returns>The rendering hint</returns>
-    private RenderHint Handle(Macro parser, KeyCommand commandId) {
+    private RenderHint HandleCommand(Macro parser, KeyCommand commandId) {
         if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING && KeyMap.IsRecordable(commandId)) {
             if (!_recorder.RememberKeystroke(commandId, parser.RestOfLine())) {
                 StatusBar.Error(Edit.MaximumKeystrokes);
@@ -139,7 +143,7 @@ public class Screen {
             KeyCommand.KC_REGEXP => RegExpToggle(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
-            _ => _activeWindow.Handle(parser, commandId)
+            _ => _activeWindow.HandleCommand(parser, commandId)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
             UpdateCursorPosition();
@@ -151,6 +155,15 @@ public class Screen {
             flags &= ~RenderHint.REFRESH;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Handle an editing action at the screen level.
+    /// </summary>
+    /// <param name="keyInfo">Console key info</param>
+    /// <returns>The rendering hint</returns>
+    private RenderHint HandleEditing(ConsoleKeyInfo keyInfo) {
+        return _activeWindow.HandleEditing(keyInfo);
     }
 
     /// <summary>
@@ -328,7 +341,7 @@ public class Screen {
                 StatusBar.Message(Edit.UnknownCommand);
             }
             else {
-                flags = Handle(parser, commandId);
+                flags = HandleCommand(parser, commandId);
             }
         }
         return flags;
@@ -384,7 +397,7 @@ public class Screen {
                 Macro parser = new Macro(commandString);
                 KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
                 if (commandId != KeyCommand.KC_NONE) {
-                    flags |= Handle(parser, commandId);
+                    flags |= HandleCommand(parser, commandId);
                 }
             }
             StatusBar.KeystrokesMode = KeystrokesMode.NONE;
@@ -487,7 +500,7 @@ public class Screen {
         RenderHint flags = RenderHint.NONE;
         if (StatusBar.PromptForRepeat(out int repeatCount, out KeyCommand commandId)) {
             while (repeatCount-- > 0) {
-                flags |= Handle(new Macro(), commandId);
+                flags |= HandleCommand(new Macro(), commandId);
             }
         }
         return flags;
