@@ -258,27 +258,29 @@ public class Window {
                     break;
 
                 case MarkMode.COLUMN:
-                    if (markExtent.Start.X > 0 && markExtent.Start.X > _viewportOffset.X) {
-                        int diff = markExtent.Start.X - _viewportOffset.X;
-                        Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
-                        x += diff;
-                        w -= diff;
-                        left += diff;
-                        length -= diff;
+                    if (i >= markExtent.Start.Y && i <= markExtent.End.Y) {
+                        if (markExtent.Start.X > 0 && markExtent.Start.X > _viewportOffset.X) {
+                            int diff = markExtent.Start.X - _viewportOffset.X;
+                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                            x += diff;
+                            w -= diff;
+                            left += diff;
+                            length -= diff;
+                        }
+                        if (markExtent.End.X > _viewportOffset.X) {
+                            int diff = Math.Min(markExtent.End.X - markExtent.Start.X + 1, line.Length - left);
+                            int diff2 = markExtent.End.X - markExtent.Start.X + 1;
+                            bg = Screen.Colours.ForegroundColour;
+                            fg = Screen.Colours.BackgroundColour;
+                            Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
+                            x += diff2;
+                            w -= diff2;
+                            left += diff;
+                            length -= diff;
+                        }
+                        bg = Screen.Colours.BackgroundColour;
+                        fg = Screen.Colours.ForegroundColour;
                     }
-                    if (markExtent.End.X > _viewportOffset.X) {
-                        int diff = Math.Min(markExtent.End.X - markExtent.Start.X + 1, line.Length - left);
-                        int diff2 = markExtent.End.X - markExtent.Start.X + 1;
-                        bg = Screen.Colours.ForegroundColour;
-                        fg = Screen.Colours.BackgroundColour;
-                        Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
-                        x += diff2;
-                        w -= diff2;
-                        left += diff;
-                        length -= diff;
-                    }
-                    bg = Screen.Colours.BackgroundColour;
-                    fg = Screen.Colours.ForegroundColour;
                     break;
 
                 case MarkMode.CHARACTER:
