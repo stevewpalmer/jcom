@@ -158,6 +158,16 @@ public class Buffer {
     public int Length => _lines.Count;
 
     /// <summary>
+    /// Return whether the cursor is at the start of the buffer
+    /// </summary>
+    public bool AtStartOfBuffer => Offset == 0 && LineIndex == 0;
+
+    /// <summary>
+    /// Return whether the cursor is at the end of the buffer
+    /// </summary>
+    public bool AtEndOfBuffer => Offset == _lines[^1].Length - 1 && LineIndex == _lines.Count - 1;
+
+    /// <summary>
     /// Index of line being edited
     /// </summary>
     public int LineIndex { get; set; }
@@ -185,10 +195,53 @@ public class Buffer {
     /// Insert the specified character at the current offset.
     /// </summary>
     public void Insert(char ch) {
-        StringBuilder line = new StringBuilder(_lines[LineIndex]);
+        StringBuilder line = PrepareLine();
         line.Insert(Offset++, ch);
         _lines[LineIndex] = line.ToString();
         Invalidate(0, LineIndex, Offset, LineIndex);
+        Modified = true;
+    }
+
+    /// <summary>
+    /// Delete the given number of characters from the current offset
+    /// without moving the offset. If count is greater than the number
+    /// of characters between the offset and the end of the buffer then
+    /// it stops when it reaches the end of the buffer.
+    /// </summary>
+    public void Delete(int count) {
+        StringBuilder line = PrepareLine();
+        int depth = 0;
+        while (count-- > 0) {
+            if (AtEndOfBuffer) {
+                break;
+            }
+            char ch = line[Offset];
+            line.Remove(Offset, 1);
+            if (ch == Consts.EndOfLine) {
+                if (LineIndex + 1 == _lines.Count) {
+                    break;
+                }
+                line.Append(_lines[LineIndex + 1]);
+                _lines.RemoveAt(LineIndex + 1);
+                depth = _lines.Count - LineIndex;
+            }
+        }
+        Invalidate(0, LineIndex, Offset, LineIndex + depth);
+        _lines[LineIndex] = line.ToString();
+        Modified = true;
+    }
+
+    /// <summary>
+    /// Insert a line break at the current offset.
+    /// </summary>
+    public void Break() {
+        StringBuilder line = PrepareLine();
+        string newLine = line.ToString(Offset, line.Length - Offset);
+        _lines[LineIndex] = line.ToString(0, Offset) + Consts.EndOfLine;
+        _lines.Insert(LineIndex + 1, newLine);
+        Invalidate(0, LineIndex, _lines[^1].Length - 1, _lines.Count - 1);
+        Offset = 0;
+        LineIndex++;
         Modified = true;
     }
 
@@ -199,6 +252,22 @@ public class Buffer {
         File.WriteAllText(FullFilename, Content);
         Modified = false;
         NewFile = false;
+    }
+
+    /// <summary>
+    /// Return the current line ready for any editing actions. If the offset
+    /// is in the virtual space then we pad the end of the line out to the
+    /// offset with physical spaces.
+    /// </summary>
+    private StringBuilder PrepareLine() {
+        StringBuilder line = new StringBuilder(_lines[LineIndex]);
+        if (Offset >= line.Length) {
+            int count = line.Length - 1;
+            while (count < Offset) {
+                line.Insert(count++, ' ');
+            }
+        }
+        return line;
     }
 
     /// <summary>

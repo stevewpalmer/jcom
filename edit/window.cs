@@ -115,7 +115,9 @@ public class Window {
     }
 
     /// <summary>
-    /// Handle an editing action at the screen level.
+    /// Handle an editing action at the screen level. The keys here are not
+    /// associated with any command and thus are treated as primitives. Other
+    /// editing actions are handled in HandleCommand.
     /// </summary>
     /// <param name="keyInfo">Console key info</param>
     /// <returns>The rendering hint</returns>
@@ -123,7 +125,14 @@ public class Window {
         RenderHint flags = RenderHint.BLOCK;
         if (!char.IsControl(keyInfo.KeyChar)) {
             Buffer.Insert(keyInfo.KeyChar);
-            flags |= CursorFromOffset();
+        }
+        else {
+            flags = keyInfo.Key switch {
+                ConsoleKey.Enter => Newline(),
+                ConsoleKey.Delete => DeleteChar(),
+                ConsoleKey.Backspace => Backspace(),
+                _ => RenderHint.NONE
+            };
         }
         return ApplyRenderHint(flags);
     }
@@ -222,7 +231,8 @@ public class Window {
         ConsoleColor bg = Screen.Colours.BackgroundColour;
         ConsoleColor fg = Screen.Colours.ForegroundColour;
 
-        // Determine the extent of the window to update.
+        // By default, the extent being updated is the entire window. This would be
+        // the case if the window was scrolled or the text attributes changed.
         Extent renderExtent = new Extent()
             .Add(new Point(0, _viewportOffset.Y))
             .Add(new Point(0, _viewportOffset.Y + _viewportBounds.Height - 1));
@@ -231,11 +241,23 @@ public class Window {
             .Add(_markAnchor)
             .Add(Buffer.Cursor);
 
+        // For block updates, we're scoping the area being rendered down to just those
+        // lines that are affected. For changes to the block mark, this would be the
+        // area being marked plus any area where the mark was removed. The other area
+        // is the buffer invalidate extent which is the extent of the buffer that was
+        // modified by the most recent edit action. The resulting extent to be updated
+        // is the superset of the two, limited to the area of the visible window.
         if (flags.HasFlag(RenderHint.BLOCK)) {
-            Extent blockExtent = new Extent()
-                .Add(_markAnchor)
-                .Add(Buffer.Cursor)
-                .Add(_lastMarkPoint);
+            Extent blockExtent = new Extent();
+            if (_markMode != MarkMode.NONE) {
+                blockExtent
+                    .Add(_markAnchor)
+                    .Add(Buffer.Cursor)
+                    .Add(_lastMarkPoint);
+            }
+            blockExtent
+                .Add(Buffer.InvalidateExtent.Start)
+                .Add(Buffer.InvalidateExtent.End);
             renderExtent.Subtract(blockExtent.Start, blockExtent.End);
         }
 
@@ -329,6 +351,7 @@ public class Window {
             i++;
         }
 
+        // Indicate that all buffer modifications have been rendered.
         Buffer.InvalidateExtent.Clear();
 
         Terminal.SetCursor(savedCursor);
@@ -354,6 +377,37 @@ public class Window {
             flags |= CursorFromLineIndex();
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Delete the character at the cursor
+    /// </summary>
+    private RenderHint DeleteChar() {
+        RenderHint flags = RenderHint.BLOCK;
+        Buffer.Delete(1);
+        return flags | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Backspace over the previous character if we're not at the start
+    /// of the buffer.
+    /// </summary>
+    private RenderHint Backspace() {
+        RenderHint flags = RenderHint.NONE;
+        if (!Buffer.AtStartOfBuffer) {
+            flags = CursorLeft();
+            Buffer.Delete(1);
+            flags |= RenderHint.BLOCK;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Insert a newline character at the cursor.
+    /// </summary>
+    private RenderHint Newline() {
+        Buffer.Break();
+        return RenderHint.BLOCK;
     }
 
     /// <summary>
@@ -555,10 +609,10 @@ public class Window {
     /// Move the cursor left.
     /// </summary>
     private RenderHint CursorLeft() {
-        RenderHint flags = SaveLastMarkPoint();
         if (Buffer.Offset == 0) {
             return EndOfPreviousLine();
         }
+        RenderHint flags = SaveLastMarkPoint();
         --Buffer.Offset;
         return flags | CursorFromOffset();
     }
