@@ -52,13 +52,13 @@ public partial class Compiler {
         paramsNode.Add(CastNodeToType(StringExpression(), SymType.CHAR));
         ExpectToken(TokenID.COMMA);
 
-        string mode = "r";
-        switch (GetNextToken().ID) {
-            case TokenID.KREAD:     mode = "r"; break;
-            case TokenID.KWRITE:    mode = "w"; break;
-            case TokenID.KAPPEND:   mode = "w+"; break;
-            case TokenID.KRANDOM:   mode = "x"; break;
-        }
+        string mode = GetNextToken().ID switch {
+            TokenID.KREAD => "r",
+            TokenID.KWRITE => "w",
+            TokenID.KAPPEND => "w+",
+            TokenID.KRANDOM => "x",
+            _ => "r"
+        };
         paramsNode.Add(new StringParseNode(mode));
 
         // Random requires a record size
@@ -489,7 +489,7 @@ public partial class Compiler {
         }
 
         // Is this a simple PRINT statement to the console? If so, call the string version.
-        if (isStdout && formats.Count == 1 && formats[0] == 'S') {
+        if (isStdout && formats is ['S']) {
             paramsNode.Add(varargs.Nodes[0]);
         } else {
             paramsNode.Add(fileParseNode);

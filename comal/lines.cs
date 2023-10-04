@@ -34,8 +34,8 @@ namespace JComal;
 /// </summary>
 public class Line {
 
+    private readonly List<SimpleToken> _tokens;
     private int _tindex;
-    private List<SimpleToken> _tokens;
     private SimpleToken _pushedToken;
 
     /// <summary>
@@ -222,7 +222,7 @@ public class Line {
         if (Tokens.Length > 0 && Tokens[index].ID == TokenID.INTEGER) {
             if (includeLineNumber) {
                 IntegerToken lineNumberToken = Tokens[index] as IntegerToken;
-                line.AppendFormat("{0,5}", lineNumberToken.Value);
+                line.Append($"{lineNumberToken.Value,5}");
             }
             index++;
         }
@@ -275,7 +275,6 @@ public class Lines {
     /// <summary>
     /// Copy constructor
     /// </summary>
-    /// <param name="source">Original lines</param>
     public Lines() {
         _lines = new List<Line>();
     }
@@ -290,9 +289,9 @@ public class Lines {
     }
 
     /// <summary>
-    /// Copy constructor
+    /// Initialise a Lines collection with the given line
     /// </summary>
-    /// <param name="source">Original lines</param>
+    /// <param name="line">Line object</param>
     public Lines(Line line) {
         _lines = new List<Line> { line };
         _currentLine = 0;
@@ -357,12 +356,7 @@ public class Lines {
     /// </summary>
     /// <param name="lineNumber">Number of the line required</param>
     public Line Get(int lineNumber) {
-        for (int index = 0; index < _lines.Count; ++index) {
-            if (_lines[index].LineNumber == lineNumber) {
-                return _lines[index];
-            }
-        }
-        return null;
+        return _lines.FirstOrDefault(line => line.LineNumber == lineNumber);
     }
 
     /// <summary>
@@ -411,12 +405,12 @@ public class Lines {
     public bool LinesForProcedure(string name, ref int startLine, ref int endLine) {
 
         bool found = false;
-        for (int index = 0; index < _lines.Count; index++) {
-            Line line = _lines[index];
+        foreach (Line line in _lines) {
             if (line.GetToken() is IntegerToken lineNumber) {
                 SimpleToken firstToken = line.GetToken();
                 if (firstToken.ID == TokenID.KPROC || firstToken.ID == TokenID.KFUNC) {
-                    if (line.GetToken() is IdentifierToken nameToken && nameToken.Name.ToUpper() == name.ToUpper()) {
+                    if (line.GetToken() is IdentifierToken nameToken &&
+                        string.Equals(nameToken.Name, name, StringComparison.CurrentCultureIgnoreCase)) {
                         startLine = lineNumber.Value;
                         found = true;
                     }
@@ -473,7 +467,7 @@ public class Lines {
     /// <summary>
     /// Deserialize the byte array to program lines.
     /// </summary>
-    /// <param name="byteStream">Byte array</param>
+    /// <param name="byteReader">Byte reader</param>
     public void Deserialize(ByteReader byteReader) {
         do {
             Line line = Line.Deserialize(byteReader);

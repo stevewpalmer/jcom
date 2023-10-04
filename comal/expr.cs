@@ -629,7 +629,7 @@ public partial class Compiler {
 
                 // Function?
                 Symbol sym = Globals.Get(identToken.Name);
-                if (sym != null && sym.Class == SymClass.FUNCTION) {
+                if (sym is { Class: SymClass.FUNCTION }) {
                     return ExecWithIdentifier(identToken);
                 }
                 return ParseIdentifierFromToken(identToken);
@@ -803,19 +803,12 @@ public partial class Compiler {
         // For literal values, promote them to the required type by
         // doing variant conversion.
         if (node is NumberParseNode) {
-            switch (typeNeeded) {
-                case SymType.INTEGER:
-                    node.Value = new Variant(node.Value.IntValue);
-                    break;
-
-                case SymType.FLOAT:
-                    node.Value = new Variant(node.Value.RealValue);
-                    break;
-
-                case SymType.DOUBLE:
-                    node.Value = new Variant((double)node.Value.RealValue);
-                    break;
-            }
+            node.Value = typeNeeded switch {
+                SymType.INTEGER => new Variant(node.Value.IntValue),
+                SymType.FLOAT => new Variant(node.Value.RealValue),
+                SymType.DOUBLE => new Variant((double)node.Value.RealValue),
+                _ => node.Value
+            };
         }
         node.Type = typeNeeded;
         return node;

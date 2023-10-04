@@ -417,10 +417,9 @@ public class Interpreter {
     private void KFindOrChange(Line ls, bool findOnly) {
 
         SimpleToken token = ls.GetToken();
-        StringToken findToken;
         StringToken replaceToken = null;
 
-        findToken = token as StringToken;
+        StringToken findToken = token as StringToken;
         if (findToken == null) {
             SyntaxError();
         }
@@ -558,9 +557,7 @@ public class Interpreter {
                 }
             }
         }
-        if (listFile != null) {
-            listFile.Close();
-        }
+        listFile?.Close();
         Lines.Reset();
     }
 

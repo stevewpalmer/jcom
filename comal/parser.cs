@@ -38,7 +38,7 @@ public partial class Compiler {
     // Parse an integer, real or string constant
     private Variant ParseConstant() {
         ParseNode tokenNode = SimpleExpression();
-        if (tokenNode != null && tokenNode.IsConstant) {
+        if (tokenNode is { IsConstant: true }) {
             return tokenNode.Value;
         }
         Messages.Error(MessageCode.CONSTANTEXPECTED, "Constant expected");
@@ -81,7 +81,7 @@ public partial class Compiler {
 
         // Make sure strings have been explicitly DIM'd in strict mode. We set an
         // explicit width to avoid this error being thrown several times.
-        if (!sym.IsParameter && sym.Type == SymType.FIXEDCHAR && sym.FullType.Width == 0 && _opts.Strict) {
+        if (sym is { IsParameter: false, Type: SymType.FIXEDCHAR } && sym.FullType.Width == 0 && _opts.Strict) {
             Messages.Error(MessageCode.MISSINGSTRINGDECLARATION, "String width must be specified with DIM before use");
             sym.FullType.Width = Consts.DefaultStringWidth;
         }
@@ -99,7 +99,7 @@ public partial class Compiler {
         // If this a string and we've got array indexes? If so then this is
         // a non-standard substring reference. Fix this up unless strict is
         // specified in which case this is an error
-        else if (sym.Type == SymType.FIXEDCHAR && !sym.IsArray && node.HasIndexes) {
+        else if (sym is { Type: SymType.FIXEDCHAR, IsArray: false } && node.HasIndexes) {
             if (_opts.Strict || node.Indexes.Count > 1) {
                 Messages.Error(MessageCode.BADSUBSTRINGSPEC, "Substring must have start and end specification");
             } else {
@@ -165,7 +165,6 @@ public partial class Compiler {
 
         ProcedureParseNode node = new();
         IdentifierToken identToken = null;
-        SimpleToken token;
         bool isImplicit = endToken == TokenID.ENDOFFILE;
 
         // Add the name to the global scope, ensuring it hasn't already been
@@ -233,7 +232,7 @@ public partial class Compiler {
 
         // Don't catch run-time exceptions if we're running in
         // the interpreter.
-        node.CatchExceptions = !_opts.Interactive && !_opts.DevMode;
+        node.CatchExceptions = _opts is { Interactive: false, DevMode: false };
 
         if (methodName == _entryPointName) {
             method.Modifier |= SymModifier.ENTRYPOINT;
@@ -266,7 +265,7 @@ public partial class Compiler {
         }
 
         // Check identifier matches
-        token = GetNextToken();
+        SimpleToken token = GetNextToken();
         CheckEndOfBlockName(identToken, token);
 
         // Validate the block.
@@ -277,11 +276,11 @@ public partial class Compiler {
             }
 
             // For non-array characters, if there's no value, set the empty string
-            if (sym.Type == SymType.FIXEDCHAR && !sym.IsArray && !sym.Value.HasValue) {
+            if (sym is { Type: SymType.FIXEDCHAR, IsArray: false } && !sym.Value.HasValue) {
                 sym.Value = new Variant(string.Empty);
             }
 
-            if (!sym.IsReferenced && !sym.IsHidden && !sym.Modifier.HasFlag(SymModifier.RETVAL)) {
+            if (sym is { IsReferenced: false, IsHidden: false } && !sym.Modifier.HasFlag(SymModifier.RETVAL)) {
                 string scopeName = sym.IsParameter ? "parameter" : sym.IsLabel ? "label" : "variable";
                 Messages.Warning(MessageCode.UNUSEDVARIABLE,
                                   3,
@@ -379,7 +378,7 @@ public partial class Compiler {
             
             // Ban any conflict with PROGRAM name or the current function
             Symbol globalSym = Globals.Get(identToken.Name);
-            if (globalSym != null && globalSym.Type == SymType.PROGRAM) {
+            if (globalSym is { Type: SymType.PROGRAM }) {
                 Messages.Error(MessageCode.IDENTIFIERISGLOBAL,
                     $"Identifier {identToken.Name} already has global declaration");
                 SkipToEndOfLine();
@@ -428,43 +427,41 @@ public partial class Compiler {
     private Collection<SymDimension> ParseArrayDimensions() {
         Collection<SymDimension> dimensions = new();
 
-        if (TestToken(TokenID.LPAREN)) {
+        while (TestToken(TokenID.LPAREN)) {
             do {
-                do {
-                    ParseNode intVal = IntegerExpression();
-                    if (intVal == null) {
-                        SkipToEndOfLine();
-                        return null;
-                    }
+                ParseNode intVal = IntegerExpression();
+                if (intVal == null) {
+                    SkipToEndOfLine();
+                    return null;
+                }
 
-                    SymDimension dim = new();
+                SymDimension dim = new();
 
-                    // Arrays lower bounds start from 1 but one can
-                    // specify a custom bound range with the lower:upper syntax.
-                    ParseNode in1 = new NumberParseNode(1);
-                    ParseNode in2 = intVal;
-                    if (TestToken(TokenID.COLON)) {
-                        intVal = IntegerExpression();
-                        if (intVal != null) {
-                            in1 = in2;
-                            in2 = intVal;
-                        }
+                // Arrays lower bounds start from 1 but one can
+                // specify a custom bound range with the lower:upper syntax.
+                ParseNode in1 = new NumberParseNode(1);
+                ParseNode in2 = intVal;
+                if (TestToken(TokenID.COLON)) {
+                    intVal = IntegerExpression();
+                    if (intVal != null) {
+                        in1 = in2;
+                        in2 = intVal;
                     }
-                    if (in2.IsConstant && in1.IsConstant) {
-                        if (in2.Value.IntValue > 0 && in2.Value.IntValue < in1.Value.IntValue) {
-                            Messages.Error(MessageCode.ARRAYILLEGALBOUNDS, "Illegal bounds in array");
-                        }
+                }
+                if (in2.IsConstant && in1.IsConstant) {
+                    if (in2.Value.IntValue > 0 && in2.Value.IntValue < in1.Value.IntValue) {
+                        Messages.Error(MessageCode.ARRAYILLEGALBOUNDS, "Illegal bounds in array");
                     }
-                    dim.LowerBound = in1;
-                    dim.UpperBound = in2;
-                    if (dimensions.Count == 7) {
-                        Messages.Error(MessageCode.TOOMANYDIMENSIONS, "Too many dimensions in array");
-                    } else {
-                        dimensions.Add(dim);
-                    }
-                } while (TestToken(TokenID.COMMA));
-                ExpectToken(TokenID.RPAREN);
-            } while (TestToken(TokenID.LPAREN));
+                }
+                dim.LowerBound = in1;
+                dim.UpperBound = in2;
+                if (dimensions.Count == 7) {
+                    Messages.Error(MessageCode.TOOMANYDIMENSIONS, "Too many dimensions in array");
+                } else {
+                    dimensions.Add(dim);
+                }
+            } while (TestToken(TokenID.COMMA));
+            ExpectToken(TokenID.RPAREN);
         }
         return dimensions;
     }

@@ -44,7 +44,7 @@ public class ComalOptions : Options {
     /// Sets and returns whether the strict mode is enforced.
     /// </summary>
     [OptionField("-strict", Help = "Enable strict mode")]
-    public bool Strict { get; set; }
+    public bool Strict { get; init; }
 
     /// <summary>
     /// Parse the specified command line array passed to the application.

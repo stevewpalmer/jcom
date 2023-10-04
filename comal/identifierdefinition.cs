@@ -36,10 +36,10 @@ public class IdentifierDefinition {
     /// <summary>
     /// Identifier name
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; init; }
 
     /// <summary>
     /// Optional dimensions
     /// </summary>
-    public Collection<SymDimension> Dimensions { get; set; }
+    public Collection<SymDimension> Dimensions { get; init; }
 }

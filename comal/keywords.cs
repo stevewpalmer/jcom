@@ -141,7 +141,7 @@ public partial class Compiler {
         } else {
             string methodName = identToken.Name;
             Symbol sym = Globals.Get(methodName);
-            if (sym != null && sym.IsExported) {
+            if (sym is { IsExported: true }) {
                 Messages.Error(MessageCode.ALREADYEXPORTED,
                                $"{methodName} already exported");
             }
@@ -179,9 +179,8 @@ public partial class Compiler {
             valueList.AddRange(dataSymbol.ArrayValues);
         }
 
-        Variant valueNode;
         do {
-            valueNode = ParseConstant();
+            Variant valueNode = ParseConstant();
             if (valueNode.Type == VariantType.INTEGER) {
                 valueNode = new Variant(valueNode.RealValue);
             }
@@ -279,13 +278,13 @@ public partial class Compiler {
 
         AssignmentParseNode node = new() {
             Identifiers = new[] {
-            new IdentifierParseNode(GetMakeReadDataIndexSymbol()),
-            new IdentifierParseNode(GetMakeEODSymbol())
+                new IdentifierParseNode(GetMakeReadDataIndexSymbol()),
+                new IdentifierParseNode(GetMakeEODSymbol())
             },
             ValueExpressions = new[] {
-            new NumberParseNode(0),
-            new NumberParseNode(0)
-        }
+                new NumberParseNode(0),
+                new NumberParseNode(0)
+            }
         };
         return node;
     }
@@ -405,7 +404,7 @@ public partial class Compiler {
         // Possible procedure call? This is where we need to resolve A(X) between a
         // substring assignment, an array assignment or a method call. If A is defined
         // and is not a method, it can't be a procedure call.
-        if (sym == null || !sym.Defined || (sym.Defined && sym.IsMethod)) {
+        if (sym == null || !sym.Defined || sym is { Defined: true, IsMethod: true }) {
             if (token.ID == TokenID.EOL || token.ID == TokenID.LPAREN) {
                 _currentLine.PushToken(token);
                 return ExecWithIdentifier(identToken);
@@ -492,9 +491,7 @@ public partial class Compiler {
                     Dimensions = sym.Dimensions.ToArray(),
                     Redimension = true
                 };
-                if (nodes == null) {
-                    nodes = new BlockParseNode();
-                }
+                nodes ??= new BlockParseNode();
                 nodes.Add(node);
             }
             token = GetNextToken();
@@ -533,11 +530,10 @@ public partial class Compiler {
         InsertTokenIfMissing(TokenID.KOF);
         ExpectEndOfLine();
 
-        SimpleToken token;
         while (!_ls.EndOfFile) {
 
             _currentLine = _ls.NextLine;
-            token = GetNextToken();
+            SimpleToken token = GetNextToken();
             if (token.ID != TokenID.EOL) {
 
                 // Possible initial line number

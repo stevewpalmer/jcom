@@ -27,7 +27,7 @@ using CCompiler;
 
 namespace JComal; 
 
-public class Program {
+public static class Program {
 
     public static void Main(string[] args) {
         ComalOptions opts = new();

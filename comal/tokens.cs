@@ -39,7 +39,6 @@ public enum TokenID {
     COLON = 2,
     COMMA = 3,
     COMMENT = 4,
-    CONCAT = 5,
     DIVIDE = 6,
     ENDOFFILE = 7,
     EOL = 8,
@@ -453,7 +452,7 @@ public class SimpleToken {
     /// Returns the token ID.
     /// </summary>
     public TokenID ID {
-        get; set;
+        get;
     }
 
     /// <summary>
@@ -505,7 +504,7 @@ public class ErrorToken : SimpleToken {
     /// <summary>
     /// Actual string found in token stream
     /// </summary>
-    public string String {
+    private string String {
         get;
     }
 
@@ -565,7 +564,7 @@ public class StringToken : SimpleToken {
     /// Returns the literal string value of the token.
     /// </summary>
     public string String {
-        get; set;
+        get;
     }
 
     /// <summary>
@@ -660,7 +659,7 @@ public class FloatToken : SimpleToken {
     /// Returns the floating point value of the token.
     /// </summary>
     public float Value {
-        get; set;
+        get;
     }
 
     /// <summary>
@@ -708,7 +707,7 @@ public class IdentifierToken : SimpleToken {
     /// Returns the identifier name.
     /// </summary>
     public string Name {
-        get; set;
+        get;
     }
 
     /// <summary>

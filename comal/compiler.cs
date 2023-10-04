@@ -64,27 +64,27 @@ public partial class Compiler : ICompiler {
     /// Return or set the list of compiler messages.
     /// </summary>
     public MessageCollection Messages {
-        get; set;
+        get; init;
     }
 
     /// <summary>
     /// Symbol table stack
     /// </summary>
-    public SymbolStack SymbolStack {
-        get; set;
+    private SymbolStack SymbolStack {
+        get;
     }
 
     /// <summary>
     /// Global methods symbol table
     /// </summary>
-    public SymbolCollection Globals {
-        get; set;
+    private SymbolCollection Globals {
+        get;
     }
 
     /// <summary>
     /// Current procedure being parsed
     /// </summary>
-    public ProcedureParseNode CurrentProcedure {
+    private ProcedureParseNode CurrentProcedure {
         get; set;
     }
 
@@ -364,7 +364,7 @@ public partial class Compiler : ICompiler {
                     // Check method name hasn't already been declared.
                     string methodName = identToken.Name;
                     Symbol method = Globals.Get(methodName);
-                    if (method != null && method.Defined && !method.IsExternal) {
+                    if (method is { Defined: true, IsExternal: false }) {
                         Messages.Error(MessageCode.SUBFUNCDEFINED, $"{methodName} already defined");
                         parents.Push(method);
                         SkipToEndOfLine();
@@ -485,9 +485,7 @@ public partial class Compiler : ICompiler {
 
         SimpleToken token = _currentLine.GetToken();
         while (token is ErrorToken errorToken) {
-            if (Messages != null) {
-                Messages.Error(MessageCode.EXPECTEDTOKEN, errorToken.Message);
-            }
+            Messages?.Error(MessageCode.EXPECTEDTOKEN, errorToken.Message);
             token = _currentLine.GetToken();
         }
         return token;
@@ -626,7 +624,7 @@ public partial class Compiler : ICompiler {
     // other types as MSIL will do this automatically for us.
     private void InitialiseToDefault(Symbol sym) {
 
-        if (!sym.IsArray && sym.Type == SymType.FIXEDCHAR) {
+        if (sym is { IsArray: false, Type: SymType.FIXEDCHAR }) {
             sym.Value = new Variant(string.Empty);
             if (!_opts.Strict) {
                 sym.FullType.Width = Consts.DefaultStringWidth;
