@@ -209,6 +209,7 @@ public class Buffer {
     /// it stops when it reaches the end of the buffer.
     /// </summary>
     public void Delete(int count) {
+
         StringBuilder line = PrepareLine();
         int depth = 0;
         while (count-- > 0) {

@@ -6,9 +6,8 @@ decreasing order of priority.
 ## Work Items
 
 ### Editor
-* Editing capability.
 * Split windows.
-* Block cut and paste.
+* Block paste.
 * Replace.
 * Help.
 

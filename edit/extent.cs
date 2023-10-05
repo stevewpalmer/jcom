@@ -75,6 +75,11 @@ public class Extent {
     public Point End { get; private set; } = Uninitalised;
 
     /// <summary>
+    /// Returns whether the extent has a valid range
+    /// </summary>
+    public bool Valid => Start != Uninitalised && End != Uninitalised;
+
+    /// <summary>
     /// Return whether point p1 is before point p2 in the extent.
     /// </summary>
     private static bool Before(Point p1, Point p2) =>

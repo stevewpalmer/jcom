@@ -296,5 +296,17 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("RegExpOffStatus", resourceCulture);
             }
         }
+        
+        internal static string BlockDeleted {
+            get {
+                return ResourceManager.GetString("BlockDeleted", resourceCulture);
+            }
+        }
+        
+        internal static string DeletedToScrap {
+            get {
+                return ResourceManager.GetString("DeletedToScrap", resourceCulture);
+            }
+        }
     }
 }

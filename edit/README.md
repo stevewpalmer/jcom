@@ -19,6 +19,8 @@ own buffer.
 | Up                       | Up arrow                 | Up arrow                 |
 | Down                     | Down arrow               | Down arrow               |
 | Exit                     | Alt+X                    | Alt+X                    |
+| Delete                   | Del                      | Del                      |
+| Backspace                | Backspace                | Backspace                |
 | Write Buffer             | Alt+W                    | Alt+W                    |
 | Write Buffers and Exit   | Ctrl+X                   | Alt+W                    |
 | Change Output Filename   | Alt+O                    | Alt+O                    |

@@ -27,8 +27,31 @@ using System.Drawing;
 using System.Text;
 using JComLib;
 using JEdit.Resources;
+using JEdit.Resources;
 
 namespace JEdit;
+
+/// <summary>
+/// Block actions
+/// </summary>
+[Flags]
+public enum BlockAction {
+
+    /// <summary>
+    /// Copy the block to the scrap buffer
+    /// </summary>
+    COPY = 1,
+
+    /// <summary>
+    /// Delete the block
+    /// </summary>
+    DELETE = 2,
+
+    /// <summary>
+    /// Copy the block and then delete
+    /// </summary>
+    COPY_AND_DELETE = COPY | DELETE
+}
 
 public class Window {
     private Rectangle _viewportBounds;
@@ -91,13 +114,14 @@ public class Window {
             KeyCommand.KC_CLEFT => CursorLeft(),
             KeyCommand.KC_CLINEEND => EndOfCurrentLine(),
             KeyCommand.KC_CLINESTART => StartOfCurrentLine(),
-            KeyCommand.KC_COPY => Copy(),
+            KeyCommand.KC_COPY => HandleBlock(BlockAction.COPY),
             KeyCommand.KC_CPAGEDOWN => PageDown(),
             KeyCommand.KC_CPAGEUP => PageUp(),
             KeyCommand.KC_CRIGHT => CursorRight(),
             KeyCommand.KC_CTOBOTTOM => LineToBottom(),
             KeyCommand.KC_CTOTOP => LineToTop(),
             KeyCommand.KC_CUP => CursorUp(),
+            KeyCommand.KC_CUT => HandleBlock(BlockAction.COPY_AND_DELETE),
             KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
             KeyCommand.KC_CWINDOWTOP => WindowTop(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
@@ -255,9 +279,11 @@ public class Window {
                     .Add(Buffer.Cursor)
                     .Add(_lastMarkPoint);
             }
-            blockExtent
-                .Add(Buffer.InvalidateExtent.Start)
-                .Add(Buffer.InvalidateExtent.End);
+            if (Buffer.InvalidateExtent.Valid) {
+                blockExtent
+                    .Add(Buffer.InvalidateExtent.Start)
+                    .Add(Buffer.InvalidateExtent.End);
+            }
             renderExtent.Subtract(blockExtent.Start, blockExtent.End);
         }
 
@@ -380,11 +406,18 @@ public class Window {
     }
 
     /// <summary>
-    /// Delete the character at the cursor
+    /// If we are in mark mode, deletes the marked block
+    /// otherwise delete the character at the cursor
     /// </summary>
     private RenderHint DeleteChar() {
-        RenderHint flags = RenderHint.BLOCK;
-        Buffer.Delete(1);
+        RenderHint flags = RenderHint.NONE;
+        if (_markMode == MarkMode.NONE) {
+            flags |= RenderHint.BLOCK;
+            Buffer.Delete(1);
+        }
+        else {
+            flags |= HandleBlock(BlockAction.DELETE);
+        }
         return flags | CursorFromOffset();
     }
 
@@ -453,6 +486,9 @@ public class Window {
     /// </summary>
     private RenderHint Mark(MarkMode markMode) {
         if (_markMode == markMode) {
+            Buffer.InvalidateExtent
+                .Add(_markAnchor)
+                .Add(Buffer.Cursor);
             _markMode = MarkMode.NONE;
         }
         else {
@@ -466,11 +502,18 @@ public class Window {
     }
 
     /// <summary>
-    /// Copy a marked block to the scrapboard.
+    /// Perform the specified actions on a marked block.
     /// </summary>
-    private RenderHint Copy() {
+    private RenderHint HandleBlock(BlockAction action) {
 
         (Point markStart, Point markEnd) = GetOrderedMarkRange();
+
+        // Delete ranges are a collection of ranges to be deleted, indicated by
+        // a cursor position and a count. For LINE and COLUMN blocks, these are
+        // simply the start of the mark range and the entire extent. For COLUMN,
+        // these are a collection for each line in the column.
+        List<(Point, int)> deleteRanges = new();
+        (Point, int Count) currentRange = new(markStart, 0);
 
         StringBuilder copyText = new();
         for (int l = markStart.Y; l <= markEnd.Y; l++) {
@@ -479,8 +522,13 @@ public class Window {
             int length = line.Length;
             switch (_markMode) {
                 case MarkMode.COLUMN:
+                    if (currentRange.Count > 0) {
+                        deleteRanges.Add(currentRange);
+                    }
+                    --length;
                     startIndex = Math.Min(length, markStart.X);
                     length = Math.Min(length - startIndex, markEnd.X - startIndex + 1);
+                    currentRange = new(new Point(startIndex, l), 0);
                     break;
 
                 case MarkMode.CHARACTER:
@@ -493,13 +541,43 @@ public class Window {
                     }
                     break;
             }
-            copyText.Append(Utilities.SpanBound(line, startIndex, length));
-            if (copyText.Length > 0 && copyText[^1] != Consts.EndOfLine) {
-                copyText.Append(Consts.EndOfLine);
+            if (action.HasFlag(BlockAction.COPY)) {
+                copyText.Append(Utilities.SpanBound(line, startIndex, length));
+                if (copyText.Length > 0 && copyText[^1] != Consts.EndOfLine) {
+                    copyText.Append(Consts.EndOfLine);
+                }
+            }
+            if (action.HasFlag(BlockAction.DELETE)) {
+                currentRange.Count += length;
             }
         }
-        Screen.ScrapBuffer.Content = copyText.ToString();
-        Screen.StatusBar.Message(Edit.CopiedToScrap);
+
+        if (action.HasFlag(BlockAction.COPY)) {
+            Screen.ScrapBuffer.Content = copyText.ToString();
+            Buffer.InvalidateExtent
+                .Add(markStart)
+                .Add(markEnd);
+        }
+        if (action.HasFlag(BlockAction.DELETE)) {
+            deleteRanges.Add(currentRange);
+            foreach ((Point point, int count) in deleteRanges) {
+                if (count > 0) {
+                    Buffer.Offset = point.X;
+                    Buffer.LineIndex = point.Y;
+                    Buffer.Delete(count);
+                }
+            }
+        }
+
+        Screen.StatusBar.Message(action switch {
+            BlockAction.COPY =>  Edit.CopiedToScrap,
+            BlockAction.DELETE => Edit.BlockDeleted,
+            BlockAction.COPY_AND_DELETE => Edit.DeletedToScrap,
+            _ => throw new ArgumentOutOfRangeException(nameof(action), action, null)
+        });
+
+        Buffer.Offset = markStart.X;
+        Buffer.LineIndex = markStart.Y;
 
         _markMode = MarkMode.NONE;
         return RenderHint.BLOCK;

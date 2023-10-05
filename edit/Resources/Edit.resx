@@ -67,7 +67,7 @@
         <value>Command:</value>
     </data>
     <data name="ModifiedBuffers" xml:space="preserve">
-        <value>"{0} buffers have not been saved. Exit @@?"</value>
+        <value>{0} buffers have not been saved. Exit @@?</value>
     </data>
     <data name="NothingToPlayback" xml:space="preserve">
         <value>Nothing to play back.</value>
@@ -143,5 +143,11 @@
     </data>
     <data name="RegExpOffStatus" xml:space="preserve">
         <value>(RE Off) </value>
+    </data>
+    <data name="BlockDeleted" xml:space="preserve">
+        <value>Block deleted</value>
+    </data>
+    <data name="DeletedToScrap" xml:space="preserve">
+        <value>Block deleted to scrap</value>
     </data>
 </root>
