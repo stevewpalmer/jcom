@@ -54,7 +54,7 @@ public class Screen {
     /// <summary>
     /// Configuration
     /// </summary>
-    private static Config Config { get; set; }
+    public static Config Config { get; set; }
 
     /// <summary>
     /// Scrap buffer

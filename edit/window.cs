@@ -126,6 +126,9 @@ public class Window {
             KeyCommand.KC_CWINDOWTOP => WindowTop(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
             KeyCommand.KC_CWORDRIGHT => WordRight(),
+            KeyCommand.KC_DELETELINE => DeleteLine(),
+            KeyCommand.KC_DELETETOEND => DeleteToEndOfLine(),
+            KeyCommand.KC_DELETETOSTART => DeleteToStartOfLine(),
             KeyCommand.KC_GOTO => GoToLine(parser),
             KeyCommand.KC_MARK => Mark(MarkMode.CHARACTER),
             KeyCommand.KC_MARKCOLUMN => Mark(MarkMode.COLUMN),
@@ -479,6 +482,35 @@ public class Window {
             flags = RenderHint.REDRAW;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Delete the current line.
+    /// </summary>
+    private RenderHint DeleteLine() {
+        int length = Buffer.GetLine(Buffer.LineIndex).Length;
+        Buffer.Offset = 0;
+        Buffer.Delete(length);
+        return RenderHint.BLOCK | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Delete to the end of the current line.
+    /// </summary>
+    private RenderHint DeleteToEndOfLine() {
+        int length = Buffer.GetLine(Buffer.LineIndex).Length - Buffer.Offset - 1;
+        Buffer.Delete(length);
+        return RenderHint.BLOCK | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Delete to the start of the current line.
+    /// </summary>
+    private RenderHint DeleteToStartOfLine() {
+        int length = Buffer.Offset;
+        Buffer.Offset = 0;
+        Buffer.Delete(length);
+        return RenderHint.BLOCK | CursorFromOffset();
     }
 
     /// <summary>

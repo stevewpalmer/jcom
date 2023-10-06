@@ -6,10 +6,8 @@ decreasing order of priority.
 ## Work Items
 
 ### Editor
-* Split windows.
 * Block paste.
 * Replace.
-* Help.
 
 ### Fortran
 * BLOCK DATA (FM500, FM503, FM506)
