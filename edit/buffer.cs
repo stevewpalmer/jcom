@@ -29,6 +29,9 @@ using System.Text;
 
 namespace JEdit;
 
+// TODO: Filename handling is messy.
+// TODO: BaseFilename should be split into GetBufferName as "New File" is not a filename.
+
 public class Buffer {
     private readonly LineTerminator _terminatorType;
     private List<string> _lines;
@@ -203,6 +206,57 @@ public class Buffer {
     }
 
     /// <summary>
+    /// Replace the text at the current offset with the new string. Only
+    /// as many characters that remain from the current offset will be
+    /// replaced and the remainder ignored.
+    /// </summary>
+    /// <param name='newText'>The text to replace</param>
+    public void Replace(string newText) {
+        int offset = Offset;
+        int index = LineIndex;
+        int s = 0;
+        StringBuilder line = new(GetLine(index));
+        while (s < newText.Length) {
+            if (line[offset] == Consts.EndOfLine) {
+                if (index == _lines.Count - 1) {
+                    break;
+                }
+                _lines[index++] = line.ToString();
+                line = new StringBuilder(GetLine(index));
+                offset = 0;
+            }
+            if (newText[s] == Consts.EndOfLine) {
+                s++;
+                continue;
+            }
+            line[offset++] = newText[s++];
+        }
+        Invalidate(0, LineIndex, Offset, index);
+        _lines[index] = line.ToString();
+        Modified = true;
+    }
+
+    /// <summary>
+    /// Get the specified number of characters of text from the
+    /// current cursor position.
+    /// </summary>
+    /// <param name="count">Number of characters to retrieve</param>
+    /// <returns>A string containing the retrieved text</returns>
+    public string GetText(int count) {
+        StringBuilder text = new();
+        int offset = Offset;
+        int index = LineIndex;
+        while (count > 0) {
+            string line = GetLine(index++);
+            int length = Math.Min(count, line.Length - offset);
+            text.Append(line.AsSpan(offset, length));
+            offset = 0;
+            count -= length;
+        }
+        return text.ToString();
+    }
+
+    /// <summary>
     /// Delete the given number of characters from the current offset
     /// without moving the offset. If count is greater than the number
     /// of characters between the offset and the end of the buffer then
@@ -212,10 +266,7 @@ public class Buffer {
 
         StringBuilder line = PrepareLine();
         int depth = 0;
-        while (count-- > 0) {
-            if (AtEndOfBuffer) {
-                break;
-            }
+        while (!AtEndOfBuffer && count-- > 0) {
             char ch = line[Offset];
             line.Remove(Offset, 1);
             if (ch == Consts.EndOfLine) {

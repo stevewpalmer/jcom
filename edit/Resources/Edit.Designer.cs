@@ -308,5 +308,29 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("DeletedToScrap", resourceCulture);
             }
         }
+        
+        internal static string Lowercasing {
+            get {
+                return ResourceManager.GetString("Lowercasing", resourceCulture);
+            }
+        }
+        
+        internal static string Uppercasing {
+            get {
+                return ResourceManager.GetString("Uppercasing", resourceCulture);
+            }
+        }
+        
+        internal static string WriteSuccess {
+            get {
+                return ResourceManager.GetString("WriteSuccess", resourceCulture);
+            }
+        }
+        
+        internal static string WriteBlockAs {
+            get {
+                return ResourceManager.GetString("WriteBlockAs", resourceCulture);
+            }
+        }
     }
 }

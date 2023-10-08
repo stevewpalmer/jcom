@@ -93,12 +93,10 @@ public class Screen {
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
             KeyCommand commandId = KeyMap.MapKeyToCommand(keyIn);
-            if (commandId == KeyCommand.KC_NONE) {
-                flags = HandleEditing(keyIn);
-            } else {
-                Macro parser = new Macro();
-                flags = HandleCommand(parser, commandId);
-            }
+            Macro parser = new Macro();
+            flags = commandId == KeyCommand.KC_NONE ?
+                HandleEditing(parser, keyIn) :
+                HandleCommand(parser, commandId);
         } while (flags != RenderHint.EXIT);
     }
 
@@ -160,10 +158,11 @@ public class Screen {
     /// <summary>
     /// Handle an editing action at the screen level.
     /// </summary>
+    /// <param name="parser">Macro parser</param>
     /// <param name="keyInfo">Console key info</param>
     /// <returns>The rendering hint</returns>
-    private RenderHint HandleEditing(ConsoleKeyInfo keyInfo) {
-        return _activeWindow.HandleEditing(keyInfo);
+    private RenderHint HandleEditing(Macro parser, ConsoleKeyInfo keyInfo) {
+        return _activeWindow.HandleEditing(parser, keyInfo);
     }
 
     /// <summary>

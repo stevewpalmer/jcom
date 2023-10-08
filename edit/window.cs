@@ -27,31 +27,8 @@ using System.Drawing;
 using System.Text;
 using JComLib;
 using JEdit.Resources;
-using JEdit.Resources;
 
 namespace JEdit;
-
-/// <summary>
-/// Block actions
-/// </summary>
-[Flags]
-public enum BlockAction {
-
-    /// <summary>
-    /// Copy the block to the scrap buffer
-    /// </summary>
-    COPY = 1,
-
-    /// <summary>
-    /// Delete the block
-    /// </summary>
-    DELETE = 2,
-
-    /// <summary>
-    /// Copy the block and then delete
-    /// </summary>
-    COPY_AND_DELETE = COPY | DELETE
-}
 
 public class Window {
     private Rectangle _viewportBounds;
@@ -114,14 +91,14 @@ public class Window {
             KeyCommand.KC_CLEFT => CursorLeft(),
             KeyCommand.KC_CLINEEND => EndOfCurrentLine(),
             KeyCommand.KC_CLINESTART => StartOfCurrentLine(),
-            KeyCommand.KC_COPY => HandleBlock(BlockAction.COPY),
+            KeyCommand.KC_COPY => HandleBlock(parser, BlockAction.COPY),
             KeyCommand.KC_CPAGEDOWN => PageDown(),
             KeyCommand.KC_CPAGEUP => PageUp(),
             KeyCommand.KC_CRIGHT => CursorRight(),
             KeyCommand.KC_CTOBOTTOM => LineToBottom(),
             KeyCommand.KC_CTOTOP => LineToTop(),
             KeyCommand.KC_CUP => CursorUp(),
-            KeyCommand.KC_CUT => HandleBlock(BlockAction.COPY_AND_DELETE),
+            KeyCommand.KC_CUT => HandleBlock(parser, BlockAction.CUT),
             KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
             KeyCommand.KC_CWINDOWTOP => WindowTop(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
@@ -130,12 +107,15 @@ public class Window {
             KeyCommand.KC_DELETETOEND => DeleteToEndOfLine(),
             KeyCommand.KC_DELETETOSTART => DeleteToStartOfLine(),
             KeyCommand.KC_GOTO => GoToLine(parser),
+            KeyCommand.KC_LOWERCASE => HandleBlock(parser, BlockAction.LOWER),
             KeyCommand.KC_MARK => Mark(MarkMode.CHARACTER),
             KeyCommand.KC_MARKCOLUMN => Mark(MarkMode.COLUMN),
             KeyCommand.KC_MARKLINE => Mark(MarkMode.LINE),
+            KeyCommand.KC_OPENLINE => OpenLine(),
             KeyCommand.KC_SCREENDOWN => ScreenDown(),
             KeyCommand.KC_SCREENUP => ScreenUp(),
-            KeyCommand.KC_WRITEBUFFER => WriteBuffer(),
+            KeyCommand.KC_UPPERCASE => HandleBlock(parser, BlockAction.UPPER),
+            KeyCommand.KC_WRITEBUFFER => WriteBuffer(parser),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -146,9 +126,10 @@ public class Window {
     /// associated with any command and thus are treated as primitives. Other
     /// editing actions are handled in HandleCommand.
     /// </summary>
+    /// <param name="parser">Macro parser</param>
     /// <param name="keyInfo">Console key info</param>
     /// <returns>The rendering hint</returns>
-    public RenderHint HandleEditing(ConsoleKeyInfo keyInfo) {
+    public RenderHint HandleEditing(Macro parser, ConsoleKeyInfo keyInfo) {
         RenderHint flags = RenderHint.BLOCK;
         if (!char.IsControl(keyInfo.KeyChar)) {
             Buffer.Insert(keyInfo.KeyChar);
@@ -156,7 +137,7 @@ public class Window {
         else {
             flags = keyInfo.Key switch {
                 ConsoleKey.Enter => Newline(),
-                ConsoleKey.Delete => DeleteChar(),
+                ConsoleKey.Delete => DeleteChar(parser),
                 ConsoleKey.Backspace => Backspace(),
                 _ => RenderHint.NONE
             };
@@ -412,14 +393,14 @@ public class Window {
     /// If we are in mark mode, deletes the marked block
     /// otherwise delete the character at the cursor
     /// </summary>
-    private RenderHint DeleteChar() {
+    private RenderHint DeleteChar(Macro parser) {
         RenderHint flags = RenderHint.NONE;
         if (_markMode == MarkMode.NONE) {
             flags |= RenderHint.BLOCK;
             Buffer.Delete(1);
         }
         else {
-            flags |= HandleBlock(BlockAction.DELETE);
+            flags |= HandleBlock(parser, BlockAction.DELETE);
         }
         return flags | CursorFromOffset();
     }
@@ -442,6 +423,15 @@ public class Window {
     /// Insert a newline character at the cursor.
     /// </summary>
     private RenderHint Newline() {
+        Buffer.Break();
+        return RenderHint.BLOCK;
+    }
+
+    /// <summary>
+    /// Open a line below the current line.
+    /// </summary>
+    private RenderHint OpenLine() {
+        EndOfCurrentLine();
         Buffer.Break();
         return RenderHint.BLOCK;
     }
@@ -536,18 +526,17 @@ public class Window {
     /// <summary>
     /// Perform the specified actions on a marked block.
     /// </summary>
-    private RenderHint HandleBlock(BlockAction action) {
+    private RenderHint HandleBlock(Macro parser, BlockAction action) {
 
         (Point markStart, Point markEnd) = GetOrderedMarkRange();
 
-        // Delete ranges are a collection of ranges to be deleted, indicated by
+        // Ranges are a collection of ranges to be copied or modified, indicated by
         // a cursor position and a count. For LINE and COLUMN blocks, these are
         // simply the start of the mark range and the entire extent. For COLUMN,
         // these are a collection for each line in the column.
-        List<(Point, int)> deleteRanges = new();
+        List<(Point, int)> blockRanges = new();
         (Point, int Count) currentRange = new(markStart, 0);
 
-        StringBuilder copyText = new();
         for (int l = markStart.Y; l <= markEnd.Y; l++) {
             string line = Buffer.GetLine(l);
             int startIndex = 0;
@@ -555,12 +544,12 @@ public class Window {
             switch (_markMode) {
                 case MarkMode.COLUMN:
                     if (currentRange.Count > 0) {
-                        deleteRanges.Add(currentRange);
+                        blockRanges.Add(currentRange);
                     }
                     --length;
                     startIndex = Math.Min(length, markStart.X);
                     length = Math.Min(length - startIndex, markEnd.X - startIndex + 1);
-                    currentRange = new(new Point(startIndex, l), 0);
+                    currentRange = new ValueTuple<Point, int>(new Point(startIndex, l), 0);
                     break;
 
                 case MarkMode.CHARACTER:
@@ -573,40 +562,63 @@ public class Window {
                     }
                     break;
             }
-            if (action.HasFlag(BlockAction.COPY)) {
-                copyText.Append(Utilities.SpanBound(line, startIndex, length));
-                if (copyText.Length > 0 && copyText[^1] != Consts.EndOfLine) {
-                    copyText.Append(Consts.EndOfLine);
-                }
-            }
-            if (action.HasFlag(BlockAction.DELETE)) {
-                currentRange.Count += length;
-            }
+            currentRange.Count += length;
         }
 
-        if (action.HasFlag(BlockAction.COPY)) {
-            Screen.ScrapBuffer.Content = copyText.ToString();
-            Buffer.InvalidateExtent
-                .Add(markStart)
-                .Add(markEnd);
-        }
-        if (action.HasFlag(BlockAction.DELETE)) {
-            deleteRanges.Add(currentRange);
-            foreach ((Point point, int count) in deleteRanges) {
-                if (count > 0) {
-                    Buffer.Offset = point.X;
-                    Buffer.LineIndex = point.Y;
+        blockRanges.Add(currentRange);
+        StringBuilder copyText = new();
+        foreach ((Point point, int count) in blockRanges) {
+            if (count > 0) {
+                Buffer.Offset = point.X;
+                Buffer.LineIndex = point.Y;
+                string text = Buffer.GetText(count);
+                if (action.HasFlag(BlockAction.UPPER)) {
+                    Buffer.Replace(text.ToUpper());
+                }
+                if (action.HasFlag(BlockAction.LOWER)) {
+                    Buffer.Replace(text.ToLower());
+                }
+                if (action.HasFlag(BlockAction.GET)) {
+                    copyText.Append(text);
+                    if (text.Length > 0 && text[^1] != Consts.EndOfLine) {
+                        copyText.Append(Consts.EndOfLine);
+                    }
+                }
+                if (action.HasFlag(BlockAction.DELETE)) {
                     Buffer.Delete(count);
                 }
             }
         }
 
+        if (action.HasFlag(BlockAction.COPY)) {
+            Screen.ScrapBuffer.Content = copyText.ToString();
+        }
+
+        if (action.HasFlag(BlockAction.WRITE)) {
+            if (parser.GetFilename(Edit.WriteBlockAs, out string outputFileName)) {
+                Buffer writeBuffer = new(outputFileName) {
+                    Content = copyText.ToString()
+                };
+                writeBuffer.Write();
+            }
+        }
+
+        if (action.HasFlag(BlockAction.GET)) {
+            Buffer.InvalidateExtent
+                .Add(markStart)
+                .Add(markEnd);
+        }
+
+    #pragma warning disable CS8509
         Screen.StatusBar.Message(action switch {
             BlockAction.COPY =>  Edit.CopiedToScrap,
             BlockAction.DELETE => Edit.BlockDeleted,
-            BlockAction.COPY_AND_DELETE => Edit.DeletedToScrap,
-            _ => throw new ArgumentOutOfRangeException(nameof(action), action, null)
+            BlockAction.CUT => Edit.DeletedToScrap,
+            BlockAction.LOWER => Edit.Lowercasing,
+            BlockAction.UPPER => Edit.Uppercasing,
+            BlockAction.WRITE => Edit.WriteSuccess
         });
+    #pragma warning restore CS8509
 
         Buffer.Offset = markStart.X;
         Buffer.LineIndex = markStart.Y;
@@ -663,9 +675,15 @@ public class Window {
     /// Write the current buffer to disk.
     /// </summary>
     /// <returns></returns>
-    private RenderHint WriteBuffer() {
-        Buffer.Write();
-        return RenderHint.NONE;
+    private RenderHint WriteBuffer(Macro parser) {
+        RenderHint flags = RenderHint.NONE;
+        if (_markMode != MarkMode.NONE) {
+            flags = HandleBlock(parser, BlockAction.WRITE);
+        }
+        else {
+            Buffer.Write();
+        }
+        return flags;
     }
 
     /// <summary>

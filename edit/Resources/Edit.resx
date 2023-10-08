@@ -150,4 +150,16 @@
     <data name="DeletedToScrap" xml:space="preserve">
         <value>Block deleted to scrap</value>
     </data>
+    <data name="Lowercasing" xml:space="preserve">
+        <value>Lowercasing complete</value>
+    </data>
+    <data name="Uppercasing" xml:space="preserve">
+        <value>Uppercasing complete</value>
+    </data>
+    <data name="WriteSuccess" xml:space="preserve">
+        <value>Write successful.</value>
+    </data>
+    <data name="WriteBlockAs" xml:space="preserve">
+        <value>Write block as: </value>
+    </data>
 </root>

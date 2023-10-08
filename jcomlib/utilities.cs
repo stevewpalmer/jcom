@@ -44,16 +44,22 @@ public static class Utilities {
         return filename;
     }
 
-    // Helper function that returns a description on an enum.
+    /// <summary>
+    /// Helper function that returns a description on an enum. If the enum has no
+    /// explicit description attribute then the enum name is returned.
+    /// </summary>
+    /// <param name="value">Enum for which description is to be returned</param>
+    /// <returns>The enum description or name</returns>
     public static string GetEnumDescription(Enum value) {
 
-        FieldInfo fi = value.GetType().GetField(value.ToString());
-        if (fi != null && fi.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attributes) {
+        string valueName = value.ToString();
+        FieldInfo field = value.GetType().GetField(valueName);
+        if (field != null && field.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attributes) {
             if (attributes.Any()) {
-                return attributes.First().Description;
+                valueName = attributes.First().Description;
             }
         }
-        return value.ToString();
+        return valueName;
     }
 
     /// <summary>
@@ -70,9 +76,7 @@ public static class Utilities {
             index = 0;
             length = 0;
         }
-        if (index + length > str.Length) {
-            length = str.Length - index;
-        }
+        length = Math.Min(length, str.Length - index);
         return str.Substring(index, length);
     }
 }

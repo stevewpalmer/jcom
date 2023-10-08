@@ -64,10 +64,12 @@ public enum KeyCommand {
     KC_EXIT,
     KC_GOTO,
     KC_LOADKEYSTROKES,
+    KC_LOWERCASE,
     KC_MARK,
     KC_MARKCOLUMN,
     KC_MARKLINE,
     KC_NEXTBUFFER,
+    KC_OPENLINE,
     KC_OUTPUTFILE,
     KC_PLAYBACK,
     KC_PREVBUFFER,
@@ -81,6 +83,7 @@ public enum KeyCommand {
     KC_SEARCHBACK,
     KC_SEARCHCASE,
     KC_SEARCHFORWARD,
+    KC_UPPERCASE,
     KC_USETABCHAR,
     KC_VERSION,
     KC_WRITEANDEXIT,
@@ -138,6 +141,7 @@ public class KeyMap {
         new() { CommandName = "mark", CommandId = KeyCommand.KC_MARK },
         new() { CommandName = "next_char", CommandId = KeyCommand.KC_CRIGHT },
         new() { CommandName = "next_word", CommandId = KeyCommand.KC_CWORDRIGHT },
+        new() { CommandName = "open_line", CommandId = KeyCommand.KC_OPENLINE },
         new() { CommandName = "output_file", CommandId = KeyCommand.KC_OUTPUTFILE },
         new() { CommandName = "page_down", CommandId = KeyCommand.KC_CPAGEDOWN },
         new() { CommandName = "page_up", CommandId = KeyCommand.KC_CPAGEUP },
@@ -155,6 +159,8 @@ public class KeyMap {
         new() { CommandName = "search_fwd", CommandId = KeyCommand.KC_SEARCHFORWARD },
         new() { CommandName = "show_clock", CommandId = KeyCommand.KC_CLOCK },
         new() { CommandName = "toggle_re", CommandId = KeyCommand.KC_REGEXP },
+        new() { CommandName = "tolower", CommandId = KeyCommand.KC_LOWERCASE },
+        new() { CommandName = "toupper", CommandId = KeyCommand.KC_UPPERCASE },
         new() { CommandName = "to_bottom", CommandId = KeyCommand.KC_CTOBOTTOM },
         new() { CommandName = "to_top", CommandId = KeyCommand.KC_CTOTOP },
         new() { CommandName = "top_of_buffer", CommandId = KeyCommand.KC_CFILESTART },
@@ -326,7 +332,7 @@ public class KeyMap {
     public static KeyCommand MapCommandNameToCommand(string input) {
         return CommandTable.Where(ct => ct.CommandName == input)
                .Select(ct => ct.CommandId)
-               .FirstOrDefault();
+               .FirstOrDefault(KeyCommand.KC_NONE);
     }
 
     /// <summary>
