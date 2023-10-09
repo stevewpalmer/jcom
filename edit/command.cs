@@ -1,5 +1,5 @@
 // JEdit
-// Macro command parsing
+// Command object
 //
 // Authors:
 //  Steve Palmer
@@ -27,18 +27,35 @@ using JComLib;
 
 namespace JEdit;
 
-public class Macro : Parser {
+/// <summary>
+/// A single editing command with optional
+/// arguments.
+/// </summary>
+public class Command {
 
     /// <summary>
-    /// Initialise an empty macro command line
+    /// Default constructor.
     /// </summary>
-    public Macro() : base("") { }
+    public Command() { }
 
     /// <summary>
-    /// Initalise a macro parser with the specified input
+    /// Create a clone of an existing Command
     /// </summary>
-    /// <param name="input">Command line to parse</param>
-    public Macro(string input) : base(input) { }
+    /// <param name="copy">Command to copy</param>
+    public Command(Command copy) {
+        Id = copy.Id;
+        Args = new Parser(copy.Args);
+    }
+
+    /// <summary>
+    /// Command ID
+    /// </summary>
+    public KeyCommand Id { get; init; }
+
+    /// <summary>
+    /// Command arguments
+    /// </summary>
+    public Parser Args { get; init; }
 
     /// <summary>
     /// Read a number from the command line. If none present then prompt
@@ -48,7 +65,7 @@ public class Macro : Parser {
     /// <param name="inputValue">Input value</param>
     /// <returns>True if string retrieved, false if the input was cancelled</returns>
     public bool GetNumber(string prompt, out int inputValue) {
-        string nextWord = NextWord();
+        string nextWord = Args.NextWord();
         if (string.IsNullOrEmpty(nextWord) || !int.TryParse(nextWord, out inputValue)) {
             if (!Screen.StatusBar.PromptForNumber(prompt, out inputValue)) {
                 return false;
@@ -65,7 +82,7 @@ public class Macro : Parser {
     /// <param name="inputValue">Input value</param>
     /// <returns>True if string retrieved, false if the input was cancelled</returns>
     public bool GetFilename(string prompt, out string inputValue) {
-        inputValue = NextWord();
+        inputValue = Args.NextWord();
         if (string.IsNullOrEmpty(inputValue)) {
             if (!Screen.StatusBar.PromptForInput(prompt, ref inputValue, true)) {
                 return false;
@@ -82,7 +99,7 @@ public class Macro : Parser {
     /// <param name="inputValue">Input value</param>
     /// <returns>True if string retrieved, false if the input was cancelled</returns>
     public bool GetInput(string prompt, ref string inputValue) {
-        string nextWord = NextWord();
+        string nextWord = Args.NextWord();
         if (string.IsNullOrEmpty(nextWord)) {
             if (!Screen.StatusBar.PromptForInput(prompt, ref inputValue, false)) {
                 return false;

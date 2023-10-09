@@ -28,6 +28,7 @@ namespace JEdit;
 public class History {
 
     private static readonly Dictionary<string, History> PromptHistory = new();
+    private List<string> _items { get; } = new();
     private int _historyIndex;
 
     /// <summary>
@@ -45,11 +46,6 @@ public class History {
     }
 
     /// <summary>
-    /// List of history items.
-    /// </summary>
-    private List<string> Items { get; } = new();
-
-    /// <summary>
     /// Add a new item at the start of the list, removing one from
     /// the end if we're already at the maximum length. If the new
     /// item is the same as the first item in the history then we
@@ -57,12 +53,12 @@ public class History {
     /// </summary>
     /// <param name="newItem">New string to be added</param>
     public void Add(IEnumerable<char> newItem) {
-        if (Items.Count == Consts.MaxCommandHistory) {
-            Items.RemoveAt(Items.Count - 1);
+        if (_items.Count == Consts.MaxCommandHistory) {
+            _items.RemoveAt(_items.Count - 1);
         }
         string newString = string.Join("", newItem);
-        if (Items.Count == 0 || Items.Count > 0 && Items[0] != newString) {
-            Items.Insert(0, string.Join("", newString));
+        if (_items.Count == 0 || _items.Count > 0 && _items[0] != newString) {
+            _items.Insert(0, string.Join("", newString));
         }
         _historyIndex = -1;
     }
@@ -71,13 +67,14 @@ public class History {
     /// Get the next item from the list, wrapping round when we
     /// reach the end.
     /// </summary>
+    /// <returns>The next history item</returns>
     public string Next() {
-        if (Items.Count > 0) {
+        if (_items.Count > 0) {
             ++_historyIndex;
-            if (_historyIndex == Items.Count) {
+            if (_historyIndex == _items.Count) {
                 _historyIndex = 0;
             }
-            return Items[_historyIndex];
+            return _items[_historyIndex];
         }
         return string.Empty;
     }
@@ -86,13 +83,14 @@ public class History {
     /// Get the previous item from the list, wrapping round when we
     /// reach the end.
     /// </summary>
+    /// <returns>The previous history item</returns>
     public string Previous() {
-        if (Items.Count > 0) {
+        if (_items.Count > 0) {
             --_historyIndex;
             if (_historyIndex < 0) {
-                _historyIndex = Items.Count - 1;
+                _historyIndex = _items.Count - 1;
             }
-            return Items[_historyIndex];
+            return _items[_historyIndex];
         }
         return string.Empty;
     }

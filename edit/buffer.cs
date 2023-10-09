@@ -26,15 +26,14 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
+using JEdit.Resources;
 
 namespace JEdit;
-
-// TODO: Filename handling is messy.
-// TODO: BaseFilename should be split into GetBufferName as "New File" is not a filename.
 
 public class Buffer {
     private readonly LineTerminator _terminatorType;
     private List<string> _lines;
+    private FileInfo _fileInfo;
 
     /// <summary>
     /// Create a new empty buffer not associated with any file.
@@ -61,8 +60,14 @@ public class Buffer {
             Content = Consts.EndOfLine.ToString();
             NewFile = true;
         }
-        Filename = filename ?? string.Empty;
+        Filename = filename;
     }
+
+    /// <summary>
+    /// Return the name of the buffer. This is the base part of the filename if
+    /// there is one, or the New File string otherwise.
+    /// </summary>
+    public string Name => _fileInfo == null ? Edit.NewFile : _fileInfo.Name;
 
     /// <summary>
     /// Get or set the content of the buffer to the specified string. All existing
@@ -70,10 +75,7 @@ public class Buffer {
     /// </summary>
     public string Content {
         set {
-            _lines = value
-                .Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
-                .Select(l => l + Consts.EndOfLine)
-                .ToList();
+            _lines = SplitLines(value).Select(line => line).ToList();
             Invalidate(0, 0, _lines[^1].Length - 1, _lines.Count - 1);
         }
         get {
@@ -81,11 +83,11 @@ public class Buffer {
                 LineTerminator.CR => "\r",
                 LineTerminator.LF => "\n",
                 LineTerminator.CRLF => "\r\n",
-                _ => ""
+                _ => Consts.EndOfLine.ToString()
             };
             StringBuilder lines = new StringBuilder();
             foreach (string line in _lines) {
-                lines.Append(line.Trim(Consts.EndOfLine) + lineTerminator);
+                lines.Append(line.Replace(Consts.EndOfLine.ToString(), lineTerminator));
             }
             return lines.ToString();
         }
@@ -100,48 +102,10 @@ public class Buffer {
     /// <summary>
     /// Return the fully qualified file name with path.
     /// </summary>
-    public string FullFilename {
-        get {
-            if (string.IsNullOrEmpty(Filename)) {
-                return string.Empty;
-            }
-            FileInfo fileInfo = new FileInfo(Filename);
-            return fileInfo.FullName;
-        }
+    public string Filename {
+        get => _fileInfo == null ? string.Empty : _fileInfo.FullName;
+        set => _fileInfo = string.IsNullOrEmpty(value) ? null : new FileInfo(value);
     }
-
-    /// <summary>
-    /// Return the base part of the filename.
-    /// </summary>
-    public string BaseFilename => string.IsNullOrEmpty(Filename) ? "New File" : GetBaseFilename(Filename);
-
-    /// <summary>
-    /// Return the base filename given a fully or partially qualified
-    /// filename.
-    /// </summary>
-    /// <param name="filename">Input filename</param>
-    /// <returns>Base filename</returns>
-    public static string GetBaseFilename(string filename) {
-        FileInfo fileInfo = new FileInfo(filename);
-        return fileInfo.Name;
-    }
-    
-    /// <summary>
-    /// Return the full filename given a fully or partially qualified
-    /// filename.
-    /// </summary>
-    /// <param name="filename">Input filename</param>
-    /// <returns>Full filename</returns>
-    public static string GetFullFilename(string filename) {
-        FileInfo fileInfo = new FileInfo(filename);
-        return fileInfo.FullName;
-    }
-
-    /// <summary>
-    /// Name of file associated with buffer, or empty string
-    /// if the buffer has not yet been saved to a file
-    /// </summary>
-    public string Filename { get; set; }
 
     /// <summary>
     /// Whether the buffer has been modified since it was last
@@ -168,7 +132,7 @@ public class Buffer {
     /// <summary>
     /// Return whether the cursor is at the end of the buffer
     /// </summary>
-    public bool AtEndOfBuffer => Offset == _lines[^1].Length - 1 && LineIndex == _lines.Count - 1;
+    private bool AtEndOfBuffer => Offset == _lines[^1].Length - 1 && LineIndex == _lines.Count - 1;
 
     /// <summary>
     /// Index of line being edited
@@ -197,43 +161,36 @@ public class Buffer {
     /// <summary>
     /// Insert the specified character at the current offset.
     /// </summary>
+    /// <param name="ch">Character to insert</param>
     public void Insert(char ch) {
         StringBuilder line = PrepareLine();
-        line.Insert(Offset++, ch);
-        _lines[LineIndex] = line.ToString();
-        Invalidate(0, LineIndex, Offset, LineIndex);
+        if (ch == Consts.EndOfLine) {
+            string newLine = line.ToString(Offset, line.Length - Offset);
+            _lines[LineIndex] = line.ToString(0, Offset) + Consts.EndOfLine;
+            _lines.Insert(LineIndex + 1, newLine);
+            Invalidate(0, LineIndex, _lines[^1].Length - 1, _lines.Count - 1);
+            Offset = 0;
+            LineIndex++;
+        }
+        else {
+            line.Insert(Offset++, ch);
+            _lines[LineIndex] = line.ToString();
+            Invalidate(0, LineIndex, Offset, LineIndex);
+        }
         Modified = true;
     }
 
     /// <summary>
-    /// Replace the text at the current offset with the new string. Only
-    /// as many characters that remain from the current offset will be
-    /// replaced and the remainder ignored.
+    /// Insert the specified text at the current offset. Currently we do
+    /// it the slow way using the Insert character method. Ideally we
+    /// should do this more intelligently, such as treat Insert(char) as
+    /// Insert(text[0]) without losing single char performance.
     /// </summary>
-    /// <param name='newText'>The text to replace</param>
-    public void Replace(string newText) {
-        int offset = Offset;
-        int index = LineIndex;
-        int s = 0;
-        StringBuilder line = new(GetLine(index));
-        while (s < newText.Length) {
-            if (line[offset] == Consts.EndOfLine) {
-                if (index == _lines.Count - 1) {
-                    break;
-                }
-                _lines[index++] = line.ToString();
-                line = new StringBuilder(GetLine(index));
-                offset = 0;
-            }
-            if (newText[s] == Consts.EndOfLine) {
-                s++;
-                continue;
-            }
-            line[offset++] = newText[s++];
+    /// <param name="text">Text to insert</param>
+    public void Insert(string text) {
+        foreach (char ch in text) {
+            Insert(ch);
         }
-        Invalidate(0, LineIndex, Offset, index);
-        _lines[index] = line.ToString();
-        Modified = true;
     }
 
     /// <summary>
@@ -262,6 +219,7 @@ public class Buffer {
     /// of characters between the offset and the end of the buffer then
     /// it stops when it reaches the end of the buffer.
     /// </summary>
+    /// <param name="count">The number of characters to delete</param>
     public void Delete(int count) {
 
         StringBuilder line = PrepareLine();
@@ -284,24 +242,10 @@ public class Buffer {
     }
 
     /// <summary>
-    /// Insert a line break at the current offset.
-    /// </summary>
-    public void Break() {
-        StringBuilder line = PrepareLine();
-        string newLine = line.ToString(Offset, line.Length - Offset);
-        _lines[LineIndex] = line.ToString(0, Offset) + Consts.EndOfLine;
-        _lines.Insert(LineIndex + 1, newLine);
-        Invalidate(0, LineIndex, _lines[^1].Length - 1, _lines.Count - 1);
-        Offset = 0;
-        LineIndex++;
-        Modified = true;
-    }
-
-    /// <summary>
     /// Write the buffer back to disk.
     /// </summary>
     public void Write() {
-        File.WriteAllText(FullFilename, Content);
+        File.WriteAllText(Filename, Content);
         Modified = false;
         NewFile = false;
     }
@@ -311,6 +255,7 @@ public class Buffer {
     /// is in the virtual space then we pad the end of the line out to the
     /// offset with physical spaces.
     /// </summary>
+    /// <returns>A StringBuilder object initialised with the line contents</returns>
     private StringBuilder PrepareLine() {
         StringBuilder line = new StringBuilder(_lines[LineIndex]);
         if (Offset >= line.Length) {
@@ -333,6 +278,7 @@ public class Buffer {
     /// <summary>
     /// Determine the default line terminator for the system.
     /// </summary>
+    /// <returns>The default line terminator for the system</returns>
     private static LineTerminator DefaultLineTerminator() {
         return RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? LineTerminator.CRLF : LineTerminator.LF;
     }
@@ -341,6 +287,7 @@ public class Buffer {
     /// Determine the line terminator type by scanning for newlines in the
     /// text. If multiple terminators are found, use the first one.
     /// </summary>
+    /// <param name="text">Text to analyse for the line terminator</param>
     private static LineTerminator DetermineLineTerminator(string text) {
 
         LineTerminator terminator = LineTerminator.NONE;
@@ -362,6 +309,31 @@ public class Buffer {
             }
         }
         return terminator;
+    }
+
+    /// <summary>
+    /// Splits the given text into a series of lines, each line terminator
+    /// replaced by the single EOL character.
+    /// </summary>
+    /// <param name="text">Text to split</param>
+    /// <returns>An enumerable array of split lines</returns>
+    private static IEnumerable<string> SplitLines(string text) {
+        int start = 0;
+        int index;
+
+        while ((index = text.IndexOfAny(new[] { '\r', '\n' }, start)) != -1) {
+            if (index - start >= 0) {
+                int eolIndex = index;
+                if (text[index] == '\r' && index < text.Length - 2 && text[index + 1] == '\n') {
+                    ++index;
+                }
+                yield return text.Substring(start, eolIndex - start) + Consts.EndOfLine;
+            }
+            start = index + 1;
+        }
+        if (start < text.Length) {
+            yield return text[start..];
+        }
     }
 }
 

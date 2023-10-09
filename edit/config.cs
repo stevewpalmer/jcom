@@ -34,8 +34,10 @@ namespace JEdit;
 public class Config {
 
     /// <summary>
-    /// Load a config file.
+    /// Load a config file if one is found, otherwise return a default
+    /// configuration.
     /// </summary>
+    /// <returns>A Config object initialised from the file</returns>
     public static Config Load() {
         Config fileConfig = new Config();
         if (File.Exists(Consts.ConfigurationFilename)) {

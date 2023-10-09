@@ -92,11 +92,7 @@ public class Screen {
         RenderHint flags;
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
-            KeyCommand commandId = KeyMap.MapKeyToCommand(keyIn);
-            Macro parser = new Macro();
-            flags = commandId == KeyCommand.KC_NONE ?
-                HandleEditing(parser, keyIn) :
-                HandleCommand(parser, commandId);
+            flags = HandleCommand(KeyMap.MapKeyToCommand(keyIn));
         } while (flags != RenderHint.EXIT);
     }
 
@@ -104,44 +100,43 @@ public class Screen {
     /// Handle commands at the screen level and pass on any unhandled
     /// ones to the active window.
     /// </summary>
-    /// <param name="parser">Parser object</param>
-    /// <param name="commandId">Command ID</param>
-    /// <returns>The rendering hint</returns>
-    private RenderHint HandleCommand(Macro parser, KeyCommand commandId) {
-        if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING && KeyMap.IsRecordable(commandId)) {
-            if (!_recorder.RememberKeystroke(commandId, parser.RestOfLine())) {
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private RenderHint HandleCommand(Command command) {
+        if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING && KeyMap.IsRecordable(command.Id)) {
+            if (!_recorder.RememberKeystroke(command)) {
                 StatusBar.Error(Edit.MaximumKeystrokes);
                 StatusBar.KeystrokesMode = KeystrokesMode.NONE;
                 return RenderHint.CURSOR_STATUS;
             }
         }
-        RenderHint flags = commandId switch {
-            KeyCommand.KC_ASSIGNTOKEY => AssignToKey(parser),
-            KeyCommand.KC_CD => ChangeDirectory(parser),
+        RenderHint flags = command.Id switch {
+            KeyCommand.KC_ASSIGNTOKEY => AssignToKey(command),
+            KeyCommand.KC_CD => ChangeDirectory(command),
             KeyCommand.KC_CLOCK => ToggleClock(),
             KeyCommand.KC_CLOSE => CloseWindow(),
-            KeyCommand.KC_COLOUR => ConfigureColours(parser),
+            KeyCommand.KC_COLOUR => ConfigureColours(command),
             KeyCommand.KC_COMMAND => RunCommand(),
-            KeyCommand.KC_DELFILE => DeleteFile(parser),
+            KeyCommand.KC_DELFILE => DeleteFile(command),
             KeyCommand.KC_DETAILS => ShowDetails(),
-            KeyCommand.KC_EDIT => EditFile(parser),
+            KeyCommand.KC_EDIT => EditFile(command),
             KeyCommand.KC_EXIT => ExitEditor(true),
             KeyCommand.KC_LOADKEYSTROKES => LoadRecording(),
             KeyCommand.KC_NEXTBUFFER => SelectWindow(1),
-            KeyCommand.KC_OUTPUTFILE => RenameOutputFile(parser),
+            KeyCommand.KC_OUTPUTFILE => RenameOutputFile(command),
             KeyCommand.KC_PLAYBACK => Playback(),
             KeyCommand.KC_PREVBUFFER => SelectWindow(-1),
             KeyCommand.KC_REMEMBER => StartStopRecording(),
             KeyCommand.KC_REPEAT => Repeat(),
             KeyCommand.KC_SAVEKEYSTROKES => SaveRecording(),
             KeyCommand.KC_SEARCHAGAIN => SearchAgain(),
-            KeyCommand.KC_SEARCHBACK => Search(parser, false),
+            KeyCommand.KC_SEARCHBACK => Search(command, false),
             KeyCommand.KC_SEARCHCASE => SearchCaseToggle(),
-            KeyCommand.KC_SEARCHFORWARD => Search(parser, true),
+            KeyCommand.KC_SEARCHFORWARD => Search(command, true),
             KeyCommand.KC_REGEXP => RegExpToggle(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
-            _ => _activeWindow.HandleCommand(parser, commandId)
+            _ => _activeWindow.HandleCommand(command)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
             UpdateCursorPosition();
@@ -153,16 +148,6 @@ public class Screen {
             flags &= ~RenderHint.REFRESH;
         }
         return flags;
-    }
-
-    /// <summary>
-    /// Handle an editing action at the screen level.
-    /// </summary>
-    /// <param name="parser">Macro parser</param>
-    /// <param name="keyInfo">Console key info</param>
-    /// <returns>The rendering hint</returns>
-    private RenderHint HandleEditing(Macro parser, ConsoleKeyInfo keyInfo) {
-        return _activeWindow.HandleEditing(parser, keyInfo);
     }
 
     /// <summary>
@@ -178,7 +163,10 @@ public class Screen {
     /// </summary>
     public void AddWindow(Window theWindow) {
         if (theWindow.Buffer.NewFile) {
-            StatusBar.Message(string.Format(Edit.NewFileWarning, theWindow.Buffer.BaseFilename));
+            string message = theWindow.Buffer.Filename == string.Empty ?
+                Edit.NewFile :
+                string.Format(Edit.NewFileWarning, theWindow.Buffer.Name);
+            StatusBar.Message(message);
         }
         _windowList.Add(theWindow);
         theWindow.SetViewportBounds(1, 1, Terminal.Width - 2, Terminal.Height - 3);
@@ -188,6 +176,7 @@ public class Screen {
     /// Select the next window in the specified direction in the window list.
     /// </summary>
     /// <param name="direction">Direction</param>
+    /// <returns>Render hint</returns>
     private RenderHint SelectWindow(int direction) {
         if (_windowList.Count == 1) {
             StatusBar.Message(Edit.NoOtherBuffers);
@@ -217,12 +206,14 @@ public class Screen {
     /// <summary>
     /// Edit a file in a new window, or switch to the file in an existing window.
     /// </summary>
-    private RenderHint EditFile(Macro parser) {
-        if (parser.GetFilename(Edit.File, out string inputValue)) {
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private RenderHint EditFile(Command command) {
+        if (command.GetFilename(Edit.File, out string inputValue)) {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
-            Window newWindow = _windowList.FirstOrDefault(window => window.Buffer.FullFilename == inputValue);
+            Window newWindow = _windowList.FirstOrDefault(window => window.Buffer.Filename == inputValue);
             if (newWindow == null) {
                 newWindow = new Window(new Buffer(inputValue));
                 AddWindow(newWindow);
@@ -238,6 +229,7 @@ public class Screen {
     /// Close the current window. You cannot close the window if this is
     /// the last window in the list.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CloseWindow() {
         if (_windowList.Count == 1) {
             return RenderHint.NONE;
@@ -263,6 +255,7 @@ public class Screen {
     /// <summary>
     /// Toggle display of the clock on the status bar.
     /// </summary>
+    /// <returns>Render hint</returns>
     private static RenderHint ToggleClock() {
         StatusBar.ShowClock = !StatusBar.ShowClock;
         Config.ShowClock = StatusBar.ShowClock;
@@ -272,24 +265,26 @@ public class Screen {
     /// <summary>
     /// Change the colour configuration.
     /// </summary>
-    private static RenderHint ConfigureColours(Macro parser) {
-        if (!GetColourInput(parser, Edit.BackgroundColourNumber, out int backgroundColour)) {
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint ConfigureColours(Command command) {
+        if (!GetColourInput(command, Edit.BackgroundColourNumber, out int backgroundColour)) {
             return RenderHint.NONE;
         }
-        if (!GetColourInput(parser, Edit.ForegroundColourNumber, out int foregroundColour)) {
+        if (!GetColourInput(command, Edit.ForegroundColourNumber, out int foregroundColour)) {
             return RenderHint.NONE;
         }
         if (foregroundColour == backgroundColour) {
             StatusBar.Error(Edit.InvalidColour);
             return RenderHint.NONE;
         }
-        if (!GetColourInput(parser, Edit.SelectedTitleColourNumber, out int selectedTitleColour)) {
+        if (!GetColourInput(command, Edit.SelectedTitleColourNumber, out int selectedTitleColour)) {
             return RenderHint.NONE;
         }
-        if (!GetColourInput(parser, Edit.NormalTextColourNumber, out int normalMessageColour)) {
+        if (!GetColourInput(command, Edit.NormalTextColourNumber, out int normalMessageColour)) {
             return RenderHint.NONE;
         }
-        if (!GetColourInput(parser, Edit.ErrorTextColourNumber, out int errorMessageColour)) {
+        if (!GetColourInput(command, Edit.ErrorTextColourNumber, out int errorMessageColour)) {
             return RenderHint.NONE;
         }
         Config.BackgroundColour = backgroundColour.ToString();
@@ -304,12 +299,12 @@ public class Screen {
     /// <summary>
     /// Input a colour index as part of the colour command.
     /// </summary>
-    /// <param name="parser">Command parser</param>
+    /// <param name="command">Editing command</param>
     /// <param name="prompt">Prompt to display</param>
     /// <param name="colourValue">Output value</param>
     /// <returns>True if the output value is valid, false otherwise.</returns>
-    private static bool GetColourInput(Macro parser, string prompt, out int colourValue) {
-        if (!parser.GetNumber(prompt, out colourValue)) {
+    private static bool GetColourInput(Command command, string prompt, out int colourValue) {
+        if (!command.GetNumber(prompt, out colourValue)) {
             return false;
         }
         if (colourValue < 0 || colourValue > Colours.MaxColourIndex) {
@@ -322,25 +317,30 @@ public class Screen {
     /// <summary>
     /// Show details of the file in the buffer on the status bar.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint ShowDetails() {
-        StatusBar.Message(Edit.File + _activeWindow.Buffer.FullFilename + (_activeWindow.Buffer.Modified ? "*" : ""));
+        StatusBar.Message(Edit.File + _activeWindow.Buffer.Filename + (_activeWindow.Buffer.Modified ? "*" : ""));
         return RenderHint.NONE;
     }
 
     /// <summary>
     /// Run a user specified command with optional parameters
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint RunCommand() {
         RenderHint flags = RenderHint.NONE;
         string inputValue = string.Empty;
         if (StatusBar.PromptForInput(Edit.CommandPrompt, ref inputValue, false)) {
-            Macro parser = new Macro(inputValue);
+            Parser parser = new Parser(inputValue);
             KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
             if (commandId == KeyCommand.KC_NONE) {
                 StatusBar.Message(Edit.UnknownCommand);
             }
             else {
-                flags = HandleCommand(parser, commandId);
+                flags = HandleCommand(new Command {
+                    Id = commandId,
+                    Args = parser
+                });
             }
         }
         return flags;
@@ -349,6 +349,7 @@ public class Screen {
     /// <summary>
     /// Show the editor version on the status bar.
     /// </summary>
+    /// <returns>Render hint</returns>
     private static RenderHint Version() {
         StatusBar.Message($"{AssemblySupport.AssemblyDescription} v{AssemblySupport.AssemblyVersion} - {AssemblySupport.AssemblyCopyright}");
         return RenderHint.NONE;
@@ -357,6 +358,7 @@ public class Screen {
     /// <summary>
     /// Start or stop keystroke recording.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint StartStopRecording() {
         if (StatusBar.KeystrokesMode == KeystrokesMode.NONE && _recorder.HasKeystrokeMacro) {
             char[] validInput = { 'y', 'n' };
@@ -381,7 +383,7 @@ public class Screen {
     /// <summary>
     /// Play back a recorded macro.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Render hint</returns>
     private RenderHint Playback() {
         RenderHint flags = RenderHint.NONE;
         if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING) {
@@ -393,10 +395,13 @@ public class Screen {
         else {
             StatusBar.KeystrokesMode = KeystrokesMode.PLAYBACK;
             foreach (string commandString in _recorder.Keystrokes) {
-                Macro parser = new Macro(commandString);
+                Parser parser = new Parser(commandString);
                 KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
                 if (commandId != KeyCommand.KC_NONE) {
-                    flags |= HandleCommand(parser, commandId);
+                    flags |= HandleCommand(new Command {
+                        Id = commandId,
+                        Args = parser
+                    });
                 }
             }
             StatusBar.KeystrokesMode = KeystrokesMode.NONE;
@@ -407,6 +412,7 @@ public class Screen {
     /// <summary>
     /// Load a keystroke macro from a file.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint LoadRecording() {
         if (_recorder.HasKeystrokeMacro) {
             char[] validInput = { 'y', 'n' };
@@ -431,6 +437,7 @@ public class Screen {
     /// <summary>
     /// Save the current keystroke macro to a file.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint SaveRecording() {
         string inputValue = string.Empty;
         if (StatusBar.PromptForInput(Edit.SaveKeystrokesAs, ref inputValue, true)) {
@@ -442,13 +449,14 @@ public class Screen {
     /// <summary>
     /// Search in the active window
     /// </summary>
-    /// <param name="parser">Command parser instance</param>
+    /// <param name="command">Editing command</param>
     /// <param name="forward">True if we search forward</param>
-    private RenderHint Search(Macro parser, bool forward) {
+    /// <returns>Render hint</returns>
+    private RenderHint Search(Command command, bool forward) {
         RenderHint flags = RenderHint.NONE;
         string inputValue = Config.LastSearchString;
         string prompt = string.Format(Edit.SearchFor, forward ? "\u2193" : "\u2191", Config.RegExpOff ? Edit.RegExpOffStatus : "");
-        if (parser.GetInput(prompt, ref inputValue)) {
+        if (command.GetInput(prompt, ref inputValue)) {
             _search = new Search {
                 SearchString = inputValue,
                 RegExp = !Config.RegExpOff,
@@ -465,6 +473,7 @@ public class Screen {
     /// <summary>
     /// Repeat the previous search.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint SearchAgain() {
         RenderHint flags = RenderHint.NONE;
         if (_search != null) {
@@ -477,6 +486,7 @@ public class Screen {
     /// <summary>
     /// Toggle search case sensitivity
     /// </summary>
+    /// <returns>Render hint</returns>
     private static RenderHint SearchCaseToggle() {
         Config.SearchCaseInsensitive = !Config.SearchCaseInsensitive;
         StatusBar.Message(Config.SearchCaseInsensitive ? Edit.CaseSensitivityOff : Edit.CaseSensitivityOn);
@@ -486,6 +496,7 @@ public class Screen {
     /// <summary>
     /// Toggle regular expressions in search strings
     /// </summary>
+    /// <returns>Render hint</returns>
     private static RenderHint RegExpToggle() {
         Config.RegExpOff = !Config.RegExpOff;
         StatusBar.Message(Config.RegExpOff ? Edit.RegExpOff : Edit.RegExpOn);
@@ -495,11 +506,12 @@ public class Screen {
     /// <summary>
     /// Repeat a key command.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint Repeat() {
         RenderHint flags = RenderHint.NONE;
-        if (StatusBar.PromptForRepeat(out int repeatCount, out KeyCommand commandId)) {
+        if (StatusBar.PromptForRepeat(out int repeatCount, out Command command)) {
             while (repeatCount-- > 0) {
-                flags |= HandleCommand(new Macro(), commandId);
+                flags |= HandleCommand(new Command(command));
             }
         }
         return flags;
@@ -510,10 +522,12 @@ public class Screen {
     /// name must not conflict with any existing buffer name otherwise an error
     /// is displayed.
     /// </summary>
-    private RenderHint RenameOutputFile(Macro parser) {
-        if (parser.GetFilename(Edit.EnterNewOutputFileName, out string outputFileName)) {
-            string fullFilename = Buffer.GetFullFilename(outputFileName);
-            if (_windowList.Any(window => fullFilename.Equals(window.Buffer.FullFilename, StringComparison.OrdinalIgnoreCase))) {
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private RenderHint RenameOutputFile(Command command) {
+        if (command.GetFilename(Edit.EnterNewOutputFileName, out string outputFileName)) {
+            string fullFilename = new FileInfo(outputFileName).FullName;
+            if (_windowList.Any(window => fullFilename.Equals(window.Buffer.Filename, StringComparison.OrdinalIgnoreCase))) {
                 StatusBar.Message(Edit.InvalidOutputFilename);
             }
             else {
@@ -529,8 +543,10 @@ public class Screen {
     /// <summary>
     /// Delete a file.
     /// </summary>
-    private static RenderHint DeleteFile(Macro parser) {
-        string filename = parser.NextWord();
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint DeleteFile(Command command) {
+        string filename = command.Args.NextWord();
         if (!string.IsNullOrEmpty(filename)) {
             try {
                 File.Delete(filename);
@@ -544,11 +560,13 @@ public class Screen {
     /// <summary>
     /// Assign a command to a key.
     /// </summary>
-    private static RenderHint AssignToKey(Macro parser) {
-        if (!parser.GetFilename(Edit.EnterKey, out string keystroke)) {
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint AssignToKey(Command command) {
+        if (!command.GetFilename(Edit.EnterKey, out string keystroke)) {
             return RenderHint.NONE;
         }
-        if (!parser.GetFilename(Edit.EnterMacroName, out string commandName)) {
+        if (!command.GetFilename(Edit.EnterMacroName, out string commandName)) {
             return RenderHint.NONE;
         }
         if (!KeyMap.RemapKeyToCommand(keystroke, commandName)) {
@@ -560,8 +578,10 @@ public class Screen {
     /// <summary>
     /// Change the current working directory.
     /// </summary>
-    private static RenderHint ChangeDirectory(Macro parser) {
-        string newDirectory = parser.NextWord();
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint ChangeDirectory(Command command) {
+        string newDirectory = command.Args.NextWord();
         if (string.IsNullOrEmpty(newDirectory)) {
             StatusBar.Message(Directory.GetCurrentDirectory());
         }
@@ -580,6 +600,8 @@ public class Screen {
     /// TRUE, we prompt whether to save or exit without saving. If prompt
     /// is FALSE, we just save all modified buffers and exit.
     /// </summary>
+    /// <param name="prompt">True to display a confirmation prompt, false to just save and exit</param>
+    /// <returns>Render hint</returns>
     private RenderHint ExitEditor(bool prompt) {
         RenderHint flags = RenderHint.EXIT;
         bool writeBuffers = !prompt;

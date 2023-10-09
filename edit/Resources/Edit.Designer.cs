@@ -332,5 +332,11 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("WriteBlockAs", resourceCulture);
             }
         }
+        
+        internal static string NewFile {
+            get {
+                return ResourceManager.GetString("NewFile", resourceCulture);
+            }
+        }
     }
 }

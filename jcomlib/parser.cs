@@ -43,6 +43,15 @@ public class Parser {
         _index = 0;
     }
 
+    /// <summary>
+    /// Make a copy of the specified parser object.
+    /// </summary>
+    public Parser(Parser copy) {
+        _line = copy._line;
+        _index = copy._index;
+        _pushedChar = copy._pushedChar;
+    }
+
     // Retrieve the remainder of the command line as a series of
     // delimited string arguments.
     public string[] RestOfLine() {

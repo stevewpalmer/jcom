@@ -166,11 +166,11 @@ public class StatusBar {
     /// Display a prompt to repeat a command a given number of times.
     /// </summary>
     /// <param name="repeatCount">Set to the repeat count</param>
-    /// <param name="commandId">Set to the command Id</param>
+    /// <param name="command">Initialised with the editing command</param>
     /// <returns>True if a repeat count and command were entered, false if cancelled</returns>
-    public bool PromptForRepeat(out int repeatCount, out KeyCommand commandId) {
+    public bool PromptForRepeat(out int repeatCount, out Command command) {
         repeatCount = 1;
-        commandId = KeyCommand.KC_NONE;
+        command = new Command { Id = KeyCommand.KC_NONE };
 
         Point cursorPosition = Terminal.GetCursor();
         List<char> inputBuffer = new();
@@ -193,8 +193,8 @@ public class StatusBar {
                 repeatCount = Convert.ToInt32(string.Join("", inputBuffer));
                 continue;
             }
-            commandId = KeyMap.MapKeyToCommand(input);
-            if (commandId != KeyCommand.KC_NONE) {
+            command = KeyMap.MapKeyToCommand(input);
+            if (command.Id != KeyCommand.KC_NONE) {
                 break;
             }
         }
@@ -327,7 +327,7 @@ public class StatusBar {
                             allfilesIndex = 0;
                         }
                         if (allfiles.Length > 0) {
-                            string completedName = Buffer.GetBaseFilename(allfiles[allfilesIndex++]);
+                            string completedName = new FileInfo(allfiles[allfilesIndex++]).Name;
                             if (allfilesIndex == allfiles.Length) {
                                 allfilesIndex = 0;
                             }

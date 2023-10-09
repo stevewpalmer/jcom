@@ -53,6 +53,8 @@ own buffer.
 | Mark Line                | Alt+L                    | Alt+L                    |
 | Mark Column              | Alt+C                    | Alt+C                    |
 | Copy to Scrap            | Ctrl+OemPlus             |                          |
+| Cut to Scrap             | Ctrl+OemMinus            |                          |
+| Paste from Scrap         | Insert                   |                          |
 | Delete Line              | Alt+D                    | Alt+D                    |
 | Delete to Start of Line  | Ctrl_K                   | Ctrl_K                   |
 | Delete to End of Line    | Alt+K                    | Alt+K                    |

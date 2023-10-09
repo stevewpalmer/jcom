@@ -82,6 +82,9 @@ public class Extent {
     /// <summary>
     /// Return whether point p1 is before point p2 in the extent.
     /// </summary>
+    /// <param name="p1">First point to test</param>
+    /// <param name="p2">Second point to test</param>
+    /// <returns>True if point p1 is before point p2, false otherwise.</returns>
     private static bool Before(Point p1, Point p2) =>
         p1 == Uninitalised || p2 == Uninitalised ||
         p1.Y < p2.Y || p1.Y == p2.Y && p1.X < p2.X;
@@ -89,6 +92,9 @@ public class Extent {
     /// <summary>
     /// Return whether point p1 is after point p2 in the extent.
     /// </summary>
+    /// <param name="p1">First point to test</param>
+    /// <param name="p2">Second point to test</param>
+    /// <returns>True if point p1 is after point p2, false otherwise.</returns>
     private static bool After(Point p1, Point p2) =>
         p1 == Uninitalised || p2 == Uninitalised ||
         p1.Y > p2.Y || p1.Y == p2.Y && p1.X > p2.X;

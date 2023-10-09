@@ -56,14 +56,16 @@ public class Recorder {
     /// Add the specified command and arguments to the keystroke buffer
     /// list if room.
     /// </summary>
-    /// <param name="commandId">Command Id</param>
-    /// <param name="arguments">Argument list</param>
-    public bool RememberKeystroke(KeyCommand commandId, string [] arguments) {
+    /// <param name="command">Editing command</param>
+    /// <returns>True if the keystroke was saved, false if the buffer was full.</returns>
+    public bool RememberKeystroke(Command command) {
         bool success = false;
         if (_keystrokeBuffer.Count < Consts.MaxKeystrokes) {
-            string line = KeyMap.MapCommandToCommandName(commandId);
-            if (arguments.Length > 0) {
-                line += $" {string.Join(", ", arguments)}";
+            string line = KeyMap.MapCommandToCommandName(command.Id);
+            Parser args = new Parser(command.Args);
+            string[] argStrings = args.RestOfLine();
+            if (argStrings.Length > 0) {
+                line += $" {string.Join(", ", argStrings)}";
             }
             _keystrokeBuffer.Add(line);
             success = true;
@@ -85,6 +87,7 @@ public class Recorder {
     /// Load keystrokes from the specified file.
     /// </summary>
     /// <param name="filename">Keystroke macro filename</param>
+    /// <returns>True if the file was successfully loaded, false otherwise</returns>
     public bool LoadKeystrokes(string filename) {
         bool success = false;
         if (File.Exists(filename)) {
@@ -98,6 +101,7 @@ public class Recorder {
     /// <summary>
     /// Save keystrokes to the specified file.
     /// </summary>
+    /// <param name="filename">Keystroke macro filename</param>
     public void SaveKeystrokes(string filename) {
         filename = Utilities.AddExtensionIfMissing(filename, Consts.MacroExtension);
         File.WriteAllLines(filename, _keystrokeBuffer);

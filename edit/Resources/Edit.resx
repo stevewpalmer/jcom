@@ -162,4 +162,7 @@
     <data name="WriteBlockAs" xml:space="preserve">
         <value>Write block as: </value>
     </data>
+    <data name="NewFile" xml:space="preserve">
+        <value>New File</value>
+    </data>
 </root>

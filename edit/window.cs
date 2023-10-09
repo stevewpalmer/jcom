@@ -79,11 +79,11 @@ public class Window {
     /// <summary>
     /// Handle a keyboard command.
     /// </summary>
-    /// <param name="parser">Macro parser</param>
-    /// <param name="commandId">Command ID</param>
-    /// <returns>Rendering hint</returns>
-    public RenderHint HandleCommand(Macro parser, KeyCommand commandId) {
-        RenderHint flags = commandId switch {
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    public RenderHint HandleCommand(Command command) {
+        RenderHint flags = command.Id switch {
+            KeyCommand.KC_BACKSPACE => Backspace(),
             KeyCommand.KC_CDOWN => CursorDown(),
             KeyCommand.KC_CENTRE => CenterWindow(),
             KeyCommand.KC_CFILEEND => FileEnd(),
@@ -91,57 +91,36 @@ public class Window {
             KeyCommand.KC_CLEFT => CursorLeft(),
             KeyCommand.KC_CLINEEND => EndOfCurrentLine(),
             KeyCommand.KC_CLINESTART => StartOfCurrentLine(),
-            KeyCommand.KC_COPY => HandleBlock(parser, BlockAction.COPY),
+            KeyCommand.KC_COPY => HandleBlock(command, BlockAction.COPY),
             KeyCommand.KC_CPAGEDOWN => PageDown(),
             KeyCommand.KC_CPAGEUP => PageUp(),
             KeyCommand.KC_CRIGHT => CursorRight(),
             KeyCommand.KC_CTOBOTTOM => LineToBottom(),
             KeyCommand.KC_CTOTOP => LineToTop(),
             KeyCommand.KC_CUP => CursorUp(),
-            KeyCommand.KC_CUT => HandleBlock(parser, BlockAction.CUT),
+            KeyCommand.KC_CUT => HandleBlock(command, BlockAction.CUT),
             KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
             KeyCommand.KC_CWINDOWTOP => WindowTop(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
             KeyCommand.KC_CWORDRIGHT => WordRight(),
+            KeyCommand.KC_DELETECHAR => DeleteChar(command),
             KeyCommand.KC_DELETELINE => DeleteLine(),
             KeyCommand.KC_DELETETOEND => DeleteToEndOfLine(),
             KeyCommand.KC_DELETETOSTART => DeleteToStartOfLine(),
-            KeyCommand.KC_GOTO => GoToLine(parser),
-            KeyCommand.KC_LOWERCASE => HandleBlock(parser, BlockAction.LOWER),
+            KeyCommand.KC_GOTO => GoToLine(command),
+            KeyCommand.KC_LOWERCASE => HandleBlock(command, BlockAction.LOWER),
             KeyCommand.KC_MARK => Mark(MarkMode.CHARACTER),
             KeyCommand.KC_MARKCOLUMN => Mark(MarkMode.COLUMN),
             KeyCommand.KC_MARKLINE => Mark(MarkMode.LINE),
             KeyCommand.KC_OPENLINE => OpenLine(),
+            KeyCommand.KC_PASTE => Paste(),
+            KeyCommand.KC_SELFINSERT => SelfInsert(command),
             KeyCommand.KC_SCREENDOWN => ScreenDown(),
             KeyCommand.KC_SCREENUP => ScreenUp(),
-            KeyCommand.KC_UPPERCASE => HandleBlock(parser, BlockAction.UPPER),
-            KeyCommand.KC_WRITEBUFFER => WriteBuffer(parser),
+            KeyCommand.KC_UPPERCASE => HandleBlock(command, BlockAction.UPPER),
+            KeyCommand.KC_WRITEBUFFER => WriteBuffer(command),
             _ => RenderHint.NONE
         };
-        return ApplyRenderHint(flags);
-    }
-
-    /// <summary>
-    /// Handle an editing action at the screen level. The keys here are not
-    /// associated with any command and thus are treated as primitives. Other
-    /// editing actions are handled in HandleCommand.
-    /// </summary>
-    /// <param name="parser">Macro parser</param>
-    /// <param name="keyInfo">Console key info</param>
-    /// <returns>The rendering hint</returns>
-    public RenderHint HandleEditing(Macro parser, ConsoleKeyInfo keyInfo) {
-        RenderHint flags = RenderHint.BLOCK;
-        if (!char.IsControl(keyInfo.KeyChar)) {
-            Buffer.Insert(keyInfo.KeyChar);
-        }
-        else {
-            flags = keyInfo.Key switch {
-                ConsoleKey.Enter => Newline(),
-                ConsoleKey.Delete => DeleteChar(parser),
-                ConsoleKey.Backspace => Backspace(),
-                _ => RenderHint.NONE
-            };
-        }
         return ApplyRenderHint(flags);
     }
 
@@ -149,6 +128,7 @@ public class Window {
     /// Apply the render hint flags to the current window. On completion,
     /// return just the flags that were not applied.
     /// </summary>
+    /// <returns>Unapplied render hint</returns>
     public RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REDRAW)) {
             Render(RenderHint.REDRAW);
@@ -177,6 +157,7 @@ public class Window {
     /// cursor to the first match.
     /// </summary>
     /// <param name="searchData">A search object</param>
+    /// <returns>Render hint</returns>
     public RenderHint Search(Search searchData) {
         RenderHint flags = RenderHint.NONE;
         if (searchData.Next()) {
@@ -212,7 +193,7 @@ public class Window {
     /// is narrower than the title then we truncate the title to fit.
     /// </summary>
     private void RenderTitle() {
-        string title = Buffer.BaseFilename;
+        string title = Buffer.Name;
         Rectangle frameRect = _viewportBounds;
         frameRect.Inflate(1, 1);
         Point savedCursor = Terminal.GetCursor();
@@ -371,12 +352,13 @@ public class Window {
     /// <summary>
     /// Go to input line.
     /// </summary>
-    private RenderHint GoToLine(Macro parser) {
+    /// <returns>Render hint</returns>
+    private RenderHint GoToLine(Command command) {
         RenderHint flags = RenderHint.NONE;
         if (_markMode != MarkMode.NONE) {
             flags |= RenderHint.BLOCK;
         }
-        if (parser.GetNumber(Edit.GoToLine, out int inputLine)) {
+        if (command.GetNumber(Edit.GoToLine, out int inputLine)) {
             if (inputLine > Buffer.Length) {
                 inputLine = Buffer.Length;
             }
@@ -390,17 +372,43 @@ public class Window {
     }
 
     /// <summary>
+    /// Handle the self-insert command.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SelfInsert(Command command) {
+        string nextWord = command.Args.NextWord();
+        if (string.IsNullOrEmpty(nextWord)) {
+            return Newline();
+        }
+        if (!int.TryParse(nextWord, out int inputValue)) {
+            Screen.StatusBar.Error("Invalid number");
+            return RenderHint.NONE;
+        }
+        RenderHint flags = RenderHint.BLOCK;
+        if (inputValue == 8) {
+            flags = Backspace();
+        }
+        else {
+            if (!char.IsControl((char)inputValue)) {
+                Buffer.Insert((char)inputValue);
+            }
+        }
+        return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
     /// If we are in mark mode, deletes the marked block
     /// otherwise delete the character at the cursor
     /// </summary>
-    private RenderHint DeleteChar(Macro parser) {
+    /// <returns>Render hint</returns>
+    private RenderHint DeleteChar(Command command) {
         RenderHint flags = RenderHint.NONE;
         if (_markMode == MarkMode.NONE) {
             flags |= RenderHint.BLOCK;
             Buffer.Delete(1);
         }
         else {
-            flags |= HandleBlock(parser, BlockAction.DELETE);
+            flags |= HandleBlock(command, BlockAction.DELETE);
         }
         return flags | CursorFromOffset();
     }
@@ -409,6 +417,7 @@ public class Window {
     /// Backspace over the previous character if we're not at the start
     /// of the buffer.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint Backspace() {
         RenderHint flags = RenderHint.NONE;
         if (!Buffer.AtStartOfBuffer) {
@@ -422,17 +431,19 @@ public class Window {
     /// <summary>
     /// Insert a newline character at the cursor.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint Newline() {
-        Buffer.Break();
+        Buffer.Insert(Consts.EndOfLine);
         return RenderHint.BLOCK;
     }
 
     /// <summary>
     /// Open a line below the current line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint OpenLine() {
         EndOfCurrentLine();
-        Buffer.Break();
+        Buffer.Insert(Consts.EndOfLine);
         return RenderHint.BLOCK;
     }
 
@@ -440,6 +451,7 @@ public class Window {
     /// Move the line containing the cursor to the bottom of the
     /// current window.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint LineToBottom() {
         return ShiftInWindow(_viewportBounds.Height - 1);
     }
@@ -448,6 +460,7 @@ public class Window {
     /// Move the line containing the cursor to the top of the
     /// current window.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint LineToTop() {
         return ShiftInWindow(0);
     }
@@ -455,6 +468,7 @@ public class Window {
     /// <summary>
     /// Center the cursor in the window
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CenterWindow() {
         return ShiftInWindow(_viewportBounds.Height / 2);
     }
@@ -463,6 +477,7 @@ public class Window {
     /// Shift the cursor in the current window by the specified offset
     /// by scrolling the window up or down as required.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint ShiftInWindow(int offset) {
         RenderHint flags = RenderHint.NONE;
         int diff = offset - CursorRowInViewport;
@@ -477,6 +492,7 @@ public class Window {
     /// <summary>
     /// Delete the current line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint DeleteLine() {
         int length = Buffer.GetLine(Buffer.LineIndex).Length;
         Buffer.Offset = 0;
@@ -487,6 +503,7 @@ public class Window {
     /// <summary>
     /// Delete to the end of the current line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint DeleteToEndOfLine() {
         int length = Buffer.GetLine(Buffer.LineIndex).Length - Buffer.Offset - 1;
         Buffer.Delete(length);
@@ -496,6 +513,7 @@ public class Window {
     /// <summary>
     /// Delete to the start of the current line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint DeleteToStartOfLine() {
         int length = Buffer.Offset;
         Buffer.Offset = 0;
@@ -506,6 +524,7 @@ public class Window {
     /// <summary>
     /// Start or end a block mark.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint Mark(MarkMode markMode) {
         if (_markMode == markMode) {
             Buffer.InvalidateExtent
@@ -524,9 +543,22 @@ public class Window {
     }
 
     /// <summary>
+    /// Paste the contents of the scrap buffer at the current cursor
+    /// position.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint Paste() {
+        Buffer.Insert(Screen.ScrapBuffer.Content);
+        return RenderHint.BLOCK;
+    }
+
+    /// <summary>
     /// Perform the specified actions on a marked block.
     /// </summary>
-    private RenderHint HandleBlock(Macro parser, BlockAction action) {
+    /// <param name="command">Editing command</param>
+    /// <param name="action">Block action</param>
+    /// <returns>Render hint</returns>
+    private RenderHint HandleBlock(Command command, BlockAction action) {
 
         (Point markStart, Point markEnd) = GetOrderedMarkRange();
 
@@ -567,22 +599,23 @@ public class Window {
 
         blockRanges.Add(currentRange);
         StringBuilder copyText = new();
+        string separator = string.Empty;
         foreach ((Point point, int count) in blockRanges) {
             if (count > 0) {
                 Buffer.Offset = point.X;
                 Buffer.LineIndex = point.Y;
                 string text = Buffer.GetText(count);
                 if (action.HasFlag(BlockAction.UPPER)) {
-                    Buffer.Replace(text.ToUpper());
+                    Buffer.Delete(count);
+                    Buffer.Insert(text.ToUpper());
                 }
                 if (action.HasFlag(BlockAction.LOWER)) {
-                    Buffer.Replace(text.ToLower());
+                    Buffer.Delete(count);
+                    Buffer.Insert(text.ToLower());
                 }
                 if (action.HasFlag(BlockAction.GET)) {
-                    copyText.Append(text);
-                    if (text.Length > 0 && text[^1] != Consts.EndOfLine) {
-                        copyText.Append(Consts.EndOfLine);
-                    }
+                    copyText.Append($"{separator}{text}");
+                    separator = Consts.EndOfLine.ToString();
                 }
                 if (action.HasFlag(BlockAction.DELETE)) {
                     Buffer.Delete(count);
@@ -595,7 +628,7 @@ public class Window {
         }
 
         if (action.HasFlag(BlockAction.WRITE)) {
-            if (parser.GetFilename(Edit.WriteBlockAs, out string outputFileName)) {
+            if (command.GetFilename(Edit.WriteBlockAs, out string outputFileName)) {
                 Buffer writeBuffer = new(outputFileName) {
                     Content = copyText.ToString()
                 };
@@ -603,6 +636,8 @@ public class Window {
             }
         }
 
+        // Any action which is non-destructive requires an explicit invalidate of
+        // the extent to ensure the block mark is removed from the screen.
         if (action.HasFlag(BlockAction.GET)) {
             Buffer.InvalidateExtent
                 .Add(markStart)
@@ -631,6 +666,7 @@ public class Window {
     /// Return the mark range as two Point tuples where the first tuple is guaranteed
     /// to be earlier in the range than the second.
     /// </summary>
+    /// <returns>Tuple with ordered mark range</returns>
     private (Point, Point) GetOrderedMarkRange() {
         Extent markExtent = new Extent().Add(Buffer.Cursor);
         if (_markMode != MarkMode.NONE) {
@@ -643,6 +679,7 @@ public class Window {
     /// Scroll the screen down one line, keeping the cursor in the same
     /// column.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint ScreenDown() {
         RenderHint flags = RenderHint.NONE;
         if (CursorRowInViewport == _viewportBounds.Bottom - 1) {
@@ -659,6 +696,7 @@ public class Window {
     /// Scroll the screen up one line, keeping the cursor in the same
     /// column.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint ScreenUp() {
         RenderHint flags = RenderHint.NONE;
         if (CursorRowInViewport == 0) {
@@ -674,11 +712,11 @@ public class Window {
     /// <summary>
     /// Write the current buffer to disk.
     /// </summary>
-    /// <returns></returns>
-    private RenderHint WriteBuffer(Macro parser) {
+    /// <returns>Render hint</returns>
+    private RenderHint WriteBuffer(Command command) {
         RenderHint flags = RenderHint.NONE;
         if (_markMode != MarkMode.NONE) {
-            flags = HandleBlock(parser, BlockAction.WRITE);
+            flags = HandleBlock(command, BlockAction.WRITE);
         }
         else {
             Buffer.Write();
@@ -691,6 +729,7 @@ public class Window {
     /// it so that we maintain a last mark point to compute the extent of the
     /// area to render when we update the window.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint SaveLastMarkPoint() {
         if (_markMode != MarkMode.NONE) {
             _lastMarkPoint = Buffer.Cursor;
@@ -702,6 +741,7 @@ public class Window {
     /// <summary>
     /// Move the cursor down if possible.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CursorDown() {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex < Buffer.Length - 1) {
@@ -719,6 +759,7 @@ public class Window {
     /// <summary>
     /// Move the cursor up if possible.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CursorUp() {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0) {
@@ -736,6 +777,7 @@ public class Window {
     /// <summary>
     /// Move the cursor left.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CursorLeft() {
         if (Buffer.Offset == 0) {
             return EndOfPreviousLine();
@@ -748,6 +790,7 @@ public class Window {
     /// <summary>
     /// Move the cursor right.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CursorRight() {
         RenderHint flags = SaveLastMarkPoint();
         ++Buffer.Offset;
@@ -759,6 +802,7 @@ public class Window {
     /// The cursor is placed at the beginning of the line and we
     /// scroll the viewport to bring it into focus if necessary.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint StartOfNextLine() {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex < Buffer.Length - 1) {
@@ -781,6 +825,7 @@ public class Window {
     /// extends beyond the viewport then scroll the viewport to bring
     /// it into view.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint EndOfPreviousLine() {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0) {
@@ -800,6 +845,7 @@ public class Window {
     /// <summary>
     /// Move the cursor to the start of the current line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint StartOfCurrentLine() {
         RenderHint flags = SaveLastMarkPoint();
         Buffer.Offset = 0;
@@ -809,6 +855,7 @@ public class Window {
     /// <summary>
     /// Move the cursor to the end of the current line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint EndOfCurrentLine() {
         RenderHint flags = SaveLastMarkPoint();
         Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
@@ -818,6 +865,7 @@ public class Window {
     /// <summary>
     /// Move the cursor down one page.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint PageDown() {
         RenderHint flags = SaveLastMarkPoint();
         int previousLineIndex = Buffer.LineIndex;
@@ -832,6 +880,7 @@ public class Window {
     /// <summary>
     /// Move the cursor up one page.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint PageUp() {
         RenderHint flags = SaveLastMarkPoint();
         int previousLineIndex = Buffer.LineIndex;
@@ -849,6 +898,7 @@ public class Window {
     /// <summary>
     /// Move to the start of the buffer.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint FileStart() {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.LineIndex > 0 || Buffer.Offset > 0) {
@@ -868,6 +918,7 @@ public class Window {
     /// <summary>
     /// Move to the end of the buffer.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint FileEnd() {
         RenderHint flags = SaveLastMarkPoint();
         Buffer.LineIndex = Buffer.Length - 1;
@@ -878,6 +929,7 @@ public class Window {
     /// <summary>
     /// Move to the top of the window
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint WindowTop() {
         RenderHint flags = SaveLastMarkPoint();
         Buffer.LineIndex -= CursorRowInViewport;
@@ -887,6 +939,7 @@ public class Window {
     /// <summary>
     /// Move to the bottom of the window
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint WindowBottom() {
         RenderHint flags = SaveLastMarkPoint();
         Buffer.LineIndex += _viewportBounds.Height - 1;
@@ -903,6 +956,7 @@ public class Window {
     /// to the start of the next word. If it is on the last word on a line, it
     /// moves to the start of the first word on the next line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint WordRight() {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.Offset >= Buffer.GetLine(Buffer.LineIndex).Length) {
@@ -927,6 +981,7 @@ public class Window {
     /// the first word on a line, it moves to the end of the first word on the
     /// previous line.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint WordLeft() {
         RenderHint flags = SaveLastMarkPoint();
         if (Buffer.Offset == 0) {
@@ -948,6 +1003,7 @@ public class Window {
     /// Update the physical cursor position in the current viewport
     /// based on the buffer line index.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CursorFromLineIndex() {
         RenderHint flags = RenderHint.NONE;
         if (Buffer.LineIndex < _viewportOffset.Y) {
@@ -967,6 +1023,7 @@ public class Window {
     /// Update the physical cursor position in the current viewport
     /// based on the buffer offset.
     /// </summary>
+    /// <returns>Render hint</returns>
     private RenderHint CursorFromOffset() {
         RenderHint flags = RenderHint.NONE;
         if (Buffer.Offset < _viewportOffset.X) {

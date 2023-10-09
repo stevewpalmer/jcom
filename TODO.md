@@ -6,7 +6,6 @@ decreasing order of priority.
 ## Work Items
 
 ### Editor
-* Block paste.
 * Replace.
 
 ### Fortran

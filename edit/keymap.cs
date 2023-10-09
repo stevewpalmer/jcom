@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JComLib;
+
 namespace JEdit;
 
 /// <summary>
@@ -31,6 +33,7 @@ namespace JEdit;
 public enum KeyCommand {
     KC_NONE,
     KC_ASSIGNTOKEY,
+    KC_BACKSPACE,
     KC_CD,
     KC_CDOWN,
     KC_CENTRE,
@@ -55,6 +58,7 @@ public enum KeyCommand {
     KC_CWINDOWTOP,
     KC_CWORDLEFT,
     KC_CWORDRIGHT,
+    KC_DELETECHAR,
     KC_DELETELINE,
     KC_DELETETOEND,
     KC_DELETETOSTART,
@@ -71,6 +75,7 @@ public enum KeyCommand {
     KC_NEXTBUFFER,
     KC_OPENLINE,
     KC_OUTPUTFILE,
+    KC_PASTE,
     KC_PLAYBACK,
     KC_PREVBUFFER,
     KC_REGEXP,
@@ -83,6 +88,7 @@ public enum KeyCommand {
     KC_SEARCHBACK,
     KC_SEARCHCASE,
     KC_SEARCHFORWARD,
+    KC_SELFINSERT,
     KC_UPPERCASE,
     KC_USETABCHAR,
     KC_VERSION,
@@ -113,6 +119,7 @@ public class KeyMap {
     /// </summary>
     private static readonly KeyCommands[] CommandTable = {
         new() { CommandName = "assign_to_key", CommandId = KeyCommand.KC_ASSIGNTOKEY },
+        new() { CommandName = "backspace", CommandId = KeyCommand.KC_BACKSPACE },
         new() { CommandName = "beginning_of_line", CommandId = KeyCommand.KC_CLINESTART },
         new() { CommandName = "cd", CommandId = KeyCommand.KC_CD },
         new() { CommandName = "center_line", CommandId = KeyCommand.KC_CENTRE },
@@ -122,6 +129,7 @@ public class KeyMap {
         new() { CommandName = "copy", CommandId = KeyCommand.KC_COPY },
         new() { CommandName = "cut", CommandId = KeyCommand.KC_CUT },
         new() { CommandName = "del", CommandId = KeyCommand.KC_DELFILE },
+        new() { CommandName = "delete_char", CommandId = KeyCommand.KC_DELETECHAR },
         new() { CommandName = "delete_curr_buffer", CommandId = KeyCommand.KC_CLOSE },
         new() { CommandName = "delete_line", CommandId = KeyCommand.KC_DELETELINE },
         new() { CommandName = "delete_to_bol", CommandId = KeyCommand.KC_DELETETOSTART },
@@ -145,6 +153,7 @@ public class KeyMap {
         new() { CommandName = "output_file", CommandId = KeyCommand.KC_OUTPUTFILE },
         new() { CommandName = "page_down", CommandId = KeyCommand.KC_CPAGEDOWN },
         new() { CommandName = "page_up", CommandId = KeyCommand.KC_CPAGEUP },
+        new() { CommandName = "paste", CommandId = KeyCommand.KC_PASTE },
         new() { CommandName = "playback", CommandId = KeyCommand.KC_PLAYBACK },
         new() { CommandName = "prev_char", CommandId = KeyCommand.KC_CLEFT },
         new() { CommandName = "previous_word", CommandId = KeyCommand.KC_CWORDLEFT },
@@ -157,6 +166,7 @@ public class KeyMap {
         new() { CommandName = "search_back", CommandId = KeyCommand.KC_SEARCHBACK },
         new() { CommandName = "search_case", CommandId = KeyCommand.KC_SEARCHCASE },
         new() { CommandName = "search_fwd", CommandId = KeyCommand.KC_SEARCHFORWARD },
+        new() { CommandName = "self_insert", CommandId = KeyCommand.KC_SELFINSERT },
         new() { CommandName = "show_clock", CommandId = KeyCommand.KC_CLOCK },
         new() { CommandName = "toggle_re", CommandId = KeyCommand.KC_REGEXP },
         new() { CommandName = "tolower", CommandId = KeyCommand.KC_LOWERCASE },
@@ -253,6 +263,7 @@ public class KeyMap {
     /// Keyboard map
     /// </summary>
     private static readonly KeyMap[] KeyMaps = {
+        new() { KeyCommand = KeyCommand.KC_BACKSPACE, Key = ConsoleKey.Backspace },
         new() { KeyCommand = KeyCommand.KC_CDOWN, Key = ConsoleKey.DownArrow },
         new() { KeyCommand = KeyCommand.KC_CENTRE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.C },
         new() { KeyCommand = KeyCommand.KC_CFILEEND, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.End },
@@ -277,6 +288,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CWINDOWTOP, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.Home },
         new() { KeyCommand = KeyCommand.KC_CWORDLEFT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.LeftArrow },
         new() { KeyCommand = KeyCommand.KC_CWORDRIGHT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.RightArrow },
+        new() { KeyCommand = KeyCommand.KC_DELETECHAR, Key = ConsoleKey.Delete },
         new() { KeyCommand = KeyCommand.KC_DELETELINE, KeyChar = 8706},
         new() { KeyCommand = KeyCommand.KC_DELETELINE, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.D },
         new() { KeyCommand = KeyCommand.KC_DELETETOSTART, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.K },
@@ -302,6 +314,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_NEXTBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.N },
         new() { KeyCommand = KeyCommand.KC_OUTPUTFILE, KeyChar = 248 },
         new() { KeyCommand = KeyCommand.KC_OUTPUTFILE, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.O },
+        new() { KeyCommand = KeyCommand.KC_PASTE, Key = ConsoleKey.Insert },
         new() { KeyCommand = KeyCommand.KC_PLAYBACK, Key = ConsoleKey.F8 },
         new() { KeyCommand = KeyCommand.KC_PREVBUFFER, KeyChar = 305 },
         new() { KeyCommand = KeyCommand.KC_PREVBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.OemMinus },
@@ -309,6 +322,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_REPEAT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.R },
         new() { KeyCommand = KeyCommand.KC_SAVEKEYSTROKES, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F8 },
         new() { KeyCommand = KeyCommand.KC_SAVEKEYSTROKES, Key = ConsoleKey.F13 },
+        new() { KeyCommand = KeyCommand.KC_SELFINSERT, Key = ConsoleKey.Enter },
         new() { KeyCommand = KeyCommand.KC_SCREENDOWN, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D },
         new() { KeyCommand = KeyCommand.KC_SCREENUP, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.E },
         new() { KeyCommand = KeyCommand.KC_SEARCHAGAIN, Modifiers = ConsoleModifiers.Shift, Key = ConsoleKey.F5 },
@@ -340,10 +354,16 @@ public class KeyMap {
     /// </summary>
     /// <param name="keyIn">Keyboard input</param>
     /// <returns>KeyCommand equivalent, or KC_NONE if there's no mapping</returns>
-    public static KeyCommand MapKeyToCommand(ConsoleKeyInfo keyIn) {
+    public static Command MapKeyToCommand(ConsoleKeyInfo keyIn) {
 
         KeyMap match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
-        return match?.KeyCommand ?? KeyCommand.KC_NONE;
+        KeyCommand commandId = match?.KeyCommand ?? KeyCommand.KC_NONE;
+        Parser commandArgs = new Parser(string.Empty);
+        if (commandId == KeyCommand.KC_NONE && !char.IsControl(keyIn.KeyChar)) {
+            commandId = KeyCommand.KC_SELFINSERT;
+            commandArgs = new Parser(((int)keyIn.KeyChar).ToString());
+        }
+        return new Command { Id = commandId, Args = commandArgs };
     }
 
     /// <summary>
