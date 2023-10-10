@@ -49,7 +49,7 @@ public static partial class Commands {
                 < 1024 * 1024 => size / 1024 + "K",
                 _ => size / (1024 * 1024) + "M"
             };
-            Console.WriteLine("{0,-20} {1,5}", info.Name, sizeString);
+            Console.WriteLine(@"{0,-20} {1,5}", info.Name, sizeString);
         }
         return true;
     }

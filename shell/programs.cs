@@ -32,13 +32,10 @@ public static partial class Commands {
 
     // Run a program.
     private static bool RunProgram(string programName, Parser cmdLine) {
-
-        string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        string josBinRoot = $"{homeFolder}/jos/bin";
-
         Process process = new();
-        process.StartInfo.FileName = $"{josBinRoot}/{programName}";
+        process.StartInfo.FileName = $"{Program.BinaryFolder}/{programName}";
         process.StartInfo.Arguments = string.Join(' ', cmdLine.RestOfLine());
+        process.StartInfo.WorkingDirectory = Program.HomeFolder;
         process.Start();
         process.WaitForExit();
         return true;

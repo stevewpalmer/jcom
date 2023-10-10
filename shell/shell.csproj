@@ -22,4 +22,20 @@
     <ProjectReference Include="..\fortran\for.csproj" />
     <ProjectReference Include="..\edit\edit.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Shell.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Shell.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\Shell.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Shell.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cp $(OutputPath)* $(SolutionDir)drop/bin" />
+  </Target>
 </Project>
