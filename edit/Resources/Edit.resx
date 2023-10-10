@@ -165,4 +165,16 @@
     <data name="NewFile" xml:space="preserve">
         <value>New File</value>
     </data>
+    <data name="Replacement" xml:space="preserve">
+        <value>Replacement: </value>
+    </data>
+    <data name="Pattern" xml:space="preserve">
+        <value>{0} Pattern {1}: </value>
+    </data>
+    <data name="TranslateComplete" xml:space="preserve">
+        <value>Translation complete, {0} occurrences changed.</value>
+    </data>
+    <data name="TranslatePrompt" xml:space="preserve">
+        <value>Change [Yes!No!Global!One]? </value>
+    </data>
 </root>

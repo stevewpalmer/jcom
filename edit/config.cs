@@ -111,4 +111,14 @@ public class Config {
     /// Whether or not regular expressions are enabled in search strings
     /// </summary>
     public bool RegExpOff { get; set; }
+
+    /// <summary>
+    /// Last translate replacement string
+    /// </summary>
+    public string LastTranslateString { get; set; }
+
+    /// <summary>
+    /// Last translate command pattern
+    /// </summary>
+    public string LastTranslatePattern { get; set; }
 }

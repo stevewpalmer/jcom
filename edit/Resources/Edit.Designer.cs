@@ -338,5 +338,29 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("NewFile", resourceCulture);
             }
         }
+        
+        internal static string Replacement {
+            get {
+                return ResourceManager.GetString("Replacement", resourceCulture);
+            }
+        }
+        
+        internal static string Pattern {
+            get {
+                return ResourceManager.GetString("Pattern", resourceCulture);
+            }
+        }
+        
+        internal static string TranslateComplete {
+            get {
+                return ResourceManager.GetString("TranslateComplete", resourceCulture);
+            }
+        }
+        
+        internal static string TranslatePrompt {
+            get {
+                return ResourceManager.GetString("TranslatePrompt", resourceCulture);
+            }
+        }
     }
 }

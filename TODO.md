@@ -5,9 +5,6 @@ decreasing order of priority.
 
 ## Work Items
 
-### Editor
-* Replace.
-
 ### Fortran
 * BLOCK DATA (FM500, FM503, FM506)
 * Assigned FORMAT label (FM111, FM252)

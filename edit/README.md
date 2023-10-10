@@ -63,5 +63,8 @@ own buffer.
 | Search Forward           | F5 or Alt+S              | F5 or Alt+S              |
 | Search Backward          | Alt+F5                   |                          |
 | Search Again             | Shift+F5                 |                          |
+| Translate                | F6 or Alt+T              | F6 or Alt+T              |
+| Translate Backward       | Alt+F6                   |                          |
+| Translate Again          | Shift+F6                 |                          |
 | Toggle Case Search       | Ctrl+F5                  |                          |
 | Toggle RegEx Search      | Ctrl+F6                  |                          |

@@ -168,7 +168,45 @@ public class Window {
         return ApplyRenderHint(flags);
     }
 
-        /// <summary>
+    /// <summary>
+    /// Perform a search for the text specified in searchData and update the
+    /// cursor to the first match. Then prompt the user whether to replace
+    /// the text or skip, or end the search.
+    /// </summary>
+    /// <param name="searchData">A search object</param>
+    /// <returns>Render hint</returns>
+    public RenderHint Translate(Search searchData) {
+        RenderHint flags = RenderHint.NONE;
+        bool prompt = true;
+        bool finish = false;
+        while (!finish && searchData.Next()) {
+            Buffer.LineIndex = searchData.Row;
+            Buffer.Offset = searchData.Column;
+            if (prompt) {
+                char[] validChars = new[] { 'y', 'n', 'g', 'o' };
+                if (!Screen.StatusBar.Prompt(Edit.TranslatePrompt, validChars, 'n', out char inputChar)) {
+                    break;
+                }
+                if (inputChar == 'g') {
+                    prompt = false;
+                }
+                if (inputChar == 'n') {
+                    continue;
+                }
+                if (inputChar == 'o') {
+                    finish = true;
+                }
+            }
+            Buffer.Delete(searchData.MatchLength);
+            Buffer.Insert(searchData.ReplacementString);
+            flags |= RenderHint.BLOCK | CursorFromLineIndex();
+            flags = ApplyRenderHint(flags);
+            ++searchData.TranslateCount;
+        }
+        return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
     /// Draw the window frame
     /// </summary>
     private void RenderFrame() {

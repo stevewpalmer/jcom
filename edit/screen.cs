@@ -133,6 +133,9 @@ public class Screen {
             KeyCommand.KC_SEARCHBACK => Search(command, false),
             KeyCommand.KC_SEARCHCASE => SearchCaseToggle(),
             KeyCommand.KC_SEARCHFORWARD => Search(command, true),
+            KeyCommand.KC_TRANSLATE => Translate(command, true),
+            KeyCommand.KC_TRANSLATEAGAIN => TranslateAgain(),
+            KeyCommand.KC_TRANSLATEBACK => Translate(command, false),
             KeyCommand.KC_REGEXP => RegExpToggle(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
@@ -501,6 +504,51 @@ public class Screen {
         Config.RegExpOff = !Config.RegExpOff;
         StatusBar.Message(Config.RegExpOff ? Edit.RegExpOff : Edit.RegExpOn);
         return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Translate in the active window
+    /// </summary>
+    /// <param name="command">Editing command</param>
+    /// <param name="forward">True if we search forward</param>
+    /// <returns>Render hint</returns>
+    private RenderHint Translate(Command command, bool forward) {
+        string searchString = Config.LastTranslatePattern;
+        string replacementString = Config.LastTranslateString;
+        string prompt = string.Format(Edit.Pattern, forward ? "\u2193" : "\u2191", Config.RegExpOff ? Edit.RegExpOffStatus : "");
+        if (!command.GetInput(prompt, ref searchString)) {
+            return RenderHint.NONE;
+        }
+        if (!command.GetInput(Edit.Replacement, ref replacementString)) {
+            return RenderHint.NONE;
+        }
+        _search = new Search {
+            SearchString = searchString,
+            ReplacementString = replacementString,
+            RegExp = !Config.RegExpOff,
+            CaseInsensitive = Config.SearchCaseInsensitive,
+            Buffer = _activeWindow.Buffer,
+            Forward = forward
+        };
+        Config.LastTranslatePattern = searchString;
+        Config.LastTranslateString = replacementString;
+        return TranslateAgain();
+    }
+
+    /// <summary>
+    /// Repeat the previous translate.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint TranslateAgain() {
+        RenderHint flags = RenderHint.NONE;
+        if (_search != null) {
+            _search.TranslateCount = 0;
+            flags |= _activeWindow.Translate(_search);
+            StatusBar.Message(_search.TranslateCount == 0 ?
+                Edit.PatternNotFound :
+                string.Format(Edit.TranslateComplete, _search.TranslateCount));
+        }
+        return flags;
     }
 
     /// <summary>

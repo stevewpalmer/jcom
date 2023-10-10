@@ -73,6 +73,23 @@ public class Search {
     public bool RegExp { get; init; }
 
     /// <summary>
+    /// Replacement string if we're translating.
+    /// </summary>
+    public string ReplacementString { get; set; }
+
+    /// <summary>
+    /// Count of translations performed.
+    /// </summary>
+    public int TranslateCount { get; set; }
+
+    /// <summary>
+    /// Length of matched text. For RegExp searches, this may be
+    /// variable with each match. Otherwise it will be the length of
+    /// the search string.
+    /// </summary>
+    public int MatchLength { get; set; }
+
+    /// <summary>
     /// Return the next instance of the search string in the buffer. If a match
     /// is found then matchPoint is set to the (column, row) of the matching string
     /// in offset and lineIndex coordinates, and the function returns true. If no
@@ -102,10 +119,12 @@ public class Search {
                 Regex regex = new Regex(SearchString, options);
                 Match m = regex.Match(line, Column);
                 matchIndex = m.Success ? m.Index : -1;
+                MatchLength = m.Length;
             }
             else {
                 StringComparison type = CaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
                 matchIndex = line.IndexOf(SearchString, Column, type);
+                MatchLength = SearchString.Length;
             }
             if (matchIndex >= 0) {
                 Column = matchIndex;
@@ -140,10 +159,12 @@ public class Search {
                 Regex regex = new Regex(SearchString, options | RegexOptions.RightToLeft);
                 Match m = regex.Match(line, 0, Column);
                 matchIndex = m.Success ? m.Index : -1;
+                MatchLength = m.Length;
             }
             else {
                 StringComparison type = CaseInsensitive ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
                 matchIndex = line.LastIndexOf(SearchString, Column, Column + 1, type);
+                MatchLength = SearchString.Length;
             }
             if (matchIndex >= 0) {
                 Column = matchIndex;
