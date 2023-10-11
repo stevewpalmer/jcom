@@ -24,7 +24,6 @@
 // under the License.
 
 using System.ComponentModel;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 

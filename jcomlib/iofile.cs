@@ -87,6 +87,7 @@ public sealed class StdoutIOFile : IOFile {
     /// embedded newlines are written but do not contribute the the record count.
     /// </summary>
     /// <param name="str">The string to write</param>
+    /// <param name="carriageAtEnd">Whether to write a newline at the end</param>
     /// <returns>The number of characters written to the device</returns>
     public override int WriteLine(string str, bool carriageAtEnd) {
         int charsWritten = 0;
@@ -174,7 +175,7 @@ public sealed class StdinIOFile : IOFile {
     public override string ReadChars(int count) {
 
         StringBuilder stringBuilder = new();
-        while (count > 0) {
+        while (count-- > 0) {
             ConsoleKeyInfo keyInfo = Console.ReadKey();
             stringBuilder.Append(keyInfo.KeyChar);
         }
@@ -199,7 +200,7 @@ public sealed class StdinIOFile : IOFile {
 /// A class that encapsulates information about a file. A file is identified by
 /// its I/O unit number which is any valid integer. Two I/O unit numbers are
 /// pre-defined for standard output and standard input and are identified by the
-/// <see cref="IOConstant">IOConstant</c> numbers.
+/// <see cref="IOConstant">IOConstant</see> numbers.
 ///
 /// A file can be either sequential or direct, based on the IsSequential property.
 /// A sequential file is accessed by reading through the data in sequence. A
@@ -300,7 +301,7 @@ public class IOFile : IDisposable {
     /// <param name="iodevice">Unit number</param>
     /// <returns>The IOFile instance for the unit, or null if the unit is not opened</returns>
     public static IOFile Get(int iodevice) {
-        return _filemap.ContainsKey(iodevice) ? _filemap[iodevice] : null;
+        return _filemap.TryGetValue(iodevice, out IOFile value) ? value : null;
     }
 
     /// <summary>
@@ -609,7 +610,7 @@ public class IOFile : IDisposable {
             return charsRead;
         }
 
-        int intSize = sizeof(int);
+        const int intSize = sizeof(int);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
             return 0;
@@ -630,7 +631,7 @@ public class IOFile : IDisposable {
         if (Handle == null) {
             return -1;
         }
-        int intSize = sizeof(int);
+        const int intSize = sizeof(int);
         byte [] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
@@ -666,7 +667,7 @@ public class IOFile : IDisposable {
             return charsRead;
         }
 
-        int intSize = sizeof(float);
+        const int intSize = sizeof(float);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
             return 0;
@@ -687,7 +688,7 @@ public class IOFile : IDisposable {
         if (Handle == null) {
             return -1;
         }
-        int intSize = sizeof(float);
+        const int intSize = sizeof(float);
         byte [] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
@@ -830,6 +831,7 @@ public class IOFile : IDisposable {
     /// The string is truncated to fit the fixed string length.
     /// </summary>
     /// <param name="strValue">A reference to the string to be set</param>
+    /// <param name="count">Count of characters to read</param>
     /// <returns>The number of bytes read</returns>
     public int ReadString(ref FixedString strValue, int count) {
         string value = null;

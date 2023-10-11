@@ -351,7 +351,6 @@ public static partial class Intrinsics {
     /// RAND intrinsic function
     /// Returns a random number.
     /// </summary>
-    /// <param name="seed">Seed value</param>
     /// <returns>The next random number for the given seed</returns>
     public static void RANDOMIZE() {
         _rand = new Random();
@@ -370,7 +369,7 @@ public static partial class Intrinsics {
     /// <summary>
     /// Emit inline code for REPORT.
     /// </summary>
-    /// <param name="em">Emitter object</param>
+    /// <param name="value">JComRuntimeErrors object</param>
     public static void REPORT(ref int value) {
         throw new JComRuntimeException((JComRuntimeErrors)value);
     }

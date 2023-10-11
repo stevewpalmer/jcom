@@ -69,8 +69,6 @@ public class ReadLine {
     /// Line input function
     /// </summary>
     /// <param name="existingLine">Existing text to display</param>
-    /// <param name="maxWidth">Maximum number of characters to accept</param>
-    /// <param name="newlineAtEnd">Whether to issue a newline at the end</param>
     /// <returns>Input string</returns>
     public string Read(string existingLine) {
 

@@ -27,7 +27,7 @@ using JComLib;
 
 namespace JComalLib; 
 
-public class FileManager {
+public static class FileManager {
 
     /// <summary>
     /// Default zone.

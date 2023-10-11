@@ -161,7 +161,7 @@ public class FixedString : IEquatable<FixedString> {
     /// <summary>
     /// Return a substring of the fixed string.
     /// </summary>
-    /// <param name="index">1 based index at which the substring starts</param>
+    /// <param name="start">1 based index at which the substring starts</param>
     /// <returns>A native string containing the requested substring of the fixed string</returns>
     public FixedString Substring(int start) {
         if (start < 1 || start > Length) {
@@ -331,10 +331,9 @@ public class FixedString : IEquatable<FixedString> {
     /// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current
     /// <see cref="FixedString"/>; otherwise, <c>false</c>.</returns>
     public override bool Equals(object obj) {
-        if (!(obj is FixedString)) {
+        if (obj is not FixedString otherString) {
             return false;
         }
-        FixedString otherString = (FixedString)obj;
         return Compare(otherString) == 0;
     }
 

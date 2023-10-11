@@ -35,7 +35,6 @@ public class InputManager {
     /// Construct an InputManager for sequential file I/O.
     /// </summary>
     /// <param name="iodevice">The device to read from</param>
-    /// <param name="recordNumber">The number of the record to read</param>
     public InputManager(int iodevice) {
 
         _file = IOFile.Get(iodevice);
@@ -72,7 +71,7 @@ public class InputManager {
     /// </summary>
     /// <param name="iodevice">The device to read from</param>
     /// <param name="promptString">Optional prompt string</param>
-    /// <param name="carriageReturn">Whether to issue a newline at the end of input</param>
+    /// <param name="terminator">End of line terminator option</param>
     public InputManager(int iodevice, string promptString, LineTerminator terminator):
         this(0, 0, -1, iodevice, promptString, terminator) {
     }
@@ -92,7 +91,7 @@ public class InputManager {
     /// <param name="maxWidth">Maximum input width</param>
     /// <param name="iodevice">The device to read from</param>
     /// <param name="promptString">Optional prompt string</param>
-    /// <param name="carriageReturn">Whether to issue a newline at the end of input</param>
+    /// <param name="terminator">End of line terminator option</param>
     public InputManager(int row, int column, int maxWidth, int iodevice, string promptString, LineTerminator terminator) {
 
         _file = IOFile.Get(iodevice);
@@ -159,7 +158,7 @@ public class InputManager {
     /// <summary>
     /// Reads from the input into the specified string variable.
     /// </summary>
-    /// <param name="stringData">String value that was read</param>
+    /// <param name="stringValue">String value that was read</param>
     public void READ(ref string stringValue) {
         _file.ReadString(ref stringValue, int.MaxValue);
     }

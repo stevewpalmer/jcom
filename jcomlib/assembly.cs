@@ -28,7 +28,7 @@ using System.Reflection;
 
 namespace JComLib;
 
-public class AssemblySupport {
+public static class AssemblySupport {
 
     /// <summary>
     /// Return the assembly copyright
