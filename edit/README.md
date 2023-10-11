@@ -22,18 +22,18 @@ own buffer.
 | Delete                   | Del                      | Del                      |
 | Backspace                | Backspace                | Backspace                |
 | Write Buffer             | Alt+W                    | Alt+W                    |
-| Write Buffers and Exit   | Ctrl+X                   | Alt+W                    |
+| Write Buffers and Exit   | Ctrl+X                   | Ctrl+X                   |
 | Change Output Filename   | Alt+O                    | Alt+O                    |
 | Version                  | Alt+V                    | Alt+V                    |
-| Details                  | Alt+F                    | Shift+Alt+F              |
-| Edit Buffer              | Alt+E                    | Shift+Alt+E              |
+| Details                  | Alt+F                    | Alt+F                    |
+| Edit Buffer              | Alt+E                    | Ctrl+O                   |
 | Repeat Command           | Ctrl+R                   | Ctrl+R                   |
 | Record Keystrokes        | F7                       | F7                       |
 | Playback Recording       | F8                       | F8                       |
 | Save Recording           | Alt+F8                   | Alt+F8                   |
 | Load Recording           | Alt+F7                   | Alt+F7                   |
 | Command                  | F10                      | F10                      |
-| Go To Line               | Alt+G                    | Shift+Alt+G              |
+| Go To Line               | Alt+G                    | Ctrl+G                   |
 | Start of Line            | Home                     | Home                     |
 | End of Line              | End                      | End                      |
 | Start of Buffer          | Alt+Home                 |                          |
@@ -48,23 +48,23 @@ own buffer.
 | Screen Up                | Ctrl+E                   | Ctrl+E                   |
 | Line to Top of Window    | Ctrl+T                   | Ctrl+T                   |
 | Line to Bottom of Window | Ctrl+B                   | Ctrl+B                   |
-| Centre Screen            | Ctrl+C                   | Ctrl+C                   |
+| Centre Screen            | Ctrl+C                   | Ctrl+W                   |
 | Mark                     | Alt+M                    | Alt+M                    |
 | Mark Line                | Alt+L                    | Alt+L                    |
 | Mark Column              | Alt+C                    | Alt+C                    |
-| Copy to Scrap            | Ctrl+OemPlus             |                          |
-| Cut to Scrap             | Ctrl+OemMinus            |                          |
-| Paste from Scrap         | Insert                   |                          |
+| Copy to Scrap            | Ctrl+OemPlus             | Ctrl+C                   |
+| Cut to Scrap             | Ctrl+OemMinus            | Ctrl+X                   |
+| Paste from Scrap         | Insert                   | Ctrl+V                   |
 | Delete Line              | Alt+D                    | Alt+D                    |
-| Delete to Start of Line  | Ctrl_K                   | Ctrl_K                   |
+| Delete to Start of Line  | Ctrl+K                   |                          |
 | Delete to End of Line    | Alt+K                    | Alt+K                    |
-| Next Buffer              | Shift+Alt+N              |                          |
-| Previous Buffer          | Shift+Alt+               |                          |
+| Next Buffer              | Alt+N                    | Ctrl+N                   |
+| Previous Buffer          | Alt+-                    | Ctrl+P                   |
 | Search Forward           | F5 or Alt+S              | F5 or Alt+S              |
 | Search Backward          | Alt+F5                   |                          |
 | Search Again             | Shift+F5                 |                          |
 | Translate                | F6 or Alt+T              | F6 or Alt+T              |
 | Translate Backward       | Alt+F6                   |                          |
 | Translate Again          | Shift+F6                 |                          |
-| Toggle Case Search       | Ctrl+F5                  |                          |
-| Toggle RegEx Search      | Ctrl+F6                  |                          |
+| Toggle Case Search       | Ctrl+F5                  | Ctrl+S                   |
+| Toggle RegEx Search      | Ctrl+F6                  | Ctrl+F                   |
