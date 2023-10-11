@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using JComLib;
 
 namespace JShell;
@@ -44,22 +45,40 @@ internal static class Program {
         { "help", new CommandDefinition { Function = CmdHelp, Description = "Display this help" } }
     };
 
+    /// <summary>
+    /// Shell home folder, where user files are stored
+    /// </summary>
+    public static string HomeFolder { get; private set; }
+
+    /// <summary>
+    /// Shell binary folder, where executables are stored
+    /// </summary>
+    public static string BinaryFolder { get; private set; }
+
     private static void Main() {
 
-        Console.WriteLine($"{AssemblySupport.AssemblyDescription} {AssemblySupport.AssemblyVersion}");
-        Console.WriteLine($"{AssemblySupport.AssemblyCopyright}");
+        Console.WriteLine($@"{AssemblySupport.AssemblyDescription} {AssemblySupport.AssemblyVersion}");
+        Console.WriteLine($@"{AssemblySupport.AssemblyCopyright}");
         Console.WriteLine();
 
         // Ensure we have a home folder and set it as the default.
-        string homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        string josRoot = $"{homeFolder}/jos/home";
-        if (!Directory.Exists(josRoot)) {
-            Directory.CreateDirectory(josRoot);
+        // Get the full name path of the executable file
+        ProcessModule mainModule = Process.GetCurrentProcess().MainModule;
+        if (mainModule == null) {
+            return;
         }
-        Directory.SetCurrentDirectory(josRoot);
+        BinaryFolder = Path.GetDirectoryName(mainModule.FileName);
+        if (BinaryFolder == null) {
+            return;
+        }
+        HomeFolder = $"{Directory.GetParent(BinaryFolder)?.FullName}/home";
+        if (!Directory.Exists(HomeFolder)) {
+            Directory.CreateDirectory(HomeFolder);
+        }
+        Directory.SetCurrentDirectory(HomeFolder);
 
         while (true) {
-            Console.Write("$ ");
+            Console.Write(@"$ ");
             ReadLine readLine = new() {
                 AllowHistory = true
             };
@@ -74,7 +93,7 @@ internal static class Program {
                 if (CommandMap.TryGetValue(command.ToLower(), out CommandDefinition commandFunc)) {
                     commandFunc.Function(cmdLine);
                 } else {
-                    Console.WriteLine($"Unknown command {command}");
+                    Console.WriteLine(Shell.UnknownCommand, command);
                     break;
                 }
                 command = cmdLine.NextWord();
@@ -88,7 +107,7 @@ internal static class Program {
 
         int maxLength = CommandMap.Keys.Max(k => k.Length);
         foreach (string key in CommandMap.Keys.OrderBy(k => k)) {
-            Console.WriteLine(key.PadRight(maxLength) + " ... " + CommandMap[key].Description);
+            Console.WriteLine(key.PadRight(maxLength) + @" ... " + CommandMap[key].Description);
         }
         return true;
     }
