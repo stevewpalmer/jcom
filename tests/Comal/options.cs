@@ -62,7 +62,7 @@ namespace ComalTests {
 
             Assert.IsFalse(opts.Inline);
             Assert.IsTrue(opts.GenerateDebug);
-            Assert.IsTrue(opts.Interactive);
+            Assert.IsFalse(opts.Interactive);
             Assert.IsTrue(opts.Messages.Count == 1);
             Assert.IsTrue(opts.Messages[0].Code == MessageCode.BADOPTION);
         }

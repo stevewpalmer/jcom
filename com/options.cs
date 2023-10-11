@@ -176,7 +176,9 @@ public class Options {
     /// </summary>
     private void DisplayVersion() {
         Version ver = Assembly.GetEntryAssembly()?.GetName().Version;
-        Messages.Info($"{ver.Major}.{ver.Minor}.{ver.Build}");
+        if (ver != null) {
+            Messages.Info($"{ver.Major}.{ver.Minor}.{ver.Build}");
+        }
     }
 
     /// <summary>
@@ -189,6 +191,7 @@ public class Options {
     public virtual bool Parse(string[] arguments) {
         PropertyInfo[] props = GetType().GetProperties();
 
+        bool success = true;
         foreach (string optstring in arguments) {
             if (optstring.StartsWith("-")) {
                 string[] opts = optstring[1..].ToLower().Split(':');
@@ -235,7 +238,7 @@ public class Options {
                             if (opts[0] == da.Name || opts[0] == da.ShortName) {
 
                                 if (prop.PropertyType == typeof(bool)) {
-                                    prop.SetValue(this, true);
+                                    prop.SetValue(this, !da.Name.StartsWith("-no"));
                                 }
                                 if (prop.PropertyType == typeof(int)) {
                                     if (opts.Length < 2 || !int.TryParse(opts[1], out int value) || value < da.MinRange || value > da.MaxRange) {
@@ -258,12 +261,12 @@ public class Options {
                 }
                 if (!validOption) {
                     Messages.Error(MessageCode.BADOPTION, $"Invalid option -{opts[0]}");
-                    return false;
+                    success = false;
                 }
             } else {
                 SourceFiles.Add(optstring);
             }
         }
-        return true;
+        return success;
     }
 }
