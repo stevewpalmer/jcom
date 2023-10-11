@@ -75,7 +75,7 @@ public class Search {
     /// <summary>
     /// Replacement string if we're translating.
     /// </summary>
-    public string ReplacementString { get; set; }
+    public string ReplacementString { get; init; }
 
     /// <summary>
     /// Count of translations performed.
@@ -83,11 +83,16 @@ public class Search {
     public int TranslateCount { get; set; }
 
     /// <summary>
+    /// Whether the most recent match succeeded.
+    /// </summary>
+    public bool MatchSuccess { get; private set; }
+
+    /// <summary>
     /// Length of matched text. For RegExp searches, this may be
     /// variable with each match. Otherwise it will be the length of
     /// the search string.
     /// </summary>
-    public int MatchLength { get; set; }
+    public int MatchLength { get; private set; }
 
     /// <summary>
     /// Return the next instance of the search string in the buffer. If a match
@@ -105,7 +110,7 @@ public class Search {
     /// </summary>
     /// <returns></returns>
     private bool NextForward() {
-        bool foundMatch = false;
+        MatchSuccess = false;
         while (Row < _buffer.Length) {
             string line = _buffer.GetLine(Row);
             if (++Column == line.Length) {
@@ -128,13 +133,13 @@ public class Search {
             }
             if (matchIndex >= 0) {
                 Column = matchIndex;
-                foundMatch = true;
+                MatchSuccess = true;
                 break;
             }
             ++Row;
             Column = -1;
         }
-        return foundMatch;
+        return MatchSuccess;
     }
 
     /// <summary>
@@ -142,7 +147,7 @@ public class Search {
     /// back through the file.
     /// </summary>
     private bool NextBack() {
-        bool foundMatch = false;
+        MatchSuccess = false;
         while (Row >= 0) {
             string line = _buffer.GetLine(Row);
             if (Column == -1) {
@@ -168,12 +173,12 @@ public class Search {
             }
             if (matchIndex >= 0) {
                 Column = matchIndex;
-                foundMatch = true;
+                MatchSuccess = true;
                 break;
             }
             --Row;
             Column = -1;
         }
-        return foundMatch;
+        return MatchSuccess;
     }
 }

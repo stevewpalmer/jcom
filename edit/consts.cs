@@ -51,4 +51,9 @@ public static class Consts {
     /// Internal end-of-line character.
     /// </summary>
     public const char EndOfLine = '\n';
+
+    /// <summary>
+    /// Backup file extension
+    /// </summary>
+    public const string BackupExtension = ".bak";
 }

@@ -245,6 +245,11 @@ public class Buffer {
     /// Write the buffer back to disk.
     /// </summary>
     public void Write() {
+        if (Screen.Config.BackupFile && File.Exists(Filename)) {
+            string backupFile = Filename + Consts.BackupExtension;
+            File.Delete(backupFile);
+            File.Copy(Filename, backupFile);
+        }
         File.WriteAllText(Filename, Content);
         Modified = false;
         NewFile = false;

@@ -177,4 +177,10 @@
     <data name="TranslatePrompt" xml:space="preserve">
         <value>Change [Yes!No!Global!One]? </value>
     </data>
+    <data name="NoBackupFiles" xml:space="preserve">
+        <value>Backup files will be created.</value>
+    </data>
+    <data name="BackupFiles" xml:space="preserve">
+        <value>Backup files will not be created.</value>
+    </data>
 </root>

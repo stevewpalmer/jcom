@@ -110,8 +110,11 @@ public class Screen {
                 return RenderHint.CURSOR_STATUS;
             }
         }
+        _activeWindow.PreCommand();
         RenderHint flags = command.Id switch {
             KeyCommand.KC_ASSIGNTOKEY => AssignToKey(command),
+            KeyCommand.KC_BACKUPFILE => ToggleBackup(),
+            KeyCommand.KC_BORDERS => ToggleBorders(),
             KeyCommand.KC_CD => ChangeDirectory(command),
             KeyCommand.KC_CLOCK => ToggleClock(),
             KeyCommand.KC_CLOSE => CloseWindow(),
@@ -172,7 +175,7 @@ public class Screen {
             StatusBar.Message(message);
         }
         _windowList.Add(theWindow);
-        theWindow.SetViewportBounds(1, 1, Terminal.Width - 2, Terminal.Height - 3);
+        SetWindowViewport(theWindow);
     }
 
     /// <summary>
@@ -481,7 +484,7 @@ public class Screen {
         RenderHint flags = RenderHint.NONE;
         if (_search != null) {
             flags |= _activeWindow.Search(_search);
-            StatusBar.Message(flags == RenderHint.NONE ? Edit.PatternNotFound : Edit.SearchCompleted);
+            StatusBar.Message(_search.MatchSuccess ? Edit.SearchCompleted : Edit.PatternNotFound);
         }
         return flags;
     }
@@ -544,9 +547,9 @@ public class Screen {
         if (_search != null) {
             _search.TranslateCount = 0;
             flags |= _activeWindow.Translate(_search);
-            StatusBar.Message(_search.TranslateCount == 0 ?
-                Edit.PatternNotFound :
-                string.Format(Edit.TranslateComplete, _search.TranslateCount));
+            StatusBar.Message(_search.MatchSuccess ?
+                string.Format(Edit.TranslateComplete, _search.TranslateCount) :
+                Edit.PatternNotFound);
         }
         return flags;
     }
@@ -641,6 +644,37 @@ public class Screen {
             }
         }
         return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Toggle whether or not backup files are created when the buffer
+    /// is saved.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint ToggleBackup() {
+        Config.BackupFile = !Config.BackupFile;
+        StatusBar.Message(Config.BackupFile ? Edit.NoBackupFiles : Edit.BackupFiles);
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Toggle whether or not window borders are drawn.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint ToggleBorders() {
+        Config.HideBorders = !Config.HideBorders;
+        foreach (Window window in _windowList) {
+            SetWindowViewport(window);
+        }
+        return RenderHint.REFRESH;
+    }
+
+    /// <summary>
+    /// Set the viewport for the specified window.
+    /// </summary>
+    /// <param name="theWindow"></param>
+    private static void SetWindowViewport(Window theWindow) {
+        theWindow.SetViewportBounds(1, 1, Terminal.Width - 2, Terminal.Height - 3);
     }
 
     /// <summary>

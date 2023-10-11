@@ -34,6 +34,8 @@ public enum KeyCommand {
     KC_NONE,
     KC_ASSIGNTOKEY,
     KC_BACKSPACE,
+    KC_BACKUPFILE,
+    KC_BORDERS,
     KC_CD,
     KC_CDOWN,
     KC_CENTRE,
@@ -124,6 +126,7 @@ public class KeyMap {
         new() { CommandName = "assign_to_key", CommandId = KeyCommand.KC_ASSIGNTOKEY },
         new() { CommandName = "backspace", CommandId = KeyCommand.KC_BACKSPACE },
         new() { CommandName = "beginning_of_line", CommandId = KeyCommand.KC_CLINESTART },
+        new() { CommandName = "borders", CommandId = KeyCommand.KC_BORDERS },
         new() { CommandName = "cd", CommandId = KeyCommand.KC_CD },
         new() { CommandName = "center_line", CommandId = KeyCommand.KC_CENTRE },
         new() { CommandName = "centre_line", CommandId = KeyCommand.KC_CENTRE },
@@ -150,6 +153,8 @@ public class KeyMap {
         new() { CommandName = "goto_line", CommandId = KeyCommand.KC_GOTO },
         new() { CommandName = "load_keystroke_macro", CommandId = KeyCommand.KC_LOADKEYSTROKES },
         new() { CommandName = "mark", CommandId = KeyCommand.KC_MARK },
+        new() { CommandName = "mark_col", CommandId = KeyCommand.KC_MARKCOLUMN },
+        new() { CommandName = "mark_line", CommandId = KeyCommand.KC_MARKLINE },
         new() { CommandName = "next_char", CommandId = KeyCommand.KC_CRIGHT },
         new() { CommandName = "next_word", CommandId = KeyCommand.KC_CWORDRIGHT },
         new() { CommandName = "open_line", CommandId = KeyCommand.KC_OPENLINE },
@@ -170,6 +175,7 @@ public class KeyMap {
         new() { CommandName = "search_case", CommandId = KeyCommand.KC_SEARCHCASE },
         new() { CommandName = "search_fwd", CommandId = KeyCommand.KC_SEARCHFORWARD },
         new() { CommandName = "self_insert", CommandId = KeyCommand.KC_SELFINSERT },
+        new() { CommandName = "set_backup", CommandId = KeyCommand.KC_BACKUPFILE },
         new() { CommandName = "show_clock", CommandId = KeyCommand.KC_CLOCK },
         new() { CommandName = "toggle_re", CommandId = KeyCommand.KC_REGEXP },
         new() { CommandName = "tolower", CommandId = KeyCommand.KC_LOWERCASE },
@@ -270,6 +276,8 @@ public class KeyMap {
     /// </summary>
     private static readonly KeyMap[] KeyMaps = {
         new() { KeyCommand = KeyCommand.KC_BACKSPACE, Key = ConsoleKey.Backspace },
+        new() { KeyCommand = KeyCommand.KC_BACKUPFILE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.W },
+        new() { KeyCommand = KeyCommand.KC_BORDERS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F1 },
         new() { KeyCommand = KeyCommand.KC_CDOWN, Key = ConsoleKey.DownArrow },
         new() { KeyCommand = KeyCommand.KC_CENTRE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.C },
         new() { KeyCommand = KeyCommand.KC_CFILEEND, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.End },
@@ -345,6 +353,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_VERSION, KeyChar = 8730 },
         new() { KeyCommand = KeyCommand.KC_VERSION, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.V },
         new() { KeyCommand = KeyCommand.KC_WRITEANDEXIT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.X },
+        new() { KeyCommand = KeyCommand.KC_WRITEBUFFER, KeyChar = 8721 },
         new() { KeyCommand = KeyCommand.KC_WRITEBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.W }
     };
 
@@ -368,6 +377,7 @@ public class KeyMap {
 
         KeyMap match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
         KeyCommand commandId = match?.KeyCommand ?? KeyCommand.KC_NONE;
+        Screen.StatusBar.Message($"KeyChar={keyIn.KeyChar}, Key={keyIn.Key}, Modifiers={keyIn.Modifiers}");
         Parser commandArgs = new Parser(string.Empty);
         if (commandId == KeyCommand.KC_NONE && !char.IsControl(keyIn.KeyChar)) {
             commandId = KeyCommand.KC_SELFINSERT;

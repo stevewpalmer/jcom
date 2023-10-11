@@ -121,4 +121,15 @@ public class Config {
     /// Last translate command pattern
     /// </summary>
     public string LastTranslatePattern { get; set; }
+
+    /// <summary>
+    /// Specifies whether or not a backup file is created when a buffer
+    /// is saved.
+    /// </summary>
+    public bool BackupFile { get; set; }
+
+    /// <summary>
+    /// Specifies whether we hide the window borders.
+    /// </summary>
+    public bool HideBorders { get; set; }
 }

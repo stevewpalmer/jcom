@@ -362,5 +362,17 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("TranslatePrompt", resourceCulture);
             }
         }
+        
+        internal static string NoBackupFiles {
+            get {
+                return ResourceManager.GetString("NoBackupFiles", resourceCulture);
+            }
+        }
+        
+        internal static string BackupFiles {
+            get {
+                return ResourceManager.GetString("BackupFiles", resourceCulture);
+            }
+        }
     }
 }

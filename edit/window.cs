@@ -36,6 +36,7 @@ public class Window {
     private MarkMode _markMode;
     private Point _markAnchor;
     private Point _lastMarkPoint;
+    private Extent _searchExtent;
 
     /// <summary>
     /// Create an empty window
@@ -66,6 +67,9 @@ public class Window {
     /// <param name="height">Height of window</param>
     public void SetViewportBounds(int x, int y, int width, int height) {
         _viewportBounds = new Rectangle(x, y, width, height);
+        if (Screen.Config.HideBorders) {
+            _viewportBounds.Inflate(1, 1);
+        }
     }
 
     /// <summary>
@@ -74,6 +78,16 @@ public class Window {
     public void Refresh() {
         RenderFrame();
         Render(RenderHint.REDRAW);
+    }
+
+    /// <summary>
+    /// Handle actions before a top-level command. If there is a buffer
+    /// invalidation pending then apply that first.
+    /// </summary>
+    public void PreCommand() {
+        if (Buffer.InvalidateExtent.Valid) {
+            ApplyRenderHint(RenderHint.BLOCK);
+        }
     }
 
     /// <summary>
@@ -159,13 +173,10 @@ public class Window {
     /// <param name="searchData">A search object</param>
     /// <returns>Render hint</returns>
     public RenderHint Search(Search searchData) {
-        RenderHint flags = RenderHint.NONE;
         if (searchData.Next()) {
-            Buffer.LineIndex = searchData.Row;
-            Buffer.Offset = searchData.Column;
-            flags |= CursorFromLineIndex();
+            MarkSearch(searchData);
         }
-        return ApplyRenderHint(flags);
+        return RenderHint.NONE;
     }
 
     /// <summary>
@@ -180,10 +191,9 @@ public class Window {
         bool prompt = true;
         bool finish = false;
         while (!finish && searchData.Next()) {
-            Buffer.LineIndex = searchData.Row;
-            Buffer.Offset = searchData.Column;
+            MarkSearch(searchData);
             if (prompt) {
-                char[] validChars = new[] { 'y', 'n', 'g', 'o' };
+                char[] validChars = { 'y', 'n', 'g', 'o' };
                 if (!Screen.StatusBar.Prompt(Edit.TranslatePrompt, validChars, 'n', out char inputChar)) {
                     break;
                 }
@@ -207,23 +217,42 @@ public class Window {
     }
 
     /// <summary>
+    /// Highlight the matched search string
+    /// </summary>
+    /// <param name="searchData">Search string</param>
+    private void MarkSearch(Search searchData) {
+        RenderHint flags = RenderHint.BLOCK;
+        _lastMarkPoint = Buffer.Cursor;
+        Buffer.LineIndex = searchData.Row;
+        Buffer.Offset = searchData.Column;
+        _markMode = MarkMode.SEARCH;
+        _searchExtent = new Extent()
+            .Add(Buffer.Cursor)
+            .Add(new Point(Buffer.Offset + searchData.MatchLength - 1, Buffer.LineIndex));
+        flags |= CursorFromOffset();
+        ApplyRenderHint(flags);
+    }
+
+    /// <summary>
     /// Draw the window frame
     /// </summary>
     private void RenderFrame() {
-        Rectangle frameRect = _viewportBounds;
-        frameRect.Inflate(1, 1);
+        if (!Screen.Config.HideBorders) {
+            Rectangle frameRect = _viewportBounds;
+            frameRect.Inflate(1, 1);
 
-        RenderTitle();
+            RenderTitle();
 
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+            Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
 
-        for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
-            Terminal.SetCursor(frameRect.Left, c);
-            Terminal.Write($"\u2502{new string(' ', frameRect.Width - 2)}\u2502");
+            for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
+                Terminal.SetCursor(frameRect.Left, c);
+                Terminal.Write($"\u2502{new string(' ', frameRect.Width - 2)}\u2502");
+            }
+
+            Terminal.SetCursor(frameRect.Left, frameRect.Height - 1);
+            Terminal.Write($"\u2558{new string('═', frameRect.Width - 2)}\u255b");
         }
-
-        Terminal.SetCursor(frameRect.Left, frameRect.Height - 1);
-        Terminal.Write($"\u2558{new string('═', frameRect.Width - 2)}\u255b");
     }
 
     /// <summary>
@@ -231,22 +260,24 @@ public class Window {
     /// is narrower than the title then we truncate the title to fit.
     /// </summary>
     private void RenderTitle() {
-        string title = Buffer.Name;
-        Rectangle frameRect = _viewportBounds;
-        frameRect.Inflate(1, 1);
-        Point savedCursor = Terminal.GetCursor();
+        if (!Screen.Config.HideBorders) {
+            string title = Buffer.Name;
+            Rectangle frameRect = _viewportBounds;
+            frameRect.Inflate(1, 1);
+            Point savedCursor = Terminal.GetCursor();
 
-        Terminal.SetCursor(frameRect.Left, frameRect.Top);
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
-        Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
+            Terminal.SetCursor(frameRect.Left, frameRect.Top);
+            Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+            Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
+            Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
 
-        int realLength = Math.Min(title.Length, frameRect.Width - 4);
-        Terminal.SetCursor((frameRect.Width - realLength - 2) / 2, 0);
-        Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
-        Terminal.Write($@" {title[..realLength]} ");
+            int realLength = Math.Min(title.Length, frameRect.Width - 4);
+            Terminal.SetCursor((frameRect.Width - realLength - 2) / 2, 0);
+            Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
+            Terminal.Write($@" {title[..realLength]} ");
 
-        Terminal.SetCursor(savedCursor);
+            Terminal.SetCursor(savedCursor);
+        }
     }
 
     /// <summary>
@@ -264,9 +295,7 @@ public class Window {
             .Add(new Point(0, _viewportOffset.Y))
             .Add(new Point(0, _viewportOffset.Y + _viewportBounds.Height - 1));
 
-        Extent markExtent = new Extent()
-            .Add(_markAnchor)
-            .Add(Buffer.Cursor);
+        Extent markExtent = new Extent();
 
         // For block updates, we're scoping the area being rendered down to just those
         // lines that are affected. For changes to the block mark, this would be the
@@ -276,18 +305,28 @@ public class Window {
         // is the superset of the two, limited to the area of the visible window.
         if (flags.HasFlag(RenderHint.BLOCK)) {
             Extent blockExtent = new Extent();
-            if (_markMode != MarkMode.NONE) {
-                blockExtent
-                    .Add(_markAnchor)
-                    .Add(Buffer.Cursor)
-                    .Add(_lastMarkPoint);
+            if (_markMode == MarkMode.SEARCH) {
+                markExtent = new Extent()
+                    .Add(_searchExtent.Start)
+                    .Add(_searchExtent.End);
             }
+            else if (_markMode != MarkMode.NONE) {
+                markExtent = new Extent()
+                    .Add(_markAnchor)
+                    .Add(Buffer.Cursor);
+            }
+            blockExtent
+                .Add(markExtent.Start)
+                .Add(markExtent.End)
+                .Add(_lastMarkPoint);
             if (Buffer.InvalidateExtent.Valid) {
                 blockExtent
                     .Add(Buffer.InvalidateExtent.Start)
                     .Add(Buffer.InvalidateExtent.End);
             }
-            renderExtent.Subtract(blockExtent.Start, blockExtent.End);
+            if (blockExtent.Valid) {
+                renderExtent.Subtract(blockExtent.Start, blockExtent.End);
+            }
         }
 
         int i = renderExtent.Start.Y;
@@ -335,6 +374,7 @@ public class Window {
                     break;
 
                 case MarkMode.CHARACTER:
+                case MarkMode.SEARCH:
                     if (i == markExtent.Start.Y) {
                         if (markExtent.Start.X > 0 && markExtent.Start.X > _viewportOffset.X) {
                             int diff = markExtent.Start.X - _viewportOffset.X;
@@ -382,6 +422,16 @@ public class Window {
 
         // Indicate that all buffer modifications have been rendered.
         Buffer.InvalidateExtent.Clear();
+
+        // Search highlighting is temporary and needs to be removed in response
+        // to the next keystroke.
+        if (_markMode == MarkMode.SEARCH) {
+            Buffer.InvalidateExtent
+                .Add(_searchExtent.Start)
+                .Add(_searchExtent.End);
+            _searchExtent.Clear();
+            _markMode = MarkMode.NONE;
+        }
 
         Terminal.SetCursor(savedCursor);
         PlaceCursor();

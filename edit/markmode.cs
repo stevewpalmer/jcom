@@ -45,5 +45,10 @@ public enum MarkMode {
     /// <summary>
     /// Column marking
     /// </summary>
-    COLUMN
+    COLUMN,
+
+    /// <summary>
+    /// Temporary search string mark
+    /// </summary>
+    SEARCH
 }
