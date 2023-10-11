@@ -46,7 +46,7 @@ public partial class Compiler {
     // OPEN keyword
     // Opens a data file for reading or writing.
     private ParseNode KOpen() {
-        ExtCallParseNode node = new("JFortranLib.IO,jforlib", "OPEN");
+        ExtCallParseNode node = new("JFortranLib.IO,forlib", "OPEN");
 
         InitFunctionNodes();
 
@@ -75,7 +75,7 @@ public partial class Compiler {
     // CLOSE keyword
     // Close a data file.
     private ParseNode KClose() {
-        ExtCallParseNode node = new("JFortranLib.IO,jforlib", "CLOSE");
+        ExtCallParseNode node = new("JFortranLib.IO,forlib", "CLOSE");
 
         InitFunctionNodes();
 
@@ -104,7 +104,7 @@ public partial class Compiler {
     // INQUIRE keyword
     // Inquire of the state of a file.
     private ParseNode KInquire() {
-        ExtCallParseNode node = new("JFortranLib.IO,jforlib", "INQUIRE");
+        ExtCallParseNode node = new("JFortranLib.IO,forlib", "INQUIRE");
 
         InitFunctionNodes();
 
@@ -252,7 +252,7 @@ public partial class Compiler {
     // Generic function that handles ENDFILE, BACKSPACE and REWIND since they
     // all take the exact same parameters.
     private ParseNode PositionStatement(string keyword) {
-        ExtCallParseNode node = new("JFortranLib.IO,jforlib", keyword);
+        ExtCallParseNode node = new("JFortranLib.IO,forlib", keyword);
 
         InitFunctionNodes();
 

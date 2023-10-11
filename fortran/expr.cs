@@ -476,7 +476,7 @@ public partial class Compiler {
         IntrDefinition intrDefinition = Intrinsics.IntrinsicDefinition(name);
         Debug.Assert(intrDefinition != null);
 
-        ExtCallParseNode tokenNode = new("JFortranLib.Intrinsics,jforlib", intrDefinition.FunctionName);
+        ExtCallParseNode tokenNode = new("JFortranLib.Intrinsics,forlib", intrDefinition.FunctionName);
 
         SymType argType = SymType.NONE;
         int countOfParams = 0;

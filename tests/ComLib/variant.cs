@@ -112,7 +112,7 @@ namespace ComLibTests {
             Assert.AreEqual(45f, v1.RealValue);
             Assert.AreEqual(45d, v1.DoubleValue);
             Assert.AreEqual(true, v1.BoolValue);
-            Assert.AreEqual("(45, 8)", v1.StringValue);
+            Assert.AreEqual("<45; 8>", v1.StringValue);
             Assert.AreEqual(VariantType.COMPLEX, v1.Type);
             Assert.IsTrue(v1.IsNumber);
             Assert.IsFalse(v1.IsZero);

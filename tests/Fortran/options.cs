@@ -53,9 +53,9 @@ namespace FortranTests {
         public void ValidateOptionParsing() {
             FortranOptions opts = new();
             string[] args = {
-                "-backslash",
-                "-invalidoption",
-                "-debug" };
+                "--backslash",
+                "--invalidoption",
+                "--debug" };
             Assert.IsFalse(opts.Parse(args));
 
             Assert.IsTrue(opts.Backslash);
@@ -68,9 +68,9 @@ namespace FortranTests {
         public void ValidateFilenameParsing() {
             FortranOptions opts = new();
             string[] args = {
-                "-backslash",
+                "--backslash",
                 "testfile1.f",
-                "-debug",
+                "--debug",
                 "testfile2.f"
             };
 

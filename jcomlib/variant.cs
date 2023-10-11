@@ -29,12 +29,10 @@ using System.Numerics;
 
 namespace JComLib;
 
-
 /// <summary>
 /// Variant type
 /// </summary>
-public enum VariantType
-{
+public enum VariantType {
     NONE,
     INTEGER,
     FLOAT,
@@ -48,11 +46,9 @@ public enum VariantType
 /// Encapsulates a value in any supported type and provides an
 /// interface for setting and retrieving the value.
 /// </summary>
-public class Variant
-{
+public class Variant {
 
-    public Variant()
-    {
+    public Variant() {
         HasValue = false;
         Type = VariantType.NONE;
     }
@@ -61,14 +57,31 @@ public class Variant
     /// Instantiates a variant from an object.
     /// </summary>
     /// <param name="value">Object value to set</param>
-    public Variant(object value)
-    {
-        if (value is float floatValue) { Set(floatValue); return; }
-        if (value is int intValue) { Set(intValue); return; }
-        if (value is double doubleValue) { Set(doubleValue); return; }
-        if (value is string stringValue) { Set(stringValue); return; }
-        if (value is bool boolValue) { Set(boolValue); return; }
-        if (value is Complex complexValue) { Set(complexValue); return; }
+    public Variant(object value) {
+        if (value is float floatValue) {
+            Set(floatValue);
+            return;
+        }
+        if (value is int intValue) {
+            Set(intValue);
+            return;
+        }
+        if (value is double doubleValue) {
+            Set(doubleValue);
+            return;
+        }
+        if (value is string stringValue) {
+            Set(stringValue);
+            return;
+        }
+        if (value is bool boolValue) {
+            Set(boolValue);
+            return;
+        }
+        if (value is Complex complexValue) {
+            Set(complexValue);
+            return;
+        }
         Debug.Assert(false, "Invalid object type");
     }
 
@@ -76,8 +89,7 @@ public class Variant
     /// Instantiates a boolean variant.
     /// </summary>
     /// <param name="value">Boolean value to set</param>
-    public Variant(bool value)
-    {
+    public Variant(bool value) {
         Set(value);
     }
 
@@ -85,8 +97,7 @@ public class Variant
     /// Instantiates an integer variant.
     /// </summary>
     /// <param name="value">Integer value to set</param>
-    public Variant(int value)
-    {
+    public Variant(int value) {
         Set(value);
     }
 
@@ -94,8 +105,7 @@ public class Variant
     /// Instantiates a floating point variant.
     /// </summary>
     /// <param name="value">Float value to set</param>
-    public Variant(float value)
-    {
+    public Variant(float value) {
         Set(value);
     }
 
@@ -103,8 +113,7 @@ public class Variant
     /// Instantiates a double variant.
     /// </summary>
     /// <param name="value">Double value to set</param>
-    public Variant(double value)
-    {
+    public Variant(double value) {
         Set(value);
     }
 
@@ -112,8 +121,7 @@ public class Variant
     /// Instantiates a string variant.
     /// </summary>
     /// <param name="value">String value to set</param>
-    public Variant(string value)
-    {
+    public Variant(string value) {
         Set(value);
     }
 
@@ -121,8 +129,7 @@ public class Variant
     /// Instantiates a complex variant.
     /// </summary>
     /// <param name="value">Complex value to set</param>
-    public Variant(Complex value)
-    {
+    public Variant(Complex value) {
         Set(value);
     }
 
@@ -132,8 +139,7 @@ public class Variant
     /// </summary>
     /// <param name="i">An integer value</param>
     /// <returns>A new VarType representing the specified integer value</returns>
-    public static explicit operator Variant(int i)
-    {
+    public static explicit operator Variant(int i) {
         return new Variant(i);
     }
 
@@ -144,18 +150,14 @@ public class Variant
     /// <param name="v1">First variant</param>
     /// <param name="v2">Second variant</param>
     /// <returns>A VarType that contains the result of adding v to this variant</returns>
-    public static Variant operator +(Variant v1, Variant v2)
-    {
-        if (v1 == null)
-        {
+    public static Variant operator +(Variant v1, Variant v2) {
+        if (v1 == null) {
             throw new ArgumentNullException(nameof(v1));
         }
-        if (v2 == null)
-        {
+        if (v2 == null) {
             throw new ArgumentNullException(nameof(v2));
         }
-        return LargestType(v1.Type, v2.Type) switch
-        {
+        return LargestType(v1.Type, v2.Type) switch {
             VariantType.DOUBLE => new Variant(v1.DoubleValue + v2.DoubleValue),
             VariantType.INTEGER => new Variant(v1.IntValue + v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue + v2.RealValue),
@@ -171,8 +173,7 @@ public class Variant
     /// </summary>
     /// <param name="v">The variant to be added to this one</param>
     /// <returns>A VarType that contains the result of adding v to this variant</returns>
-    public Variant Add(Variant v)
-    {
+    public Variant Add(Variant v) {
         return this + v;
     }
 
@@ -182,14 +183,11 @@ public class Variant
     /// </summary>
     /// <param name="v1">Left operand</param>
     /// <returns>A VarType that contains the result of negating this variant</returns>
-    public static Variant operator -(Variant v1)
-    {
-        if (v1 == null)
-        {
+    public static Variant operator -(Variant v1) {
+        if (v1 == null) {
             throw new ArgumentNullException(nameof(v1));
         }
-        return v1.Type switch
-        {
+        return v1.Type switch {
             VariantType.DOUBLE => new Variant(-v1.DoubleValue),
             VariantType.INTEGER => new Variant(-v1.IntValue),
             VariantType.FLOAT => new Variant(-v1.RealValue),
@@ -203,8 +201,7 @@ public class Variant
     /// operator overloading.
     /// </summary>
     /// <returns>A VarType that contains the result of negating this variant</returns>
-    public Variant Negate()
-    {
+    public Variant Negate() {
         return -this;
     }
 
@@ -215,18 +212,14 @@ public class Variant
     /// <param name="v1">Left operand</param>
     /// <param name="v2">Right operand</param>
     /// <returns>A VarType that contains the result of subtracting v from this variant</returns>
-    public static Variant operator -(Variant v1, Variant v2)
-    {
-        if (v1 == null)
-        {
+    public static Variant operator -(Variant v1, Variant v2) {
+        if (v1 == null) {
             throw new ArgumentNullException(nameof(v1));
         }
-        if (v2 == null)
-        {
+        if (v2 == null) {
             throw new ArgumentNullException(nameof(v2));
         }
-        return LargestType(v1.Type, v2.Type) switch
-        {
+        return LargestType(v1.Type, v2.Type) switch {
             VariantType.DOUBLE => new Variant(v1.DoubleValue - v2.DoubleValue),
             VariantType.INTEGER => new Variant(v1.IntValue - v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue - v2.RealValue),
@@ -241,8 +234,7 @@ public class Variant
     /// </summary>
     /// <param name="v">The variant to be subtracted from this one</param>
     /// <returns>A VarType that contains the result of subtracting v from this variant</returns>
-    public Variant Subtract(Variant v)
-    {
+    public Variant Subtract(Variant v) {
         return this - v;
     }
 
@@ -253,18 +245,14 @@ public class Variant
     /// <param name="v1">Left operand</param>
     /// <param name="v2">Right operand</param>
     /// <returns>A VarType that contains the result of multiplying v with this variant</returns>
-    public static Variant operator *(Variant v1, Variant v2)
-    {
-        if (v1 == null)
-        {
+    public static Variant operator *(Variant v1, Variant v2) {
+        if (v1 == null) {
             throw new ArgumentNullException(nameof(v1));
         }
-        if (v2 == null)
-        {
+        if (v2 == null) {
             throw new ArgumentNullException(nameof(v2));
         }
-        return LargestType(v1.Type, v2.Type) switch
-        {
+        return LargestType(v1.Type, v2.Type) switch {
             VariantType.DOUBLE => new Variant(v1.DoubleValue * v2.DoubleValue),
             VariantType.INTEGER => new Variant(v1.IntValue * v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue * v2.RealValue),
@@ -279,8 +267,7 @@ public class Variant
     /// </summary>
     /// <param name="v">The variant to be multiplied by this one</param>
     /// <returns>A VarType that contains the result of multiplying v with this variant</returns>
-    public Variant Multiply(Variant v)
-    {
+    public Variant Multiply(Variant v) {
         return this * v;
     }
 
@@ -292,18 +279,14 @@ public class Variant
     /// <param name="v1">Left operand</param>
     /// <param name="v2">Right operand</param>
     /// <returns>A VarType that contains the result of dividing this variant by v</returns>
-    public static Variant operator /(Variant v1, Variant v2)
-    {
-        if (v1 == null)
-        {
+    public static Variant operator /(Variant v1, Variant v2) {
+        if (v1 == null) {
             throw new ArgumentNullException(nameof(v1));
         }
-        if (v2 == null)
-        {
+        if (v2 == null) {
             throw new ArgumentNullException(nameof(v2));
         }
-        return LargestType(v1.Type, v2.Type) switch
-        {
+        return LargestType(v1.Type, v2.Type) switch {
             VariantType.DOUBLE => new Variant(v1.DoubleValue / v2.DoubleValue),
             VariantType.INTEGER => new Variant(v1.IntValue / v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue / v2.RealValue),
@@ -318,8 +301,7 @@ public class Variant
     /// </summary>
     /// <param name="v">The variant to be divided into this one</param>
     /// <returns>A VarType that contains the result of dividing this variant by v</returns>
-    public Variant Divide(Variant v)
-    {
+    public Variant Divide(Variant v) {
         return this / v;
     }
 
@@ -331,18 +313,14 @@ public class Variant
     /// <param name="v1">Left operand</param>
     /// <param name="v2">Right operand</param>
     /// <returns>A VarType that contains the remainder after dividing this variant by v</returns>
-    public static Variant operator %(Variant v1, Variant v2)
-    {
-        if (v1 == null)
-        {
+    public static Variant operator %(Variant v1, Variant v2) {
+        if (v1 == null) {
             throw new ArgumentNullException(nameof(v1));
         }
-        if (v2 == null)
-        {
+        if (v2 == null) {
             throw new ArgumentNullException(nameof(v2));
         }
-        return LargestType(v1.Type, v2.Type) switch
-        {
+        return LargestType(v1.Type, v2.Type) switch {
             VariantType.DOUBLE => new Variant(v1.DoubleValue % v2.DoubleValue),
             VariantType.INTEGER => new Variant(v1.IntValue % v2.IntValue),
             VariantType.FLOAT => new Variant(v1.RealValue % v2.RealValue),
@@ -356,8 +334,7 @@ public class Variant
     /// </summary>
     /// <param name="v">The variant for which the remainder is to be obtained</param>
     /// <returns>A VarType that contains the remainder after dividing this variant by v</returns>
-    public Variant Modulus(Variant v)
-    {
+    public Variant Modulus(Variant v) {
         return this % v;
     }
 
@@ -368,14 +345,11 @@ public class Variant
     /// </summary>
     /// <param name="v">A variant that specifies the power</param>
     /// <returns>A VarType that contains the result of raising this variant to the power of v</returns>
-    public Variant Pow(Variant v)
-    {
-        if (v == null)
-        {
+    public Variant Pow(Variant v) {
+        if (v == null) {
             throw new ArgumentNullException(nameof(v));
         }
-        return LargestType(Type, v.Type) switch
-        {
+        return LargestType(Type, v.Type) switch {
             VariantType.DOUBLE => new Variant(Math.Pow(DoubleValue, v.DoubleValue)),
             VariantType.INTEGER => new Variant((int)Math.Pow(IntValue, v.IntValue)),
             VariantType.FLOAT => new Variant((float)Math.Pow(RealValue, v.RealValue)),
@@ -388,8 +362,7 @@ public class Variant
     /// Sets the boolean value of a variant.
     /// </summary>
     /// <param name="boolValue">Boolean value to set</param>
-    public void Set(bool boolValue)
-    {
+    public void Set(bool boolValue) {
         BoolValue = boolValue;
         IntValue = boolValue ? -1 : 0;
         DoubleValue = IntValue;
@@ -404,8 +377,7 @@ public class Variant
     /// Sets the integer value of a variant.
     /// </summary>
     /// <param name="intValue">Integer value to set</param>
-    public void Set(int intValue)
-    {
+    public void Set(int intValue) {
         DoubleValue = intValue;
         RealValue = intValue;
         IntValue = intValue;
@@ -420,8 +392,7 @@ public class Variant
     /// Sets the float value of a variant.
     /// </summary>
     /// <param name="floatValue">Float value to set</param>
-    public void Set(float floatValue)
-    {
+    public void Set(float floatValue) {
         RealValue = floatValue;
         DoubleValue = floatValue;
         IntValue = (int)floatValue;
@@ -436,8 +407,7 @@ public class Variant
     /// Sets the double value of a variant.
     /// </summary>
     /// <param name="doubleValue">Double value to set</param>
-    public void Set(double doubleValue)
-    {
+    public void Set(double doubleValue) {
         DoubleValue = doubleValue;
         RealValue = (float)doubleValue;
         IntValue = (int)doubleValue;
@@ -452,8 +422,7 @@ public class Variant
     /// Sets the string value of a variant.
     /// </summary>
     /// <param name="stringValue">String value to set</param>
-    public void Set(string stringValue)
-    {
+    public void Set(string stringValue) {
         double.TryParse(stringValue, out double _doubleValue);
         DoubleValue = _doubleValue;
         RealValue = (float)_doubleValue;
@@ -469,8 +438,7 @@ public class Variant
     /// Sets the complex value of a variant.
     /// </summary>
     /// <param name="complexValue">Complex value to set</param>
-    public void Set(Complex complexValue)
-    {
+    public void Set(Complex complexValue) {
         DoubleValue = complexValue.Real;
         RealValue = (float)complexValue.Real;
         IntValue = (int)complexValue.Real;
@@ -503,10 +471,8 @@ public class Variant
     /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="Variant"/>.</param>
     /// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current
     /// <see cref="Variant"/>; otherwise, <c>false</c>.</returns>
-    public override bool Equals(object obj)
-    {
-        if (!(obj is Variant))
-        {
+    public override bool Equals(object obj) {
+        if (!(obj is Variant)) {
             return false;
         }
         Variant s2 = (Variant)obj;
@@ -519,10 +485,8 @@ public class Variant
     /// </summary>
     /// <returns>A hash code for this instance that is suitable for use in hashing
     /// algorithms and data structures such as a hash table.</returns>
-    public override int GetHashCode()
-    {
-        unchecked
-        {
+    public override int GetHashCode() {
+        unchecked {
             int hash = 17;
             hash = hash * 23 + DoubleValue.GetHashCode();
             return hash;
@@ -531,14 +495,12 @@ public class Variant
 
     /// <summary>
     /// Implements the equality operator between two variants.
-    /// </summary>            
+    /// </summary>
     /// <param name="s1">First variant</param>
     /// <param name="s2">Second variant</param>
     /// <returns>True if the two variants are equal, false otherwise</returns>
-    public static bool operator ==(Variant s1, Variant s2)
-    {
-        if (s1 is null)
-        {
+    public static bool operator ==(Variant s1, Variant s2) {
+        if (s1 is null) {
             return s2 is null;
         }
         return s1.Compare(s2);
@@ -546,14 +508,12 @@ public class Variant
 
     /// <summary>
     /// Implements the equality operator between two variants.
-    /// </summary>            
+    /// </summary>
     /// <param name="s1">First variant</param>
     /// <param name="s2">Second variant</param>
     /// <returns>True if the two variants are equal, false otherwise</returns>
-    public static bool operator !=(Variant s1, Variant s2)
-    {
-        if (s1 is null)
-        {
+    public static bool operator !=(Variant s1, Variant s2) {
+        if (s1 is null) {
             return s2 is not null;
         }
         return !s1.Compare(s2);
@@ -564,8 +524,7 @@ public class Variant
     /// </summary>
     /// <param name="v">The integer value to compare against</param>
     /// <returns><c>true</c> if the variant is zero; otherwise, <c>false</c>.</returns>
-    public bool Compare(int v)
-    {
+    public bool Compare(int v) {
         return Compare(new Variant(v));
     }
 
@@ -574,14 +533,11 @@ public class Variant
     /// </summary>
     /// <param name="v">The variant to compare against</param>
     /// <returns><c>true</c> if the two variants match; otherwise, <c>false</c>.</returns>
-    public bool Compare(Variant v)
-    {
-        if (v is null)
-        {
+    public bool Compare(Variant v) {
+        if (v is null) {
             return false;
         }
-        return Type switch
-        {
+        return Type switch {
             VariantType.INTEGER => IntValue == v.IntValue,
             VariantType.FLOAT => RealValue.CompareTo(v.RealValue) == 0,
             VariantType.DOUBLE => DoubleValue.CompareTo(v.DoubleValue) == 0,
@@ -635,8 +591,7 @@ public class Variant
     /// Returns the variant value as a string.
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
-    {
+    public override string ToString() {
         return StringValue;
     }
 
@@ -645,10 +600,8 @@ public class Variant
     /// </summary>
     /// <param name="type">Variant type</param>
     /// <returns>The corresponding system type</returns>
-    public static Type VariantTypeToSystemType(VariantType type)
-    {
-        switch (type)
-        {
+    public static Type VariantTypeToSystemType(VariantType type) {
+        switch (type) {
             case VariantType.STRING: return typeof(string);
             case VariantType.FLOAT: return typeof(float);
             case VariantType.DOUBLE: return typeof(double);
@@ -663,14 +616,11 @@ public class Variant
     // Return the variant type that can contain the largest of the two given. The types
     // must both be numeric. Thus if one type is double and the other is integer, an
     // double is returned since it can contain a value of both types.
-    private static VariantType LargestType(VariantType op1, VariantType op2)
-    {
-        if (op1 == VariantType.INTEGER)
-        {
+    private static VariantType LargestType(VariantType op1, VariantType op2) {
+        if (op1 == VariantType.INTEGER) {
             return op2;
         }
-        if (op1 == VariantType.FLOAT)
-        {
+        if (op1 == VariantType.FLOAT) {
             return op2 == VariantType.INTEGER ? op1 : op2;
         }
         return op1;

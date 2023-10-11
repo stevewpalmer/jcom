@@ -55,9 +55,9 @@ namespace ComalTests {
         public void ValidateOptionParsing() {
             ComalOptions opts = new();
             string[] args = {
-                "-noinline",
-                "-invalidoption",
-                "-debug" };
+                "--noinline",
+                "--invalidoption",
+                "--debug" };
             Assert.IsFalse(opts.Parse(args));
 
             Assert.IsFalse(opts.Inline);
@@ -73,7 +73,7 @@ namespace ComalTests {
             ComalOptions opts = new();
             string[] args = {
                 "testfile1.cml",
-                "-debug",
+                "--debug",
                 "testfile2.cml"
             };
 
@@ -91,7 +91,7 @@ namespace ComalTests {
             ComalOptions opts = new();
             string[] args = {
                 "testfile1.",
-                "-debug",
+                "--debug",
                 "testfile2"
             };
 
