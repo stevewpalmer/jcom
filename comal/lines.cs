@@ -45,7 +45,7 @@ public class Line {
     public Line(SimpleToken[] tokens) {
         _tokens = tokens.ToList();
         Debug.Assert(_tokens.Count > 0);
-        Debug.Assert(_tokens[_tokens.Count-1].ID == TokenID.EOL);
+        Debug.Assert(_tokens[^1].ID == TokenID.EOL);
         _tindex = 0;
     }
 
@@ -87,7 +87,7 @@ public class Line {
                 }
                 token = Tokens[index];
             }
-            return token.ID == TokenID.EOL || token.ID == TokenID.COMMENT;
+            return token.ID is TokenID.EOL or TokenID.COMMENT;
         }
     }
 
@@ -97,7 +97,7 @@ public class Line {
     public bool IsAtEndOfStatement {
         get {
             SimpleToken token = PeekToken();
-            return token.ID == TokenID.COMMENT || token.ID == TokenID.EOL || token.ID == TokenID.KELSE;
+            return token.ID is TokenID.COMMENT or TokenID.EOL or TokenID.KELSE;
         }
     }
 
@@ -105,7 +105,7 @@ public class Line {
     /// Skip to the end of the line
     /// </summary>
     public void SkipToEndOfLine() {
-        Debug.Assert(Tokens.Length > 0 && Tokens[Tokens.Length - 1].ID == TokenID.EOL);
+        Debug.Assert(Tokens.Length > 0 && Tokens[^1].ID == TokenID.EOL);
         _tindex = Tokens.Length - 1;
     }
 
@@ -349,7 +349,7 @@ public class Lines {
     /// <summary>
     /// Return the highest line number.
     /// </summary>
-    public int MaxLine => _lines.Count == 0 ? 0 : _lines[_lines.Count - 1].LineNumber;
+    public int MaxLine => _lines.Count == 0 ? 0 : _lines[^1].LineNumber;
 
     /// <summary>
     /// Returns a specified line given its line number.
@@ -408,14 +408,14 @@ public class Lines {
         foreach (Line line in _lines) {
             if (line.GetToken() is IntegerToken lineNumber) {
                 SimpleToken firstToken = line.GetToken();
-                if (firstToken.ID == TokenID.KPROC || firstToken.ID == TokenID.KFUNC) {
+                if (firstToken.ID is TokenID.KPROC or TokenID.KFUNC) {
                     if (line.GetToken() is IdentifierToken nameToken &&
                         string.Equals(nameToken.Name, name, StringComparison.CurrentCultureIgnoreCase)) {
                         startLine = lineNumber.Value;
                         found = true;
                     }
                 }
-                if (firstToken.ID == TokenID.KENDPROC || firstToken.ID == TokenID.KENDFUNC) {
+                if (firstToken.ID is TokenID.KENDPROC or TokenID.KENDFUNC) {
                     if (found) {
                         endLine = lineNumber.Value;
                         break;

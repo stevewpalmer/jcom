@@ -62,7 +62,7 @@ public partial class Compiler {
                 dll = Assembly.LoadFile(typeDllPath);
             }
             catch (Exception e) {
-                if (e is FileNotFoundException || e is FileLoadException) {
+                if (e is FileNotFoundException or FileLoadException) {
                     Messages.Error(MessageCode.LIBRARYNOTFOUND, $"Library {baseTypeName} not found");
                     return null;
                 }
@@ -281,7 +281,7 @@ public partial class Compiler {
                 new IdentifierParseNode(GetMakeReadDataIndexSymbol()),
                 new IdentifierParseNode(GetMakeEODSymbol())
             },
-            ValueExpressions = new[] {
+            ValueExpressions = new ParseNode[] {
                 new NumberParseNode(0),
                 new NumberParseNode(0)
             }
@@ -404,8 +404,8 @@ public partial class Compiler {
         // Possible procedure call? This is where we need to resolve A(X) between a
         // substring assignment, an array assignment or a method call. If A is defined
         // and is not a method, it can't be a procedure call.
-        if (sym == null || !sym.Defined || sym is { Defined: true, IsMethod: true }) {
-            if (token.ID == TokenID.EOL || token.ID == TokenID.LPAREN) {
+        if (sym is not { Defined: true } or { Defined: true, IsMethod: true }) {
+            if (token.ID is TokenID.EOL or TokenID.LPAREN) {
                 _currentLine.PushToken(token);
                 return ExecWithIdentifier(identToken);
             }
@@ -663,7 +663,7 @@ public partial class Compiler {
                     expr = null;
                     ExpectEndOfLine();
                 }
-            } while (endToken == TokenID.KELIF || endToken == TokenID.KELSE);
+            } while (endToken is TokenID.KELIF or TokenID.KELSE);
         }
         return node;
     }

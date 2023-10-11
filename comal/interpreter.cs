@@ -101,10 +101,6 @@ public class Interpreter {
 
         while (!hasBye) {
             string inputLine = ReadLine();
-            if (inputLine == null) {
-                break;
-            }
-
             try {
                 LineTokeniser tokeniser = new();
                 Line line = new(tokeniser.TokeniseLine(inputLine));
@@ -191,9 +187,7 @@ public class Interpreter {
                             break;
 
                         case TokenID.KNEW:
-                            if (oldLines == null) {
-                                oldLines = new Lines(Lines);
-                            }
+                            oldLines ??= new Lines(Lines);
                             ActiveCompiler = null;
                             Lines.Clear();
                             FileManager.Zone = FileManager.DefaultZone;
@@ -734,9 +728,7 @@ public class Interpreter {
     //
     private static void ExecuteStatement(ComalOptions opts, Line line) {
 
-        if (ActiveCompiler == null) {
-            ActiveCompiler = new Compiler(opts);
-        }
+        ActiveCompiler ??= new Compiler(opts);
         ActiveCompiler.Messages.Interactive = opts.Interactive;
         ActiveCompiler.Messages.Clear();
         ActiveCompiler.CompileMethod("_Direct", new Lines(line));

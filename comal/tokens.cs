@@ -422,10 +422,8 @@ public static class Tokens {
         }
 
         // Anything else here is a keyword token
-        foreach (KeyValuePair<string, TokenID> pair in Keywords) {
-            if (id.Equals(pair.Value)) {
-                return pair.Key.ToUpper();
-            }
+        foreach (KeyValuePair<string, TokenID> pair in Keywords.Where(pair => id.Equals(pair.Value))) {
+            return pair.Key.ToUpper();
         }
 
         // If we get here, we added a new token but forgot to add it to

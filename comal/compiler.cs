@@ -353,10 +353,10 @@ public partial class Compiler : ICompiler {
                 Messages.Linenumber = lineNumber;
                 token = GetNextToken();
             }
-            if (token.ID == TokenID.KENDPROC || token.ID == TokenID.KENDFUNC) {
+            if (token.ID is TokenID.KENDPROC or TokenID.KENDFUNC) {
                 parents.Pop();
             }
-            if (token.ID == TokenID.KPROC || token.ID == TokenID.KFUNC) {
+            if (token.ID is TokenID.KPROC or TokenID.KFUNC) {
                 SymClass klass = token.ID == TokenID.KPROC ? SymClass.SUBROUTINE : SymClass.FUNCTION;
                 IdentifierToken identToken = ParseIdentifier();
                 if (identToken != null) {
@@ -379,9 +379,7 @@ public partial class Compiler : ICompiler {
                     }
 
                     // Add this method to the global symbol table now.
-                    if (method == null) {
-                        method = Globals.Add(methodName, new SymFullType(), klass, null, lineNumber);
-                    }
+                    method ??= Globals.Add(methodName, new SymFullType(), klass, null, lineNumber);
                     if (klass == SymClass.FUNCTION) {
                         method.FullType = GetTypeFromName(methodName);
                     }
@@ -1024,8 +1022,7 @@ public partial class Compiler : ICompiler {
     // Validate an assignment of the exprNode to the specified identNode.
     private static bool ValidateAssignment(IdentifierParseNode identNode, ParseNode exprNode) {
         if (identNode.IsArrayBase) {
-            IdentifierParseNode exprIdentNode = exprNode as IdentifierParseNode;
-            if (exprIdentNode == null || !exprIdentNode.IsArrayBase) {
+            if (exprNode is not IdentifierParseNode { IsArrayBase: true }) {
                 return false;
             }
         }

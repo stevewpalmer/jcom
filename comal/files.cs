@@ -420,10 +420,7 @@ public partial class Compiler {
                         usingArgs.Add(exprNode);
 
                         TokenID tokenID = _currentLine.PeekToken().ID;
-                        if (tokenID == TokenID.SEMICOLON ||
-                            tokenID == TokenID.APOSTROPHE ||
-                            tokenID == TokenID.TILDE ||
-                            tokenID == TokenID.EOL) {
+                        if (tokenID is TokenID.SEMICOLON or TokenID.APOSTROPHE or TokenID.TILDE or TokenID.EOL) {
                             break;
                         }
                         ExpectToken(TokenID.COMMA);

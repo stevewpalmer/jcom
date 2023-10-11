@@ -81,7 +81,7 @@ public class LineTokeniser {
                         str.Append(ch);
                         ch = GetChar();
                     }
-                    if (ch == Consts.StringChar || ch == Consts.IntegerChar) {
+                    if (ch is Consts.StringChar or Consts.IntegerChar) {
                         str.Append(ch);
                     } else {
                         PushChar(ch);
@@ -251,7 +251,7 @@ public class LineTokeniser {
             isFloat = true;
             str.Append('E');
             ch = GetChar();
-            if (ch == '+' || ch == '-') {
+            if (ch is '+' or '-') {
                 str.Append(ch);
                 ch = GetChar();
             }
@@ -295,9 +295,6 @@ public class LineTokeniser {
             _pushedChar = '\0';
             return ch;
         }
-        if (AtLineEnd()) {
-            return EOL;
-        }
-        return _line[_index++];
+        return AtLineEnd() ? EOL : _line[_index++];
     }
 }

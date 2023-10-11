@@ -64,10 +64,7 @@ public partial class Compiler {
     // Parse a label
     private SymbolParseNode ParseLabel() {
         IdentifierToken identToken = ParseIdentifier();
-        if (identToken != null) {
-            return new SymbolParseNode(GetMakeLabel(identToken.Name, false));
-        }
-        return null;
+        return identToken != null ? new SymbolParseNode(GetMakeLabel(identToken.Name, false)) : null;
     }
 
     // Parse an identifier from the specified token and assign the corresponding
@@ -220,7 +217,7 @@ public partial class Compiler {
             _importSymbols = new SymbolCollection("Import");
             if (savedImportSymbols != null) {
                 _importSymbols.Add(savedImportSymbols);
-            };
+            }
             _importSymbols.Add(method);
             AddChildSymbols(_importSymbols, method);
             node.IsClosed = true;
