@@ -34,10 +34,10 @@ own buffer.
 | Load Recording           | Alt+F7                   | Alt+F7                   |
 | Command                  | F10                      | F10                      |
 | Go To Line               | Alt+G                    | Ctrl+G                   |
-| Start of Line            | Home                     | Home                     |
-| End of Line              | End                      | End                      |
-| Start of Buffer          | Alt+Home                 |                          |
-| End of Buffer            | Alt+End                  |                          |
+| Start of Line            | Home                     | Alt+Left / Home          |
+| End of Line              | End                      | Alt+Right / End          |
+| Start of Buffer          | Alt+Home                 | Ctrl+L                   |
+| End of Buffer            | Alt+End                  | Ctrl+U                   |
 | Top of Window            | Ctrl+Home                |                          |
 | Bottom of Window         | Ctrl+End                 |                          |
 | Next Word                | Ctrl+Command+Right arrow | Ctrl+Command+Right arrow |
@@ -56,15 +56,15 @@ own buffer.
 | Cut to Scrap             | Ctrl+OemMinus            | Ctrl+X                   |
 | Paste from Scrap         | Insert                   | Ctrl+V                   |
 | Delete Line              | Alt+D                    | Alt+D                    |
-| Delete to Start of Line  | Ctrl+K                   |                          |
+| Delete to Start of Line  | Ctrl+K                   | Ctrl+K                   |
 | Delete to End of Line    | Alt+K                    | Alt+K                    |
 | Next Buffer              | Alt+N                    | Ctrl+N                   |
 | Previous Buffer          | Alt+-                    | Ctrl+P                   |
 | Search Forward           | F5 or Alt+S              | F5 or Alt+S              |
-| Search Backward          | Alt+F5                   |                          |
-| Search Again             | Shift+F5                 |                          |
+| Search Backward          | Alt+F5                   | Ctrl+U                   |
+| Search Again             | Shift+F5                 | Ctrl+A                   |
 | Translate                | F6 or Alt+T              | F6 or Alt+T              |
 | Translate Backward       | Alt+F6                   |                          |
-| Translate Again          | Shift+F6                 |                          |
+| Translate Again          | Shift+F6                 | Alt+A                    |
 | Toggle Case Search       | Ctrl+F5                  | Ctrl+S                   |
 | Toggle RegEx Search      | Ctrl+F6                  | Ctrl+F                   |

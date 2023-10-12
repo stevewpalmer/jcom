@@ -30,7 +30,7 @@ internal static class Program {
     private static void Main(string[] args) {
 
         Screen mainScreen = new();
-        mainScreen.Open();
+        Screen.Open();
         if (args.Length == 0) {
             mainScreen.AddWindow(new Window());
         }
@@ -39,6 +39,6 @@ internal static class Program {
         }
         mainScreen.ActivateWindow(0);
         mainScreen.StartKeyboardLoop();
-        mainScreen.Close();
+        Screen.Close();
     }
 }

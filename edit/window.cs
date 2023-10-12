@@ -146,7 +146,7 @@ public class Window {
     public RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REDRAW)) {
             Render(RenderHint.REDRAW);
-            flags &= ~RenderHint.REDRAW|RenderHint.BLOCK;
+            flags &= ~(RenderHint.REDRAW|RenderHint.BLOCK);
             flags |= RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
@@ -229,7 +229,7 @@ public class Window {
         _searchExtent = new Extent()
             .Add(Buffer.Cursor)
             .Add(new Point(Buffer.Offset + searchData.MatchLength - 1, Buffer.LineIndex));
-        flags |= CursorFromOffset();
+        flags |= CursorFromOffset() | CursorFromLineIndex();
         ApplyRenderHint(flags);
     }
 
@@ -296,6 +296,16 @@ public class Window {
             .Add(new Point(0, _viewportOffset.Y + _viewportBounds.Height - 1));
 
         Extent markExtent = new Extent();
+        if (_markMode == MarkMode.SEARCH) {
+            markExtent = new Extent()
+                .Add(_searchExtent.Start)
+                .Add(_searchExtent.End);
+        }
+        else if (_markMode != MarkMode.NONE) {
+            markExtent = new Extent()
+                .Add(_markAnchor)
+                .Add(Buffer.Cursor);
+        }
 
         // For block updates, we're scoping the area being rendered down to just those
         // lines that are affected. For changes to the block mark, this would be the
@@ -305,16 +315,6 @@ public class Window {
         // is the superset of the two, limited to the area of the visible window.
         if (flags.HasFlag(RenderHint.BLOCK)) {
             Extent blockExtent = new Extent();
-            if (_markMode == MarkMode.SEARCH) {
-                markExtent = new Extent()
-                    .Add(_searchExtent.Start)
-                    .Add(_searchExtent.End);
-            }
-            else if (_markMode != MarkMode.NONE) {
-                markExtent = new Extent()
-                    .Add(_markAnchor)
-                    .Add(Buffer.Cursor);
-            }
             blockExtent
                 .Add(markExtent.Start)
                 .Add(markExtent.End)

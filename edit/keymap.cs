@@ -280,7 +280,9 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_BORDERS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F1 },
         new() { KeyCommand = KeyCommand.KC_CDOWN, Key = ConsoleKey.DownArrow },
         new() { KeyCommand = KeyCommand.KC_CENTRE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.W },
+        new() { KeyCommand = KeyCommand.KC_CFILEEND, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.U },
         new() { KeyCommand = KeyCommand.KC_CFILEEND, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.End },
+        new() { KeyCommand = KeyCommand.KC_CFILESTART, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.L },
         new() { KeyCommand = KeyCommand.KC_CFILESTART, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.Home },
         new() { KeyCommand = KeyCommand.KC_CLEFT, Key = ConsoleKey.LeftArrow },
         new() { KeyCommand = KeyCommand.KC_CLINEEND, Key = ConsoleKey.End },
@@ -343,7 +345,9 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_SELFINSERT, Key = ConsoleKey.Enter },
         new() { KeyCommand = KeyCommand.KC_SCREENDOWN, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D },
         new() { KeyCommand = KeyCommand.KC_SCREENUP, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.E },
+        new() { KeyCommand = KeyCommand.KC_SEARCHAGAIN, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.A },
         new() { KeyCommand = KeyCommand.KC_SEARCHAGAIN, Modifiers = ConsoleModifiers.Shift, Key = ConsoleKey.F5 },
+        new() { KeyCommand = KeyCommand.KC_SEARCHBACK, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.U },
         new() { KeyCommand = KeyCommand.KC_SEARCHBACK, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F5 },
         new() { KeyCommand = KeyCommand.KC_SEARCHCASE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.S },
         new() { KeyCommand = KeyCommand.KC_SEARCHFORWARD, KeyChar = 223 },
@@ -351,7 +355,9 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_SEARCHFORWARD, Key = ConsoleKey.F5 },
         new() { KeyCommand = KeyCommand.KC_TRANSLATE, Key = ConsoleKey.F6 },
         new() { KeyCommand = KeyCommand.KC_TRANSLATE, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.T },
+        new() { KeyCommand = KeyCommand.KC_TRANSLATEAGAIN, KeyChar = 229},
         new() { KeyCommand = KeyCommand.KC_TRANSLATEAGAIN, Modifiers = ConsoleModifiers.Shift, Key = ConsoleKey.F6 },
+        new() { KeyCommand = KeyCommand.KC_TRANSLATEBACK, KeyChar = 168 },
         new() { KeyCommand = KeyCommand.KC_TRANSLATEBACK, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F6 },
         new() { KeyCommand = KeyCommand.KC_VERSION, KeyChar = 8730 },
         new() { KeyCommand = KeyCommand.KC_VERSION, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.V },
@@ -380,7 +386,6 @@ public class KeyMap {
 
         KeyMap match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
         KeyCommand commandId = match?.KeyCommand ?? KeyCommand.KC_NONE;
-        Screen.StatusBar.Message($"KeyChar={keyIn.KeyChar}, Key={keyIn.Key}, Modifiers={keyIn.Modifiers}");
         Parser commandArgs = new Parser(string.Empty);
         if (commandId == KeyCommand.KC_NONE && !char.IsControl(keyIn.KeyChar)) {
             commandId = KeyCommand.KC_SELFINSERT;

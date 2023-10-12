@@ -54,7 +54,7 @@ public class Screen {
     /// <summary>
     /// Configuration
     /// </summary>
-    public static Config Config { get; set; }
+    public static Config Config { get; private set; }
 
     /// <summary>
     /// Scrap buffer
@@ -64,7 +64,7 @@ public class Screen {
     /// <summary>
     /// Open the main window.
     /// </summary>
-    public void Open() {
+    public static void Open() {
         Terminal.Open();
 
         Config = Config.Load();
@@ -79,7 +79,7 @@ public class Screen {
     /// <summary>
     /// Close the main screen when the editor is closed.
     /// </summary>
-    public void Close() {
+    public static void Close() {
         Config.Save();
         Terminal.Close();
     }
@@ -107,7 +107,6 @@ public class Screen {
             if (!_recorder.RememberKeystroke(command)) {
                 StatusBar.Error(Edit.MaximumKeystrokes);
                 StatusBar.KeystrokesMode = KeystrokesMode.NONE;
-                return RenderHint.CURSOR_STATUS;
             }
         }
         _activeWindow.PreCommand();

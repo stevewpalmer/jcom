@@ -42,6 +42,9 @@ public static class Terminal {
         _savedForegroundColour = Console.ForegroundColor;
         _isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         Console.TreatControlCAsInput = true;
+        if (!_isWindows) {
+            Console.Write(@"7[?47h");
+        }
         Console.Clear();
         SetDefaultCursor();
     }
@@ -53,6 +56,9 @@ public static class Terminal {
         Console.BackgroundColor = _savedBackgroundColour;
         Console.ForegroundColor = _savedForegroundColour;
         Console.Clear();
+        if (!_isWindows) {
+            Console.Write(@"[2J[?47l8");
+        }
     }
 
     /// <summary>

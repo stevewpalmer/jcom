@@ -10,6 +10,18 @@
     <RootNamespace>JEdit</RootNamespace>
     <Title>Text Editor</Title>
     <Authors>Steven Palmer</Authors>
+    <Nullable>warnings</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn />
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn />
   </PropertyGroup>
 
   <ItemGroup>
