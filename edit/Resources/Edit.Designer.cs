@@ -374,5 +374,17 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("BackupFiles", resourceCulture);
             }
         }
+        
+        internal static string EnterTabStops {
+            get {
+                return ResourceManager.GetString("EnterTabStops", resourceCulture);
+            }
+        }
+        
+        internal static string InvalidNumber {
+            get {
+                return ResourceManager.GetString("InvalidNumber", resourceCulture);
+            }
+        }
     }
 }

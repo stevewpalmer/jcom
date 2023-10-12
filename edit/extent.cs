@@ -27,7 +27,7 @@ using System.Drawing;
 
 namespace JEdit;
 
-public struct Extent {
+public class Extent {
     private static readonly Point Uninitalised = new(-1, -1);
 
     /// <summary>

@@ -27,7 +27,7 @@ namespace JEdit;
 
 public class Colours {
 
-    private readonly Config _config;
+    private readonly Config? _config;
     private readonly ConsoleColor[] _colours = {
         ConsoleColor.Black,
         ConsoleColor.Blue,
@@ -48,10 +48,15 @@ public class Colours {
     };
 
     /// <summary>
+    /// Initialise a Colors object
+    /// </summary>
+    public Colours() : this(null) { }
+
+    /// <summary>
     /// Initialise a Colors object with the specified configuration
     /// </summary>
     /// <param name="config">Configuration file</param>
-    public Colours(Config config) {
+    public Colours(Config? config) {
         _config = config;
     }
 
@@ -64,31 +69,31 @@ public class Colours {
     /// Retrieve the background colour
     /// </summary>
     public ConsoleColor BackgroundColour =>
-        GetColour(_config.BackgroundColour, 0);
+        GetColour(_config?.BackgroundColour, 0);
 
     /// <summary>
     /// Retrieve the foreground colour
     /// </summary>
     public ConsoleColor ForegroundColour =>
-        GetColour(_config.ForegroundColour, 7);
+        GetColour(_config?.ForegroundColour, 7);
 
     /// <summary>
     /// Retrieve the selected title colour
     /// </summary>
     public ConsoleColor SelectedTitleColour =>
-        GetColour(_config.SelectedTitleColour, 7);
+        GetColour(_config?.SelectedTitleColour, 7);
 
     /// <summary>
     /// Retrieve the normal message colour
     /// </summary>
     public ConsoleColor NormalMessageColour =>
-        GetColour(_config.NormalMessageColour, 2);
+        GetColour(_config?.NormalMessageColour, 2);
 
     /// <summary>
     /// Retrieve the error message colour
     /// </summary>
     public ConsoleColor ErrorMessageColour =>
-        GetColour(_config.ErrorMessageColour, 7);
+        GetColour(_config?.ErrorMessageColour, 7);
 
     /// <summary>
     /// Parse a colour value from the configuration file. Colours are specified as
@@ -98,7 +103,7 @@ public class Colours {
     /// <param name="value">Configuration value</param>
     /// <param name="defaultIndex">Default index if config not present</param>
     /// <returns>Colour</returns>
-    private ConsoleColor GetColour(string value, int defaultIndex) {
+    private ConsoleColor GetColour(string? value, int defaultIndex) {
         if (value == null || !int.TryParse(value, out int index) || index < 0 || index >= _colours.Length) {
             index = defaultIndex;
         }

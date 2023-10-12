@@ -28,38 +28,31 @@ using JEdit.Resources;
 
 namespace JEdit;
 
-public class Screen {
-    private readonly List<Window> _windowList = new();
-    private readonly Recorder _recorder = new();
-    private Window? _activeWindow;
-    private Search? _search;
+public static class Screen {
+    private static readonly List<Window> _windowList = new();
+    private static readonly Recorder _recorder = new();
+    private static Window? _activeWindow;
+    private static Search? _search;
 
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    public Screen() {
-        StatusBar = new StatusBar();
-    }
-        
     /// <summary>
     /// The status bar
     /// </summary>
-    public static StatusBar StatusBar { get; private set; }
+    public static StatusBar StatusBar { get; } = new();
 
     /// <summary>
     /// Configured colours
     /// </summary>
-    public static Colours Colours { get; private set; }
+    public static Colours Colours { get; private set; } = new();
 
     /// <summary>
     /// Configuration
     /// </summary>
-    public static Config Config { get; private set; }
+    public static Config Config { get; private set; } = new();
 
     /// <summary>
     /// Scrap buffer
     /// </summary>
-    public static Buffer ScrapBuffer { get; private set; }
+    public static Buffer ScrapBuffer { get; private set; } = new();
 
     /// <summary>
     /// Open the main window.
@@ -88,7 +81,7 @@ public class Screen {
     /// Start the editor keyboard loop and exit when the user issues the
     /// exit command.
     /// </summary>
-    public void StartKeyboardLoop() {
+    public static void StartKeyboardLoop() {
         RenderHint flags;
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
@@ -102,7 +95,7 @@ public class Screen {
     /// </summary>
     /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
-    private RenderHint HandleCommand(Command command) {
+    private static RenderHint HandleCommand(Command command) {
         if (_activeWindow == null) {
             throw new InvalidOperationException();
         }
@@ -127,6 +120,7 @@ public class Screen {
             KeyCommand.KC_EDIT => EditFile(command),
             KeyCommand.KC_EXIT => ExitEditor(true),
             KeyCommand.KC_LOADKEYSTROKES => LoadRecording(),
+            KeyCommand.KC_MARGIN => SetMargin(command),
             KeyCommand.KC_NEXTBUFFER => SelectWindow(1),
             KeyCommand.KC_OUTPUTFILE => RenameOutputFile(command),
             KeyCommand.KC_PLAYBACK => Playback(),
@@ -138,6 +132,7 @@ public class Screen {
             KeyCommand.KC_SEARCHBACK => Search(command, false),
             KeyCommand.KC_SEARCHCASE => SearchCaseToggle(),
             KeyCommand.KC_SEARCHFORWARD => Search(command, true),
+            KeyCommand.KC_TABS => SetTabStops(command),
             KeyCommand.KC_TRANSLATE => Translate(command, true),
             KeyCommand.KC_TRANSLATEAGAIN => TranslateAgain(),
             KeyCommand.KC_TRANSLATEBACK => Translate(command, false),
@@ -161,15 +156,17 @@ public class Screen {
     /// <summary>
     /// Render the current cursor position on the status bar.
     /// </summary>
-    private void UpdateCursorPosition() {
-        StatusBar.UpdateCursorPosition(_activeWindow.Buffer.LineIndex + 1, _activeWindow.Buffer.Offset + 1);
+    private static void UpdateCursorPosition() {
+        if (_activeWindow != null) {
+            StatusBar.UpdateCursorPosition(_activeWindow.Buffer.LineIndex + 1, _activeWindow.Buffer.Offset + 1);
+        }
     }
 
     /// <summary>
     /// Add a window to the window list. This will not make the window
     /// active.
     /// </summary>
-    public void AddWindow(Window theWindow) {
+    public static void AddWindow(Window theWindow) {
         if (theWindow.Buffer.NewFile) {
             string message = theWindow.Buffer.Filename == string.Empty ?
                 Edit.NewFile :
@@ -185,8 +182,8 @@ public class Screen {
     /// </summary>
     /// <param name="direction">Direction</param>
     /// <returns>Render hint</returns>
-    private RenderHint SelectWindow(int direction) {
-        if (_windowList.Count == 1) {
+    private static RenderHint SelectWindow(int direction) {
+        if (_windowList.Count == 1 || _activeWindow == null) {
             StatusBar.Message(Edit.NoOtherBuffers);
             return RenderHint.NONE;
         }
@@ -205,7 +202,7 @@ public class Screen {
     /// Activate a window by its index
     /// </summary>
     /// <param name="index">Index of the window to be activated</param>
-    public void ActivateWindow(int index) {
+    public static void ActivateWindow(int index) {
         _activeWindow = _windowList[index];
         _activeWindow.Refresh();
         UpdateCursorPosition();
@@ -216,7 +213,7 @@ public class Screen {
     /// </summary>
     /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
-    private RenderHint EditFile(Command command) {
+    private static RenderHint EditFile(Command command) {
         if (command.GetFilename(Edit.File, out string inputValue)) {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
@@ -238,8 +235,8 @@ public class Screen {
     /// the last window in the list.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint CloseWindow() {
-        if (_windowList.Count == 1) {
+    private static RenderHint CloseWindow() {
+        if (_windowList.Count == 1 || _activeWindow == null) {
             return RenderHint.NONE;
         }
         if (_activeWindow.Buffer.Modified) {
@@ -326,8 +323,10 @@ public class Screen {
     /// Show details of the file in the buffer on the status bar.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint ShowDetails() {
-        StatusBar.Message(Edit.File + _activeWindow.Buffer.Filename + (_activeWindow.Buffer.Modified ? "*" : ""));
+    private static RenderHint ShowDetails() {
+        if (_activeWindow != null) {
+            StatusBar.Message(Edit.File + _activeWindow.Buffer.Filename + (_activeWindow.Buffer.Modified ? "*" : ""));
+        }
         return RenderHint.NONE;
     }
 
@@ -335,7 +334,7 @@ public class Screen {
     /// Run a user specified command with optional parameters
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint RunCommand() {
+    private static RenderHint RunCommand() {
         RenderHint flags = RenderHint.NONE;
         string inputValue = string.Empty;
         if (StatusBar.PromptForInput(Edit.CommandPrompt, ref inputValue, false)) {
@@ -364,10 +363,40 @@ public class Screen {
     }
 
     /// <summary>
+    /// Change tab stop settings.
+    /// </summary>
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint SetTabStops(Command command) {
+        string tabInput = command.Args.NextWord() ?? string.Empty;
+        List<int> tabStops = new();
+        bool hasArg = tabInput != string.Empty;
+        while (hasArg || command.GetInput(Edit.EnterTabStops, ref tabInput)) {
+            if (string.IsNullOrWhiteSpace(tabInput)) {
+                break;
+            }
+            string[] values = tabInput.Split(' ', ',', StringSplitOptions.TrimEntries);
+            foreach (string value in values) {
+                if (!int.TryParse(value, out int tabValue)) {
+                    StatusBar.Error(Edit.InvalidNumber);
+                    break;
+                }
+                tabStops.Add(tabValue);
+            }
+            tabInput = command.Args.NextWord() ?? string.Empty;
+            if (hasArg && tabInput == string.Empty) {
+                break;
+            }
+        }
+        Config.TabStops = tabStops.Distinct().OrderBy(t => t).ToArray();
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
     /// Start or stop keystroke recording.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint StartStopRecording() {
+    private static RenderHint StartStopRecording() {
         if (StatusBar.KeystrokesMode == KeystrokesMode.NONE && _recorder.HasKeystrokeMacro) {
             char[] validInput = { 'y', 'n' };
             if (!StatusBar.Prompt(Edit.OverwriteExistingKeystrokeMacro, validInput, 'n', out char inputChar)) {
@@ -392,7 +421,7 @@ public class Screen {
     /// Play back a recorded macro.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint Playback() {
+    private static RenderHint Playback() {
         RenderHint flags = RenderHint.NONE;
         if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING) {
             StatusBar.Error(Edit.CannotPlayback);
@@ -421,7 +450,7 @@ public class Screen {
     /// Load a keystroke macro from a file.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint LoadRecording() {
+    private static RenderHint LoadRecording() {
         if (_recorder.HasKeystrokeMacro) {
             char[] validInput = { 'y', 'n' };
             if (!StatusBar.Prompt(Edit.OverwriteExistingKeystrokeMacro, validInput, 'n', out char inputChar)) {
@@ -446,7 +475,7 @@ public class Screen {
     /// Save the current keystroke macro to a file.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint SaveRecording() {
+    private static RenderHint SaveRecording() {
         string inputValue = string.Empty;
         if (StatusBar.PromptForInput(Edit.SaveKeystrokesAs, ref inputValue, true)) {
             _recorder.SaveKeystrokes(inputValue);
@@ -460,7 +489,10 @@ public class Screen {
     /// <param name="command">Editing command</param>
     /// <param name="forward">True if we search forward</param>
     /// <returns>Render hint</returns>
-    private RenderHint Search(Command command, bool forward) {
+    private static RenderHint Search(Command command, bool forward) {
+        if (_activeWindow == null) {
+            throw new InvalidOperationException();
+        }
         RenderHint flags = RenderHint.NONE;
         string inputValue = Config.LastSearchString;
         string prompt = string.Format(Edit.SearchFor, forward ? "\u2193" : "\u2191", Config.RegExpOff ? Edit.RegExpOffStatus : "");
@@ -481,7 +513,10 @@ public class Screen {
     /// Repeat the previous search.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint SearchAgain() {
+    private static RenderHint SearchAgain() {
+        if (_activeWindow == null) {
+            throw new InvalidOperationException();
+        }
         RenderHint flags = RenderHint.NONE;
         if (_search != null) {
             flags |= _activeWindow.Search(_search);
@@ -516,7 +551,10 @@ public class Screen {
     /// <param name="command">Editing command</param>
     /// <param name="forward">True if we search forward</param>
     /// <returns>Render hint</returns>
-    private RenderHint Translate(Command command, bool forward) {
+    private static RenderHint Translate(Command command, bool forward) {
+        if (_activeWindow == null) {
+            throw new InvalidOperationException();
+        }
         string searchString = Config.LastTranslatePattern;
         string replacementString = Config.LastTranslateString;
         string prompt = string.Format(Edit.Pattern, forward ? "\u2193" : "\u2191", Config.RegExpOff ? Edit.RegExpOffStatus : "");
@@ -542,7 +580,10 @@ public class Screen {
     /// Repeat the previous translate.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint TranslateAgain() {
+    private static RenderHint TranslateAgain() {
+        if (_activeWindow == null) {
+            throw new InvalidOperationException();
+        }
         RenderHint flags = RenderHint.NONE;
         if (_search != null) {
             _search.TranslateCount = 0;
@@ -558,7 +599,7 @@ public class Screen {
     /// Repeat a key command.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint Repeat() {
+    private static RenderHint Repeat() {
         RenderHint flags = RenderHint.NONE;
         if (StatusBar.PromptForRepeat(out int repeatCount, out Command command)) {
             while (repeatCount-- > 0) {
@@ -569,13 +610,28 @@ public class Screen {
     }
 
     /// <summary>
+    /// Set the window margin.
+    /// </summary>
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint SetMargin(Command command) {
+        if (command.GetNumber("Enter margin: ", out int newMargin)) {
+            Config.Margin = newMargin;
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
     /// Prompt for a new output file name for the current buffer. The new
     /// name must not conflict with any existing buffer name otherwise an error
     /// is displayed.
     /// </summary>
     /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
-    private RenderHint RenameOutputFile(Command command) {
+    private static RenderHint RenameOutputFile(Command command) {
+        if (_activeWindow == null) {
+            throw new InvalidOperationException();
+        }
         if (command.GetFilename(Edit.EnterNewOutputFileName, out string outputFileName)) {
             string fullFilename = new FileInfo(outputFileName).FullName;
             if (_windowList.Any(window => fullFilename.Equals(window.Buffer.Filename, StringComparison.OrdinalIgnoreCase))) {
@@ -661,7 +717,7 @@ public class Screen {
     /// Toggle whether or not window borders are drawn.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint ToggleBorders() {
+    private static RenderHint ToggleBorders() {
         Config.HideBorders = !Config.HideBorders;
         foreach (Window window in _windowList) {
             SetWindowViewport(window);
@@ -684,7 +740,7 @@ public class Screen {
     /// </summary>
     /// <param name="prompt">True to display a confirmation prompt, false to just save and exit</param>
     /// <returns>Render hint</returns>
-    private RenderHint ExitEditor(bool prompt) {
+    private static RenderHint ExitEditor(bool prompt) {
         RenderHint flags = RenderHint.EXIT;
         bool writeBuffers = !prompt;
         Buffer [] modifiedBuffers = _windowList.Where(w => w.Buffer.Modified).Select(b => b.Buffer).ToArray();

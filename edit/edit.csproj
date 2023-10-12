@@ -12,16 +12,17 @@
     <Authors>Steven Palmer</Authors>
     <IsPackable>false</IsPackable>
     <LangVersion>11</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>8632</NoWarn>
+    <NoWarn></NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn>8632</NoWarn>
+    <NoWarn></NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

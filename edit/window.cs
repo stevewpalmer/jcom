@@ -36,7 +36,7 @@ public class Window {
     private MarkMode _markMode;
     private Point _markAnchor;
     private Point _lastMarkPoint;
-    private Extent _searchExtent;
+    private Extent _searchExtent = new();
 
     /// <summary>
     /// Create an empty window
@@ -99,7 +99,7 @@ public class Window {
         RenderHint flags = command.Id switch {
             KeyCommand.KC_BACKSPACE => Backspace(),
             KeyCommand.KC_CDOWN => CursorDown(),
-            KeyCommand.KC_CENTRE => CenterWindow(),
+            KeyCommand.KC_CENTRE => CentreLine(),
             KeyCommand.KC_CFILEEND => FileEnd(),
             KeyCommand.KC_CFILESTART => FileStart(),
             KeyCommand.KC_CLEFT => CursorLeft(),
@@ -114,6 +114,7 @@ public class Window {
             KeyCommand.KC_CUP => CursorUp(),
             KeyCommand.KC_CUT => HandleBlock(command, BlockAction.CUT),
             KeyCommand.KC_CWINDOWBOTTOM => WindowBottom(),
+            KeyCommand.KC_CWINDOWCENTRE => CenterWindow(),
             KeyCommand.KC_CWINDOWTOP => WindowTop(),
             KeyCommand.KC_CWORDLEFT => WordLeft(),
             KeyCommand.KC_CWORDRIGHT => WordRight(),
@@ -1035,6 +1036,22 @@ public class Window {
             Buffer.LineIndex = Buffer.Length - 1;
         }
         return flags | CursorFromLineIndex();
+    }
+
+    /// <summary>
+    /// Center the current line horizontally in the window between
+    /// the current margin.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CentreLine() {
+        string line = Buffer.GetLine(Buffer.LineIndex).TrimEnd(Consts.EndOfLine);
+        int savedOffset = Buffer.Offset;
+        Buffer.Offset = 0;
+        Buffer.Delete(line.Length);
+        line = line.PadLeft((Screen.Config.Margin - line.Length) / 2 + line.Length).PadRight(Screen.Config.Margin);
+        Buffer.Insert(line);
+        Buffer.Offset = savedOffset;
+        return RenderHint.BLOCK | CursorFromOffset();
     }
 
     /// <summary>

@@ -29,16 +29,15 @@ internal static class Program {
 
     private static void Main(string[] args) {
 
-        Screen mainScreen = new();
         Screen.Open();
         if (args.Length == 0) {
-            mainScreen.AddWindow(new Window());
+            Screen.AddWindow(new Window());
         }
         foreach (string filename in args) {
-            mainScreen.AddWindow(new Window(new Buffer(filename)));
+            Screen.AddWindow(new Window(new Buffer(filename)));
         }
-        mainScreen.ActivateWindow(0);
-        mainScreen.StartKeyboardLoop();
+        Screen.ActivateWindow(0);
+        Screen.StartKeyboardLoop();
         Screen.Close();
     }
 }

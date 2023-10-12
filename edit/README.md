@@ -38,8 +38,8 @@ own buffer.
 | End of Line              | End                      | Alt+Right / End          |
 | Start of Buffer          | Alt+Home                 | Ctrl+L                   |
 | End of Buffer            | Alt+End                  | Ctrl+U                   |
-| Top of Window            | Ctrl+Home                |                          |
-| Bottom of Window         | Ctrl+End                 |                          |
+| Top of Window            | Ctrl+Home                | Alt+T                    |
+| Bottom of Window         | Ctrl+End                 | Alt+B                    |
 | Next Word                | Ctrl+Command+Right arrow | Ctrl+Command+Right arrow |
 | Previous Word            | Ctrl+Command+Left arrow  | Ctrl+Command+Left arrow  |
 | Page Down                | PgDn                     | PgDn                     |
@@ -64,7 +64,7 @@ own buffer.
 | Search Backward          | Alt+F5                   | Ctrl+U                   |
 | Search Again             | Shift+F5                 | Ctrl+A                   |
 | Translate                | F6 or Alt+T              | F6 or Alt+T              |
-| Translate Backward       | Alt+F6                   |                          |
+| Translate Backward       | Alt+F6                   | Alt+U                    |
 | Translate Again          | Shift+F6                 | Alt+A                    |
 | Toggle Case Search       | Ctrl+F5                  | Ctrl+S                   |
 | Toggle RegEx Search      | Ctrl+F6                  | Ctrl+F                   |

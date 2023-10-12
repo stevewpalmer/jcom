@@ -115,8 +115,7 @@ public class Parser {
         _pushedChar = ch;
     }
 
-    // Check whether we're at the end of the line. A '&' means we continue
-    // onto the next line.
+    // Check whether we're at the end of the line.
     private bool AtLineEnd() {
         return _index == _line.Length;
     }

@@ -56,4 +56,9 @@ public static class Consts {
     /// Backup file extension
     /// </summary>
     public const string BackupExtension = ".bak";
+
+    /// <summary>
+    /// Default right margin
+    /// </summary>
+    public const int DefaultMargin = 70;
 }

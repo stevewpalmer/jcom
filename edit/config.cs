@@ -132,4 +132,14 @@ public class Config {
     /// Specifies whether we hide the window borders.
     /// </summary>
     public bool HideBorders { get; set; }
+
+    /// <summary>
+    /// Right-hand margin for formatting commands.
+    /// </summary>
+    public int Margin { get; set; } = Consts.DefaultMargin;
+
+    /// <summary>
+    /// Tab stop settings
+    /// </summary>
+    public int[] TabStops { get; set; } = { 4, 7 };
 }
