@@ -43,7 +43,7 @@ public class Config {
         if (File.Exists(Consts.ConfigurationFilename)) {
             try {
                 using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
-                fileConfig = JsonSerializer.Deserialize<Config>(stream);
+                fileConfig = JsonSerializer.Deserialize<Config>(stream) ?? fileConfig;
             }
             catch (Exception) {
                 Screen.StatusBar.Error(string.Format(Edit.UnableToReadConfig, Consts.ConfigurationFilename));
@@ -70,32 +70,32 @@ public class Config {
     /// <summary>
     /// Background colour
     /// </summary>
-    public string BackgroundColour { get; set; }
+    public string BackgroundColour { get; set; } = "";
 
     /// <summary>
     /// Foreground colour
     /// </summary>
-    public string ForegroundColour { get; set; }
+    public string ForegroundColour { get; set; } = "";
 
     /// <summary>
     /// Title of selected window colour
     /// </summary>
-    public string SelectedTitleColour { get; set; }
+    public string SelectedTitleColour { get; set; } = "";
 
     /// <summary>
     /// Normal status bar message colour
     /// </summary>
-    public string NormalMessageColour { get; set; }
+    public string NormalMessageColour { get; set; } = "";
 
     /// <summary>
     /// Status bar error message colour
     /// </summary>
-    public string ErrorMessageColour { get; set; }
+    public string ErrorMessageColour { get; set; } = "";
 
     /// <summary>
     /// Last search string
     /// </summary>
-    public string LastSearchString { get; set; }
+    public string LastSearchString { get; set; } = "";
 
     /// <summary>
     /// Whether or not the search is case sensitive
@@ -115,12 +115,12 @@ public class Config {
     /// <summary>
     /// Last translate replacement string
     /// </summary>
-    public string LastTranslateString { get; set; }
+    public string LastTranslateString { get; set; } = "";
 
     /// <summary>
     /// Last translate command pattern
     /// </summary>
-    public string LastTranslatePattern { get; set; }
+    public string LastTranslatePattern { get; set; } = "";
 
     /// <summary>
     /// Specifies whether or not a backup file is created when a buffer

@@ -30,9 +30,9 @@ namespace JEdit;
 
 public class Screen {
     private readonly List<Window> _windowList = new();
-    private Window _activeWindow;
     private readonly Recorder _recorder = new();
-    private Search _search;
+    private Window? _activeWindow;
+    private Search? _search;
 
     /// <summary>
     /// Constructor
@@ -103,6 +103,9 @@ public class Screen {
     /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
     private RenderHint HandleCommand(Command command) {
+        if (_activeWindow == null) {
+            throw new InvalidOperationException();
+        }
         if (StatusBar.KeystrokesMode == KeystrokesMode.RECORDING && KeyMap.IsRecordable(command.Id)) {
             if (!_recorder.RememberKeystroke(command)) {
                 StatusBar.Error(Edit.MaximumKeystrokes);
@@ -218,7 +221,7 @@ public class Screen {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
-            Window newWindow = _windowList.FirstOrDefault(window => window.Buffer.Filename == inputValue);
+            Window? newWindow = _windowList.FirstOrDefault(window => window.Buffer.Filename == inputValue);
             if (newWindow == null) {
                 newWindow = new Window(new Buffer(inputValue));
                 AddWindow(newWindow);
@@ -462,11 +465,10 @@ public class Screen {
         string inputValue = Config.LastSearchString;
         string prompt = string.Format(Edit.SearchFor, forward ? "\u2193" : "\u2191", Config.RegExpOff ? Edit.RegExpOffStatus : "");
         if (command.GetInput(prompt, ref inputValue)) {
-            _search = new Search {
+            _search = new Search(_activeWindow.Buffer) {
                 SearchString = inputValue,
                 RegExp = !Config.RegExpOff,
                 CaseInsensitive = Config.SearchCaseInsensitive,
-                Buffer = _activeWindow.Buffer,
                 Forward = forward
             };
             Config.LastSearchString = inputValue;
@@ -524,12 +526,11 @@ public class Screen {
         if (!command.GetInput(Edit.Replacement, ref replacementString)) {
             return RenderHint.NONE;
         }
-        _search = new Search {
+        _search = new Search(_activeWindow.Buffer) {
             SearchString = searchString,
             ReplacementString = replacementString,
             RegExp = !Config.RegExpOff,
             CaseInsensitive = Config.SearchCaseInsensitive,
-            Buffer = _activeWindow.Buffer,
             Forward = forward
         };
         Config.LastTranslatePattern = searchString;

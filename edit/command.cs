@@ -36,7 +36,9 @@ public class Command {
     /// <summary>
     /// Default constructor.
     /// </summary>
-    public Command() { }
+    public Command() {
+        Args = new Parser("");
+    }
 
     /// <summary>
     /// Create a clone of an existing Command

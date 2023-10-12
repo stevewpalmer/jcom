@@ -51,7 +51,7 @@ public class StatusBar {
     private ConsoleColor _fgColour;
     private ConsoleColor _errColour;
     private bool _showClock;
-    private Timer _clockTimer;
+    private Timer? _clockTimer;
 
     /// <summary>
     /// Construct a status bar object.
@@ -59,6 +59,8 @@ public class StatusBar {
     public StatusBar() {
         _statusRow = Terminal.Height - 1;
         _cachedText = string.Empty;
+        _cachedTextInput = string.Empty;
+        _clockTimer = null;
         _modeWidth = 3;
         _timeWidth = 8;
         _showClock = false;
@@ -112,7 +114,7 @@ public class StatusBar {
                 _modePosition = Terminal.Width - timeWidth - _modeWidth;
                 _cursorPositionPosition = _modePosition - _cursorPositionWidth;
                 _displayWidth = Terminal.Width - (timeWidth + _cursorPositionWidth + _modeWidth);
-                if (!_showClock) {
+                if (!_showClock && _clockTimer != null) {
                     _clockTimer.Change(Timeout.Infinite, Timeout.Infinite);
                 }
                 _timerStarted = false;
@@ -226,7 +228,7 @@ public class StatusBar {
             string readyText = input.Key switch {
                 ConsoleKey.UpArrow => history.Next(),
                 ConsoleKey.DownArrow => history.Previous(),
-                _ => null
+                _ => string.Empty
             };
             if (input.Key == ConsoleKey.Backspace && inputBuffer.Count > 0) {
                 inputBuffer.RemoveAt(inputBuffer.Count - 1);
@@ -236,7 +238,7 @@ public class StatusBar {
                 inputBuffer.Add(input.KeyChar);
                 Terminal.Write(_bgColour, _fgColour, input.KeyChar);
             }
-            if (readyText != null) {
+            if (readyText != string.Empty) {
                 inputBuffer = new List<char>(readyText.ToCharArray());
                 Message(prompt + readyText);
                 Terminal.SetCursor(prompt.Length + readyText.Length, _statusRow);
@@ -266,7 +268,7 @@ public class StatusBar {
 
         List<char> inputBuffer = new();
         History history = History.Get(prompt);
-        string[] allfiles = null;
+        string[]? allfiles = null;
         int allfilesIndex = 0;
         string readyText = inputValue;
         bool selection = false;
@@ -274,7 +276,7 @@ public class StatusBar {
         ConsoleKeyInfo input;
 
         do {
-            if (!string.IsNullOrEmpty(readyText)) {
+            if (readyText != string.Empty) {
                 int totalWidth = prompt.Length + readyText.Length;
                 inputBuffer = new List<char>(readyText.ToCharArray());
                 Selected(prompt.Length, _statusRow, _displayWidth - totalWidth, readyText);
@@ -294,7 +296,7 @@ public class StatusBar {
             readyText = input.Key switch {
                 ConsoleKey.UpArrow => history.Next(),
                 ConsoleKey.DownArrow => history.Previous(),
-                _ => null
+                _ => string.Empty
             };
             if (input.KeyChar == 172) {
                 readyText = _cachedTextInput;

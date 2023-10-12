@@ -109,7 +109,7 @@ public class KeyCommands {
     /// <summary>
     /// Command name
     /// </summary>
-    public string CommandName { get; init; }
+    public string CommandName { get; init; } = "";
 
     /// <summary>
     /// Associated command ID
@@ -238,7 +238,7 @@ public class KeyMap {
     /// Parse a string that defines a keystroke and creates a KeyMap instance
     /// for that key with the command ID left empty.
     /// </summary>
-    private static KeyMap Parse(string keydef) {
+    private static KeyMap? Parse(string keydef) {
         KeyMap newKeymap = new KeyMap();
         bool validKeymap = false;
         foreach (string part in keydef.Split('-', '+').Select(s => s.Trim().ToLower())) {
@@ -384,7 +384,7 @@ public class KeyMap {
     /// <returns>KeyCommand equivalent, or KC_NONE if there's no mapping</returns>
     public static Command MapKeyToCommand(ConsoleKeyInfo keyIn) {
 
-        KeyMap match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
+        KeyMap? match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
         KeyCommand commandId = match?.KeyCommand ?? KeyCommand.KC_NONE;
         Parser commandArgs = new Parser(string.Empty);
         if (commandId == KeyCommand.KC_NONE && !char.IsControl(keyIn.KeyChar)) {
@@ -405,7 +405,7 @@ public class KeyMap {
     /// </summary>
     public static bool RemapKeyToCommand(string keystroke, string command) {
         KeyCommand commandId = MapCommandNameToCommand(command);
-        KeyMap keyMap = Parse(keystroke);
+        KeyMap? keyMap = Parse(keystroke);
         bool success = false;
         if (commandId != KeyCommand.KC_NONE && keyMap != null) {
             foreach (KeyMap km in KeyMaps) {

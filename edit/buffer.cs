@@ -32,8 +32,8 @@ namespace JEdit;
 
 public class Buffer {
     private readonly LineTerminator _terminatorType;
-    private List<string> _lines;
-    private FileInfo _fileInfo;
+    private List<string> _lines = new();
+    private FileInfo? _fileInfo;
 
     /// <summary>
     /// Create a new empty buffer not associated with any file.
@@ -155,7 +155,10 @@ public class Buffer {
     /// <param name="index">Zero based index</param>
     /// <returns>Line, or null if the index is out of range</returns>
     public string GetLine(int index) {
-        return index >= 0 && index < _lines.Count ? _lines[index] : null;
+        if (index < 0 || index >= _lines.Count) {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+        return _lines[index];
     }
 
     /// <summary>

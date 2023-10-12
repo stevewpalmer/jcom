@@ -38,7 +38,7 @@ public class History {
     /// <param name="prompt">Prompt</param>
     /// <returns>History cache</returns>
     public static History Get(string prompt) {
-        if (!PromptHistory.TryGetValue(prompt, out History history)) {
+        if (!PromptHistory.TryGetValue(prompt, out History? history)) {
             history = new History();
             PromptHistory.Add(prompt, history);
         }

@@ -42,7 +42,7 @@ public class Window {
     /// Create an empty window
     /// </summary>
     public Window() {
-        Buffer = new Buffer(null);
+        Buffer = new Buffer(string.Empty);
     }
 
     /// <summary>
@@ -331,7 +331,7 @@ public class Window {
 
         int i = renderExtent.Start.Y;
         string line = Buffer.GetLine(i);
-        while (line != null && i <= renderExtent.End.Y) {
+        while (i <= renderExtent.End.Y) {
 
             int y = _viewportBounds.Top + (i - _viewportOffset.Y);
             int x = _viewportBounds.Left;

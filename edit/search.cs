@@ -28,17 +28,16 @@ using System.Text.RegularExpressions;
 namespace JEdit;
 
 public class Search {
-    private Buffer _buffer;
+    private readonly Buffer _buffer;
 
     /// <summary>
-    /// The buffer to search
+    /// Search constructor with a specific buffer.
     /// </summary>
-    public Buffer Buffer {
-        set {
-            _buffer = value;
-            Row = _buffer.LineIndex;
-            Column = _buffer.Offset - 1;
-        }
+    /// <param name="buffer"></param>
+    public Search(Buffer buffer) {
+        _buffer = buffer;
+        Row = _buffer.LineIndex;
+        Column = _buffer.Offset - 1;
     }
 
     /// <summary>
@@ -54,7 +53,7 @@ public class Search {
     /// <summary>
     /// Search string
     /// </summary>
-    public string SearchString { get; init; }
+    public string SearchString { get; init; } = "";
 
     /// <summary>
     /// True if the search is case insensitive.
@@ -75,7 +74,7 @@ public class Search {
     /// <summary>
     /// Replacement string if we're translating.
     /// </summary>
-    public string ReplacementString { get; init; }
+    public string ReplacementString { get; init; } = "";
 
     /// <summary>
     /// Count of translations performed.

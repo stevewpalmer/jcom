@@ -27,8 +27,16 @@ using System.Drawing;
 
 namespace JEdit;
 
-public class Extent {
+public struct Extent {
     private static readonly Point Uninitalised = new(-1, -1);
+
+    /// <summary>
+    /// Create an empty Extent
+    /// </summary>
+    public Extent() {
+        Start = Uninitalised;
+        End = Uninitalised;
+    }
 
     /// <summary>
     /// Add a new point to the extent, increasing the size of the
@@ -67,12 +75,12 @@ public class Extent {
     /// <summary>
     /// Return the start of the extent.
     /// </summary>
-    public Point Start { get; private set; } = Uninitalised;
+    public Point Start { get; private set; }
 
     /// <summary>
     /// Return the end of the extent.
     /// </summary>
-    public Point End { get; private set; } = Uninitalised;
+    public Point End { get; private set; }
 
     /// <summary>
     /// Returns whether the extent has a valid range
