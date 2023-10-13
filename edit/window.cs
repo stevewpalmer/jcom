@@ -477,6 +477,9 @@ public class Window {
         if (inputValue == 8) {
             flags = Backspace();
         }
+        else if (inputValue == 9) {
+            flags = TabChar();
+        }
         else {
             if (!char.IsControl((char)inputValue)) {
                 Buffer.Insert((char)inputValue);
@@ -515,6 +518,33 @@ public class Window {
             flags |= RenderHint.BLOCK;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Insert a tab character or add spaces up to the next
+    /// tab stop if UseTabChar is set.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint TabChar() {
+        if (!Screen.Config.UseTabChar) {
+            Buffer.Insert('\t');
+        }
+        else {
+            int tabWidth = 7;
+            int previousStop = 1;
+            foreach (int tabStop in Screen.Config.TabStops) {
+                tabWidth = tabStop - previousStop;
+                if (tabStop > Buffer.Offset + 1) {
+                    break;
+                }
+                previousStop = tabStop;
+            }
+            int spacesToAdd = tabWidth - (Buffer.Offset % tabWidth);
+            while (spacesToAdd-- > 0) {
+                Buffer.Insert(' ');
+            }
+        }
+        return RenderHint.BLOCK | CursorFromOffset();
     }
 
     /// <summary>

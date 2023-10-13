@@ -142,4 +142,9 @@ public class Config {
     /// Tab stop settings
     /// </summary>
     public int[] TabStops { get; set; } = { 4, 7 };
+
+    /// <summary>
+    /// Whether Tab inserts a hard tab or spaces
+    /// </summary>
+    public bool UseTabChar { get; set; } = true;
 }

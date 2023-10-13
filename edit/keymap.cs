@@ -396,7 +396,7 @@ public class KeyMap {
         KeyMap? match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
         KeyCommand commandId = match?.KeyCommand ?? KeyCommand.KC_NONE;
         Parser commandArgs = new Parser(string.Empty);
-        if (commandId == KeyCommand.KC_NONE && !char.IsControl(keyIn.KeyChar)) {
+        if (commandId == KeyCommand.KC_NONE) {
             commandId = KeyCommand.KC_SELFINSERT;
             commandArgs = new Parser(((int)keyIn.KeyChar).ToString());
         }

@@ -137,6 +137,7 @@ public static class Screen {
             KeyCommand.KC_TRANSLATEAGAIN => TranslateAgain(),
             KeyCommand.KC_TRANSLATEBACK => Translate(command, false),
             KeyCommand.KC_REGEXP => RegExpToggle(),
+            KeyCommand.KC_USETABCHAR => UseTabCharToggle(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
             _ => _activeWindow.HandleCommand(command)
@@ -542,6 +543,15 @@ public static class Screen {
     private static RenderHint RegExpToggle() {
         Config.RegExpOff = !Config.RegExpOff;
         StatusBar.Message(Config.RegExpOff ? Edit.RegExpOff : Edit.RegExpOn);
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Toggle whether the Tab key inserts a hard tab or spaces.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint UseTabCharToggle() {
+        Config.UseTabChar = !Config.UseTabChar;
         return RenderHint.NONE;
     }
 
