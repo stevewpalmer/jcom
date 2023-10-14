@@ -495,7 +495,7 @@ public class Window {
             Screen.StatusBar.Error("Invalid number");
             return RenderHint.NONE;
         }
-        RenderHint flags = RenderHint.BLOCK;
+        RenderHint flags;
         if (inputValue == 8) {
             flags = Backspace();
         }
@@ -503,9 +503,7 @@ public class Window {
             flags = TabChar();
         }
         else {
-            if (!char.IsControl((char)inputValue)) {
-                Buffer.Insert((char)inputValue);
-            }
+            flags = AddChar((char)inputValue);
         }
         return ApplyRenderHint(flags);
     }
@@ -548,6 +546,10 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint TabChar() {
+        if (!Screen.Config.InsertMode) {
+            Buffer.Offset += SpacesToPad(Buffer.Offset);
+            return CursorFromOffset();
+        }
         if (!Screen.Config.UseTabChar) {
             Buffer.Insert('\t');
         }
@@ -558,6 +560,25 @@ public class Window {
             }
         }
         return RenderHint.BLOCK | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Add the specified character to the buffer. In insert
+    /// mode, the character is inserted at the current cursor
+    /// position. In overstrike mode it replaces the current
+    /// character at the cursor position.
+    /// </summary>
+    /// <param name="ch">Character to add</param>
+    private RenderHint AddChar(char ch) {
+        if (!char.IsControl(ch)) {
+            if (Screen.Config.InsertMode) {
+                Buffer.Insert(ch);
+            }
+            else {
+                Buffer.Replace(ch);
+            }
+        }
+        return RenderHint.BLOCK;
     }
 
     /// <summary>
@@ -584,6 +605,9 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint Newline() {
+        if (!Screen.Config.InsertMode) {
+            return StartOfNextLine();
+        }
         Buffer.Insert(Consts.EndOfLine);
         return RenderHint.BLOCK;
     }

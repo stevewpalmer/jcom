@@ -159,6 +159,23 @@ public class Buffer {
     }
 
     /// <summary>
+    /// Replace the character at the current offset.
+    /// </summary>
+    /// <param name="ch">Character to replace</param>
+    public void Replace(char ch) {
+        StringBuilder line = PrepareLine();
+        if (line[Offset] == Consts.EndOfLine) {
+            line.Insert(Offset++, ch);
+        }
+        else {
+            line[Offset++] = ch;
+        }
+        _lines[LineIndex] = line.ToString();
+        Invalidate(Offset, LineIndex, Offset, LineIndex);
+        Modified = true;
+    }
+
+    /// <summary>
     /// Insert the specified character at the current offset.
     /// </summary>
     /// <param name="ch">Character to insert</param>

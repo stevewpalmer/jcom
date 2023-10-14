@@ -147,4 +147,9 @@ public class Config {
     /// Whether Tab inserts a hard tab or spaces
     /// </summary>
     public bool UseTabChar { get; set; } = true;
+
+    /// <summary>
+    /// Insert or overstrike mode
+    /// </summary>
+    public bool InsertMode { get; set; } = true;
 }

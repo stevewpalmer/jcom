@@ -61,7 +61,7 @@ public class StatusBar {
         _cachedText = string.Empty;
         _cachedTextInput = string.Empty;
         _clockTimer = null;
-        _modeWidth = 3;
+        _modeWidth = 4;
         _timeWidth = 8;
         _showClock = false;
         _cursorPositionWidth = 18;
@@ -412,7 +412,8 @@ public class StatusBar {
             bool isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             char numLockEnabled = isWindows && Console.NumberLock ? '#' : ' ';
             char capsLockEnabled = isWindows && Console.CapsLock ? '\u2191' : ' ';
-            modeField = $"{numLockEnabled}{capsLockEnabled}";
+            char insertMode = Screen.Config.InsertMode ? ' ' : 'O';
+            modeField = $"{numLockEnabled}{capsLockEnabled}{insertMode}";
         }
         RenderText(_modePosition, _statusRow, _modeWidth, modeField, _fgColour);
     }

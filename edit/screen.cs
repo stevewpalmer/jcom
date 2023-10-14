@@ -119,6 +119,7 @@ public static class Screen {
             KeyCommand.KC_DETAILS => ShowDetails(),
             KeyCommand.KC_EDIT => EditFile(command),
             KeyCommand.KC_EXIT => ExitEditor(true),
+            KeyCommand.KC_INSERTMODE => InsertModeToggle(),
             KeyCommand.KC_LOADKEYSTROKES => LoadRecording(),
             KeyCommand.KC_MARGIN => SetMargin(command),
             KeyCommand.KC_NEXTBUFFER => SelectWindow(1),
@@ -266,6 +267,15 @@ public static class Screen {
         StatusBar.ShowClock = !StatusBar.ShowClock;
         Config.ShowClock = StatusBar.ShowClock;
         return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Toggle between insert and overstrike mode.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint InsertModeToggle() {
+        Config.InsertMode = !Config.InsertMode;
+        return RenderHint.REFRESH;
     }
 
     /// <summary>
