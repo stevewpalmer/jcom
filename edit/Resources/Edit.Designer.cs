@@ -386,5 +386,11 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("InvalidNumber", resourceCulture);
             }
         }
+        
+        internal static string ModifiedBuffer {
+            get {
+                return ResourceManager.GetString("ModifiedBuffer", resourceCulture);
+            }
+        }
     }
 }

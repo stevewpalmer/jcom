@@ -757,7 +757,10 @@ public static class Screen {
         if (prompt) {
             if (modifiedBuffers.Any()) {
                 char[] validInput = { 'y', 'n', 'w' };
-                if (StatusBar.Prompt(string.Format(Edit.ModifiedBuffers, modifiedBuffers.Length), validInput, 'n', out char inputChar)) {
+                string exitPrompt = modifiedBuffers.Length == 1 ?
+                    Edit.ModifiedBuffer :
+                    string.Format(Edit.ModifiedBuffers, modifiedBuffers.Length);
+                if (StatusBar.Prompt(exitPrompt, validInput, 'n', out char inputChar)) {
                     switch (inputChar) {
                         case 'n':
                             flags = RenderHint.NONE;

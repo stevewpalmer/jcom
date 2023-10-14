@@ -21,6 +21,8 @@ own buffer.
 | Exit                     | Alt+X                    | Alt+X                    |
 | Delete                   | Del                      | Del                      |
 | Backspace                | Backspace                | Backspace                |
+| Delete Next Word         | Alt+Backspace            | Alt+E                    |
+| Delete Previous Word     | Ctrl+Backspace           | Alt+H                    |
 | Write Buffer             | Alt+W                    | Alt+W                    |
 | Write Buffers and Exit   | Ctrl+X                   | Ctrl+X                   |
 | Change Output Filename   | Alt+O                    | Alt+O                    |

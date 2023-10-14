@@ -120,8 +120,10 @@ public class Window {
             KeyCommand.KC_CWORDRIGHT => WordRight(),
             KeyCommand.KC_DELETECHAR => DeleteChar(command),
             KeyCommand.KC_DELETELINE => DeleteLine(),
+            KeyCommand.KC_DELETEPREVWORD => DeleteWord(false),
             KeyCommand.KC_DELETETOEND => DeleteToEndOfLine(),
             KeyCommand.KC_DELETETOSTART => DeleteToStartOfLine(),
+            KeyCommand.KC_DELETEWORD => DeleteWord(true),
             KeyCommand.KC_GOTO => GoToLine(command),
             KeyCommand.KC_LOWERCASE => HandleBlock(command, BlockAction.LOWER),
             KeyCommand.KC_MARK => Mark(MarkMode.CHARACTER),
@@ -671,6 +673,41 @@ public class Window {
     }
 
     /// <summary>
+    /// Delete the next or previous word.
+    /// </summary>
+    /// <param name="next">True if we delete the next word, false if we delete the previous word</param>
+    /// <returns>Render hint</returns>
+    private RenderHint DeleteWord(bool next) {
+        char[] text = Buffer.GetLine(Buffer.LineIndex).ToCharArray();
+        int offset = Buffer.Offset;
+        if (next) {
+            while (offset < text.Length && !char.IsWhiteSpace(text[offset])) {
+                ++offset;
+            }
+            while (offset < text.Length && char.IsWhiteSpace(text[offset])) {
+                ++offset;
+            }
+            Buffer.Delete(offset - Buffer.Offset);
+        }
+        else {
+            if (Buffer.Offset == 0) {
+                EndOfPreviousLine();
+                offset = Buffer.Offset;;
+            }
+            int lastOffset = Buffer.Offset;
+            while (offset > 0 && offset < text.Length && char.IsWhiteSpace(text[offset - 1])) {
+                --offset;
+            }
+            while (offset > 0 && offset < text.Length && !char.IsWhiteSpace(text[offset - 1])) {
+                --offset;
+            }
+            Buffer.Offset = offset;
+            Buffer.Delete(lastOffset - offset);
+        }
+        return RenderHint.BLOCK | CursorFromOffset();
+    }
+
+    /// <summary>
     /// Start or end a block mark.
     /// </summary>
     /// <returns>Render hint</returns>
@@ -869,6 +906,7 @@ public class Window {
         }
         else {
             Buffer.Write();
+            Screen.StatusBar.Message(Edit.WriteSuccess);
         }
         return flags;
     }
@@ -1185,18 +1223,19 @@ public class Window {
     }
 
     /// <summary>
-    /// Update the physical cursor position in the current viewport
-    /// based on the buffer offset.
+    /// Update the physical cursor position in the current viewport,
+    /// adjusting the horizontal scroll if needed.
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint CursorFromOffset() {
         RenderHint flags = RenderHint.NONE;
-        if (Buffer.Offset < _viewportOffset.X) {
-            _viewportOffset.X = Buffer.Offset;
+        int cursorColumn = CursorColumn();
+        if (cursorColumn < _viewportOffset.X) {
+            _viewportOffset.X = cursorColumn;
             flags |= RenderHint.REDRAW;
         }
-        else if (Buffer.Offset >= _viewportOffset.X + _viewportBounds.Width - 1) {
-            _viewportOffset.X = Buffer.Offset - (_viewportBounds.Width - 1);
+        else if (cursorColumn >= _viewportOffset.X + _viewportBounds.Width - 1) {
+            _viewportOffset.X = cursorColumn - (_viewportBounds.Width - 1);
             flags |= RenderHint.REDRAW;
         } else {
             flags |= RenderHint.CURSOR;
@@ -1214,7 +1253,21 @@ public class Window {
     /// Return the cursor column position within the viewport (where 0 is the
     /// left-most column)
     /// </summary>
-    private int CursorColumnInViewport => Buffer.Offset - _viewportOffset.X;
+    private int CursorColumnInViewport => CursorColumn() - _viewportOffset.X;
+
+    /// <summary>
+    /// Calculate the actual cursor column from the start of the line, taking
+    /// hard tabs into account.
+    /// </summary>
+    /// <returns>Cursor column</returns>
+    private int CursorColumn() {
+        int column = 0;
+        string line = Buffer.GetLine(Buffer.LineIndex);
+        for (int offset = 0; offset < Buffer.Offset; offset++) {
+            column += offset < line.Length && line[offset] == '\t' ? SpacesToPad(column) : 1;
+        }
+        return column;
+    }
 
     /// <summary>
     /// Place the cursor on screen if it is visible.
