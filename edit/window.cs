@@ -331,7 +331,7 @@ public class Window {
         }
 
         int i = renderExtent.Start.Y;
-        string line = Buffer.GetLine(i);
+        string line = GetPreRenderLine(i);
         while (i <= renderExtent.End.Y) {
 
             int y = _viewportBounds.Top + (i - _viewportOffset.Y);
@@ -352,7 +352,7 @@ public class Window {
                     if (i >= markExtent.Start.Y && i <= markExtent.End.Y) {
                         if (markExtent.Start.X > 0 && markExtent.Start.X > _viewportOffset.X) {
                             int diff = markExtent.Start.X - _viewportOffset.X;
-                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                            Terminal.Write(x, y, 0, bg, fg, Utilities.SpanBound(line, left, diff));
                             x += diff;
                             w -= diff;
                             left += diff;
@@ -363,7 +363,7 @@ public class Window {
                             int diff2 = markExtent.End.X - markExtent.Start.X + 1;
                             bg = Screen.Colours.ForegroundColour;
                             fg = Screen.Colours.BackgroundColour;
-                            Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
+                            Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
                             x += diff2;
                             w -= diff2;
                             left += diff;
@@ -379,7 +379,7 @@ public class Window {
                     if (i == markExtent.Start.Y) {
                         if (markExtent.Start.X > 0 && markExtent.Start.X > _viewportOffset.X) {
                             int diff = markExtent.Start.X - _viewportOffset.X;
-                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                            Terminal.Write(x, y, 0, bg, fg, Utilities.SpanBound(line, left, diff));
                             x += diff;
                             w -= diff;
                             left += diff;
@@ -397,7 +397,7 @@ public class Window {
                         if (diff > 0) {
                             bg = Screen.Colours.ForegroundColour;
                             fg = Screen.Colours.BackgroundColour;
-                            Terminal.Write(x, y, bg, fg, Utilities.SpanBound(line, left, diff));
+                            Terminal.Write(x, y, 0, bg, fg, Utilities.SpanBound(line, left, diff));
                             x += diff;
                             w -= diff;
                             left = markExtent.End.X + 1;
@@ -409,16 +409,11 @@ public class Window {
                     break;
             }
 
-            Terminal.WriteLine(x, y, w, bg, fg, Utilities.SpanBound(line, left, length));
-            line = Buffer.GetLine(++i);
+            Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, length));
+            line = GetPreRenderLine(++i);
 
             bg = Screen.Colours.BackgroundColour;
             fg = Screen.Colours.ForegroundColour;
-        }
-        while (i <= renderExtent.End.Y) {
-            int y = _viewportBounds.Top + (i - _viewportOffset.Y);
-            Terminal.Write(_viewportBounds.Left, y, _viewportBounds.Width, bg, fg, string.Empty);
-            i++;
         }
 
         // Indicate that all buffer modifications have been rendered.
@@ -436,6 +431,31 @@ public class Window {
 
         Terminal.SetCursor(savedCursor);
         PlaceCursor();
+    }
+
+    /// <summary>
+    /// Retrieve and pre-render a line by expanding tabs and replacing line
+    /// terminators.
+    /// </summary>
+    /// <param name="lineIndex">Index of line to retrieve</param>
+    /// <returns>Pre-rendered line</returns>
+    private string GetPreRenderLine(int lineIndex) {
+        StringBuilder line = new StringBuilder(Buffer.GetLine(lineIndex));
+        int index = 0;
+        while (index < line.Length) {
+            if (line[index] == Consts.EndOfLine) {
+                line[index] = ' ';
+            }
+            else if (line[index] == '\t') {
+                int spacesToTab = SpacesToPad(index);
+                line[index] = ' ';
+                while (--spacesToTab > 0) {
+                    line.Insert(index++, ' ');
+                }
+            }
+            index++;
+        }
+        return line.ToString();
     }
 
     /// <summary>
@@ -530,21 +550,31 @@ public class Window {
             Buffer.Insert('\t');
         }
         else {
-            int tabWidth = 7;
-            int previousStop = 1;
-            foreach (int tabStop in Screen.Config.TabStops) {
-                tabWidth = tabStop - previousStop;
-                if (tabStop > Buffer.Offset + 1) {
-                    break;
-                }
-                previousStop = tabStop;
-            }
-            int spacesToAdd = tabWidth - (Buffer.Offset % tabWidth);
+            int spacesToAdd = SpacesToPad(Buffer.Offset);
             while (spacesToAdd-- > 0) {
                 Buffer.Insert(' ');
             }
         }
         return RenderHint.BLOCK | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Given a 0-based line offset, compute the number of spaces
+    /// from that offset to the next tab stop.
+    /// </summary>
+    /// <param name="offset"></param>
+    /// <returns></returns>
+    private static int SpacesToPad(int offset) {
+        int tabWidth = 7;
+        int previousStop = 1;
+        foreach (int tabStop in Screen.Config.TabStops) {
+            tabWidth = tabStop - previousStop;
+            if (tabStop > offset + 1) {
+                break;
+            }
+            previousStop = tabStop;
+        }
+        return tabWidth - offset % tabWidth;
     }
 
     /// <summary>

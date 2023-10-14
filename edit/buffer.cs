@@ -155,10 +155,7 @@ public class Buffer {
     /// <param name="index">Zero based index</param>
     /// <returns>Line, or null if the index is out of range</returns>
     public string GetLine(int index) {
-        if (index < 0 || index >= _lines.Count) {
-            throw new ArgumentOutOfRangeException(nameof(index));
-        }
-        return _lines[index];
+        return index >= 0 && index < _lines.Count ? _lines[index] : string.Empty;
     }
 
     /// <summary>

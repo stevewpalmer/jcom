@@ -390,7 +390,7 @@ public static class Screen {
             }
         }
         Config.TabStops = tabStops.Distinct().OrderBy(t => t).ToArray();
-        return RenderHint.NONE;
+        return RenderHint.REFRESH;
     }
 
     /// <summary>

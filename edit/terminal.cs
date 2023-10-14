@@ -109,48 +109,6 @@ public static class Terminal {
     }
 
     /// <summary>
-    /// Write to the console at the specified position. The cursor position
-    /// is left at the end of the string.
-    /// </summary>
-    /// <param name="x">Zero based column of output</param>
-    /// <param name="y">Zero based line of output</param>
-    /// <param name="bg">Background colour</param>
-    /// <param name="fg">Foreground colour</param>
-    /// <param name="str">String to output</param>
-    public static void Write(int x, int y, ConsoleColor bg, ConsoleColor fg, string str) {
-        lock (LockObj) {
-            Console.SetCursorPosition(x, y);
-            ConsoleColor fgSaved = Console.ForegroundColor;
-            ConsoleColor bgSaved = Console.BackgroundColor;
-            Console.ForegroundColor = fg;
-            Console.BackgroundColor = bg;
-            Console.Write(str);
-            Console.ForegroundColor = fgSaved;
-            Console.BackgroundColor = bgSaved;
-        }
-    }
-
-    /// <summary>
-    /// Write a line to the specified output. Any newline character at the end of the line is
-    /// replaced with a space.
-    /// </summary>
-    /// <param name="x">Zero based column of output</param>
-    /// <param name="y">Zero based line of output</param>
-    /// <param name="width">Width of area to write to</param>
-    /// <param name="bg">Background colour</param>
-    /// <param name="fg">Foreground colour</param>
-    /// <param name="str">String to output</param>
-    public static void WriteLine(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
-        lock (LockObj) {
-            string rawStr = str;
-            if (rawStr.EndsWith(Consts.EndOfLine)) {
-                rawStr = rawStr[..^1] + ' ';
-            }
-            Write(x, y, width, bg, fg, rawStr);
-        }
-    }
-
-    /// <summary>
     /// Write to the console at the specified position, padding out to the width
     /// with spaces if required. The cursor position is left at the end of the
     /// string.
