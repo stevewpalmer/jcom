@@ -131,6 +131,7 @@ public class Window {
             KeyCommand.KC_MARKLINE => Mark(MarkMode.LINE),
             KeyCommand.KC_OPENLINE => OpenLine(),
             KeyCommand.KC_PASTE => Paste(),
+            KeyCommand.KC_REFORM => ReformParagraph(),
             KeyCommand.KC_SELFINSERT => SelfInsert(command),
             KeyCommand.KC_SCREENDOWN => ScreenDown(),
             KeyCommand.KC_SCREENUP => ScreenUp(),
@@ -726,6 +727,59 @@ public class Window {
             Buffer.Delete(lastOffset - offset);
         }
         return RenderHint.BLOCK | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Reformat a paragraph.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint ReformParagraph() {
+        int paraStartIndex = Buffer.LineIndex;
+        while (paraStartIndex > 0) {
+            string line = Buffer.GetLine(paraStartIndex - 1);
+            if (string.IsNullOrWhiteSpace(line)) {
+                break;
+            }
+            --paraStartIndex;
+        }
+        int paraEndIndex = Buffer.LineIndex;
+        while (paraEndIndex < Buffer.Length - 1) {
+            string line = Buffer.GetLine(paraEndIndex + 1);
+            if (string.IsNullOrWhiteSpace(line)) {
+                break;
+            }
+            ++paraEndIndex;
+        }
+        int paragraphLength = 0;
+        StringBuilder formattedText = new();
+        StringBuilder formattedLine = new();
+        for (int index = paraStartIndex; index <= paraEndIndex; index++) {
+            string line = Buffer.GetLine(index);
+            paragraphLength += line.Length;
+            string[] words = line.Split(' ',
+                StringSplitOptions.TrimEntries |
+                StringSplitOptions.RemoveEmptyEntries);
+            foreach (string word in words) {
+                if (formattedLine.Length + word.Length + 1 > Screen.Config.Margin) {
+                    formattedLine.Append(Consts.EndOfLine);
+                    formattedText.Append(formattedLine);
+                    formattedLine.Clear();
+                }
+                if (formattedLine.Length > 0) {
+                    formattedLine.Append(' ');
+                }
+                formattedLine.Append(word);
+            }
+        }
+        if (formattedLine.Length > 0) {
+            formattedLine.Append(Consts.EndOfLine);
+            formattedText.Append(formattedLine);
+        }
+        Buffer.LineIndex = paraStartIndex;
+        Buffer.Offset = 0;
+        Buffer.Delete(paragraphLength);
+        Buffer.Insert(formattedText.ToString());
+        return RenderHint.BLOCK;
     }
 
     /// <summary>
