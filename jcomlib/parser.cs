@@ -73,7 +73,9 @@ public class Parser {
         char ch = GetChar();
         while (ch != Eol) {
             while (char.IsWhiteSpace(ch)) {
-                ch = GetChar();
+                if ((ch = GetChar()) == Eol) {
+                    break;
+                }
             }
             switch (ch) {
                 default: {

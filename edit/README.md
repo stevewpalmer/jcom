@@ -35,6 +35,7 @@ own buffer.
 | Save Recording           | Alt+F8                   | Alt+F8                   |
 | Load Recording           | Alt+F7                   | Alt+F7                   |
 | Command                  | F10                      | F10                      |
+| Overstrike/Insert        | Insert                   | Insert                   |
 | Go To Line               | Alt+G                    | Ctrl+G                   |
 | Start of Line            | Home                     | Alt+Left / Home          |
 | End of Line              | End                      | Alt+Right / End          |

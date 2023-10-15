@@ -40,6 +40,7 @@ internal static class Program {
         { "comal", new CommandDefinition { Function = Commands.CmdComal, Description = "Run the Comal compiler/interpreter" } },
         { "fortran", new CommandDefinition { Function = Commands.CmdFortran, Description = "Run the Fortran compiler" } },
         { "edit", new CommandDefinition { Function = Commands.CmdEdit, Description = "Create or edit a file" } },
+        { "del", new CommandDefinition { Function = Commands.CmdDel, Description = "Delete files" } },
         { "dir", new CommandDefinition { Function = Commands.CmdDir, Description = "Display a list of files" } },
         { "type", new CommandDefinition { Function = Commands.CmdType, Description = "Display the content of a file" } },
         { "help", new CommandDefinition { Function = CmdHelp, Description = "Display this help" } }
@@ -80,7 +81,8 @@ internal static class Program {
         while (true) {
             Console.Write(@"$ ");
             ReadLine readLine = new() {
-                AllowHistory = true
+                AllowHistory = true,
+                AllowFilenameCompletion = true
             };
             string inputLine = readLine.Read(string.Empty);
             if (inputLine == null) {
