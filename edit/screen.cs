@@ -216,7 +216,8 @@ public static class Screen {
     /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
     private static RenderHint EditFile(Command command) {
-        if (command.GetFilename(Edit.File, out string inputValue)) {
+        string inputValue = string.Empty;
+        if (command.GetInput(Edit.File, ref inputValue, true)) {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
@@ -652,7 +653,8 @@ public static class Screen {
         if (_activeWindow == null) {
             throw new InvalidOperationException();
         }
-        if (command.GetFilename(Edit.EnterNewOutputFileName, out string outputFileName)) {
+        string outputFileName = string.Empty;
+        if (command.GetInput(Edit.EnterNewOutputFileName, ref outputFileName, true)) {
             string fullFilename = new FileInfo(outputFileName).FullName;
             if (_windowList.Any(window => fullFilename.Equals(window.Buffer.Filename, StringComparison.OrdinalIgnoreCase))) {
                 StatusBar.Message(Edit.InvalidOutputFilename);
@@ -690,10 +692,12 @@ public static class Screen {
     /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
     private static RenderHint AssignToKey(Command command) {
-        if (!command.GetFilename(Edit.EnterKey, out string keystroke)) {
+        string keystroke = string.Empty;
+        string commandName = string.Empty;
+        if (!command.GetInput(Edit.EnterKey, ref keystroke)) {
             return RenderHint.NONE;
         }
-        if (!command.GetFilename(Edit.EnterMacroName, out string commandName)) {
+        if (!command.GetInput(Edit.EnterMacroName, ref commandName)) {
             return RenderHint.NONE;
         }
         if (!KeyMap.RemapKeyToCommand(keystroke, commandName)) {

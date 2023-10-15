@@ -77,33 +77,17 @@ public class Command {
     }
 
     /// <summary>
-    /// Read a filename from the command line. If none present then prompt
-    /// for the input.
-    /// </summary>
-    /// <param name="prompt">Prompt to display if input is required</param>
-    /// <param name="inputValue">Input value</param>
-    /// <returns>True if string retrieved, false if the input was cancelled</returns>
-    public bool GetFilename(string prompt, out string inputValue) {
-        inputValue = Args.NextWord();
-        if (string.IsNullOrEmpty(inputValue)) {
-            if (!Screen.StatusBar.PromptForInput(prompt, ref inputValue, true)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /// <summary>
     /// Read input from the command line. If none present then prompt
     /// for the input.
     /// </summary>
     /// <param name="prompt">Prompt to display if input is required</param>
     /// <param name="inputValue">Input value</param>
+    /// <param name="allowFilenameCompletion">Whether filename completion is allowed</param>
     /// <returns>True if string retrieved, false if the input was cancelled</returns>
-    public bool GetInput(string prompt, ref string inputValue) {
+    public bool GetInput(string prompt, ref string inputValue, bool allowFilenameCompletion = false) {
         string nextWord = Args.NextWord();
         if (string.IsNullOrEmpty(nextWord)) {
-            if (!Screen.StatusBar.PromptForInput(prompt, ref inputValue, false)) {
+            if (!Screen.StatusBar.PromptForInput(prompt, ref inputValue, allowFilenameCompletion)) {
                 return false;
             }
         }

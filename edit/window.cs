@@ -488,23 +488,20 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint SelfInsert(Command command) {
         string nextWord = command.Args.NextWord();
+        int inputValue;
         if (string.IsNullOrEmpty(nextWord)) {
-            return Newline();
+            inputValue = 10;
         }
-        if (!int.TryParse(nextWord, out int inputValue)) {
+        else if (!int.TryParse(nextWord, out inputValue)) {
             Screen.StatusBar.Error("Invalid number");
             return RenderHint.NONE;
         }
-        RenderHint flags;
-        if (inputValue == 8) {
-            flags = Backspace();
-        }
-        else if (inputValue == 9) {
-            flags = TabChar();
-        }
-        else {
-            flags = AddChar((char)inputValue);
-        }
+        RenderHint flags = inputValue switch {
+            8 => Backspace(),
+            9 => TabChar(),
+            10 => Newline(),
+            _ => AddChar((char)inputValue)
+        };
         return ApplyRenderHint(flags);
     }
 
@@ -716,7 +713,7 @@ public class Window {
         else {
             if (Buffer.Offset == 0) {
                 EndOfPreviousLine();
-                offset = Buffer.Offset;;
+                offset = Buffer.Offset;
             }
             int lastOffset = Buffer.Offset;
             while (offset > 0 && offset < text.Length && char.IsWhiteSpace(text[offset - 1])) {
@@ -838,7 +835,8 @@ public class Window {
         }
 
         if (action.HasFlag(BlockAction.WRITE)) {
-            if (command.GetFilename(Edit.WriteBlockAs, out string outputFileName)) {
+            string outputFileName = string.Empty;
+            if (command.GetInput(Edit.WriteBlockAs, ref outputFileName, true)) {
                 Buffer writeBuffer = new(outputFileName) {
                     Content = copyText.ToString()
                 };

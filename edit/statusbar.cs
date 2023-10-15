@@ -186,7 +186,7 @@ public class StatusBar {
                 repeatCount = 0;
                 break;
             }
-            if (input.Key == ConsoleKey.R && input.Modifiers.HasFlag(ConsoleModifiers.Control)) {
+            if (KeyMap.MapKeyToCommand(input).Id == KeyCommand.KC_REPEAT) {
                 repeatCount *= 4;
                 continue;
             }
