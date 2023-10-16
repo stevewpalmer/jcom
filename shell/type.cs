@@ -29,17 +29,14 @@ namespace JShell;
 
 public static partial class Commands {
 
-    // TYPE command.
-    // Display file contents.
+    /// <summary>
+    /// TYPE command. Display file contents.
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>Always true</returns>
     public static bool CmdType(Parser cmdLine) {
 
-        string[] matchfiles = cmdLine.RestOfLine();
-        if (!matchfiles.Any()) {
-            matchfiles = new[] { "*" };
-        }
-        string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
-        allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
-        Array.Sort(allfiles);
+        IEnumerable<string> allfiles = cmdLine.ReadAndExpandWildcards();
         foreach (string file in allfiles) {
             Console.WriteLine(File.ReadAllText(file));
         }

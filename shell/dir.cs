@@ -29,18 +29,15 @@ namespace JShell;
 
 public static partial class Commands {
 
-    // DIR command.
-    // The rest of the command line specifies the files to be
-    // filtered.
+    /// <summary>
+    /// DIR command. The rest of the command line specifies the files to be
+    /// filtered.
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>Always true</returns>
     public static bool CmdDir(Parser cmdLine) {
 
-        string[] matchfiles = cmdLine.RestOfLine();
-        if (!matchfiles.Any()) {
-            matchfiles = new[] { "*" };
-        }
-        string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
-        allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
-        Array.Sort(allfiles);
+        IEnumerable<string> allfiles = cmdLine.ReadAndExpandWildcards();
         foreach (string file in allfiles) {
             FileInfo info = new(file);
             long size = info.Length;

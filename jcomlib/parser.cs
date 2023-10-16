@@ -52,8 +52,11 @@ public class Parser {
         _pushedChar = copy._pushedChar;
     }
 
-    // Retrieve the remainder of the command line as a series of
-    // delimited string arguments.
+    /// <summary>
+    /// Retrieve the remainder of the command line as a series of
+    /// delimited string arguments.
+    /// </summary>
+    /// <returns>String array of arguments</returns>
     public string[] RestOfLine() {
         List<string> args = new();
         string argument = NextWord();
@@ -64,10 +67,28 @@ public class Parser {
         return args.ToArray();
     }
 
-    // Retrieve the next word from the input. A single or double
-    // quote wraps all text up to the next matching quote or the
-    // end of the line. Otherwise a word is delimited by any space
-    // character.
+    /// <summary>
+    /// Read the remainder of the command line and expand any wildcards.
+    /// </summary>
+    /// <returns>String array of arguments</returns>
+    public IEnumerable<string> ReadAndExpandWildcards() {
+        string[] matchfiles = RestOfLine();
+        if (!matchfiles.Any()) {
+            matchfiles = new[] { "*" };
+        }
+        string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
+        allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
+        Array.Sort(allfiles);
+        return allfiles;
+    }
+
+    /// <summary>
+    /// Retrieve the next word from the input. A single or double
+    /// quote wraps all text up to the next matching quote or the
+    /// end of the line. Otherwise a word is delimited by any space
+    /// character.
+    /// </summary>
+    /// <returns>Next word, or null if no more words to read</returns>
     public string NextWord() {
 
         char ch = GetChar();

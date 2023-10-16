@@ -30,7 +30,14 @@ namespace JShell;
 
 public static partial class Commands {
 
-    // Run a program.
+    /// <summary>
+    /// Run the specified program, passing through the remainder of the
+    /// command line. The working directory is set to the shell home
+    /// directory automatically.
+    /// </summary>
+    /// <param name="programName">Program name</param>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>The result of the proces</returns>
     private static bool RunProgram(string programName, Parser cmdLine) {
         Process process = new();
         process.StartInfo.FileName = $"{Program.BinaryFolder}/{programName}";
@@ -41,17 +48,29 @@ public static partial class Commands {
         return true;
     }
 
-    // Run the Fortran compiler.
+    /// <summary>
+    /// Run the Fortran compiler
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>The result of the proces</returns>
     public static bool CmdFortran(Parser cmdLine) {
         return RunProgram("for", cmdLine);
     }
 
-    // Run the Comal interpreter/compiler.
+    /// <summary>
+    /// Run the Comal interpreter/compiler
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>The result of the proces</returns>
     public static bool CmdComal(Parser cmdLine) {
         return RunProgram("comal", cmdLine);
     }
 
-    // Run the editor.
+    /// <summary>
+    /// Run the text editor
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>The result of the proces</returns>
     public static  bool CmdEdit(Parser cmdLine) {
         return RunProgram("edit", cmdLine);
     }

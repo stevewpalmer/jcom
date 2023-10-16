@@ -29,18 +29,14 @@ namespace JShell;
 
 public static partial class Commands {
 
-    // DEL command.
-    // The rest of the command line specifies the files to be
-    // deleted.
+    /// <summary>
+    /// DEL command: delete the files specified on the command line.
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>Always true</returns>
     public static bool CmdDel(Parser cmdLine) {
 
-        string[] matchfiles = cmdLine.RestOfLine();
-        if (!matchfiles.Any()) {
-            matchfiles = new[] { "*" };
-        }
-        string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
-        allfiles = Array.ConvertAll(allfiles, f => f.ToLower());
-        Array.Sort(allfiles);
+        IEnumerable<string> allfiles = cmdLine.ReadAndExpandWildcards();
         foreach (string file in allfiles) {
             File.Delete(file);
         }
