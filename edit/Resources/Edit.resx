@@ -192,4 +192,7 @@
     <data name="ModifiedBuffer" xml:space="preserve">
         <value>1 buffer has not been saved. Exit @@?</value>
     </data>
+    <data name="PressAnyKey" xml:space="preserve">
+        <value>Press any key to return back to the editor...</value>
+    </data>
 </root>

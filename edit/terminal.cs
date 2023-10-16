@@ -53,6 +53,7 @@ public static class Terminal {
     /// Close down the display.
     /// </summary>
     public static void Close() {
+        Console.TreatControlCAsInput = false;
         Console.BackgroundColor = _savedBackgroundColour;
         Console.ForegroundColor = _savedForegroundColour;
         Console.Clear();

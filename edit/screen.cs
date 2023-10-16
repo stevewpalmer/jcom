@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using JComLib;
 using JEdit.Resources;
 
@@ -115,6 +116,7 @@ public static class Screen {
             KeyCommand.KC_CLOSE => CloseWindow(),
             KeyCommand.KC_COLOUR => ConfigureColours(command),
             KeyCommand.KC_COMMAND => RunCommand(),
+            KeyCommand.KC_COMPILE => CompileAndRun(),
             KeyCommand.KC_DELFILE => DeleteFile(command),
             KeyCommand.KC_DETAILS => ShowDetails(),
             KeyCommand.KC_EDIT => EditFile(command),
@@ -126,6 +128,7 @@ public static class Screen {
             KeyCommand.KC_OUTPUTFILE => RenameOutputFile(command),
             KeyCommand.KC_PLAYBACK => Playback(),
             KeyCommand.KC_PREVBUFFER => SelectWindow(-1),
+            KeyCommand.KC_REGEXP => RegExpToggle(),
             KeyCommand.KC_REMEMBER => StartStopRecording(),
             KeyCommand.KC_REPEAT => Repeat(),
             KeyCommand.KC_SAVEKEYSTROKES => SaveRecording(),
@@ -137,7 +140,6 @@ public static class Screen {
             KeyCommand.KC_TRANSLATE => Translate(command, true),
             KeyCommand.KC_TRANSLATEAGAIN => TranslateAgain(),
             KeyCommand.KC_TRANSLATEBACK => Translate(command, false),
-            KeyCommand.KC_REGEXP => RegExpToggle(),
             KeyCommand.KC_USETABCHAR => UseTabCharToggle(),
             KeyCommand.KC_VERSION => Version(),
             KeyCommand.KC_WRITEANDEXIT => ExitEditor(false),
@@ -340,6 +342,38 @@ public static class Screen {
             StatusBar.Message(Edit.File + _activeWindow.Buffer.Filename + (_activeWindow.Buffer.Modified ? "*" : ""));
         }
         return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Compile and run the code in the active window.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint CompileAndRun() {
+        RenderHint flags = RenderHint.NONE;
+        if (_activeWindow != null) {
+            Compiler? compiler = Compiler.CompilerForExtension(Path.GetExtension(_activeWindow.Buffer.Filename));
+            if (compiler != null) {
+                _activeWindow.Buffer.Write();
+                Terminal.Close();
+
+                Process process = new();
+                process.StartInfo.FileName = $"../bin/{compiler.ProgramName}";
+                process.StartInfo.Arguments = string.Format(compiler.CommandLine, _activeWindow.Buffer.Filename);
+                process.Start();
+                process.WaitForExit();
+
+                Terminal.Write(Edit.PressAnyKey);
+                Console.ReadKey(true);
+                Terminal.Write("\n");
+
+                Terminal.Open();
+                if (process.ExitCode != 0) {
+                    StatusBar.Error("Error was returned.");
+                }
+                flags = RenderHint.REFRESH;
+            }
+        }
+        return flags;
     }
 
     /// <summary>

@@ -33,7 +33,7 @@ namespace CCompiler;
 /// </summary>
 public sealed class ReadItemParseNode : ParseNode {
 
-    private const string LibraryName = "JFortranLib.IO,jforlib";
+    private const string LibraryName = "JFortranLib.IO,forlib";
     private const string Name = "READ";
 
     /// <summary>

@@ -392,5 +392,11 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("ModifiedBuffer", resourceCulture);
             }
         }
+        
+        internal static string PressAnyKey {
+            get {
+                return ResourceManager.GetString("PressAnyKey", resourceCulture);
+            }
+        }
     }
 }

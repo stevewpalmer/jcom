@@ -27,11 +27,12 @@ using CCompiler;
 
 namespace JCobol; 
 
-public class Program {
+public static class Program {
 
     public static void Main(string[] args) {
         CobolOptions opts = new();
         MessageCollection messages = new(opts);
+        int exitCode = 0;
 
         opts.Messages = messages;
         if (opts.Parse(args)) {
@@ -67,6 +68,8 @@ public class Program {
         }
         if (messages.ErrorCount > 0) {
             Console.WriteLine("*** {0} errors found. Compilation stopped.", messages.ErrorCount);
+            exitCode = 1;
         }
+        Environment.ExitCode = exitCode;
     }
 }
