@@ -195,4 +195,7 @@
     <data name="PressAnyKey" xml:space="preserve">
         <value>Press any key to return back to the editor...</value>
     </data>
+    <data name="FileToEdit" xml:space="preserve">
+        <value>File to edit: </value>
+    </data>
 </root>

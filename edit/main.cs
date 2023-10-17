@@ -30,11 +30,16 @@ internal static class Program {
     private static void Main(string[] args) {
 
         Screen.Open();
-        if (args.Length == 0) {
-            Screen.AddWindow(new Window());
-        }
         foreach (string filename in args) {
             Screen.AddWindow(new Window(new Buffer(filename)));
+        }
+        if (args.Length == 0) {
+            Screen.AddWindow(new Window());
+            Screen.ActivateWindow(0);
+            if (!Screen.GetInitialFile()) {
+                Screen.Close();
+                return;
+            }
         }
         Screen.ActivateWindow(0);
         Screen.StartKeyboardLoop();

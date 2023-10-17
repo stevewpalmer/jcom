@@ -398,5 +398,11 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("PressAnyKey", resourceCulture);
             }
         }
+        
+        internal static string FileToEdit {
+            get {
+                return ResourceManager.GetString("FileToEdit", resourceCulture);
+            }
+        }
     }
 }

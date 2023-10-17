@@ -90,6 +90,19 @@ public static class Screen {
         } while (flags != RenderHint.EXIT);
     }
 
+    public static bool GetInitialFile() {
+        string inputValue = string.Empty;
+        if (StatusBar.PromptForInput(Edit.FileToEdit, ref inputValue, true)) {
+            FileInfo fileInfo = new FileInfo(inputValue);
+            inputValue = fileInfo.FullName;
+            _activeWindow = new Window(new Buffer(inputValue));
+            AddWindow(_activeWindow);
+            _activeWindow.Refresh();
+            UpdateCursorPosition();
+        }
+        return inputValue != "";
+    }
+
     /// <summary>
     /// Handle commands at the screen level and pass on any unhandled
     /// ones to the active window.

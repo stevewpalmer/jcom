@@ -308,6 +308,8 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.D7 },
         new() { KeyCommand = KeyCommand.KC_CLOSE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.OemMinus },
         new() { KeyCommand = KeyCommand.KC_COMMAND, Key = ConsoleKey.F10 },
+        new() { KeyCommand = KeyCommand.KC_COMPILE, Key = ConsoleKey.F15 },
+        new() { KeyCommand = KeyCommand.KC_COMPILE, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F10 },
         new() { KeyCommand = KeyCommand.KC_COPY, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.C },
         new() { KeyCommand = KeyCommand.KC_COPY, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.OemPlus },
         new() { KeyCommand = KeyCommand.KC_CPAGEDOWN, Key = ConsoleKey.PageDown },
