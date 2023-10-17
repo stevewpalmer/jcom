@@ -28,26 +28,43 @@ namespace JEdit;
 public class Compiler {
 
     /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="extensions">List of file extensions</param>
+    /// <param name="programName">Name of compiler executable</param>
+    /// <param name="commandLine">Templatized command line</param>
+    private Compiler(string[] extensions, string programName, string commandLine) {
+        Extensions = extensions;
+        ProgramName = programName;
+        CommandLine = commandLine;
+    }
+
+    /// <summary>
     /// Name of the executable for the compiler.
     /// </summary>
-    public string ProgramName { get; private init; } = "";
+    public string ProgramName { get; }
 
     /// <summary>
     /// Command-line for the compiler with placeholders.
     /// </summary>
-    public string CommandLine { get; private set; } = "";
+    public string CommandLine { get; }
 
     /// <summary>
     /// Extensions associated with this compiler
     /// </summary>
-    private string[] Extensions { get; init; } = Array.Empty<string>();
+    private string[] Extensions { get; }
+
+    /// <summary>
+    /// Path to binary files
+    /// </summary>
+    public const string BinaryPath = "../bin";
 
     /// <summary>
     /// Built-in compilers.
     /// </summary>
     private static readonly Compiler[] BuiltIn = {
-        new() { Extensions = new []{ "f", "f90" }, ProgramName = "for", CommandLine = "--run {0}"},
-        new() { Extensions = new [] { "cml", "lst" }, ProgramName = "comal", CommandLine = "--run {0}"},
+        new(new []{ "f", "f90" }, "for", "--run {0}"),
+        new(new [] { "cml", "lst" }, "comal", "--ide --run {0}")
     };
 
     /// <summary>

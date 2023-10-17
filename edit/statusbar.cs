@@ -44,6 +44,7 @@ public class StatusBar {
     private string _cachedTextInput;
     private KeystrokesMode _keystrokesMode;
     private string _currentMessage;
+    private ConsoleColor _currentColour;
     private bool _timerStarted;
     private int _cursorRow;
     private int _cursorColumn;
@@ -70,6 +71,7 @@ public class StatusBar {
         _cursorPositionPosition = _modePosition - _cursorPositionWidth;
         _displayWidth = Terminal.Width - (_cursorPositionWidth + _modeWidth);
         _currentMessage = string.Empty;
+        _currentColour = _fgColour;
         _keystrokesMode = KeystrokesMode.NONE;
         _cursorRow = 1;
         _cursorColumn = 1;
@@ -129,6 +131,7 @@ public class StatusBar {
     /// <param name="message">Message string</param>
     public void Message(string message) {
         _currentMessage = message;
+        _currentColour = _fgColour;
         RenderMessage();
     }
 
@@ -138,6 +141,7 @@ public class StatusBar {
     /// <param name="message">Message string</param>
     public void Error(string message) {
         _currentMessage = message;
+        _currentColour = _errColour;
         RenderText(0, _statusRow, _displayWidth, _currentMessage, _errColour);
     }
 
@@ -389,7 +393,7 @@ public class StatusBar {
     /// Display the current status bar message.
     /// </summary>
     private void RenderMessage() {
-        RenderText(0, _statusRow, _displayWidth, _currentMessage, _fgColour);
+        RenderText(0, _statusRow, _displayWidth, _currentMessage, _currentColour);
     }
 
     /// <summary>

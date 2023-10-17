@@ -404,5 +404,11 @@ namespace JEdit.Resources {
                 return ResourceManager.GetString("FileToEdit", resourceCulture);
             }
         }
+        
+        internal static string NoErrors {
+            get {
+                return ResourceManager.GetString("NoErrors", resourceCulture);
+            }
+        }
     }
 }

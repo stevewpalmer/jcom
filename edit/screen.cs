@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
 using JComLib;
 using JEdit.Resources;
 
@@ -90,17 +89,19 @@ public static class Screen {
         } while (flags != RenderHint.EXIT);
     }
 
+    /// <summary>
+    /// Prompt for the initial file to edit, replacing the buffer in the
+    /// existing window.
+    /// </summary>
+    /// <returns>True if file retrieved, false if the user cancelled the prompt</returns>
     public static bool GetInitialFile() {
         string inputValue = string.Empty;
         if (StatusBar.PromptForInput(Edit.FileToEdit, ref inputValue, true)) {
-            FileInfo fileInfo = new FileInfo(inputValue);
-            inputValue = fileInfo.FullName;
-            _activeWindow = new Window(new Buffer(inputValue));
-            AddWindow(_activeWindow);
-            _activeWindow.Refresh();
-            UpdateCursorPosition();
+            inputValue = new FileInfo(inputValue).FullName;
+            _windowList.Clear();
+            AddWindow(new Window(new Buffer(inputValue)));
         }
-        return inputValue != "";
+        return inputValue != string.Empty;
     }
 
     /// <summary>
@@ -129,7 +130,6 @@ public static class Screen {
             KeyCommand.KC_CLOSE => CloseWindow(),
             KeyCommand.KC_COLOUR => ConfigureColours(command),
             KeyCommand.KC_COMMAND => RunCommand(),
-            KeyCommand.KC_COMPILE => CompileAndRun(),
             KeyCommand.KC_DELFILE => DeleteFile(command),
             KeyCommand.KC_DETAILS => ShowDetails(),
             KeyCommand.KC_EDIT => EditFile(command),
@@ -355,38 +355,6 @@ public static class Screen {
             StatusBar.Message(Edit.File + _activeWindow.Buffer.Filename + (_activeWindow.Buffer.Modified ? "*" : ""));
         }
         return RenderHint.NONE;
-    }
-
-    /// <summary>
-    /// Compile and run the code in the active window.
-    /// </summary>
-    /// <returns>Render hint</returns>
-    private static RenderHint CompileAndRun() {
-        RenderHint flags = RenderHint.NONE;
-        if (_activeWindow != null) {
-            Compiler? compiler = Compiler.CompilerForExtension(Path.GetExtension(_activeWindow.Buffer.Filename));
-            if (compiler != null) {
-                _activeWindow.Buffer.Write();
-                Terminal.Close();
-
-                Process process = new();
-                process.StartInfo.FileName = $"../bin/{compiler.ProgramName}";
-                process.StartInfo.Arguments = string.Format(compiler.CommandLine, _activeWindow.Buffer.Filename);
-                process.Start();
-                process.WaitForExit();
-
-                Terminal.Write(Edit.PressAnyKey);
-                Console.ReadKey(true);
-                Terminal.Write("\n");
-
-                Terminal.Open();
-                if (process.ExitCode != 0) {
-                    StatusBar.Error("Error was returned.");
-                }
-                flags = RenderHint.REFRESH;
-            }
-        }
-        return flags;
     }
 
     /// <summary>

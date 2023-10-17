@@ -198,4 +198,7 @@
     <data name="FileToEdit" xml:space="preserve">
         <value>File to edit: </value>
     </data>
+    <data name="NoErrors" xml:space="preserve">
+        <value>No errors.</value>
+    </data>
 </root>

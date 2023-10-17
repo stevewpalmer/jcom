@@ -47,6 +47,14 @@ public class ComalOptions : Options {
     public bool Strict { get; init; }
 
     /// <summary>
+    /// Sets and returns whether the compiler is running in IDE mode. In
+    /// IDE mode, line numbers in the error and warning messages relate
+    /// to the physical line position, not the COMAL line numbers.
+    /// </summary>
+    [OptionField("-ide", Help = "Enable IDE mode")]
+    public bool IDE { get; init; }
+
+    /// <summary>
     /// Parse the specified command line array passed to the application.
     /// Any errors are added to the error list. Also note that the first
     /// argument in the list is assumed to be the application name.

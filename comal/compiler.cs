@@ -426,7 +426,7 @@ public partial class Compiler : ICompiler {
             // Possible initial line number
             if (token.ID == TokenID.INTEGER) {
                 IntegerToken lineNumberToken = token as IntegerToken;
-                _currentLineNumber = lineNumberToken.Value;
+                _currentLineNumber = _opts.IDE ? _ls.Index : lineNumberToken.Value;
                 Messages.Linenumber = _currentLineNumber;
                 token = GetNextToken();
             }
@@ -907,6 +907,9 @@ public partial class Compiler : ICompiler {
             case TokenID.KFOR:
             case TokenID.KGOTO:
             case TokenID.KIF:
+            case TokenID.KELSE:
+            case TokenID.KENDIF:
+            case TokenID.KENDFUNC:
             case TokenID.KIMPORT:
             case TokenID.KINPUT:
             case TokenID.KLET:

@@ -64,7 +64,7 @@ public static class Program {
             if (msg.Level == MessageLevel.Error) {
                 Console.ForegroundColor = ConsoleColor.Red;
             }
-            Console.WriteLine(msg);
+            Console.Error.WriteLine(msg);
             Console.ResetColor();
         }
         if (messages.ErrorCount > 0) {

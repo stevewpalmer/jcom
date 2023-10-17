@@ -23,14 +23,16 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using JComLib;
 using JEdit.Resources;
 
 namespace JEdit;
 
-public class Window {
+public partial class Window {
     private Rectangle _viewportBounds;
     private Point _viewportOffset;
     private MarkMode _markMode;
@@ -57,6 +59,17 @@ public class Window {
     /// Buffer associated with window
     /// </summary>
     public Buffer Buffer { get; }
+
+    /// <summary>
+    /// Active list of errors from last compile
+    /// </summary>
+    private CircularList ErrorList { get; set; } = new();
+
+    /// <summary>
+    /// Compiler error string compile-time regex.
+    /// </summary>
+    [GeneratedRegex(@"^.*\((\d+)\).*?:\s*(.*)$")]
+    private static partial Regex ErrorRegex();
 
     /// <summary>
     /// Set the viewport for the window.
@@ -105,6 +118,7 @@ public class Window {
             KeyCommand.KC_CLEFT => CursorLeft(),
             KeyCommand.KC_CLINEEND => EndOfCurrentLine(),
             KeyCommand.KC_CLINESTART => StartOfCurrentLine(),
+            KeyCommand.KC_COMPILE => CompileAndRun(),
             KeyCommand.KC_COPY => HandleBlock(command, BlockAction.COPY),
             KeyCommand.KC_CPAGEDOWN => PageDown(),
             KeyCommand.KC_CPAGEUP => PageUp(),
@@ -129,6 +143,7 @@ public class Window {
             KeyCommand.KC_MARK => Mark(MarkMode.CHARACTER),
             KeyCommand.KC_MARKCOLUMN => Mark(MarkMode.COLUMN),
             KeyCommand.KC_MARKLINE => Mark(MarkMode.LINE),
+            KeyCommand.KC_NEXTERROR => NextError(),
             KeyCommand.KC_OPENLINE => OpenLine(),
             KeyCommand.KC_PASTE => Paste(),
             KeyCommand.KC_REFORM => ReformParagraph(),
@@ -218,6 +233,63 @@ public class Window {
             ++searchData.TranslateCount;
         }
         return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
+    /// Compile and run the code in the active window.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CompileAndRun() {
+        RenderHint flags = RenderHint.NONE;
+        Compiler? compiler = Compiler.CompilerForExtension(Path.GetExtension(Buffer.Filename));
+        if (compiler != null) {
+            Buffer.Write();
+            Terminal.Close();
+
+            Process process = new();
+            process.StartInfo.FileName = Path.Combine(Compiler.BinaryPath, compiler.ProgramName);
+            process.StartInfo.Arguments = string.Format(compiler.CommandLine, Buffer.Filename);
+            process.StartInfo.RedirectStandardError = true;
+            process.Start();
+            process.WaitForExit();
+
+            Terminal.Write(Edit.PressAnyKey);
+            Console.ReadKey(true);
+            Terminal.Write("\n");
+
+            Terminal.Open();
+            if (process.ExitCode == 0) {
+                Screen.StatusBar.Message(string.Empty);
+            } else {
+                ErrorList = new CircularList();
+                StreamReader myStreamReader = process.StandardError;
+                string[] lines = myStreamReader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                foreach (string line in lines) {
+                    ErrorList.Append(line);
+                }
+                flags |= NextError();
+            }
+            flags |= RenderHint.REFRESH;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Display the next error in the error list.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint NextError() {
+        string line = ErrorList.Next();
+        Match match = ErrorRegex().Match(line);
+        if (match is { Success: true, Groups.Count: 3 }) {
+            if (int.TryParse(match.Groups[1].ToString(), out int lineNumber)) {
+                if (lineNumber >= 1 && lineNumber <= Buffer.Length) {
+                    Buffer.LineIndex = lineNumber - 1;
+                }
+            }
+            Screen.StatusBar.Error(match.Groups[2].ToString());
+        }
+        return CursorFromLineIndex();
     }
 
     /// <summary>
@@ -1177,7 +1249,7 @@ public class Window {
         }
         return flags;
     }
-    
+
     /// <summary>
     /// Move to the end of the buffer.
     /// </summary>
@@ -1316,7 +1388,7 @@ public class Window {
         } else {
             flags |= RenderHint.CURSOR;
         }
-        return flags;        
+        return flags;
     }
 
     /// <summary>

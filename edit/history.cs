@@ -23,13 +23,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JComLib;
+
 namespace JEdit;
 
-public class History {
+public class History : CircularList {
 
     private static readonly Dictionary<string, History> PromptHistory = new();
-    private List<string> _items { get; } = new();
-    private int _historyIndex;
+
+    /// <summary>
+    /// Create a new history queue with the specified maximum number of
+    /// items.
+    /// </summary>
+    private History() : base(Consts.MaxCommandHistory) { }
 
     /// <summary>
     /// Return the history cache for the given prompt. If one doesn't exist
@@ -51,47 +57,8 @@ public class History {
     /// item is the same as the first item in the history then we
     /// skip it.
     /// </summary>
-    /// <param name="newItem">New string to be added</param>
+    /// <param name="newItem">New character array to be added</param>
     public void Add(IEnumerable<char> newItem) {
-        if (_items.Count == Consts.MaxCommandHistory) {
-            _items.RemoveAt(_items.Count - 1);
-        }
-        string newString = string.Join("", newItem);
-        if (_items.Count == 0 || _items.Count > 0 && _items[0] != newString) {
-            _items.Insert(0, string.Join("", newString));
-        }
-        _historyIndex = -1;
-    }
-
-    /// <summary>
-    /// Get the next item from the list, wrapping round when we
-    /// reach the end.
-    /// </summary>
-    /// <returns>The next history item</returns>
-    public string Next() {
-        if (_items.Count > 0) {
-            ++_historyIndex;
-            if (_historyIndex == _items.Count) {
-                _historyIndex = 0;
-            }
-            return _items[_historyIndex];
-        }
-        return string.Empty;
-    }
-
-    /// <summary>
-    /// Get the previous item from the list, wrapping round when we
-    /// reach the end.
-    /// </summary>
-    /// <returns>The previous history item</returns>
-    public string Previous() {
-        if (_items.Count > 0) {
-            --_historyIndex;
-            if (_historyIndex < 0) {
-                _historyIndex = _items.Count - 1;
-            }
-            return _items[_historyIndex];
-        }
-        return string.Empty;
+        base.Add(string.Join("", newItem));
     }
 }

@@ -93,7 +93,7 @@ public class Colours {
     /// Retrieve the error message colour
     /// </summary>
     public ConsoleColor ErrorMessageColour =>
-        GetColour(_config?.ErrorMessageColour, 7);
+        GetColour(_config?.ErrorMessageColour, 4);
 
     /// <summary>
     /// Parse a colour value from the configuration file. Colours are specified as
