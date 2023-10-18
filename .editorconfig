@@ -1,0 +1,24 @@
+[*]
+tab_width = 4
+trim_trailing_whitespace = true
+
+[*.cs]
+resharper_unused_auto_property_accessor_global_highlighting = none
+resharper_check_namespace_highlighting = none
+
+# FortranLib exports methods used at runtime so ignore warnings about
+# unused public members or types.
+[fortranlib/*.cs]
+resharper_unused_member_global_highlighting = none
+resharper_unused_type_global_highlighting = none
+resharper_member_can_be_private_global_highlighting = none
+resharper_property_can_be_made_init_only_global_highlighting = none
+
+# ComalLib exports methods used at runtime so ignore warnings about
+# unused public members or types.
+[comallib/*.cs]
+resharper_unused_member_global_highlighting = none
+resharper_unused_type_global_highlighting = none
+resharper_member_can_be_private_global_highlighting = none
+resharper_property_can_be_made_init_only_global_highlighting = none
+
