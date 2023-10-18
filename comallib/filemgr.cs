@@ -91,7 +91,7 @@ public static class FileManager {
             IsNew = mode == "w",
             IsSequential = mode != "x"
         };
-        if ((mode == "w+" || mode == "x") && !File.Exists(filename)) {
+        if (mode is "w+" or "x" && !File.Exists(filename)) {
             file.IsNew = true;
         }
         file.Open();

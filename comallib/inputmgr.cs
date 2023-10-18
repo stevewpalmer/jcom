@@ -105,8 +105,7 @@ public class InputManager {
 
         // For console input, display the prompt. For any other file, the
         // prompt is ignored.
-        if (_file is StdinIOFile) {
-            StdinIOFile file = _file as StdinIOFile;
+        if (_file is StdinIOFile file) {
             file.Terminator = terminator;
             file.Width = maxWidth;
             file.Zone = FileManager.Zone;

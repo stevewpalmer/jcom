@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Globalization;
 using System.Text;
 using JComLib;
 
@@ -52,7 +53,7 @@ public static partial class Intrinsics {
 
             int startIndex = index;
             char ch = template[index++];
-            if (ch == '-' || ch == '#' || ch == '.') {
+            if (ch is '-' or '#' or '.') {
 
                 int signPart = 0;
                 int integerPart = 0;
@@ -106,7 +107,7 @@ public static partial class Intrinsics {
                 int fieldWidth = integerPart + decimalPart + fractionPart;
 
                 if (value != null && value.IsNumber) {
-                    string strNumber = value.RealValue.ToString();
+                    string strNumber = value.RealValue.ToString(CultureInfo.InvariantCulture);
                     string[] parts = strNumber.Split('.');
 
                     string integerString = string.Empty;
@@ -126,14 +127,12 @@ public static partial class Intrinsics {
                     // Fraction?
                     if (fractionPart > 0) {
 
-                        if (parts.Length > 1) {
-                            fractionString = parts[1].PadRight(fractionPart, '0');
-                        } else {
-                            fractionString = new string('0', fractionPart);
-                        }
+                        fractionString = parts.Length > 1 ?
+                            parts[1].PadRight(fractionPart, '0') :
+                            new string('0', fractionPart);
                         if (fractionString.Length > fractionPart) {
                             double roundedFraction = Math.Round(value.RealValue, fractionPart);
-                            parts = roundedFraction.ToString().Split('.');
+                            parts = roundedFraction.ToString(CultureInfo.InvariantCulture).Split('.');
                             fractionString = parts[1];
                         }
                     }

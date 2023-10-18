@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Globalization;
 using System.Text;
 using JComLib;
 
@@ -230,7 +231,7 @@ public class PrintManager {
 
     // Write a float value
     private static void WriteValue(StringBuilder output, float floatValue, bool useHex, int fieldWidth) {
-        string result = useHex ? floatValue.ToString("X") : floatValue.ToString();
+        string result = useHex ? floatValue.ToString("X") : floatValue.ToString(CultureInfo.InvariantCulture);
         if (fieldWidth > 0 && result.Length < fieldWidth) {
             result = result.PadLeft(fieldWidth);
         }
