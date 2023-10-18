@@ -281,7 +281,7 @@ public class Buffer {
     private StringBuilder PrepareLine() {
         StringBuilder line = new StringBuilder(_lines[LineIndex]);
         if (Offset >= line.Length) {
-            int count = line.Length - 1;
+            int count = Math.Max(0, line.Length - 1);
             while (count < Offset) {
                 line.Insert(count++, ' ');
             }
