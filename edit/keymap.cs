@@ -35,6 +35,7 @@ public enum KeyCommand {
     KC_ASSIGNTOKEY,
     KC_BACKSPACE,
     KC_BACKUPFILE,
+    KC_BACKTAB,
     KC_BORDERS,
     KC_CD,
     KC_CDOWN,
@@ -133,6 +134,7 @@ public class KeyMap {
     /// </summary>
     private static readonly KeyCommands[] CommandTable = {
         new() { CommandName = "assign_to_key", CommandId = KeyCommand.KC_ASSIGNTOKEY },
+        new() { CommandName = "back_tab", CommandId = KeyCommand.KC_BACKTAB },
         new() { CommandName = "backspace", CommandId = KeyCommand.KC_BACKSPACE },
         new() { CommandName = "beginning_of_line", CommandId = KeyCommand.KC_CLINESTART },
         new() { CommandName = "borders", CommandId = KeyCommand.KC_BORDERS },
@@ -295,6 +297,7 @@ public class KeyMap {
     /// </summary>
     private static readonly KeyMap[] KeyMaps = {
         new() { KeyCommand = KeyCommand.KC_BACKSPACE, Key = ConsoleKey.Backspace },
+        new() { KeyCommand = KeyCommand.KC_BACKTAB, Modifiers = ConsoleModifiers.Shift, Key = ConsoleKey.Tab },
         new() { KeyCommand = KeyCommand.KC_BACKUPFILE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.W },
         new() { KeyCommand = KeyCommand.KC_BORDERS, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F1 },
         new() { KeyCommand = KeyCommand.KC_CDOWN, Key = ConsoleKey.DownArrow },

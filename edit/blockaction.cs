@@ -64,5 +64,15 @@ public enum BlockAction {
     /// <summary>
     /// Write the block to a file
     /// </summary>
-    WRITE = GET | 32
+    WRITE = GET | 32,
+
+    /// <summary>
+    /// Block indent
+    /// </summary>
+    INDENT = 64,
+
+    /// <summary>
+    /// Block outdent
+    /// </summary>
+    OUTDENT = 128
 }

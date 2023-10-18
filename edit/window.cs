@@ -110,6 +110,7 @@ public partial class Window {
     /// <returns>Render hint</returns>
     public RenderHint HandleCommand(Command command) {
         RenderHint flags = command.Id switch {
+            KeyCommand.KC_BACKTAB => BackTab(),
             KeyCommand.KC_BACKSPACE => Backspace(),
             KeyCommand.KC_CDOWN => CursorDown(),
             KeyCommand.KC_CENTRE => CentreLine(),
@@ -616,6 +617,9 @@ public partial class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint TabChar() {
+        if (_markMode != MarkMode.NONE) {
+            return HandleBlock(new Command(), BlockAction.INDENT);
+        }
         if (!Screen.Config.InsertMode) {
             Buffer.Offset += SpacesToPad(Buffer.Offset);
             return CursorFromOffset();
@@ -630,6 +634,34 @@ public partial class Window {
             }
         }
         return RenderHint.BLOCK | CursorFromOffset();
+    }
+
+    /// <summary>
+    /// Handle the backward-tab key.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint BackTab() {
+        RenderHint flags = RenderHint.NONE;
+        if (_markMode != MarkMode.NONE) {
+            flags = HandleBlock(new Command(), BlockAction.OUTDENT);
+        } else {
+            if (Buffer.Offset == 0) {
+                if (Buffer.LineIndex == 0) {
+                    return flags;
+                }
+                flags |= EndOfPreviousLine();
+            }
+            int previousStop = 1;
+            foreach (int tabStop in TabStops()) {
+                if (tabStop >= Buffer.Offset + 1) {
+                    break;
+                }
+                previousStop = tabStop;
+            }
+            Buffer.Offset = previousStop - 1;
+            flags |= CursorFromOffset();
+        }
+        return flags;
     }
 
     /// <summary>
@@ -660,7 +692,7 @@ public partial class Window {
     private static int SpacesToPad(int offset) {
         int tabWidth = 7;
         int previousStop = 1;
-        foreach (int tabStop in Screen.Config.TabStops) {
+        foreach (int tabStop in TabStops()) {
             tabWidth = tabStop - previousStop;
             if (tabStop > offset + 1) {
                 break;
@@ -668,6 +700,27 @@ public partial class Window {
             previousStop = tabStop;
         }
         return tabWidth - offset % tabWidth;
+    }
+
+    /// <summary>
+    /// Iterator that returns each defined tabstop. If no tab
+    /// stops are configured then the iterator returns tab stops
+    /// set 8 units apart.
+    /// </summary>
+    /// <returns>Next tabstop</returns>
+    private static IEnumerable<int> TabStops() {
+        int tabWidth = 7;
+        int previousStop = 1;
+        foreach (int tabStop in Screen.Config.TabStops) {
+            tabWidth = tabStop - previousStop;
+            yield return tabStop;
+            previousStop = tabStop;
+        }
+        while (previousStop < 100) {
+            int tabStop = previousStop + tabWidth;
+            yield return tabStop;
+            previousStop = tabStop;
+        }
     }
 
     /// <summary>
@@ -893,6 +946,7 @@ public partial class Window {
     /// <returns>Render hint</returns>
     private RenderHint HandleBlock(Command command, BlockAction action) {
 
+        Point savedCursor = Buffer.Cursor;
         (Point markStart, Point markEnd) = GetOrderedMarkRange();
 
         // Ranges are a collection of ranges to be copied or modified, indicated by
@@ -901,6 +955,8 @@ public partial class Window {
         // these are a collection for each line in the column.
         List<(Point, int)> blockRanges = new();
         (Point, int Count) currentRange = new(markStart, 0);
+
+        bool indenting = action is BlockAction.INDENT or BlockAction.OUTDENT;
 
         for (int l = markStart.Y; l <= markEnd.Y; l++) {
             string line = Buffer.GetLine(l);
@@ -917,6 +973,16 @@ public partial class Window {
                     currentRange = new ValueTuple<Point, int>(new Point(startIndex, l), 0);
                     break;
 
+                case MarkMode.LINE:
+                    currentRange.Item1.X = 0;
+                    if (indenting) {
+                        if (currentRange.Count > 0) {
+                            blockRanges.Add(currentRange);
+                        }
+                        currentRange = new ValueTuple<Point, int>(new Point(startIndex, l), 0);
+                    }
+                    break;
+
                 case MarkMode.CHARACTER:
                     if (l == markStart.Y) {
                         startIndex = markStart.X;
@@ -924,6 +990,12 @@ public partial class Window {
                     }
                     if (l == markEnd.Y) {
                         length = markEnd.X - startIndex + 1;
+                    }
+                    if (indenting) {
+                        if (currentRange.Count > 0) {
+                            blockRanges.Add(currentRange);
+                        }
+                        currentRange = new ValueTuple<Point, int>(new Point(startIndex, l), 0);
                     }
                     break;
             }
@@ -945,6 +1017,35 @@ public partial class Window {
                 if (action.HasFlag(BlockAction.LOWER)) {
                     Buffer.Delete(count);
                     Buffer.Insert(text.ToLower());
+                }
+                if (action.HasFlag(BlockAction.INDENT)) {
+                    if (!Screen.Config.UseTabChar) {
+                        Buffer.Insert('\t');
+                    }
+                    else {
+                        int spacesToAdd = SpacesToPad(Buffer.Offset);
+                        while (spacesToAdd-- > 0) {
+                            Buffer.Insert(' ');
+                        }
+                    }
+                }
+                if (action.HasFlag(BlockAction.OUTDENT)) {
+                    if (text.Length > 0 && text[0] == '\t') {
+                        text = text[1..];
+                    }
+                    else {
+                        int firstTabStop = TabStops().First();
+                        int index = 0;
+                        while (index < firstTabStop && index < text.Length) {
+                            if (text[index] != ' ') {
+                                break;
+                            }
+                            ++index;
+                        }
+                        text = text[index..];
+                    }
+                    Buffer.Delete(count);
+                    Buffer.Insert(text);
                 }
                 if (action.HasFlag(BlockAction.GET)) {
                     copyText.Append($"{separator}{text}");
@@ -972,27 +1073,31 @@ public partial class Window {
 
         // Any action which is non-destructive requires an explicit invalidate of
         // the extent to ensure the block mark is removed from the screen.
-        if (action.HasFlag(BlockAction.GET)) {
+        if (action.HasFlag(BlockAction.GET) || indenting) {
             Buffer.InvalidateExtent
                 .Add(markStart)
                 .Add(markEnd);
         }
 
-    #pragma warning disable CS8509
         Screen.StatusBar.Message(action switch {
             BlockAction.COPY =>  Edit.CopiedToScrap,
             BlockAction.DELETE => Edit.BlockDeleted,
             BlockAction.CUT => Edit.DeletedToScrap,
             BlockAction.LOWER => Edit.Lowercasing,
             BlockAction.UPPER => Edit.Uppercasing,
-            BlockAction.WRITE => Edit.WriteSuccess
+            BlockAction.WRITE => Edit.WriteSuccess,
+            _ => string.Empty
         });
-    #pragma warning restore CS8509
 
-        Buffer.Offset = markStart.X;
-        Buffer.LineIndex = markStart.Y;
-
-        _markMode = MarkMode.NONE;
+        if (!indenting) {
+            Buffer.Offset = markStart.X;
+            Buffer.LineIndex = markStart.Y;
+            _markMode = MarkMode.NONE;
+        }
+        else {
+            Buffer.Offset = savedCursor.X;
+            Buffer.LineIndex = savedCursor.Y;
+        }
         return RenderHint.BLOCK;
     }
 

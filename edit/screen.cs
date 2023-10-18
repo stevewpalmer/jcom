@@ -733,6 +733,9 @@ public static class Screen {
         }
         else {
             try {
+                newDirectory = newDirectory
+                    .Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
+                    .Replace("//", "/");
                 Directory.SetCurrentDirectory(newDirectory);
             } catch(Exception e) {
                 StatusBar.Error(e.Message);
