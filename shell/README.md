@@ -20,6 +20,7 @@ default folder for all applications.
 
 | Command | Description                          |
 |---------|--------------------------------------|
+| COPY    | Make a copy of a file                |
 | DIR     | Display directory contents           |
 | TYPE    | Display the contents of a file       |
 | DEL     | Delete files                         |

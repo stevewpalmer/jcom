@@ -30,32 +30,33 @@ namespace JShell;
 
 internal static class Program {
 
-    private record CommandDefinition {
-        public Func<Parser, bool> Function;
-        public string Description;
+    private record CommandDefinition(Func<Parser, bool> Function, string Description) {
+        public readonly Func<Parser, bool> Function = Function;
+        public readonly string Description = Description;
     }
 
     // Command table
     private static readonly Dictionary<string, CommandDefinition> CommandMap = new() {
-        { "comal", new CommandDefinition { Function = Commands.CmdComal, Description = "Run the Comal compiler/interpreter" } },
-        { "del", new CommandDefinition { Function = Commands.CmdDel, Description = "Delete files" } },
-        { "dir", new CommandDefinition { Function = Commands.CmdDir, Description = "Display a list of files" } },
-        { "edit", new CommandDefinition { Function = Commands.CmdEdit, Description = "Create or edit a file" } },
-        { "for", new CommandDefinition { Function = Commands.CmdFortran, Description = "Run the Fortran compiler" } },
-        { "help", new CommandDefinition { Function = CmdHelp, Description = "Display this help" } },
-        { "rename", new CommandDefinition { Function = Commands.CmdRename, Description = "Rename a file" } },
-        { "type", new CommandDefinition { Function = Commands.CmdType, Description = "Display the content of a file" } }
+        { "comal", new CommandDefinition(Commands.CmdComal,"Run the Comal compiler/interpreter") },
+        { "copy", new CommandDefinition(Commands.CmdCopy,"Copy a file" ) },
+        { "del", new CommandDefinition(Commands.CmdDel,"Delete files" ) },
+        { "dir", new CommandDefinition(Commands.CmdDir,"Display a list of files" ) },
+        { "edit", new CommandDefinition(Commands.CmdEdit,"Create or edit a file" ) },
+        { "for", new CommandDefinition(Commands.CmdFortran,"Run the Fortran compiler" ) },
+        { "help", new CommandDefinition(CmdHelp,"Display this help" ) },
+        { "rename", new CommandDefinition(Commands.CmdRename,"Rename a file" ) },
+        { "type", new CommandDefinition(Commands.CmdType,"Display the content of a file" ) }
     };
 
     /// <summary>
     /// Shell home folder, where user files are stored
     /// </summary>
-    public static string HomeFolder { get; private set; }
+    public static string HomeFolder { get; private set; } = "";
 
     /// <summary>
     /// Shell binary folder, where executables are stored
     /// </summary>
-    public static string BinaryFolder { get; private set; }
+    public static string BinaryFolder { get; private set; } = "";
 
     private static void Main() {
 
@@ -65,12 +66,12 @@ internal static class Program {
 
         // Ensure we have a home folder and set it as the default.
         // Get the full name path of the executable file
-        ProcessModule mainModule = Process.GetCurrentProcess().MainModule;
+        ProcessModule? mainModule = Process.GetCurrentProcess().MainModule;
         if (mainModule == null) {
             return;
         }
-        BinaryFolder = Path.GetDirectoryName(mainModule.FileName);
-        if (BinaryFolder == null) {
+        BinaryFolder = Path.GetDirectoryName(mainModule.FileName) ?? string.Empty;
+        if (BinaryFolder == string.Empty) {
             return;
         }
         HomeFolder = $"{Directory.GetParent(BinaryFolder)?.FullName}/home";
@@ -93,7 +94,7 @@ internal static class Program {
             string command = cmdLine.NextWord();
             while (command != null) {
 
-                if (CommandMap.TryGetValue(command.ToLower(), out CommandDefinition commandFunc)) {
+                if (CommandMap.TryGetValue(command.ToLower(), out CommandDefinition? commandFunc)) {
                     try {
                         commandFunc.Function(cmdLine);
                     }

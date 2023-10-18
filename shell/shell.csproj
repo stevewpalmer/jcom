@@ -14,6 +14,7 @@
     <Title>Shell</Title>
     <Authors>Steven Palmer</Authors>
     <UserSecretsId>0f1ae6ac-5f87-4a98-9792-6aad52d36a17</UserSecretsId>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\comlib\comlib.csproj" />
