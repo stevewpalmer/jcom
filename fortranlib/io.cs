@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -26,7 +26,7 @@
 using System.Numerics;
 using JComLib;
 
-namespace JFortranLib; 
+namespace JFortranLib;
 
 /// <summary>
 /// Processor dependent error codes returned in IOSTAT
@@ -454,11 +454,11 @@ public static class IO {
         if (readManager == null) {
             throw new ArgumentNullException(nameof(readManager));
         }
-        
+
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
             int value = 0;
-            
+
             int charsRead = READ(readManager, ref iostat, ref value);
             if (charsRead <= 0) {
                 return charsRead;
@@ -501,11 +501,11 @@ public static class IO {
         if (readManager == null) {
             throw new ArgumentNullException(nameof(readManager));
         }
-        
+
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
             bool value = false;
-            
+
             int charsRead = READ(readManager, ref iostat, ref value);
             if (charsRead <= 0) {
                 return charsRead;
@@ -515,7 +515,7 @@ public static class IO {
         }
         return totalCharsRead;
     }
-    
+
     /// <summary>
     /// READ keyword
     /// Read a boolean from the device into the specified identifier.
@@ -548,11 +548,11 @@ public static class IO {
         if (readManager == null) {
             throw new ArgumentNullException(nameof(readManager));
         }
-        
+
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
             float value = 0;
-            
+
             int charsRead = READ(readManager, ref iostat, ref value);
             if (charsRead <= 0) {
                 return charsRead;
@@ -657,7 +657,7 @@ public static class IO {
         if (readManager == null) {
             throw new ArgumentNullException(nameof(readManager));
         }
-        
+
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
             double value = 0;
@@ -828,9 +828,7 @@ public static class IO {
     public static int REWIND(int iodevice, ref int iostat) {
         iostat = 0;
         IOFile iofile = IOFile.Get(iodevice);
-        if (iofile != null) {
-            iofile.Rewind();
-        }
+        iofile?.Rewind();
         return 0;
     }
 
@@ -972,7 +970,7 @@ public static class IO {
         // as UNKNOWN.
         string fixedStatus = status == null ? "UNKNOWN" : status.ToUpper().Trim();
 
-        if ((fixedStatus == "OLD" || fixedStatus == "NEW" || fixedStatus == "UNKNOWN") && filename != null) {
+        if (fixedStatus is "OLD" or "NEW" or "UNKNOWN" && filename != null) {
             bool fileExists = File.Exists(filename.Trim());
             if (fixedStatus == "UNKNOWN") {
                 fixedStatus = fileExists ? "OLD" : "NEW";

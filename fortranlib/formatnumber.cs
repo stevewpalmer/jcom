@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -27,7 +27,7 @@ using System.Numerics;
 using System.Text;
 using JComLib;
 
-namespace JFortranLib; 
+namespace JFortranLib;
 
 /// <summary>
 /// Internal class that simplifies number parsing.
@@ -87,7 +87,7 @@ public sealed class FormatParser {
 public static class FormatNumber {
 
     private static readonly double [] powersOf10 = { 10, 100, 1.0e4, 1.0e8, 1.0e16, 1.0e32, 1.0e64, 1.0e128, 1.0e256 };
-    
+
     /// <summary>
     /// Format a value represented by the object with default width and precision. The object must
     /// be a value or object type that can be represented as a string.
@@ -115,7 +115,7 @@ public static class FormatNumber {
 
     /// <summary>
     /// Format the specified boolean value using FORTRAN L formatting rules.
-    /// The width specifies the amount of space, in characters, into which 
+    /// The width specifies the amount of space, in characters, into which
     /// the whole number must fit or otherwise the return value is a
     /// string consisting of '*'s. If the width is zero, the string is returned
     /// without any size constraint.
@@ -130,7 +130,7 @@ public static class FormatNumber {
         string newString = value ? "T" : "F";
         return FormatToWidth(record.FieldWidth, newString);
     }
-    
+
     /// <summary>
     /// Parses an integer from the given string. Leading blanks are ignored.
     /// Either '+' or '-' are accepted as sign characters and must appear after
@@ -168,14 +168,14 @@ public static class FormatNumber {
         }
         return intValue * sign;
     }
-    
+
     /// <summary>
     /// Format the specified integer number using FORTRAN I formatting rules using
     /// an integer number. The width specifies the amount of space, in characters,
     /// into which the whole number must fit or otherwise the return value is a
     /// string consisting of '*'s. If the width is zero, the string is returned
     /// without any size constraint.
-    /// 
+    ///
     /// The precision is the minimum number of leading zeroes that the number must
     /// contain. If this is zero, the number is not zero padded.
     /// </summary>
@@ -190,7 +190,7 @@ public static class FormatNumber {
         StringBuilder str = new();
         int tempValue = Math.Abs(value);
         int fieldWidth = 0;
-        
+
         do {
             char ch = (char)(tempValue % 10 + 48);
             str.Append(ch);
@@ -210,22 +210,22 @@ public static class FormatNumber {
         }
         return FormatToWidth(record.FieldWidth, ReverseString(str.ToString()));
     }
-    
+
     /// <summary>
     /// Parses a float from the given string. Leading blanks are ignored.
     /// Either '+' or '-' are accepted as sign characters and must appear after
     /// any leading blanks at the beginning of the string. The rest of the string
     /// must contain a fractional number of the format:
-    /// 
+    ///
     /// [s][nnn].[fff][Emm]
-    /// 
+    ///
     /// where [s] is the optional sign, [nnn] is the optional mantissa and [fff]
     /// is an optional fraction. If an exponent is specified, it must contain an
     /// exponentiation value.
-    /// 
+    ///
     /// If no exponent is explicitly specified then any scale factor is applied to
     /// the number.
-    /// 
+    ///
     /// Blanks are treated as either '0' or ignored depending on the BlanksAsZero
     /// flag in the record.
     /// </summary>
@@ -238,14 +238,14 @@ public static class FormatNumber {
         }
         return (float)ParseDouble(floatString, record);
     }
-    
+
     /// <summary>
     /// Format the specified floating point number using FORTRAN F formatting rules
     /// using a floating point number. The width specifies the amount of space, in
     /// characters, into which the whole number must fit or otherwise the return value
     /// is a string consisting of '*'s. If the width is zero, the string is returned
     /// without any size constraint.
-    /// 
+    ///
     /// The precision is the number of units for the non-fractional part. The
     /// resulting number is truncated (and the exponent adjusted if appropriate) to fit
     /// into the given width. If the precision is zero, no truncation occurs and
@@ -281,16 +281,16 @@ public static class FormatNumber {
     /// Either '+' or '-' are accepted as sign characters and must appear after
     /// any leading blanks at the beginning of the string. The rest of the string
     /// must contain a fractional number of the format:
-    /// 
+    ///
     /// [s][nnn].[fff][Dmm]
-    /// 
+    ///
     /// where [s] is the optional sign, [nnn] is the optional mantissa and [fff]
     /// is an optional fraction. If an exponent is specified, it must contain an
     /// exponentiation value.
-    /// 
+    ///
     /// If no exponent is explicitly specified then any scale factor is applied to
     /// the number.
-    /// 
+    ///
     /// Blanks are treated as either '0' or ignored depending on the BlanksAsZero
     /// flag in the record.
     /// </summary>
@@ -310,7 +310,7 @@ public static class FormatNumber {
 
         FormatParser parser = new(doubleString, record);
         char ch = parser.Next();
-        
+
         if (ch == '+') {
             ch = parser.Next();
         } else if (ch == '-') {
@@ -334,7 +334,7 @@ public static class FormatNumber {
             }
             ch = parser.Next();
         }
-        if ("EeDd".IndexOf(ch) >= 0) {
+        if ("EeDd".Contains(ch)) {
             ch = parser.Next();
             hasExponentPart = true;
         }
@@ -399,7 +399,7 @@ public static class FormatNumber {
     /// characters, into which the whole number must fit or otherwise the return value
     /// is a string consisting of '*'s. If the width is zero, the string is returned
     /// without any size constraint.
-    /// 
+    ///
     /// The precisionWidth is the number of units for the non-fractional part. The
     /// resulting number is truncated (and the exponent adjusted if appropriate) to fit
     /// into the given width. If the precisionWidth is zero, no truncation occurs and
@@ -426,7 +426,7 @@ public static class FormatNumber {
         // BUGBUG: Doesn't apply the FormatOptionalPlus flag.
         // BUGBUG: Doesn't apply the scaling factor
         // BUGBUG: Exponent character should be 'D' for double.
-        
+
         string formatString;
         if (record.FieldWidth == 0 && record.Precision == 0) {
             formatString = "{0:G}";
@@ -435,14 +435,14 @@ public static class FormatNumber {
         }
         return FormatFloatToWidth(record, string.Format(formatString, value));
     }
-    
+
     /// <summary>
     /// Format the specified complex number using FORTRAN F formatting rules
     /// using a double precision number. The width specifies the amount of space, in
     /// characters, into which the whole number must fit or otherwise the return value
     /// is a string consisting of '*'s. If the width is zero, the string is returned
     /// without any size constraint.
-    /// 
+    ///
     /// The precisionWidth is the number of units for the non-fractional part. The
     /// resulting number is truncated (and the exponent adjusted if appropriate) to fit
     /// into the given width. If the precisionWidth is zero, no truncation occurs and
@@ -483,10 +483,10 @@ public static class FormatNumber {
         if (recordReal.FieldWidth > 0 || recordImg.FieldWidth > 0) {
             return FormatToWidth(recordReal.FieldWidth + recordImg.FieldWidth + 2, $"{realPart}  {imgPart}");
         }
-        
+
         return $"({realPart},{imgPart})";
     }
-    
+
     /// <summary>
     /// Format the specified double using FORTRAN E and D formatting rules:
     ///
@@ -513,7 +513,7 @@ public static class FormatNumber {
 
         // BUGBUG: Doesn't apply the FormatOptionalPlus flag.
 
-        while (newValue >= 1.0 || newValue < -1.0) {
+        while (newValue is >= 1.0 or < -1.0) {
             ++exponent;
             newValue = value * Math.Pow(10.0, -exponent);
         }
@@ -534,7 +534,7 @@ public static class FormatNumber {
         string mantissaFormat = new('0', leadingZeroes);
         string fractionalFormat = new('0', precision);
         string exponentPortion;
-        
+
         if (record.ExponentWidth > 0) {
             string exponentFormat = new('0', record.ExponentWidth);
             exponentPortion = exponentChar + exponent.ToString("+" + exponentFormat + ";-" + exponentFormat);
@@ -578,12 +578,12 @@ public static class FormatNumber {
         }
         if (record.FieldWidth > 0) {
             int length = newString.Length;
-            
+
             if (newString.StartsWith("0.") && length == record.FieldWidth + 1) {
-                newString = newString.Substring(1);
+                newString = newString[1..];
             }
             if (newString.StartsWith("-0.") && length == record.FieldWidth + 1) {
-                newString = "-." + newString.Substring(3);
+                newString = "-." + newString[3..];
             }
         }
         return FormatToWidth(record.FieldWidth, newString);
@@ -592,7 +592,7 @@ public static class FormatNumber {
     // Format the argument and verify it fits within the given width. If the size
     // exceeds the width then a string of asterisks is returned instead.
     private static string FormatToWidth(int width, string stringToFit) {
-        return width == 0 ?                  stringToFit : 
+        return width == 0 ?                  stringToFit :
                stringToFit.Length <= width ? stringToFit.PadLeft(width):
                                                new string('*', width);
     }
@@ -602,5 +602,5 @@ public static class FormatNumber {
         char [] stringArray = stringToReverse.ToCharArray();
         Array.Reverse(stringArray);
         return new string(stringArray);
-    }    
+    }
 }

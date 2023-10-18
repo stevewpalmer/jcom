@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -26,7 +26,7 @@
 using System.Numerics;
 using JComLib;
 
-namespace JFortranLib; 
+namespace JFortranLib;
 
 /// <summary>
 /// Fortran external intrinsics.
@@ -155,7 +155,7 @@ public static class Intrinsics {
     public static float AMAX0(params object[] args) {
         return (float)MAX(args);
     }
-    
+
     /// <summary>
     /// Returns the largest of its arguments.
     /// </summary>
@@ -251,7 +251,7 @@ public static class Intrinsics {
     }
 
     /// <summary>
-    /// Arc-tangent of m1/m2 resolved into the correct quadrant, the result is in the range −π to + π. 
+    /// Arc-tangent of m1/m2 resolved into the correct quadrant, the result is in the range −π to + π.
     /// It is an error to have both arguments zero.
     /// </summary>
     /// <param name="m1">First value</param>
@@ -262,7 +262,7 @@ public static class Intrinsics {
     }
 
     /// <summary>
-    /// Arc-tangent of m1/m2 resolved into the correct quadrant, the result is in the range −π to + π. 
+    /// Arc-tangent of m1/m2 resolved into the correct quadrant, the result is in the range −π to + π.
     /// It is an error to have both arguments zero.
     /// </summary>
     /// <param name="m1">First value</param>
@@ -551,7 +551,7 @@ public static class Intrinsics {
     public static double DLOG(ref double v) {
         return Math.Log(v);
     }
-    
+
     /// <summary>
     /// Logarithm to base 10.
     /// </summary>
@@ -560,7 +560,7 @@ public static class Intrinsics {
     public static double DLOG10(ref double v) {
         return Math.Log10(v);
     }
-    
+
     /// <summary>
     /// Returns the largest of its arguments.
     /// </summary>
@@ -569,7 +569,7 @@ public static class Intrinsics {
     public static double DMAX1(params object[] args) {
         return MAX(args);
     }
-    
+
     /// <summary>
     /// Returns the smallest of its arguments.
     /// </summary>
@@ -639,7 +639,7 @@ public static class Intrinsics {
     public static double DSIN(ref double d) {
         return Math.Sin(d);
     }
-    
+
     /// <summary>
     /// Returns the hyperbolic sine of the angle in radians.
     /// </summary>
@@ -658,7 +658,7 @@ public static class Intrinsics {
     public static double DSQRT(ref double value) {
         return Math.Sqrt(value);
     }
-    
+
     /// <summary>
     /// Tangent of the angle in radians.
     /// </summary>
@@ -1149,7 +1149,7 @@ public static class Intrinsics {
     public static double LOG10(ref double v) {
         return Math.Log10(v);
     }
-    
+
     /// <summary>
     /// Returns the largest of its arguments.
     /// </summary>
@@ -1158,7 +1158,7 @@ public static class Intrinsics {
     public static int MAX0(params object[] args) {
         return (int)MAX(args);
     }
-    
+
     /// <summary>
     /// Returns the largest of its arguments.
     /// </summary>
@@ -1189,7 +1189,7 @@ public static class Intrinsics {
         }
         return max;
     }
-    
+
     /// <summary>
     /// Returns the smallest of its arguments.
     /// </summary>
@@ -1198,7 +1198,7 @@ public static class Intrinsics {
     public static int MIN1(params object[] args) {
         return (int)MIN(args);
     }
-    
+
     /// <summary>
     /// Returns the smallest of its arguments.
     /// </summary>
@@ -1239,7 +1239,7 @@ public static class Intrinsics {
     public static int MOD(ref int m1, ref int m2) {
         return m1 % m2;
     }
-    
+
     /// <summary>
     /// MOD intrinsic function.
     /// </summary>
@@ -1341,7 +1341,7 @@ public static class Intrinsics {
         if (length < 0 || length > s.Length) {
             length = s.Length;
         }
-        return s.Substring(s.Length - length);
+        return s[^length..];
     }
 
     /// <summary>

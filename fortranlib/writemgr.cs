@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -27,7 +27,7 @@ using System.Numerics;
 using System.Text;
 using JComLib;
 
-namespace JFortranLib; 
+namespace JFortranLib;
 
 /// <summary>
 /// Implements WriteManager.
@@ -115,9 +115,7 @@ public class WriteManager : IDisposable {
         if (_isDisposed) {
             throw new ObjectDisposedException(GetType().Name);
         }
-        if (_file != null) {
-            _file.Flush();
-        }
+        _file?.Flush();
         if (IsFormatted()) {
             FormatRecord record = Record(false);
             FormatRecord lastRecord = record;
@@ -131,9 +129,7 @@ public class WriteManager : IDisposable {
             }
             if (_writeIndex > 0) {
                 string str = new(_line, 0, _writeMaxIndex);
-                if (_file != null) {
-                    _file.WriteLine(str, carriageReturn);
-                }
+                _file?.WriteLine(str, carriageReturn);
                 _writeMaxIndex = 0;
                 _writeIndex = 0;
                 _writeItemsCount = 0;
@@ -368,7 +364,7 @@ public class WriteManager : IDisposable {
     public void Dispose() {
         Dispose(true);
     }
-    
+
     /// <summary>
     /// Releases all resource used by the <see cref="WriteManager"/> object.
     /// </summary>
@@ -376,9 +372,7 @@ public class WriteManager : IDisposable {
     protected virtual void Dispose(bool disposing) {
         if (!_isDisposed) {
             if (disposing) {
-                if (_file != null) {
-                    _file.Dispose();
-                }
+                _file?.Dispose();
             }
             _isDisposed = true;
         }
@@ -399,7 +393,7 @@ public class WriteManager : IDisposable {
 
         if (record.FieldWidth > 0) {
             if (value.Length > record.FieldWidth) {
-                svalue = value.Substring(0, record.FieldWidth);
+                svalue = value[..record.FieldWidth];
             } else if (record.LeftJustify) {
                 svalue = value.PadRight(record.FieldWidth);
             } else {
@@ -413,24 +407,25 @@ public class WriteManager : IDisposable {
     // a run-time exception if there's a mismatch.
     private static void VerifyFormatMatch(FormatRecord record, object value) {
         char ch = record.FormatChar;
-        bool match = true;
-        switch (ch) {
-            case 'A':   match = value is string || value is FixedString; break;
-            case 'I':   match = value is int; break;
-            case 'L':   match = value is bool; break;
-            case 'F':   match = value is float || value is double || value is Complex; break;    
-            case 'G':   match = value is float || value is double || value is Complex; break;    
-            case 'E':   match = value is float || value is double || value is Complex; break;    
-        }
+        bool match = ch switch {
+            'A' => value is string or FixedString,
+            'I' => value is int,
+            'L' => value is bool,
+            'F' => value is float or double or Complex,
+            'G' => value is float or double or Complex,
+            'E' => value is float or double or Complex,
+            _ => true
+        };
         if (!match) {
             string realName = value.GetType().Name;
-            switch (realName.ToLower()) {
-                case "int32":       realName = "INTEGER"; break;
-                case "single":      realName = "REAL"; break;
-                case "double":      realName = "DOUBLE"; break;
-                case "string":      realName = "CHARACTER"; break;
-                case "fixedstring": realName = "CHARACTER"; break;
-            }
+            realName = realName.ToLower() switch {
+                "int32" => "INTEGER",
+                "single" => "REAL",
+                "double" => "DOUBLE",
+                "string" => "CHARACTER",
+                "fixedstring" => "CHARACTER",
+                _ => realName
+            };
             throw new JComRuntimeException(JComRuntimeErrors.FORMAT_RECORD_MISMATCH,
                         $"Format record mismatch: '{ch}' specifier and {realName} type");
         }
@@ -643,9 +638,7 @@ public class WriteManager : IDisposable {
     // and reseting the write buffer.
     private void ProcessEndRecord() {
         string str = new(_line, 0, _writeMaxIndex);
-        if (_file != null) {
-            _file.WriteLine(str, true);
-        }
+        _file?.WriteLine(str, true);
         _writeMaxIndex = 0;
         _writeIndex = 0;
         _writeItemsCount = 0;

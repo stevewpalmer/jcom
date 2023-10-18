@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -27,7 +27,7 @@ using System.Collections;
 using System.Text;
 using JComLib;
 
-namespace JFortranLib; 
+namespace JFortranLib;
 
 /// <summary>
 /// Defines one format group which is a collection of format specifiers
@@ -130,7 +130,7 @@ public class FormatManager {
 
         while (_charIndex < _fmtLength) {
             char ch = NextChar();
-            if (ch == '"' || ch == '\'') {
+            if (ch is '"' or '\'') {
                 inQuote = !inQuote;
                 ++_charIndex;
             } else if (inQuote) {
@@ -220,7 +220,7 @@ public class FormatManager {
 
                 // Make sure a prefix value is specified for those format characters
                 // that require one, and not specified for those that don't.
-                if (formatChar == 'X' || formatChar == 'P'|| formatChar == 'H') {
+                if (formatChar is 'X' or 'P' or 'H') {
                     if (!hasPrefixValue) {
                         throw new JComRuntimeException(JComRuntimeErrors.FORMAT_MISSING_VALUE,
                             $"'{formatChar}' specifier requires a value");
@@ -250,7 +250,7 @@ public class FormatManager {
                             _lastRecord.Relative = true;
                             _lastRecord.Count = -ExtractNumber(0);
                             return _lastRecord;
-                            
+
                         case 'R':
                             ++_charIndex;
                             _lastRecord.Relative = true;
@@ -311,12 +311,12 @@ public class FormatManager {
                             ++_charIndex;
                             _plusRequired = FormatOptionalPlus.Always;
                             break;
-                            
+
                         case 'S':
                             ++_charIndex;
                             _plusRequired = FormatOptionalPlus.Never;
                             break;
-                            
+
                         default:
                             _plusRequired = FormatOptionalPlus.Default;
                             break;
@@ -345,7 +345,7 @@ public class FormatManager {
                 if (NextChar() == '.') {
                     ++_charIndex;
                     precision = ExtractNumber(0);
-                    if ((formatChar == 'E' || formatChar == 'G') && NextChar() == 'E') {
+                    if (formatChar is 'E' or 'G' && NextChar() == 'E') {
                         ++_charIndex;
                         exponentWidth = ExtractNumber(2);
                     }

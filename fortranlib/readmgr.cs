@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -26,7 +26,7 @@
 using System.Text;
 using JComLib;
 
-namespace JFortranLib; 
+namespace JFortranLib;
 
 /// <summary>
 /// Implements ReadManager.
@@ -303,9 +303,7 @@ public class ReadManager : IDisposable {
     protected virtual void Dispose(bool disposing) {
         if (!_isDisposed) {
             if (disposing) {
-                if (_file != null) {
-                    _file.Dispose();
-                }
+                _file?.Dispose();
             }
             _isDisposed = true;
         }
@@ -424,7 +422,7 @@ public class ReadManager : IDisposable {
             --_valueRepeatCount;
             return _valueCharCount;
         }
-        
+
         // For input formats, only the field width is used and it
         // determines the fixed number of characters to read.
         FormatRecord record = Record();
@@ -545,7 +543,7 @@ public class ReadManager : IDisposable {
         } else {
             StringBuilder strBuilder = new();
             List<char> validFloatChars = new() { '0','1','2','3','4','5','6','7','8','9','E','-','+','.' };
-            
+
             char ch = ReadNonSpaceChar();
             for (int m = 0; m < 2; ++m) {
                 if (ch == EOF) {
@@ -601,7 +599,7 @@ public class ReadManager : IDisposable {
         } else {
             StringBuilder strBuilder = new();
             List<char> validDoubleChars = new() { '0','1','2','3','4','5','6','7','8','9','D','-','+','.' };
-            
+
             char ch = ReadNonSpaceChar();
             for (int m = 0; m < 2; ++m) {
                 if (ch == EOF) {
@@ -655,8 +653,8 @@ public class ReadManager : IDisposable {
             string realString = ReadChars(fieldWidth);
             int index = Math.Max(0, realString.Length - strSize);
             int length = Math.Min(strSize, realString.Length);
-            
-            fixedstrVar.Set(realString.Substring(index));
+
+            fixedstrVar.Set(realString[index..]);
             charsRead = length;
         } else {
             StringBuilder str = new();
