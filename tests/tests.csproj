@@ -28,7 +28,7 @@
     <ProjectReference Include="..\fortran\for.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
     <ProjectReference Include="..\comal\comal.csproj" />
-    <ProjectReference Include="..\jcomlib\comlib.csproj" />
+    <ProjectReference Include="..\comlib\comlib.csproj" />
     <ProjectReference Include="..\comallib\comallib.csproj" />
   </ItemGroup>
   <ItemGroup>

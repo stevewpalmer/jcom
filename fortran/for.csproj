@@ -15,7 +15,7 @@
     <Authors>Steven Palmer</Authors>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\jcomlib\comlib.csproj" />
+    <ProjectReference Include="..\comlib\comlib.csproj" />
     <ProjectReference Include="..\com\com.csproj" />
     <ProjectReference Include="..\fortranlib\forlib.csproj" />
   </ItemGroup>
