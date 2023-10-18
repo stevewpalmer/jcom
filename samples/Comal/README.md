@@ -1,6 +1,7 @@
 # Comal Sample Programs
 
-This folder contains sample Comal programs that can be compiled using the JComal compiler using the supplied makefile.
+This folder contains sample Comal programs that can be compiled using the
+Comal compiler or loaded and run from the interpreter.
 
 * abs.lst        ... Displays the ABS of a number
 * and.lst        ... Simple test for characters in a string

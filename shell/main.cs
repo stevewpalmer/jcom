@@ -41,7 +41,7 @@ internal static class Program {
         { "del", new CommandDefinition { Function = Commands.CmdDel, Description = "Delete files" } },
         { "dir", new CommandDefinition { Function = Commands.CmdDir, Description = "Display a list of files" } },
         { "edit", new CommandDefinition { Function = Commands.CmdEdit, Description = "Create or edit a file" } },
-        { "fortran", new CommandDefinition { Function = Commands.CmdFortran, Description = "Run the Fortran compiler" } },
+        { "for", new CommandDefinition { Function = Commands.CmdFortran, Description = "Run the Fortran compiler" } },
         { "help", new CommandDefinition { Function = CmdHelp, Description = "Display this help" } },
         { "rename", new CommandDefinition { Function = Commands.CmdRename, Description = "Rename a file" } },
         { "type", new CommandDefinition { Function = Commands.CmdType, Description = "Display the content of a file" } }

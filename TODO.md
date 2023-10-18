@@ -21,23 +21,23 @@ decreasing order of priority.
 ### Cobol
 * Implement
 
+### Editor
+* Undo/Redo.
+* Split windows.
+
 ## Bug Fixes
 
 ### Fortran
 * Fix failing ArrayVerifyDimensions1 unit test.
 
 ### Comal
-* USE libraries not working on Windows.
+* Can no longer generate USE libraries under .net core 7.
+* USE libraries and USE statement not working on Windows.
 * GET$ is skipping over newlines.
-* Fix USE statement on Windows
 * Fix Nested PROC/FUNC.
   * How can nested proc/func reference a parameter or variable in the parent method??
   * How do we deal with IMPORT from a PROC/FUNC we’re nested in?
   * Idea - what if we passed IMPORTed variables as hidden parameters to the nested functions?
-* Debug Info
-  * For some reason, local symbols don't show up in the VS Local pane.
-  * On Visual Studio Mac, the debugger is unable to find the source code.
-  * Single-stepping gets stuck on the first line for several steps in ABS.LST
 
 ### Code Generation
 * Fix local lifetime optimisation.

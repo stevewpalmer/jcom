@@ -1,11 +1,18 @@
 # Shell
 
-This folder contains the source files for a very simple shell interface 
+This folder contains the source files for a very simple shell interface
 that allows running the other programs and manipulating files.
 
-### Structure
+To run the shell:
 
-On startup, it will look for a home folder under `..\home` 
+```
+Shell 1.0.0
+(c) Steven Palmer 2013-2023
+
+$
+```
+
+On startup, it will look for a home folder under `..\home`
 and create one if it is not found. The home folder then becomes the
 default folder for all applications.
 
@@ -19,4 +26,4 @@ default folder for all applications.
 | EDIT    | Run the text editor                  |
 | HELP    | Display a list of available commands |
 | COMAL   | Run the Comal interpreter/compiler   |
-| FORTRAN | Run the Fortran compiler             |
+| FOR     | Run the Fortran compiler             |

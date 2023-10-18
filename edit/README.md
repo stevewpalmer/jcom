@@ -1,14 +1,21 @@
 # Edit
 
-This folder contains the source files for a simple text editor 
+This folder contains the source files for a simple text editor
 based on the DOS Brief editor from the 1990s.
 
-### Starting
-
 Run the editor from the shell with the `edit` command. By default
-this opens the editor with a blank file. Specify one or more
-filenames after the command to open those files, each in their
-own buffer.
+this opens the editor and prompts you for the name of the file to edit.
+Specify one or more filenames after the command to open those files,
+each in their own buffer.
+
+`edit helloworld.f`
+
+You can also compile and run Comal or Fortran programs from within the
+Editor. Just ensure that the file being edited has the .f or .f90 extension
+for a Fortran source file, or .lst for a Comal source file, and then
+press Alt+F10 to compile and run the program. If there are any errors,
+the errors will be displayed in the Editor with the cursor set to the
+offending line. You can step through each error with the F3 key.
 
 ### Keyboard
 
