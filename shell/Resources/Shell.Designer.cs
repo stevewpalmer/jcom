@@ -50,5 +50,23 @@ namespace JShell {
                 return ResourceManager.GetString("UnknownCommand", resourceCulture);
             }
         }
+        
+        internal static string TargetAlreadyExists {
+            get {
+                return ResourceManager.GetString("TargetAlreadyExists", resourceCulture);
+            }
+        }
+        
+        internal static string SyntaxError {
+            get {
+                return ResourceManager.GetString("SyntaxError", resourceCulture);
+            }
+        }
+        
+        internal static string SourceFileDoesNotExist {
+            get {
+                return ResourceManager.GetString("SourceFileDoesNotExist", resourceCulture);
+            }
+        }
     }
 }

@@ -21,4 +21,13 @@
     <data name="UnknownCommand" xml:space="preserve">
         <value>Unknown command {0}</value>
     </data>
+    <data name="TargetAlreadyExists" xml:space="preserve">
+        <value>Error: Target file already exists.</value>
+    </data>
+    <data name="SyntaxError" xml:space="preserve">
+        <value>Syntax error.</value>
+    </data>
+    <data name="SourceFileDoesNotExist" xml:space="preserve">
+        <value>Error: File {0} does not exist.</value>
+    </data>
 </root>

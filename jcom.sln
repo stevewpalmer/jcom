@@ -203,6 +203,6 @@ Global
 		$8.WrappingKeepStatementsOnSingleLine = False
 		$8.scope = text/x-csharp
 		outputpath = .
-		version = 0.3
+		version = 0.4
 	EndGlobalSection
 EndGlobal

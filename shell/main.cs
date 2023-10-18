@@ -43,6 +43,7 @@ internal static class Program {
         { "edit", new CommandDefinition { Function = Commands.CmdEdit, Description = "Create or edit a file" } },
         { "fortran", new CommandDefinition { Function = Commands.CmdFortran, Description = "Run the Fortran compiler" } },
         { "help", new CommandDefinition { Function = CmdHelp, Description = "Display this help" } },
+        { "rename", new CommandDefinition { Function = Commands.CmdRename, Description = "Rename a file" } },
         { "type", new CommandDefinition { Function = Commands.CmdType, Description = "Display the content of a file" } }
     };
 
@@ -93,7 +94,13 @@ internal static class Program {
             while (command != null) {
 
                 if (CommandMap.TryGetValue(command.ToLower(), out CommandDefinition commandFunc)) {
-                    commandFunc.Function(cmdLine);
+                    try {
+                        commandFunc.Function(cmdLine);
+                    }
+                    catch (Exception e) {
+                        Console.WriteLine(e.Message);
+                        break;
+                    }
                 } else {
                     Console.WriteLine(Shell.UnknownCommand, command);
                     break;
