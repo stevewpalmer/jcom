@@ -27,7 +27,7 @@ using System.Globalization;
 using System.Text;
 using JComLib;
 
-namespace JComalLib; 
+namespace JComalLib;
 
 public static partial class Intrinsics {
 
@@ -42,7 +42,7 @@ public static partial class Intrinsics {
         StringBuilder str = new();
         int length = template.Length;
         int index = 0;
-        Variant value = null;
+        Variant? value = null;
         int argIndex = 0;
 
         while (index < length) {
