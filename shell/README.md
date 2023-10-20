@@ -18,13 +18,14 @@ default folder for all applications.
 
 ### Commands
 
-| Command | Description                          |
-|---------|--------------------------------------|
-| COPY    | Make a copy of a file                |
-| DIR     | Display directory contents           |
-| TYPE    | Display the contents of a file       |
-| DEL     | Delete files                         |
-| EDIT    | Run the text editor                  |
-| HELP    | Display a list of available commands |
-| COMAL   | Run the Comal interpreter/compiler   |
-| FOR     | Run the Fortran compiler             |
+| Command  | Description                          |
+|----------|--------------------------------------|
+| COPY     | Make a copy of a file                |
+| DIR      | Display directory contents           |
+| TYPE     | Display the contents of a file       |
+| DEL      | Delete files                         |
+| EDIT     | Run the text editor                  |
+| HELP     | Display a list of available commands |
+| ACCOUNTS | Run the Accounts program             |
+| COMAL    | Run the Comal interpreter/compiler   |
+| FOR      | Run the Fortran compiler             |
