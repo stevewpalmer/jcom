@@ -37,6 +37,7 @@ internal static class Program {
 
     // Command table
     private static readonly Dictionary<string, CommandDefinition> CommandMap = new() {
+        { "accounts", new CommandDefinition(Commands.CmdAccounts,"Run the Accounts program") },
         { "comal", new CommandDefinition(Commands.CmdComal,"Run the Comal compiler/interpreter") },
         { "copy", new CommandDefinition(Commands.CmdCopy,"Copy a file" ) },
         { "del", new CommandDefinition(Commands.CmdDel,"Delete files" ) },

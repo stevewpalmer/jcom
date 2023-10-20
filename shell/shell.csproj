@@ -17,6 +17,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\accounts\accounts.csproj" />
     <ProjectReference Include="..\comlib\comlib.csproj" />
     <ProjectReference Include="..\cobol\cobol.csproj" />
     <ProjectReference Include="..\comal\comal.csproj" />

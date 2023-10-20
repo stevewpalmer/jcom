@@ -1,4 +1,4 @@
-// JEdit
+// JCom Runtime Library
 // Console I/O
 //
 // Authors:
@@ -26,7 +26,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace JEdit; 
+namespace JComLib;
 
 public static class Terminal {
     private static readonly object LockObj = new();

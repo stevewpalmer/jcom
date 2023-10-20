@@ -79,6 +79,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comlib", "comlib\comlib.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "edit", "edit\edit.csproj", "{5A662A5A-EF69-4A87-A706-BAAD5B82C211}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "accounts", "accounts\accounts.csproj", "{379D9F22-5464-4C32-841F-6BD78875C7D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,6 +148,12 @@ Global
 		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A662A5A-EF69-4A87-A706-BAAD5B82C211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

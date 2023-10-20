@@ -52,7 +52,7 @@ public static partial class Commands {
     /// Run the Fortran compiler
     /// </summary>
     /// <param name="cmdLine">Command line</param>
-    /// <returns>The result of the proces</returns>
+    /// <returns>The result of the process</returns>
     public static bool CmdFortran(Parser cmdLine) {
         return RunProgram("for", cmdLine);
     }
@@ -61,7 +61,7 @@ public static partial class Commands {
     /// Run the Comal interpreter/compiler
     /// </summary>
     /// <param name="cmdLine">Command line</param>
-    /// <returns>The result of the proces</returns>
+    /// <returns>The result of the process</returns>
     public static bool CmdComal(Parser cmdLine) {
         return RunProgram("comal", cmdLine);
     }
@@ -73,6 +73,15 @@ public static partial class Commands {
     /// <returns>The result of the proces</returns>
     public static  bool CmdEdit(Parser cmdLine) {
         return RunProgram("edit", cmdLine);
+    }
+
+    /// <summary>
+    /// Run the accounts program
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>The result of the process</returns>
+    public static  bool CmdAccounts(Parser cmdLine) {
+        return RunProgram("accounts", cmdLine);
     }
 }
 
