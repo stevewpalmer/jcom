@@ -210,6 +210,9 @@ public static class Month {
 
             } while (!form.Fields(index).IsSection);
             statement.Save();
+
+            // Recalculate entry balance so changes here flow to the next months.
+            account.UpdateEntryBalances();
         }
     }
 }

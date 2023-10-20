@@ -175,6 +175,9 @@ public static class Fixed {
                 index += 3;
             } while (!form.Fields(index).IsSection);
             TAccount.SaveFixed(fixedRecords);
+
+            // Recalculate entry balance so changes here flow to the next months.
+            account.UpdateEntryBalances();
         }
     }
 }

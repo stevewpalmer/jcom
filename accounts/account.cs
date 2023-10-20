@@ -207,7 +207,7 @@ public class TAccount {
     /// <summary>
     /// Update the entry balance across all statements.
     /// </summary>
-    private void UpdateEntryBalances() {
+    public void UpdateEntryBalances() {
         double entryBalance = _startBalance;
 
         foreach (TStatement statement in _statements) {
