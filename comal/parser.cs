@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -28,7 +28,7 @@ using System.Diagnostics;
 using CCompiler;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// Extension of the Compiler class to do general parsing.
@@ -115,7 +115,7 @@ public partial class Compiler {
         IdentifierParseNode node = new (null);
         Collection<ParseNode> indices = null;
         SimpleToken token = GetNextToken();
-        
+
         while (token.ID == TokenID.LPAREN) {
             indices ??= new Collection<ParseNode>();
             if (_currentLine.PeekToken().ID != TokenID.RPAREN) {
@@ -372,7 +372,7 @@ public partial class Compiler {
         Symbol sym = null;
 
         if (identToken != null) {
-            
+
             // Ban any conflict with PROGRAM name or the current function
             Symbol globalSym = Globals.Get(identToken.Name);
             if (globalSym is { Type: SymType.PROGRAM }) {
@@ -381,7 +381,7 @@ public partial class Compiler {
                 SkipToEndOfLine();
                 return null;
             }
-            
+
             // Now check the local program unit
             sym = GetSymbolForCurrentScope(identToken.Name);
 
@@ -409,7 +409,7 @@ public partial class Compiler {
             if (globalSym != null && sym == globalSym.RetVal) {
                 globalSym.FullType = thisFullType;
             }
-            
+
             // BUGBUG: This should be done in the Symbols class when the
             // identifier becomes an array.
             if (sym.IsArray) {

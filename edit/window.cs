@@ -1063,7 +1063,7 @@ public partial class Window {
 
         if (action.HasFlag(BlockAction.WRITE)) {
             string outputFileName = string.Empty;
-            if (command.GetInput(Edit.WriteBlockAs, ref outputFileName, true)) {
+            if (command.GetFilename(Edit.WriteBlockAs, ref outputFileName)) {
                 Buffer writeBuffer = new(outputFileName) {
                     Content = copyText.ToString()
                 };

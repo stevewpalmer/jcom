@@ -259,6 +259,23 @@ public class StatusBar {
     }
 
     /// <summary>
+    /// Display a prompt on the status bar and input a filename.
+    /// </summary>
+    /// <param name="prompt">Prompt string</param>
+    /// <param name="inputValue">The input value</param>
+    /// <returns>True if a value was input, false if empty or cancelled</returns>
+    public bool PromptForFilename(string prompt, ref string inputValue) {
+        bool result = PromptForInput(prompt, ref inputValue, true);
+        if (result) {
+            if (inputValue == "" || inputValue.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0) {
+                Error("Invalid filename");
+                result = false;
+            }
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Display a prompt on the status bar and input text.
     /// </summary>
     /// <param name="prompt">Prompt string</param>
@@ -276,6 +293,7 @@ public class StatusBar {
         int allfilesIndex = 0;
         string readyText = inputValue;
         bool selection = false;
+        bool cancelled = false;
         int index = 0;
         ConsoleKeyInfo input;
 
@@ -294,6 +312,7 @@ public class StatusBar {
                 break;
             }
             if (input.Key == ConsoleKey.Escape) {
+                cancelled = true;
                 inputBuffer.Clear();
                 break;
             }
@@ -368,7 +387,7 @@ public class StatusBar {
         }
         Message(input.Key == ConsoleKey.Escape ? Edit.CommandCancelled : _cachedText);
         Terminal.SetCursor(cursorPosition);
-        return inputBuffer.Count > 0;
+        return !cancelled;
     }
 
     /// <summary>

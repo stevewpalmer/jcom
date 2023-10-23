@@ -96,7 +96,7 @@ public static class Screen {
     /// <returns>True if file retrieved, false if the user cancelled the prompt</returns>
     public static bool GetInitialFile() {
         string inputValue = string.Empty;
-        if (StatusBar.PromptForInput(Edit.FileToEdit, ref inputValue, true)) {
+        if (StatusBar.PromptForFilename(Edit.FileToEdit, ref inputValue)) {
             inputValue = new FileInfo(inputValue).FullName;
             _windowList.Clear();
             AddWindow(new Window(new Buffer(inputValue)));
@@ -232,7 +232,7 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint EditFile(Command command) {
         string inputValue = string.Empty;
-        if (command.GetInput(Edit.File, ref inputValue, true)) {
+        if (command.GetFilename(Edit.File, ref inputValue)) {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
@@ -258,7 +258,7 @@ public static class Screen {
             return RenderHint.NONE;
         }
         if (_activeWindow.Buffer.Modified) {
-            char[] validInput = { 'y', 'n', 'w' }; 
+            char[] validInput = { 'y', 'n', 'w' };
             if (StatusBar.Prompt(Edit.ThisBufferHasNotBeenSaved, validInput, 'n', out char inputChar)) {
                 switch (inputChar) {
                     case 'n':
@@ -488,7 +488,7 @@ public static class Screen {
             }
         }
         string inputValue = string.Empty;
-        if (StatusBar.PromptForInput(Edit.KeystrokeMacroFile, ref inputValue, true)) {
+        if (StatusBar.PromptForFilename(Edit.KeystrokeMacroFile, ref inputValue)) {
             if (!_recorder.LoadKeystrokes(inputValue)) {
                 StatusBar.Error(Edit.KeystrokeMacroNotFound);
             } else {
@@ -504,7 +504,7 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint SaveRecording() {
         string inputValue = string.Empty;
-        if (StatusBar.PromptForInput(Edit.SaveKeystrokesAs, ref inputValue, true)) {
+        if (StatusBar.PromptForFilename(Edit.SaveKeystrokesAs, ref inputValue)) {
             _recorder.SaveKeystrokes(inputValue);
         }
         return RenderHint.NONE;
@@ -669,7 +669,7 @@ public static class Screen {
             throw new InvalidOperationException();
         }
         string outputFileName = string.Empty;
-        if (command.GetInput(Edit.EnterNewOutputFileName, ref outputFileName, true)) {
+        if (command.GetFilename(Edit.EnterNewOutputFileName, ref outputFileName)) {
             string fullFilename = new FileInfo(outputFileName).FullName;
             if (_windowList.Any(window => fullFilename.Equals(window.Buffer.Filename, StringComparison.OrdinalIgnoreCase))) {
                 StatusBar.Message(Edit.InvalidOutputFilename);
