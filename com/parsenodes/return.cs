@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node for a return statement.
@@ -91,7 +91,17 @@ public sealed class ReturnParseNode : ParseNode {
                 retVal = cg.CurrentProcedure.ProcedureSymbol;
                 emitter.ConvertType(thisType, retVal.Type);
             }
+
+            // Store the value in the return index if one exists.
+            if (cg.CurrentProcedure.ReturnIndex != null) {
+                emitter.StoreLocal(cg.CurrentProcedure.ReturnIndex);
+            }
         }
-        emitter.Branch(cg.CurrentProcedure.ReturnLabel);
+        if (cg.HandlerLevel > 0) {
+            emitter.Leave(cg.CurrentProcedure.ReturnLabel);
+        }
+        else {
+            emitter.Branch(cg.CurrentProcedure.ReturnLabel);
+        }
     }
 }

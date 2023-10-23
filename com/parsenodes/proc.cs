@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -26,7 +26,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node for a procedure.
@@ -109,6 +109,12 @@ public sealed class ProcedureParseNode : ParseNode {
     public Label ReturnLabel { get; set; }
 
     /// <summary>
+    /// Predefined label for the return statement for any
+    /// inner parse nodes that issue a RETURN statement.
+    /// </summary>
+    public LocalDescriptor ReturnIndex { get; set; }
+
+    /// <summary>
     /// Generate the code to emit a procedure.
     /// </summary>
     /// <param name="cg">A CodeGenerator object</param>
@@ -123,6 +129,9 @@ public sealed class ProcedureParseNode : ParseNode {
         cg.CurrentProcedure = this;
 
         ReturnLabel = emitter.CreateLabel();
+        if (ProcedureSymbol.Type != SymType.NONE) {
+            ReturnIndex = emitter.GetTemporary(Symbol.SymTypeToSystemType(ProcedureSymbol.Type));
+        }
 
         // Generate all locals for this method
         foreach (SymbolCollection symbols in Symbols) {
@@ -152,6 +161,9 @@ public sealed class ProcedureParseNode : ParseNode {
             emitter.CloseTryCatchBlock();
         }
 
+        if (ProcedureSymbol.Type != SymType.NONE) {
+            emitter.LoadLocal(ReturnIndex);
+        }
         emitter.Return();
         emitter.Save();
     }

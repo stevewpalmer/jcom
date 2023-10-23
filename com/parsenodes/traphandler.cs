@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that includes statements wrapped in
@@ -81,10 +81,12 @@ public sealed class TrappableParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
+        ++cg.HandlerLevel;
         emitter.SetupTryCatchBlock();
         Body.Generate(emitter, cg);
         emitter.AddTryCatchHandlerBlock(Err, Message);
         Handler.Generate(emitter, cg);
         emitter.CloseTryCatchBlock();
+        --cg.HandlerLevel;
     }
 }

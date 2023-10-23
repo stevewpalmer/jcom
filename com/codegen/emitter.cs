@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -31,7 +31,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines a class that emits MSIL opcodes and operands
@@ -189,6 +189,14 @@ public class Emitter {
     /// <param name="lab">Label destination</param>
     public void BranchIfFalse(Label lab) {
         Emit0(OpCodes.Brfalse, lab);
+    }
+
+    /// <summary>
+    /// Emit the instruction to branch to the given label.
+    /// </summary>
+    /// <param name="lab">Label destination</param>
+    public void Leave(Label lab) {
+        Emit0(OpCodes.Leave, lab);
     }
 
     /// <summary>
@@ -405,7 +413,7 @@ public class Emitter {
             case SymType.COMPLEX:
                 Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Subtraction", new [] { typeof(Complex), typeof(Complex) } ));
                 break;
-                
+
             default:
                 Emit0(OpCodes.Sub);
                 break;
@@ -421,7 +429,7 @@ public class Emitter {
             case SymType.COMPLEX:
                 Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_UnaryNegation", new [] { typeof(Complex) } ));
                 break;
-                
+
             default:
                 Emit0(OpCodes.Neg);
                 break;
@@ -437,7 +445,7 @@ public class Emitter {
             case SymType.COMPLEX:
                 Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Multiply", new [] { typeof(Complex), typeof(Complex) } ));
                 break;
-                
+
             default:
                 Emit0(OpCodes.Mul);
                 break;
@@ -453,7 +461,7 @@ public class Emitter {
             case SymType.COMPLEX:
                 Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Division", new [] { typeof(Complex), typeof(Complex) } ));
                 break;
-                
+
             default:
                 Emit0(OpCodes.Div);
 
@@ -1133,7 +1141,7 @@ public class Emitter {
     public void Emit0(OpCode op) {
         _code.Add(new Instruction(op));
     }
-    
+
     /// <summary>
     /// Emit an opcode with a MethodInfo parameter.
     /// </summary>
@@ -1142,7 +1150,7 @@ public class Emitter {
     public void Emit0(OpCode op, MethodInfo operand) {
         _code.Add(new InstructionMethod(op, operand));
     }
-    
+
     /// <summary>
     /// Emit an opcode with a ConstructorInfo token.
     /// </summary>
@@ -1194,7 +1202,7 @@ public class Emitter {
     private void Emit0(OpCode op, byte operand) {
         _code.Add(new InstructionByte(op, operand));
     }
-    
+
     // Emit an opcode with a branch destination
     private void Emit0(OpCode op, Label operand) {
         _code.Add(new InstructionLabel(op, operand));

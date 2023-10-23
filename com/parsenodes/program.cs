@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -29,7 +29,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node for a single program.
@@ -147,6 +147,11 @@ public class ProgramParseNode : ParseNode {
     /// </summary>
     /// <value>The parse tree root</value>
     public BlockParseNode Root { get; set; }
+
+    /// <summary>
+    /// Depth at which parsing is occurring within a trap handler.
+    /// </summary>
+    public int HandlerLevel { get; set; }
 
     /// <summary>
     /// Dumps the contents of this parse node to the ParseNode XML
