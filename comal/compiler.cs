@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -144,10 +144,29 @@ public partial class Compiler : ICompiler {
             LineTokeniser tokeniser = new();
 
             using StreamReader sr = new(filename);
+            int lineNumber = 10;
+            bool lineNumberPatching = false;
             while (sr.Peek() != -1) {
                 string sourceLine = sr.ReadLine();
                 if (!string.IsNullOrWhiteSpace(sourceLine)) {
                     Line line = new(tokeniser.TokeniseLine(sourceLine));
+                    if (line.LineNumber == 0) {
+                        line.LineNumber = lineNumber;
+                        lineNumber += 10;
+                        if (!lineNumberPatching) {
+                            lineNumberPatching = true;
+                            Messages.Warning(MessageCode.LINENUMBERPATCHING, 2,
+                                $"Source file is missing line numbers. Line numbers will be assumed starting from 10.");
+                        }
+                    }
+                    else if (lineNumberPatching) {
+
+                        // If we have to patch line numbers in then we need to update
+                        // any existing numbers to ensure the sequence is contiguous. Source
+                        // files with just partial line numbers will elicit a warning.
+                        line.LineNumber = lineNumber;
+                        lineNumber += 10;
+                    }
                     lines.Add(line);
                 }
             }
@@ -564,7 +583,7 @@ public partial class Compiler : ICompiler {
     // Look up the symbol table for the specified identifier starting with the
     // current scope and working up to and including global/imports. If we're
     // in a closed procedure, the global symbol tables are ignored and _importSymbols
-    // is used so that anything other than predefined 
+    // is used so that anything other than predefined
     private Symbol GetSymbolForCurrentScope(string name) {
 
         Symbol sym = null;
