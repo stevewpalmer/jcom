@@ -25,7 +25,7 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a switch/select statement.
@@ -87,7 +87,8 @@ public sealed class SwitchParseNode : ParseNode {
             cg.GenerateExpression(emitter, exprType, _caseList[0]);
             Symbol sym = ProgramParseNode.GetLabel(_labelList[0]);
             emitter.BranchEqual((Label)sym.Info);
-        } else {
+        }
+        else {
             LocalDescriptor index = emitter.GetTemporary(Symbol.SymTypeToSystemType(exprType));
             emitter.StoreLocal(index);
             for (int switchIndex = 0; switchIndex < switchCount; ++switchIndex) {

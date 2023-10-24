@@ -26,7 +26,7 @@
 using System.Diagnostics;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a unary operator parse node which encapsulates
@@ -38,7 +38,7 @@ public sealed class UnaryOpParseNode : ParseNode {
     /// Creates a unary parse node of the specified type.
     /// </summary>
     /// <param name="id">The ID of the operator</param>
-    public UnaryOpParseNode(ParseID id) : base(id) {}
+    public UnaryOpParseNode(ParseID id) : base(id) { }
 
     /// <summary>
     /// Returns whether this unary operator has a numeric operand.
@@ -75,8 +75,8 @@ public sealed class UnaryOpParseNode : ParseNode {
             throw new ArgumentNullException(nameof(cg));
         }
         switch (ID) {
-            case ParseID.MINUS:     return GenerateMinus(emitter, cg);
-            case ParseID.NOT:       return GenerateNot(emitter, cg);
+            case ParseID.MINUS: return GenerateMinus(emitter, cg);
+            case ParseID.NOT: return GenerateNot(emitter, cg);
         }
         Debug.Assert(false, "Unsupported parse ID for UnaryOpParseNode");
         return Symbol.VariantTypeToSymbolType(Value.Type);

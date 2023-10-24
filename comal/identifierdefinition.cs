@@ -26,7 +26,7 @@
 using System.Collections.ObjectModel;
 using CCompiler;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// A single identifier definition

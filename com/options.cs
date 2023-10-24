@@ -28,7 +28,7 @@ using System.Reflection;
 using System.Text;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Used to mark Option attributes
@@ -103,14 +103,14 @@ public class Options {
     /// <value>
     /// Sets and returns whether debuggable code is enabled.
     /// </value>
-    [OptionField("-debug", Help= "Generate debugging information")]
+    [OptionField("-debug", Help = "Generate debugging information")]
     public bool GenerateDebug { get; set; }
 
     /// <value>
     /// Sets and returns the compiler warning level where 0 means no warnings
     /// and 4 equates to all warnings.
     /// </value>
-    [OptionField("-warn", ShortName="w", ArgName="NUM", MinRange=0, MaxRange = 4, Help = "Sets warning level, the default is 4")]
+    [OptionField("-warn", ShortName = "w", ArgName = "NUM", MinRange = 0, MaxRange = 4, Help = "Sets warning level, the default is 4")]
     public int WarnLevel { get; set; }
 
     /// <value>
@@ -263,7 +263,8 @@ public class Options {
                     Messages.Error(MessageCode.BADOPTION, $"Invalid option -{opts[0]}");
                     success = false;
                 }
-            } else {
+            }
+            else {
                 SourceFiles.Add(optstring);
             }
         }

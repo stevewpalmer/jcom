@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines a single execution result that holds the result

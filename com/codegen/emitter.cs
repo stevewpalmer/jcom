@@ -290,11 +290,11 @@ public class Emitter {
             throw new ArgumentNullException(nameof(sym));
         }
         LocalBuilder lb = _il.DeclareLocal(sym.SystemType);
-    #if GENERATE_NATIVE_BINARIES
+#if GENERATE_NATIVE_BINARIES
         if (IsDebuggable) {
             lb.SetLocalSymInfo(sym.Name);
         }
-    #endif
+#endif
         sym.Index = AssignLocal(sym.SystemType, lb.LocalIndex);
     }
 
@@ -321,7 +321,7 @@ public class Emitter {
         Debug.Assert(sym.Type == SymType.FIXEDCHAR);
         Type baseType = typeof(FixedString);
         LoadInteger(sym.FullType.Width);
-        CreateObject(baseType, new [] { typeof(int) });
+        CreateObject(baseType, new[] { typeof(int) });
     }
 
     /// <summary>
@@ -395,7 +395,7 @@ public class Emitter {
     public void Add(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Addition", new [] { typeof(Complex), typeof(Complex) } ));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Addition", new[] { typeof(Complex), typeof(Complex) }));
                 break;
 
             default:
@@ -411,7 +411,7 @@ public class Emitter {
     public void Sub(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Subtraction", new [] { typeof(Complex), typeof(Complex) } ));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Subtraction", new[] { typeof(Complex), typeof(Complex) }));
                 break;
 
             default:
@@ -427,7 +427,7 @@ public class Emitter {
     public void Neg(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_UnaryNegation", new [] { typeof(Complex) } ));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_UnaryNegation", new[] { typeof(Complex) }));
                 break;
 
             default:
@@ -443,7 +443,7 @@ public class Emitter {
     public void Mul(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Multiply", new [] { typeof(Complex), typeof(Complex) } ));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Multiply", new[] { typeof(Complex), typeof(Complex) }));
                 break;
 
             default:
@@ -459,7 +459,7 @@ public class Emitter {
     public void Div(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Division", new [] { typeof(Complex), typeof(Complex) } ));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Division", new[] { typeof(Complex), typeof(Complex) }));
                 break;
 
             default:
@@ -530,11 +530,21 @@ public class Emitter {
         }
         if (actualType != typeNeeded) {
             switch (typeNeeded) {
-                case SymType.NONE:      typeNeeded = actualType; break;
-                case SymType.LABEL:     typeNeeded = actualType; break;
-                case SymType.DOUBLE:    Emit0(OpCodes.Conv_R8); break;
-                case SymType.FLOAT:     Emit0(OpCodes.Conv_R4); break;
-                case SymType.INTEGER:   Emit0(OpCodes.Conv_I4); break;
+                case SymType.NONE:
+                    typeNeeded = actualType;
+                    break;
+                case SymType.LABEL:
+                    typeNeeded = actualType;
+                    break;
+                case SymType.DOUBLE:
+                    Emit0(OpCodes.Conv_R8);
+                    break;
+                case SymType.FLOAT:
+                    Emit0(OpCodes.Conv_R4);
+                    break;
+                case SymType.INTEGER:
+                    Emit0(OpCodes.Conv_I4);
+                    break;
 
                 case SymType.BOOLEAN:
                     if (actualType == SymType.FIXEDCHAR) {
@@ -552,25 +562,25 @@ public class Emitter {
 
                 case SymType.CHAR:
                     if (actualType == SymType.FIXEDCHAR) {
-                        Emit0(OpCodes.Callvirt, typeof(FixedString).GetMethod("ToString", Type.EmptyTypes ));
+                        Emit0(OpCodes.Callvirt, typeof(FixedString).GetMethod("ToString", Type.EmptyTypes));
                     }
                     break;
 
                 case SymType.FIXEDCHAR: {
                     Type fromType = Symbol.SymTypeToSystemType(actualType);
-                    Emit0(OpCodes.Call, typeof(FixedString).GetMethod("op_Implicit", new [] { fromType } ));
+                    Emit0(OpCodes.Call, typeof(FixedString).GetMethod("op_Implicit", new[] { fromType }));
                     break;
                 }
 
                 case SymType.COMPLEX: {
                     Type fromType = Symbol.SymTypeToSystemType(actualType);
-                    Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Implicit", new [] { fromType } ));
+                    Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Implicit", new[] { fromType }));
                     break;
                 }
             }
         }
         return typeNeeded;
-        }
+    }
 
     /// <summary>
     /// Emit the code that loads an entire array. This is generally
@@ -590,9 +600,11 @@ public class Emitter {
 
         if (useRef) {
             GenerateLoadAddress(sym);
-        } else if (sym.IsLocal) {
+        }
+        else if (sym.IsLocal) {
             LoadSymbol(sym);
-        } else {
+        }
+        else {
             GenerateLoadArgument(sym);
         }
         return SymType.REF;
@@ -631,13 +643,17 @@ public class Emitter {
     public void GenerateLoadAddress(Symbol sym) {
         if (sym.IsStatic) {
             LoadStaticAddress((FieldInfo)sym.Info);
-        } else if (sym.IsMethod) {
+        }
+        else if (sym.IsMethod) {
             LoadFunction(sym);
-        } else if (sym.IsLocal) {
+        }
+        else if (sym.IsLocal) {
             LoadLocalAddress(sym.Index);
-        } else if (sym.IsParameter) {
+        }
+        else if (sym.IsParameter) {
             LoadParameterAddress(sym.ParameterIndex);
-        } else {
+        }
+        else {
             Debug.Assert(false, $"Cannot load the address of {sym}");
         }
     }
@@ -688,7 +704,8 @@ public class Emitter {
         }
         if (sym.IsStatic) {
             LoadStatic((FieldInfo)sym.Info);
-        } else {
+        }
+        else {
             LoadLocal(sym.Index);
         }
         return sym.Type;
@@ -704,12 +721,24 @@ public class Emitter {
             throw new ArgumentNullException(nameof(value));
         }
         switch (value.Type) {
-            case VariantType.STRING:    LoadString(value.StringValue); break;
-            case VariantType.FLOAT:     LoadFloat(value.RealValue); break;
-            case VariantType.DOUBLE:    LoadDouble(value.DoubleValue); break;
-            case VariantType.BOOLEAN:   LoadBoolean(value.BoolValue); break;
-            case VariantType.INTEGER:   LoadInteger(value.IntValue); break;
-            case VariantType.COMPLEX:   LoadComplex(value.ComplexValue); break;
+            case VariantType.STRING:
+                LoadString(value.StringValue);
+                break;
+            case VariantType.FLOAT:
+                LoadFloat(value.RealValue);
+                break;
+            case VariantType.DOUBLE:
+                LoadDouble(value.DoubleValue);
+                break;
+            case VariantType.BOOLEAN:
+                LoadBoolean(value.BoolValue);
+                break;
+            case VariantType.INTEGER:
+                LoadInteger(value.IntValue);
+                break;
+            case VariantType.COMPLEX:
+                LoadComplex(value.ComplexValue);
+                break;
 
             default:
                 Debug.Assert(false, $"GenerateLoad: Unsupported type {value.Type}");
@@ -733,7 +762,8 @@ public class Emitter {
         }
         if (sym.IsStatic) {
             StoreStatic((FieldInfo)sym.Info);
-        } else {
+        }
+        else {
             StoreLocal(sym.Index);
         }
     }
@@ -749,9 +779,15 @@ public class Emitter {
             throw new ArgumentNullException(nameof(typeNeeded));
         }
         switch (typeNeeded.Name.ToLower()) {
-            case "int":       Emit0(OpCodes.Conv_I4); break;
-            case "single":    Emit0(OpCodes.Conv_R4); break;
-            case "double":    Emit0(OpCodes.Conv_R8); break;
+            case "int":
+                Emit0(OpCodes.Conv_I4);
+                break;
+            case "single":
+                Emit0(OpCodes.Conv_R4);
+                break;
+            case "double":
+                Emit0(OpCodes.Conv_R8);
+                break;
 
             default:
                 Debug.Assert(false, $"ConvertSystemType: Unsupported type {typeNeeded}");
@@ -776,9 +812,15 @@ public class Emitter {
             throw new ArgumentNullException(nameof(value));
         }
         switch (type) {
-            case SymType.INTEGER:   LoadInteger(value.IntValue); break;
-            case SymType.FLOAT:     LoadFloat(value.RealValue); break;
-            case SymType.DOUBLE:    LoadDouble(value.DoubleValue); break;
+            case SymType.INTEGER:
+                LoadInteger(value.IntValue);
+                break;
+            case SymType.FLOAT:
+                LoadFloat(value.RealValue);
+                break;
+            case SymType.DOUBLE:
+                LoadDouble(value.DoubleValue);
+                break;
 
             default:
                 Debug.Assert(false, $"LoadValue: Unsupported type {type}");
@@ -838,7 +880,7 @@ public class Emitter {
     public void LoadComplex(Complex value) {
         LoadDouble(value.Real);
         LoadDouble(value.Imaginary);
-        Emit0(OpCodes.Newobj, value.GetType().GetConstructor(new [] { typeof(double), typeof(double) } ));
+        Emit0(OpCodes.Newobj, value.GetType().GetConstructor(new[] { typeof(double), typeof(double) }));
     }
 
     /// <summary>
@@ -888,12 +930,24 @@ public class Emitter {
     /// <param name="type">The type of the value</param>
     public void LoadIndirect(SymType type) {
         switch (type) {
-            case SymType.DOUBLE:    Emit0(OpCodes.Ldind_R8); break;
-            case SymType.FLOAT:     Emit0(OpCodes.Ldind_R4); break;
-            case SymType.INTEGER:   Emit0(OpCodes.Ldind_I4); break;
-            case SymType.BOOLEAN:   Emit0(OpCodes.Ldind_I1); break;
-            case SymType.CHAR:      Emit0(OpCodes.Ldind_Ref); break;
-            case SymType.REF:       Emit0(OpCodes.Ldind_Ref); break;
+            case SymType.DOUBLE:
+                Emit0(OpCodes.Ldind_R8);
+                break;
+            case SymType.FLOAT:
+                Emit0(OpCodes.Ldind_R4);
+                break;
+            case SymType.INTEGER:
+                Emit0(OpCodes.Ldind_I4);
+                break;
+            case SymType.BOOLEAN:
+                Emit0(OpCodes.Ldind_I1);
+                break;
+            case SymType.CHAR:
+                Emit0(OpCodes.Ldind_Ref);
+                break;
+            case SymType.REF:
+                Emit0(OpCodes.Ldind_Ref);
+                break;
 
             default:
                 Debug.Assert(false, $"LoadIndirect: Unsupported type {type}");
@@ -907,11 +961,21 @@ public class Emitter {
     /// <param name="index">Index of the parameter</param>
     public void LoadParameter(int index) {
         switch (index) {
-            case 0:  Emit0(OpCodes.Ldarg_0); break;
-            case 1:  Emit0(OpCodes.Ldarg_1); break;
-            case 2:  Emit0(OpCodes.Ldarg_2); break;
-            case 3:  Emit0(OpCodes.Ldarg_3); break;
-            default: Emit0(OpCodes.Ldarg, index); break;
+            case 0:
+                Emit0(OpCodes.Ldarg_0);
+                break;
+            case 1:
+                Emit0(OpCodes.Ldarg_1);
+                break;
+            case 2:
+                Emit0(OpCodes.Ldarg_2);
+                break;
+            case 3:
+                Emit0(OpCodes.Ldarg_3);
+                break;
+            default:
+                Emit0(OpCodes.Ldarg, index);
+                break;
         }
     }
 
@@ -923,7 +987,8 @@ public class Emitter {
     public void LoadParameterAddress(int index) {
         if (index < 256) {
             Emit0(OpCodes.Ldarga_S, (byte)index);
-        } else {
+        }
+        else {
             Emit0(OpCodes.Ldarga, index);
         }
     }
@@ -954,13 +1019,14 @@ public class Emitter {
             throw new ArgumentNullException(nameof(sym));
         }
         if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
-            Type [] paramTypes = new Type[sym.Dimensions.Count];
+            Type[] paramTypes = new Type[sym.Dimensions.Count];
             for (int c = 0; c < sym.Dimensions.Count; ++c) {
                 paramTypes[c] = typeof(int);
             }
             Type baseType = sym.SystemType;
             Emit0(OpCodes.Call, baseType.GetMethod("Get", paramTypes));
-        } else {
+        }
+        else {
             Emit0(OpCodes.Ldelem, Symbol.SymTypeToSystemType(sym.Type));
         }
     }
@@ -975,13 +1041,14 @@ public class Emitter {
             throw new ArgumentNullException(nameof(sym));
         }
         if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
-            Type [] paramTypes = new Type[sym.Dimensions.Count];
+            Type[] paramTypes = new Type[sym.Dimensions.Count];
             for (int c = 0; c < sym.Dimensions.Count; ++c) {
                 paramTypes[c] = typeof(int);
             }
             Type baseType = sym.SystemType;
             Emit0(OpCodes.Call, baseType.GetMethod("Address", paramTypes));
-        } else {
+        }
+        else {
             Emit0(OpCodes.Ldelema, Symbol.SymTypeToSystemType(sym.Type));
         }
     }
@@ -993,10 +1060,18 @@ public class Emitter {
     /// <param name="type">Type of the value to be stored</param>
     public void StoreIndirect(SymType type) {
         switch (type) {
-            case SymType.DOUBLE:    Emit0(OpCodes.Stind_R8); break;
-            case SymType.FLOAT:     Emit0(OpCodes.Stind_R4); break;
-            case SymType.INTEGER:   Emit0(OpCodes.Stind_I4); break;
-            case SymType.BOOLEAN:   Emit0(OpCodes.Stind_I4); break;
+            case SymType.DOUBLE:
+                Emit0(OpCodes.Stind_R8);
+                break;
+            case SymType.FLOAT:
+                Emit0(OpCodes.Stind_R4);
+                break;
+            case SymType.INTEGER:
+                Emit0(OpCodes.Stind_I4);
+                break;
+            case SymType.BOOLEAN:
+                Emit0(OpCodes.Stind_I4);
+                break;
 
             default:
                 Debug.Assert(false, $"StoreIndirect: Unsupported type {type}");
@@ -1021,7 +1096,8 @@ public class Emitter {
         }
         if (sym.IsStatic) {
             StoreStatic((FieldInfo)sym.Info);
-        } else {
+        }
+        else {
             StoreLocal(sym.Index);
         }
         return sym.Type;
@@ -1051,7 +1127,8 @@ public class Emitter {
     public void StoreParameter(int index) {
         if (index < 256) {
             Emit0(OpCodes.Starg_S, (byte)index);
-        } else {
+        }
+        else {
             Emit0(OpCodes.Starg, index);
         }
     }
@@ -1074,14 +1151,15 @@ public class Emitter {
             throw new ArgumentNullException(nameof(sym));
         }
         if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
-            Type [] paramTypes = new Type[sym.Dimensions.Count + 1];
+            Type[] paramTypes = new Type[sym.Dimensions.Count + 1];
             for (int c = 0; c < sym.Dimensions.Count; ++c) {
                 paramTypes[c] = typeof(int);
             }
             Type baseType = sym.SystemType;
             paramTypes[sym.Dimensions.Count] = Symbol.SymTypeToSystemType(sym.Type);
             Emit0(OpCodes.Call, baseType.GetMethod("Set", paramTypes));
-        } else {
+        }
+        else {
             StoreElement(sym.Type);
         }
     }
@@ -1219,7 +1297,7 @@ public class Emitter {
     }
 
     // Emit an opcode with a Label array
-    private void Emit0(OpCode op, Label [] operand) {
+    private void Emit0(OpCode op, Label[] operand) {
         _code.Add(new InstructionLabelArray(op, operand));
     }
 

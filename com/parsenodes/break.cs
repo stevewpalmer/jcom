@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a break statement.
@@ -73,7 +73,8 @@ public sealed class BreakParseNode : ParseNode {
 
         if (IsUnconditionalBreak) {
             emitter.Branch(ScopeParseNode.ExitLabel);
-        } else {
+        }
+        else {
             cg.GenerateExpression(emitter, SymType.BOOLEAN, BreakExpression);
             emitter.BranchIfTrue(ScopeParseNode.ExitLabel);
         }

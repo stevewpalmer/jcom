@@ -26,7 +26,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies an Identifier parse node that stores a symbol table
@@ -34,7 +34,7 @@ namespace CCompiler;
 /// </summary>
 public class IdentifierParseNode : ParseNode {
     private Symbol _symbol;
-    
+
     /// <summary>
     /// Creates an identifier parse node with the specified symbol.
     /// No indexes are created and the type of the node is set from
@@ -58,19 +58,19 @@ public class IdentifierParseNode : ParseNode {
             new NumberParseNode(index)
         };
     }
-    
+
     /// <summary>
     /// Set or return the optional array indexes for this identifier. If
     /// no indexes have been set, value can be null.
     /// </summary>
     public Collection<ParseNode> Indexes { get; set; }
-    
+
     /// <summary>
     /// Set or return the start offset for a substring if this is a
     /// character identifier.
     /// </summary>
     public ParseNode SubstringStart { get; set; }
-    
+
     /// <summary>
     /// Set or return the end offset for a substring if this is a
     /// character identifier.
@@ -132,25 +132,31 @@ public class IdentifierParseNode : ParseNode {
         }
         Symbol sym = Symbol;
         SymType thisType;
-        
+
         if (sym.Class == SymClass.INLINE) {
             GenerateInline(emitter, cg);
             thisType = sym.Type;
-        } else if (sym.IsArray) {
+        }
+        else if (sym.IsArray) {
             thisType = cg.GenerateLoadFromArray(emitter, this, false);
-        } else if (sym.IsIntrinsic || sym.IsExternal) {
+        }
+        else if (sym.IsIntrinsic || sym.IsExternal) {
             emitter.LoadFunction(sym);
             thisType = SymType.INTEGER;
-        } else if (sym.IsParameter) {
+        }
+        else if (sym.IsParameter) {
             emitter.GenerateLoadArgument(sym);
             thisType = sym.Type;
-        } else if (sym.Class == SymClass.FUNCTION) {
+        }
+        else if (sym.Class == SymClass.FUNCTION) {
             emitter.LoadFunction(sym);
             thisType = SymType.INTEGER;
-        } else if (sym.IsLocal) {
+        }
+        else if (sym.IsLocal) {
             emitter.LoadSymbol(sym);
             thisType = sym.Type;
-        } else {
+        }
+        else {
             Debug.Assert(false, "Unknown identifier type (not local OR parameter)");
             thisType = SymType.NONE;
         }
@@ -190,18 +196,21 @@ public class IdentifierParseNode : ParseNode {
 
         if (SubstringStart.IsConstant) {
             emitter.LoadInteger(SubstringStart.Value.IntValue);
-        } else {
+        }
+        else {
             cg.GenerateExpression(emitter, SymType.INTEGER, SubstringStart);
         }
         if (SubstringEnd == null) {
-            emitter.Call(cg.GetMethodForType(charType, "Substring", new [] { typeof(int) }));
-        } else {
+            emitter.Call(cg.GetMethodForType(charType, "Substring", new[] { typeof(int) }));
+        }
+        else {
             if (SubstringEnd.IsConstant) {
                 emitter.LoadInteger(SubstringEnd.Value.IntValue);
-            } else {
+            }
+            else {
                 cg.GenerateExpression(emitter, SymType.INTEGER, SubstringEnd);
             }
-            emitter.Call(cg.GetMethodForType(charType, "Substring", new [] { typeof(int), typeof(int) }));
+            emitter.Call(cg.GetMethodForType(charType, "Substring", new[] { typeof(int), typeof(int) }));
         }
         return Type;
     }
@@ -211,7 +220,7 @@ public class IdentifierParseNode : ParseNode {
     // assigned to its parameters.
     private void GenerateInline(Emitter emitter, ProgramParseNode cg) {
         Symbol sym = Symbol;
-        
+
         if (Indexes != null) {
             int paramIndex = 0;
             foreach (ParseNode param in Indexes) {
@@ -224,7 +233,7 @@ public class IdentifierParseNode : ParseNode {
                 }
             }
         }
-        
+
         // Because we may have adjusted the type of the parameters based
         // on the assigned values, we now need to rescan the tree and
         // equalise and fix the types on the nodes.
@@ -244,7 +253,7 @@ public class IdentifierParseNode : ParseNode {
                 node.Type = identNode.Symbol.Type;
                 break;
             }
-                
+
             case ParseID.ADD:
             case ParseID.SUB:
             case ParseID.MULT:
@@ -254,10 +263,10 @@ public class IdentifierParseNode : ParseNode {
                 BinaryOpParseNode tokenNode = (BinaryOpParseNode)node;
                 AdjustNodeType(tokenNode.Left);
                 AdjustNodeType(tokenNode.Right);
-                
+
                 SymType type1 = tokenNode.Left.Type;
                 SymType type2 = tokenNode.Right.Type;
-                
+
                 node.Type = Symbol.LargestType(type1, type2);
                 break;
             }

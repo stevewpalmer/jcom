@@ -25,7 +25,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that stores a variable size list of

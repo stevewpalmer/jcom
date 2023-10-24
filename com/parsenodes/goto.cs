@@ -26,7 +26,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node for a GOTO statement.
@@ -103,14 +103,15 @@ public sealed class GotoParseNode : ParseNode {
         if (ValueExpression == null) {
             Symbol sym = ProgramParseNode.GetLabel(Nodes[0]);
             emitter.Branch((Label)sym.Info);
-        } else {
+        }
+        else {
             Collection<ParseNode> labelNodes = Nodes;
 
             if (labelNodes == null || labelNodes.Count == 0) {
                 labelNodes = cg.CurrentProcedure.LabelList;
             }
 
-            Label [] jumpTable = new Label[labelNodes.Count];
+            Label[] jumpTable = new Label[labelNodes.Count];
             for (int c = 0; c < labelNodes.Count; ++c) {
                 Symbol sym = ProgramParseNode.GetLabel(labelNodes[c]);
                 if (sym.Type == SymType.LABEL) {

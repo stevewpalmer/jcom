@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a filename marker in
@@ -37,7 +37,7 @@ public sealed class MarkFilenameParseNode : ParseNode {
     /// <summary>
     /// Creates a filename marker parse node.
     /// </summary>
-    public MarkFilenameParseNode() : base(ParseID.FILENAME) {}
+    public MarkFilenameParseNode() : base(ParseID.FILENAME) { }
 
     /// <summary>
     /// Gets or sets the filename marker.

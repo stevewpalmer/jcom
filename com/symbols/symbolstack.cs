@@ -25,7 +25,7 @@
 
 using System.Diagnostics;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines a stack of symbol collections

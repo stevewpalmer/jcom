@@ -25,7 +25,7 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that marks a label at the current

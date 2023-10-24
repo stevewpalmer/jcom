@@ -26,7 +26,7 @@
 using System.Diagnostics.SymbolStore;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines an instruction class that constructs a source code marker.
@@ -55,10 +55,9 @@ public class InstructionMarker : Instruction {
         if (il == null) {
             throw new ArgumentNullException(nameof(il));
         }
-        if (Deleted) {
-        }
-    #if GENERATE_NATIVE_BINARIES
+        if (Deleted) { }
+#if GENERATE_NATIVE_BINARIES
         il.MarkSequencePoint(_doc, _linenumber, 1, _linenumber, 100);
-    #endif
+#endif
     }
 }

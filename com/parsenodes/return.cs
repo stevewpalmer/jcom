@@ -67,7 +67,8 @@ public sealed class ReturnParseNode : ParseNode {
                 if (ReturnExpression != null) {
                     SymType thisType = cg.GenerateExpression(emitter, retVal.Type, ReturnExpression);
                     emitter.ConvertType(thisType, retVal.Type);
-                } else {
+                }
+                else {
                     if (retVal.Index == null) {
                         cg.Error($"Function {cg.CurrentProcedure.ProcedureSymbol.Name} does not return a value");
                     }
@@ -79,10 +80,12 @@ public sealed class ReturnParseNode : ParseNode {
                 // them then it will be compiled as a function. So it must always
                 // have a return value. A value of 0 means the default behaviour
                 // (i.e. none of the labels specified are picked).
-            } else if (cg.CurrentProcedure.AlternateReturnCount > 0) {
+            }
+            else if (cg.CurrentProcedure.AlternateReturnCount > 0) {
                 if (ReturnExpression != null) {
                     cg.GenerateExpression(emitter, SymType.INTEGER, ReturnExpression);
-                } else {
+                }
+                else {
                     emitter.LoadInteger(0);
                 }
                 needStore = true;

@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// JType construction flags
@@ -113,8 +113,8 @@ public class JType {
         get {
             if (_defaultConstructor == null) {
                 ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
-                        CallingConventions.Standard,
-                        Array.Empty<Type>());
+                    CallingConventions.Standard,
+                    Array.Empty<Type>());
                 _defaultConstructor = new JMethod(this, cntb);
             }
             return _defaultConstructor;
@@ -158,7 +158,8 @@ public class JType {
 
         if (isFunction) {
             returnType = Symbol.SymTypeToSystemType(sym.Type);
-        } else {
+        }
+        else {
             returnType = typeof(void);
         }
 
@@ -196,7 +197,8 @@ public class JType {
             }
             if (param.Linkage == SymLinkage.BYREF) {
                 metb.DefineParameter(paramIndex++, ParameterAttributes.In | ParameterAttributes.Out, param.Name);
-            } else {
+            }
+            else {
                 metb.DefineParameter(paramIndex++, ParameterAttributes.None, param.Name);
             }
         }

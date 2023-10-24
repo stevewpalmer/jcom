@@ -25,7 +25,7 @@
 
 using System.Xml;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines a single parse tree dump node.

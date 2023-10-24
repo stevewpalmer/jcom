@@ -26,7 +26,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines and represents a Peephole optimiser and a set of static functions
@@ -97,7 +97,7 @@ public static class Peephole {
                 code[c + 3].Code == OpCodes.Conv_I1 &&
                 code[c + 4].Code == OpCodes.Brfalse) {
 
-                if (code[c + 1] is InstructionInt intLoad && 
+                if (code[c + 1] is InstructionInt intLoad &&
                     code[c + 4] is InstructionLabel brFalse && intLoad.Value == 0) {
 
                     code[c] = new InstructionLabel(OpCodes.Brtrue, brFalse.Target);

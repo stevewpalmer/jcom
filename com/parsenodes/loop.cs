@@ -26,7 +26,7 @@
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a loop.
@@ -156,9 +156,11 @@ public sealed class LoopParseNode : ParseNode {
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
         if (LoopVariable != null) {
             GenerateForNextLoop(emitter, cg);
-        } else if (EndExpression == null) {
+        }
+        else if (EndExpression == null) {
             GenerateWhileLoop(emitter, cg);
-        } else {
+        }
+        else {
             GenerateRepeatLoop(emitter, cg);
         }
     }
@@ -246,7 +248,8 @@ public sealed class LoopParseNode : ParseNode {
                 return;
             }
             emitter.LoadInteger(iterValue);
-        } else {
+        }
+        else {
             GenerateLoopCount(emitter, cg, sym, stepVar);
             emitter.Dup();
             emitter.LoadInteger(0);
@@ -277,7 +280,8 @@ public sealed class LoopParseNode : ParseNode {
             if (sym.Type == SymType.FLOAT) {
                 emitter.LoadFloat(StepExpression.Value.RealValue);
             }
-        } else {
+        }
+        else {
             emitter.LoadLocal(stepVar);
         }
         emitter.Add(sym.Type);
@@ -301,7 +305,8 @@ public sealed class LoopParseNode : ParseNode {
             // Start index is zero so no initial subtraction required.
             cg.GenerateExpression(emitter, sym.Type, StartExpression);
             emitter.StoreLocal(sym);
-        } else {
+        }
+        else {
             cg.GenerateExpression(emitter, sym.Type, StartExpression);
             emitter.Dup();
             emitter.StoreLocal(sym);
@@ -316,7 +321,8 @@ public sealed class LoopParseNode : ParseNode {
                 emitter.LoadInteger(stepValue);
                 emitter.Div(SymType.INTEGER);
             }
-        } else {
+        }
+        else {
             cg.GenerateExpression(emitter, sym.Type, StepExpression);
             emitter.Dup();
             emitter.StoreLocal(stepVar);

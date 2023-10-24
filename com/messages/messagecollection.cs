@@ -26,7 +26,7 @@
 using System.Collections;
 using System.Diagnostics;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// A collection of all compiler issued messages including errors, warnings and
@@ -120,10 +120,10 @@ public class MessageCollection : IEnumerable<Message> {
         }
         if (ErrorCount == 100) {
             _messages.Add(new Message(filename,
-                                      MessageLevel.Error,
-                                      MessageCode.TOOMANYCONTINUATION,
-                                      line,
-                                      "Too many errors. Compilation stopped"));
+                MessageLevel.Error,
+                MessageCode.TOOMANYCONTINUATION,
+                line,
+                "Too many errors. Compilation stopped"));
             throw new ApplicationException();
         }
         _messages.Add(new Message(filename, MessageLevel.Error, code, line, str));
@@ -164,7 +164,8 @@ public class MessageCollection : IEnumerable<Message> {
     public void Warning(string filename, MessageCode code, int level, int line, string str) {
         if (_opts.WarnAsError) {
             Error(filename, code, line, str);
-        } else {
+        }
+        else {
             if (level <= _opts.WarnLevel) {
                 Debug.Assert((int)code >= 0x1000);
                 _messages.Add(new Message(filename, MessageLevel.Warning, code, line, str));
@@ -193,7 +194,7 @@ public class MessageCollection : IEnumerable<Message> {
     /// </summary>
     /// <returns>The enumerator.</returns>
     public IEnumerator<Message> GetEnumerator() {
-        _messages.Sort(delegate (Message t1, Message t2) { return t1.Line - t2.Line; });
+        _messages.Sort(delegate(Message t1, Message t2) { return t1.Line - t2.Line; });
         for (int i = 0; i < _messages.Count; i++) {
             yield return _messages[i];
         }

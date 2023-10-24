@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// A set of class extensions.
@@ -46,4 +46,4 @@ public static class MyExtensions {
         }
         return str;
     }
-}   
+}

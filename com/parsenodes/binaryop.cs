@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a binary operator parse node which encapsulates
@@ -39,7 +39,7 @@ public sealed class BinaryOpParseNode : ParseNode {
     /// Creates a binary parse node of the specified type.
     /// </summary>
     /// <param name="id">The ID of the operator</param>
-    public BinaryOpParseNode(ParseID id) : base(id) {}
+    public BinaryOpParseNode(ParseID id) : base(id) { }
 
     /// <summary>
     /// Returns whether this binary operator has numeric operands. Both
@@ -84,28 +84,28 @@ public sealed class BinaryOpParseNode : ParseNode {
             throw new ArgumentNullException(nameof(cg));
         }
         switch (ID) {
-            case ParseID.ADD:       return GenerateAdd(emitter, cg);
-            case ParseID.AND:       return GenerateBitwiseAnd(emitter, cg);
-            case ParseID.ANDTHEN:   return GenerateLogicalAnd(emitter, cg);
-            case ParseID.CONCAT:    return GenerateConcat(emitter, cg);
-            case ParseID.DIVIDE:    return GenerateDivide(emitter, cg);
-            case ParseID.EQ:        return GenerateEq(emitter, cg);
-            case ParseID.EQV:       return GenerateEq(emitter, cg);
-            case ParseID.EXP:       return GenerateExp(emitter, cg);
-            case ParseID.GE:        return GenerateGe(emitter, cg);
-            case ParseID.GT:        return GenerateGt(emitter, cg);
-            case ParseID.IDIVIDE:   return GenerateIDivide(emitter, cg);
-            case ParseID.LE:        return GenerateLe(emitter, cg);
-            case ParseID.LT:        return GenerateLt(emitter, cg);
-            case ParseID.MERGE:     return GenerateMerge(emitter, cg);
-            case ParseID.MOD:       return GenerateMod(emitter, cg);
-            case ParseID.MULT:      return GenerateMult(emitter, cg);
-            case ParseID.NE:        return GenerateNe(emitter, cg);   
-            case ParseID.NEQV:      return GenerateNe(emitter, cg);
-            case ParseID.OR:        return GenerateBitwiseOr(emitter, cg);
-            case ParseID.ORTHEN:    return GenerateLogicalOr(emitter, cg);
-            case ParseID.SUB:       return GenerateSub(emitter, cg);
-            case ParseID.XOR:       return GenerateXor(emitter, cg);
+            case ParseID.ADD: return GenerateAdd(emitter, cg);
+            case ParseID.AND: return GenerateBitwiseAnd(emitter, cg);
+            case ParseID.ANDTHEN: return GenerateLogicalAnd(emitter, cg);
+            case ParseID.CONCAT: return GenerateConcat(emitter, cg);
+            case ParseID.DIVIDE: return GenerateDivide(emitter, cg);
+            case ParseID.EQ: return GenerateEq(emitter, cg);
+            case ParseID.EQV: return GenerateEq(emitter, cg);
+            case ParseID.EXP: return GenerateExp(emitter, cg);
+            case ParseID.GE: return GenerateGe(emitter, cg);
+            case ParseID.GT: return GenerateGt(emitter, cg);
+            case ParseID.IDIVIDE: return GenerateIDivide(emitter, cg);
+            case ParseID.LE: return GenerateLe(emitter, cg);
+            case ParseID.LT: return GenerateLt(emitter, cg);
+            case ParseID.MERGE: return GenerateMerge(emitter, cg);
+            case ParseID.MOD: return GenerateMod(emitter, cg);
+            case ParseID.MULT: return GenerateMult(emitter, cg);
+            case ParseID.NE: return GenerateNe(emitter, cg);
+            case ParseID.NEQV: return GenerateNe(emitter, cg);
+            case ParseID.OR: return GenerateBitwiseOr(emitter, cg);
+            case ParseID.ORTHEN: return GenerateLogicalOr(emitter, cg);
+            case ParseID.SUB: return GenerateSub(emitter, cg);
+            case ParseID.XOR: return GenerateXor(emitter, cg);
         }
         Debug.Assert(false, "Unsupported parse ID for BinaryOpParseNode");
         return Symbol.VariantTypeToSymbolType(Value.Type);
@@ -163,7 +163,7 @@ public sealed class BinaryOpParseNode : ParseNode {
     private SymType GenerateExp(Emitter emitter, ProgramParseNode cg) {
         cg.GenerateExpression(emitter, SymType.DOUBLE, Left);
         cg.GenerateExpression(emitter, SymType.DOUBLE, Right);
-        emitter.Call(cg.GetMethodForType(typeof(Math), "Pow", new [] {typeof(double), typeof(double)}));
+        emitter.Call(cg.GetMethodForType(typeof(Math), "Pow", new[] { typeof(double), typeof(double) }));
         return SymType.DOUBLE;
     }
 
@@ -181,11 +181,11 @@ public sealed class BinaryOpParseNode : ParseNode {
     // Generate the code for a string concatenation operator
     private SymType GenerateConcat(Emitter emitter, ProgramParseNode cg) {
         Type charType = Symbol.SymTypeToSystemType(Left.Type);
-        
+
         cg.GenerateExpression(emitter, Left.Type, Left);
         cg.GenerateExpression(emitter, Left.Type, Right);
-        
-        emitter.Call(cg.GetMethodForType(charType, "Concat", new [] { charType, charType }));
+
+        emitter.Call(cg.GetMethodForType(charType, "Concat", new[] { charType, charType }));
         return Left.Type;
     }
 
@@ -252,7 +252,7 @@ public sealed class BinaryOpParseNode : ParseNode {
         cg.GenerateExpression(emitter, neededType, Right);
         if (Symbol.IsCharType(neededType)) {
             Type charType = Symbol.SymTypeToSystemType(neededType);
-            emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+            emitter.Call(cg.GetMethodForType(charType, "Compare", new[] { charType, charType }));
             emitter.LoadInteger(0);
         }
         emitter.CompareLesser();
@@ -266,7 +266,7 @@ public sealed class BinaryOpParseNode : ParseNode {
         cg.GenerateExpression(emitter, neededType, Right);
         if (Symbol.IsCharType(neededType)) {
             Type charType = Symbol.SymTypeToSystemType(neededType);
-            emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+            emitter.Call(cg.GetMethodForType(charType, "Compare", new[] { charType, charType }));
             emitter.LoadInteger(0);
         }
         emitter.CompareGreater();
@@ -282,7 +282,7 @@ public sealed class BinaryOpParseNode : ParseNode {
         cg.GenerateExpression(emitter, neededType, Right);
         if (Symbol.IsCharType(neededType)) {
             Type charType = Symbol.SymTypeToSystemType(neededType);
-            emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+            emitter.Call(cg.GetMethodForType(charType, "Compare", new[] { charType, charType }));
             emitter.LoadInteger(0);
         }
         emitter.CompareGreater();
@@ -296,7 +296,7 @@ public sealed class BinaryOpParseNode : ParseNode {
         cg.GenerateExpression(emitter, neededType, Right);
         if (Symbol.IsCharType(neededType)) {
             Type charType = Symbol.SymTypeToSystemType(neededType);
-            emitter.Call(cg.GetMethodForType(charType, "Compare", new [] {charType, charType}));
+            emitter.Call(cg.GetMethodForType(charType, "Compare", new[] { charType, charType }));
             emitter.LoadInteger(0);
         }
         emitter.CompareLesser();
@@ -312,8 +312,9 @@ public sealed class BinaryOpParseNode : ParseNode {
         cg.GenerateExpression(emitter, neededType, Right);
         if (Symbol.IsCharType(neededType)) {
             Type charType = Symbol.SymTypeToSystemType(neededType);
-            emitter.Call(cg.GetMethodForType(charType, "op_Equality", new [] {charType, charType}));
-        } else {
+            emitter.Call(cg.GetMethodForType(charType, "op_Equality", new[] { charType, charType }));
+        }
+        else {
             emitter.CompareEquals();
         }
         return Type;
@@ -326,8 +327,9 @@ public sealed class BinaryOpParseNode : ParseNode {
         cg.GenerateExpression(emitter, neededType, Right);
         if (Symbol.IsCharType(neededType)) {
             Type charType = Symbol.SymTypeToSystemType(neededType);
-            emitter.Call(cg.GetMethodForType(charType, "op_Equality", new [] {charType, charType}));
-        } else {
+            emitter.Call(cg.GetMethodForType(charType, "op_Equality", new[] { charType, charType }));
+        }
+        else {
             emitter.CompareEquals();
         }
         emitter.LoadInteger(1);

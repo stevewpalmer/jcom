@@ -25,7 +25,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines a class that stores a collection of temporaries local to

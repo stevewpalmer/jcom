@@ -25,16 +25,52 @@
 
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// List of valid parse IDs for ParseNode
 /// </summary>
 public enum ParseID {
-    ADD, AND, ANDTHEN, BREAK, CONCAT, COND, DIVIDE, EQ, EQUOP, EQV, EXP, FILENAME,
-    GE, GOTO, GT, IDENT, IDIVIDE, INSTR, LABEL, LE, LINENUMBER, LOOP, LT, MERGE,
-    MINUS, MOD, MULT, NE, NEQV, NOT, NUMBER, OR, ORTHEN, PLUS, PROCEDURE, PROGRAM,
-    STRING, SUB, UNKNOWN, XOR
+    ADD,
+    AND,
+    ANDTHEN,
+    BREAK,
+    CONCAT,
+    COND,
+    DIVIDE,
+    EQ,
+    EQUOP,
+    EQV,
+    EXP,
+    FILENAME,
+    GE,
+    GOTO,
+    GT,
+    IDENT,
+    IDIVIDE,
+    INSTR,
+    LABEL,
+    LE,
+    LINENUMBER,
+    LOOP,
+    LT,
+    MERGE,
+    MINUS,
+    MOD,
+    MULT,
+    NE,
+    NEQV,
+    NOT,
+    NUMBER,
+    OR,
+    ORTHEN,
+    PLUS,
+    PROCEDURE,
+    PROGRAM,
+    STRING,
+    SUB,
+    UNKNOWN,
+    XOR
 }
 
 /// <summary>
@@ -59,7 +95,7 @@ public abstract class ParseNode {
     protected ParseNode(ParseID id) {
         ID = id;
     }
-    
+
     /// <summary>
     /// Returns the parse ID of this node.
     /// </summary>

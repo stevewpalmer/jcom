@@ -26,7 +26,7 @@
 using System.Reflection.Emit;
 using JFortranLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a single write item.
@@ -87,7 +87,8 @@ public sealed class WriteItemParseNode : ParseNode {
         if (node is LoopParseNode loopNode) {
             loopNode.Callback = this;
             loopNode.Generate(emitter, cg);
-        } else {
+        }
+        else {
             Type writeManagerType = typeof(WriteManager);
             List<Type> writeParamTypes = new();
 

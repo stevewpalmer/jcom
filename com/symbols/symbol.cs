@@ -30,7 +30,7 @@ using System.Numerics;
 using System.Text;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines a single symbol.
@@ -290,7 +290,7 @@ public class Symbol {
     /// <summary>
     /// Gets or sets the values for an array.
     /// </summary>
-    public Variant [] ArrayValues { get; set; }
+    public Variant[] ArrayValues { get; set; }
 
     /// <summary>
     /// Is this a dynamic array where one of the bounds is
@@ -393,15 +393,15 @@ public class Symbol {
     public static Type SymTypeToSystemType(SymType type) {
         switch (type) {
             case SymType.FIXEDCHAR: return typeof(FixedString);
-            case SymType.CHAR:      return typeof(string);
-            case SymType.FLOAT:     return typeof(float);
-            case SymType.DOUBLE:    return typeof(double);
-            case SymType.INTEGER:   return typeof(int);
-            case SymType.BOOLEAN:   return typeof(bool);
-            case SymType.COMPLEX:   return typeof(Complex);
-            case SymType.VARARG:    return typeof(object[]);
-            case SymType.REF:       return typeof(IntPtr);
-            case SymType.GENERIC:   return typeof(object);
+            case SymType.CHAR: return typeof(string);
+            case SymType.FLOAT: return typeof(float);
+            case SymType.DOUBLE: return typeof(double);
+            case SymType.INTEGER: return typeof(int);
+            case SymType.BOOLEAN: return typeof(bool);
+            case SymType.COMPLEX: return typeof(Complex);
+            case SymType.VARARG: return typeof(object[]);
+            case SymType.REF: return typeof(IntPtr);
+            case SymType.GENERIC: return typeof(object);
         }
         Debug.Assert(false, $"No system type for {type}");
         return typeof(int);
@@ -464,16 +464,16 @@ public class Symbol {
             typeName = typeName.Replace("&", "");
         }
         switch (typeName) {
-            case "int32":           return SymType.INTEGER;
-            case "float":           return SymType.FLOAT;
-            case "single":          return SymType.FLOAT;
-            case "double":          return SymType.DOUBLE;
-            case "fixedstring":     return SymType.FIXEDCHAR;
-            case "string":          return SymType.CHAR;
-            case "bool":            return SymType.BOOLEAN;
-            case "boolean":         return SymType.BOOLEAN;
-            case "complex":         return SymType.COMPLEX;
-            case "void":            return SymType.NONE;
+            case "int32": return SymType.INTEGER;
+            case "float": return SymType.FLOAT;
+            case "single": return SymType.FLOAT;
+            case "double": return SymType.DOUBLE;
+            case "fixedstring": return SymType.FIXEDCHAR;
+            case "string": return SymType.CHAR;
+            case "bool": return SymType.BOOLEAN;
+            case "boolean": return SymType.BOOLEAN;
+            case "complex": return SymType.COMPLEX;
+            case "void": return SymType.NONE;
         }
         Debug.Assert(false, $"No symbol type for {typeName}");
         return SymType.NONE;
@@ -501,7 +501,7 @@ public class Symbol {
     public static bool IsCharType(SymType type) {
         return type == SymType.CHAR || type == SymType.FIXEDCHAR;
     }
-    
+
     /// <summary>
     /// Returns whether the specific type is a logical (boolean) type.
     /// </summary>
@@ -539,13 +539,13 @@ public class Symbol {
     public static SymType VariantTypeToSymbolType(VariantType variantType) {
 
         switch (variantType) {
-            case VariantType.BOOLEAN:   return SymType.BOOLEAN;
-            case VariantType.NONE:      return SymType.NONE;
-            case VariantType.INTEGER:   return SymType.INTEGER;
-            case VariantType.FLOAT:     return SymType.FLOAT;
-            case VariantType.DOUBLE:    return SymType.DOUBLE;
-            case VariantType.COMPLEX:   return SymType.COMPLEX;
-            case VariantType.STRING:    return SymType.CHAR;
+            case VariantType.BOOLEAN: return SymType.BOOLEAN;
+            case VariantType.NONE: return SymType.NONE;
+            case VariantType.INTEGER: return SymType.INTEGER;
+            case VariantType.FLOAT: return SymType.FLOAT;
+            case VariantType.DOUBLE: return SymType.DOUBLE;
+            case VariantType.COMPLEX: return SymType.COMPLEX;
+            case VariantType.STRING: return SymType.CHAR;
         }
         Debug.Assert(false, $"Unhandled variant type {variantType}");
         return SymType.NONE;

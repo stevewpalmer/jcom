@@ -25,7 +25,7 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines an instruction class that constructs an opcode that takes
@@ -64,16 +64,36 @@ public class InstructionInt : Instruction {
         switch (Code.Name) {
             case "ldc.i4":
                 switch (Value) {
-                    case -1: il.Emit(OpCodes.Ldc_I4_M1); return;
-                    case 0: il.Emit(OpCodes.Ldc_I4_0); return;
-                    case 1: il.Emit(OpCodes.Ldc_I4_1); return;
-                    case 2: il.Emit(OpCodes.Ldc_I4_2); return;
-                    case 3: il.Emit(OpCodes.Ldc_I4_3); return;
-                    case 4: il.Emit(OpCodes.Ldc_I4_4); return;
-                    case 5: il.Emit(OpCodes.Ldc_I4_5); return;
-                    case 6: il.Emit(OpCodes.Ldc_I4_6); return;
-                    case 7: il.Emit(OpCodes.Ldc_I4_7); return;
-                    case 8: il.Emit(OpCodes.Ldc_I4_8); return;
+                    case -1:
+                        il.Emit(OpCodes.Ldc_I4_M1);
+                        return;
+                    case 0:
+                        il.Emit(OpCodes.Ldc_I4_0);
+                        return;
+                    case 1:
+                        il.Emit(OpCodes.Ldc_I4_1);
+                        return;
+                    case 2:
+                        il.Emit(OpCodes.Ldc_I4_2);
+                        return;
+                    case 3:
+                        il.Emit(OpCodes.Ldc_I4_3);
+                        return;
+                    case 4:
+                        il.Emit(OpCodes.Ldc_I4_4);
+                        return;
+                    case 5:
+                        il.Emit(OpCodes.Ldc_I4_5);
+                        return;
+                    case 6:
+                        il.Emit(OpCodes.Ldc_I4_6);
+                        return;
+                    case 7:
+                        il.Emit(OpCodes.Ldc_I4_7);
+                        return;
+                    case 8:
+                        il.Emit(OpCodes.Ldc_I4_8);
+                        return;
                 }
                 if (Value >= -128 && Value <= 127) {
                     il.Emit(OpCodes.Ldc_I4_S, (byte)Value);

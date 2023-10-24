@@ -27,7 +27,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines an Instruction class for a Try/Catch block.
@@ -115,7 +115,7 @@ public class InstructionTryCatch : Instruction {
                     }
                 }
                 break;
-                }
+            }
 
             case EmitExceptionHandlerType.EndCatch:
                 il.EndExceptionBlock();

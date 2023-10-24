@@ -26,7 +26,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a single READ DATA item.
@@ -137,7 +137,8 @@ public sealed class ReadDataParseNode : ParseNode {
                 emitter.LoadInteger(DataArray.ArraySize);
                 emitter.Emit0(OpCodes.Ceq);
                 emitter.StoreStatic((FieldInfo)EndOfData.Info);
-            } else {
+            }
+            else {
                 emitter.StoreStatic((FieldInfo)DataIndex.Info);
             }
         }

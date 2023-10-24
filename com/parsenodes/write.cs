@@ -91,7 +91,7 @@ public sealed class WriteParseNode : ParseNode {
         }
 
         Type writeManagerType = typeof(WriteManager);
-        Type [] paramTypes = WriteManagerParamsNode.Generate(emitter, cg);
+        Type[] paramTypes = WriteManagerParamsNode.Generate(emitter, cg);
 
         emitter.CreateObject(writeManagerType, paramTypes);
         LocalDescriptor objIndex = emitter.GetTemporary(writeManagerType);
@@ -100,7 +100,7 @@ public sealed class WriteParseNode : ParseNode {
         if (ErrLabel != null) {
             emitter.LoadLocal(objIndex);
             emitter.LoadInteger(1);
-            emitter.Call(writeManagerType.GetMethod("set_HasErr", new [] { typeof(bool) }));
+            emitter.Call(writeManagerType.GetMethod("set_HasErr", new[] { typeof(bool) }));
         }
 
         // Disable use of separators for BASIC output
@@ -125,7 +125,8 @@ public sealed class WriteParseNode : ParseNode {
                 itemNode.Generate(emitter, cg, ArgList.Nodes[c]);
                 WriteParamsNode.FreeLocalDescriptors();
             }
-        } else {
+        }
+        else {
             itemNode.Generate(emitter, cg, null);
         }
 

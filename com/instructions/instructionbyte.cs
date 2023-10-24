@@ -25,7 +25,7 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines an instruction class that constructs an opcode that

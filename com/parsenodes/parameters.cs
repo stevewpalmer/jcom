@@ -25,7 +25,7 @@
 
 using System.Collections.ObjectModel;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parameters parse node.

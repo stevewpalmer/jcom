@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.Reflection;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines one or more assignment statements.
@@ -37,8 +37,7 @@ public sealed class AssignmentParseNode : ParseNode {
     /// <summary>
     /// Create an AssignmentParseNode.
     /// </summary>
-    public AssignmentParseNode() {
-    }
+    public AssignmentParseNode() { }
 
     /// <summary>
     /// Create an AssignmentParseNode for a single assignment.
@@ -54,7 +53,7 @@ public sealed class AssignmentParseNode : ParseNode {
     /// Gets or sets the identifier to which the value is assigned
     /// </summary>
     /// <value>The identifier parse node</value>
-    public IdentifierParseNode [] Identifiers { get; set; }
+    public IdentifierParseNode[] Identifiers { get; set; }
 
     /// <summary>
     /// Gets or sets the parsenode for the value to be assigned.
@@ -109,7 +108,8 @@ public sealed class AssignmentParseNode : ParseNode {
             if (Identifiers[arrayIndex].HasSubstring) {
                 if (sym.IsParameter) {
                     emitter.LoadParameter(sym.ParameterIndex);
-                } else {
+                }
+                else {
                     emitter.LoadSymbol(sym);
                 }
                 SymType exprType = cg.GenerateExpression(emitter, SymType.NONE, valueExpression);
@@ -119,7 +119,8 @@ public sealed class AssignmentParseNode : ParseNode {
             if (!sym.IsValueType) {
                 if (sym.IsParameter) {
                     emitter.LoadParameter(sym.ParameterIndex);
-                } else {
+                }
+                else {
                     emitter.LoadSymbol(sym);
                 }
                 SymType wantedType = sym.Type;
@@ -147,19 +148,20 @@ public sealed class AssignmentParseNode : ParseNode {
         ParseNode valueExpression) {
 
         Symbol sym = identifier.Symbol;
-        
+
         Debug.Assert(sym.IsArray);
         if (identifier.IsArrayBase) {
             if (sym.IsParameter) {
                 GenerateStoreArgument(emitter, cg, valueExpression, sym);
-            } else {
+            }
+            else {
                 cg.GenerateExpression(emitter, SymType.NONE, valueExpression);
                 emitter.StoreLocal(sym.Index);
             }
             return;
         }
         cg.GenerateLoadArrayAddress(emitter, identifier);
-        
+
         if (identifier.HasSubstring) {
             emitter.LoadArrayElement(sym);
             cg.GenerateExpression(emitter, SymType.FIXEDCHAR, valueExpression);
@@ -175,7 +177,7 @@ public sealed class AssignmentParseNode : ParseNode {
                 }));
             return;
         }
-        
+
         cg.GenerateExpression(emitter, sym.Type, valueExpression);
         emitter.StoreArrayElement(sym);
     }
@@ -186,23 +188,26 @@ public sealed class AssignmentParseNode : ParseNode {
         IdentifierParseNode identifier, SymType charType) {
 
         Type baseType = Symbol.SymTypeToSystemType(charType);
-        
+
         // Optimise for constant start/end values
         if (identifier.SubstringStart.IsConstant) {
             emitter.LoadInteger(identifier.SubstringStart.Value.IntValue);
-        } else {
+        }
+        else {
             cg.GenerateExpression(emitter, SymType.INTEGER, identifier.SubstringStart);
         }
         if (identifier.SubstringEnd == null) {
             emitter.LoadInteger(identifier.Symbol.FullType.Width);
-        } else {
+        }
+        else {
             if (identifier.SubstringEnd.IsConstant) {
                 emitter.LoadInteger(identifier.SubstringEnd.Value.IntValue);
-            } else {
+            }
+            else {
                 cg.GenerateExpression(emitter, SymType.INTEGER, identifier.SubstringEnd);
             }
         }
-        emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set", new [] { baseType, typeof(int), typeof(int) }));
+        emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set", new[] { baseType, typeof(int), typeof(int) }));
     }
 
     // Emit the appropriate store parameter index opcode.
@@ -214,7 +219,7 @@ public sealed class AssignmentParseNode : ParseNode {
                 cg.GenerateExpression(emitter, sym.Type, value);
                 emitter.StoreParameter(sym.ParameterIndex);
                 break;
-                
+
             case SymLinkage.BYREF:
                 emitter.LoadParameter(sym.ParameterIndex);
                 cg.GenerateExpression(emitter, sym.Type, value);

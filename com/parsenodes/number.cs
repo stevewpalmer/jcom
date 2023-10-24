@@ -25,7 +25,7 @@
 
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a number parse node that stores a single constant number.
@@ -81,9 +81,15 @@ public sealed class NumberParseNode : ParseNode {
         }
         Variant actualValue = Value;
         switch (returnType) {
-            case SymType.INTEGER:   actualValue = new Variant(Value.IntValue); break;
-            case SymType.FLOAT:     actualValue = new Variant(Value.RealValue); break;
-            case SymType.DOUBLE:    actualValue = new Variant(Value.DoubleValue); break;
+            case SymType.INTEGER:
+                actualValue = new Variant(Value.IntValue);
+                break;
+            case SymType.FLOAT:
+                actualValue = new Variant(Value.RealValue);
+                break;
+            case SymType.DOUBLE:
+                actualValue = new Variant(Value.DoubleValue);
+                break;
         }
         emitter.LoadVariant(actualValue);
         return Symbol.VariantTypeToSymbolType(actualValue.Type);

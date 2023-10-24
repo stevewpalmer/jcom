@@ -26,7 +26,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that calls an internal procedure.
@@ -98,21 +98,22 @@ public sealed class CallParseNode : ParseNode {
     private SymType InternalGenerate(Emitter emitter, ProgramParseNode cg, SymClass callType, string callName) {
         Symbol sym = ProcName.Symbol;
         SymType thisType = SymType.NONE;
-        
+
         if (!sym.Defined) {
             cg.Error(sym.RefLine, $"Undefined {callName} {sym.Name}");
         }
         if (sym.Class != callType) {
             cg.Error(sym.RefLine, $"{sym.Name} is not a {callName}");
         }
-        
+
         Type[] paramTypes = Parameters.Generate(emitter, cg, sym);
-        
+
         if (sym.IsParameter) {
             ProcName.Generate(emitter, cg);
             emitter.CallIndirect(sym.Type, paramTypes);
             thisType = sym.Type;
-        } else {
+        }
+        else {
             if (sym.Info is JMethod method) {
                 emitter.Call(method.Builder);
                 thisType = sym.Type;
@@ -127,7 +128,7 @@ public sealed class CallParseNode : ParseNode {
 
         // Post-alternate return branching
         if (AlternateReturnLabels.Count > 0) {
-            Label [] jumpTable = new Label[AlternateReturnLabels.Count];
+            Label[] jumpTable = new Label[AlternateReturnLabels.Count];
             for (int c = 0; c < AlternateReturnLabels.Count; ++c) {
                 Symbol symLabel = AlternateReturnLabels[c];
                 jumpTable[c] = (Label)symLabel.Info;

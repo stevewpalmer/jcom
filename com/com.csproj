@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11.0</LangVersion>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>CCompiler</RootNamespace>
-    <Title>Core Compiler</Title>
-    <Authors>Steven Palmer</Authors>
-    <Description>Core Compiler</Description>
-    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\comlib\comlib.csproj" />
-    <ProjectReference Include="..\fortranlib\forlib.csproj" />
-    <ProjectReference Include="..\comallib\comallib.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>11.0</LangVersion>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RootNamespace>CCompiler</RootNamespace>
+        <Title>Core Compiler</Title>
+        <Authors>Steven Palmer</Authors>
+        <Description>Core Compiler</Description>
+        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
+        <ProjectReference Include="..\fortranlib\forlib.csproj"/>
+        <ProjectReference Include="..\comallib\comallib.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="System.Reflection.Emit" Version="4.7.0"/>
+    </ItemGroup>
 </Project>

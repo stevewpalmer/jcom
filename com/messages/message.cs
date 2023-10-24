@@ -25,7 +25,7 @@
 
 using System.Text;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Represents a single compiler message.
@@ -56,7 +56,8 @@ public class Message {
         StringBuilder str = new();
         if (Level == MessageLevel.Info) {
             str.Append(Text);
-        } else {
+        }
+        else {
             if (Filename != null) {
                 str.Append(Filename);
             }

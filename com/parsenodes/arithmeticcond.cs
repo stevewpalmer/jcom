@@ -26,7 +26,7 @@
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines an arithmetic based conditional

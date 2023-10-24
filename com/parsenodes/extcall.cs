@@ -25,7 +25,7 @@
 
 using System.Reflection;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that calls an external interface.
@@ -35,7 +35,7 @@ public sealed class ExtCallParseNode : ParseNode {
     /// <summary>
     /// Creates an external interface call parse node.
     /// </summary>
-    public ExtCallParseNode() {}
+    public ExtCallParseNode() { }
 
     /// <summary>
     /// Creates an external interface call parse node with a pre-specified
@@ -79,10 +79,10 @@ public sealed class ExtCallParseNode : ParseNode {
     /// </summary>
     /// <returns><c>true</c> if this instance can be inlined; otherwise, <c>false</c>.</returns>
     public bool CanInline() {
-        if (typeof(Inlined).GetMethod(Name, new [] { typeof(Emitter), typeof(Type) }) != null) {
+        if (typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter), typeof(Type) }) != null) {
             return true;
         }
-        return typeof(Inlined).GetMethod(Name, new [] { typeof(Emitter) }) != null;
+        return typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter) }) != null;
     }
 
     /// <summary>
@@ -121,7 +121,7 @@ public sealed class ExtCallParseNode : ParseNode {
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
 
         Type argType = typeof(void);
-        Type [] paramTypes;
+        Type[] paramTypes;
 
         // It is the caller responsibility to set the parameter
         // node types to match the external function types.
@@ -130,37 +130,38 @@ public sealed class ExtCallParseNode : ParseNode {
             if (paramTypes.Length > 0) {
                 argType = paramTypes[0];
             }
-        } else {
+        }
+        else {
             paramTypes = System.Type.EmptyTypes;
         }
-        
+
         // For anything else, we emit the appropriate call to the library. If
         // inline is permitted, we check the library for an inline version of the
         // name and if one exists, invoke it to insert the inline code.
         MethodInfo meth;
         if (Inline) {
-            
+
             // First try specific methods where different inline methods are
             // provided depending on the type.
-            meth = typeof(Inlined).GetMethod(Name, new [] { typeof(Emitter), typeof(Type) });
+            meth = typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter), typeof(Type) });
             if (meth != null) {
-                object [] ilParams = { emitter, argType };
+                object[] ilParams = { emitter, argType };
                 meth.Invoke(null, ilParams);
                 return Type;
             }
-            
+
             // Otherwise try the type-less variant.
-            meth = typeof(Inlined).GetMethod(Name, new [] { typeof(Emitter) });
+            meth = typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter) });
             if (meth != null) {
-                object [] ilParams = { emitter };
+                object[] ilParams = { emitter };
                 meth.Invoke(null, ilParams);
                 return Type;
             }
         }
-        
+
         meth = cg.GetMethodForType(LibraryName, Name, paramTypes);
         emitter.Call(meth);
-        
+
         // If this method returns a value but we're invoking it as a
         // subroutine, discard the return value from the stack
         if (returnType == SymType.NONE && meth.ReturnType != typeof(void)) {

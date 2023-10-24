@@ -180,24 +180,24 @@ public class ProgramParseNode : ParseNode {
             };
 
             bool isSaveable = !string.IsNullOrEmpty(OutputFile);
-        #if GENERATE_NATIVE_BINARIES
+#if GENERATE_NATIVE_BINARIES
             AssemblyBuilderAccess access = isSaveable ? AssemblyBuilderAccess.RunAndSave : AssemblyBuilderAccess.Run;
-        #else
+#else
             AssemblyBuilderAccess access = AssemblyBuilderAccess.Run;
-        #endif
+#endif
             _ab = AssemblyBuilder.DefineDynamicAssembly(an, access);
 
             // Don't make the main class abstract if the program is being run from
             // memory as otherwise the caller will be unable to create an instance.
-        #if GENERATE_NATIVE_BINARIES
+#if GENERATE_NATIVE_BINARIES
             if (isSaveable) {
                 Builder = _ab.DefineDynamicModule(DotNetName, OutputFilename(OutputFile), GenerateDebug);
             } else {
                 Builder = _ab.DefineDynamicModule(DotNetName, GenerateDebug);
             }
-        #else
+#else
             Builder = _ab.DefineDynamicModule(DotNetName);
-        #endif
+#endif
 
             // Make this assembly debuggable if the debug option was specified.
             if (GenerateDebug) {
@@ -259,12 +259,12 @@ public class ProgramParseNode : ParseNode {
 #endif
     }
 
-        /// <summary>
-        /// Execute the generated code and return the result.
-        /// </summary>
-        /// <param name="methodName">The name of the method to be invoked.</param>
-        /// <returns>The result as an object</returns>
-        public ExecutionResult Run(string methodName) {
+    /// <summary>
+    /// Execute the generated code and return the result.
+    /// </summary>
+    /// <param name="methodName">The name of the method to be invoked.</param>
+    /// <returns>The result as an object</returns>
+    public ExecutionResult Run(string methodName) {
         try {
             ExecutionResult execResult = new() {
                 Success = false,
@@ -296,15 +296,15 @@ public class ProgramParseNode : ParseNode {
 #endif
     }
 
-        /// <summary>
-        /// Gets the MethodInfo for the given method name in the type and throws an error exception
-        /// if it is not found. The return value is thus guaranteed to be non-null.
-        /// </summary>
-        /// <param name="baseTypeName">The name of the type containing the method</param>
-        /// <param name="methodName">The method name</param>
-        /// <param name="paramTypes">An array of parameter types</param>
-        /// <returns>The method for the given base type</returns>
-        public MethodInfo GetMethodForType(string baseTypeName, string methodName, Type[] paramTypes) {
+    /// <summary>
+    /// Gets the MethodInfo for the given method name in the type and throws an error exception
+    /// if it is not found. The return value is thus guaranteed to be non-null.
+    /// </summary>
+    /// <param name="baseTypeName">The name of the type containing the method</param>
+    /// <param name="methodName">The method name</param>
+    /// <param name="paramTypes">An array of parameter types</param>
+    /// <returns>The method for the given base type</returns>
+    public MethodInfo GetMethodForType(string baseTypeName, string methodName, Type[] paramTypes) {
         if (baseTypeName == null) {
             throw new ArgumentNullException(nameof(baseTypeName));
         }
@@ -340,7 +340,8 @@ public class ProgramParseNode : ParseNode {
 
             string name = Path.GetFileNameWithoutExtension(baseTypeName).CapitaliseString();
             baseType = dll.GetType(name + "." + name);
-        } else {
+        }
+        else {
             baseType = System.Type.GetType(baseTypeName);
         }
         if (baseType == null) {
@@ -367,7 +368,8 @@ public class ProgramParseNode : ParseNode {
         MethodInfo meth;
         try {
             meth = baseType.GetMethod(methodName, paramTypes);
-        } catch (AmbiguousMatchException) {
+        }
+        catch (AmbiguousMatchException) {
             meth = null;
         }
         if (meth == null) {
@@ -416,7 +418,8 @@ public class ProgramParseNode : ParseNode {
         Symbol sym = identNode.Symbol;
         if (sym.IsArray) {
             GenerateLoadFromArray(emitter, identNode, true);
-        } else {
+        }
+        else {
             emitter.GenerateLoadAddress(sym);
         }
     }
@@ -444,7 +447,8 @@ public class ProgramParseNode : ParseNode {
         GenerateLoadArrayAddress(emitter, identNode);
         if (useRef) {
             emitter.LoadArrayElementReference(sym);
-        } else {
+        }
+        else {
             emitter.LoadArrayElement(sym);
         }
         return sym.Type;
@@ -464,7 +468,8 @@ public class ProgramParseNode : ParseNode {
         Symbol sym = identNode.Symbol;
         if (sym.IsLocal) {
             emitter.LoadSymbol(sym);
-        } else {
+        }
+        else {
             emitter.GenerateLoadArgument(sym);
         }
         for (int c = 0; c < identNode.Indexes.Count; ++c) {
@@ -473,22 +478,25 @@ public class ProgramParseNode : ParseNode {
                 NumberParseNode intNode = (NumberParseNode)indexNode;
                 if (sym.Dimensions[c].LowerBound.IsConstant) {
                     emitter.LoadInteger(0 - sym.Dimensions[c].LowerBound.Value.IntValue + intNode.Value.IntValue);
-                } else {
+                }
+                else {
                     emitter.LoadInteger(0);
                     GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[c].LowerBound);
                     emitter.Sub(SymType.INTEGER);
                     emitter.LoadInteger(intNode.Value.IntValue);
                     emitter.Add(SymType.INTEGER);
                 }
-            } else {
+            }
+            else {
                 GenerateExpression(emitter, SymType.INTEGER, indexNode);
                 if (sym.Dimensions[c].LowerBound.IsConstant) {
-                    int lowBound = sym.Dimensions [c].LowerBound.Value.IntValue;
+                    int lowBound = sym.Dimensions[c].LowerBound.Value.IntValue;
                     if (lowBound != 0) {
                         emitter.LoadInteger(0 - lowBound);
                         emitter.Add(SymType.INTEGER);
                     }
-                } else {
+                }
+                else {
                     emitter.LoadInteger(0);
                     GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[c].LowerBound);
                     emitter.Sub(SymType.INTEGER);
@@ -500,7 +508,8 @@ public class ProgramParseNode : ParseNode {
                     int arraySize = sym.Dimensions[m].Size;
                     if (arraySize >= 0) {
                         emitter.LoadInteger(arraySize);
-                    } else {
+                    }
+                    else {
                         GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[m].UpperBound);
                         GenerateExpression(emitter, SymType.INTEGER, sym.Dimensions[m].LowerBound);
                         emitter.Sub(SymType.INTEGER);
@@ -549,8 +558,9 @@ public class ProgramParseNode : ParseNode {
         Type type = typeof(DebuggableAttribute);
         ConstructorInfo ctor = type.GetConstructor(new[] { typeof(DebuggableAttribute.DebuggingModes) });
         CustomAttributeBuilder caBuilder = new(ctor, new object[] {
-                                                    DebuggableAttribute.DebuggingModes.DisableOptimizations |
-                                                    DebuggableAttribute.DebuggingModes.Default });
+            DebuggableAttribute.DebuggingModes.DisableOptimizations |
+            DebuggableAttribute.DebuggingModes.Default
+        });
         Builder.SetCustomAttribute(caBuilder);
     }
 

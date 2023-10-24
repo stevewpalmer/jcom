@@ -25,7 +25,7 @@
 
 using System.Reflection;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that stores the index of a local identifier.

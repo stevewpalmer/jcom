@@ -26,7 +26,7 @@
 using JComalLib;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a single INPUT item.
@@ -72,7 +72,7 @@ public sealed class InputManagerParseNode : ParseNode {
     /// Gets or sets the list of identifiers for the input.
     /// </summary>
     /// <value>The read parameters node</value>
-    public IdentifierParseNode [] Identifiers { get; set; }
+    public IdentifierParseNode[] Identifiers { get; set; }
 
     /// <summary>
     /// Dumps the contents of this parse node to the ParseNode XML
@@ -163,18 +163,21 @@ public sealed class InputManagerParseNode : ParseNode {
             if (identNode.IsArrayBase) {
                 emitter.GenerateLoadArray(identNode, true);
                 readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeArrayType().MakeByRefType());
-            } else if (identNode.HasSubstring) {
+            }
+            else if (identNode.HasSubstring) {
                 cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringStart);
                 if (identNode.SubstringEnd != null) {
                     cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringEnd);
-                } else {
+                }
+                else {
                     emitter.LoadInteger(-1);
                 }
                 cg.LoadAddress(emitter, identNode);
                 readParamTypes.Add(typeof(int));
                 readParamTypes.Add(typeof(int));
                 readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
-            } else {
+            }
+            else {
                 cg.LoadAddress(emitter, identNode);
                 readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
             }

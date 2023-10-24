@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a single parameter parse node.
@@ -156,7 +156,8 @@ public class ParameterParseNode : ParseNode {
                         emitter.LoadIndirect(identType);
                     }
                     emitter.ConvertType(symIdent.Type, identType);
-                } else {
+                }
+                else {
 
                     // Passing an array by reference
                     if (symIdent.IsArray && !identNode.HasIndexes) {
@@ -165,14 +166,16 @@ public class ParameterParseNode : ParseNode {
                     }
                     if (isByRef) {
                         cg.LoadAddress(emitter, identNode);
-                    } else {
+                    }
+                    else {
                         identNode.Generate(emitter, cg);
                         if (symParam != null) {
                             if (!symParam.IsMethod) {
                                 emitter.ConvertType(identNode.Type, symParam.Type);
                             }
                             identType = symParam.Type;
-                        } else {
+                        }
+                        else {
                             emitter.ConvertType(symIdent.Type, identType);
                         }
                     }
@@ -184,7 +187,7 @@ public class ParameterParseNode : ParseNode {
                 return paramType;
             }
         }
-        
+
         // For reference function parameters, if this argument is not an
         // addressable object, such as a literal value or an expression,
         // then we need to generate local storage for the result and pass
@@ -217,16 +220,16 @@ public class ParameterParseNode : ParseNode {
             emitter.GenerateLoadArray(identNode, symParam.IsByRef);
             return;
         }
-        
+
         LocalDescriptor index = locals.New(symParam.SystemType);
-        
+
         cg.GenerateLoadArrayAddress(emitter, identNode);
         emitter.CreateSimpleArray(symParam.ArraySize, Symbol.SymTypeToSystemType(symParam.Type));
         emitter.Dup();
         emitter.StoreLocal(index);
         emitter.LoadInteger(0);
         emitter.LoadInteger(symParam.ArraySize);
-        emitter.Call(typeof(Array).GetMethod("Copy", new [] { typeof(Array), typeof(int), typeof(Array), typeof(int), typeof(int) }));
+        emitter.Call(typeof(Array).GetMethod("Copy", new[] { typeof(Array), typeof(int), typeof(Array), typeof(int), typeof(int) }));
         emitter.LoadLocal(index);
     }
 }

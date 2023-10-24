@@ -25,7 +25,7 @@
 
 using JFortranLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a READ statement.
@@ -88,24 +88,24 @@ public sealed class ReadParseNode : ParseNode {
         }
 
         Type readManagerType = typeof(ReadManager);
-        Type [] paramTypes = ReadManagerParamsNode.Generate(emitter, cg);
+        Type[] paramTypes = ReadManagerParamsNode.Generate(emitter, cg);
 
         emitter.CreateObject(readManagerType, paramTypes);
         LocalDescriptor objIndex = emitter.GetTemporary(readManagerType);
         emitter.StoreLocal(objIndex);
-        
+
         if (EndLabel != null) {
             emitter.LoadLocal(objIndex);
             emitter.LoadInteger(1);
-            emitter.Call(readManagerType.GetMethod("set_HasEnd", new [] { typeof(bool) }));
+            emitter.Call(readManagerType.GetMethod("set_HasEnd", new[] { typeof(bool) }));
         }
-        
+
         if (ErrLabel != null) {
             emitter.LoadLocal(objIndex);
             emitter.LoadInteger(1);
-            emitter.Call(readManagerType.GetMethod("set_HasErr", new [] { typeof(bool) }));
+            emitter.Call(readManagerType.GetMethod("set_HasErr", new[] { typeof(bool) }));
         }
-        
+
         LocalDescriptor index = emitter.GetTemporary(typeof(int));
 
         // Construct a parsenode that will be called for each item in the loop
@@ -120,19 +120,20 @@ public sealed class ReadParseNode : ParseNode {
 
         if (ArgList != null && ArgList.Nodes.Count > 0) {
             int countOfArgs = ArgList.Nodes.Count;
-            
+
             for (int c = 0; c < countOfArgs; ++c) {
                 itemNode.Generate(emitter, cg, ArgList.Nodes[c]);
                 ReadParamsNode.FreeLocalDescriptors();
             }
-        } else {
+        }
+        else {
             itemNode.Generate(emitter, cg, null);
         }
 
         // Issue an EndRecord to complete this record read
         emitter.LoadLocal(objIndex);
         emitter.Call(cg.GetMethodForType(readManagerType, "EndRecord", System.Type.EmptyTypes));
-        
+
         Emitter.ReleaseTemporary(index);
         Emitter.ReleaseTemporary(objIndex);
     }

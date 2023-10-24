@@ -30,7 +30,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines an enumerable collection of symbols.
@@ -242,16 +242,17 @@ public class SymbolCollection : IEnumerable<Symbol> {
                 case SymType.FLOAT:
                 case SymType.COMPLEX:
                 case SymType.BOOLEAN: {
-                        if (sym.IsLocal && !sym.IsMethod) {
-                            if (sym.IsStatic) {
-                                cg.CurrentType.CreateField(sym);
-                            } else {
-                                emitter.CreateLocal(sym);
-                            }
-                            initialise = true;
+                    if (sym.IsLocal && !sym.IsMethod) {
+                        if (sym.IsStatic) {
+                            cg.CurrentType.CreateField(sym);
                         }
-                        break;
+                        else {
+                            emitter.CreateLocal(sym);
+                        }
+                        initialise = true;
                     }
+                    break;
+                }
 
                 case SymType.LABEL:
                     sym.Info = emitter.CreateLabel();
@@ -279,7 +280,8 @@ public class SymbolCollection : IEnumerable<Symbol> {
                             paramTypes[c] = typeof(int);
                         }
                         realEmitter.CreateObject(baseType, paramTypes);
-                    } else {
+                    }
+                    else {
                         realEmitter.CreateSimpleArray(sym.ArraySize, Symbol.SymTypeToSystemType(sym.Type));
                     }
 
@@ -310,7 +312,8 @@ public class SymbolCollection : IEnumerable<Symbol> {
                         realEmitter.LoadSymbol(sym);
                         realEmitter.LoadVariant(sym.Value);
                         realEmitter.Emit0(OpCodes.Call, typeof(FixedString).GetMethod("Set", new[] { typeof(string) }));
-                    } else {
+                    }
+                    else {
                         realEmitter.LoadVariant(sym.Value);
                         realEmitter.ConvertType(Symbol.VariantTypeToSymbolType(sym.Value.Type), sym.Type);
                         realEmitter.StoreSymbol(sym);

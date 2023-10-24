@@ -25,7 +25,7 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines an instruction class that constructs an opcode that takes
@@ -63,7 +63,8 @@ public class InstructionString : Instruction {
             case "ldstr":
                 if (_str.Length == 0) {
                     il.Emit(OpCodes.Ldsfld, typeof(string).GetField("Empty"));
-                } else {
+                }
+                else {
                     il.Emit(OpCodes.Ldstr, _str);
                 }
                 break;

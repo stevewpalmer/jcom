@@ -26,7 +26,7 @@
 using System.Reflection.Emit;
 using JFortranLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a single READ item.
@@ -94,7 +94,8 @@ public sealed class ReadItemParseNode : ParseNode {
         if (node is LoopParseNode loopNode) {
             loopNode.Callback = this;
             loopNode.Generate(emitter, cg);
-        } else {
+        }
+        else {
             Type readManagerType = typeof(ReadManager);
             List<Type> readParamTypes = new();
 
@@ -110,18 +111,21 @@ public sealed class ReadItemParseNode : ParseNode {
 
                     readParamTypes.Add(typeof(int));
                     readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeArrayType());
-                } else if (identNode.HasSubstring) {
+                }
+                else if (identNode.HasSubstring) {
                     cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringStart);
                     if (identNode.SubstringEnd != null) {
                         cg.GenerateExpression(emitter, SymType.INTEGER, identNode.SubstringEnd);
-                    } else {
+                    }
+                    else {
                         emitter.LoadInteger(-1);
                     }
                     cg.LoadAddress(emitter, identNode);
                     readParamTypes.Add(typeof(int));
                     readParamTypes.Add(typeof(int));
                     readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
-                } else {
+                }
+                else {
                     cg.LoadAddress(emitter, identNode);
                     readParamTypes.Add(Symbol.SymTypeToSystemType(identNode.Symbol.Type).MakeByRefType());
                 }

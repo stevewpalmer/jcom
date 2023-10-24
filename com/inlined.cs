@@ -28,7 +28,7 @@ using System.Reflection.Emit;
 using JComLib;
 using JFortranLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Inline-able functions. Each function generates the code that implements
@@ -44,7 +44,7 @@ namespace CCompiler;
 /// 
 /// </summary>
 public static class Inlined {
-    
+
     /// <summary>
     /// Returns the absolute of the given value.
     /// </summary>
@@ -55,9 +55,10 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", new [] { typeWanted }));
-        } else {
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new [] { typeWanted }));
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", new[] { typeWanted }));
+        }
+        else {
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new[] { typeWanted }));
         }
     }
 
@@ -69,7 +70,7 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", new[] { typeof(double) }));
     }
 
     /// <summary>
@@ -84,7 +85,7 @@ public static class Inlined {
         em.Emit0(OpCodes.Conv_I4);
         em.ConvertSystemType(typeWanted);
     }
-    
+
     /// <summary>
     /// Logarithm to base e (where e=2.718...).
     /// Generic real type version.
@@ -94,9 +95,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Logarithm to base 10.
     /// Generic real type version.
@@ -106,9 +107,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// AMOD intrinsic function.
     /// Generic real type version.
@@ -120,7 +121,7 @@ public static class Inlined {
         }
         em.Emit0(OpCodes.Rem);
     }
-    
+
     /// <summary>
     /// Returns the angle whose sine is the specified value.
     /// </summary>
@@ -129,7 +130,7 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", new[] { typeof(double) }));
     }
 
     /// <summary>
@@ -144,7 +145,7 @@ public static class Inlined {
         if (typeWanted != typeof(double)) {
             em.Emit0(OpCodes.Conv_R8);
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", new[] { typeof(double) }));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -158,9 +159,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", new [] { typeof(Complex) }));
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", new[] { typeof(Complex) }));
     }
-    
+
     /// <summary>
     /// Cosine of the angle in radians.
     /// </summary>
@@ -169,9 +170,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", new [] { typeof(Complex) }));
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", new[] { typeof(Complex) }));
     }
-    
+
     /// <summary>
     /// Returns Nth character in local character code table.
     /// </summary>
@@ -181,9 +182,9 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         em.Emit0(OpCodes.Conv_U2);
-        em.CreateObject(typeof(FixedString), new [] { typeof(char) });
+        em.CreateObject(typeof(FixedString), new[] { typeof(char) });
     }
-    
+
     /// <summary>
     /// Logarithm to base e (where e=2.718...)..
     /// </summary>
@@ -192,9 +193,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", new [] { typeof(Complex) }));
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", new[] { typeof(Complex) }));
     }
-    
+
     /// <summary>
     /// Convert the specified value to a complex value.
     /// </summary>
@@ -203,9 +204,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Newobj, typeof(Complex).GetConstructor(new [] { typeof(double), typeof(double) } ));
+        em.Emit0(OpCodes.Newobj, typeof(Complex).GetConstructor(new[] { typeof(double), typeof(double) }));
     }
-    
+
     /// <summary>
     /// Cosine of the angle in radians.
     /// </summary>
@@ -216,18 +217,19 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", new [] { typeWanted }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", new[] { typeWanted }));
+        }
+        else {
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", new [] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", new[] { typeof(double) }));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
         }
     }
-    
+
     /// <summary>
     /// Hyperbolic cosine of the angle in radians.
     /// </summary>
@@ -236,9 +238,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Sine of the angle in radians.
     /// </summary>
@@ -247,9 +249,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", new [] { typeof(Complex) }));
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", new[] { typeof(Complex) }));
     }
-    
+
     /// <summary>
     /// SQRT intrinsic function
     /// Returns the square root of the given value.
@@ -259,9 +261,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", new [] { typeof(Complex) }));
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", new[] { typeof(Complex) }));
     }
-    
+
     /// <summary>
     /// Returns the absolute of the given value.
     /// </summary>
@@ -270,9 +272,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Arc-cosine; the result is in the range 0 to + π.
     /// </summary>
@@ -281,9 +283,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Arc-sine; the result is in the range 0 to + π.
     /// </summary>
@@ -292,9 +294,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Returns the angle whose tangent is the specified value.
     /// </summary>
@@ -303,9 +305,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Returns the angle whose tangent is the quotient of m1 and m2.
     /// </summary>
@@ -314,9 +316,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan2", new [] { typeof(double), typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan2", new[] { typeof(double), typeof(double) }));
     }
-    
+
     /// <summary>
     /// Emit inline code for DBLE function. For Complex this is a bit hacky and we redirect
     /// to the JComLib library to get the actual Real since this requires access to a property
@@ -329,12 +331,13 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("DBLE", new [] { typeof(Complex) }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("DBLE", new[] { typeof(Complex) }));
+        }
+        else {
             em.Emit0(OpCodes.Conv_R8);
         }
     }
-    
+
     /// <summary>
     /// Cosine of the angle in radians.
     /// </summary>
@@ -343,9 +346,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Hyperbolic cosine of the specified angle in radians.
     /// </summary>
@@ -354,7 +357,7 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", new[] { typeof(double) }));
     }
 
     /// <summary>
@@ -365,7 +368,7 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.LoadDouble(180/Math.PI);
+        em.LoadDouble(180 / Math.PI);
         em.Mul(SymType.DOUBLE);
     }
 
@@ -377,9 +380,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Converts to integer by truncation.
     /// </summary>
@@ -391,7 +394,7 @@ public static class Inlined {
         em.Emit0(OpCodes.Conv_I4);
         em.Emit0(OpCodes.Conv_R8);
     }
-    
+
     /// <summary>
     /// Logarithm to base e (where e=2.718...)..
     /// </summary>
@@ -400,9 +403,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Logarithm to base 10.
     /// </summary>
@@ -411,7 +414,7 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new[] { typeof(double) }));
     }
 
     /// <summary>
@@ -425,7 +428,7 @@ public static class Inlined {
         }
         em.Emit0(OpCodes.Rem);
     }
-    
+
     /// <summary>
     /// Emit inline code for DPROD function.
     /// </summary>
@@ -445,9 +448,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Returns the hyperbolic sine of the angle in radians.
     /// </summary>
@@ -456,9 +459,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// SQRT intrinsic function
     /// Returns the square root of the given value.
@@ -468,9 +471,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Tangent of the angle in radians.
     /// </summary>
@@ -479,9 +482,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Returns the hyperbolic tangent of the specified angle.
     /// </summary>
@@ -490,9 +493,9 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", new[] { typeof(double) }));
     }
-    
+
     /// <summary>
     /// Returns the exponential, i.e. e to the power of the argument. This is the
     /// inverse of the natural logarithm.
@@ -504,12 +507,13 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Exp", new [] { typeof(Complex) }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Exp", new[] { typeof(Complex) }));
+        }
+        else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", new [] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", new[] { typeof(double) }));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -536,10 +540,10 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         em.Emit0(OpCodes.Conv_R8);
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new[] { typeof(double) }));
         em.Emit0(OpCodes.Conv_I4);
     }
-    
+
     /// <summary>
     /// Returns position of first character of the string in the local character code table.
     /// </summary>
@@ -553,12 +557,12 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(typeWanted));
         }
         em.LoadInteger(0);
-        em.Emit0(OpCodes.Call, typeWanted.GetMethod("get_Chars", new [] { typeof(int) }));
+        em.Emit0(OpCodes.Call, typeWanted.GetMethod("get_Chars", new[] { typeof(int) }));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
     }
-    
+
     /// <summary>
     /// Converts to integer by truncation.
     /// </summary>
@@ -569,7 +573,7 @@ public static class Inlined {
         }
         em.Emit0(OpCodes.Conv_I4);
     }
-    
+
     /// <summary>
     /// Returns the integer value of the given float.
     /// </summary>
@@ -591,8 +595,9 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("INT", new [] { typeof(Complex) }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("INT", new[] { typeof(Complex) }));
+        }
+        else {
             em.Emit0(OpCodes.Conv_I4);
         }
     }
@@ -648,12 +653,13 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", new [] { typeWanted }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", new[] { typeWanted }));
+        }
+        else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new [] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new[] { typeof(double) }));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -672,7 +678,7 @@ public static class Inlined {
         if (typeWanted != typeof(double)) {
             em.Emit0(OpCodes.Conv_R8);
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new[] { typeof(double) }));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -711,8 +717,9 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("REAL", new [] { typeof(Complex) }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("REAL", new[] { typeof(Complex) }));
+        }
+        else {
             em.Emit0(OpCodes.Conv_R4);
         }
     }
@@ -751,18 +758,19 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", new [] { typeWanted }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", new[] { typeWanted }));
+        }
+        else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", new [] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", new[] { typeof(double) }));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
         }
     }
-    
+
     /// <summary>
     /// Returns the hyperbolic sine of the angle in radians.
     /// </summary>
@@ -771,7 +779,7 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", new[] { typeof(double) }));
     }
 
     /// <summary>
@@ -823,12 +831,13 @@ public static class Inlined {
             throw new ArgumentNullException(nameof(em));
         }
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", new [] { typeWanted }));
-        } else {
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", new[] { typeWanted }));
+        }
+        else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", new [] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", new[] { typeof(double) }));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -847,7 +856,7 @@ public static class Inlined {
         if (typeWanted != typeof(double)) {
             em.Emit0(OpCodes.Conv_R8);
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", new[] { typeof(double) }));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -861,7 +870,7 @@ public static class Inlined {
         if (em == null) {
             throw new ArgumentNullException(nameof(em));
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", new [] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", new[] { typeof(double) }));
     }
 
     /// <summary>

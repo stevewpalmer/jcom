@@ -26,7 +26,7 @@
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a conditional block.
@@ -38,7 +38,7 @@ public sealed class ConditionalParseNode : ParseNode {
     /// <summary>
     /// Creates a conditional parse node.
     /// </summary>
-    public ConditionalParseNode() : base(ParseID.COND) {}
+    public ConditionalParseNode() : base(ParseID.COND) { }
 
     /// <summary>
     /// Return the list of block nodes for each conditional block.
@@ -91,7 +91,7 @@ public sealed class ConditionalParseNode : ParseNode {
         int index = 0;
 
         Label labFalse = emitter.CreateLabel(); // Destination of false condition
-        Label labExit = emitter.CreateLabel();  // Exit from entire IF statement
+        Label labExit = emitter.CreateLabel(); // Exit from entire IF statement
 
         while (index < _exprList.Count) {
             bool isLastBlock = index == _exprList.Count - 1;
@@ -102,10 +102,12 @@ public sealed class ConditionalParseNode : ParseNode {
                 if (expr.IsConstant) {
                     if (expr.Value.BoolValue) {
                         isLastBlock = true;
-                    } else {
+                    }
+                    else {
                         skipBlock = true;
                     }
-                } else {
+                }
+                else {
                     cg.GenerateExpression(emitter, SymType.BOOLEAN, _exprList[index]);
                     emitter.BranchIfFalse(isLastBlock ? labExit : labFalse);
                 }
@@ -119,7 +121,8 @@ public sealed class ConditionalParseNode : ParseNode {
                     emitter.MarkLabel(labFalse);
                     labFalse = emitter.CreateLabel();
                 }
-            } else {
+            }
+            else {
                 break;
             }
             ++index;

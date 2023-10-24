@@ -25,7 +25,7 @@
 
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a string parse node that stores a simple string
@@ -81,7 +81,7 @@ public sealed class StringParseNode : ParseNode {
         ParseNodeXml subNode = root.Node("String");
         subNode.Attribute("Value", Value.ToString());
     }
-    
+
     /// <summary>
     /// Returns the string value of this node.
     /// </summary>

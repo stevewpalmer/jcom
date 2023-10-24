@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a variable argument parse node which encapsulates an
@@ -59,7 +59,8 @@ public sealed class VarArgParseNode : CollectionParseNode {
                 IdentifierParseNode identNode = (IdentifierParseNode)Nodes[c];
                 cg.LoadAddress(emitter, identNode);
                 emitter.StoreElementReference(identNode.Type);
-            } else {
+            }
+            else {
                 emitter.StoreElementReference(cg.GenerateExpression(emitter, Nodes[c].Type, Nodes[c]));
             }
         }

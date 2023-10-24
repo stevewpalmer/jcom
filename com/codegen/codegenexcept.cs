@@ -25,7 +25,7 @@
 
 using System.Runtime.Serialization;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines a CodeGeneratorException for exceptions found

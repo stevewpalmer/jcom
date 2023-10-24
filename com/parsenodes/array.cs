@@ -28,7 +28,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using JComLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that initialises an array object
@@ -55,7 +55,7 @@ public sealed class ArrayParseNode : ParseNode {
     /// <summary>
     /// Specifies the array dimensions
     /// </summary>
-    public SymDimension [] Dimensions { get; set; }
+    public SymDimension[] Dimensions { get; set; }
 
     /// <value>
     /// Gets or sets the start range for the array initialisation.
@@ -110,7 +110,8 @@ public sealed class ArrayParseNode : ParseNode {
                         dim.UpperBound = new StaticParseNode(upperBound);
                     }
                 }
-            } else {
+            }
+            else {
                 foreach (SymDimension dim in Dimensions) {
                     if (!dim.LowerBound.IsConstant) {
                         LocalDescriptor lowBound = emitter.GetTemporary(typeof(int));
@@ -132,13 +133,15 @@ public sealed class ArrayParseNode : ParseNode {
                 SymDimension dim = Dimensions[c];
                 if (dim.UpperBound.IsConstant) {
                     emitter.LoadInteger(dim.UpperBound.Value.IntValue);
-                } else {
+                }
+                else {
                     sym.Dimensions[c].UpperBound.Generate(emitter, cg, SymType.INTEGER);
                 }
                 if (!(dim.LowerBound.IsConstant && dim.LowerBound.Value.IntValue == 1)) {
                     if (dim.LowerBound.IsConstant) {
                         emitter.LoadInteger(dim.LowerBound.Value.IntValue);
-                    } else {
+                    }
+                    else {
                         sym.Dimensions[c].LowerBound.Generate(emitter, cg, SymType.INTEGER);
                     }
                     emitter.Sub(SymType.INTEGER);
@@ -155,7 +158,8 @@ public sealed class ArrayParseNode : ParseNode {
             }
             if (sym.IsFlatArray) {
                 emitter.CreateArray(Symbol.SymTypeToSystemType(sym.Type));
-            } else {
+            }
+            else {
                 emitter.CreateObject(sym.SystemType, paramTypes);
             }
             emitter.StoreSymbol(sym);
@@ -173,8 +177,9 @@ public sealed class ArrayParseNode : ParseNode {
                 Debug.Assert(sym.Dimensions[0].LowerBound.IsConstant);
                 int index = number.Value.IntValue + (0 - sym.Dimensions[0].LowerBound.Value.IntValue);
                 GenerateStoreToArray(emitter, sym, index, RangeValue);
-            } else {
-                Type [] paramTypes = new Type[Identifier.Indexes.Count + 1];
+            }
+            else {
+                Type[] paramTypes = new Type[Identifier.Indexes.Count + 1];
                 int index = 0;
 
                 emitter.LoadSymbol(sym);
@@ -191,15 +196,16 @@ public sealed class ArrayParseNode : ParseNode {
             }
         }
         else if (StartRange < EndRange + 4) {
-            
+
             // When initialising arrays less than 4 values, unroll
             // the loop as it will be faster.
             int index = StartRange;
             while (index <= EndRange) {
                 GenerateStoreToArray(emitter, sym, index++, RangeValue);
             }
-        } else {
-            
+        }
+        else {
+
             // For large arrays, generate code to initialise the elements
             // to a specific value.
             Label label1 = emitter.CreateLabel();

@@ -25,7 +25,7 @@
 
 using System.Reflection.Emit;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Defines an instruction class that constructs an opcode that takes
@@ -67,28 +67,46 @@ public class InstructionLocal : Instruction {
         switch (Code.Name) {
             case "stloc":
                 switch (Value.Index) {
-                    case 0: il.Emit(OpCodes.Stloc_0); return;
-                    case 1: il.Emit(OpCodes.Stloc_1); return;
-                    case 2: il.Emit(OpCodes.Stloc_2); return;
-                    case 3: il.Emit(OpCodes.Stloc_3); return;
+                    case 0:
+                        il.Emit(OpCodes.Stloc_0);
+                        return;
+                    case 1:
+                        il.Emit(OpCodes.Stloc_1);
+                        return;
+                    case 2:
+                        il.Emit(OpCodes.Stloc_2);
+                        return;
+                    case 3:
+                        il.Emit(OpCodes.Stloc_3);
+                        return;
                 }
                 if (Value.Index < 256) {
                     il.Emit(OpCodes.Stloc_S, (byte)Value.Index);
-                } else {
+                }
+                else {
                     il.Emit(OpCodes.Stloc, Value.Index);
                 }
                 break;
 
             case "ldloc":
                 switch (Value.Index) {
-                    case 0: il.Emit(OpCodes.Ldloc_0); return;
-                    case 1: il.Emit(OpCodes.Ldloc_1); return;
-                    case 2: il.Emit(OpCodes.Ldloc_2); return;
-                    case 3: il.Emit(OpCodes.Ldloc_3); return;
+                    case 0:
+                        il.Emit(OpCodes.Ldloc_0);
+                        return;
+                    case 1:
+                        il.Emit(OpCodes.Ldloc_1);
+                        return;
+                    case 2:
+                        il.Emit(OpCodes.Ldloc_2);
+                        return;
+                    case 3:
+                        il.Emit(OpCodes.Ldloc_3);
+                        return;
                 }
                 if (Value.Index < 256) {
                     il.Emit(OpCodes.Ldloc_S, (byte)Value.Index);
-                } else {
+                }
+                else {
                     il.Emit(OpCodes.Ldloc, Value.Index);
                 }
                 break;
@@ -96,7 +114,8 @@ public class InstructionLocal : Instruction {
             case "ldloca":
                 if (Value.Index < 256) {
                     il.Emit(OpCodes.Ldloca_S, (byte)Value.Index);
-                } else {
+                }
+                else {
                     il.Emit(OpCodes.Ldloca, Value.Index);
                 }
                 break;
