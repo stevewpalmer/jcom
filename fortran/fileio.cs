@@ -180,9 +180,6 @@ public partial class Compiler {
         node.ArgList = ParseVarargList();
         node.ErrLabel = (SymbolParseNode)cilist["ERR"];
 
-        // First column is special for pre-Fortran 90 only
-        node.FirstColumnSpecial = !_opts.F90;
-
         // If this is internal storage, create an expression that
         // assigns the result to the character string
         ParseNode unit = cilist["UNIT"];
@@ -212,9 +209,6 @@ public partial class Compiler {
             ["FMT"] = ParseFormatSpecifier(),
             ["UNIT"] = new NumberParseNode(new Variant(IOConstant.Stdout))
         };
-
-        // First column is special for pre-Fortran 90 only
-        node.FirstColumnSpecial = !_opts.F90;
 
         if (!IsAtEndOfLine()) {
             SimpleToken token;

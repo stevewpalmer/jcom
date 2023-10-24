@@ -22,7 +22,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{A6F5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fortran", "Fortran", "{9FF5FDA2-96E2-43C5-AD9C-04F134E42A1F}"
 	ProjectSection(SolutionItems) = preProject
-		samples\Fortran\bottles.f90 = samples\Fortran\bottles.f90
 		samples\Fortran\date.f = samples\Fortran\date.f
 		samples\Fortran\datest.f = samples\Fortran\datest.f
 		samples\Fortran\euclid.f = samples\Fortran\euclid.f
@@ -35,6 +34,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fortran", "Fortran", "{9FF5
 		samples\Fortran\stats.f = samples\Fortran\stats.f
 		samples\Fortran\triang.f = samples\Fortran\triang.f
 		samples\Fortran\vowels.f = samples\Fortran\vowels.f
+		samples\Fortran\bottles.f = samples\Fortran\bottles.f
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39-BF1A-4D40-89E0-95655031D755}"

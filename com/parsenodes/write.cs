@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -25,7 +25,7 @@
 
 using JFortranLib;
 
-namespace CCompiler; 
+namespace CCompiler;
 
 /// <summary>
 /// Specifies a parse node that defines a write statement.
@@ -59,15 +59,8 @@ public sealed class WriteParseNode : ParseNode {
     public SymbolParseNode ErrLabel { get; set; }
 
     /// <summary>
-    /// Gets or sets a flag which indicates whether the first column of the
-    /// output string has special meaning to the console.
-    /// </summary>
-    /// <value><c>true</c> if first column special; otherwise, <c>false</c>.</value>
-    public bool FirstColumnSpecial { get; set; }
-
-    /// <summary>
     /// Emit the code to generate a call to the WRITE library function.
-    /// 
+    ///
     /// This interface implements the statement version. Refer to the
     /// comments for the function version below for more details.
     /// </summary>
@@ -79,7 +72,7 @@ public sealed class WriteParseNode : ParseNode {
 
     /// <summary>
     /// Emit the code to generate a call to the WRITE library function.
-    /// 
+    ///
     /// The WRITE function may be invoked as either a subroutine or a function depending
     /// on whether it is being used for formatting a string or writing to a device. The
     /// returnType parameter should direct how it should be used. If returnType is
@@ -103,17 +96,11 @@ public sealed class WriteParseNode : ParseNode {
         emitter.CreateObject(writeManagerType, paramTypes);
         LocalDescriptor objIndex = emitter.GetTemporary(writeManagerType);
         emitter.StoreLocal(objIndex);
-        
+
         if (ErrLabel != null) {
             emitter.LoadLocal(objIndex);
             emitter.LoadInteger(1);
             emitter.Call(writeManagerType.GetMethod("set_HasErr", new [] { typeof(bool) }));
-        }
-
-        if (FirstColumnSpecial) {
-            emitter.LoadLocal(objIndex);
-            emitter.LoadInteger(1);
-            emitter.Call(writeManagerType.GetMethod("SetFirstColumnSpecial", new [] { typeof(bool) }));
         }
 
         // Disable use of separators for BASIC output
@@ -163,7 +150,6 @@ public sealed class WriteParseNode : ParseNode {
     /// <param name="root">The parent XML node</param>
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("Write");
-        blockNode.Attribute("FirstColumnSpecial", FirstColumnSpecial.ToString());
         WriteManagerParamsNode.Dump(blockNode.Node("WriteManagerParams"));
         WriteParamsNode.Dump(blockNode.Node("WriteParams"));
         if (ArgList != null) {

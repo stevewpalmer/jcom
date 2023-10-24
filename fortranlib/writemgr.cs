@@ -140,22 +140,6 @@ public class WriteManager : IDisposable {
     }
 
     /// <summary>
-    /// Sets whether the first column of the output string is treated as
-    /// a control code. If true, then the first character of each output line is
-    /// interpreted as a Fortran control code. If false, the first character is
-    /// output normally.
-    /// </summary>
-    /// <param name="isSpecial">Boolean flag that specifies whether the first column is special</param>
-    public void SetFirstColumnSpecial(bool isSpecial) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
-        if (_file != null) {
-            _file.IsFirstWriteColumnSpecial = isSpecial;
-        }
-    }
-
-    /// <summary>
     /// Sets whether or not successive output is separated by single spaces.
     /// </summary>
     public bool UseSeparators { get; set; }
@@ -463,9 +447,6 @@ public class WriteManager : IDisposable {
     // Write an integer formatted to the output file
     private int WriteIntegerFormatted(int intValue) {
         FormatRecord record = Record(true);
-        if (record == null && _file != null && _file.IsFirstWriteColumnSpecial) {
-            WriteChar(' ', 1);
-        }
         string str;
         if (record != null) {
             VerifyFormatMatch(record, intValue);
@@ -484,9 +465,6 @@ public class WriteManager : IDisposable {
     // Write a float value formatted to the output file
     private int WriteFloatFormatted(float floatValue) {
         FormatRecord record = Record(true);
-        if (record == null && _file != null && _file.IsFirstWriteColumnSpecial) {
-            WriteChar(' ', 1);
-        }
         string str;
         if (record != null) {
             VerifyFormatMatch(record, floatValue);
@@ -505,9 +483,6 @@ public class WriteManager : IDisposable {
     // Write a double value formatted to the output file
     private int WriteDoubleFormatted(double doubleValue) {
         FormatRecord record = Record(true);
-        if (record == null && _file != null && _file.IsFirstWriteColumnSpecial) {
-            WriteChar(' ', 1);
-        }
         string str;
         if (record != null) {
             VerifyFormatMatch(record, doubleValue);
@@ -526,9 +501,6 @@ public class WriteManager : IDisposable {
     // Write a complex value formatted to the output file
     private int WriteComplexFormatted(Complex complexValue) {
         FormatRecord record = Record(true);
-        if (record == null && _file != null && _file.IsFirstWriteColumnSpecial) {
-            WriteChar(' ', 1);
-        }
         string str;
 
         if (record != null) {
@@ -561,9 +533,6 @@ public class WriteManager : IDisposable {
     // Write a boolean value formatted to the output file
     private int WriteBoolFormatted(bool boolValue) {
         FormatRecord record = Record(true);
-        if (record == null && _file != null && _file.IsFirstWriteColumnSpecial) {
-            WriteChar(' ', 1);
-        }
         string str;
         if (record != null) {
             VerifyFormatMatch(record, boolValue);
@@ -582,9 +551,6 @@ public class WriteManager : IDisposable {
     // Write a string formatted to the output file
     private int WriteStringFormatted(string str) {
         FormatRecord record = Record(true);
-        if (record == null && _file != null && _file.IsFirstWriteColumnSpecial) {
-            WriteChar(' ', 1);
-        }
         if (record != null) {
             VerifyFormatMatch(record, str);
             str = FormatString(str, record);

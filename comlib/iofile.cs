@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -25,7 +25,7 @@
 
 using System.Text;
 
-namespace JComLib; 
+namespace JComLib;
 
 /// <summary>
 /// Special I/O constants.
@@ -68,11 +68,8 @@ public enum LineTerminator {
 
 /// <summary>
 /// A class that encapsulates the standard output file.
-/// </summary>            
+/// </summary>
 public sealed class StdoutIOFile : IOFile {
-
-    // Class variables
-    private bool _skipClear;
 
     public StdoutIOFile() : base(IOConstant.Stdout) {}
 
@@ -94,40 +91,6 @@ public sealed class StdoutIOFile : IOFile {
 
         if (str.Length == 0) {
             Console.WriteLine();
-        } else if (IsFirstWriteColumnSpecial) {
-            string toWrite = str.Substring(1);
-            switch (str[0]) {
-                default:
-                    Console.WriteLine(toWrite);
-                    break;
-
-                case '+':
-                    Console.Write(toWrite);
-                    Console.Write('\r'); // Move to start of same line
-                    break;
-
-                case '0':
-                    Console.WriteLine();
-                    Console.WriteLine(toWrite);
-                    break;
-
-                case '1':
-                    // Doing Console.Clear with redirection causes an exception
-                    // on Windows, although, oddly enough, not with Mono. The
-                    // property to test for redirection is .NET 4.5 only. So we
-                    // hack and catch the exception and then use a flag for any
-                    // future outputs in this session.
-                    if (!_skipClear) {
-                        try {
-                            Console.Clear();
-                        } catch (IOException) {
-                            _skipClear = true;
-                        }
-                    }
-                    Console.WriteLine(toWrite);
-                    break;
-            }
-            charsWritten = toWrite.Length;
         } else if (carriageAtEnd) {
             Console.WriteLine(str);
         } else {
@@ -139,7 +102,7 @@ public sealed class StdoutIOFile : IOFile {
 
 /// <summary>
 /// A class that encapsulates the standard input file.
-/// </summary>            
+/// </summary>
 public sealed class StdinIOFile : IOFile {
 
     public StdinIOFile() : base(IOConstant.Stdin) {
@@ -207,7 +170,7 @@ public sealed class StdinIOFile : IOFile {
 /// direct file obtains the data by seeking to fixed offsets.
 ///
 /// A file can also be either Formatted or Unformatted.
-/// </summary>            
+/// </summary>
 public class IOFile : IDisposable {
 
     private static Dictionary<int, IOFile> _filemap = new();
@@ -259,14 +222,6 @@ public class IOFile : IDisposable {
     public bool IsScratch { get; set; }
 
     /// <summary>
-    /// Specifies whether the first column of the stdout device is treated as
-    /// a control character that determines line spacing. This is typically
-    /// used in FORTRAN only.
-    /// </summary>
-    /// <value><c>true</c> if this the first character is a control character otherwise, <c>false</c>.</value>
-    public bool IsFirstWriteColumnSpecial { get; set; }
-
-    /// <summary>
     /// Specifies the handling of blanks in input.
     /// </summary>
     public char Blank { get; set; }
@@ -287,7 +242,6 @@ public class IOFile : IDisposable {
     /// <param name="iodevice">The device number for the file</param>
     public IOFile(int iodevice) {
         Unit = iodevice;
-        IsFirstWriteColumnSpecial = false;
         IsNew = true;
         IsSequential = true;
         _isFormatted = true;
@@ -512,7 +466,7 @@ public class IOFile : IDisposable {
             WriteRecord();
         }
     }
-    
+
     /// <summary>
     /// If this file is opened for reading, read a line from the device. If the
     /// file is opened non-formatted then this has no effect.
@@ -547,7 +501,7 @@ public class IOFile : IDisposable {
     /// <returns>The number of characters written to the device</returns>
     public virtual int WriteLine(string str, bool carriageAtEnd) {
         int charsWritten;
-        
+
         if (_isDisposed) {
             throw new ObjectDisposedException(GetType().Name);
         }
@@ -904,7 +858,7 @@ public class IOFile : IDisposable {
         WriteEncodedString(value, value.Length);
         return intSize + value.Length;
     }
-    
+
     /// <summary>
     /// Specifies whether or not the file is opened for formatted access.
     /// </summary>
@@ -984,7 +938,7 @@ public class IOFile : IDisposable {
     public void Dispose() {
         Dispose(true);
     }
-    
+
     /// <summary>
     /// Releases all resource used by the <see cref="IOFile"/> object.
     /// </summary>
@@ -1088,13 +1042,13 @@ public class IOFile : IDisposable {
     private int WriteEncodedString(string strToWrite, int charsToWrite) {
         int count = Math.Min(Encoding.ASCII.GetByteCount(strToWrite), charsToWrite);
         byte [] data = new byte[charsToWrite];
-        
+
         // Make sure that unused elements are set to spaces and not
         // NUL characters or bad things will happen on the READ.
         for (int c = 0; c < charsToWrite; ++c) {
             data[c] = (byte)' ';
         }
-        
+
         Encoding.ASCII.GetBytes(strToWrite, 0, count, data, 0);
         WriteBytes(data, charsToWrite);
         return charsToWrite;
@@ -1107,7 +1061,7 @@ public class IOFile : IDisposable {
     // chunks.
     private bool UnformattedBackspace() {
         long currentPos = CurrentPositionInFile();
-        
+
         // At ENDFILE? If so, exit now
         if (currentPos == Handle.Length || currentPos == 0) {
             return true;
@@ -1143,18 +1097,18 @@ public class IOFile : IDisposable {
     // offset of the record in the file.
     private bool FormattedBackspace() {
         long currentPos = CurrentPositionInFile();
-        
+
         // Do it the hard way. Work backward reading 4K chunks and look for
         // the last newline record in the block. The new position is just
         // after that.
         int bufferSize = 4096;
         byte [] data = new byte[bufferSize];
         int startOffset = 0;
-        
+
         currentPos -= 1;
         while (currentPos > 0) {
             bool foundRecord = false;
-            
+
             int bytesToRead = (int)Math.Min(currentPos, bufferSize);
             currentPos = Math.Max(startOffset, currentPos - bufferSize);
             Handle.Seek(currentPos, SeekOrigin.Begin);

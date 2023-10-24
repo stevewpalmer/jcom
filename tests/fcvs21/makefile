@@ -7,6 +7,9 @@ include tests.mak
 all: $(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS)
 
 failures: $(FAILTESTS)
+	-rm run.out FORT.*
+	-for f in $(FAILTESTS); do $(JFOR) $$f; done >>run.out
+	-grep "\sFAIL\s" run.out
 
 run: $(ALLTESTS)
 	-rm run.out FORT.*

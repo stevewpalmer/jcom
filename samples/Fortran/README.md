@@ -3,7 +3,7 @@
 This folder contains sample Fortran programs that can be compiled using
 the Fortran compiler.
 
-* bottles.f90 ... Prints 99 bottles of beer. Copied from http://www.99-bottles-of-beer.net/language-fortran-77-760.
+* bottles.f ... Prints 99 bottles of beer. Copied from http://www.99-bottles-of-beer.net/language-fortran-77-760.
   html with minor edits to the FORMAT strings for first column special.
 * date.f    ... Calculate the number of days in a month for a given year.
 * datest.f  ... Test of direct access records.
