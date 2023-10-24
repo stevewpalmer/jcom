@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -24,6 +24,7 @@
 // under the License
 
 using System;
+using System.Collections.Generic;
 using CCompiler;
 using JFortran;
 using NUnit.Framework;
@@ -175,6 +176,132 @@ namespace FortranTests {
             Assert.AreEqual(1, comp.Messages.ErrorCount);
             Assert.AreEqual(21, comp.Messages[0].Line);
             Assert.AreEqual(MessageCode.TOOMANYCONTINUATION, comp.Messages[0].Code);
+        }
+
+        // Validate Fortran 77 fixed format source
+        // Spacing between tokens.
+        [Test]
+        public void ValidateFixedFormat1() {
+            string[] code = {
+                "      A=1.                                                              01110010",
+                "      B =2.                                                             01120010",
+                "      C =3.                                                             01130010",
+                "      D   =4.                                                           01140010",
+                "      E     =5.                                                         01150010",
+                "      F      =6.                                                        01160010",
+                "     0G                      =                   7.                     01170010",
+                "                                        H=8.                            01180010",
+                "                                                                     I=901190010",
+                "      J  =  10                                                          01200010",
+                "          K        =          11                                        01210010",
+                "      L                                 =                             1201220010"
+            };
+            FortranOptions opts = new();
+            MessageCollection messages = new(opts);
+            Lexer ls = new(code, opts, messages);
+
+            List<(string, int)> testValues = new List<(string, int)> {
+                ("A", 1),
+                ("B", 2),
+                ("C", 3),
+                ("D", 4),
+                ("E", 5),
+                ("F", 6),
+                ("G", 7),
+                ("H", 8),
+                ("I", 9),
+                ("J", 10),
+                ("K", 11),
+                ("L", 12),
+            };
+
+            foreach ((string name, int value) in testValues) {
+                SimpleToken token = ls.GetToken();
+                Assert.IsTrue(token.ID == TokenID.IDENT);
+
+                IdentifierToken identToken = (IdentifierToken)token;
+                Assert.AreEqual(identToken.Name, name);
+
+                Assert.IsTrue(ls.GetToken().ID == TokenID.EQUOP);
+
+                token = ls.GetToken();
+                if (name[0] >= 'I') { // Implied integer type
+                    Assert.IsTrue(token.ID == TokenID.INTEGER);
+                    IntegerToken integerToken = (IntegerToken)token;
+                    Assert.AreEqual(integerToken.Value, value);
+                }
+                else {
+                    Assert.IsTrue(token.ID == TokenID.REAL);
+                    RealToken realToken = (RealToken)token;
+                    Assert.AreEqual(realToken.Value, value);
+                }
+
+                Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
+            }
+        }
+
+        // Validate Fortran 77 fixed format source
+        // Spaces in identifiers.
+        [Test]
+        public void ValidateFixedFormat2() {
+            string[] code = {
+                "      K 5 6 78  9=37                                                    01470010",
+                "       L 2 L 2 L 2 =38                                                  01480010",
+                "        M  3   M           3                      M3   =              3901490010",
+                "         N         40        =                   4                     001500010",
+                "     0    OMY    =           4                                        1.01510010",
+                "      I   PM   H =           4                                         201520010",
+                "      GO TO 1 = 4 3.                                                    01530010",
+                "      IF 3 = 44                                                         01540010",
+                "      DO 3 =   53.                                                      01550010",
+                "      CALL FL =62.                                                      01560010",
+                "      TYPE I = 63.                                                      01570010",
+                "      TRUE   =71.                                                       01580010",
+                "      FALSE  = 72.                                                      01590010"
+            };
+            FortranOptions opts = new();
+            MessageCollection messages = new(opts);
+            Lexer ls = new(code, opts, messages);
+
+            List<(string, int)> testValues = new List<(string, int)> {
+                ("K56789", 37),
+                ("L2L2L2", 38),
+                ("M3M3M3", 39),
+                ("N40", 40),
+                ("OMY", 41),
+                ("IPMH", 42),
+                ("GOTO1", 43),
+                ("IF3", 44),
+                ("DO3", 53),
+                ("CALLFL", 62),
+                ("TYPEI", 63),
+                ("TRUE", 71),
+                ("FALSE", 72)
+            };
+
+            foreach ((string name, int value) in testValues) {
+                SimpleToken token = ls.GetToken();
+                Assert.IsTrue(token.ID == TokenID.IDENT);
+
+                IdentifierToken identToken = (IdentifierToken)token;
+                Assert.AreEqual(identToken.Name, name);
+
+                Assert.IsTrue(ls.GetToken().ID == TokenID.EQUOP);
+
+                token = ls.GetToken();
+                if (name[0] >= 'I') { // Implied integer type
+                    Assert.IsTrue(token.ID == TokenID.INTEGER);
+                    IntegerToken integerToken = (IntegerToken)token;
+                    Assert.AreEqual(integerToken.Value, value);
+                }
+                else {
+                    Assert.IsTrue(token.ID == TokenID.REAL);
+                    RealToken realToken = (RealToken)token;
+                    Assert.AreEqual(realToken.Value, value);
+                }
+
+                Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
+            }
         }
 
         // Validate tab support
