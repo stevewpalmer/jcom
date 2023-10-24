@@ -32,7 +32,7 @@ namespace FortranTests {
     public class FortranHelper : Helper {
 
         // Compile the given code and return the error count.
-        public static Compiler HelperCompile(string [] code, FortranOptions opts) {
+        public static Compiler HelperCompile(string[] code, FortranOptions opts) {
             Compiler comp = new(opts);
             comp.CompileString(code);
             Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");

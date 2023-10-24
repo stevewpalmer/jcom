@@ -29,13 +29,12 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class FormatTests {
 
         // Basic FORMAT verification
         [Test]
         public void FormatBasic() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION FMTTEST",
                 "        CHARACTER*26 STR, FMTTEST",
                 "3       FORMAT (\"The sum of \",I,\" and \",I,\" is \",I)",
@@ -51,7 +50,7 @@ namespace FortranTests {
         // Array FORMAT verification
         [Test]
         public void FormatArrayRef() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION FMTTEST",
                 "        CHARACTER*18 STR, FMTTEST",
                 "        INTEGER V(3)",
@@ -70,7 +69,7 @@ namespace FortranTests {
         // Exponential format tests.
         [Test]
         public void FormatExpTests() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION EXPTEST1",
                 "        CHARACTER*7 STR, EXPTEST1",
                 "        WRITE (STR, \"E7.2\") 678912.0",
@@ -106,4 +105,3 @@ namespace FortranTests {
         }
     }
 }
-

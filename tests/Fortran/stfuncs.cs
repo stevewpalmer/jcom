@@ -29,14 +29,13 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class StatementFunctions {
 
         // A simple statement function. Verify that the scope of
         // arguments is constrained to the statement function.
         [Test]
         public void StatementFunction1() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER B",
                 "        B=12",
@@ -51,7 +50,7 @@ namespace FortranTests {
         // A statement function that calls another statement function.
         [Test]
         public void StatementFunction2() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER B",
                 "        B=12",

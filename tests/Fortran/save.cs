@@ -29,14 +29,13 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class SaveTests {
 
         // Verify basic SAVE to save the state of a single
         // keyword.
         [Test]
         public void SaveInFunction() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        DO 10 I=1,10",
                 "          ITEST = ITEST + FOO()",
@@ -56,7 +55,7 @@ namespace FortranTests {
         // Verify the use of SAVE to save all local identifiers
         [Test]
         public void SaveAllInFunction() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        DO 10 I=1,10",
                 "          ITEST = ITEST + FOO()",

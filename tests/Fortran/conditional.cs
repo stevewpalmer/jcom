@@ -34,7 +34,7 @@ namespace FortranTests {
         // Arithmetic IF block validation
         [Test]
         public void ConditionalArithmeticIF1() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 45",
                 "        IF (A.LT.47) A= 90",
@@ -48,7 +48,7 @@ namespace FortranTests {
         // Arithmetic IF block validation
         [Test]
         public void ConditionalArithmeticIF2() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 88",
                 "        IF (A.LT.47) A= 90",
@@ -62,7 +62,7 @@ namespace FortranTests {
         // Block IF block validation
         [Test]
         public void ConditionalBlockIF1() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 45",
                 "        IF (A.LT.47) THEN",
@@ -77,7 +77,7 @@ namespace FortranTests {
         // Block IF block validation
         [Test]
         public void ConditionalBlockIF2() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 45",
                 "        IF (A.GT.47) THEN",
@@ -94,7 +94,7 @@ namespace FortranTests {
         // Block IF block validation
         [Test]
         public void ConditionalBlockIF3() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 45",
                 "        IF (A.GT.47) THEN",
@@ -113,7 +113,7 @@ namespace FortranTests {
         // Block IF block validation
         [Test]
         public void ConditionalBlockIF4() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 45",
                 "        IF (A.GT.47) THEN",
@@ -134,7 +134,7 @@ namespace FortranTests {
         // Block IF block validation
         [Test]
         public void ConditionalBlockIF5() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 45",
                 "        IF (A.LT.47) THEN",
@@ -153,7 +153,7 @@ namespace FortranTests {
         // Block IF block validation
         [Test]
         public void ConditionalBlockIF6() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        A = 55",
                 "        IF (A.LT.47) THEN",

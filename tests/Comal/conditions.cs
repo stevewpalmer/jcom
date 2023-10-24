@@ -29,7 +29,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Conditions {
 
         // Test IF true THEN
@@ -143,5 +142,3 @@ namespace ComalTests {
         }
     }
 }
-
-

@@ -30,13 +30,12 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class ArrayTests {
 
         // Verify all array declarations are valid.
         [Test]
         public void ArrayVerifySyntax() {
-            string [] code = {
+            string[] code = {
                 "      PROGRAM ARRAYVERIFY",
                 "      IMPLICIT NONE",
                 "      INTEGER A(12), B(90), C(4:9)",
@@ -51,7 +50,7 @@ namespace FortranTests {
         // Verify basic arrays.
         [Test]
         public void ArrayVerifyArraySyntax() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(2)",
                 "        A(1) = 45",
@@ -66,7 +65,7 @@ namespace FortranTests {
         // Verify non 1-based array references.
         [Test]
         public void ArrayVerifyNon1ArraySyntax() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(-3:2), B",
                 "        A(-3) = 45",
@@ -82,7 +81,7 @@ namespace FortranTests {
         // Verify passing arrays to functions
         [Test]
         public void ArrayVerifyArrayToFunction() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "      PARAMETER (MAXVAL = 10)",
                 "      REAL ARRAY(MAXVAL)",
@@ -103,7 +102,7 @@ namespace FortranTests {
         // function
         [Test]
         public void ArrayVerifyDynamicArrays() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "      PARAMETER (MAXVAL = 10)",
                 "      REAL ARRAY(MAXVAL)",
@@ -125,7 +124,7 @@ namespace FortranTests {
         // the compiler should catch it.
         [Test]
         public void ArrayVerifyIllegalDeclaration() {
-            string [] code = {
+            string[] code = {
                 "      PROGRAM FOO",
                 "      INTEGER MAXVAL",
                 "      REAL ARRAY(MAXVAL)",
@@ -133,7 +132,7 @@ namespace FortranTests {
                 "      TEST=FOO(ARRAY,MAXVAL)",
                 "      END"
             };
-            
+
             Compiler comp = new(new FortranOptions());
             comp.CompileString(code);
             Assert.AreEqual(1, comp.Messages.ErrorCount);
@@ -145,7 +144,7 @@ namespace FortranTests {
         // not modify the actual array dimensions.
         [Test]
         public void ArrayVerifyDimensions1() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "      REAL ARRAY(2,2)",
                 "      ARRAY(2,2) = 4.2",
@@ -165,7 +164,7 @@ namespace FortranTests {
         // Verify assumed sized arrays
         [Test]
         public void ArrayAssumedSizeArrays() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "      REAL ARRAY(2)",
                 "      ARRAY(1) = 45",

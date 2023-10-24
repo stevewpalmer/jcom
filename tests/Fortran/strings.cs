@@ -29,7 +29,6 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class Strings {
 
         // Test substring manipulation

@@ -29,7 +29,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Operators {
 
         // Test assignments.
@@ -158,5 +157,3 @@ namespace ComalTests {
         }
     }
 }
-
-

@@ -31,7 +31,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Arrays {
 
         // Test Simple 1D array

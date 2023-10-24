@@ -31,7 +31,6 @@ using Utilities;
 
 namespace ComLibTests {
     [TestFixture]
-
     public class Variants {
 
         // Test simple variant assignment.
@@ -154,7 +153,7 @@ namespace ComLibTests {
             Variant v2 = new(12);
             Assert.AreEqual(v1 + v2, new Variant(90f));
             Assert.AreEqual((v1 + v2).IntValue, 90);
-            Assert.AreEqual(v1 .Add(v2).IntValue, 90);
+            Assert.AreEqual(v1.Add(v2).IntValue, 90);
         }
 
         // Test simple variant subtraction.

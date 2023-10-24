@@ -29,7 +29,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Loops {
 
         // Test LOOP and conditional EXIT THEN
@@ -242,5 +241,3 @@ namespace ComalTests {
         }
     }
 }
-
-

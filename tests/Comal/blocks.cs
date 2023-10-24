@@ -30,7 +30,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Blocks {
 
         // Test NULL statement

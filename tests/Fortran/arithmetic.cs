@@ -30,13 +30,12 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class ArithmeticTests {
 
         // Test general constant usage.
         [Test]
         public void ArithTestConstantUsage() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "      PARAMETER (PI=3.1459, PI2=2*PI)",
                 "        REAL A",
@@ -47,11 +46,11 @@ namespace FortranTests {
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
             Helper.HelperRunInteger(comp, "ITEST", 314);
         }
-        
+
         // Verify basic addition expression generation
         [Test]
         public void ArithBasicAddition() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "        INTEGER A",
                 "        A = 20",
@@ -66,7 +65,7 @@ namespace FortranTests {
         // Verify basic subtraction expression generation
         [Test]
         public void ArithBasicSubtraction() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A,B",
                 "        A = 4543",
@@ -81,7 +80,7 @@ namespace FortranTests {
         // Verify basic multiplication expression generation
         [Test]
         public void ArithBasicMultiplication() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A",
                 "        INTEGER B",
@@ -97,7 +96,7 @@ namespace FortranTests {
         // Verify basic division expression generation
         [Test]
         public void ArithBasicDivision() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "        REAL A",
                 "        REAL B",
@@ -113,7 +112,7 @@ namespace FortranTests {
         // Verify implicit precedence
         [Test]
         public void ArithImplicitPrecedence1() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "        RETURN 10 + 4 * 6",
                 "      END"
@@ -126,7 +125,7 @@ namespace FortranTests {
         // Exponential is higher than multiplication so this is (10**3) * 2
         [Test]
         public void ArithImplicitPrecedence2() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION TEST",
                 "        RETURN 10 ** 3 * 2",
                 "      END"
@@ -140,7 +139,7 @@ namespace FortranTests {
         // error and handled separately.
         [Test]
         public void ArithDivisionByZero() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER I,J",
                 "        I = 10",
@@ -148,7 +147,7 @@ namespace FortranTests {
                 "        RETURN I/J",
                 "      END"
             };
-            
+
             Compiler comp = new(new FortranOptions());
             comp.CompileString(code);
             Assert.AreEqual(0, comp.Messages.ErrorCount);
@@ -159,7 +158,7 @@ namespace FortranTests {
         // exponential simplification we explicitly handle.
         [Test]
         public void ArithSimplificationExp() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION SIMPLIFY1",
                 "        REAL LH",
                 "        LH=16",
@@ -173,7 +172,7 @@ namespace FortranTests {
         // Verify concatenation operator
         [Test]
         public void ArithConcatenation() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION CONCATTEST",
                 "        CHARACTER*6 CONCATTEST",
                 "        CONCATTEST='90' // '45' // '34'",

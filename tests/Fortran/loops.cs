@@ -29,13 +29,12 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class LoopTests {
 
         // Verify basic loop operation
         [Test]
         public void Loops1() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        DO 20,I=1,10",
                 "          J=J+I",
@@ -50,7 +49,7 @@ namespace FortranTests {
         // Verify nested loop operation
         [Test]
         public void Loops2() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        DO 20,I=1,10",
                 "          DO 20,K=1,10",
@@ -67,7 +66,7 @@ namespace FortranTests {
         // of the loops.
         [Test]
         public void Loops3() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        DO 20,I=1,10",
                 "          DO 20,K=1,10",
@@ -84,7 +83,7 @@ namespace FortranTests {
         // not affect the number of iterations.
         [Test]
         public void Loops4() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        LSTART=2",
                 "        LEND=10",
@@ -105,7 +104,7 @@ namespace FortranTests {
         // Verify negative iterations.
         [Test]
         public void Loops5() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        LSTART=40",
                 "        LEND=4",
@@ -124,7 +123,7 @@ namespace FortranTests {
         // than the start value.
         [Test]
         public void Loops6() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        LSTART=50",
                 "        LEND=30",
@@ -141,7 +140,7 @@ namespace FortranTests {
         // Verify ENDDO to terminate the loop.
         [Test]
         public void Loops7() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        LSTART=1",
                 "        LEND=20",
@@ -158,7 +157,7 @@ namespace FortranTests {
         // Verify DO WHILE loop.
         [Test]
         public void Loops8() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        LSTART=1",
                 "        LEND=20",
@@ -177,7 +176,7 @@ namespace FortranTests {
         // as the final statement
         [Test]
         public void Loops9() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        LSTART=1",
                 "        LEND=20",
@@ -195,7 +194,7 @@ namespace FortranTests {
         // Verify zero start loop optimisation
         [Test]
         public void Loops10() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        LEND=9",
                 "        DO 20,I=0,LEND",
@@ -207,6 +206,6 @@ namespace FortranTests {
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
             Helper.HelperRunInteger(comp, "ITEST", 45);
         }
-        
+
     }
 }

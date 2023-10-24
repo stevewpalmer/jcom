@@ -30,7 +30,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Arithmetic {
 
         // Test general constant usage.

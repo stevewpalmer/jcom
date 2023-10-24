@@ -29,14 +29,13 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class DataTests {
 
         // Verify basic DATA syntax to initialise a set of
         // variables where there's a 1:1 match.
         [Test]
         public void DataBasicSyntax() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A,B,C,D",
                 "        DATA A,B,C,D /12,13,14,15/",
@@ -51,7 +50,7 @@ namespace FortranTests {
         // variables to the same value.
         [Test]
         public void DataRepeatCount() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A,B,C,D",
                 "        DATA A,B,C,D /4*17/",
@@ -66,7 +65,7 @@ namespace FortranTests {
         // variables to the same minus value.
         [Test]
         public void DataRepeatCountWithMinus() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A,B,C,D",
                 "        DATA A,B,C,D /4*-17/",
@@ -80,7 +79,7 @@ namespace FortranTests {
         // Verify DATA syntax to set an array.
         [Test]
         public void DataArrayNonRepeat() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(4)",
                 "        DATA A /34,67,90,-12/",
@@ -94,7 +93,7 @@ namespace FortranTests {
         // Verify DATA syntax to set an array using a repeat.
         [Test]
         public void DataArrayWithRepeat() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(4)",
                 "        DATA A /4*65/",
@@ -108,7 +107,7 @@ namespace FortranTests {
         // Verify DATA syntax to set an array using separate repeats.
         [Test]
         public void DataArrayWithSeparateRepeats() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(4)",
                 "        DATA A /2*65, 2*12/",
@@ -123,7 +122,7 @@ namespace FortranTests {
         // A(3) is omitted.
         [Test]
         public void DataSpecificArrayElements() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(4)",
                 "        DATA A(1),A(2),A(4) /34,67,99/",
@@ -138,7 +137,7 @@ namespace FortranTests {
         // set even if it precedes DATA.
         [Test]
         public void DataSpecificArrayElementsWithOverride() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(4)",
                 "        A(1)=450",
@@ -154,7 +153,7 @@ namespace FortranTests {
         // elements.
         [Test]
         public void DataSpecificArrayElementsWithRepeat() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER A(4)",
                 "        DATA A(1),A(2),A(4) /3*77/",
@@ -169,7 +168,7 @@ namespace FortranTests {
         // for the values.
         [Test]
         public void DataImpliedDo1() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER ODD(10)",
                 "        DATA (ODD(I),I=1,10,2)/ 5 * 43/",
@@ -192,7 +191,7 @@ namespace FortranTests {
         // discrete values.
         [Test]
         public void DataImpliedDo2() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ITEST",
                 "        INTEGER NUMBER(10)",
                 "        DATA (NUMBER(I),I=1,10)/1,1,2,3,5,8,13,21,34,55/",

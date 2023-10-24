@@ -28,7 +28,6 @@ using NUnit.Framework;
 
 namespace ComLibTests {
     [TestFixture]
-
     public class Using {
 
         // Test simple USING patterns.

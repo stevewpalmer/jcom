@@ -29,7 +29,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Data {
 
         // Test simple DATA read

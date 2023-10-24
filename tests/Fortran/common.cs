@@ -29,14 +29,13 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-
     public class CommonTests {
 
         // Basic COMMON test involving an unnamed and named COMMON block
         // and two subroutines that modify the global values.
         [Test]
         public void BasicCommonTest() {
-            string [] code = {
+            string[] code = {
                 "      PROGRAM COMMONTEST",
                 "      COMMON A,B",
                 "      COMMON /FOO/ C,D",
@@ -70,7 +69,7 @@ namespace FortranTests {
         // in the sub-programs match up.
         [Test]
         public void MultipartCommonTest() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ICOMMONTEST",
                 "      COMMON A,B",
                 "      COMMON // J,K",
@@ -92,7 +91,7 @@ namespace FortranTests {
         // in the sub-programs match up.
         [Test]
         public void SplitMultipartCommonTest() {
-            string [] code = {
+            string[] code = {
                 "      FUNCTION ICOMMONTEST",
                 "      COMMON A,B",
                 "      COMMON /FOO/ J",

@@ -31,14 +31,13 @@ using Utilities;
 
 namespace FortranTests {
     [TestFixture]
-    
     public class LexicalTests {
 
         // Verify that a label is correctly parsed from one line
         // and that it is not present on the second line.
         [Test]
         public void ValidateHasLabel() {
-            string [] code = {
+            string[] code = {
                 "100   INTEGER A",
                 "      STOP"
             };
@@ -55,7 +54,7 @@ namespace FortranTests {
         // Validate continuation character support
         [Test]
         public void ValidateContinuationCharacter() {
-            string [] code = {
+            string[] code = {
                 "100   INTEGER STA",
                 "     1TION"
             };
@@ -74,7 +73,7 @@ namespace FortranTests {
         // Validate that digit 0 specifies a new line.
         [Test]
         public void ValidateDigit0ContinuationCharacter() {
-            string [] code = {
+            string[] code = {
                 "100   INTEGER BAR",
                 "     0INTEGER FOO"
             };
@@ -96,7 +95,7 @@ namespace FortranTests {
         // Validate Fortran 77 extension continuation character support
         [Test]
         public void ValidateF77ExtContinuationCharacter() {
-            string [] code = {
+            string[] code = {
                 "100   INTEGER STA&",
                 "      TION"
             };
@@ -104,10 +103,10 @@ namespace FortranTests {
             MessageCollection messages = new(opts);
             Lexer ls = new(code, opts, messages);
             Assert.IsTrue(ls.GetKeyword().ID == TokenID.KINTEGER);
-            
+
             SimpleToken token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.IDENT);
-            
+
             IdentifierToken identToken = (IdentifierToken)token;
             Assert.AreEqual(identToken.Name, "STATION");
         }
@@ -115,7 +114,7 @@ namespace FortranTests {
         // Verify we maximum 19 continuation lines allowed
         [Test]
         public void ValidateMaximumContinuationLines() {
-            string [] code = {
+            string[] code = {
                 "      INTEGER A,",
                 "     1B,",
                 "     2C,",
@@ -147,7 +146,7 @@ namespace FortranTests {
         // for the maximum line.
         [Test]
         public void ValidateExceedMaximumContinuationLines() {
-            string [] code = {
+            string[] code = {
                 "      INTEGER A,",
                 "     1B,",
                 "     2C,",
@@ -181,7 +180,7 @@ namespace FortranTests {
         // Validate tab support
         [Test]
         public void ValidateTabDelimiter() {
-            string [] code = {
+            string[] code = {
                 "100\tINTEGER A",
                 "\tREAL B"
             };
@@ -194,16 +193,16 @@ namespace FortranTests {
 
             SimpleToken token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.IDENT);
-            
+
             IdentifierToken identToken = (IdentifierToken)token;
             Assert.AreEqual(identToken.Name, "A");
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
             Assert.IsTrue(ls.GetKeyword().ID == TokenID.KREAL);
-            
+
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.IDENT);
-            
+
             identToken = (IdentifierToken)token;
             Assert.AreEqual(identToken.Name, "B");
         }
@@ -211,7 +210,7 @@ namespace FortranTests {
         // Validate debug lines support
         [Test]
         public void ValidateDebug() {
-            string [] code = {
+            string[] code = {
                 "      INTEGER A",
                 "D     REAL B",
                 "      INTEGER C"
@@ -236,7 +235,7 @@ namespace FortranTests {
         // Validate integer parsing
         [Test]
         public void ValidateIntegerParsing() {
-            string [] code = {
+            string[] code = {
                 "      1230976AA"
             };
             FortranOptions opts = new();
@@ -244,7 +243,7 @@ namespace FortranTests {
             Lexer ls = new(code, opts, messages);
             SimpleToken token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.INTEGER);
-            
+
             IntegerToken intToken = (IntegerToken)token;
             Assert.AreEqual(intToken.Value, 1230976);
         }
@@ -252,7 +251,7 @@ namespace FortranTests {
         // Validate real number parsing
         [Test]
         public void ValidateRealParsing() {
-            string [] code = {
+            string[] code = {
                 "      123.0976AA",
                 "      123.0976E-2",
                 "      .5"
@@ -285,7 +284,7 @@ namespace FortranTests {
         // Validate double precision number parsing
         [Test]
         public void ValidateDoublePrecisionParsing() {
-            string [] code = {
+            string[] code = {
                 "      123.0976D4AA",
                 "      123.0976D-2"
             };
@@ -297,10 +296,10 @@ namespace FortranTests {
             Assert.IsTrue(token.ID == TokenID.DOUBLE);
             DoubleToken realToken = (DoubleToken)token;
             Assert.IsTrue(Helper.DoubleCompare(realToken.Value, 123.0976E4), "Expected 123.0976E4 but saw " + realToken.Value);
-            
+
             Assert.IsTrue(ls.GetToken().ID == TokenID.IDENT);
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.DOUBLE);
             realToken = (DoubleToken)token;
@@ -310,7 +309,7 @@ namespace FortranTests {
         // Validate hexadecimal number parsing
         [Test]
         public void ValidateHexParsing() {
-            string [] code = {
+            string[] code = {
                 "      $CC4DE",
                 "      Z'CC4DE'",
                 "      Z\"CC4DE\"",
@@ -326,21 +325,21 @@ namespace FortranTests {
             Assert.AreEqual(intToken.Value, 0xCC4DE);
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.INTEGER);
             intToken = (IntegerToken)token;
             Assert.AreEqual(intToken.Value, 0xCC4DE);
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.INTEGER);
             intToken = (IntegerToken)token;
             Assert.AreEqual(intToken.Value, 0xCC4DE);
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.INTEGER);
             intToken = (IntegerToken)token;
@@ -349,11 +348,10 @@ namespace FortranTests {
             Assert.IsTrue(ls.GetToken().ID == TokenID.IDENT);
         }
 
-
         // Validate octal number parsing
         [Test]
         public void ValidateOctalParsing() {
-            string [] code = {
+            string[] code = {
                 "      O'745'",
                 "      O\"340\"",
                 "      O'892'"
@@ -368,14 +366,14 @@ namespace FortranTests {
             Assert.AreEqual(intToken.Value, 485);
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.INTEGER);
             intToken = (IntegerToken)token;
             Assert.AreEqual(intToken.Value, 224);
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             ls.GetToken();
             Assert.IsTrue(messages.ErrorCount > 0);
             Assert.IsTrue(messages[0].Line == 3);
@@ -385,7 +383,7 @@ namespace FortranTests {
         // Validate binary number parsing
         [Test]
         public void ValidateBinaryParsing() {
-            string [] code = {
+            string[] code = {
                 "      B'1010101111'",
                 "      b\"111\"",
                 "      B'121'"
@@ -400,14 +398,14 @@ namespace FortranTests {
             Assert.AreEqual(intToken.Value, 687);
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.INTEGER);
             intToken = (IntegerToken)token;
             Assert.AreEqual(intToken.Value, 7);
 
             Assert.IsTrue(ls.GetToken().ID == TokenID.EOL);
-            
+
             ls.GetToken();
             Assert.IsTrue(messages.ErrorCount > 0);
             Assert.IsTrue(messages[0].Line == 3);
@@ -417,7 +415,7 @@ namespace FortranTests {
         // Validate string parsing
         [Test]
         public void ValidateStringParsing() {
-            string [] code = {
+            string[] code = {
                 "      PRINT \"AbCDEf\""
             };
             FortranOptions opts = new();
@@ -435,7 +433,7 @@ namespace FortranTests {
         // Validate backslash handling
         [Test]
         public void ValidateBackslashStringParsing() {
-            string [] code = {
+            string[] code = {
                 "      \"Ab\\tCDEf\\n\""
             };
             FortranOptions opts = new();
@@ -443,7 +441,7 @@ namespace FortranTests {
             Lexer ls = new(code, opts, messages);
             SimpleToken token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.STRING);
-            
+
             StringToken stringToken = (StringToken)token;
             Assert.AreEqual(stringToken.String, "Ab\tCDEf\n");
 
@@ -453,10 +451,9 @@ namespace FortranTests {
             ls = new Lexer(code, opts, messages);
             token = ls.GetToken();
             Assert.IsTrue(token.ID == TokenID.STRING);
-            
+
             stringToken = (StringToken)token;
             Assert.AreEqual(stringToken.String, "Ab\\tCDEf\\n");
         }
     }
 }
-

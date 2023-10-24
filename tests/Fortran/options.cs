@@ -55,7 +55,8 @@ namespace FortranTests {
             string[] args = {
                 "--backslash",
                 "--invalidoption",
-                "--debug" };
+                "--debug"
+            };
             Assert.IsFalse(opts.Parse(args));
 
             Assert.IsTrue(opts.Backslash);
@@ -83,4 +84,3 @@ namespace FortranTests {
         }
     }
 }
-

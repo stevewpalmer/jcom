@@ -57,7 +57,8 @@ namespace ComalTests {
             string[] args = {
                 "--noinline",
                 "--invalidoption",
-                "--debug" };
+                "--debug"
+            };
             Assert.IsFalse(opts.Parse(args));
 
             Assert.IsFalse(opts.Inline);
@@ -103,4 +104,3 @@ namespace ComalTests {
         }
     }
 }
-

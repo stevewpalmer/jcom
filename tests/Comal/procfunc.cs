@@ -31,7 +31,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class ProcFunc {
 
         // Test calling a procedure.
@@ -197,5 +196,3 @@ namespace ComalTests {
         }
     }
 }
-
-

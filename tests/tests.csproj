@@ -1,50 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('packages\NUnit.3.11.0\build\NUnit.props')" />
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <OutputType>Library</OutputType>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
-    <Description>Unit Tests</Description>
-    <Copyright>(c) 2013-23 Steven Palmer</Copyright>
-    <Authors>Steven Palmer</Authors>
-    <Product>Unit Tests</Product>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <LangVersion>9.0</LangVersion>
-    <ConsolePause>False</ConsolePause>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>none</DebugType>
-    <OutputPath>bin\Release</OutputPath>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\fortran\for.csproj" />
-    <ProjectReference Include="..\com\com.csproj" />
-    <ProjectReference Include="..\comal\comal.csproj" />
-    <ProjectReference Include="..\comlib\comlib.csproj" />
-    <ProjectReference Include="..\comallib\comallib.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Fortran\" />
-    <Folder Include="Comal\" />
-    <Folder Include="Utilities\" />
-    <Folder Include="ComLib\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="fcvs21\run.out" />
-    <None Remove="fcvs21\FORT.07" />
-    <None Remove="fcvs21\FORT.08" />
-    <None Remove="fcvs21\FORT.09" />
-    <None Remove="fcvs21\FORT.24" />
-  </ItemGroup>
+    <Import Project="packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('packages\NUnit.3.11.0\build\NUnit.props')"/>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <Description>Unit Tests</Description>
+        <Copyright>(c) 2013-23 Steven Palmer</Copyright>
+        <Authors>Steven Palmer</Authors>
+        <Product>Unit Tests</Product>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+        <LangVersion>9.0</LangVersion>
+        <ConsolePause>False</ConsolePause>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <OutputPath>bin\Debug</OutputPath>
+        <DefineConstants>DEBUG;</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <DebugType>none</DebugType>
+        <OutputPath>bin\Release</OutputPath>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\fortran\for.csproj"/>
+        <ProjectReference Include="..\com\com.csproj"/>
+        <ProjectReference Include="..\comal\comal.csproj"/>
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
+        <ProjectReference Include="..\comallib\comallib.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2"/>
+        <PackageReference Include="NUnit" Version="3.13.3"/>
+        <PackageReference Include="NUnit3TestAdapter" Version="4.5.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Fortran\"/>
+        <Folder Include="Comal\"/>
+        <Folder Include="Utilities\"/>
+        <Folder Include="ComLib\"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="fcvs21\run.out"/>
+        <None Remove="fcvs21\FORT.07"/>
+        <None Remove="fcvs21\FORT.08"/>
+        <None Remove="fcvs21\FORT.09"/>
+        <None Remove="fcvs21\FORT.24"/>
+    </ItemGroup>
 </Project>

@@ -29,7 +29,6 @@ using Utilities;
 
 namespace ComalTests {
     [TestFixture]
-
     public class Strings {
 
         // Test the rule that for str1 IN str2, where str1 is

@@ -42,7 +42,7 @@ namespace ComalTests {
         }
 
         // Compile the given code and check the specified errors occurred.
-        public static void HelperCompileAndCheckErrors(string code, ComalOptions opts, Message [] expectedErrors) {
+        public static void HelperCompileAndCheckErrors(string code, ComalOptions opts, Message[] expectedErrors) {
             opts.Run = true;
             Compiler comp = new(opts);
             comp.CompileString(code, true);
