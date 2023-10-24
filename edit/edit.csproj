@@ -1,49 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <Description>Edit</Description>
-    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
-    <RootNamespace>JEdit</RootNamespace>
-    <Title>Text Editor</Title>
-    <Authors>Steven Palmer</Authors>
-    <IsPackable>false</IsPackable>
-    <LangVersion>11</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <Description>Edit</Description>
+        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+        <RootNamespace>JEdit</RootNamespace>
+        <Title>Text Editor</Title>
+        <Authors>Steven Palmer</Authors>
+        <IsPackable>false</IsPackable>
+        <LangVersion>11</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn></NoWarn>
-  </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn></NoWarn>
+    </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <NoWarn></NoWarn>
-  </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <NoWarn></NoWarn>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\comlib\comlib.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Edit.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>edit.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Edit.resx">
-      <LastGenOutput>Edit.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Resources\Edit.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>edit.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+        <EmbeddedResource Update="Resources\Edit.resx">
+            <LastGenOutput>Edit.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Resources\Edit.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Edit.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Resources\Edit.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Edit.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
 </Project>

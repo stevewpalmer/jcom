@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JEdit; 
+namespace JEdit;
 
 [Flags]
 public enum RenderHint {
@@ -42,12 +42,12 @@ public enum RenderHint {
     /// Cursor position update needed
     /// </summary>
     CURSOR = 2,
-    
+
     /// <summary>
     /// Cursor position on the status bar needs updating
     /// </summary>
     CURSOR_STATUS = 4,
-    
+
     /// <summary>
     /// Exit the program
     /// </summary>

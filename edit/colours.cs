@@ -28,6 +28,7 @@ namespace JEdit;
 public class Colours {
 
     private readonly Config? _config;
+
     private readonly ConsoleColor[] _colours = {
         ConsoleColor.Black,
         ConsoleColor.Blue,

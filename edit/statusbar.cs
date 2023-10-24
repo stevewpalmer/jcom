@@ -152,7 +152,7 @@ public class StatusBar {
     public bool Prompt(string prompt, char[] validInput, char defaultChar, out char inputValue) {
 
         Point cursorPosition = Terminal.GetCursor();
-        prompt = prompt.Replace("@@", $"[{string.Join("",validInput)}]");
+        prompt = prompt.Replace("@@", $"[{string.Join("", validInput)}]");
         Message(prompt);
         Terminal.SetCursor(prompt.Length, _statusRow);
         ConsoleKeyInfo input = Console.ReadKey(true);
@@ -249,7 +249,7 @@ public class StatusBar {
             }
             input = Console.ReadKey(true);
         }
-        inputValue =  inputBuffer.Count > 0 ? Convert.ToInt32(string.Join("", inputBuffer)) : 0;
+        inputValue = inputBuffer.Count > 0 ? Convert.ToInt32(string.Join("", inputBuffer)) : 0;
         if (inputBuffer.Count > 1) {
             history.Add(inputBuffer);
         }
@@ -380,7 +380,7 @@ public class StatusBar {
                 selection = false;
             }
         } while (true);
-        inputValue =  inputBuffer.Count > 0 ? string.Join("", inputBuffer) : string.Empty;
+        inputValue = inputBuffer.Count > 0 ? string.Join("", inputBuffer) : string.Empty;
         if (inputValue.Length > 1) {
             _cachedTextInput = inputValue;
             history.Add(inputBuffer);

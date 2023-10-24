@@ -63,8 +63,8 @@ public class Compiler {
     /// Built-in compilers.
     /// </summary>
     private static readonly Compiler[] BuiltIn = {
-        new(new []{ "f", "f90" }, "for", "--run {0}"),
-        new(new [] { "cml", "lst" }, "comal", "--ide --run {0}")
+        new(new[] { "f", "f90" }, "for", "--run {0}"),
+        new(new[] { "cml", "lst" }, "comal", "--ide --run {0}")
     };
 
     /// <summary>

@@ -333,11 +333,11 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CWORDLEFT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.LeftArrow },
         new() { KeyCommand = KeyCommand.KC_CWORDRIGHT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.RightArrow },
         new() { KeyCommand = KeyCommand.KC_DELETECHAR, Key = ConsoleKey.Delete },
-        new() { KeyCommand = KeyCommand.KC_DELETELINE, KeyChar = 8706},
+        new() { KeyCommand = KeyCommand.KC_DELETELINE, KeyChar = 8706 },
         new() { KeyCommand = KeyCommand.KC_DELETELINE, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.D },
         new() { KeyCommand = KeyCommand.KC_DELETEPREVWORD, KeyChar = 180 },
         new() { KeyCommand = KeyCommand.KC_DELETEPREVWORD, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.E },
-        new() { KeyCommand = KeyCommand.KC_DELETETOEND, KeyChar = 730},
+        new() { KeyCommand = KeyCommand.KC_DELETETOEND, KeyChar = 730 },
         new() { KeyCommand = KeyCommand.KC_DELETETOEND, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.K },
         new() { KeyCommand = KeyCommand.KC_DELETETOSTART, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.K },
         new() { KeyCommand = KeyCommand.KC_DELETEWORD, KeyChar = 729 },
@@ -387,7 +387,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_SELFINSERT, Key = ConsoleKey.Enter },
         new() { KeyCommand = KeyCommand.KC_TRANSLATE, Key = ConsoleKey.F6 },
         new() { KeyCommand = KeyCommand.KC_TRANSLATE, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.T },
-        new() { KeyCommand = KeyCommand.KC_TRANSLATEAGAIN, KeyChar = 229},
+        new() { KeyCommand = KeyCommand.KC_TRANSLATEAGAIN, KeyChar = 229 },
         new() { KeyCommand = KeyCommand.KC_TRANSLATEAGAIN, Modifiers = ConsoleModifiers.Shift, Key = ConsoleKey.F6 },
         new() { KeyCommand = KeyCommand.KC_TRANSLATEBACK, KeyChar = 168 },
         new() { KeyCommand = KeyCommand.KC_TRANSLATEBACK, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.F6 },
@@ -405,8 +405,8 @@ public class KeyMap {
     /// <returns>KeyCommand equivalent, or KC_NONE if there's no mapping</returns>
     public static KeyCommand MapCommandNameToCommand(string input) {
         return CommandTable.Where(ct => ct.CommandName == input)
-               .Select(ct => ct.CommandId)
-               .FirstOrDefault(KeyCommand.KC_NONE);
+            .Select(ct => ct.CommandId)
+            .FirstOrDefault(KeyCommand.KC_NONE);
     }
 
     /// <summary>
@@ -483,4 +483,3 @@ public class KeyMap {
         };
     }
 }
-

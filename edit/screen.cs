@@ -185,9 +185,7 @@ public static class Screen {
     /// </summary>
     public static void AddWindow(Window theWindow) {
         if (theWindow.Buffer.NewFile) {
-            string message = theWindow.Buffer.Filename == string.Empty ?
-                Edit.NewFile :
-                string.Format(Edit.NewFileWarning, theWindow.Buffer.Name);
+            string message = theWindow.Buffer.Filename == string.Empty ? Edit.NewFile : string.Format(Edit.NewFileWarning, theWindow.Buffer.Name);
             StatusBar.Message(message);
         }
         _windowList.Add(theWindow);
@@ -491,7 +489,8 @@ public static class Screen {
         if (StatusBar.PromptForFilename(Edit.KeystrokeMacroFile, ref inputValue)) {
             if (!_recorder.LoadKeystrokes(inputValue)) {
                 StatusBar.Error(Edit.KeystrokeMacroNotFound);
-            } else {
+            }
+            else {
                 StatusBar.Message(Edit.LoadKeystrokeMacroSuccessful);
             }
         }
@@ -624,9 +623,7 @@ public static class Screen {
         if (_search != null) {
             _search.TranslateCount = 0;
             flags |= _activeWindow.Translate(_search);
-            StatusBar.Message(_search.MatchSuccess ?
-                string.Format(Edit.TranslateComplete, _search.TranslateCount) :
-                Edit.PatternNotFound);
+            StatusBar.Message(_search.MatchSuccess ? string.Format(Edit.TranslateComplete, _search.TranslateCount) : Edit.PatternNotFound);
         }
         return flags;
     }
@@ -694,7 +691,8 @@ public static class Screen {
         if (!string.IsNullOrEmpty(filename)) {
             try {
                 File.Delete(filename);
-            } catch(Exception e) {
+            }
+            catch (Exception e) {
                 StatusBar.Error(e.Message);
             }
         }
@@ -737,7 +735,8 @@ public static class Screen {
                     .Replace("~", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile))
                     .Replace("//", "/");
                 Directory.SetCurrentDirectory(newDirectory);
-            } catch(Exception e) {
+            }
+            catch (Exception e) {
                 StatusBar.Error(e.Message);
             }
         }
@@ -785,13 +784,11 @@ public static class Screen {
     private static RenderHint ExitEditor(bool prompt) {
         RenderHint flags = RenderHint.EXIT;
         bool writeBuffers = !prompt;
-        Buffer [] modifiedBuffers = _windowList.Where(w => w.Buffer.Modified).Select(b => b.Buffer).ToArray();
+        Buffer[] modifiedBuffers = _windowList.Where(w => w.Buffer.Modified).Select(b => b.Buffer).ToArray();
         if (prompt) {
             if (modifiedBuffers.Any()) {
                 char[] validInput = { 'y', 'n', 'w' };
-                string exitPrompt = modifiedBuffers.Length == 1 ?
-                    Edit.ModifiedBuffer :
-                    string.Format(Edit.ModifiedBuffers, modifiedBuffers.Length);
+                string exitPrompt = modifiedBuffers.Length == 1 ? Edit.ModifiedBuffer : string.Format(Edit.ModifiedBuffers, modifiedBuffers.Length);
                 if (StatusBar.Prompt(exitPrompt, validInput, 'n', out char inputChar)) {
                     switch (inputChar) {
                         case 'n':

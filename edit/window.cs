@@ -166,7 +166,7 @@ public partial class Window {
     public RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REDRAW)) {
             Render(RenderHint.REDRAW);
-            flags &= ~(RenderHint.REDRAW|RenderHint.BLOCK);
+            flags &= ~(RenderHint.REDRAW | RenderHint.BLOCK);
             flags |= RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
@@ -261,7 +261,8 @@ public partial class Window {
             Terminal.Open();
             if (process.ExitCode == 0) {
                 Screen.StatusBar.Message(string.Empty);
-            } else {
+            }
+            else {
                 ErrorList = new CircularList();
                 StreamReader myStreamReader = process.StandardError;
                 string[] lines = myStreamReader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -644,7 +645,8 @@ public partial class Window {
         RenderHint flags = RenderHint.NONE;
         if (_markMode != MarkMode.NONE) {
             flags = HandleBlock(new Command(), BlockAction.OUTDENT);
-        } else {
+        }
+        else {
             if (Buffer.Offset == 0) {
                 if (Buffer.LineIndex == 0) {
                     return flags;
@@ -1080,7 +1082,7 @@ public partial class Window {
         }
 
         Screen.StatusBar.Message(action switch {
-            BlockAction.COPY =>  Edit.CopiedToScrap,
+            BlockAction.COPY => Edit.CopiedToScrap,
             BlockAction.DELETE => Edit.BlockDeleted,
             BlockAction.CUT => Edit.DeletedToScrap,
             BlockAction.LOWER => Edit.Lowercasing,
@@ -1188,7 +1190,8 @@ public partial class Window {
             ++Buffer.LineIndex;
             if (CursorRowInViewport < _viewportBounds.Height) {
                 flags |= RenderHint.CURSOR;
-            } else {
+            }
+            else {
                 ++_viewportOffset.Y;
                 flags |= RenderHint.REDRAW;
             }
@@ -1206,7 +1209,8 @@ public partial class Window {
             --Buffer.LineIndex;
             if (CursorRowInViewport >= 0) {
                 flags |= RenderHint.CURSOR;
-            } else {
+            }
+            else {
                 --_viewportOffset.Y;
                 flags |= RenderHint.REDRAW;
             }
@@ -1348,7 +1352,8 @@ public partial class Window {
                 _viewportOffset.X = 0;
                 _viewportOffset.Y = 0;
                 flags |= RenderHint.REDRAW;
-            } else {
+            }
+            else {
                 flags |= RenderHint.CURSOR;
             }
         }
@@ -1469,7 +1474,8 @@ public partial class Window {
         else if (Buffer.LineIndex >= _viewportBounds.Height) {
             _viewportOffset.Y = Buffer.LineIndex - (_viewportBounds.Height - 1);
             flags |= RenderHint.REDRAW;
-        } else {
+        }
+        else {
             flags |= RenderHint.CURSOR;
         }
         return flags;
@@ -1490,7 +1496,8 @@ public partial class Window {
         else if (cursorColumn >= _viewportOffset.X + _viewportBounds.Width - 1) {
             _viewportOffset.X = cursorColumn - (_viewportBounds.Width - 1);
             flags |= RenderHint.REDRAW;
-        } else {
+        }
+        else {
             flags |= RenderHint.CURSOR;
         }
         return flags;
@@ -1531,11 +1538,11 @@ public partial class Window {
         if (_viewportBounds.Contains(column, row)) {
             if (Buffer.Offset > Buffer.GetLine(Buffer.LineIndex).Length) {
                 Terminal.SetVirtualCursor();
-            } else {
+            }
+            else {
                 Terminal.SetDefaultCursor();
             }
             Terminal.SetCursor(column, row);
         }
     }
 }
-

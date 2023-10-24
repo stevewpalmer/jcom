@@ -55,7 +55,8 @@ public class Buffer {
             string allText = File.ReadAllText(filename);
             _terminatorType = DetermineLineTerminator(allText);
             Content = allText;
-        } else {
+        }
+        else {
             _terminatorType = DefaultLineTerminator();
             Content = Consts.EndOfLine.ToString();
             NewFile = true;
@@ -358,4 +359,3 @@ public class Buffer {
         }
     }
 }
-

@@ -33,20 +33,17 @@ public enum KeystrokesMode {
     /// <summary>
     /// No recording
     /// </summary>
-    [Description("  ")]
-    NONE,
+    [Description("  ")] NONE,
 
     /// <summary>
     /// We're recording keystrokes
     /// </summary>
-    [Description("RE")]
-    RECORDING,
+    [Description("RE")] RECORDING,
 
     /// <summary>
     /// We're playing back keystrokes
     /// </summary>
-    [Description("PL")]
-    PLAYBACK
+    [Description("PL")] PLAYBACK
 }
 
 public class Recorder {
