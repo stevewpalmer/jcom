@@ -51,4 +51,3 @@ public static partial class Commands {
         return true;
     }
 }
-

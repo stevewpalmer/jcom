@@ -37,16 +37,16 @@ internal static class Program {
 
     // Command table
     private static readonly Dictionary<string, CommandDefinition> CommandMap = new() {
-        { "accounts", new CommandDefinition(Commands.CmdAccounts,"Run the Accounts program") },
-        { "comal", new CommandDefinition(Commands.CmdComal,"Run the Comal compiler/interpreter") },
-        { "copy", new CommandDefinition(Commands.CmdCopy,"Copy a file" ) },
-        { "del", new CommandDefinition(Commands.CmdDel,"Delete files" ) },
-        { "dir", new CommandDefinition(Commands.CmdDir,"Display a list of files" ) },
-        { "edit", new CommandDefinition(Commands.CmdEdit,"Create or edit a file" ) },
-        { "for", new CommandDefinition(Commands.CmdFortran,"Run the Fortran compiler" ) },
-        { "help", new CommandDefinition(CmdHelp,"Display this help" ) },
-        { "rename", new CommandDefinition(Commands.CmdRename,"Rename a file" ) },
-        { "type", new CommandDefinition(Commands.CmdType,"Display the content of a file" ) }
+        { "accounts", new CommandDefinition(Commands.CmdAccounts, "Run the Accounts program") },
+        { "comal", new CommandDefinition(Commands.CmdComal, "Run the Comal compiler/interpreter") },
+        { "copy", new CommandDefinition(Commands.CmdCopy, "Copy a file") },
+        { "del", new CommandDefinition(Commands.CmdDel, "Delete files") },
+        { "dir", new CommandDefinition(Commands.CmdDir, "Display a list of files") },
+        { "edit", new CommandDefinition(Commands.CmdEdit, "Create or edit a file") },
+        { "for", new CommandDefinition(Commands.CmdFortran, "Run the Fortran compiler") },
+        { "help", new CommandDefinition(CmdHelp, "Display this help") },
+        { "rename", new CommandDefinition(Commands.CmdRename, "Rename a file") },
+        { "type", new CommandDefinition(Commands.CmdType, "Display the content of a file") }
     };
 
     /// <summary>
@@ -103,7 +103,8 @@ internal static class Program {
                         Console.WriteLine(e.Message);
                         break;
                     }
-                } else {
+                }
+                else {
                     Console.WriteLine(Shell.UnknownCommand, command);
                     break;
                 }

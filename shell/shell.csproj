@@ -1,43 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11.0</LangVersion>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <RootNamespace>JShell</RootNamespace>
-    <Description>Shell</Description>
-    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
-    <Title>Shell</Title>
-    <Authors>Steven Palmer</Authors>
-    <UserSecretsId>0f1ae6ac-5f87-4a98-9792-6aad52d36a17</UserSecretsId>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\accounts\accounts.csproj" />
-    <ProjectReference Include="..\comlib\comlib.csproj" />
-    <ProjectReference Include="..\cobol\cobol.csproj" />
-    <ProjectReference Include="..\comal\comal.csproj" />
-    <ProjectReference Include="..\fortran\for.csproj" />
-    <ProjectReference Include="..\edit\edit.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Shell.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Shell.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Resources\Shell.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Shell.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cp $(OutputPath)* $(SolutionDir)drop/bin" />
-  </Target>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>11.0</LangVersion>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <RootNamespace>JShell</RootNamespace>
+        <Description>Shell</Description>
+        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+        <Title>Shell</Title>
+        <Authors>Steven Palmer</Authors>
+        <UserSecretsId>0f1ae6ac-5f87-4a98-9792-6aad52d36a17</UserSecretsId>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\accounts\accounts.csproj"/>
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
+        <ProjectReference Include="..\cobol\cobol.csproj"/>
+        <ProjectReference Include="..\comal\comal.csproj"/>
+        <ProjectReference Include="..\fortran\for.csproj"/>
+        <ProjectReference Include="..\edit\edit.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Update="Resources\Shell.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Shell.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Update="Resources\Shell.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>Shell.resx</DependentUpon>
+        </Compile>
+    </ItemGroup>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="cp $(OutputPath)* $(SolutionDir)drop/bin"/>
+    </Target>
 </Project>

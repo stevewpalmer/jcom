@@ -71,7 +71,7 @@ public static partial class Commands {
     /// </summary>
     /// <param name="cmdLine">Command line</param>
     /// <returns>The result of the proces</returns>
-    public static  bool CmdEdit(Parser cmdLine) {
+    public static bool CmdEdit(Parser cmdLine) {
         return RunProgram("edit", cmdLine);
     }
 
@@ -80,8 +80,7 @@ public static partial class Commands {
     /// </summary>
     /// <param name="cmdLine">Command line</param>
     /// <returns>The result of the process</returns>
-    public static  bool CmdAccounts(Parser cmdLine) {
+    public static bool CmdAccounts(Parser cmdLine) {
         return RunProgram("accounts", cmdLine);
     }
 }
-
