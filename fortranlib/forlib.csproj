@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11.0</LangVersion>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>JForLib</RootNamespace>
-    <Title>Fortran Runtime Library</Title>
-    <Authors>Steven Palmer</Authors>
-    <Description>Fortran Runtime Library</Description>
-    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\comlib\comlib.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>11.0</LangVersion>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RootNamespace>JForLib</RootNamespace>
+        <Title>Fortran Runtime Library</Title>
+        <Authors>Steven Palmer</Authors>
+        <Description>Fortran Runtime Library</Description>
+        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
+    </ItemGroup>
 </Project>

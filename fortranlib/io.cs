@@ -127,7 +127,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <param name="intArray">An array of integers to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
-    public static int WRITE(WriteManager writeManager, ref int iostat, int [] intArray) {
+    public static int WRITE(WriteManager writeManager, ref int iostat, int[] intArray) {
         if (writeManager == null) {
             throw new ArgumentNullException(nameof(writeManager));
         }
@@ -170,7 +170,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <param name="boolArray">An array of booleans to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
-    public static int WRITE(WriteManager writeManager, ref int iostat, bool [] boolArray) {
+    public static int WRITE(WriteManager writeManager, ref int iostat, bool[] boolArray) {
         if (writeManager == null) {
             throw new ArgumentNullException(nameof(writeManager));
         }
@@ -213,7 +213,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <param name="floatArray">An array of float values</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
-    public static int WRITE(WriteManager writeManager, ref int iostat, float [] floatArray) {
+    public static int WRITE(WriteManager writeManager, ref int iostat, float[] floatArray) {
         if (writeManager == null) {
             throw new ArgumentNullException(nameof(writeManager));
         }
@@ -256,7 +256,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <param name="doubleArray">An array of double values</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
-    public static int WRITE(WriteManager writeManager, ref int iostat, double [] doubleArray) {
+    public static int WRITE(WriteManager writeManager, ref int iostat, double[] doubleArray) {
         if (writeManager == null) {
             throw new ArgumentNullException(nameof(writeManager));
         }
@@ -344,7 +344,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <param name="strArray">An array of string values to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
-    public static int WRITE(WriteManager writeManager, ref int iostat, string [] strArray) {
+    public static int WRITE(WriteManager writeManager, ref int iostat, string[] strArray) {
         if (writeManager == null) {
             throw new ArgumentNullException(nameof(writeManager));
         }
@@ -387,7 +387,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <param name="fixedstrArray">An array of fixed string values to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
-    public static int WRITE(WriteManager writeManager, ref int iostat, FixedString [] fixedstrArray) {
+    public static int WRITE(WriteManager writeManager, ref int iostat, FixedString[] fixedstrArray) {
         if (writeManager == null) {
             throw new ArgumentNullException(nameof(writeManager));
         }
@@ -765,7 +765,8 @@ public static class IO {
         int charsRead = readManager.ReadString(ref fixedString);
         if (charsRead == -1) {
             iostat = IOError.ReadError;
-        } else {
+        }
+        else {
             fixedstrVar.Set(fixedString, start, end);
         }
         return charsRead;
@@ -862,9 +863,9 @@ public static class IO {
     /// <param name="blank">A reference variable that will be set to NULL or ZERO</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int INQUIRE(int iodevice, string filename, ref int iostat, ref bool exists, ref bool opened, ref int number,
-                              ref bool named, ref FixedString name, ref FixedString access, ref FixedString sequential,
-                              ref FixedString direct, ref FixedString form, ref FixedString formatted, ref FixedString unformatted,
-                              ref int recl, ref int nextrec, ref FixedString blank) {
+        ref bool named, ref FixedString name, ref FixedString access, ref FixedString sequential,
+        ref FixedString direct, ref FixedString form, ref FixedString formatted, ref FixedString unformatted,
+        ref int recl, ref int nextrec, ref FixedString blank) {
         bool isFileStatement = filename != null;
         IOFile ioobject;
         iostat = 0;
@@ -879,7 +880,8 @@ public static class IO {
             if (opened) {
                 number = ioobject.Unit;
             }
-        } else {
+        }
+        else {
             exists = true;
             number = iodevice;
             ioobject = IOFile.Get(iodevice);
@@ -926,13 +928,16 @@ public static class IO {
         // Parse BLANK specifier.
         if (blank == null) {
             blankChar = ' ';
-        } else {
+        }
+        else {
             string fixedBlank = blank.ToUpper().Trim();
             if (fixedBlank == "NULL") {
                 blankChar = ' ';
-            } else if (fixedBlank == "ZERO") {
+            }
+            else if (fixedBlank == "ZERO") {
                 blankChar = '0';
-            } else {
+            }
+            else {
                 iostat = IOError.IllegalBlank;
                 return -1;
             }
@@ -962,7 +967,8 @@ public static class IO {
             // the effect is as if a CLOSE statement (12.10.2) without a STATUS= specifier had been executed for
             // the unit immediately prior to the execution of the OPEN statement.
             iofile.Handle.Close();
-        } else {
+        }
+        else {
             iofile = new IOFile(iodevice);
         }
 
@@ -1012,13 +1018,16 @@ public static class IO {
         // default we assume sequential access.
         if (access == null) {
             iofile.IsSequential = true;
-        } else {
+        }
+        else {
             string fixedAccess = access.ToUpper().Trim();
             if (fixedAccess == "SEQUENTIAL") {
                 iofile.IsSequential = true;
-            } else if (fixedAccess == "DIRECT") {
+            }
+            else if (fixedAccess == "DIRECT") {
                 iofile.IsSequential = false;
-            } else {
+            }
+            else {
                 iostat = IOError.IllegalAccess;
                 return -1;
             }
@@ -1028,13 +1037,16 @@ public static class IO {
         // unformatted. Access matters here too.
         if (form == null) {
             iofile.IsFormatted = iofile.IsSequential;
-        } else {
+        }
+        else {
             string fixedForm = form.ToUpper().Trim();
             if (fixedForm == "FORMATTED") {
                 iofile.IsFormatted = true;
-            } else if (fixedForm == "UNFORMATTED") {
+            }
+            else if (fixedForm == "UNFORMATTED") {
                 iofile.IsFormatted = false;
-            } else {
+            }
+            else {
                 iostat = IOError.IllegalForm;
                 return -1;
             }
@@ -1081,9 +1093,11 @@ public static class IO {
                 string fixedStatus = status.ToUpper().Trim();
                 if (fixedStatus == "DELETE") {
                     deleteFile = true;
-                } else if (fixedStatus == "KEEP") {
+                }
+                else if (fixedStatus == "KEEP") {
                     deleteFile = false;
-                } else {
+                }
+                else {
                     iostat = IOError.IllegalStatus;
                     return -1;
                 }

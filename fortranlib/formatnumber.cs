@@ -86,7 +86,7 @@ public sealed class FormatParser {
 /// </summary>
 public static class FormatNumber {
 
-    private static readonly double [] powersOf10 = { 10, 100, 1.0e4, 1.0e8, 1.0e16, 1.0e32, 1.0e64, 1.0e128, 1.0e256 };
+    private static readonly double[] powersOf10 = { 10, 100, 1.0e4, 1.0e8, 1.0e16, 1.0e32, 1.0e64, 1.0e128, 1.0e256 };
 
     /// <summary>
     /// Format a value represented by the object with default width and precision. The object must
@@ -154,7 +154,8 @@ public static class FormatNumber {
 
         if (ch == '+') {
             ch = parser.Next();
-        } else if (ch == '-') {
+        }
+        else if (ch == '-') {
             sign = -1;
             ch = parser.Next();
         }
@@ -203,7 +204,8 @@ public static class FormatNumber {
         }
         if (value < 0) {
             str.Append('-');
-        } else {
+        }
+        else {
             if (record.PlusRequired == FormatOptionalPlus.Always) {
                 str.Append('+');
             }
@@ -270,7 +272,8 @@ public static class FormatNumber {
         string formatString;
         if (record.FieldWidth == 0 && record.Precision == 0) {
             formatString = "{0:G}";
-        } else {
+        }
+        else {
             formatString = "{0," + record.FieldWidth + ":F" + record.Precision + "}";
         }
         return FormatFloatToWidth(record, string.Format(formatString, value));
@@ -313,7 +316,8 @@ public static class FormatNumber {
 
         if (ch == '+') {
             ch = parser.Next();
-        } else if (ch == '-') {
+        }
+        else if (ch == '-') {
             sign = -1;
             ch = parser.Next();
         }
@@ -323,7 +327,8 @@ public static class FormatNumber {
                     throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_NUMBER);
                 }
                 inFraction = true;
-            } else {
+            }
+            else {
                 if (!char.IsDigit(ch)) {
                     break;
                 }
@@ -344,7 +349,8 @@ public static class FormatNumber {
 
             if (ch == '+') {
                 ch = parser.Next();
-            } else if (ch == '-') {
+            }
+            else if (ch == '-') {
                 exponentSign = -1;
                 ch = parser.Next();
             }
@@ -361,7 +367,8 @@ public static class FormatNumber {
             }
             exponent += exponentSign * exponentPart;
             hasExponentPart = true;
-        } else {
+        }
+        else {
             if (ch != '\0') {
                 throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_NUMBER,
                     $"Illegal character {ch} in number");
@@ -387,7 +394,8 @@ public static class FormatNumber {
         double fraction = mantissaPart;
         if (expSign) {
             fraction /= doubleExponent;
-        } else {
+        }
+        else {
             fraction *= doubleExponent;
         }
         return fraction * sign;
@@ -430,7 +438,8 @@ public static class FormatNumber {
         string formatString;
         if (record.FieldWidth == 0 && record.Precision == 0) {
             formatString = "{0:G}";
-        } else {
+        }
+        else {
             formatString = "{0," + record.FieldWidth + ":F" + record.Precision + "}";
         }
         return FormatFloatToWidth(record, string.Format(formatString, value));
@@ -470,7 +479,7 @@ public static class FormatNumber {
             'E' => FormatExponential(value.Real, 'E', tempRecordReal),
             'G' => FormatExponential(value.Real, 'E', tempRecordReal),
             _ => throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_FOR_COMPLEX,
-                        $"Invalid format specifier {recordReal.FormatChar} for COMPLEX")
+                $"Invalid format specifier {recordReal.FormatChar} for COMPLEX")
         };
         string imgPart = recordImg.FormatChar switch {
             'D' => FormatDouble(value.Imaginary, tempRecordImg),
@@ -478,7 +487,7 @@ public static class FormatNumber {
             'E' => FormatExponential(value.Imaginary, 'E', tempRecordImg),
             'G' => FormatExponential(value.Imaginary, 'E', tempRecordImg),
             _ => throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_FOR_COMPLEX,
-                        $"Invalid format specifier {recordImg.FormatChar} for COMPLEX")
+                $"Invalid format specifier {recordImg.FormatChar} for COMPLEX")
         };
         if (recordReal.FieldWidth > 0 || recordImg.FieldWidth > 0) {
             return FormatToWidth(recordReal.FieldWidth + recordImg.FieldWidth + 2, $"{realPart}  {imgPart}");
@@ -526,7 +535,8 @@ public static class FormatNumber {
             if (record.ScaleFactor <= 0 && record.ScaleFactor > -record.ExponentWidth) {
                 leadingZeroes = Math.Abs(record.ScaleFactor);
                 precision = record.ExponentWidth - Math.Abs(record.ScaleFactor);
-            } else if (record.ScaleFactor > 0 && record.ScaleFactor < record.ExponentWidth + 2) {
+            }
+            else if (record.ScaleFactor > 0 && record.ScaleFactor < record.ExponentWidth + 2) {
                 precision = precision - record.ScaleFactor + 1;
             }
         }
@@ -538,11 +548,14 @@ public static class FormatNumber {
         if (record.ExponentWidth > 0) {
             string exponentFormat = new('0', record.ExponentWidth);
             exponentPortion = exponentChar + exponent.ToString("+" + exponentFormat + ";-" + exponentFormat);
-        } else if (exponent <= 99) {
+        }
+        else if (exponent <= 99) {
             exponentPortion = exponentChar + exponent.ToString("+00;-00");
-        } else if (exponent < 999) {
+        }
+        else if (exponent < 999) {
             exponentPortion = exponent.ToString("+000;-000");
-        } else {
+        }
+        else {
             // TODO: Run-time failure here. Exponent too big for E/D format
             return string.Empty;
         }
@@ -562,10 +575,12 @@ public static class FormatNumber {
         if (value > 0.0) {
             if (value > 1.0) {
                 exponent = (int)(Math.Floor(Math.Log10(value) / 3.0) * 3.0);
-            } else {
+            }
+            else {
                 exponent = (int)(Math.Ceiling(Math.Log10(value) / 3.0) * 3.0);
             }
-        } else {
+        }
+        else {
             exponent = 0;
         }
         return exponent;
@@ -592,14 +607,14 @@ public static class FormatNumber {
     // Format the argument and verify it fits within the given width. If the size
     // exceeds the width then a string of asterisks is returned instead.
     private static string FormatToWidth(int width, string stringToFit) {
-        return width == 0 ?                  stringToFit :
-               stringToFit.Length <= width ? stringToFit.PadLeft(width):
-                                               new string('*', width);
+        return width == 0 ? stringToFit :
+            stringToFit.Length <= width ? stringToFit.PadLeft(width) :
+            new string('*', width);
     }
 
     // Reverse a string.
     private static string ReverseString(string stringToReverse) {
-        char [] stringArray = stringToReverse.ToCharArray();
+        char[] stringArray = stringToReverse.ToCharArray();
         Array.Reverse(stringArray);
         return new string(stringArray);
     }

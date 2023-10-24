@@ -72,7 +72,8 @@ public class ReadManager : IDisposable {
         if (formatString == "*") {
             formatString = string.Empty;
             _file.IsFormatted = true;
-        } else {
+        }
+        else {
             _file.IsFormatted = !string.IsNullOrEmpty(formatString);
         }
         _format = new FormatManager(formatString) {
@@ -164,7 +165,8 @@ public class ReadManager : IDisposable {
         int returnValue;
         try {
             returnValue = _file.SkipRecord();
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -185,10 +187,12 @@ public class ReadManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = ReadIntegerFormatted(ref intValue);
-            } else {
+            }
+            else {
                 returnValue = ReadIntegerUnformatted(ref intValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -209,10 +213,12 @@ public class ReadManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = ReadBooleanFormatted(ref boolValue);
-            } else {
+            }
+            else {
                 returnValue = ReadBooleanUnformatted(ref boolValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -233,10 +239,12 @@ public class ReadManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = ReadFloatFormatted(ref floatValue);
-            } else {
+            }
+            else {
                 returnValue = ReadFloatUnformatted(ref floatValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -257,10 +265,12 @@ public class ReadManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = ReadDoubleFormatted(ref doubleValue);
-            } else {
+            }
+            else {
                 returnValue = ReadDoubleUnformatted(ref doubleValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -280,10 +290,12 @@ public class ReadManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = ReadStringFormatted(ref fixedString);
-            } else {
+            }
+            else {
                 returnValue = ReadStringUnformatted(ref fixedString);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -393,7 +405,8 @@ public class ReadManager : IDisposable {
     // ch is a '*' character then str is a repeat value so parse off the
     // number and return true. Otherwise return false.
     private bool ParseRepeatSpecifier(char ch, string str) {
-        if (ch != '*') { // Repeat specifier
+        if (ch != '*') {
+            // Repeat specifier
             return false;
         }
 
@@ -433,7 +446,8 @@ public class ReadManager : IDisposable {
         if (fieldWidth > 0) {
             str = ReadChars(fieldWidth);
             charsRead = str.Length;
-        } else {
+        }
+        else {
             StringBuilder strBuilder = new();
 
             char ch = ReadNonSpaceChar();
@@ -487,7 +501,8 @@ public class ReadManager : IDisposable {
         string str;
         if (fieldWidth > 0) {
             str = ReadChars(fieldWidth);
-        } else {
+        }
+        else {
             StringBuilder strBuilder = new();
             char ch = ReadNonSpaceChar();
             if (ch == EOF) {
@@ -540,9 +555,10 @@ public class ReadManager : IDisposable {
         if (fieldWidth > 0) {
             str = ReadChars(fieldWidth);
             charsRead = str.Length;
-        } else {
+        }
+        else {
             StringBuilder strBuilder = new();
-            List<char> validFloatChars = new() { '0','1','2','3','4','5','6','7','8','9','E','-','+','.' };
+            List<char> validFloatChars = new() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'E', '-', '+', '.' };
 
             char ch = ReadNonSpaceChar();
             for (int m = 0; m < 2; ++m) {
@@ -596,9 +612,10 @@ public class ReadManager : IDisposable {
         if (fieldWidth > 0) {
             str = ReadChars(fieldWidth);
             charsRead = str.Length;
-        } else {
+        }
+        else {
             StringBuilder strBuilder = new();
-            List<char> validDoubleChars = new() { '0','1','2','3','4','5','6','7','8','9','D','-','+','.' };
+            List<char> validDoubleChars = new() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'D', '-', '+', '.' };
 
             char ch = ReadNonSpaceChar();
             for (int m = 0; m < 2; ++m) {
@@ -656,7 +673,8 @@ public class ReadManager : IDisposable {
 
             fixedstrVar.Set(realString[index..]);
             charsRead = length;
-        } else {
+        }
+        else {
             StringBuilder str = new();
             char ch = ReadNonSpaceChar();
             if (ch == '\'' && record == null) {
@@ -673,7 +691,8 @@ public class ReadManager : IDisposable {
                     ch = ReadChar();
                 }
                 SkipSeparators(ch);
-            } else {
+            }
+            else {
                 while (charsRead < strSize && ch != EOL && ch != EOF) {
                     str.Append(ch);
                     ch = ReadChar();
@@ -729,7 +748,8 @@ public class ReadManager : IDisposable {
         if (record.IsPositional && _line != null) {
             if (record.Relative) {
                 _readIndex += record.Count;
-            } else {
+            }
+            else {
                 _readIndex = record.Count;
             }
             _readIndex = Math.Max(_readIndex, 0);

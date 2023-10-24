@@ -23,13 +23,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JFortranLib; 
+namespace JFortranLib;
 
 /// <summary>
 /// Flags that specify the optional plus sign requirement.
 /// </summary>
 public enum FormatOptionalPlus {
-    Default, Always, Never
+    Default,
+    Always,
+    Never
 }
 
 /// <summary>
@@ -38,14 +40,14 @@ public enum FormatOptionalPlus {
 public class FormatRecord {
 
     private string _rawString;
-    
+
     /// <summary>
     /// Construct an empty FormatRecord instance.
     /// </summary>
     public FormatRecord() {
         PlusRequired = FormatOptionalPlus.Default;
     }
-    
+
     /// <summary>
     /// Construct an FormatRecord instance containing the specified
     /// format character.
@@ -116,25 +118,25 @@ public class FormatRecord {
     /// </summary>
     /// <value>The width of the field.</value>
     public int FieldWidth { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the precision.
     /// </summary>
     /// <value>The precision.</value>
     public int Precision { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the width of the exponent for E and D specifiers.
     /// </summary>
     /// <value>The precision.</value>
     public int ExponentWidth { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the scale factor of the output.
     /// </summary>
     /// <value>The precision.</value>
     public int ScaleFactor { get; set; }
-    
+
     /// <summary>
     /// Gets or sets a flag that indicates whether blank characters in
     /// the input should be treated as zeroes.
@@ -147,14 +149,14 @@ public class FormatRecord {
     /// field should be right or left justified.
     /// </summary>
     public bool LeftJustify { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the flag that specifies whether the '+' symbol in
     /// numeric output is required or suppressed.
     /// </summary>
     /// <value>The <c>FormatOptionalPlus</c> setting for the plus sign</value>
     public FormatOptionalPlus PlusRequired { get; set; }
-    
+
     /// <summary>
     /// Specifies whether or not this is a relative or absolute
     /// cursor movement for TL, TR T and X positioning statements..

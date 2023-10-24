@@ -1277,7 +1277,7 @@ public static class Intrinsics {
     /// <param name="degrees">Value in degrees</param>
     /// <returns>Input value converted to radians</returns>
     public static float RAD(ref int degrees) {
-        return Convert.ToSingle(degrees * (Math.PI/180.0));
+        return Convert.ToSingle(degrees * (Math.PI / 180.0));
     }
 
     /// <summary>

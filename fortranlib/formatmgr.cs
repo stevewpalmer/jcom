@@ -133,10 +133,12 @@ public class FormatManager {
             if (ch is '"' or '\'') {
                 inQuote = !inQuote;
                 ++_charIndex;
-            } else if (inQuote) {
+            }
+            else if (inQuote) {
                 str.Append(ch);
                 ++_charIndex;
-            } else {
+            }
+            else {
                 if (ch == ',' || char.IsWhiteSpace(ch)) {
                     ++_charIndex;
                     continue;
@@ -152,7 +154,7 @@ public class FormatManager {
                 }
 
                 // Remember this offset for _lastFormatGroup later
-                int markedIndex = _charIndex-1;
+                int markedIndex = _charIndex - 1;
 
                 // Check and validate any repeat specifier. Note that X, P and H are required to have
                 // a value preceding them. It's just not treated as repeat.
@@ -225,7 +227,8 @@ public class FormatManager {
                         throw new JComRuntimeException(JComRuntimeErrors.FORMAT_MISSING_VALUE,
                             $"'{formatChar}' specifier requires a value");
                     }
-                } else {
+                }
+                else {
                     if (hasPrefixValue && "IFEDGLA".IndexOf(formatChar) < 0) {
                         throw new JComRuntimeException(JComRuntimeErrors.FORMAT_INVALID_REPEAT_COUNT,
                             $"Repeat count not permitted with '{formatChar}' specifier");

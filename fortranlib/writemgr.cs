@@ -50,8 +50,7 @@ public class WriteManager : IDisposable {
     /// <param name="iodevice">The device to read from</param>
     /// <param name="record">The index of the record to write (for direct access)</param>
     /// <param name="formatString">Format string</param>
-    public WriteManager(int iodevice, int record, string formatString) : this(iodevice, record, formatString, 1) {
-    }
+    public WriteManager(int iodevice, int record, string formatString) : this(iodevice, record, formatString, 1) { }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WriteManager"/> class for the
@@ -174,7 +173,8 @@ public class WriteManager : IDisposable {
             }
             else if (record.IsEndRecord) {
                 ProcessEndRecord();
-            } else {
+            }
+            else {
                 break;
             }
             record = _format.Next();
@@ -196,10 +196,12 @@ public class WriteManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = WriteIntegerFormatted(intValue);
-            } else {
+            }
+            else {
                 returnValue = WriteIntegerUnformatted(intValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -219,10 +221,12 @@ public class WriteManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = WriteFloatFormatted(floatValue);
-            } else {
+            }
+            else {
                 returnValue = WriteFloatUnformatted(floatValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -242,10 +246,12 @@ public class WriteManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = WriteDoubleFormatted(doubleValue);
-            } else {
+            }
+            else {
                 returnValue = WriteDoubleUnformatted(doubleValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -265,10 +271,12 @@ public class WriteManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = WriteComplexFormatted(complexValue);
-            } else {
+            }
+            else {
                 returnValue = WriteComplexUnformatted(complexValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -288,10 +296,12 @@ public class WriteManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = WriteBoolFormatted(boolValue);
-            } else {
+            }
+            else {
                 returnValue = WriteBoolUnformatted(boolValue);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -311,10 +321,12 @@ public class WriteManager : IDisposable {
         try {
             if (IsFormatted()) {
                 returnValue = WriteStringFormatted(str);
-            } else {
+            }
+            else {
                 returnValue = WriteStringUnformatted(str);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -333,10 +345,12 @@ public class WriteManager : IDisposable {
             if (IsFormatted()) {
                 Record(false);
                 WriteChars(string.Empty);
-            } else {
+            }
+            else {
                 WriteStringUnformatted(string.Empty);
             }
-        } catch (IOException) {
+        }
+        catch (IOException) {
             returnValue = -1;
         }
         return TestAndThrowError(returnValue);
@@ -378,9 +392,11 @@ public class WriteManager : IDisposable {
         if (record.FieldWidth > 0) {
             if (value.Length > record.FieldWidth) {
                 svalue = value[..record.FieldWidth];
-            } else if (record.LeftJustify) {
+            }
+            else if (record.LeftJustify) {
                 svalue = value.PadRight(record.FieldWidth);
-            } else {
+            }
+            else {
                 svalue = value.PadLeft(record.FieldWidth);
             }
         }
@@ -411,7 +427,7 @@ public class WriteManager : IDisposable {
                 _ => realName
             };
             throw new JComRuntimeException(JComRuntimeErrors.FORMAT_RECORD_MISMATCH,
-                        $"Format record mismatch: '{ch}' specifier and {realName} type");
+                $"Format record mismatch: '{ch}' specifier and {realName} type");
         }
     }
 
@@ -451,7 +467,8 @@ public class WriteManager : IDisposable {
         if (record != null) {
             VerifyFormatMatch(record, intValue);
             str = FormatNumber.FormatInteger(intValue, record);
-        } else {
+        }
+        else {
             if (_writeItemsCount > 0 && UseSeparators) {
                 WriteChar(' ', 1); // To neatly separate out the items
             }
@@ -469,7 +486,8 @@ public class WriteManager : IDisposable {
         if (record != null) {
             VerifyFormatMatch(record, floatValue);
             str = FormatNumber.FormatFloat(floatValue, record);
-        } else {
+        }
+        else {
             if (_writeItemsCount > 0 && UseSeparators) {
                 WriteChar(' ', 1); // To neatly separate out the items
             }
@@ -487,7 +505,8 @@ public class WriteManager : IDisposable {
         if (record != null) {
             VerifyFormatMatch(record, doubleValue);
             str = FormatNumber.FormatDouble(doubleValue, record);
-        } else {
+        }
+        else {
             if (_writeItemsCount > 0 && UseSeparators) {
                 WriteChar(' ', 1); // To neatly separate out the items
             }
@@ -537,7 +556,8 @@ public class WriteManager : IDisposable {
         if (record != null) {
             VerifyFormatMatch(record, boolValue);
             str = FormatNumber.FormatBoolean(boolValue, record);
-        } else {
+        }
+        else {
             if (_writeItemsCount > 0 && UseSeparators) {
                 WriteChar(' ', 1); // To neatly separate out the items
             }
@@ -554,7 +574,8 @@ public class WriteManager : IDisposable {
         if (record != null) {
             VerifyFormatMatch(record, str);
             str = FormatString(str, record);
-        } else {
+        }
+        else {
             if (_writeItemsCount > 0 && UseSeparators) {
                 WriteChar(' ', 1); // To neatly separate out the items
             }
@@ -615,13 +636,15 @@ public class WriteManager : IDisposable {
         int currentWidth = _writeIndex;
         if (record.Relative) {
             currentWidth += record.Count;
-        } else {
+        }
+        else {
             currentWidth = record.Count - 1;
         }
         if (currentWidth > _writeMaxIndex) {
             _writeIndex = _writeMaxIndex;
             WriteChar(' ', currentWidth - _writeMaxIndex);
-        } else {
+        }
+        else {
             _writeIndex = currentWidth;
         }
     }
