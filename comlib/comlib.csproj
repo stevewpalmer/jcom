@@ -1,17 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11.0</LangVersion>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <AssemblyName>comlib</AssemblyName>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>JComLib</RootNamespace>
-    <Title>Common Library</Title>
-    <Authors>Steven Palmer</Authors>
-    <Description>Common Library</Description>
-    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>11.0</LangVersion>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <AssemblyName>comlib</AssemblyName>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RootNamespace>JComLib</RootNamespace>
+        <Title>Common Library</Title>
+        <Authors>Steven Palmer</Authors>
+        <Description>Common Library</Description>
+        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+    </PropertyGroup>
 </Project>

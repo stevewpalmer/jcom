@@ -68,4 +68,3 @@ public static class AssemblySupport {
     /// <returns>Executable filename string</returns>
     public static string ExecutableFilename() => Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
 }
-

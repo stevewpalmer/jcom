@@ -27,7 +27,7 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 
-namespace JComLib; 
+namespace JComLib;
 
 /// <summary>
 /// Defines the type of run time exception encountered.
@@ -37,26 +37,22 @@ public enum JComRuntimeErrors {
     /// <summary>
     /// File cannot be opened
     /// </summary>
-    [Description("Cannot Open File")]
-    CANNOT_OPEN_FILE = 1,
+    [Description("Cannot Open File")] CANNOT_OPEN_FILE = 1,
 
     /// <summary>
     /// File already open
     /// </summary>
-    [Description("File Already Open")]
-    FILE_ALREADY_OPEN = 2,
+    [Description("File Already Open")] FILE_ALREADY_OPEN = 2,
 
     /// <summary>
     /// File not open
     /// </summary>
-    [Description("File Not Open")]
-    FILE_NOT_OPEN = 3,
+    [Description("File Not Open")] FILE_NOT_OPEN = 3,
 
     /// <summary>
     /// Division by zero
     /// </summary>
-    [Description("Division By Zero")]
-    DIVISION_BY_ZERO = 4,
+    [Description("Division By Zero")] DIVISION_BY_ZERO = 4,
 
     /// <summary>
     /// Unexpected end of file
@@ -85,8 +81,7 @@ public enum JComRuntimeErrors {
     /// <summary>
     /// File cannot be created
     /// </summary>
-    [Description("Cannot Create File")]
-    CANNOT_CREATE_FILE = 9,
+    [Description("Cannot Create File")] CANNOT_CREATE_FILE = 9,
 
     /// <summary>
     /// File is not open for random access
@@ -198,7 +193,7 @@ public enum JComRuntimeExceptionType {
 /// during JCom runtime.
 /// </summary>
 [Serializable]
-[ComVisible (true)]
+[ComVisible(true)]
 public class JComRuntimeException : Exception {
 
     /// <summary>
@@ -219,9 +214,8 @@ public class JComRuntimeException : Exception {
     /// <summary>
     /// Constructs an empty JComRuntimeException instance.
     /// </summary>
-    public JComRuntimeException() : 
-        base("The requested operation caused a JCom runtime exception") {
-    }
+    public JComRuntimeException() :
+        base("The requested operation caused a JCom runtime exception") { }
 
     /// <summary>
     /// Constructs an JComRuntimeException> instance with
@@ -249,8 +243,7 @@ public class JComRuntimeException : Exception {
     /// the specified exception message.
     /// </summary>
     /// <param name="message">The exception message.</param>
-    public JComRuntimeException(string message) : base(message) {
-    }
+    public JComRuntimeException(string message) : base(message) { }
 
     /// <summary>
     /// Constructs an JComRuntimeException> instance with
@@ -258,8 +251,7 @@ public class JComRuntimeException : Exception {
     /// </summary>
     /// <param name="message">The exception message.</param>
     /// <param name="innerException">The inner exception object that yielded this exception.</param>
-    public JComRuntimeException(string message, Exception innerException) : base(message, innerException) {
-    }
+    public JComRuntimeException(string message, Exception innerException) : base(message, innerException) { }
 
     /// <summary>
     /// General purpose exception handler to convert .NET exceptions into JComRuntimeException
@@ -300,6 +292,5 @@ public class JComRuntimeException : Exception {
     /// </summary>
     /// <param name="info">A SerializationInfo object.</param>
     /// <param name="context">A StreamingContext object.</param>
-    protected JComRuntimeException(SerializationInfo info, StreamingContext context) : base(info, context) {
-    }
+    protected JComRuntimeException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 }

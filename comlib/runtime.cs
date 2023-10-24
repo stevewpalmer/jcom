@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JComLib; 
+namespace JComLib;
 
 /// <summary>
 /// System functions.
@@ -89,7 +89,8 @@ public static class Runtime {
     public static void PAUSE(string str) {
         if (string.IsNullOrEmpty(str)) {
             Console.WriteLine("PAUSE");
-        } else {
+        }
+        else {
             Console.WriteLine("PAUSE {0}", str);
         }
         Console.ReadKey(true);
@@ -113,7 +114,8 @@ public static class Runtime {
         string stopMessage;
         if (string.IsNullOrEmpty(str)) {
             stopMessage = "STOP" + (lineNumber > 0 ? " AT LINE " + lineNumber : string.Empty);
-        } else {
+        }
+        else {
             stopMessage = $"STOP {str}";
         }
         throw new JComRuntimeException(stopMessage) {
@@ -166,28 +168,60 @@ public static class Runtime {
         if (colorIndex >= 128) {
             ConsoleColor bgColour = ConsoleColor.Black;
             switch (colorIndex) {
-                case 128: bgColour = ConsoleColor.Black; break;
-                case 129: bgColour = ConsoleColor.Red; break;
-                case 130: bgColour = ConsoleColor.Green; break;
-                case 131: bgColour = ConsoleColor.Yellow; break;
-                case 132: bgColour = ConsoleColor.Blue; break;
-                case 133: bgColour = ConsoleColor.Magenta; break;
-                case 134: bgColour = ConsoleColor.Cyan; break;
-                case 135: bgColour = ConsoleColor.White; break;
+                case 128:
+                    bgColour = ConsoleColor.Black;
+                    break;
+                case 129:
+                    bgColour = ConsoleColor.Red;
+                    break;
+                case 130:
+                    bgColour = ConsoleColor.Green;
+                    break;
+                case 131:
+                    bgColour = ConsoleColor.Yellow;
+                    break;
+                case 132:
+                    bgColour = ConsoleColor.Blue;
+                    break;
+                case 133:
+                    bgColour = ConsoleColor.Magenta;
+                    break;
+                case 134:
+                    bgColour = ConsoleColor.Cyan;
+                    break;
+                case 135:
+                    bgColour = ConsoleColor.White;
+                    break;
             }
             Console.BackgroundColor = bgColour;
         }
         if (colorIndex < 128) {
             ConsoleColor fgColour = ConsoleColor.White;
             switch (colorIndex) {
-                case 0: fgColour = ConsoleColor.Black; break;
-                case 1: fgColour = ConsoleColor.Red; break;
-                case 2: fgColour = ConsoleColor.Green; break;
-                case 3: fgColour = ConsoleColor.Yellow; break;
-                case 4: fgColour = ConsoleColor.Blue; break;
-                case 5: fgColour = ConsoleColor.Magenta; break;
-                case 6: fgColour = ConsoleColor.Cyan; break;
-                case 7: fgColour = ConsoleColor.White; break;
+                case 0:
+                    fgColour = ConsoleColor.Black;
+                    break;
+                case 1:
+                    fgColour = ConsoleColor.Red;
+                    break;
+                case 2:
+                    fgColour = ConsoleColor.Green;
+                    break;
+                case 3:
+                    fgColour = ConsoleColor.Yellow;
+                    break;
+                case 4:
+                    fgColour = ConsoleColor.Blue;
+                    break;
+                case 5:
+                    fgColour = ConsoleColor.Magenta;
+                    break;
+                case 6:
+                    fgColour = ConsoleColor.Cyan;
+                    break;
+                case 7:
+                    fgColour = ConsoleColor.White;
+                    break;
             }
             Console.ForegroundColor = fgColour;
         }
@@ -208,9 +242,11 @@ public static class Runtime {
             string sizeString;
             if (size < 1024) {
                 sizeString = size + "B";
-            } else if (size < 1024 * 1024) {
+            }
+            else if (size < 1024 * 1024) {
                 sizeString = size / 1024 + "K";
-            } else {
+            }
+            else {
                 sizeString = size / (1024 * 1024) + "M";
             }
             Console.WriteLine("{0,-20} {1,5}", info.Name, sizeString);

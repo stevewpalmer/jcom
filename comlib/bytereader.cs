@@ -25,7 +25,7 @@
 
 using System.Text;
 
-namespace JComLib; 
+namespace JComLib;
 
 /// <summary>
 /// Classes for reading bytes from a buffer.

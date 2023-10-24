@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JComLib; 
+namespace JComLib;
 
 public class ByteWriter {
 
@@ -66,5 +66,5 @@ public class ByteWriter {
     /// <summary>
     /// Return the byte buffer as a byte array
     /// </summary>
-    public byte [] Buffer => _buffer.ToArray();
+    public byte[] Buffer => _buffer.ToArray();
 }

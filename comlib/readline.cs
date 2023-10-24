@@ -25,7 +25,7 @@
 
 using System.Text;
 
-namespace JComLib; 
+namespace JComLib;
 
 public class ReadLine {
 

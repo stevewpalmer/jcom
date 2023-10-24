@@ -1,20 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11.0</LangVersion>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <RootNamespace>JComalLib</RootNamespace>
-    <Title>Comal Runtime Library</Title>
-    <Authors>Steven Palmer</Authors>
-    <Description>Comal Runtime Library   </Description>
-    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
-    <Nullable>enable</Nullable>
- </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\comlib\comlib.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>11.0</LangVersion>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RootNamespace>JComalLib</RootNamespace>
+        <Title>Comal Runtime Library</Title>
+        <Authors>Steven Palmer</Authors>
+        <Description>Comal Runtime Library</Description>
+        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
+    </ItemGroup>
 </Project>

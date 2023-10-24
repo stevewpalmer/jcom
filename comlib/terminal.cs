@@ -91,9 +91,9 @@ public static class Terminal {
     /// </summary>
     public static void SetDefaultCursor() {
         if (_isWindows) {
-            #pragma warning disable CA1416
+#pragma warning disable CA1416
             Console.CursorSize = 10;
-            #pragma warning restore CA1416
+#pragma warning restore CA1416
         }
     }
 
@@ -103,9 +103,9 @@ public static class Terminal {
     /// </summary>
     public static void SetVirtualCursor() {
         if (_isWindows) {
-            #pragma warning disable CA1416
+#pragma warning disable CA1416
             Console.CursorSize = 50;
-            #pragma warning restore CA1416
+#pragma warning restore CA1416
         }
     }
 

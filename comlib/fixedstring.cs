@@ -25,13 +25,13 @@
 
 using System.Runtime.CompilerServices;
 
-namespace JComLib; 
+namespace JComLib;
 
 /// <summary>
 /// Fixed string management class
 /// </summary>
 public class FixedString : IEquatable<FixedString> {
-    private readonly char [] _fixedString;
+    private readonly char[] _fixedString;
 
     /// <summary>
     /// Returns the length of this string.
@@ -124,8 +124,8 @@ public class FixedString : IEquatable<FixedString> {
     /// </summary>
     /// <param name="rhs">The source native string</param>
     /// <returns>Returns new FixedString object.</returns>
-    public static implicit operator FixedString(string rhs) { 
-        return new FixedString(rhs);            
+    public static implicit operator FixedString(string rhs) {
+        return new FixedString(rhs);
     }
 
     /// <summary>
@@ -133,7 +133,7 @@ public class FixedString : IEquatable<FixedString> {
     /// length of the fixed string.
     /// </summary>
     /// <returns>A character array containing the fixed string characters.</returns>
-    public char [] ToCharArray() {
+    public char[] ToCharArray() {
         return _fixedString;
     }
 
@@ -142,7 +142,7 @@ public class FixedString : IEquatable<FixedString> {
     /// exception if the index is less than zero or outside the fixed string length.
     /// </summary>
     /// <param name="index">Index of the character to return</param>
-    [IndexerName ("Chars")]
+    [IndexerName("Chars")]
     public char this[int index] {
         get {
             if (index < 0 || index >= Length) {
@@ -196,7 +196,7 @@ public class FixedString : IEquatable<FixedString> {
         newString.RealLength = length;
         return newString;
     }
-    
+
     /// <summary>
     /// Assign a value to this fixed string using the given string as input.
     /// </summary>
@@ -256,7 +256,7 @@ public class FixedString : IEquatable<FixedString> {
         }
         InternalSet(newString.ToCharArray(), start - 1, end - 1);
     }
-    
+
     /// <summary>
     /// Compare two fixed strings.
     /// </summary>
@@ -277,8 +277,8 @@ public class FixedString : IEquatable<FixedString> {
         }
         int length = Math.Max(s1.RealLength, s2.RealLength);
         for (int c = 0; c < length; ++c) {
-            char ch1 = c < s1.Length ? s1[c]: ' ';
-            char ch2 = c < s2.Length ? s2[c]: ' ';
+            char ch1 = c < s1.Length ? s1[c] : ' ';
+            char ch2 = c < s2.Length ? s2[c] : ' ';
             if (ch1 != ch2) {
                 return ch1 - ch2;
             }
@@ -313,7 +313,8 @@ public class FixedString : IEquatable<FixedString> {
             if (_fixedString[index1] == stringToFind[index2]) {
                 ++index1;
                 ++index2;
-            } else {
+            }
+            else {
                 index1 = ++startIndex;
                 index2 = 0;
             }
@@ -470,10 +471,10 @@ public class FixedString : IEquatable<FixedString> {
 
     // Copy the characters from the specified string array into this
     // one, padding out the unused portion with spaces.
-    private void InternalSet(char [] newStringArray) {
+    private void InternalSet(char[] newStringArray) {
         int copyLength = Math.Min(newStringArray.Length, Length);
         int index = 0;
-        
+
         while (index < copyLength) {
             _fixedString[index] = newStringArray[index];
             ++index;
@@ -487,13 +488,13 @@ public class FixedString : IEquatable<FixedString> {
     // Copy the characters from the specified string array into this
     // one, starting at the given zero based start offset and ending
     // at the given zero based end offset.
-    private void InternalSet(char [] newStringArray, int start, int end) {
+    private void InternalSet(char[] newStringArray, int start, int end) {
         int pos = start;
         int endPos = Math.Min(Length, end + 1);
         int index = 0;
-        
+
         int newStringLength = newStringArray.Length;
-        
+
         while (pos < endPos && index < newStringLength) {
             _fixedString[pos++] = newStringArray[index++];
         }

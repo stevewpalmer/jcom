@@ -155,4 +155,3 @@ public class Parser {
         return AtLineEnd() ? Eol : _line[_index++];
     }
 }
-

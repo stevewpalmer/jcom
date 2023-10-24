@@ -71,7 +71,7 @@ public enum LineTerminator {
 /// </summary>
 public sealed class StdoutIOFile : IOFile {
 
-    public StdoutIOFile() : base(IOConstant.Stdout) {}
+    public StdoutIOFile() : base(IOConstant.Stdout) { }
 
     /// <summary>
     /// Stdout always produces formatted output.
@@ -91,9 +91,11 @@ public sealed class StdoutIOFile : IOFile {
 
         if (str.Length == 0) {
             Console.WriteLine();
-        } else if (carriageAtEnd) {
+        }
+        else if (carriageAtEnd) {
             Console.WriteLine(str);
-        } else {
+        }
+        else {
             Console.Write(str);
         }
         return charsWritten;
@@ -190,7 +192,7 @@ public class IOFile : IDisposable {
     // Class variables
     private bool _isDisposed;
     private bool _isFormatted;
-    private byte [] _readBuffer;
+    private byte[] _readBuffer;
     private int _readBufferIndex;
     private int _readBufferSize;
     private string _line;
@@ -294,13 +296,19 @@ public class IOFile : IDisposable {
     /// A predefined IOFile object that represents the standard
     /// input device.
     /// </summary>
-    public static IOFile StdinFile { get => stdinFile; set => stdinFile = value; }
+    public static IOFile StdinFile {
+        get => stdinFile;
+        set => stdinFile = value;
+    }
 
     /// <summary>
     /// A predefined IOFile object that represents the standard
     /// output device.
     /// </summary>
-    public static IOFile StdoutFile { get => stdoutFile; set => stdoutFile = value; }
+    public static IOFile StdoutFile {
+        get => stdoutFile;
+        set => stdoutFile = value;
+    }
 
     /// <summary>
     /// Physically open the file.
@@ -313,7 +321,8 @@ public class IOFile : IDisposable {
         if (IsScratch || IsNew) {
             mode = FileMode.Create;
             accessMode = FileAccess.ReadWrite;
-        } else {
+        }
+        else {
             mode = FileMode.Open;
             accessMode = FileAccess.ReadWrite;
         }
@@ -329,9 +338,11 @@ public class IOFile : IDisposable {
         }
         try {
             Handle = File.Open(Path, mode, accessMode);
-        } catch (IOException) {
+        }
+        catch (IOException) {
             Handle = null;
-        } catch (UnauthorizedAccessException) {
+        }
+        catch (UnauthorizedAccessException) {
             Handle = null;
         }
         return Handle != null;
@@ -449,7 +460,8 @@ public class IOFile : IDisposable {
             while (ReadByte(ref outByte) && outByte != '\n') {
                 ++skipCount;
             }
-        } else {
+        }
+        else {
             skipCount = ReadRecord();
         }
         return skipCount;
@@ -483,8 +495,9 @@ public class IOFile : IDisposable {
         }
         if (RecordLength == 0) {
             stringRead = ReadFormattedLine();
-        } else {
-            byte [] data = new byte[RecordLength];
+        }
+        else {
+            byte[] data = new byte[RecordLength];
             int bytesRead = ReadBytes(data, RecordLength);
             stringRead = Encoding.ASCII.GetString(data, 0, bytesRead);
         }
@@ -514,7 +527,8 @@ public class IOFile : IDisposable {
                 strToWrite += "\r\n";
             }
             charsWritten = WriteEncodedString(strToWrite, strToWrite.Length);
-        } else {
+        }
+        else {
             charsWritten = WriteEncodedString(str, RecordLength);
         }
         Flush();
@@ -586,7 +600,7 @@ public class IOFile : IDisposable {
             return -1;
         }
         const int intSize = sizeof(int);
-        byte [] intBuffer = BitConverter.GetBytes(value);
+        byte[] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
     }
@@ -643,7 +657,7 @@ public class IOFile : IDisposable {
             return -1;
         }
         const int intSize = sizeof(float);
-        byte [] intBuffer = BitConverter.GetBytes(value);
+        byte[] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
     }
@@ -700,7 +714,7 @@ public class IOFile : IDisposable {
             return -1;
         }
         int intSize = sizeof(double);
-        byte [] intBuffer = BitConverter.GetBytes(value);
+        byte[] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
     }
@@ -715,7 +729,7 @@ public class IOFile : IDisposable {
             throw new ObjectDisposedException(GetType().Name);
         }
         int intSize = sizeof(bool);
-        byte [] intBuffer = new byte[intSize];
+        byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
             return 0;
         }
@@ -736,7 +750,7 @@ public class IOFile : IDisposable {
             return -1;
         }
         int intSize = sizeof(bool);
-        byte [] intBuffer = BitConverter.GetBytes(value);
+        byte[] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
     }
@@ -853,7 +867,7 @@ public class IOFile : IDisposable {
             return -1;
         }
         int intSize = sizeof(int);
-        byte [] intBuffer = BitConverter.GetBytes(value.Length);
+        byte[] intBuffer = BitConverter.GetBytes(value.Length);
         WriteBytes(intBuffer, intSize);
         WriteEncodedString(value, value.Length);
         return intSize + value.Length;
@@ -925,7 +939,8 @@ public class IOFile : IDisposable {
                     }
                     Handle.Seek((_recordIndex - 1) * (long)blockSize, SeekOrigin.Begin);
                     ClearReadBuffer();
-                } else if (!IsFormatted) {
+                }
+                else if (!IsFormatted) {
                     ClearReadBuffer();
                 }
             }
@@ -960,7 +975,7 @@ public class IOFile : IDisposable {
     private string ReadFormattedLine() {
         int bufferSize = 256;
         int bufferIndex = 0;
-        byte [] data = new byte[bufferSize];
+        byte[] data = new byte[bufferSize];
 
         while (true) {
             if (bufferIndex == bufferSize) {
@@ -985,7 +1000,7 @@ public class IOFile : IDisposable {
     // Read a given number of bytes from the data file into the
     // data buffer and return the actual number of bytes read which may
     // be less than requested if we hit the EOF.
-    private int ReadBytes(byte [] data, int bytesToRead) {
+    private int ReadBytes(byte[] data, int bytesToRead) {
         int bufferIndex = 0;
         while (bufferIndex < bytesToRead) {
             byte outByte = 0;
@@ -1041,7 +1056,7 @@ public class IOFile : IDisposable {
     // it is truncated.
     private int WriteEncodedString(string strToWrite, int charsToWrite) {
         int count = Math.Min(Encoding.ASCII.GetByteCount(strToWrite), charsToWrite);
-        byte [] data = new byte[charsToWrite];
+        byte[] data = new byte[charsToWrite];
 
         // Make sure that unused elements are set to spaces and not
         // NUL characters or bad things will happen on the READ.
@@ -1067,7 +1082,7 @@ public class IOFile : IDisposable {
             return true;
         }
         int bufferSize = sizeof(int);
-        byte [] data = new byte[bufferSize];
+        byte[] data = new byte[bufferSize];
 
         int bytesToRead = bufferSize;
         currentPos -= bytesToRead;
@@ -1102,7 +1117,7 @@ public class IOFile : IDisposable {
         // the last newline record in the block. The new position is just
         // after that.
         int bufferSize = 4096;
-        byte [] data = new byte[bufferSize];
+        byte[] data = new byte[bufferSize];
         int startOffset = 0;
 
         currentPos -= 1;
@@ -1138,9 +1153,10 @@ public class IOFile : IDisposable {
                 _readBuffer = new byte[4096];
             }
             _readBufferSize = Handle.Read(_readBuffer, 0, 4096);
-        } else {
+        }
+        else {
             int intSize = sizeof(int);
-            byte [] intBuffer = new byte[intSize];
+            byte[] intBuffer = new byte[intSize];
             Handle.Read(intBuffer, 0, intSize);
 
             _readBufferSize = BitConverter.ToInt32(intBuffer, 0);
@@ -1166,9 +1182,10 @@ public class IOFile : IDisposable {
             if (bytesToWrite > 0) {
                 Handle.Write(_writeBuffer, 0, bytesToWrite);
             }
-        } else {
+        }
+        else {
             int intSize = sizeof(int);
-            byte [] intBuffer = BitConverter.GetBytes(bytesToWrite);
+            byte[] intBuffer = BitConverter.GetBytes(bytesToWrite);
 
             // The record format for an unformatted file is:
             //
