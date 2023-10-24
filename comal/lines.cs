@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.Text;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// A single tokenised line
@@ -64,7 +64,8 @@ public class Line {
             if (_tokens[0].ID == TokenID.INTEGER) {
                 IntegerToken lineNumberToken = _tokens[0] as IntegerToken;
                 lineNumberToken.Value = value;
-            } else {
+            }
+            else {
                 _tokens.Insert(0, new IntegerToken(value));
                 _tokens.Insert(1, new SimpleToken(TokenID.SPACE));
             }
@@ -80,7 +81,8 @@ public class Line {
             SimpleToken token;
             if (_pushedToken != null) {
                 token = _pushedToken;
-            } else {
+            }
+            else {
                 int index = _tindex;
                 while (Tokens[index].ID == TokenID.SPACE) {
                     ++index;
@@ -160,7 +162,7 @@ public class Line {
     /// list at the current position.
     /// </summary>
     /// <param name="newTokens">Array of tokens to insert</param>
-    public void InsertTokens(SimpleToken [] newTokens) {
+    public void InsertTokens(SimpleToken[] newTokens) {
 
         Debug.Assert(_tindex > 0);
         int index = _tindex;
@@ -188,7 +190,8 @@ public class Line {
         if (_pushedToken != null) {
             token = _pushedToken;
             _pushedToken = null;
-        } else {
+        }
+        else {
             Debug.Assert(_tindex < Tokens.Length);
             while (Tokens[_tindex].ID == TokenID.SPACE) {
                 ++_tindex;
@@ -210,7 +213,7 @@ public class Line {
     /// <summary>
     /// Tokenised line
     /// </summary>
-    private SimpleToken [] Tokens => _tokens.ToArray();
+    private SimpleToken[] Tokens => _tokens.ToArray();
 
     /// <summary>
     /// Return printable version of line
@@ -455,7 +458,7 @@ public class Lines {
     /// saving to disk.
     /// </summary>
     /// <returns>Byte array</returns>
-    public byte [] Serialize() {
+    public byte[] Serialize() {
 
         ByteWriter byteWriter = new();
         foreach (Line line in _lines) {

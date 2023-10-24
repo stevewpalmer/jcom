@@ -44,45 +44,33 @@ public class Interpreter {
     /// <summary>
     /// Active compiler instance
     /// </summary>
-    private static Compiler ActiveCompiler {
-        get; set;
-    }
+    private static Compiler ActiveCompiler { get; set; }
 
     /// <summary>
     /// Return whether we're in auto line numbering mode
     /// </summary>
-    private bool IsAutoMode {
-        get; set;
-    }
+    private bool IsAutoMode { get; set; }
 
     /// <summary>
     /// Current automatic line number
     /// </summary>
-    private int AutoLineNumber {
-        get; set;
-    }
+    private int AutoLineNumber { get; set; }
 
     /// <summary>
     /// Current automatic line number steps
     /// </summary>
-    private int AutoSteps {
-        get; set;
-    }
+    private int AutoSteps { get; set; }
 
     /// <summary>
     /// Return whether the current program in memory has been
     /// modified since it was last saved.
     /// </summary>
-    private bool IsModified {
-        get; set;
-    }
+    private bool IsModified { get; set; }
 
     /// <summary>
     /// Stored program lines in tokenised format
     /// </summary>
-    private Lines Lines {
-        get; set;
-    }
+    private Lines Lines { get; set; }
 
     /// <summary>
     /// Run the compiler as an interpreter.
@@ -111,7 +99,8 @@ public class Interpreter {
                     token = line.PeekToken();
                     if (token.ID == TokenID.EOL) {
                         IsAutoMode = false;
-                    } else {
+                    }
+                    else {
                         if (line.LineNumber < 1) {
                             throw new Exception("Invalid line number");
                         }
@@ -223,7 +212,8 @@ public class Interpreter {
                         line.PushToken(token);
                     }
                 }
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 JComRuntimeException jce = JComRuntimeException.GeneralHandlerNoThrow(e);
                 if (!string.IsNullOrEmpty(jce.Message)) {
                     Console.WriteLine(jce.Message);
@@ -377,7 +367,8 @@ public class Interpreter {
             if (isMerge) {
                 line.LineNumber = lineNumber;
                 lineNumber += 10;
-            } else {
+            }
+            else {
                 // Possible enter of a source file with no line
                 // numbers? 
                 if (line.LineNumber == 0) {
@@ -513,7 +504,8 @@ public class Interpreter {
                 string lineToWrite = line.PrintableLine(indent, listOnly);
                 if (listFile != null) {
                     listFile.WriteLine(lineToWrite);
-                } else {
+                }
+                else {
                     Console.WriteLine(lineToWrite);
                 }
             }
@@ -581,7 +573,8 @@ public class Interpreter {
             using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
             ByteReader byteReader = new(stream);
             Lines.Deserialize(byteReader);
-        } catch (Exception) {
+        }
+        catch (Exception) {
             throw new Exception("Invalid program file");
         }
     }
@@ -674,7 +667,8 @@ public class Interpreter {
                 if (!Lines.LinesForProcedure(identToken.Name, ref startLine, ref endLine)) {
                     throw new Exception("Not Found");
                 }
-            } else {
+            }
+            else {
                 if (token.ID == TokenID.INTEGER) {
                     IntegerToken startLineToken = token as IntegerToken;
                     startLine = startLineToken.Value;
@@ -686,7 +680,8 @@ public class Interpreter {
                     if (ls.IsAtEndOfLine) {
                         endLine = startLine;
                     }
-                } else {
+                }
+                else {
                     token = ls.GetToken();
                     if (token.ID == TokenID.INTEGER) {
                         IntegerToken endLineToken = token as IntegerToken;

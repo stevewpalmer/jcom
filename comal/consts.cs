@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JComal; 
+namespace JComal;
 
 public static class Consts {
 

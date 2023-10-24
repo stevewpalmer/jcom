@@ -26,7 +26,7 @@
 using CCompiler;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// Class that extends the <c>Options</c> class with additional

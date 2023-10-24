@@ -27,7 +27,7 @@ using System.Diagnostics;
 using CCompiler;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 public partial class Compiler {
 
@@ -193,7 +193,8 @@ public partial class Compiler {
                     }
                     if (node.ID == ParseID.IDIVIDE) {
                         node = new NumberParseNode((int)Math.Floor(op1.Value.DoubleValue / op2.Value.DoubleValue));
-                    } else {
+                    }
+                    else {
                         node = new NumberParseNode(op1.Value / op2.Value);
                     }
                 }
@@ -256,7 +257,7 @@ public partial class Compiler {
         BinaryOpParseNode tokenNode = (BinaryOpParseNode)node;
         tokenNode.Left = OptimiseExpressionTree(tokenNode.Left);
         tokenNode.Right = OptimiseExpressionTree(tokenNode.Right);
-        
+
         if (tokenNode.IsNumber) {
             NumberParseNode op1 = (NumberParseNode)tokenNode.Left;
             NumberParseNode op2 = (NumberParseNode)tokenNode.Right;
@@ -312,7 +313,7 @@ public partial class Compiler {
         BinaryOpParseNode tokenNode = (BinaryOpParseNode)node;
         tokenNode.Left = OptimiseExpressionTree(tokenNode.Left);
         tokenNode.Right = OptimiseExpressionTree(tokenNode.Right);
-        
+
         if (tokenNode.Left.ID == ParseID.STRING && tokenNode.Right.ID == ParseID.STRING) {
             StringParseNode op1 = (StringParseNode)tokenNode.Left;
             StringParseNode op2 = (StringParseNode)tokenNode.Right;
@@ -326,14 +327,14 @@ public partial class Compiler {
     private ParseNode OptimiseExpressionTree(ParseNode node) {
         if (node != null) {
             switch (node.ID) {
-                case ParseID.MINUS:     return OptimiseMinus(node);
-                case ParseID.ADD:       return OptimiseAddition(node);
-                case ParseID.MULT:      return OptimiseMultiplication(node);
-                case ParseID.DIVIDE:    return OptimiseDivision(node);
-                case ParseID.IDIVIDE:   return OptimiseDivision(node);
-                case ParseID.MOD:       return OptimiseModulus(node);
-                case ParseID.SUB:       return OptimiseSubtraction(node);
-                case ParseID.EXP:       return OptimiseExponentation(node);
+                case ParseID.MINUS: return OptimiseMinus(node);
+                case ParseID.ADD: return OptimiseAddition(node);
+                case ParseID.MULT: return OptimiseMultiplication(node);
+                case ParseID.DIVIDE: return OptimiseDivision(node);
+                case ParseID.IDIVIDE: return OptimiseDivision(node);
+                case ParseID.MOD: return OptimiseModulus(node);
+                case ParseID.SUB: return OptimiseSubtraction(node);
+                case ParseID.EXP: return OptimiseExponentation(node);
 
                 default:
                     if (node is BinaryOpParseNode tokenNode) {
@@ -369,7 +370,6 @@ public partial class Compiler {
     /// xor                               1
     /// neqv                              1
     /// eqv                               1
-
     /// Parse an expression.
     private ParseNode ParseExpression(int level) {
         ParseNode op1 = Operand();
@@ -382,32 +382,93 @@ public partial class Compiler {
 
             int preced;
             switch (token.ID) {
-                case TokenID.KXOR:      parseID = ParseID.XOR;      preced = 1; break;
-                case TokenID.KBITXOR:   parseID = ParseID.XOR;      preced = 1; break;
+                case TokenID.KXOR:
+                    parseID = ParseID.XOR;
+                    preced = 1;
+                    break;
+                case TokenID.KBITXOR:
+                    parseID = ParseID.XOR;
+                    preced = 1;
+                    break;
 
-                case TokenID.KOR:       parseID = ParseID.OR;       preced = 2; break;
-                case TokenID.KBITOR:    parseID = ParseID.OR;       preced = 2; break;
+                case TokenID.KOR:
+                    parseID = ParseID.OR;
+                    preced = 2;
+                    break;
+                case TokenID.KBITOR:
+                    parseID = ParseID.OR;
+                    preced = 2;
+                    break;
 
-                case TokenID.KAND:      parseID = ParseID.AND;      preced = 3; break;
-                case TokenID.KBITAND:   parseID = ParseID.AND;      preced = 3; break;
+                case TokenID.KAND:
+                    parseID = ParseID.AND;
+                    preced = 3;
+                    break;
+                case TokenID.KBITAND:
+                    parseID = ParseID.AND;
+                    preced = 3;
+                    break;
 
-                case TokenID.KGT:       parseID = ParseID.GT;       preced = 5; break;
-                case TokenID.KGE:       parseID = ParseID.GE;       preced = 5; break;
-                case TokenID.KLE:       parseID = ParseID.LE;       preced = 5; break;
-                case TokenID.KNE:       parseID = ParseID.NE;       preced = 5; break;
-                case TokenID.KEQ:       parseID = ParseID.EQ;       preced = 5; break;
-                case TokenID.KLT:       parseID = ParseID.LT;       preced = 5; break;
-                case TokenID.KIN:       parseID = ParseID.INSTR;    preced = 5; break;
+                case TokenID.KGT:
+                    parseID = ParseID.GT;
+                    preced = 5;
+                    break;
+                case TokenID.KGE:
+                    parseID = ParseID.GE;
+                    preced = 5;
+                    break;
+                case TokenID.KLE:
+                    parseID = ParseID.LE;
+                    preced = 5;
+                    break;
+                case TokenID.KNE:
+                    parseID = ParseID.NE;
+                    preced = 5;
+                    break;
+                case TokenID.KEQ:
+                    parseID = ParseID.EQ;
+                    preced = 5;
+                    break;
+                case TokenID.KLT:
+                    parseID = ParseID.LT;
+                    preced = 5;
+                    break;
+                case TokenID.KIN:
+                    parseID = ParseID.INSTR;
+                    preced = 5;
+                    break;
 
-                case TokenID.PLUS:      parseID = ParseID.ADD;      preced = 6; break;
-                case TokenID.MINUS:     parseID = ParseID.SUB;      preced = 6; break;
+                case TokenID.PLUS:
+                    parseID = ParseID.ADD;
+                    preced = 6;
+                    break;
+                case TokenID.MINUS:
+                    parseID = ParseID.SUB;
+                    preced = 6;
+                    break;
 
-                case TokenID.MULTIPLY:  parseID = ParseID.MULT;     preced = 7; break;
-                case TokenID.DIVIDE:    parseID = ParseID.DIVIDE;   preced = 7; break;
-                case TokenID.KDIV:      parseID = ParseID.IDIVIDE;  preced = 7; break;
-                case TokenID.KMOD:      parseID = ParseID.MOD;      preced = 7; break;
+                case TokenID.MULTIPLY:
+                    parseID = ParseID.MULT;
+                    preced = 7;
+                    break;
+                case TokenID.DIVIDE:
+                    parseID = ParseID.DIVIDE;
+                    preced = 7;
+                    break;
+                case TokenID.KDIV:
+                    parseID = ParseID.IDIVIDE;
+                    preced = 7;
+                    break;
+                case TokenID.KMOD:
+                    parseID = ParseID.MOD;
+                    preced = 7;
+                    break;
 
-                case TokenID.EXP:       parseID = ParseID.EXP;      preced = 10; isRTL = true; break;
+                case TokenID.EXP:
+                    parseID = ParseID.EXP;
+                    preced = 10;
+                    isRTL = true;
+                    break;
 
                 default:
                     _currentLine.PushToken(token);
@@ -423,7 +484,8 @@ public partial class Compiler {
             if (level >= preced) {
                 _currentLine.PushToken(token);
                 done = true;
-            } else {
+            }
+            else {
 
                 // For operators that evaluate right to left (such as EXP), drop the
                 // precedence so that further occurrences of the same operator to
@@ -444,7 +506,8 @@ public partial class Compiler {
                     if (op1.Type == SymType.FIXEDCHAR || op2.Type == SymType.FIXEDCHAR) {
                         op1.Type = SymType.FIXEDCHAR;
                         op2.Type = SymType.FIXEDCHAR;
-                    } else {
+                    }
+                    else {
                         op1.Type = SymType.CHAR;
                         op2.Type = SymType.CHAR;
                     }
@@ -452,7 +515,8 @@ public partial class Compiler {
                     node.Parameters.Add(op1, false);
                     node.Type = SymType.INTEGER;
                     op1 = node;
-                } else {
+                }
+                else {
                     op1 = ParseBinaryOpNode(parseID, preced, op1);
                 }
             }
@@ -482,17 +546,17 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
         switch (token.ID) {
             case TokenID.LPAREN: {
-                    ParseNode node = Expression();
+                ParseNode node = Expression();
                 ExpectToken(TokenID.RPAREN);
                 return node;
-                }
+            }
 
             case TokenID.KNOT: {
-                    UnaryOpParseNode node = new(ParseID.NOT) {
-                        Operand = ParseExpression(4)
-                    };
-                    return CastNodeToType(node, SymType.INTEGER);
-                }
+                UnaryOpParseNode node = new(ParseID.NOT) {
+                    Operand = ParseExpression(4)
+                };
+                return CastNodeToType(node, SymType.INTEGER);
+            }
 
             case TokenID.KTRUE:
                 return new NumberParseNode(new Variant(1));
@@ -511,7 +575,7 @@ public partial class Compiler {
                 ParseNode op = ParseExpression(9);
                 node.Operand = op;
                 return CastNodeToType(node, op.Type);
-                }
+            }
 
             case TokenID.KERR: {
                 Symbol errSymbol = Globals.Get(Consts.ErrName);
@@ -521,7 +585,7 @@ public partial class Compiler {
                     }
                 };
                 return node;
-                }
+            }
 
             case TokenID.KERRTEXT: {
                 Symbol errSymbol = Globals.Get(Consts.ErrText);
@@ -531,12 +595,12 @@ public partial class Compiler {
                     }
                 };
                 return node;
-                }
+            }
 
             case TokenID.KZONE: {
                 ExtCallParseNode node = GetFileManagerExtCallNode("get_Zone");
                 return CastNodeToType(node, SymType.INTEGER);
-                }
+            }
 
             case TokenID.KKEY:
                 return CastNodeToType(GetRuntimeExtCallNode("get_KEY"), SymType.CHAR);
@@ -557,7 +621,7 @@ public partial class Compiler {
                 node.Parameters.Add(IntegerExpression());
                 ExpectToken(TokenID.RPAREN);
                 return CastNodeToType(node, SymType.INTEGER);
-                }
+            }
 
             case TokenID.KEOD: {
                 Symbol eodSymbol = GetMakeEODSymbol();
@@ -567,12 +631,12 @@ public partial class Compiler {
                     }
                 };
                 return node;
-                }
+            }
 
             case TokenID.KESC: {
                 ExtCallParseNode node = GetRuntimeExtCallNode("get_ESC");
                 return CastNodeToType(node, SymType.INTEGER);
-                }
+            }
 
             case TokenID.KRND: {
                 ExtCallParseNode node = GetIntrinsicExtCallNode("RND");
@@ -584,45 +648,45 @@ public partial class Compiler {
                     ExpectToken(TokenID.RPAREN);
                 }
                 return CastNodeToType(node, SymType.FLOAT);
-                }
+            }
 
-            case TokenID.KSPC:      return KSpc();
-            case TokenID.KSTR:      return KStr();
-            case TokenID.KGET:      return KGet();
-            case TokenID.KTIME:     return KTime();
+            case TokenID.KSPC: return KSpc();
+            case TokenID.KSTR: return KStr();
+            case TokenID.KGET: return KGet();
+            case TokenID.KTIME: return KTime();
 
-            case TokenID.KLOG:      return InlineDouble("LOG10");
-            case TokenID.KSIN:      return InlineDouble("SIN");
-            case TokenID.KCOS:      return InlineDouble("COS");
-            case TokenID.KTAN:      return InlineDouble("TAN");
-            case TokenID.KATN:      return InlineDouble("ATAN");
-            case TokenID.KSQR:      return InlineDouble("SQRT");
-            case TokenID.KEXP:      return InlineDouble("EXP");
-            case TokenID.KINT:      return InlineDouble("FLOOR");
+            case TokenID.KLOG: return InlineDouble("LOG10");
+            case TokenID.KSIN: return InlineDouble("SIN");
+            case TokenID.KCOS: return InlineDouble("COS");
+            case TokenID.KTAN: return InlineDouble("TAN");
+            case TokenID.KATN: return InlineDouble("ATAN");
+            case TokenID.KSQR: return InlineDouble("SQRT");
+            case TokenID.KEXP: return InlineDouble("EXP");
+            case TokenID.KINT: return InlineDouble("FLOOR");
 
-            case TokenID.KSGN:      return InlineFloat("SGN", SymType.INTEGER);
-            case TokenID.KABS:      return InlineGeneric("ABS");
+            case TokenID.KSGN: return InlineFloat("SGN", SymType.INTEGER);
+            case TokenID.KABS: return InlineGeneric("ABS");
 
-            case TokenID.KCHR:      return InlineFixedChar("CHAR");
+            case TokenID.KCHR: return InlineFixedChar("CHAR");
 
-            case TokenID.KVAL:      return InlineString("VAL", SymType.FLOAT);
-            case TokenID.KLEN:      return InlineString("LEN", SymType.INTEGER);
-            case TokenID.KASC:      return InlineString("ICHAR", SymType.INTEGER);
+            case TokenID.KVAL: return InlineString("VAL", SymType.FLOAT);
+            case TokenID.KLEN: return InlineString("LEN", SymType.INTEGER);
+            case TokenID.KASC: return InlineString("ICHAR", SymType.INTEGER);
 
             case TokenID.REAL: {
-                    FloatToken realToken = (FloatToken)token;
-                    return new NumberParseNode(new Variant(realToken.Value));
-                }
+                FloatToken realToken = (FloatToken)token;
+                return new NumberParseNode(new Variant(realToken.Value));
+            }
 
             case TokenID.INTEGER: {
                 IntegerToken intToken = (IntegerToken)token;
                 return new NumberParseNode(new Variant((float)intToken.Value));
-                }
-                
+            }
+
             case TokenID.STRING: {
                 StringToken stringToken = (StringToken)token;
                 return new StringParseNode(stringToken.String);
-                }
+            }
 
             case TokenID.IDENT: {
                 IdentifierToken identToken = (IdentifierToken)token;

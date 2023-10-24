@@ -25,7 +25,7 @@
 
 using CCompiler;
 
-namespace JComal; 
+namespace JComal;
 
 public static class Program {
 
@@ -40,7 +40,8 @@ public static class Program {
             if (opts.Interactive) {
                 Interpreter interpreter = new();
                 interpreter.Run(opts);
-            } else {
+            }
+            else {
                 Compiler comp = new(opts) {
                     Messages = messages
                 };

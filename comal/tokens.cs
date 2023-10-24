@@ -207,139 +207,139 @@ public static class Tokens {
 
     // List of reserved keywords and their token values
     private static readonly Dictionary<string, TokenID> Keywords = new() {
-        { "abs",        TokenID.KABS        },
-        { "and",        TokenID.KAND        },
-        { "append",     TokenID.KAPPEND     },
-        { "at",         TokenID.KAT         },
-        { "atn",        TokenID.KATN        },
-        { "auto",       TokenID.KAUTO       },
-        { "bitand",     TokenID.KBITAND     },
-        { "bitor",      TokenID.KBITOR      },
-        { "bitxor",     TokenID.KBITXOR     },
-        { "bye",        TokenID.KBYE        },
-        { "case",       TokenID.KCASE       },
-        { "cat",        TokenID.KCAT        },
-        { "change",     TokenID.KCHANGE     },
-        { "chr$",       TokenID.KCHR        },
-        { "close",      TokenID.KCLOSE      },
-        { "closed",     TokenID.KCLOSED     },
-        { "colour",     TokenID.KCOLOUR     },
-        { "con",        TokenID.KCON        },
-        { "cos",        TokenID.KCOS        },
-        { "create",     TokenID.KCREATE     },
-        { "curcol",     TokenID.KCURCOL     },
-        { "currow",     TokenID.KCURROW     },
-        { "cursor",     TokenID.KCURSOR     },
-        { "data",       TokenID.KDATA       },
-        { "del",        TokenID.KDEL        },
-        { "delete",     TokenID.KDELETE     },
-        { "dim",        TokenID.KDIM        },
-        { "dir",        TokenID.KDIR        },
-        { "display",    TokenID.KDISPLAY    },
-        { "div",        TokenID.KDIV        },
-        { "do",         TokenID.KDO         },
-        { "edit",       TokenID.KEDIT       },
-        { "elif",       TokenID.KELIF       },
-        { "else",       TokenID.KELSE       },
-        { "end",        TokenID.KEND        },
-        { "endcase",    TokenID.KENDCASE    },
-        { "endfor",     TokenID.KNEXT       },
-        { "endfunc",    TokenID.KENDFUNC    },
-        { "endif",      TokenID.KENDIF      },
-        { "endloop",    TokenID.KENDLOOP    },
-        { "endmodule",  TokenID.KENDMODULE  },
-        { "endproc",    TokenID.KENDPROC    },
-        { "endtrap",    TokenID.KENDTRAP    },
-        { "endwhile",   TokenID.KENDWHILE   },
-        { "eod",        TokenID.KEOD        },
-        { "eof",        TokenID.KEOF        },
-        { "eor",        TokenID.KXOR        },
-        { "err",        TokenID.KERR        },
-        { "errtext$",   TokenID.KERRTEXT    },
-        { "enter",      TokenID.KENTER      },
-        { "esc",        TokenID.KESC        },
-        { "exec",       TokenID.KEXEC       },
-        { "exit",       TokenID.KEXIT       },
-        { "exp",        TokenID.KEXP        },
-        { "export",     TokenID.KEXPORT     },
-        { "external",   TokenID.KEXTERNAL   },
-        { "false",      TokenID.KFALSE      },
-        { "file",       TokenID.KFILE       },
-        { "find",       TokenID.KFIND       },
-        { "for",        TokenID.KFOR        },
-        { "freefile",   TokenID.KFREEFILE   },
-        { "func",       TokenID.KFUNC       },
-        { "get$",       TokenID.KGET        },
-        { "goto",       TokenID.KGOTO       },
-        { "handler",    TokenID.KHANDLER    },
-        { "if",         TokenID.KIF         },
-        { "import",     TokenID.KIMPORT     },
-        { "in",         TokenID.KIN         },
-        { "input",      TokenID.KINPUT      },
-        { "int",        TokenID.KINT        },
-        { "key$",       TokenID.KKEY        },
-        { "label",      TokenID.KLABEL      },
-        { "len",        TokenID.KLEN        },
-        { "let",        TokenID.KLET        },
-        { "list",       TokenID.KLIST       },
-        { "load",       TokenID.KLOAD       },
-        { "log",        TokenID.KLOG        },
-        { "loop",       TokenID.KLOOP       },
-        { "merge",      TokenID.KMERGE      },
-        { "mod",        TokenID.KMOD        },
-        { "module",     TokenID.KMODULE     },
-        { "new",        TokenID.KNEW        },
-        { "next",       TokenID.KNEXT       },
-        { "null",       TokenID.KNULL       },
-        { "not",        TokenID.KNOT        },
-        { "of",         TokenID.KOF         },
-        { "old",        TokenID.KOLD        },
-        { "open",       TokenID.KOPEN       },
-        { "or",         TokenID.KOR         },
-        { "ord",        TokenID.KASC        },
-        { "otherwise",  TokenID.KOTHERWISE  },
-        { "page",       TokenID.KPAGE       },
-        { "pi",         TokenID.KPI         },
-        { "print",      TokenID.KPRINT      },
-        { "proc",       TokenID.KPROC       },
-        { "random",     TokenID.KRANDOM     },
-        { "randomize",  TokenID.KRANDOMIZE  },
-        { "read",       TokenID.KREAD       },
-        { "ref",        TokenID.KREF        },
-        { "rem",        TokenID.COMMENT     },
-        { "renum",      TokenID.KRENUM      },
-        { "repeat",     TokenID.KREPEAT     },
-        { "report",     TokenID.KREPORT     },
-        { "restore",    TokenID.KRESTORE    },
-        { "return",     TokenID.KRETURN     },
-        { "rnd",        TokenID.KRND        },
-        { "run",        TokenID.KRUN        },
-        { "save",       TokenID.KSAVE       },
-        { "scan",       TokenID.KSCAN       },
-        { "select",     TokenID.KSELECT     },
-        { "sgn",        TokenID.KSGN        },
-        { "sin",        TokenID.KSIN        },
-        { "size",       TokenID.KSIZE       },
-        { "spc$",       TokenID.KSPC        },
-        { "sqr",        TokenID.KSQR        },
-        { "step",       TokenID.KSTEP       },
-        { "stop",       TokenID.KSTOP       },
-        { "str$",       TokenID.KSTR        },
-        { "tab",        TokenID.KTAB        },
-        { "tan",        TokenID.KTAN        },
-        { "then",       TokenID.KTHEN       },
-        { "time",       TokenID.KTIME       },
-        { "to",         TokenID.KTO         },
-        { "trap",       TokenID.KTRAP       },
-        { "true",       TokenID.KTRUE       },
-        { "until",      TokenID.KUNTIL      },
-        { "use",        TokenID.KUSE        },
-        { "using",      TokenID.KUSING      },
-        { "val",        TokenID.KVAL        },
-        { "when",       TokenID.KWHEN       },
-        { "while",      TokenID.KWHILE      },
-        { "write",      TokenID.KWRITE      },
-        { "zone",       TokenID.KZONE       }
+        { "abs", TokenID.KABS },
+        { "and", TokenID.KAND },
+        { "append", TokenID.KAPPEND },
+        { "at", TokenID.KAT },
+        { "atn", TokenID.KATN },
+        { "auto", TokenID.KAUTO },
+        { "bitand", TokenID.KBITAND },
+        { "bitor", TokenID.KBITOR },
+        { "bitxor", TokenID.KBITXOR },
+        { "bye", TokenID.KBYE },
+        { "case", TokenID.KCASE },
+        { "cat", TokenID.KCAT },
+        { "change", TokenID.KCHANGE },
+        { "chr$", TokenID.KCHR },
+        { "close", TokenID.KCLOSE },
+        { "closed", TokenID.KCLOSED },
+        { "colour", TokenID.KCOLOUR },
+        { "con", TokenID.KCON },
+        { "cos", TokenID.KCOS },
+        { "create", TokenID.KCREATE },
+        { "curcol", TokenID.KCURCOL },
+        { "currow", TokenID.KCURROW },
+        { "cursor", TokenID.KCURSOR },
+        { "data", TokenID.KDATA },
+        { "del", TokenID.KDEL },
+        { "delete", TokenID.KDELETE },
+        { "dim", TokenID.KDIM },
+        { "dir", TokenID.KDIR },
+        { "display", TokenID.KDISPLAY },
+        { "div", TokenID.KDIV },
+        { "do", TokenID.KDO },
+        { "edit", TokenID.KEDIT },
+        { "elif", TokenID.KELIF },
+        { "else", TokenID.KELSE },
+        { "end", TokenID.KEND },
+        { "endcase", TokenID.KENDCASE },
+        { "endfor", TokenID.KNEXT },
+        { "endfunc", TokenID.KENDFUNC },
+        { "endif", TokenID.KENDIF },
+        { "endloop", TokenID.KENDLOOP },
+        { "endmodule", TokenID.KENDMODULE },
+        { "endproc", TokenID.KENDPROC },
+        { "endtrap", TokenID.KENDTRAP },
+        { "endwhile", TokenID.KENDWHILE },
+        { "eod", TokenID.KEOD },
+        { "eof", TokenID.KEOF },
+        { "eor", TokenID.KXOR },
+        { "err", TokenID.KERR },
+        { "errtext$", TokenID.KERRTEXT },
+        { "enter", TokenID.KENTER },
+        { "esc", TokenID.KESC },
+        { "exec", TokenID.KEXEC },
+        { "exit", TokenID.KEXIT },
+        { "exp", TokenID.KEXP },
+        { "export", TokenID.KEXPORT },
+        { "external", TokenID.KEXTERNAL },
+        { "false", TokenID.KFALSE },
+        { "file", TokenID.KFILE },
+        { "find", TokenID.KFIND },
+        { "for", TokenID.KFOR },
+        { "freefile", TokenID.KFREEFILE },
+        { "func", TokenID.KFUNC },
+        { "get$", TokenID.KGET },
+        { "goto", TokenID.KGOTO },
+        { "handler", TokenID.KHANDLER },
+        { "if", TokenID.KIF },
+        { "import", TokenID.KIMPORT },
+        { "in", TokenID.KIN },
+        { "input", TokenID.KINPUT },
+        { "int", TokenID.KINT },
+        { "key$", TokenID.KKEY },
+        { "label", TokenID.KLABEL },
+        { "len", TokenID.KLEN },
+        { "let", TokenID.KLET },
+        { "list", TokenID.KLIST },
+        { "load", TokenID.KLOAD },
+        { "log", TokenID.KLOG },
+        { "loop", TokenID.KLOOP },
+        { "merge", TokenID.KMERGE },
+        { "mod", TokenID.KMOD },
+        { "module", TokenID.KMODULE },
+        { "new", TokenID.KNEW },
+        { "next", TokenID.KNEXT },
+        { "null", TokenID.KNULL },
+        { "not", TokenID.KNOT },
+        { "of", TokenID.KOF },
+        { "old", TokenID.KOLD },
+        { "open", TokenID.KOPEN },
+        { "or", TokenID.KOR },
+        { "ord", TokenID.KASC },
+        { "otherwise", TokenID.KOTHERWISE },
+        { "page", TokenID.KPAGE },
+        { "pi", TokenID.KPI },
+        { "print", TokenID.KPRINT },
+        { "proc", TokenID.KPROC },
+        { "random", TokenID.KRANDOM },
+        { "randomize", TokenID.KRANDOMIZE },
+        { "read", TokenID.KREAD },
+        { "ref", TokenID.KREF },
+        { "rem", TokenID.COMMENT },
+        { "renum", TokenID.KRENUM },
+        { "repeat", TokenID.KREPEAT },
+        { "report", TokenID.KREPORT },
+        { "restore", TokenID.KRESTORE },
+        { "return", TokenID.KRETURN },
+        { "rnd", TokenID.KRND },
+        { "run", TokenID.KRUN },
+        { "save", TokenID.KSAVE },
+        { "scan", TokenID.KSCAN },
+        { "select", TokenID.KSELECT },
+        { "sgn", TokenID.KSGN },
+        { "sin", TokenID.KSIN },
+        { "size", TokenID.KSIZE },
+        { "spc$", TokenID.KSPC },
+        { "sqr", TokenID.KSQR },
+        { "step", TokenID.KSTEP },
+        { "stop", TokenID.KSTOP },
+        { "str$", TokenID.KSTR },
+        { "tab", TokenID.KTAB },
+        { "tan", TokenID.KTAN },
+        { "then", TokenID.KTHEN },
+        { "time", TokenID.KTIME },
+        { "to", TokenID.KTO },
+        { "trap", TokenID.KTRAP },
+        { "true", TokenID.KTRUE },
+        { "until", TokenID.KUNTIL },
+        { "use", TokenID.KUSE },
+        { "using", TokenID.KUSING },
+        { "val", TokenID.KVAL },
+        { "when", TokenID.KWHEN },
+        { "while", TokenID.KWHILE },
+        { "write", TokenID.KWRITE },
+        { "zone", TokenID.KZONE }
     };
 
     /// <summary>
@@ -449,9 +449,7 @@ public class SimpleToken {
     /// <summary>
     /// Returns the token ID.
     /// </summary>
-    public TokenID ID {
-        get;
-    }
+    public TokenID ID { get; }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -495,16 +493,12 @@ public class ErrorToken : SimpleToken {
     /// <summary>
     /// Returns the error message.
     /// </summary>
-    public string Message {
-        get;
-    }
+    public string Message { get; }
 
     /// <summary>
     /// Actual string found in token stream
     /// </summary>
-    private string String {
-        get;
-    }
+    private string String { get; }
 
     /// <summary>
     /// Creates an error token with the specified string.
@@ -561,9 +555,7 @@ public class StringToken : SimpleToken {
     /// <summary>
     /// Returns the literal string value of the token.
     /// </summary>
-    public string String {
-        get;
-    }
+    public string String { get; }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -608,9 +600,7 @@ public class IntegerToken : SimpleToken {
     /// <summary>
     /// Returns the integer value of the token.
     /// </summary>
-    public int Value {
-        get; set;
-    }
+    public int Value { get; set; }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -656,9 +646,7 @@ public class FloatToken : SimpleToken {
     /// <summary>
     /// Returns the floating point value of the token.
     /// </summary>
-    public float Value {
-        get;
-    }
+    public float Value { get; }
 
     /// <summary>
     /// Returns the string equivalent of the token.
@@ -704,9 +692,7 @@ public class IdentifierToken : SimpleToken {
     /// <summary>
     /// Returns the identifier name.
     /// </summary>
-    public string Name {
-        get;
-    }
+    public string Name { get; }
 
     /// <summary>
     /// Returns the string equivalent of the token.

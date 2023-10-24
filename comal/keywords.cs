@@ -29,7 +29,7 @@ using System.Reflection;
 using CCompiler;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// Main compiler class.
@@ -49,7 +49,8 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
         if (token is not IdentifierToken identToken) {
             Messages.Error(MessageCode.LIBRARYNAMEEXPECTED, "Library name expected");
-        } else {
+        }
+        else {
             string baseTypeName = identToken.Name;
             string currentDirectory = Directory.GetCurrentDirectory();
             string typeDllPath = Path.Combine(currentDirectory, baseTypeName);
@@ -70,11 +71,11 @@ public partial class Compiler {
             }
 
             // Enumerate all types in dll and add them to the globals.20
-            Type [] allTypes = dll.GetTypes();
+            Type[] allTypes = dll.GetTypes();
             foreach (Type thisType in allTypes) {
 
                 // Enumerate all methods on type
-                MethodInfo [] allMethods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+                MethodInfo[] allMethods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static);
                 foreach (MethodInfo method in allMethods) {
 
                     SymClass klass = method.ReturnType == typeof(void) ? SymClass.SUBROUTINE : SymClass.FUNCTION;
@@ -98,7 +99,7 @@ public partial class Compiler {
                         Parameters = parameters
                     });
                 }
-            } 
+            }
         }
         return null;
     }
@@ -116,8 +117,9 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
         if (token is not IdentifierToken identToken) {
             Messages.Error(MessageCode.MODULENAMEEXPECTED,
-                           "Module name expected");
-        } else {
+                "Module name expected");
+        }
+        else {
             _program.Name = identToken.Name;
             ExpectEndOfLine();
         }
@@ -137,20 +139,21 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
         if (token is not IdentifierToken identToken) {
             Messages.Error(MessageCode.PROCFUNCNAMEEXPECTED,
-                           "Procedure or function name expected");
-        } else {
+                "Procedure or function name expected");
+        }
+        else {
             string methodName = identToken.Name;
             Symbol sym = Globals.Get(methodName);
             if (sym is { IsExported: true }) {
                 Messages.Error(MessageCode.ALREADYEXPORTED,
-                               $"{methodName} already exported");
+                    $"{methodName} already exported");
             }
             if (sym == null) {
                 sym = Globals.Add(methodName,
-                                         new SymFullType(),
-                                         SymClass.SUBROUTINE,
-                                         null,
-                                         _currentLineNumber);
+                    new SymFullType(),
+                    SymClass.SUBROUTINE,
+                    null,
+                    _currentLineNumber);
                 sym.Modifier |= SymModifier.EXPORTED;
             }
             ExpectEndOfLine();
@@ -190,8 +193,7 @@ public partial class Compiler {
         _currentLine.PushToken(token);
 
         dataSymbol.ArrayValues = valueList.ToArray();
-        dataSymbol.Dimensions = new Collection<SymDimension>
-        {
+        dataSymbol.Dimensions = new Collection<SymDimension> {
             new() {
                 LowerBound = new NumberParseNode(0),
                 UpperBound = new NumberParseNode(valueList.Count - 1)
@@ -354,7 +356,8 @@ public partial class Compiler {
 
         if (_importSymbols == null) {
             Messages.Error(MessageCode.NOTINCLOSED, "IMPORT can only be used in a CLOSED procedure or function");
-        } else {
+        }
+        else {
             do {
                 IdentifierDefinition identToken = ParseIdentifierDefinition();
                 if (identToken == null) {
@@ -460,8 +463,7 @@ public partial class Compiler {
             identToken = ParseIdentifier();
         }
 
-        return new AssignmentParseNode
-        {
+        return new AssignmentParseNode {
             Identifiers = identifiers.ToArray(),
             ValueExpressions = values.ToArray()
         };
@@ -555,7 +557,8 @@ public partial class Compiler {
                     ParseNode nextConditional = ParseBinaryOpNode(ParseID.EQ, 0, exprNode);
                     conditionalNode = CreateBinaryOpNode(ParseID.OR, conditionalNode, nextConditional);
                 }
-            } else if (token.ID != TokenID.KOTHERWISE) {
+            }
+            else if (token.ID != TokenID.KOTHERWISE) {
                 Messages.Error(MessageCode.MISSINGENDSTATEMENT, "WHEN or OTHERWISE expected");
             }
             ExpectEndOfLine();
@@ -565,7 +568,8 @@ public partial class Compiler {
             TokenID endTokenID = CompileBlock(block, new[] {
                 TokenID.KENDCASE,
                 TokenID.KOTHERWISE,
-                TokenID.KWHEN });
+                TokenID.KWHEN
+            });
             parseNode.Add(conditionalNode, block);
 
             // End of statement?
@@ -645,7 +649,8 @@ public partial class Compiler {
             statements = new BlockParseNode();
             CompileLine(token, statements);
             node.Add(expr, statements);
-        } else {
+        }
+        else {
             TokenID endToken;
             do {
                 statements = new BlockParseNode();
@@ -656,7 +661,8 @@ public partial class Compiler {
                     expr = Expression();
                     InsertTokenIfMissing(TokenID.KTHEN);
                     ExpectEndOfLine();
-                } else if (endToken == TokenID.KELSE) {
+                }
+                else if (endToken == TokenID.KELSE) {
 
                     // We mark the end of the sequence of IF blocks with
                     // a null expression.
@@ -683,8 +689,12 @@ public partial class Compiler {
             SimpleToken token = GetNextToken();
             bool escFlag = false;
             switch (token.ID) {
-                case TokenID.PLUS:  escFlag = true; break;
-                case TokenID.MINUS: escFlag = false; break;
+                case TokenID.PLUS:
+                    escFlag = true;
+                    break;
+                case TokenID.MINUS:
+                    escFlag = false;
+                    break;
                 default:
                     Messages.Error(MessageCode.UNEXPECTEDTOKEN, "+ or - expected after TRAP ESC");
                     break;
@@ -752,7 +762,8 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
         if (token.ID == TokenID.KSTEP) {
             node.StepExpression = Expression();
-        } else {
+        }
+        else {
             _currentLine.PushToken(token);
         }
 
@@ -769,7 +780,8 @@ public partial class Compiler {
                 node.LoopBody.Add(statement);
                 ExpectEndOfLine();
             }
-        } else {
+        }
+        else {
             // Long format
             CompileBlock(node.LoopBody, new[] { TokenID.KNEXT });
 
@@ -807,7 +819,8 @@ public partial class Compiler {
                 node.LoopBody.Add(subnode);
             }
             ExpectToken(TokenID.KUNTIL);
-        } else {
+        }
+        else {
             CompileBlock(node.LoopBody, new[] { TokenID.KUNTIL });
             node.LoopBody.Add(MarkLine());
         }
@@ -839,7 +852,8 @@ public partial class Compiler {
             if (subnode != null) {
                 node.LoopBody.Add(subnode);
             }
-        } else {
+        }
+        else {
             CompileBlock(node.LoopBody, new[] { TokenID.KENDWHILE });
         }
         return node;
@@ -969,7 +983,8 @@ public partial class Compiler {
         node.Parameters = new ParametersParseNode();
         if (!_currentLine.IsAtEndOfStatement) {
             node.Parameters.Add(IntegerExpression());
-        } else {
+        }
+        else {
             node.Parameters.Add(new NumberParseNode(0));
         }
         return node;
@@ -987,7 +1002,8 @@ public partial class Compiler {
         node.Parameters = new ParametersParseNode();
         if (!_currentLine.IsAtEndOfStatement) {
             node.Parameters.Add(CastNodeToType(StringExpression(), SymType.CHAR));
-        } else {
+        }
+        else {
             node.Parameters.Add(new StringParseNode(""));
         }
         node.Parameters.Add(new NumberParseNode(new Variant(_currentLineNumber)));
@@ -1006,7 +1022,8 @@ public partial class Compiler {
         node.Parameters = new ParametersParseNode();
         if (!_currentLine.IsAtEndOfStatement) {
             node.Parameters.Add(CastNodeToType(StringExpression(), SymType.CHAR));
-        } else {
+        }
+        else {
             node.Parameters.Add(new StringParseNode(""));
         }
         node.Parameters.Add(new NumberParseNode(new Variant(_currentLineNumber)));
@@ -1037,7 +1054,8 @@ public partial class Compiler {
         node.Parameters = new ParametersParseNode();
         if (!_currentLine.IsAtEndOfStatement) {
             node.Parameters.Add(CastNodeToType(StringExpression(), SymType.CHAR));
-        } else {
+        }
+        else {
             node.Parameters.Add(new StringParseNode("*"));
         }
         return node;

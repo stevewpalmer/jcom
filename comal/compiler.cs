@@ -63,30 +63,22 @@ public partial class Compiler : ICompiler {
     /// <summary>
     /// Return or set the list of compiler messages.
     /// </summary>
-    public MessageCollection Messages {
-        get; init;
-    }
+    public MessageCollection Messages { get; init; }
 
     /// <summary>
     /// Symbol table stack
     /// </summary>
-    private SymbolStack SymbolStack {
-        get;
-    }
+    private SymbolStack SymbolStack { get; }
 
     /// <summary>
     /// Global methods symbol table
     /// </summary>
-    private SymbolCollection Globals {
-        get;
-    }
+    private SymbolCollection Globals { get; }
 
     /// <summary>
     /// Current procedure being parsed
     /// </summary>
-    private ProcedureParseNode CurrentProcedure {
-        get; set;
-    }
+    private ProcedureParseNode CurrentProcedure { get; set; }
 
     /// <summary>
     /// Constructs a compiler object with the given options.
@@ -140,7 +132,8 @@ public partial class Compiler : ICompiler {
             using Stream stream = new FileStream(filename, FileMode.Open, FileAccess.Read);
             ByteReader byteReader = new(stream);
             lines.Deserialize(byteReader);
-        } else {
+        }
+        else {
             LineTokeniser tokeniser = new();
 
             using StreamReader sr = new(filename);
@@ -231,7 +224,8 @@ public partial class Compiler : ICompiler {
         // program.
         if (activeMethod != null) {
             activeMethod.Body.Clear();
-        } else {
+        }
+        else {
             Symbol method = Globals.Add(methodName, new SymFullType(), SymClass.SUBROUTINE, null, 0);
             method.Defined = true;
 
@@ -260,7 +254,8 @@ public partial class Compiler : ICompiler {
             _program.IsExecutable = _hasProgram;
             _program.Generate();
             _program.Save();
-        } catch (CodeGeneratorException e) {
+        }
+        catch (CodeGeneratorException e) {
             Messages.Error(e.Filename, MessageCode.CODEGEN, e.Linenumber, e.Message);
         }
     }
@@ -327,7 +322,8 @@ public partial class Compiler : ICompiler {
                 outputFilename = Path.ChangeExtension(outputFilename, ".xml");
                 xmlTree.Save(outputFilename);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             if (_opts.DevMode || _opts.Interactive) {
                 throw;
             }
@@ -406,7 +402,8 @@ public partial class Compiler : ICompiler {
                     if (TestToken(TokenID.KEXTERNAL)) {
                         method.Modifier = SymModifier.EXTERNAL;
                         method.ExternalLibrary = ParseStringLiteral();
-                    } else {
+                    }
+                    else {
                         method.Parent = parents.Peek();
                         parents.Push(method);
                     }
@@ -519,19 +516,22 @@ public partial class Compiler : ICompiler {
         Symbol sym = GetLabel(label);
         if (sym == null) {
             sym = SymbolStack.Top.Add(label,
-                                    new SymFullType(SymType.LABEL),
-                                    SymClass.LABEL,
-                                    null,
-                                    _currentLineNumber);
+                new SymFullType(SymType.LABEL),
+                SymClass.LABEL,
+                null,
+                _currentLineNumber);
             sym.Defined = isDeclaration;
-        } else if (isDeclaration && sym.Defined) {
+        }
+        else if (isDeclaration && sym.Defined) {
             Messages.Error(MessageCode.LABELALREADYDECLARED, $"Label {label} already declared");
-        } else {
+        }
+        else {
             sym.Defined = isDeclaration || sym.Defined;
         }
         if (isDeclaration) {
             sym.Depth = _blockDepth;
-        } else {
+        }
+        else {
             sym.IsReferenced = true;
         }
         return sym;
@@ -590,7 +590,8 @@ public partial class Compiler : ICompiler {
         foreach (SymbolCollection symbols in SymbolStack.All) {
             if ((symbols == Globals || symbols == Globals) && _importSymbols != null) {
                 sym = _importSymbols.Get(name);
-            } else {
+            }
+            else {
                 sym = symbols.Get(name);
             }
             if (sym != null) {
@@ -619,12 +620,12 @@ public partial class Compiler : ICompiler {
         if (!CurrentProcedure.IsClosed) {
             sym = MakeSymbolForScope(name, Globals);
             sym.Modifier |= SymModifier.STATIC;
-        } else {
+        }
+        else {
             sym = MakeSymbolForScope(name, SymbolStack.Top);
         }
         return sym;
     }
-
 
     // Make a symbol for the current scope and initialise it. If we're in the main
     // program, all symbols go into the global symbol table.
@@ -982,7 +983,8 @@ public partial class Compiler : ICompiler {
                 LibraryName = sym.ExternalLibrary,
                 Name = sym.Name
             };
-        } else {
+        }
+        else {
             node = new CallParseNode {
                 ProcName = new IdentifierParseNode(sym),
                 Parameters = parameters
@@ -1080,47 +1082,47 @@ public partial class Compiler : ICompiler {
         foreach (ParseNode node in blockNodes.Nodes) {
             switch (node.ID) {
                 case ParseID.COND: {
-                        // Block IF statement. One sub-block for each
-                        // IF...ELSE...ENDIF group.
-                        ConditionalParseNode tokenNode = (ConditionalParseNode)node;
-                        for (int m = 1; m < tokenNode.BodyList.Count; m += 2) {
-                            if (tokenNode.BodyList[m] != null) {
-                                ValidateBlock(level + 1, tokenNode.BodyList[m]);
-                            }
+                    // Block IF statement. One sub-block for each
+                    // IF...ELSE...ENDIF group.
+                    ConditionalParseNode tokenNode = (ConditionalParseNode)node;
+                    for (int m = 1; m < tokenNode.BodyList.Count; m += 2) {
+                        if (tokenNode.BodyList[m] != null) {
+                            ValidateBlock(level + 1, tokenNode.BodyList[m]);
                         }
-                        break;
                     }
+                    break;
+                }
 
                 case ParseID.FILENAME: {
-                        MarkFilenameParseNode tokenNode = (MarkFilenameParseNode)node;
-                        filename = tokenNode.Filename;
-                        break;
-                    }
+                    MarkFilenameParseNode tokenNode = (MarkFilenameParseNode)node;
+                    filename = tokenNode.Filename;
+                    break;
+                }
 
                 case ParseID.LINENUMBER: {
-                        MarkLineParseNode tokenNode = (MarkLineParseNode)node;
-                        line = tokenNode.DisplayableLineNumber;
-                        break;
-                    }
+                    MarkLineParseNode tokenNode = (MarkLineParseNode)node;
+                    line = tokenNode.DisplayableLineNumber;
+                    break;
+                }
 
                 case ParseID.LOOP:
                     ValidateBlock(level + 1, ((LoopParseNode)node).LoopBody);
                     break;
 
                 case ParseID.GOTO: {
-                        GotoParseNode tokenNode = (GotoParseNode)node;
-                        if (tokenNode.Nodes.Count > 0) {
-                            SymbolParseNode symNode = (SymbolParseNode)tokenNode.Nodes[0];
-                            Symbol sym = symNode.Symbol;
-                            if (sym.Depth > level) {
-                                Messages.Error(filename,
-                                               MessageCode.GOTOINTOBLOCK,
-                                               line,
-                                               "GOTO into an inner block");
-                            }
+                    GotoParseNode tokenNode = (GotoParseNode)node;
+                    if (tokenNode.Nodes.Count > 0) {
+                        SymbolParseNode symNode = (SymbolParseNode)tokenNode.Nodes[0];
+                        Symbol sym = symNode.Symbol;
+                        if (sym.Depth > level) {
+                            Messages.Error(filename,
+                                MessageCode.GOTOINTOBLOCK,
+                                line,
+                                "GOTO into an inner block");
                         }
-                        break;
                     }
+                    break;
+                }
             }
         }
     }

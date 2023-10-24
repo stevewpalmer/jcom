@@ -99,7 +99,8 @@ public partial class Compiler {
         else if (sym is { Type: SymType.FIXEDCHAR, IsArray: false } && node.HasIndexes) {
             if (_opts.Strict || node.Indexes.Count > 1) {
                 Messages.Error(MessageCode.BADSUBSTRINGSPEC, "Substring must have start and end specification");
-            } else {
+            }
+            else {
                 node.SubstringStart = node.Indexes[0];
                 node.SubstringEnd = node.Indexes[0];
                 node.Indexes = null;
@@ -112,7 +113,7 @@ public partial class Compiler {
 
     // Parse an identifier parse node from the specified token.
     private IdentifierParseNode ParseIdentifierParseNode() {
-        IdentifierParseNode node = new (null);
+        IdentifierParseNode node = new(null);
         Collection<ParseNode> indices = null;
         SimpleToken token = GetNextToken();
 
@@ -280,8 +281,8 @@ public partial class Compiler {
             if (sym is { IsReferenced: false, IsHidden: false } && !sym.Modifier.HasFlag(SymModifier.RETVAL)) {
                 string scopeName = sym.IsParameter ? "parameter" : sym.IsLabel ? "label" : "variable";
                 Messages.Warning(MessageCode.UNUSEDVARIABLE,
-                                  3,
-                                  sym.RefLine,
+                    3,
+                    sym.RefLine,
                     $"Unused {scopeName} {sym.Name} in function");
             }
         }
@@ -318,13 +319,14 @@ public partial class Compiler {
                         Symbol sym = symbolTable.Get(identifier.Name);
                         if (sym != null) {
                             Messages.Error(MessageCode.PARAMETERDEFINED, $"Parameter {identifier.Name} already defined");
-                        } else {
+                        }
+                        else {
                             SymFullType symType = GetTypeFromName(identifier.Name);
                             sym = symbolTable.Add(identifier.Name,
-                                                  symType,
-                                                  SymClass.VAR,
-                                                  identifier.Dimensions,
-                                                  _currentLineNumber);
+                                symType,
+                                SymClass.VAR,
+                                identifier.Dimensions,
+                                _currentLineNumber);
                             sym.Scope = scope;
                             sym.Linkage = linkage;
                             sym.Defined = true;
@@ -336,7 +338,8 @@ public partial class Compiler {
                 _currentLine.PushToken(token);
             }
             ExpectToken(TokenID.RPAREN);
-        } else {
+        }
+        else {
             _currentLine.PushToken(token);
         }
         return parameters;
@@ -396,7 +399,8 @@ public partial class Compiler {
             if (sym == null) {
                 sym = MakeSymbolForCurrentScope(identToken.Name);
                 sym.Dimensions = dimensions;
-            } else {
+            }
+            else {
                 if (fullType.Type != SymType.NONE) {
                     sym.FullType = thisFullType;
                 }
@@ -414,7 +418,7 @@ public partial class Compiler {
             // identifier becomes an array.
             if (sym.IsArray) {
                 sym.Linkage = SymLinkage.BYVAL;
-                sym.Modifier |= SymModifier.FLATARRAY;  // Comal always uses flat arrays
+                sym.Modifier |= SymModifier.FLATARRAY; // Comal always uses flat arrays
             }
         }
         return sym;
@@ -454,7 +458,8 @@ public partial class Compiler {
                 dim.UpperBound = in2;
                 if (dimensions.Count == 7) {
                     Messages.Error(MessageCode.TOOMANYDIMENSIONS, "Too many dimensions in array");
-                } else {
+                }
+                else {
                     dimensions.Add(dim);
                 }
             } while (TestToken(TokenID.COMMA));

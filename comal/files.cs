@@ -26,7 +26,7 @@
 using CCompiler;
 using JComLib;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// Extension of the Compiler class to handle file keywords.
@@ -146,7 +146,8 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
         if (token.ID == TokenID.COMMA) {
             recnumParseNode = IntegerExpression();
-        } else {
+        }
+        else {
             _currentLine.PushToken(token);
         }
         ExpectToken(TokenID.COLON);
@@ -251,7 +252,8 @@ public partial class Compiler {
             token = GetNextToken();
             if (token.ID == TokenID.COMMA) {
                 maximumWidth = IntegerExpression();
-            } else {
+            }
+            else {
                 _currentLine.PushToken(token);
             }
             ExpectToken(TokenID.COLON);
@@ -268,12 +270,14 @@ public partial class Compiler {
         if (token.ID == TokenID.COLON) {
             if (exprNode.IsString) {
                 promptNode = exprNode;
-            } else {
+            }
+            else {
                 fileParseNode = exprNode;
                 fileParseNode.Type = SymType.INTEGER;
             }
             exprNode = Expression();
-        } else {
+        }
+        else {
             _currentLine.PushToken(token);
         }
 
@@ -359,7 +363,7 @@ public partial class Compiler {
     // zone (one space by default if ZONE has not been specified).
     //
     private ParseNode KPrint() {
-        VarArgParseNode varargs = new ();
+        VarArgParseNode varargs = new();
         List<char> formats = new();
 
         ParseNode rowPosition = null;
@@ -383,10 +387,18 @@ public partial class Compiler {
 
             SimpleToken token = GetNextToken();
             switch (token.ID) {
-                case TokenID.SEMICOLON:     formats.Add('V'); continue;
-                case TokenID.COMMA:         formats.Add('H'); continue;
-                case TokenID.APOSTROPHE:    formats.Add('N'); continue;
-                case TokenID.TILDE:         formats.Add('6'); continue;
+                case TokenID.SEMICOLON:
+                    formats.Add('V');
+                    continue;
+                case TokenID.COMMA:
+                    formats.Add('H');
+                    continue;
+                case TokenID.APOSTROPHE:
+                    formats.Add('N');
+                    continue;
+                case TokenID.TILDE:
+                    formats.Add('6');
+                    continue;
 
                 case TokenID.KTAB:
                     ExpectToken(TokenID.LPAREN);
@@ -431,7 +443,7 @@ public partial class Compiler {
                         formats.Insert(0, 'S');
                     }
                     continue;
-                    }
+                }
 
                 default:
                     _currentLine.PushToken(token);
@@ -488,7 +500,8 @@ public partial class Compiler {
         // Is this a simple PRINT statement to the console? If so, call the string version.
         if (isStdout && formats is ['S']) {
             paramsNode.Add(varargs.Nodes[0]);
-        } else {
+        }
+        else {
             paramsNode.Add(fileParseNode);
             paramsNode.Add(new StringParseNode(string.Join("", formats)));
             paramsNode.Add(varargs);

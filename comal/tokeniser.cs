@@ -26,7 +26,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace JComal; 
+namespace JComal;
 
 /// <summary>
 /// Defines the line tokeniser.
@@ -43,7 +43,7 @@ public class LineTokeniser {
     /// </summary>
     /// <param name="line">Source line</param>
     /// <returns>Array of tokens</returns>
-    public SimpleToken [] TokeniseLine(string line) {
+    public SimpleToken[] TokeniseLine(string line) {
         _line = line.Trim();
         _index = 0;
 
@@ -52,8 +52,16 @@ public class LineTokeniser {
         do {
             char ch = GetChar();
             switch (ch) {
-                case '0': case '1': case '2': case '3': case '4':
-                case '5': case '6': case '7': case '8': case '9':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
                     PushChar(ch);
                     tokens.Add(ParseNumber());
                     break;
@@ -65,17 +73,58 @@ public class LineTokeniser {
                     }
                     break;
 
-                case 'A': case 'B': case 'C': case 'D': case 'E':
-                case 'F': case 'G': case 'H': case 'I': case 'J':
-                case 'K': case 'L': case 'M': case 'N': case 'O':
-                case 'P': case 'Q': case 'R': case 'S': case 'T':
-                case 'U': case 'V': case 'W': case 'X': case 'Y':
-                case 'Z': case 'a': case 'b': case 'c': case 'd':
-                case 'e': case 'f': case 'g': case 'h': case 'i':
-                case 'j': case 'k': case 'l': case 'm': case 'n':
-                case 'o': case 'p': case 'q': case 'r': case 's':
-                case 't': case 'u': case 'v': case 'w': case 'x':
-                case 'y': case 'z': {
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                case 'G':
+                case 'H':
+                case 'I':
+                case 'J':
+                case 'K':
+                case 'L':
+                case 'M':
+                case 'N':
+                case 'O':
+                case 'P':
+                case 'Q':
+                case 'R':
+                case 'S':
+                case 'T':
+                case 'U':
+                case 'V':
+                case 'W':
+                case 'X':
+                case 'Y':
+                case 'Z':
+                case 'a':
+                case 'b':
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'h':
+                case 'i':
+                case 'j':
+                case 'k':
+                case 'l':
+                case 'm':
+                case 'n':
+                case 'o':
+                case 'p':
+                case 'q':
+                case 'r':
+                case 's':
+                case 't':
+                case 'u':
+                case 'v':
+                case 'w':
+                case 'x':
+                case 'y':
+                case 'z': {
                     StringBuilder str = new();
                     while (char.IsLetterOrDigit(ch) || ch == '\'') {
                         str.Append(ch);
@@ -83,7 +132,8 @@ public class LineTokeniser {
                     }
                     if (ch is Consts.StringChar or Consts.IntegerChar) {
                         str.Append(ch);
-                    } else {
+                    }
+                    else {
                         PushChar(ch);
                     }
                     if (str.Length > Consts.MaximumIdentifierLength) {
@@ -97,7 +147,7 @@ public class LineTokeniser {
                     }
                     tokens.Add(new SimpleToken(tokenID));
                     break;
-                    }
+                }
 
                 case '"': {
                     StringBuilder str = new();
@@ -118,7 +168,7 @@ public class LineTokeniser {
                     }
                     tokens.Add(new StringToken(str.ToString()));
                     break;
-                    }
+                }
 
                 case ' ':
                     ch = GetChar();
@@ -129,17 +179,39 @@ public class LineTokeniser {
                     tokens.Add(new SimpleToken(TokenID.SPACE));
                     break;
 
-                case '(':   tokens.Add(new SimpleToken(TokenID.LPAREN)); break;
-                case ')':   tokens.Add(new SimpleToken(TokenID.RPAREN)); break;
-                case ',':   tokens.Add(new SimpleToken(TokenID.COMMA)); break;
-                case '=':   tokens.Add(new SimpleToken(TokenID.KEQ)); break;
-                case '-':   tokens.Add(new SimpleToken(TokenID.MINUS)); break;
-                case '+':   tokens.Add(new SimpleToken(TokenID.PLUS)); break;
-                case '*':   tokens.Add(new SimpleToken(TokenID.MULTIPLY)); break;
-                case ';':   tokens.Add(new SimpleToken(TokenID.SEMICOLON)); break;
-                case '\'':  tokens.Add(new SimpleToken(TokenID.APOSTROPHE)); break;
-                case '~':   tokens.Add(new SimpleToken(TokenID.TILDE)); break;
-                case '!':   tokens.Add(new SimpleToken(TokenID.COMMENT)); break;
+                case '(':
+                    tokens.Add(new SimpleToken(TokenID.LPAREN));
+                    break;
+                case ')':
+                    tokens.Add(new SimpleToken(TokenID.RPAREN));
+                    break;
+                case ',':
+                    tokens.Add(new SimpleToken(TokenID.COMMA));
+                    break;
+                case '=':
+                    tokens.Add(new SimpleToken(TokenID.KEQ));
+                    break;
+                case '-':
+                    tokens.Add(new SimpleToken(TokenID.MINUS));
+                    break;
+                case '+':
+                    tokens.Add(new SimpleToken(TokenID.PLUS));
+                    break;
+                case '*':
+                    tokens.Add(new SimpleToken(TokenID.MULTIPLY));
+                    break;
+                case ';':
+                    tokens.Add(new SimpleToken(TokenID.SEMICOLON));
+                    break;
+                case '\'':
+                    tokens.Add(new SimpleToken(TokenID.APOSTROPHE));
+                    break;
+                case '~':
+                    tokens.Add(new SimpleToken(TokenID.TILDE));
+                    break;
+                case '!':
+                    tokens.Add(new SimpleToken(TokenID.COMMENT));
+                    break;
 
                 case '/':
                     ch = GetChar();
@@ -265,7 +337,8 @@ public class LineTokeniser {
             if (float.TryParse(str.ToString(), out float result)) {
                 return new FloatToken(result);
             }
-        } else {
+        }
+        else {
             if (int.TryParse(str.ToString(), out int result)) {
                 return new IntegerToken(result);
             }
