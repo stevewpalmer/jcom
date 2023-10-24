@@ -92,7 +92,7 @@ public class TAccount {
         int currentYear = DateTime.Now.Year;
         int theYear = currentYear;
         int startMonth = 13;
-        int [] years = ListYears();
+        int[] years = ListYears();
 
         if (years.Length > 0) {
             if (years[0] < theYear) {
@@ -100,7 +100,7 @@ public class TAccount {
             }
         }
         while (theYear <= currentYear) {
-            int [] months = ListMonths(theYear);
+            int[] months = ListMonths(theYear);
             if (months.Length > 0) {
                 if (months[0] < startMonth) {
                     startMonth = months[0];

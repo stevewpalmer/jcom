@@ -13,9 +13,9 @@
         <Copyright>(c) Steven Palmer 2013-2023</Copyright>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
-    
+
     <ItemGroup>
-      <ProjectReference Include="..\comlib\comlib.csproj" />
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
     </ItemGroup>
 
 </Project>

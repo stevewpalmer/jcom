@@ -191,7 +191,7 @@ public static class Month {
                     break;
                 }
             }
-        } while(result != TDisplayFormResult.Save);
+        } while (result != TDisplayFormResult.Save);
 
         // Save the results
         if (result == TDisplayFormResult.Save) {

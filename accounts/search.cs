@@ -104,6 +104,6 @@ public static class Search {
                 form.Fields(searchFieldIndex).Value = "";
             }
 
-        } while(result != TDisplayFormResult.Cancel);
+        } while (result != TDisplayFormResult.Cancel);
     }
 }

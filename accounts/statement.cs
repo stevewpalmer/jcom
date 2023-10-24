@@ -71,7 +71,7 @@ public class TStatement {
     /// <summary>
     /// Is this a future statement?
     /// </summary>
-    public bool IsFuture =>  Year > DateTime.Now.Year || Year == DateTime.Now.Year && Month > DateTime.Now.Month;
+    public bool IsFuture => Year > DateTime.Now.Year || Year == DateTime.Now.Year && Month > DateTime.Now.Month;
 
     /// <summary>
     /// Save this statement

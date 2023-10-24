@@ -53,7 +53,7 @@ public static class Utils {
     /// <param name="sectionName">Name to be shown in the title</param>
     public static void ShowTitle(string sectionName) {
         ScreenClear(0, 1, Terminal.Height - 1, Terminal.Width - 1);
-        PrintBar(0,$"Accounts {AssemblySupport.AssemblyVersion}     {sectionName.ToUpper()}");
+        PrintBar(0, $"Accounts {AssemblySupport.AssemblyVersion}     {sectionName.ToUpper()}");
     }
 
     /// <summary>

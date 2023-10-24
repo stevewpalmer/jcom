@@ -65,7 +65,9 @@ public class TDate : IComparable {
     /// <param name="otherDate">Date to compare against</param>
     /// <returns></returns>
     public int CompareTo(object? otherDate) {
-        return otherDate is TDate other ? new DateTime(Year, Month, Day)
-            .CompareTo(new DateTime(other.Year, other.Month, other.Day)) : -1;
+        return otherDate is TDate other
+            ? new DateTime(Year, Month, Day)
+                .CompareTo(new DateTime(other.Year, other.Month, other.Day))
+            : -1;
     }
 }

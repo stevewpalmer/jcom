@@ -57,9 +57,9 @@ public static class Fixed {
         form.BeginSection(sectionName);
 
         foreach (TRecord record in fixedRecords) {
-            form.AddText(rowIndex, 4, 20,  record.Name);
-            form.AddCurrency(rowIndex, 28,  record.Value);
-            form.AddNumeric(rowIndex, 44, 2,  record.Date.Day, "");
+            form.AddText(rowIndex, 4, 20, record.Name);
+            form.AddCurrency(rowIndex, 28, record.Value);
+            form.AddNumeric(rowIndex, 44, 2, record.Date.Day, "");
             rowIndex++;
         }
 

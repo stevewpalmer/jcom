@@ -33,7 +33,7 @@ public class TRecord {
     /// Default constructor for JSON deserialization.
     /// </summary>
     [JsonConstructor]
-    public TRecord() {}
+    public TRecord() { }
 
     /// <summary>
     /// Construct a TRecord with the given properties.
