@@ -25,7 +25,7 @@
 
 using JComLib;
 
-namespace JComalLib; 
+namespace JComalLib;
 
 public class InputManager {
 
@@ -72,9 +72,8 @@ public class InputManager {
     /// <param name="iodevice">The device to read from</param>
     /// <param name="promptString">Optional prompt string</param>
     /// <param name="terminator">End of line terminator option</param>
-    public InputManager(int iodevice, string promptString, LineTerminator terminator):
-        this(0, 0, -1, iodevice, promptString, terminator) {
-    }
+    public InputManager(int iodevice, string promptString, LineTerminator terminator) :
+        this(0, 0, -1, iodevice, promptString, terminator) { }
 
     /// <summary>
     /// Construct an InputManager for repeated input calls from the specified
@@ -130,7 +129,7 @@ public class InputManager {
     /// Reads from the input into the specified float array.
     /// </summary>
     /// <param name="floatArray">Float array to be read</param>
-    public void READ(ref float [] floatArray) {
+    public void READ(ref float[] floatArray) {
         for (int index = 0; index < floatArray.Length; index++) {
             _file.ReadFloat(ref floatArray[index]);
         }

@@ -27,7 +27,7 @@ using System.Globalization;
 using System.Text;
 using JComLib;
 
-namespace JComalLib; 
+namespace JComalLib;
 
 /// <summary>
 /// Implements PrintManager.
@@ -144,74 +144,77 @@ public class PrintManager {
                     output.Clear();
                     break;
                 case 'X': {
-                        if (args[argIndex++] is int intValue) {
-                            output.Append(new string(' ', intValue));
-                        }
-                        break;
+                    if (args[argIndex++] is int intValue) {
+                        output.Append(new string(' ', intValue));
                     }
+                    break;
+                }
                 case 'T': {
-                        if (args[argIndex++] is int intValue) {
-                            if (output.Length > intValue) {
-                                file.WriteLine(output.ToString(), true);
-                                output.Clear();
-                            }
-                            output.Append(new string(' ', intValue - output.Length));
+                    if (args[argIndex++] is int intValue) {
+                        if (output.Length > intValue) {
+                            file.WriteLine(output.ToString(), true);
+                            output.Clear();
                         }
-                        break;
+                        output.Append(new string(' ', intValue - output.Length));
                     }
+                    break;
+                }
                 case 'S': {
-                        if (fmtIndex < formats.Length && formats[fmtIndex] == 'V') {
-                            fieldWidth = 0;
-                        }
-                        if (fmtIndex < formats.Length && formats[fmtIndex] == 'H') {
-                            fieldWidth = FileManager.Zone;
-                        }
-                        if (args[argIndex] is string[] stringArray) {
-                            foreach (string stringElement in stringArray) {
-                                WriteValue(output, stringElement, fieldWidth);
-                                output.Append(' ');
-                            }
-                        } else if (args[argIndex] is FixedString[] fixedStringArray) {
-                            foreach (FixedString fixedStringElement in fixedStringArray) {
-                                WriteValue(output, fixedStringElement.ToString(), fieldWidth);
-                                output.Append(' ');
-                            }
-                        } else {
-                            if (args[argIndex] is FixedString fixedString) {
-                                WriteValue(output, fixedString.ToString(), fieldWidth);
-                            } else if (args[argIndex] is string nativeString) {
-                                WriteValue(output, nativeString, fieldWidth);
-                            }
-                        }
-                        argIndex++;
-                        break;
+                    if (fmtIndex < formats.Length && formats[fmtIndex] == 'V') {
+                        fieldWidth = 0;
                     }
+                    if (fmtIndex < formats.Length && formats[fmtIndex] == 'H') {
+                        fieldWidth = FileManager.Zone;
+                    }
+                    if (args[argIndex] is string[] stringArray) {
+                        foreach (string stringElement in stringArray) {
+                            WriteValue(output, stringElement, fieldWidth);
+                            output.Append(' ');
+                        }
+                    }
+                    else if (args[argIndex] is FixedString[] fixedStringArray) {
+                        foreach (FixedString fixedStringElement in fixedStringArray) {
+                            WriteValue(output, fixedStringElement.ToString(), fieldWidth);
+                            output.Append(' ');
+                        }
+                    }
+                    else {
+                        if (args[argIndex] is FixedString fixedString) {
+                            WriteValue(output, fixedString.ToString(), fieldWidth);
+                        }
+                        else if (args[argIndex] is string nativeString) {
+                            WriteValue(output, nativeString, fieldWidth);
+                        }
+                    }
+                    argIndex++;
+                    break;
+                }
                 case 'I': {
-                        if (args[argIndex] is int intValue) {
-                            WriteValue(output, intValue, useHex, fieldWidth);
-                        }
-                        else if (args[argIndex] is int[] intArray) {
-                            foreach (int intElement in intArray) {
-                                WriteValue(output, intElement, useHex, fieldWidth);
-                                output.Append(' ');
-                            }
-                        }
-                        argIndex++;
-                        break;
+                    if (args[argIndex] is int intValue) {
+                        WriteValue(output, intValue, useHex, fieldWidth);
                     }
+                    else if (args[argIndex] is int[] intArray) {
+                        foreach (int intElement in intArray) {
+                            WriteValue(output, intElement, useHex, fieldWidth);
+                            output.Append(' ');
+                        }
+                    }
+                    argIndex++;
+                    break;
+                }
                 case 'F': {
-                        if (args[argIndex] is float floatValue) {
-                            WriteValue(output, floatValue, useHex, fieldWidth);
-                        }
-                        else if (args[argIndex] is float[] floatArray) {
-                            foreach (float floatElement in floatArray) {
-                                WriteValue(output, floatElement, useHex, fieldWidth);
-                                output.Append(' ');
-                            }
-                        }
-                        argIndex++;
-                        break;
+                    if (args[argIndex] is float floatValue) {
+                        WriteValue(output, floatValue, useHex, fieldWidth);
                     }
+                    else if (args[argIndex] is float[] floatArray) {
+                        foreach (float floatElement in floatArray) {
+                            WriteValue(output, floatElement, useHex, fieldWidth);
+                            output.Append(' ');
+                        }
+                    }
+                    argIndex++;
+                    break;
+                }
             }
             useHex = false;
         }

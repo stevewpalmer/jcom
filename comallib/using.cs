@@ -127,9 +127,7 @@ public static partial class Intrinsics {
                     // Fraction?
                     if (fractionPart > 0) {
 
-                        fractionString = parts.Length > 1 ?
-                            parts[1].PadRight(fractionPart, '0') :
-                            new string('0', fractionPart);
+                        fractionString = parts.Length > 1 ? parts[1].PadRight(fractionPart, '0') : new string('0', fractionPart);
                         if (fractionString.Length > fractionPart) {
                             double roundedFraction = Math.Round(value.RealValue, fractionPart);
                             parts = roundedFraction.ToString(CultureInfo.InvariantCulture).Split('.');
@@ -139,7 +137,8 @@ public static partial class Intrinsics {
 
                     if (integerString.Length + decimalString.Length + fractionString.Length > fieldWidth) {
                         str.Append(new string('*', fieldWidth));
-                    } else {
+                    }
+                    else {
                         str.Append(integerString);
                         str.Append(decimalString);
                         str.Append(fractionString);

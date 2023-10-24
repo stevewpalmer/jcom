@@ -25,7 +25,7 @@
 
 using JComLib;
 
-namespace JComalLib; 
+namespace JComalLib;
 
 public static class FileManager {
 
