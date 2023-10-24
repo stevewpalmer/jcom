@@ -28,7 +28,7 @@ using System.Numerics;
 using CCompiler;
 using JComLib;
 
-namespace JFortran; 
+namespace JFortran;
 
 public partial class Compiler {
 
@@ -126,13 +126,14 @@ public partial class Compiler {
         BinaryOpParseNode tokenNode = (BinaryOpParseNode)node;
         tokenNode.Left = OptimiseExpressionTree(tokenNode.Left);
         tokenNode.Right = OptimiseExpressionTree(tokenNode.Right);
-        
+
         if (tokenNode.IsNumber) {
             NumberParseNode op1 = (NumberParseNode)tokenNode.Left;
             NumberParseNode op2 = (NumberParseNode)tokenNode.Right;
             try {
                 node = new NumberParseNode(op1.Value / op2.Value);
-            } catch (DivideByZeroException) {
+            }
+            catch (DivideByZeroException) {
                 Messages.Error(MessageCode.DIVISIONBYZERO, "Constant division by zero");
             }
         }
@@ -145,7 +146,7 @@ public partial class Compiler {
         BinaryOpParseNode tokenNode = (BinaryOpParseNode)node;
         tokenNode.Left = OptimiseExpressionTree(tokenNode.Left);
         tokenNode.Right = OptimiseExpressionTree(tokenNode.Right);
-        
+
         if (tokenNode.IsNumber) {
             NumberParseNode op1 = (NumberParseNode)tokenNode.Left;
             NumberParseNode op2 = (NumberParseNode)tokenNode.Right;
@@ -201,7 +202,7 @@ public partial class Compiler {
         BinaryOpParseNode tokenNode = (BinaryOpParseNode)node;
         tokenNode.Left = OptimiseExpressionTree(tokenNode.Left);
         tokenNode.Right = OptimiseExpressionTree(tokenNode.Right);
-        
+
         if (tokenNode.Left.ID == ParseID.STRING && tokenNode.Right.ID == ParseID.STRING) {
             StringParseNode op1 = (StringParseNode)tokenNode.Left;
             StringParseNode op2 = (StringParseNode)tokenNode.Right;
@@ -209,7 +210,8 @@ public partial class Compiler {
                 FixedString leftString = new(op1.Value.StringValue);
                 FixedString rightString = new(op2.Value.StringValue);
                 node = new StringParseNode(FixedString.Merge(leftString, rightString).ToString());
-            } else {
+            }
+            else {
                 node = new StringParseNode(op1.Value + op2.Value);
             }
         }
@@ -221,13 +223,13 @@ public partial class Compiler {
     private ParseNode OptimiseExpressionTree(ParseNode node) {
         if (node != null) {
             switch (node.ID) {
-                case ParseID.MINUS:     return OptimiseMinus(node);
-                case ParseID.ADD:       return OptimiseAddition(node);
-                case ParseID.MULT:      return OptimiseMultiplication(node);
-                case ParseID.DIVIDE:    return OptimiseDivision(node);
-                case ParseID.SUB:       return OptimiseSubtraction(node);
-                case ParseID.EXP:       return OptimiseExponentation(node);
-                case ParseID.MERGE:     return OptimiseConcatenation(node);
+                case ParseID.MINUS: return OptimiseMinus(node);
+                case ParseID.ADD: return OptimiseAddition(node);
+                case ParseID.MULT: return OptimiseMultiplication(node);
+                case ParseID.DIVIDE: return OptimiseDivision(node);
+                case ParseID.SUB: return OptimiseSubtraction(node);
+                case ParseID.EXP: return OptimiseExponentation(node);
+                case ParseID.MERGE: return OptimiseConcatenation(node);
 
                 default:
                     if (node is BinaryOpParseNode tokenNode) {
@@ -268,7 +270,6 @@ public partial class Compiler {
     /// xor                          .XOR.             1
     /// neqv                         .NEQV.            1
     /// eqv                          .EQV.             1
-
     /// Parse an expression.
     private ParseNode ParseExpression(int level) {
         ParseNode op1 = Operand();
@@ -281,31 +282,86 @@ public partial class Compiler {
 
             int preced;
             switch (token.ID) {
-                case TokenID.KEQV:      parseID = ParseID.EQV;      preced = 1; break;
-                case TokenID.KNEQV:     parseID = ParseID.NEQV;     preced = 1; break;
-                case TokenID.KXOR:      parseID = ParseID.XOR;      preced = 1; break;
+                case TokenID.KEQV:
+                    parseID = ParseID.EQV;
+                    preced = 1;
+                    break;
+                case TokenID.KNEQV:
+                    parseID = ParseID.NEQV;
+                    preced = 1;
+                    break;
+                case TokenID.KXOR:
+                    parseID = ParseID.XOR;
+                    preced = 1;
+                    break;
 
-                case TokenID.KOR:       parseID = ParseID.OR;       preced = 2; break;
+                case TokenID.KOR:
+                    parseID = ParseID.OR;
+                    preced = 2;
+                    break;
 
-                case TokenID.KAND:      parseID = ParseID.AND;      preced = 3; break;
+                case TokenID.KAND:
+                    parseID = ParseID.AND;
+                    preced = 3;
+                    break;
 
-                case TokenID.KGT:       parseID = ParseID.GT;       preced = 5; break;
-                case TokenID.KGE:       parseID = ParseID.GE;       preced = 5; break;
-                case TokenID.KLE:       parseID = ParseID.LE;       preced = 5; break;
-                case TokenID.KEQ:       parseID = ParseID.EQ;       preced = 5; break;
-                case TokenID.KNE:       parseID = ParseID.NE;       preced = 5; break;
-                case TokenID.EQUOP:     parseID = ParseID.EQ;       preced = 5; break;
-                case TokenID.KLT:       parseID = ParseID.LT;       preced = 5; break;
+                case TokenID.KGT:
+                    parseID = ParseID.GT;
+                    preced = 5;
+                    break;
+                case TokenID.KGE:
+                    parseID = ParseID.GE;
+                    preced = 5;
+                    break;
+                case TokenID.KLE:
+                    parseID = ParseID.LE;
+                    preced = 5;
+                    break;
+                case TokenID.KEQ:
+                    parseID = ParseID.EQ;
+                    preced = 5;
+                    break;
+                case TokenID.KNE:
+                    parseID = ParseID.NE;
+                    preced = 5;
+                    break;
+                case TokenID.EQUOP:
+                    parseID = ParseID.EQ;
+                    preced = 5;
+                    break;
+                case TokenID.KLT:
+                    parseID = ParseID.LT;
+                    preced = 5;
+                    break;
 
-                case TokenID.PLUS:      parseID = ParseID.ADD;      preced = 6; break;
-                case TokenID.MINUS:     parseID = ParseID.SUB;      preced = 6; break;
+                case TokenID.PLUS:
+                    parseID = ParseID.ADD;
+                    preced = 6;
+                    break;
+                case TokenID.MINUS:
+                    parseID = ParseID.SUB;
+                    preced = 6;
+                    break;
 
-                case TokenID.STAR:      parseID = ParseID.MULT;     preced = 7; break;
-                case TokenID.DIVIDE:    parseID = ParseID.DIVIDE;   preced = 7; break;
+                case TokenID.STAR:
+                    parseID = ParseID.MULT;
+                    preced = 7;
+                    break;
+                case TokenID.DIVIDE:
+                    parseID = ParseID.DIVIDE;
+                    preced = 7;
+                    break;
 
-                case TokenID.CONCAT:    parseID = ParseID.MERGE;    preced = 8; break;
+                case TokenID.CONCAT:
+                    parseID = ParseID.MERGE;
+                    preced = 8;
+                    break;
 
-                case TokenID.EXP:       parseID = ParseID.EXP;      preced = 10; isRTL = true; break;
+                case TokenID.EXP:
+                    parseID = ParseID.EXP;
+                    preced = 10;
+                    isRTL = true;
+                    break;
 
                 default:
                     _ls.BackToken();
@@ -315,7 +371,8 @@ public partial class Compiler {
             if (level >= preced) {
                 _ls.BackToken();
                 done = true;
-            } else {
+            }
+            else {
 
                 // For operators that evaluate right to left (such as EXP), drop the
                 // precedence so that further occurrences of the same operator to
@@ -353,25 +410,25 @@ public partial class Compiler {
                 }
                 ExpectToken(TokenID.RPAREN);
                 return node;
-                }
+            }
 
             case TokenID.KNOT: {
-                    UnaryOpParseNode node = new(ParseID.NOT) {
-                        Operand = ParseExpression(4),
-                        Type = SymType.BOOLEAN
-                    };
-                    return node;
-                }
+                UnaryOpParseNode node = new(ParseID.NOT) {
+                    Operand = ParseExpression(4),
+                    Type = SymType.BOOLEAN
+                };
+                return node;
+            }
 
             case TokenID.REAL: {
                 RealToken realToken = (RealToken)token;
                 return new NumberParseNode(new Variant(realToken.Value));
-                }
+            }
 
             case TokenID.DOUBLE: {
                 DoubleToken doubleToken = (DoubleToken)token;
                 return new NumberParseNode(new Variant(doubleToken.Value));
-                }
+            }
 
             case TokenID.KTRUE:
                 return new NumberParseNode(new Variant(true));
@@ -388,17 +445,17 @@ public partial class Compiler {
                 node.Operand = op;
                 node.Type = op.Type;
                 return node;
-                }
+            }
 
             case TokenID.INTEGER: {
                 IntegerToken intToken = (IntegerToken)token;
                 return new NumberParseNode(new Variant(intToken.Value));
-                }
-                
+            }
+
             case TokenID.STRING: {
                 StringToken stringToken = (StringToken)token;
                 return new StringParseNode(stringToken.String);
-                }
+            }
 
             case TokenID.IDENT: {
                 IdentifierToken identToken = (IdentifierToken)token;
@@ -439,12 +496,12 @@ public partial class Compiler {
                         return IntrinsicOperand(identToken.Name.ToUpper(), node);
                     }
                 }
-                
+
                 // Statement functions will have been predefined
                 if (!match && sym != null && sym.Class == SymClass.INLINE) {
                     match = true;
                 }
-                
+
                 // If there are any arguments, this is a function call
                 if (!match && node.Indexes != null) {
                     return FunctionOperand(identToken.Name.ToUpper(), node);
@@ -480,7 +537,7 @@ public partial class Compiler {
 
         SymType argType = SymType.NONE;
         int countOfParams = 0;
-       
+
         bool isVarArg = intrDefinition.Count == ArgCount.TwoOrMore;
         ParametersParseNode paramsNode = new();
         VarArgParseNode argList = new();
@@ -508,7 +565,8 @@ public partial class Compiler {
 
             if (isVarArg) {
                 argList.Add(exprNode);
-            } else {
+            }
+            else {
                 paramsNode.Add(exprNode, useByRef);
             }
             ++countOfParams;
@@ -521,11 +579,21 @@ public partial class Compiler {
         // Make sure actual and expected arguments match
         bool match = false;
         switch (intrDefinition.Count) {
-            case ArgCount.One: match = countOfParams == 1; break;
-            case ArgCount.OneOrTwo: match = countOfParams == 1 || countOfParams == 2; break;
-            case ArgCount.Two: match = countOfParams == 2; break;
-            case ArgCount.TwoOrMore: match = countOfParams >= 2; break;
-            default: Debug.Assert(false, "Unhandled ArgCount!"); break;
+            case ArgCount.One:
+                match = countOfParams == 1;
+                break;
+            case ArgCount.OneOrTwo:
+                match = countOfParams == 1 || countOfParams == 2;
+                break;
+            case ArgCount.Two:
+                match = countOfParams == 2;
+                break;
+            case ArgCount.TwoOrMore:
+                match = countOfParams >= 2;
+                break;
+            default:
+                Debug.Assert(false, "Unhandled ArgCount!");
+                break;
         }
         if (!match) {
             Messages.Error(MessageCode.WRONGNUMBEROFARGUMENTS, $"Wrong number of arguments for {name}");
@@ -645,7 +713,7 @@ public partial class Compiler {
                 case SymType.DOUBLE:
                     node.Type = SymType.DOUBLE;
                     return node;
-                    
+
                 case SymType.FLOAT:
                     node.Type = SymType.FLOAT;
                     return node;
@@ -668,7 +736,7 @@ public partial class Compiler {
                 case SymType.COMPLEX:
                     node.Type = SymType.COMPLEX;
                     return node;
-            
+
                 case SymType.FLOAT:
                 case SymType.INTEGER:
                     node.Type = SymType.FLOAT;

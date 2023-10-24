@@ -99,7 +99,7 @@ public class Lexer {
 
         int length = str.Length;
         while (length > 0) {
-            ch = str[length-1];
+            ch = str[length - 1];
             if (ch != ' ') {
                 if (ch == ')') {
                     --length;
@@ -164,31 +164,36 @@ public class Lexer {
             id = TokenID.KGOTO;
             _tokens[_tindex - 2] = new SimpleToken(id);
             _tokens.RemoveAt(--_tindex);
-        } else if (id == TokenID.KEND && PeekKeyword() == TokenID.KIF) {
+        }
+        else if (id == TokenID.KEND && PeekKeyword() == TokenID.KIF) {
             // BUGBUG: Hack until full tokeniser implemented.
             LocalExpectToken(TokenID.KIF);
             id = TokenID.KENDIF;
             _tokens[_tindex - 2] = new SimpleToken(id);
             _tokens.RemoveAt(--_tindex);
-        } else if (id == TokenID.KELSE && PeekKeyword() == TokenID.KIF) {
+        }
+        else if (id == TokenID.KELSE && PeekKeyword() == TokenID.KIF) {
             // BUGBUG: Hack until full tokeniser implemented.
             LocalExpectToken(TokenID.KIF);
             id = TokenID.KELSEIF;
             _tokens[_tindex - 2] = new SimpleToken(id);
             _tokens.RemoveAt(--_tindex);
-        } else if (id == TokenID.KDOUBLE) {
+        }
+        else if (id == TokenID.KDOUBLE) {
             // BUGBUG: Hack until full tokeniser implemented.
             LocalExpectToken(TokenID.KPRECISION);
             id = TokenID.KDPRECISION;
             _tokens[_tindex - 2] = new SimpleToken(id);
             _tokens.RemoveAt(--_tindex);
-        } else if (id == TokenID.KBLOCK) {
+        }
+        else if (id == TokenID.KBLOCK) {
             // BUGBUG: Hack until full tokeniser implemented.
             LocalExpectToken(TokenID.KDATA);
             id = TokenID.KBLOCKDATA;
             _tokens[_tindex - 2] = new SimpleToken(id);
             _tokens.RemoveAt(--_tindex);
-        } else if (id == TokenID.KIMPLICIT && PeekKeyword() == TokenID.KNONE) {
+        }
+        else if (id == TokenID.KIMPLICIT && PeekKeyword() == TokenID.KNONE) {
             GetToken();
             id = TokenID.KIMPLICITNONE;
         }
@@ -251,8 +256,16 @@ public class Lexer {
                     _messages.Warning(MessageCode.NONSTANDARDHEX, 4, "Non-standard hexadecimal specification");
                     return ParseBasedNumber(16);
 
-                case '0': case '1': case '2': case '3': case '4':
-                case '5': case '6': case '7': case '8': case '9':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
                     PushChar(ch);
                     return ParseNumber();
 
@@ -280,19 +293,60 @@ public class Lexer {
                         _messages.Error(MessageCode.UNRECOGNISEDKEYWORD, $"Unrecognised keyword: {str}");
                     }
                     return new SimpleToken(id);
-                    }
+                }
 
-                case 'A': case 'B': case 'C': case 'D': case 'E':
-                case 'F': case 'G': case 'H': case 'I': case 'J':
-                case 'K': case 'L': case 'M': case 'N': case 'O':
-                case 'P': case 'Q': case 'R': case 'S': case 'T':
-                case 'U': case 'V': case 'W': case 'X': case 'Y':
-                case 'Z': case 'a': case 'b': case 'c': case 'd':
-                case 'e': case 'f': case 'g': case 'h': case 'i':
-                case 'j': case 'k': case 'l': case 'm': case 'n':
-                case 'o': case 'p': case 'q': case 'r': case 's':
-                case 't': case 'u': case 'v': case 'w': case 'x':
-                case 'y': case 'z': {
+                case 'A':
+                case 'B':
+                case 'C':
+                case 'D':
+                case 'E':
+                case 'F':
+                case 'G':
+                case 'H':
+                case 'I':
+                case 'J':
+                case 'K':
+                case 'L':
+                case 'M':
+                case 'N':
+                case 'O':
+                case 'P':
+                case 'Q':
+                case 'R':
+                case 'S':
+                case 'T':
+                case 'U':
+                case 'V':
+                case 'W':
+                case 'X':
+                case 'Y':
+                case 'Z':
+                case 'a':
+                case 'b':
+                case 'c':
+                case 'd':
+                case 'e':
+                case 'f':
+                case 'g':
+                case 'h':
+                case 'i':
+                case 'j':
+                case 'k':
+                case 'l':
+                case 'm':
+                case 'n':
+                case 'o':
+                case 'p':
+                case 'q':
+                case 'r':
+                case 's':
+                case 't':
+                case 'u':
+                case 'v':
+                case 'w':
+                case 'x':
+                case 'y':
+                case 'z': {
                     // Look for possible number base representations first
                     char chNext = PeekChar();
                     bool isQuoteNextChar = chNext is '\'' or '"';
@@ -318,19 +372,19 @@ public class Lexer {
                         _messages.Error(MessageCode.IDENTIFIERTOOLONG, $"Identifier {str} too long");
                     }
                     return new IdentifierToken(str.ToString());
-                    }
+                }
 
                 case '"':
                 case '\'':
                     return new StringToken(ParseString(ch));
 
-                case '(':   return new SimpleToken(TokenID.LPAREN);
-                case ')':   return new SimpleToken(TokenID.RPAREN);
-                case ',':   return new SimpleToken(TokenID.COMMA);
-                case '=':   return new SimpleToken(TokenID.EQUOP);
-                case '-':   return new SimpleToken(TokenID.MINUS);
-                case '+':   return new SimpleToken(TokenID.PLUS);
-                case ':':   return new SimpleToken(TokenID.COLON);
+                case '(': return new SimpleToken(TokenID.LPAREN);
+                case ')': return new SimpleToken(TokenID.RPAREN);
+                case ',': return new SimpleToken(TokenID.COMMA);
+                case '=': return new SimpleToken(TokenID.EQUOP);
+                case '-': return new SimpleToken(TokenID.MINUS);
+                case '+': return new SimpleToken(TokenID.PLUS);
+                case ':': return new SimpleToken(TokenID.COLON);
 
                 case '/':
                     ch = GetNextChar();
@@ -379,17 +433,34 @@ public class Lexer {
                     PushChar(chTmp);
                     break;
                 }
-            } else if (ch == '\\' && !_opts.Backslash) {
+            }
+            else if (ch == '\\' && !_opts.Backslash) {
                 ch = GetChar();
                 switch (ch) {
-                    case 'n':   ch = '\n';   break;
-                    case 't':   ch = '\t';   break;
-                    case 'b':   ch = '\b';   break;
-                    case 'f':   ch = '\f';   break;
-                    case '0':   ch = '\0';   break;
-                    case '\'':  ch = '\'';   break;
-                    case '"':   ch = '"';    break;
-                    case '\\':  ch = '\\';   break;
+                    case 'n':
+                        ch = '\n';
+                        break;
+                    case 't':
+                        ch = '\t';
+                        break;
+                    case 'b':
+                        ch = '\b';
+                        break;
+                    case 'f':
+                        ch = '\f';
+                        break;
+                    case '0':
+                        ch = '\0';
+                        break;
+                    case '\'':
+                        ch = '\'';
+                        break;
+                    case '"':
+                        ch = '"';
+                        break;
+                    case '\\':
+                        ch = '\\';
+                        break;
                 }
                 if (!didWarnOnce) {
                     _messages.Warning(MessageCode.NONSTANDARDESCAPES, 4, "Non-standard escape sequence in strings");
@@ -437,9 +508,9 @@ public class Lexer {
     // number base.
     private static bool IsValidInBase(char ch, int numberBase) {
         switch (numberBase) {
-            case 2:     return ch is '0' or '1';
-            case 8:     return ch is >= '0' and <= '7';
-            case 16:    return ch is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F';
+            case 2: return ch is '0' or '1';
+            case 8: return ch is >= '0' and <= '7';
+            case 16: return ch is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F';
         }
         Debug.Assert(false, $"IsValidInBase called with unsupported number base {numberBase}");
         return false;
@@ -467,7 +538,8 @@ public class Lexer {
             }
             try {
                 return new IntegerToken(Convert.ToInt32(str.ToString(), numberBase));
-            } catch (ArgumentException) {}
+            }
+            catch (ArgumentException) { }
         }
         _messages.Error(MessageCode.BADNUMBERFORMAT, "Illegal number format");
         return new IntegerToken(0);
@@ -534,7 +606,7 @@ public class Lexer {
                 ch = GetNextChar();
             }
         }
-        if ((char.ToUpper(ch) == 'E' || char.ToUpper(ch) == 'D')  && !char.IsLetter(PeekChar())) {
+        if ((char.ToUpper(ch) == 'E' || char.ToUpper(ch) == 'D') && !char.IsLetter(PeekChar())) {
             isFloat = true;
             isDouble = char.ToUpper(ch) == 'D';
             str.Append('E');
@@ -553,11 +625,13 @@ public class Lexer {
             if (double.TryParse(str.ToString(), out double result)) {
                 return new DoubleToken(result);
             }
-        } else if (isFloat) {
+        }
+        else if (isFloat) {
             if (float.TryParse(str.ToString(), out float result)) {
                 return new RealToken(result);
             }
-        } else {
+        }
+        else {
             if (int.TryParse(str.ToString(), out int result)) {
                 return new IntegerToken(result);
             }
@@ -710,7 +784,8 @@ public class Lexer {
                     ++_index;
                 }
             }
-        } else if (len > 5) {
+        }
+        else if (len > 5) {
             ++_index;
         }
 

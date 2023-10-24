@@ -1,22 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>11.0</LangVersion>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Description>Fortran Compiler</Description>
-    <Copyright>(c) Steven Palmer 2013-2023</Copyright>
-    <ReleaseVersion>0.3</ReleaseVersion>
-    <RootNamespace>JFortran</RootNamespace>
-    <Title>Fortran Compiler</Title>
-    <Authors>Steven Palmer</Authors>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\comlib\comlib.csproj" />
-    <ProjectReference Include="..\com\com.csproj" />
-    <ProjectReference Include="..\fortranlib\forlib.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>11.0</LangVersion>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Description>Fortran Compiler</Description>
+        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <RootNamespace>JFortran</RootNamespace>
+        <Title>Fortran Compiler</Title>
+        <Authors>Steven Palmer</Authors>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\comlib\comlib.csproj"/>
+        <ProjectReference Include="..\com\com.csproj"/>
+        <ProjectReference Include="..\fortranlib\forlib.csproj"/>
+    </ItemGroup>
 </Project>

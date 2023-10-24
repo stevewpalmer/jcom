@@ -25,22 +25,100 @@
 
 using System.Diagnostics;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Lexical tokens.
 /// </summary>
 public enum TokenID {
-    COLON, COMMA, DIVIDE, DOUBLE, ENDOFFILE, EOL, EQUOP, EXP, IDENT, INTEGER,
-    KASSIGN, KAND, KBACKSPACE, KBLOCK, KBLOCKDATA, KCALL, KCHARACTER, KCLOSE,
-    KCOMMON, KCOMPLEX, KCONTINUE, KDATA, KDIMENSION, KDO, KDOUBLE, KDPRECISION,
-    KELSE, KELSEIF, KEND, KENDDO, KENDFILE, KENDIF, KENTRY, KEQ, KEQUIVALENCE,
-    KEQV, KEXTERNAL, KFALSE, KFORMAT, KFUNCTION, KGE, KGO, KGOTO, KGT, KIF,
-    KIMPLICIT, KIMPLICITNONE, KINCLUDE, KINQUIRE, KINTEGER, KINTRINSIC, KLE,
-    KLOGICAL, KLT, KNE, KNEQV, KNONE, KNOT, KOPEN, KOR, KPAUSE, KPARAMETER,
-    KPRECISION, KPRINT, KPROGRAM, KREAD, KREAL, KRETURN, KREWIND, KSAVE,
-    KSTMTFUNC, KSTOP, KSUBROUTINE, KTHEN, KTO, KTRUE, KWHILE, KWRITE, KXOR,
-    LPAREN, MINUS, STAR, PLUS, CONCAT, REAL, RPAREN, STRING }
+    COLON,
+    COMMA,
+    DIVIDE,
+    DOUBLE,
+    ENDOFFILE,
+    EOL,
+    EQUOP,
+    EXP,
+    IDENT,
+    INTEGER,
+    KASSIGN,
+    KAND,
+    KBACKSPACE,
+    KBLOCK,
+    KBLOCKDATA,
+    KCALL,
+    KCHARACTER,
+    KCLOSE,
+    KCOMMON,
+    KCOMPLEX,
+    KCONTINUE,
+    KDATA,
+    KDIMENSION,
+    KDO,
+    KDOUBLE,
+    KDPRECISION,
+    KELSE,
+    KELSEIF,
+    KEND,
+    KENDDO,
+    KENDFILE,
+    KENDIF,
+    KENTRY,
+    KEQ,
+    KEQUIVALENCE,
+    KEQV,
+    KEXTERNAL,
+    KFALSE,
+    KFORMAT,
+    KFUNCTION,
+    KGE,
+    KGO,
+    KGOTO,
+    KGT,
+    KIF,
+    KIMPLICIT,
+    KIMPLICITNONE,
+    KINCLUDE,
+    KINQUIRE,
+    KINTEGER,
+    KINTRINSIC,
+    KLE,
+    KLOGICAL,
+    KLT,
+    KNE,
+    KNEQV,
+    KNONE,
+    KNOT,
+    KOPEN,
+    KOR,
+    KPAUSE,
+    KPARAMETER,
+    KPRECISION,
+    KPRINT,
+    KPROGRAM,
+    KREAD,
+    KREAL,
+    KRETURN,
+    KREWIND,
+    KSAVE,
+    KSTMTFUNC,
+    KSTOP,
+    KSUBROUTINE,
+    KTHEN,
+    KTO,
+    KTRUE,
+    KWHILE,
+    KWRITE,
+    KXOR,
+    LPAREN,
+    MINUS,
+    STAR,
+    PLUS,
+    CONCAT,
+    REAL,
+    RPAREN,
+    STRING
+}
 
 /// <summary>
 /// Class that represents lexical tokens used by the lexical
@@ -50,71 +128,71 @@ public static class Tokens {
 
     // List of reserved Fortran keywords and their token values
     private static readonly Dictionary<string, TokenID> _keywords = new() {
-        { "assign",     TokenID.KASSIGN },
-        { "backspace",  TokenID.KBACKSPACE },
-        { "block",      TokenID.KBLOCK },
-        { "character",  TokenID.KCHARACTER },
-        { "call",       TokenID.KCALL },
-        { "close",      TokenID.KCLOSE },
-        { "common",     TokenID.KCOMMON },
-        { "complex",    TokenID.KCOMPLEX },
-        { "continue",   TokenID.KCONTINUE },
-        { "dimension",  TokenID.KDIMENSION },
-        { "data",       TokenID.KDATA },
-        { "do",         TokenID.KDO },
-        { "double",     TokenID.KDOUBLE },
-        { "else",       TokenID.KELSE },
-        { "elseif",     TokenID.KELSEIF },
-        { "end",        TokenID.KEND },
-        { "enddo",      TokenID.KENDDO },
-        { "endfile",    TokenID.KENDFILE },
-        { "endif",      TokenID.KENDIF },
-        { "entry",      TokenID.KENTRY },
-        { "equivalence",TokenID.KEQUIVALENCE },
-        { "external",   TokenID.KEXTERNAL },
-        { "format",     TokenID.KFORMAT },
-        { "function",   TokenID.KFUNCTION },
-        { "go",         TokenID.KGO },
-        { "goto",       TokenID.KGOTO },
-        { "if",         TokenID.KIF },
-        { "implicit",   TokenID.KIMPLICIT },
-        { "include",    TokenID.KINCLUDE },
-        { "inquire",    TokenID.KINQUIRE },
-        { "integer",    TokenID.KINTEGER },
-        { "intrinsic",  TokenID.KINTRINSIC },
-        { "logical",    TokenID.KLOGICAL },
-        { "none",       TokenID.KNONE },
-        { "open",       TokenID.KOPEN },
-        { "pause",      TokenID.KPAUSE },
-        { "parameter",  TokenID.KPARAMETER },
-        { "precision",  TokenID.KPRECISION },
-        { "print",      TokenID.KPRINT },
-        { "program",    TokenID.KPROGRAM },
-        { "read",       TokenID.KREAD },
-        { "real",       TokenID.KREAL },
-        { "return",     TokenID.KRETURN },
-        { "rewind",     TokenID.KREWIND },
-        { "save",       TokenID.KSAVE },
-        { "stop",       TokenID.KSTOP },
+        { "assign", TokenID.KASSIGN },
+        { "backspace", TokenID.KBACKSPACE },
+        { "block", TokenID.KBLOCK },
+        { "character", TokenID.KCHARACTER },
+        { "call", TokenID.KCALL },
+        { "close", TokenID.KCLOSE },
+        { "common", TokenID.KCOMMON },
+        { "complex", TokenID.KCOMPLEX },
+        { "continue", TokenID.KCONTINUE },
+        { "dimension", TokenID.KDIMENSION },
+        { "data", TokenID.KDATA },
+        { "do", TokenID.KDO },
+        { "double", TokenID.KDOUBLE },
+        { "else", TokenID.KELSE },
+        { "elseif", TokenID.KELSEIF },
+        { "end", TokenID.KEND },
+        { "enddo", TokenID.KENDDO },
+        { "endfile", TokenID.KENDFILE },
+        { "endif", TokenID.KENDIF },
+        { "entry", TokenID.KENTRY },
+        { "equivalence", TokenID.KEQUIVALENCE },
+        { "external", TokenID.KEXTERNAL },
+        { "format", TokenID.KFORMAT },
+        { "function", TokenID.KFUNCTION },
+        { "go", TokenID.KGO },
+        { "goto", TokenID.KGOTO },
+        { "if", TokenID.KIF },
+        { "implicit", TokenID.KIMPLICIT },
+        { "include", TokenID.KINCLUDE },
+        { "inquire", TokenID.KINQUIRE },
+        { "integer", TokenID.KINTEGER },
+        { "intrinsic", TokenID.KINTRINSIC },
+        { "logical", TokenID.KLOGICAL },
+        { "none", TokenID.KNONE },
+        { "open", TokenID.KOPEN },
+        { "pause", TokenID.KPAUSE },
+        { "parameter", TokenID.KPARAMETER },
+        { "precision", TokenID.KPRECISION },
+        { "print", TokenID.KPRINT },
+        { "program", TokenID.KPROGRAM },
+        { "read", TokenID.KREAD },
+        { "real", TokenID.KREAL },
+        { "return", TokenID.KRETURN },
+        { "rewind", TokenID.KREWIND },
+        { "save", TokenID.KSAVE },
+        { "stop", TokenID.KSTOP },
         { "subroutine", TokenID.KSUBROUTINE },
-        { "then",       TokenID.KTHEN },
-        { "to",         TokenID.KTO },
-        { "while",      TokenID.KWHILE },
-        { "write",      TokenID.KWRITE },
-        { ".and.",      TokenID.KAND },
-        { ".eq.",       TokenID.KEQ },
-        { ".eqv.",      TokenID.KEQV },
-        { ".false.",    TokenID.KFALSE },
-        { ".ge.",       TokenID.KGE },
-        { ".gt.",       TokenID.KGT },
-        { ".le.",       TokenID.KLE },
-        { ".lt.",       TokenID.KLT },
-        { ".or.",       TokenID.KOR },
-        { ".ne.",       TokenID.KNE },
-        { ".neqv.",     TokenID.KNEQV },
-        { ".not.",      TokenID.KNOT },
-        { ".true.",     TokenID.KTRUE },
-        { ".xor.",      TokenID.KXOR }
+        { "then", TokenID.KTHEN },
+        { "to", TokenID.KTO },
+        { "while", TokenID.KWHILE },
+        { "write", TokenID.KWRITE },
+        { ".and.", TokenID.KAND },
+        { ".eq.", TokenID.KEQ },
+        { ".eqv.", TokenID.KEQV },
+        { ".false.", TokenID.KFALSE },
+        { ".ge.", TokenID.KGE },
+        { ".gt.", TokenID.KGT },
+        { ".le.", TokenID.KLE },
+        { ".lt.", TokenID.KLT },
+        { ".or.", TokenID.KOR },
+        { ".ne.", TokenID.KNE },
+        { ".neqv.", TokenID.KNEQV },
+        { ".not.", TokenID.KNOT },
+        { ".true.", TokenID.KTRUE },
+        { ".xor.", TokenID.KXOR }
     };
 
     /// <summary>
@@ -143,29 +221,29 @@ public static class Tokens {
                 return pair.Key.ToUpper();
             }
         }
-        
+
         // Anything else here is a non-keyword token
         switch (id) {
-            case TokenID.KSTMTFUNC:     return "statement function";
-            case TokenID.KDPRECISION:   return "DOUBLE PRECISION";
+            case TokenID.KSTMTFUNC: return "statement function";
+            case TokenID.KDPRECISION: return "DOUBLE PRECISION";
             case TokenID.KIMPLICITNONE: return "IMPLICIT NONE";
-            case TokenID.IDENT:         return "identifier";
-            case TokenID.INTEGER:       return "number";
-            case TokenID.REAL:          return "real number";
-            case TokenID.STRING:        return "string";
-            case TokenID.EQUOP:         return "=";
-            case TokenID.RPAREN:        return ")";
-            case TokenID.LPAREN:        return "(";
-            case TokenID.COMMA:         return ",";
-            case TokenID.COLON:         return ":";
-            case TokenID.STAR:          return "*";
-            case TokenID.DIVIDE:        return "/";
-            case TokenID.PLUS:          return "+";
-            case TokenID.MINUS:         return "-";
-            case TokenID.EOL:           return "end of line";
-            case TokenID.ENDOFFILE:     return "end of file";
+            case TokenID.IDENT: return "identifier";
+            case TokenID.INTEGER: return "number";
+            case TokenID.REAL: return "real number";
+            case TokenID.STRING: return "string";
+            case TokenID.EQUOP: return "=";
+            case TokenID.RPAREN: return ")";
+            case TokenID.LPAREN: return "(";
+            case TokenID.COMMA: return ",";
+            case TokenID.COLON: return ":";
+            case TokenID.STAR: return "*";
+            case TokenID.DIVIDE: return "/";
+            case TokenID.PLUS: return "+";
+            case TokenID.MINUS: return "-";
+            case TokenID.EOL: return "end of line";
+            case TokenID.ENDOFFILE: return "end of file";
         }
-        
+
         // If we get here, we added a new token but forgot to add it to
         // the switch table above.
         Debug.Assert(false, $"TokenIDToString doesn't understand {id}");

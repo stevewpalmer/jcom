@@ -27,7 +27,7 @@ using System.Collections.ObjectModel;
 using CCompiler;
 using JComLib;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Exposes methods for specifying an external function.
@@ -39,7 +39,7 @@ public class ExternalFunction {
         public Symbol Symbol;
         public bool Include;
     }
-    
+
     private readonly Collection<FunctionDefinition> _definitions;
 
     /// <summary>
@@ -90,14 +90,17 @@ public class ExternalFunction {
                 if (!cilist.Has(def.Name)) {
                     if (Symbol.IsNumberType(def.Symbol.Type)) {
                         exprNode = new NumberParseNode(0);
-                    } else if (Symbol.IsLogicalType(def.Symbol.Type)) {
+                    }
+                    else if (Symbol.IsLogicalType(def.Symbol.Type)) {
                         exprNode = new NumberParseNode(new Variant(false));
-                    } else {
+                    }
+                    else {
                         exprNode = new NullParseNode {
                             Type = def.Symbol.Type
                         };
                     }
-                } else {
+                }
+                else {
                     exprNode = cilist[def.Name];
                 }
                 paramList.Add(exprNode, def.Symbol);

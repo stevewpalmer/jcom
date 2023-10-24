@@ -156,7 +156,8 @@ public partial class Compiler {
                 return null;
             }
             node.ReadManagerParamsNode = _readFunctionString.ParametersNode(cilist);
-        } else {
+        }
+        else {
             if (unit == null) {
                 cilist["UNIT"] = new NumberParseNode(new Variant(IOConstant.Stdin));
             }

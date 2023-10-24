@@ -64,10 +64,12 @@ public partial class Compiler {
                 name = identToken.Name;
                 isNewBlock = true;
                 ExpectToken(TokenID.DIVIDE);
-            } else if (token.ID == TokenID.CONCAT) {
+            }
+            else if (token.ID == TokenID.CONCAT) {
                 name = "_COMMON";
                 isNewBlock = true;
-            } else {
+            }
+            else {
                 _ls.BackToken();
             }
             if (isNewBlock) {
@@ -85,7 +87,8 @@ public partial class Compiler {
             if (sym != null) {
                 if (sym.IsInCommon) {
                     Messages.Error(MessageCode.ALREADYINCOMMON, $"{sym.Name} is already in a COMMON block");
-                } else {
+                }
+                else {
                     sym.CommonIndex = symCommon.CommonIndex;
                     sym.Common = symCommon;
                     sym.IsReferenced = true;
@@ -95,7 +98,8 @@ public partial class Compiler {
                     if (sym.CommonIndex < commonSymbols.Count) {
                         Symbol symInCommon = commonSymbols[sym.CommonIndex];
                         sym.FullType = symInCommon.FullType;
-                    } else {
+                    }
+                    else {
                         sym.Modifier |= SymModifier.STATIC;
                         commonSymbols.Add(sym);
                     }
@@ -123,7 +127,8 @@ public partial class Compiler {
                 token = _ls.GetToken();
             } while (token.ID == TokenID.COMMA);
             _ls.BackToken();
-        } else {
+        }
+        else {
             _saveAll = true;
         }
         return null;
@@ -190,7 +195,7 @@ public partial class Compiler {
                 }
                 idList.Add(node);
                 token = _ls.GetToken();
-            } while(token.ID == TokenID.COMMA);
+            } while (token.ID == TokenID.COMMA);
             _ls.BackToken();
 
             Variant repeatNode;
@@ -205,7 +210,8 @@ public partial class Compiler {
                 if (token.ID == TokenID.STAR) {
                     if (valueNode.IntValue < 1) {
                         Messages.Error(MessageCode.BADREPEATCOUNT, "Repeat count must be positive and non-zero");
-                    } else {
+                    }
+                    else {
                         repeatNode = valueNode;
                     }
                     valueNode = ParseConstant();
@@ -213,7 +219,7 @@ public partial class Compiler {
                 }
                 valueList.Add(repeatNode);
                 valueList.Add(valueNode);
-            } while(token.ID == TokenID.COMMA);
+            } while (token.ID == TokenID.COMMA);
             _ls.BackToken();
             ExpectToken(TokenID.DIVIDE);
 
@@ -302,7 +308,8 @@ public partial class Compiler {
                         arrayNode.EndRange = 0;
                         arrayNode.RangeValue = valueNode;
                         AddInit(arrayNode);
-                    } else {
+                    }
+                    else {
                         arrayNode.StartRange = offset;
                         arrayNode.EndRange = offset + (repeatCount - 1);
                         arrayNode.RangeValue = valueNode;
@@ -310,10 +317,12 @@ public partial class Compiler {
                         offset += repeatCount;
                         repeatCount = 1;
                     }
-                } else if (idNode.HasSubstring) {
+                }
+                else if (idNode.HasSubstring) {
                     AssignmentParseNode assignNode = new(idNode, new StringParseNode(valueNode.StringValue));
                     AddInit(assignNode);
-                } else {
+                }
+                else {
                     if (valueNode.Type == VariantType.STRING && repeatCount > 1) {
                         string newString = string.Concat(Enumerable.Repeat(valueNode.ToString(), repeatCount));
                         valueNode = new Variant(newString);
@@ -492,8 +501,8 @@ public partial class Compiler {
             if (!sym.IsReferenced && !sym.Modifier.HasFlag(SymModifier.RETVAL)) {
                 string scopeName = sym.IsParameter ? "parameter" : sym.IsLabel ? "label" : "variable";
                 Messages.Warning(MessageCode.UNUSEDVARIABLE,
-                                  3,
-                                  sym.RefLine,
+                    3,
+                    sym.RefLine,
                     $"Unused {scopeName} {sym.Name} in function");
             }
         }
@@ -514,7 +523,8 @@ public partial class Compiler {
                 Symbol sym = _localSymbols.Get(identToken.Name);
                 if (sym == null) {
                     sym = _localSymbols.Add(identToken.Name, new SymFullType(), SymClass.INTRINSIC, null, _ls.LineNumber);
-                } else {
+                }
+                else {
                     Messages.Error(MessageCode.IDENTIFIERREDEFINITION,
                         $"Intrinsic {identToken.Name} already declared");
                 }
@@ -532,12 +542,20 @@ public partial class Compiler {
 
                     int paramCount = 1;
                     switch (intrDefinition.Count) {
-                        case ArgCount.One:       paramCount = 1; break;
-                        case ArgCount.OneOrTwo:  paramCount = 2; break;
-                        case ArgCount.Two:       paramCount = 2; break;
-                        case ArgCount.TwoOrMore: paramCount = 1; break;
+                        case ArgCount.One:
+                            paramCount = 1;
+                            break;
+                        case ArgCount.OneOrTwo:
+                            paramCount = 2;
+                            break;
+                        case ArgCount.Two:
+                            paramCount = 2;
+                            break;
+                        case ArgCount.TwoOrMore:
+                            paramCount = 1;
+                            break;
                     }
-                    Type [] paramTypes = new Type[paramCount];
+                    Type[] paramTypes = new Type[paramCount];
                     for (int c = 0; c < paramCount; ++c) {
                         SymType argType = intrDefinition.ArgType();
                         if (argType == SymType.GENERIC) {
@@ -548,9 +566,11 @@ public partial class Compiler {
                             // defaults to REAL.
                             if (intrDefinition.IsValidArgType(SymType.DOUBLE)) {
                                 argType = SymType.DOUBLE;
-                            } else if (intrDefinition.IsValidArgType(SymType.FLOAT)) {
+                            }
+                            else if (intrDefinition.IsValidArgType(SymType.FLOAT)) {
                                 argType = SymType.FLOAT;
-                            } else {
+                            }
+                            else {
                                 argType = SymType.INTEGER;
                             }
                         }
@@ -584,7 +604,8 @@ public partial class Compiler {
                 // External scope being given to a dummy argument
                 if (sym != null && sym.IsParameter) {
                     sym.Class = SymClass.FUNCTION;
-                } else {
+                }
+                else {
                     SymFullType fullType = new();
                     if (sym != null) {
                         fullType = sym.FullType;
@@ -624,12 +645,29 @@ public partial class Compiler {
     }
 
     /// All the type declarations, one by one.
-    private ParseNode KCharacter()  { return KDeclaration(SymType.FIXEDCHAR); }
-    private ParseNode KInteger()    { return KDeclaration(SymType.INTEGER); }
-    private ParseNode KLogical()    { return KDeclaration(SymType.BOOLEAN); }
-    private ParseNode KDouble()     { return KDeclaration(SymType.DOUBLE); }
-    private ParseNode KReal()       { return KDeclaration(SymType.FLOAT); }
-    private ParseNode KComplex()    { return KDeclaration(SymType.COMPLEX); }
+    private ParseNode KCharacter() {
+        return KDeclaration(SymType.FIXEDCHAR);
+    }
+
+    private ParseNode KInteger() {
+        return KDeclaration(SymType.INTEGER);
+    }
+
+    private ParseNode KLogical() {
+        return KDeclaration(SymType.BOOLEAN);
+    }
+
+    private ParseNode KDouble() {
+        return KDeclaration(SymType.DOUBLE);
+    }
+
+    private ParseNode KReal() {
+        return KDeclaration(SymType.FLOAT);
+    }
+
+    private ParseNode KComplex() {
+        return KDeclaration(SymType.COMPLEX);
+    }
 
     /// Handle a declaration statement of the specified type.
     private ParseNode KDeclaration(SymType type) {
@@ -655,7 +693,8 @@ public partial class Compiler {
                 if (sym.IsParameter) {
                     if (!sym.IsArray && !sym.IsMethod && sym.IsValueType) {
                         sym.Linkage = SymLinkage.BYREF;
-                    } else {
+                    }
+                    else {
                         sym.Linkage = SymLinkage.BYVAL;
                     }
                 }
@@ -679,12 +718,12 @@ public partial class Compiler {
     // Maps a type keyword token to a symbol type.
     private static SymType TokenToType(TokenID token) {
         switch (token) {
-            case TokenID.KINTEGER:          return SymType.INTEGER;
-            case TokenID.KREAL:             return SymType.FLOAT;
-            case TokenID.KDPRECISION:       return SymType.DOUBLE;
-            case TokenID.KLOGICAL:          return SymType.BOOLEAN;
-            case TokenID.KCHARACTER:        return SymType.FIXEDCHAR;
-            case TokenID.KCOMPLEX:          return SymType.COMPLEX;
+            case TokenID.KINTEGER: return SymType.INTEGER;
+            case TokenID.KREAL: return SymType.FLOAT;
+            case TokenID.KDPRECISION: return SymType.DOUBLE;
+            case TokenID.KLOGICAL: return SymType.BOOLEAN;
+            case TokenID.KCHARACTER: return SymType.FIXEDCHAR;
+            case TokenID.KCOMPLEX: return SymType.COMPLEX;
 
             default:
                 Debug.Assert(true, "TokenToType called with invalid argument");

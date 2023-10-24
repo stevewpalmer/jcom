@@ -27,7 +27,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using CCompiler;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Defines an enumerable collection of Fortran symbols.
@@ -60,7 +60,8 @@ public class FortranSymbolCollection : SymbolCollection {
         for (int c = 0; c < 26; ++c) {
             if (c + 'A' >= 'I' && c + 'A' <= 'N') {
                 _typeMap[c] = new SymFullType(SymType.INTEGER);
-            } else {
+            }
+            else {
                 _typeMap[c] = new SymFullType(SymType.FLOAT);
             }
             _typeMapSet[c] = false;

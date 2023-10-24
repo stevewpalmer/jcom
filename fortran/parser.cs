@@ -79,11 +79,13 @@ public partial class Compiler {
                 if (_ls.PeekToken().ID == TokenID.STAR) {
                     ExpectToken(TokenID.STAR);
                     width = 255;
-                } else {
+                }
+                else {
                     ParseIntegerValue(out width);
                 }
                 ExpectToken(TokenID.RPAREN);
-            } else {
+            }
+            else {
                 if (ParseIntegerValue(out width)) {
                     if (width < 1) {
                         Messages.Error(MessageCode.BADTYPEWIDTH, "Type width cannot be less than 1");
@@ -91,7 +93,8 @@ public partial class Compiler {
                     }
                 }
             }
-        } else {
+        }
+        else {
             _ls.BackToken();
         }
         return width;
@@ -122,13 +125,15 @@ public partial class Compiler {
         string str = ParseStringLiteral();
         if (string.IsNullOrWhiteSpace(str)) {
             str = string.Empty;
-        } else {
+        }
+        else {
             if (char.IsDigit(str[0])) {
                 if (!int.TryParse(str, out int value) || value > 99999) {
                     Messages.Error(MessageCode.BADSTOPFORMAT, "Illegal number code format");
                     str = string.Empty;
                 }
-            } else {
+            }
+            else {
                 str = str.Trim().Trim('"', '\'');
             }
         }
@@ -172,7 +177,8 @@ public partial class Compiler {
                 if (_ls.PeekToken().ID == TokenID.LPAREN) {
                     _ls.GetToken();
                     varargs.Add(ParseImpliedDo());
-                } else {
+                }
+                else {
                     varargs.Add(Expression());
                 }
                 token = _ls.GetToken();
@@ -388,8 +394,8 @@ public partial class Compiler {
     // Parse a function or subroutine parameter declaration and return an
     // array of symbols for all parameters
     private Collection<Symbol> ParseParameterDecl(FortranSymbolCollection symbolTable,
-                                                  SymScope scope,
-                                                  out int countOfAlternateReturn) {
+        SymScope scope,
+        out int countOfAlternateReturn) {
         SimpleToken token = _ls.GetToken();
         Collection<Symbol> parameters = new();
 
@@ -400,14 +406,16 @@ public partial class Compiler {
                     if (_ls.PeekToken().ID == TokenID.STAR) {
                         SkipToken(TokenID.STAR);
                         ++countOfAlternateReturn;
-                    } else {
+                    }
+                    else {
                         IdentifierToken identToken = ExpectIdentifierToken();
                         if (identToken != null) {
                             Symbol sym = symbolTable.Get(identToken.Name);
                             if (sym != null) {
                                 Messages.Error(MessageCode.PARAMETERDEFINED,
                                     $"Parameter {identToken.Name} already defined");
-                            } else {
+                            }
+                            else {
                                 sym = symbolTable.Add(identToken.Name, new SymFullType(), SymClass.VAR, null, _ls.LineNumber);
                                 sym.Scope = scope;
                                 if (!sym.IsArray && !sym.IsMethod && sym.IsValueType) {
@@ -425,7 +433,8 @@ public partial class Compiler {
                 _ls.BackToken();
             }
             ExpectToken(TokenID.RPAREN);
-        } else {
+        }
+        else {
             _ls.BackToken();
         }
         return parameters;
@@ -455,7 +464,7 @@ public partial class Compiler {
             SkipToken(token.ID);
             return new StringParseNode("*");
         }
-        return ParseExpressionOfTypes(new [] { SymType.CHAR, SymType.FIXEDCHAR});
+        return ParseExpressionOfTypes(new[] { SymType.CHAR, SymType.FIXEDCHAR });
     }
 
     // Parse a unit specifier:
@@ -472,7 +481,7 @@ public partial class Compiler {
             SkipToken(token.ID);
             return null;
         }
-        return ParseExpressionOfTypes(new [] { SymType.INTEGER });
+        return ParseExpressionOfTypes(new[] { SymType.INTEGER });
     }
 
     // Parse a control list.
@@ -488,10 +497,12 @@ public partial class Compiler {
         if (_ls.PeekToken().ID != TokenID.LPAREN) {
             if (allowedSpecifiers.Contains("FMT")) {
                 cilist["FMT"] = ParseFormatSpecifier();
-            } else if (allowedSpecifiers.Contains("UNIT")) {
+            }
+            else if (allowedSpecifiers.Contains("UNIT")) {
                 cilist["UNIT"] = ParseUnitSpecifier();
             }
-        } else {
+        }
+        else {
             ExpectToken(TokenID.LPAREN);
             SimpleToken token;
             do {
@@ -502,13 +513,16 @@ public partial class Compiler {
                     IdentifierToken identToken = (IdentifierToken)token;
                     paramName = identToken.Name;
                     ExpectToken(TokenID.EQUOP);
-                } else {
+                }
+                else {
                     _ls.BackToken();
                     if (index == 0) {
                         paramName = "UNIT";
-                    } else if (index == 1) {
+                    }
+                    else if (index == 1) {
                         paramName = "FMT";
-                    } else {
+                    }
+                    else {
                         Messages.Error(MessageCode.CILISTERROR, $"Parameter at position {index} must be named");
                         return null;
                     }
@@ -525,7 +539,8 @@ public partial class Compiler {
                     case "UNIT":
                         if (_ls.PeekToken().ID != TokenID.STAR) {
                             node = Expression();
-                        } else {
+                        }
+                        else {
                             _ls.GetToken();
                         }
                         break;
@@ -543,7 +558,7 @@ public partial class Compiler {
                     case "FORM":
                     case "STATUS":
                     case "BLANK":
-                        node = ParseExpressionOfTypes(new [] { SymType.FIXEDCHAR, SymType.CHAR});
+                        node = ParseExpressionOfTypes(new[] { SymType.FIXEDCHAR, SymType.CHAR });
                         break;
 
                     case "END":
@@ -553,7 +568,7 @@ public partial class Compiler {
 
                     case "REC":
                     case "RECL":
-                        node = ParseExpressionOfTypes(new [] { SymType.INTEGER });
+                        node = ParseExpressionOfTypes(new[] { SymType.INTEGER });
                         break;
 
                     case "IOSTAT":
@@ -641,7 +656,8 @@ public partial class Compiler {
                     Messages.Error(MessageCode.IDENTIFIERTOOLONG, $"Identifier {identToken.Name} length too long");
                 }
                 sym = _localSymbols.Add(identToken.Name, thisFullType, SymClass.VAR, dimensions, _ls.LineNumber);
-            } else {
+            }
+            else {
                 if (fullType.Type != SymType.NONE) {
                     sym.FullType = thisFullType;
                 }
@@ -659,7 +675,7 @@ public partial class Compiler {
             // identifier becomes an array.
             if (sym.IsArray) {
                 sym.Linkage = SymLinkage.BYVAL;
-                sym.Modifier |= SymModifier.FLATARRAY;  // FORTRAN always uses flat arrays
+                sym.Modifier |= SymModifier.FLATARRAY; // FORTRAN always uses flat arrays
             }
         }
         return sym;
@@ -680,7 +696,8 @@ public partial class Compiler {
                         SkipToken(TokenID.STAR);
                         intVal = new NumberParseNode(0);
                         hasAssumedBound = true;
-                    } else {
+                    }
+                    else {
                         intVal = IntegerExpression();
                         if (intVal == null) {
                             SkipToEndOfLine();
@@ -710,14 +727,16 @@ public partial class Compiler {
                             SkipToken(TokenID.STAR);
                             intVal = new NumberParseNode(0);
                             hasAssumedBound = true;
-                        } else {
+                        }
+                        else {
                             intVal = IntegerExpression();
                         }
                         if (intVal != null) {
                             in1 = in2;
                             in2 = intVal;
                         }
-                    } else {
+                    }
+                    else {
                         _ls.BackToken();
                     }
                     if (in2.IsConstant && in1.IsConstant) {
@@ -729,7 +748,8 @@ public partial class Compiler {
                     dim.UpperBound = in2;
                     if (dimensions.Count == 7) {
                         Messages.Error(MessageCode.TOOMANYDIMENSIONS, "Too many dimensions in array");
-                    } else {
+                    }
+                    else {
                         dimensions.Add(dim);
                     }
                     token = _ls.GetToken();

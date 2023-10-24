@@ -29,7 +29,7 @@ using System.Xml;
 using CCompiler;
 using JComLib;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Main Fortran compiler class.
@@ -113,7 +113,8 @@ public partial class Compiler : ICompiler {
             MarkExecutable();
             _cg.Generate();
             _cg.Save();
-        } catch (CodeGeneratorException e) {
+        }
+        catch (CodeGeneratorException e) {
             Messages.Error(e.Filename, MessageCode.CODEGEN, e.Linenumber, e.Message);
         }
     }
@@ -161,7 +162,7 @@ public partial class Compiler : ICompiler {
             _parsingIf = false;
             _blockDepth = 0;
             _state = BlockState.NONE;
-            
+
             // Create the top-level program node.
             if (_cg == null) {
                 string moduleName = Path.GetFileNameWithoutExtension(_opts.OutputFile);
@@ -188,7 +189,8 @@ public partial class Compiler : ICompiler {
                 outputFilename = Path.ChangeExtension(outputFilename, ".xml");
                 xmlTree.Save(outputFilename);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             if (_opts.DevMode) {
                 throw;
             }
@@ -197,13 +199,13 @@ public partial class Compiler : ICompiler {
     }
 
     // Compile a code unit, such as an include file.
-    private void CompileUnit(string filename, string [] lines) {
+    private void CompileUnit(string filename, string[] lines) {
         _ls = new Lexer(lines, _opts, Messages);
         Messages.Filename = filename;
 
         // Mark this file.
         _ptree.Add(MarkFilename());
-        
+
         // Loop and parse one single line at a time.
         SimpleToken token = _ls.GetKeyword();
         while (token.ID != TokenID.ENDOFFILE) {
@@ -227,7 +229,7 @@ public partial class Compiler : ICompiler {
     // code generator uses this to refer to the correct source file if any
     // errors are found during generation.
     private ParseNode MarkFilename() {
-        return new MarkFilenameParseNode {Filename = Messages.Filename};
+        return new MarkFilenameParseNode { Filename = Messages.Filename };
     }
 
     // Create a token node that marks the number of the current line being
@@ -235,7 +237,7 @@ public partial class Compiler : ICompiler {
     // filename to refer to the location in the source file if any errors
     // are found during generation.
     private ParseNode MarkLine() {
-        return new MarkLineParseNode {LineNumber = _ls.LineNumber};
+        return new MarkLineParseNode { LineNumber = _ls.LineNumber };
     }
 
     // Mark in the PROGRAM node whether or not this program is executable.
@@ -265,14 +267,17 @@ public partial class Compiler : ICompiler {
         if (sym == null) {
             sym = _localSymbols.Add(label, new SymFullType(SymType.LABEL), SymClass.LABEL, null, _ls.LineNumber);
             sym.Defined = isDeclaration;
-        } else if (isDeclaration && sym.Defined) {
+        }
+        else if (isDeclaration && sym.Defined) {
             Messages.Error(MessageCode.LABELALREADYDECLARED, $"Label {label} already declared");
-        } else {
+        }
+        else {
             sym.Defined = isDeclaration || sym.Defined;
         }
         if (isDeclaration) {
             sym.Depth = _blockDepth;
-        } else {
+        }
+        else {
             sym.IsReferenced = true;
         }
         return sym;
@@ -394,48 +399,48 @@ public partial class Compiler : ICompiler {
         // First make sure this statement is allowed here.
         if (ChangeState(token)) {
             switch (token.ID) {
-                case TokenID.KASSIGN:           return KAssign();
-                case TokenID.KBACKSPACE:        return KBackspace();
-                case TokenID.KBLOCKDATA:        return KBlockData();
-                case TokenID.KCALL:             return KCall();
-                case TokenID.KCHARACTER:        return KCharacter();
-                case TokenID.KCLOSE:            return KClose();
-                case TokenID.KCOMMON:           return KCommon();
-                case TokenID.KCOMPLEX:          return KComplex();
-                case TokenID.KCONTINUE:         return KContinue();
-                case TokenID.KDATA:             return KData();
-                case TokenID.KDIMENSION:        return KDimension();
-                case TokenID.KDO:               return KDo();
-                case TokenID.KDPRECISION:       return KDouble();
-                case TokenID.KENDFILE:          return KEndFile();
-                case TokenID.KENTRY:            return KEntry();
-                case TokenID.KEQUIVALENCE:      return KEquivalence();
-                case TokenID.KEXTERNAL:         return KExternal();
-                case TokenID.KFORMAT:           return KFormat();
-                case TokenID.KFUNCTION:         return KFunction();
-                case TokenID.KGOTO:             return KGoto();
-                case TokenID.KIF:               return KIf();
-                case TokenID.KIMPLICIT:         return KImplicit();
-                case TokenID.KIMPLICITNONE:     return KImplicitNone();
-                case TokenID.KINCLUDE:          return KInclude();
-                case TokenID.KINQUIRE:          return KInquire();
-                case TokenID.KINTEGER:          return KInteger();
-                case TokenID.KINTRINSIC:        return KIntrinsic();
-                case TokenID.KLOGICAL:          return KLogical();
-                case TokenID.KOPEN:             return KOpen();
-                case TokenID.KPAUSE:            return KPause();
-                case TokenID.KPARAMETER:        return KParameter();
-                case TokenID.KPRINT:            return KPrint();
-                case TokenID.KPROGRAM:          return KProgram();
-                case TokenID.KREAD:             return KRead();
-                case TokenID.KREAL:             return KReal();
-                case TokenID.KRETURN:           return KReturn();
-                case TokenID.KREWIND:           return KRewind();
-                case TokenID.KSAVE:             return KSave();
-                case TokenID.KSTOP:             return KStop();
-                case TokenID.KSUBROUTINE:       return KSubroutine();
-                case TokenID.KWRITE:            return KWrite();
-                case TokenID.IDENT:             return KAssignment();
+                case TokenID.KASSIGN: return KAssign();
+                case TokenID.KBACKSPACE: return KBackspace();
+                case TokenID.KBLOCKDATA: return KBlockData();
+                case TokenID.KCALL: return KCall();
+                case TokenID.KCHARACTER: return KCharacter();
+                case TokenID.KCLOSE: return KClose();
+                case TokenID.KCOMMON: return KCommon();
+                case TokenID.KCOMPLEX: return KComplex();
+                case TokenID.KCONTINUE: return KContinue();
+                case TokenID.KDATA: return KData();
+                case TokenID.KDIMENSION: return KDimension();
+                case TokenID.KDO: return KDo();
+                case TokenID.KDPRECISION: return KDouble();
+                case TokenID.KENDFILE: return KEndFile();
+                case TokenID.KENTRY: return KEntry();
+                case TokenID.KEQUIVALENCE: return KEquivalence();
+                case TokenID.KEXTERNAL: return KExternal();
+                case TokenID.KFORMAT: return KFormat();
+                case TokenID.KFUNCTION: return KFunction();
+                case TokenID.KGOTO: return KGoto();
+                case TokenID.KIF: return KIf();
+                case TokenID.KIMPLICIT: return KImplicit();
+                case TokenID.KIMPLICITNONE: return KImplicitNone();
+                case TokenID.KINCLUDE: return KInclude();
+                case TokenID.KINQUIRE: return KInquire();
+                case TokenID.KINTEGER: return KInteger();
+                case TokenID.KINTRINSIC: return KIntrinsic();
+                case TokenID.KLOGICAL: return KLogical();
+                case TokenID.KOPEN: return KOpen();
+                case TokenID.KPAUSE: return KPause();
+                case TokenID.KPARAMETER: return KParameter();
+                case TokenID.KPRINT: return KPrint();
+                case TokenID.KPROGRAM: return KProgram();
+                case TokenID.KREAD: return KRead();
+                case TokenID.KREAL: return KReal();
+                case TokenID.KRETURN: return KReturn();
+                case TokenID.KREWIND: return KRewind();
+                case TokenID.KSAVE: return KSave();
+                case TokenID.KSTOP: return KStop();
+                case TokenID.KSUBROUTINE: return KSubroutine();
+                case TokenID.KWRITE: return KWrite();
+                case TokenID.IDENT: return KAssignment();
             }
 
             // Anything else is unparseable, so assume the rest of the line is
@@ -451,7 +456,7 @@ public partial class Compiler : ICompiler {
     private ParseNode CheckLabel() {
         if (_ls.HasLabel) {
             Symbol sym = GetMakeLabel(_ls.Label, true);
-            return new MarkLabelParseNode {Label = sym};
+            return new MarkLabelParseNode { Label = sym };
         }
         return null;
     }
@@ -469,7 +474,7 @@ public partial class Compiler : ICompiler {
             case TokenID.KIMPLICITNONE:
                 state = BlockState.IMPLICITNONE;
                 break;
-                
+
             case TokenID.KIMPLICIT:
                 state = BlockState.IMPLICIT;
                 break;
@@ -587,7 +592,8 @@ public partial class Compiler : ICompiler {
                 CompileUnit(filename, lines.ToArray());
                 _ls = savedLexer;
                 Messages.Filename = savedFilename;
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 _ls = savedLexer;
                 Messages.Error(MessageCode.INCLUDEERROR, $"INCLUDE error: {e.Message}");
             }
@@ -640,7 +646,8 @@ public partial class Compiler : ICompiler {
                             node.AlternateReturnLabels.Add(altLabel);
                             hasAlternateReturn = true;
                         }
-                    } else {
+                    }
+                    else {
                         if (hasAlternateReturn) {
                             Messages.Error(MessageCode.ALTRETURNORDER, "Alternate return labels must be at the end");
                         }
@@ -729,13 +736,14 @@ public partial class Compiler : ICompiler {
                 ExpectToken(TokenID.RPAREN);
                 ExpectToken(TokenID.KTHEN);
                 ExpectEndOfLine();
-            } else if (id == TokenID.KELSE) {
+            }
+            else if (id == TokenID.KELSE) {
                 // We mark the end of the sequence of IF blocks with
                 // a null expression.
                 expr = null;
                 ExpectEndOfLine();
             }
-        } while(id == TokenID.KELSEIF || id == TokenID.KELSE);
+        } while (id == TokenID.KELSEIF || id == TokenID.KELSE);
         _ls.BackToken();
         ExpectToken(TokenID.KENDIF);
         return node;
@@ -831,7 +839,8 @@ public partial class Compiler : ICompiler {
         SimpleToken token = _ls.GetToken();
         if (token.ID == TokenID.COMMA) {
             node.StepExpression = Expression();
-        } else {
+        }
+        else {
             _ls.BackToken();
         }
         ExpectEndOfLine();
@@ -949,7 +958,8 @@ public partial class Compiler : ICompiler {
                 }
                 node.ValueExpressions = new[] { exprNode };
             }
-        } else {
+        }
+        else {
             SkipToEndOfLine();
         }
         return node;
@@ -959,20 +969,21 @@ public partial class Compiler : ICompiler {
     // assigned to the left hand side.
     private static bool ValidateAssignmentTypes(SymType toType, SymType fromType) {
         bool valid = false;
-        
+
         switch (toType) {
             case SymType.CHAR:
             case SymType.FIXEDCHAR:
                 valid = Symbol.IsCharType(fromType);
                 break;
-                
+
             case SymType.DOUBLE:
             case SymType.INTEGER:
             case SymType.FLOAT:
             case SymType.COMPLEX:
                 if (toType == SymType.COMPLEX) {
                     valid = fromType == SymType.COMPLEX;
-                } else {
+                }
+                else {
                     valid = Symbol.IsNumberType(fromType);
                 }
                 break;
@@ -1118,7 +1129,8 @@ public partial class Compiler : ICompiler {
         if (!_ls.HasLabel) {
             Messages.Error(MessageCode.LABELEXPECTED, "Label expected for FORMAT specifier");
             SkipToEndOfLine();
-        } else {
+        }
+        else {
             string label = _ls.Label;
 
             SimpleToken token = ExpectToken(TokenID.STRING);
@@ -1155,7 +1167,8 @@ public partial class Compiler : ICompiler {
                 if (_currentProcedure.AlternateReturnCount == 0) {
                     Messages.Error(MessageCode.ALTRETURNNOTALLOWED, "Alternate return value not allowed for this subroutine");
                 }
-            } else {
+            }
+            else {
                 ParseNode exprNode = Expression();
                 if (!ValidateAssignmentTypes(thisSymbol.Type, exprNode.Type)) {
                     Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in RETURN statement");

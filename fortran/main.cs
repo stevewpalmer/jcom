@@ -25,7 +25,7 @@
 
 using CCompiler;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// This is the main driver file for the compiler and the only part that
