@@ -25,11 +25,10 @@
 
 using CCompiler;
 
-namespace JCobol; 
+namespace JCobol;
 
 /// <summary>
 /// Class that extends the <c>Options</c> class with additional
 /// options used by the compiler.
 /// </summary>
-public class CobolOptions : Options {
-}
+public class CobolOptions : Options { }

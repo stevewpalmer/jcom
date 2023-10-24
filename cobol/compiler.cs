@@ -25,7 +25,7 @@
 
 using CCompiler;
 
-namespace JCobol; 
+namespace JCobol;
 
 /// <summary>
 /// Main Cobol compiler class.

@@ -25,7 +25,7 @@
 
 using CCompiler;
 
-namespace JCobol; 
+namespace JCobol;
 
 public static class Program {
 
@@ -42,7 +42,7 @@ public static class Program {
             }
 
             Compiler comp = new(opts) {
-               Messages = messages
+                Messages = messages
             };
 
             foreach (string srcfile in opts.SourceFiles) {
