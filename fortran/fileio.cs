@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -26,7 +26,7 @@
 using CCompiler;
 using JComLib;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Main Fortran compiler class.
@@ -114,7 +114,7 @@ public partial class Compiler {
             return null;
         }
         node.Parameters = _inquireFunction.ParametersNode(cilist);
-        
+
         // Wrap into a conditional if an ERR label is specified.
         if (cilist.Has("ERR")) {
             SwitchParseNode switchNode = new();
@@ -133,7 +133,7 @@ public partial class Compiler {
         ReadParseNode node = new();
 
         InitFunctionNodes();
-        
+
         ControlList cilist = ParseCIList(_readFunctions.ParameterList);
         if (cilist == null) {
             SkipToEndOfLine();
@@ -180,8 +180,8 @@ public partial class Compiler {
         node.ArgList = ParseVarargList();
         node.ErrLabel = (SymbolParseNode)cilist["ERR"];
 
-        // First column is special for F77 only
-        node.FirstColumnSpecial = _opts.F77;
+        // First column is special for pre-Fortran 90 only
+        node.FirstColumnSpecial = !_opts.F90;
 
         // If this is internal storage, create an expression that
         // assigns the result to the character string
@@ -207,14 +207,14 @@ public partial class Compiler {
         WriteParseNode node = new();
 
         InitFunctionNodes();
-        
+
         ControlList cilist = new() {
             ["FMT"] = ParseFormatSpecifier(),
             ["UNIT"] = new NumberParseNode(new Variant(IOConstant.Stdout))
         };
 
-        // First column is special for F77 only
-        node.FirstColumnSpecial = _opts.F77;
+        // First column is special for pre-Fortran 90 only
+        node.FirstColumnSpecial = !_opts.F90;
 
         if (!IsAtEndOfLine()) {
             SimpleToken token;
@@ -227,7 +227,7 @@ public partial class Compiler {
             } while (token.ID == TokenID.COMMA);
             _ls.BackToken();
             node.ArgList = varargs;
-        }            
+        }
 
         node.WriteParamsNode = _ioCoreFunctions.ParametersNode(cilist);
         node.WriteManagerParamsNode = _writeFunctions.ParametersNode(cilist);
@@ -266,7 +266,7 @@ public partial class Compiler {
             return null;
         }
         node.Parameters = _posFunction.ParametersNode(cilist);
-        
+
         // Wrap into a conditional if an ERR label is specified.
         if (cilist.Has("ERR")) {
             SwitchParseNode switchNode = new() {

@@ -58,6 +58,7 @@ public sealed class ReturnParseNode : ParseNode {
             throw new ArgumentNullException(nameof(cg));
         }
         if (cg.CurrentProcedure != null) {
+            bool needStore = false;
 
             // Handle the case where we return via a procedure symbol (i.e. where
             // the return value is stored in a local with the name of the procedure)
@@ -72,6 +73,7 @@ public sealed class ReturnParseNode : ParseNode {
                     }
                     emitter.LoadLocal(retVal.Index);
                 }
+                needStore = true;
 
                 // For alternate return, if the method is marked as supporting
                 // them then it will be compiled as a function. So it must always
@@ -83,6 +85,7 @@ public sealed class ReturnParseNode : ParseNode {
                 } else {
                     emitter.LoadInteger(0);
                 }
+                needStore = true;
             }
 
             // Otherwise process a straight RETURN <expression>
@@ -90,10 +93,14 @@ public sealed class ReturnParseNode : ParseNode {
                 SymType thisType = cg.GenerateExpression(emitter, SymType.NONE, ReturnExpression);
                 retVal = cg.CurrentProcedure.ProcedureSymbol;
                 emitter.ConvertType(thisType, retVal.Type);
+                needStore = true;
             }
 
             // Store the value in the return index if one exists.
-            if (cg.CurrentProcedure.ReturnIndex != null) {
+            if (needStore) {
+                if (cg.CurrentProcedure.ReturnIndex == null) {
+                    cg.CurrentProcedure.ReturnIndex = emitter.GetTemporary(Symbol.SymTypeToSystemType(cg.CurrentProcedure.ProcedureSymbol.Type));
+                }
                 emitter.StoreLocal(cg.CurrentProcedure.ReturnIndex);
             }
         }

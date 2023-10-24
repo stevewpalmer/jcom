@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -28,7 +28,7 @@ using System.Diagnostics;
 using CCompiler;
 using JComLib;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Main Fortran compiler class.
@@ -143,7 +143,7 @@ public partial class Compiler {
     // but must evaluate to a constant.
     private ParseNode KParameter() {
         SimpleToken token;
-        
+
         ExpectToken(TokenID.LPAREN);
         do {
             IdentifierToken identToken = ExpectIdentifierToken();
@@ -430,7 +430,7 @@ public partial class Compiler {
             method.RetVal = _localSymbols.Add(methodName, returnType, SymClass.VAR, null, _ls.LineNumber);
             method.RetVal.Modifier = SymModifier.RETVAL;
         }
-        
+
         node.ProcedureSymbol = method;
         node.Symbols.Add(_localSymbols);
         node.LabelList = new Collection<ParseNode>();
@@ -483,12 +483,12 @@ public partial class Compiler {
             if (_saveAll && sym.IsLocal) {
                 sym.Modifier |= SymModifier.STATIC;
             }
-            
+
             // For non-array characters, if there's no value, set the empty string
             if (sym.Type == SymType.FIXEDCHAR && !sym.IsArray && !sym.Value.HasValue) {
                 sym.Value = new Variant(string.Empty);
             }
-            
+
             if (!sym.IsReferenced && !sym.Modifier.HasFlag(SymModifier.RETVAL)) {
                 string scopeName = sym.IsParameter ? "parameter" : sym.IsLabel ? "label" : "variable";
                 Messages.Warning(MessageCode.UNUSEDVARIABLE,
@@ -498,7 +498,7 @@ public partial class Compiler {
             }
         }
         ValidateBlock(0, node.Body);
-        _state = BlockState.SPECIFICATION; 
+        _state = BlockState.SPECIFICATION;
         return node;
     }
 
@@ -622,7 +622,7 @@ public partial class Compiler {
         _ls.BackToken();
         return null;
     }
-    
+
     /// All the type declarations, one by one.
     private ParseNode KCharacter()  { return KDeclaration(SymType.FIXEDCHAR); }
     private ParseNode KInteger()    { return KDeclaration(SymType.INTEGER); }
@@ -685,7 +685,7 @@ public partial class Compiler {
             case TokenID.KLOGICAL:          return SymType.BOOLEAN;
             case TokenID.KCHARACTER:        return SymType.FIXEDCHAR;
             case TokenID.KCOMPLEX:          return SymType.COMPLEX;
-                
+
             default:
                 Debug.Assert(true, "TokenToType called with invalid argument");
                 return SymType.NONE;

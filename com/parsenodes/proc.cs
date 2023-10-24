@@ -129,9 +129,7 @@ public sealed class ProcedureParseNode : ParseNode {
         cg.CurrentProcedure = this;
 
         ReturnLabel = emitter.CreateLabel();
-        if (ProcedureSymbol.Type != SymType.NONE) {
-            ReturnIndex = emitter.GetTemporary(Symbol.SymTypeToSystemType(ProcedureSymbol.Type));
-        }
+        ReturnIndex = null;
 
         // Generate all locals for this method
         foreach (SymbolCollection symbols in Symbols) {
@@ -150,18 +148,20 @@ public sealed class ProcedureParseNode : ParseNode {
         // Generate the body of the procedure
         if (needTryBlock) {
             emitter.SetupTryCatchBlock();
+            ++cg.HandlerLevel;
         }
 
         Body.Generate(emitter, cg);
 
-        emitter.MarkLabel(ReturnLabel);
-
         if (needTryBlock) {
             emitter.AddDefaultTryCatchHandlerBlock();
             emitter.CloseTryCatchBlock();
+            --cg.HandlerLevel;
         }
 
-        if (ProcedureSymbol.Type != SymType.NONE) {
+        emitter.MarkLabel(ReturnLabel);
+
+        if (ReturnIndex != null) {
             emitter.LoadLocal(ReturnIndex);
         }
         emitter.Return();

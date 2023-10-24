@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -27,7 +27,7 @@ using System.Diagnostics;
 using System.Text;
 using CCompiler;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Defines the Fortran lexical analyser.
@@ -83,7 +83,7 @@ public class Lexer {
     /// Read the parameter to a FORMAT string.
     /// </summary>
     /// <returns>The format.</returns>
-    public string ReadFormat() {
+    private string ReadFormat() {
         StringBuilder str = new();
         int start = 0;
 
@@ -113,52 +113,21 @@ public class Lexer {
     }
 
     /// <summary>
-    /// Returns whether the lexer has reached the end of the file.
-    /// </summary>
-    /// <returns><c>true</c> if at end of file; otherwise, <c>false</c>.</returns>
-    public bool IsAtEndOfFile() {
-        return PeekChar() == EOF;
-    }
-
-    /// <summary>
-    /// Reads an entire line, joining continuation lines where found..
-    /// </summary>
-    /// <returns>The line read, or null if we got to the end</returns>
-    public string ReadEntireLine() {
-        StringBuilder str = new();
-        char ch = GetNextChar();
-        if (ch == EOF) {
-            return string.Empty;
-        }
-        while (ch != EOL && ch != EOF) {
-            str.Append(ch);
-            ch = GetNextChar();
-        }
-        if (ch == EOF) {
-            PushChar(ch);
-        }
-        return str.ToString();
-    }
-
-    /// <summary>
     /// Move the token index back one token in the queue.
     /// </summary>
     public void BackToken() {
         Debug.Assert(_tindex > 0);
         --_tindex;
     }
-    
+
     /// <summary>
     /// Peek at the next token in the input stream.
     /// </summary>
     /// <returns>A valid token</returns>
     public SimpleToken PeekToken() {
-        if (_tindex < _tokens.Count) {
-            return _tokens[_tindex];
-        }
-        return null;
+        return _tindex < _tokens.Count ? _tokens[_tindex] : null;
     }
-    
+
     /// <summary>
     /// Peek at the next keyword tokenID in the input stream.
     /// </summary>
@@ -170,19 +139,19 @@ public class Lexer {
     /// <summary>
     /// Get the next keyword from the source file, or TokenID.IDENT if the keyword
     /// isn't recognised but looks like a valid identifier.
-    /// 
+    ///
     /// This function also handles merging keywords that are represented by
     /// multiple tokens into a single keyword token. Thus:
-    /// 
+    ///
     ///   GO TO -> GOTO
     ///   DOUBLE PRECISION -> DOUBLEPRECISION
     ///   (etc...)
-    ///   
+    ///
     /// </summary>
     /// <returns>A SimpleToken representing the keyword found</returns>
     public SimpleToken GetKeyword() {
         SimpleToken token = GetToken();
-        if (!(token is IdentifierToken)) {
+        if (token is not IdentifierToken) {
             return token;
         }
         TokenID id = token.KeywordID;
@@ -240,7 +209,7 @@ public class Lexer {
             do {
                 token = ReadToken();
                 _tokens.Add(token);
-                
+
                 // BUGBUG: This is a hack until the full tokeniser is implemented.
                 TokenID keywordID = token.KeywordID;
                 if (keywordID == TokenID.KFORMAT) {
@@ -287,6 +256,9 @@ public class Lexer {
                     PushChar(ch);
                     return ParseNumber();
 
+                case '!': // Comment
+                    return new SimpleToken(TokenID.EOL);
+
                 case '.': {
                     if (char.IsDigit(PeekChar())) {
                         PushChar(ch);
@@ -323,14 +295,14 @@ public class Lexer {
                 case 'y': case 'z': {
                     // Look for possible number base representations first
                     char chNext = PeekChar();
-                    bool isQuoteNextChar = chNext == '\'' || chNext == '"';
-                    if ((ch == 'B' || ch == 'b') && isQuoteNextChar) {
+                    bool isQuoteNextChar = chNext is '\'' or '"';
+                    if (ch is 'B' or 'b' && isQuoteNextChar) {
                         return ParseBasedNumber(2);
                     }
-                    if ((ch == 'Z' || ch == 'z') && isQuoteNextChar) {
+                    if (ch is 'Z' or 'z' && isQuoteNextChar) {
                         return ParseBasedNumber(16);
                     }
-                    if ((ch == 'O' || ch == 'o') && isQuoteNextChar) {
+                    if (ch is 'O' or 'o' && isQuoteNextChar) {
                         return ParseBasedNumber(8);
                     }
 
@@ -436,10 +408,10 @@ public class Lexer {
     // Get the next non-space character on the line.
     private char GetNextChar() {
         char ch;
-        
+
         do {
             ch = GetChar();
-        } while (ch == ' ' || ch == '\t');
+        } while (ch is ' ' or '\t');
         return ch;
     }
 
@@ -465,9 +437,9 @@ public class Lexer {
     // number base.
     private static bool IsValidInBase(char ch, int numberBase) {
         switch (numberBase) {
-            case 2:     return ch == '0' || ch == '1';
-            case 8:     return ch >= '0' && ch <= '7';
-            case 16:    return (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
+            case 2:     return ch is '0' or '1';
+            case 8:     return ch is >= '0' and <= '7';
+            case 16:    return ch is >= '0' and <= '9' or >= 'a' and <= 'f' or >= 'A' and <= 'F';
         }
         Debug.Assert(false, $"IsValidInBase called with unsupported number base {numberBase}");
         return false;
@@ -480,8 +452,8 @@ public class Lexer {
         StringBuilder str = new();
         char ch = GetNextChar();
         char chDelim = '\0';
-        
-        if (ch == '\'' || ch == '"') {
+
+        if (ch is '\'' or '"') {
             chDelim = ch;
             ch = GetNextChar();
         }
@@ -529,9 +501,9 @@ public class Lexer {
                 case TokenID.KLT:
                 case TokenID.KOR:
                 case TokenID.KNE:
-                case TokenID.KNEQV: 
+                case TokenID.KNEQV:
                 case TokenID.KNOT:
-                case TokenID.KTRUE: 
+                case TokenID.KTRUE:
                 case TokenID.KXOR:
                     match = true;
                     break;
@@ -567,7 +539,7 @@ public class Lexer {
             isDouble = char.ToUpper(ch) == 'D';
             str.Append('E');
             ch = GetNextChar();
-            if (ch == '+' || ch == '-') {
+            if (ch is '+' or '-') {
                 str.Append(ch);
                 ch = GetNextChar();
             }
@@ -642,7 +614,7 @@ public class Lexer {
     //  2. Look for a non-space or '0' in column 6 in fixed format mode.
     //  3. Look for a non-space or '0' following a tab in free format mode.
     private bool HasContinuation() {
-        if (!string.IsNullOrEmpty(_line) && _line[_line.Length-1] == '&') {
+        if (!string.IsNullOrEmpty(_line) && _line[^1] == '&') {
             return true;
         }
         string nextLine;
@@ -667,6 +639,14 @@ public class Lexer {
 
     // Check whether the specified line is a comment or disabled debug line
     private bool ShouldSkipLine(string line) {
+        if (_opts.F90) {
+            foreach (char ch in line) {
+                if (char.IsWhiteSpace(ch)) {
+                    continue;
+                }
+                return ch == '!';
+            }
+        }
         return line.Length > 0 && (char.ToUpper(line[0]) == 'C' || line[0] == '*' || (char.ToUpper(line[0]) == 'D' && !_opts.GenerateDebug));
     }
 
@@ -687,9 +667,14 @@ public class Lexer {
         } while (ShouldSkipLine(_line));
         _messages.Linenumber = LineNumber;
 
+        // For Fortran 90, lines are free format.
+        if (_opts.F90) {
+            return true;
+        }
+
         // Ignore anything after column 72
         if (_line.Length > 72) {
-            _line = _line.Substring(0, 72);
+            _line = _line[..72];
         }
 
         // First five columns are statement labels. However a tab can be used to

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -25,7 +25,7 @@
 
 using CCompiler;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Class that extends the <c>Options</c> class with additional
@@ -38,7 +38,7 @@ public class FortranOptions : Options {
     /// </summary>
     public FortranOptions() {
         Backslash = false;
-        F77 = true;
+        F90 = false;
     }
 
     /// <value>
@@ -50,16 +50,8 @@ public class FortranOptions : Options {
 
     /// <value>
     /// Sets and returns whether the source code should be compiled using
-    /// the FORTRAN 77 compiler.
-    /// </value>
-    [OptionField("-f77", Help = "Compile Fortran 77 source (default)")]
-    public bool F77 { get; set; }
-
-    /// <value>
-    /// Sets and returns whether the source code should be compiled using
     /// the Fortran 90 compiler.
     /// </value>
-    [OptionField("-f90", Help = "Compile Fortran 90 source")]
     public bool F90 { get; set; }
 
     /// <summary>
@@ -74,17 +66,12 @@ public class FortranOptions : Options {
             return false;
         }
 
-        if (F77 && F90) {
-            Messages.Error(MessageCode.BADCOMPILEROPT, "Cannot specify both --f77 and --f90");
-            return false;
-        }
-
         if (SourceFiles.Count == 0) {
             Messages.Error(MessageCode.MISSINGSOURCEFILE, "Missing input source file");
             return false;
         }
 
-        bool possibleF90 = F90;
+        // If file extension is .f90 then compile in Fortran 90 mode.
         foreach (string sourceFile in SourceFiles) {
             string ext = Path.GetExtension(sourceFile);
             string extLower = ext.ToLower();
@@ -93,11 +80,8 @@ public class FortranOptions : Options {
                 return false;
             }
             if (extLower == ".f90") {
-                possibleF90 = true;
+                F90 = true;
             }
-        }
-        if (possibleF90) {
-            F90 = true;
         }
         return true;
     }

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -27,7 +27,7 @@ using System.Collections.ObjectModel;
 using CCompiler;
 using JComLib;
 
-namespace JFortran; 
+namespace JFortran;
 
 /// <summary>
 /// Provides a class that encapsulates a list of I/O control statements.
@@ -72,7 +72,7 @@ public partial class Compiler {
     private int ParseTypeWidth(int defaultWidth) {
         SimpleToken token = _ls.GetToken();
         int width = defaultWidth;
-        
+
         if (token.ID == TokenID.STAR) {
             if (_ls.PeekToken().ID == TokenID.LPAREN) {
                 ExpectToken(TokenID.LPAREN);
@@ -164,10 +164,10 @@ public partial class Compiler {
         if (!IsAtEndOfLine()) {
             varargs = new VarArgParseNode();
             SimpleToken token;
-            
+
             // Optional comma.
             SkipToken(TokenID.COMMA);
-            
+
             do {
                 if (_ls.PeekToken().ID == TokenID.LPAREN) {
                     _ls.GetToken();
@@ -188,10 +188,10 @@ public partial class Compiler {
         if (!IsAtEndOfLine()) {
             varargs = new VarArgParseNode();
             SimpleToken token;
-            
+
             // Optional comma.
             SkipToken(TokenID.COMMA);
-            
+
             do {
                 varargs.Add(ParseIdentifierWithImpliedDo());
                 token = _ls.GetToken();
@@ -242,7 +242,7 @@ public partial class Compiler {
         if (token.ID == TokenID.LPAREN) {
             return ParseImpliedDo();
         }
-        
+
         // It's an ordinary identifier reference
         _ls.BackToken();
         return Expression();
@@ -328,7 +328,7 @@ public partial class Compiler {
         Collection<ParseNode> indices = null;
         SimpleToken token = _ls.GetToken();
         bool isSubstring = false;
-        
+
         while (token.ID == TokenID.LPAREN) {
             if (indices == null) {
                 indices = new Collection<ParseNode>();
@@ -467,7 +467,7 @@ public partial class Compiler {
     //
     private ParseNode ParseUnitSpecifier() {
         SimpleToken token = _ls.PeekToken();
-        
+
         if (token.ID == TokenID.STAR) {
             SkipToken(token.ID);
             return null;
@@ -593,7 +593,7 @@ public partial class Compiler {
         Symbol sym = null;
 
         if (identToken != null) {
-            
+
             // Ban any conflict with PROGRAM name or the current function
             Symbol globalSym = _globalSymbols.Get(identToken.Name);
             if (globalSym != null && globalSym.Type == SymType.PROGRAM) {
@@ -602,7 +602,7 @@ public partial class Compiler {
                 SkipToEndOfLine();
                 return null;
             }
-            
+
             // Now check the local program unit
             sym = _localSymbols.Get(identToken.Name);
 
@@ -634,10 +634,10 @@ public partial class Compiler {
             }
             thisFullType.Type = fullType.Type;
             thisFullType.Width = ParseTypeWidth(width);
-            
+
             // Indicate this symbol is explicitly declared
             if (sym == null) {
-                if (identToken.Name.Length > 6 && _opts.F77) {
+                if (identToken.Name.Length > 6 && !_opts.F90) {
                     Messages.Error(MessageCode.IDENTIFIERTOOLONG, $"Identifier {identToken.Name} length too long");
                 }
                 sym = _localSymbols.Add(identToken.Name, thisFullType, SymClass.VAR, dimensions, _ls.LineNumber);
@@ -654,7 +654,7 @@ public partial class Compiler {
             if (globalSym != null && sym == globalSym.RetVal) {
                 globalSym.FullType = thisFullType;
             }
-            
+
             // BUGBUG: This should be done in the Symbols class when the
             // identifier becomes an array.
             if (sym.IsArray) {
