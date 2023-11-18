@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -64,16 +64,6 @@ public class CodeGeneratorException : Exception {
     }
 
     /// <summary>
-    /// Constructs an <c>CodeGeneratorException</c> instance with
-    /// the specified exception message.
-    /// </summary>
-    /// <param name="info">A SerializationInfo object.</param>
-    /// <param name="context">A StreamingContext object.</param>
-    protected CodeGeneratorException(SerializationInfo info, StreamingContext context) : base(info, context) {
-        Linenumber = -1;
-    }
-
-    /// <summary>
     /// Constructs a <c>CodeGeneratorException</c> instance.
     /// </summary>
     /// <param name="line">Line number</param>
@@ -102,19 +92,5 @@ public class CodeGeneratorException : Exception {
     public string Filename {
         get => _filename;
         set => _filename = value;
-    }
-
-    /// <summary>
-    //  Override GetObjectData to serialise the linenumber and filename objects.
-    /// </summary>
-    /// <param name="info">Info.</param>
-    /// <param name="context">Context.</param>
-    public override void GetObjectData(SerializationInfo info, StreamingContext context) {
-        if (info == null) {
-            throw new ArgumentNullException(nameof(info));
-        }
-        info.AddValue("_linenumber", _linenumber);
-        info.AddValue("_filename", _filename);
-        base.GetObjectData(info, context);
     }
 }

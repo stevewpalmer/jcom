@@ -2,11 +2,11 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <NoWarn>8600;8601;8602;8604;8618;8625;8603</NoWarn>
-        <LangVersion>11.0</LangVersion>
+        <LangVersion>12</LangVersion>
         <ReleaseVersion>0.3</ReleaseVersion>
         <WarningLevel>4</WarningLevel>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
