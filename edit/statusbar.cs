@@ -457,9 +457,9 @@ public class StatusBar {
     /// </summary>
     private void RenderText(int x, int y, int w, string text, ConsoleColor fgColor) {
         lock (LockObj) {
-            (int savedLeft, int savedTop) = Console.GetCursorPosition();
+            Point saved = Terminal.GetCursor();
             Terminal.Write(x, y, w, _bgColour, fgColor, Utilities.SpanBound(text, 0, w));
-            Console.SetCursorPosition(savedLeft, savedTop);
+            Terminal.SetCursor(saved);
         }
     }
 
