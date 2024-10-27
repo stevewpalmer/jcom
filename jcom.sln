@@ -81,6 +81,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "edit", "edit\edit.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "accounts", "accounts\accounts.csproj", "{379D9F22-5464-4C32-841F-6BD78875C7D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "calc", "calc\calc.csproj", "{06D8A3BB-6388-4D71-B9BE-D227AD5FBC9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -154,6 +156,12 @@ Global
 		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{379D9F22-5464-4C32-841F-6BD78875C7D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06D8A3BB-6388-4D71-B9BE-D227AD5FBC9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06D8A3BB-6388-4D71-B9BE-D227AD5FBC9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06D8A3BB-6388-4D71-B9BE-D227AD5FBC9D}.Default|Any CPU.ActiveCfg = Debug|Any CPU
+		{06D8A3BB-6388-4D71-B9BE-D227AD5FBC9D}.Default|Any CPU.Build.0 = Debug|Any CPU
+		{06D8A3BB-6388-4D71-B9BE-D227AD5FBC9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06D8A3BB-6388-4D71-B9BE-D227AD5FBC9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
