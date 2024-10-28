@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JComLib;
+
 namespace JCalc;
 
 public class Sheet {
@@ -31,15 +33,18 @@ public class Sheet {
     /// <summary>
     /// Create a new empty sheet not associated with any file.
     /// </summary>
-    public Sheet() {
+    /// <param name="number">Sheet number</param>
+    public Sheet(int number) {
         NewFile = true;
+        SheetNumber = number;
     }
 
     /// <summary>
     /// Creates a sheet with the specified file.
     /// </summary>
+    /// <param name="number">Sheet number</param>
     /// <param name="filename">Name of file</param>
-    public Sheet(string filename) {
+    public Sheet(int number, string filename) {
 
         if (!string.IsNullOrEmpty(filename) && File.Exists(filename)) {
         }
@@ -47,7 +52,33 @@ public class Sheet {
             NewFile = true;
         }
         Filename = filename;
+        SheetNumber = number;
     }
+
+    /// <summary>
+    /// Maximum number of columns
+    /// </summary>
+    public static int MaxColumns => 255;
+
+    /// <summary>
+    /// Maximum number of rows
+    /// </summary>
+    public static int MaxRows => 4096;
+
+    /// <summary>
+    /// The current selected row, 1 offset
+    /// </summary>
+    public int Row { get; set; } = 1;
+
+    /// <summary>
+    /// The current selected column, 1 offset
+    /// </summary>
+    public int Column { get; set; } = 1;
+
+    /// <summary>
+    /// Sheet number
+    /// </summary>
+    public int SheetNumber { get; set; }
 
     /// <summary>
     /// Return the name of the sheet. This is the base part of the filename if
@@ -81,5 +112,36 @@ public class Sheet {
     public void Write() {
         Modified = false;
         NewFile = false;
+    }
+
+    /// <summary>
+    /// Return the width of the specified column.
+    /// </summary>
+    /// <param name="columnNumber">Column number, 1-based</param>
+    /// <returns>Column width</returns>
+    public int ColumnWidth(int columnNumber) {
+        return 10;
+    }
+
+    /// <summary>
+    /// Return the height of the specified row
+    /// </summary>
+    /// <param name="rowNumber">Row number, 1-based</param>
+    /// <returns>Row height</returns>
+    public int RowHeight(int rowNumber) {
+        return 1;
+    }
+
+    /// <summary>
+    /// Draw a cell at the given cell position (1-based row and column) at
+    /// the given physical screen offset where (0,0) is the top left corner.
+    /// </summary>
+    /// <param name="sheetColumn">Column of cell to draw</param>
+    /// <param name="sheetRow">Row of the cell to draw</param>
+    /// <param name="x">X position of cell</param>
+    /// <param name="y">Y position of cell</param>
+    public void DrawCell(int sheetColumn, int sheetRow, int x, int y) {
+        Terminal.SetCursor(x, y);
+        Terminal.Write(new string(' ', ColumnWidth(sheetColumn)));
     }
 }

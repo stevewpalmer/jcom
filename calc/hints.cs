@@ -1,5 +1,5 @@
-﻿// JCalc
-// Main program
+// JCalc
+// Render hint flags
 //
 // Authors:
 //  Steve Palmer
@@ -25,26 +25,41 @@
 
 namespace JCalc;
 
-internal static class Program {
+[Flags]
+public enum RenderHint {
 
-    private static void Main(string[] args) {
+    /// <summary>
+    /// No changes needed
+    /// </summary>
+    NONE = 0,
 
-        Screen.Open();
+    /// <summary>
+    /// Update the current window
+    /// </summary>
+    REDRAW = 1,
 
-        int sheetNumber = 1;
-        foreach (string filename in args) {
-            Screen.AddWindow(new Window(new Sheet(sheetNumber++, filename)));
-        }
-        if (args.Length == 0) {
-            Screen.AddWindow(new Window());
-            Screen.ActivateWindow(0);
-            if (!Screen.GetInitialFile()) {
-                Screen.Close();
-                return;
-            }
-        }
-        Screen.ActivateWindow(0);
-        Screen.StartKeyboardLoop();
-        Screen.Close();
-    }
+    /// <summary>
+    /// Cursor position update needed
+    /// </summary>
+    CURSOR = 2,
+
+    /// <summary>
+    /// Cursor position on the command bar needs updating
+    /// </summary>
+    CURSOR_STATUS = 4,
+
+    /// <summary>
+    /// Exit the program
+    /// </summary>
+    EXIT = 8,
+
+    /// <summary>
+    /// Update the filename on the command bar
+    /// </summary>
+    TITLE = 16,
+
+    /// <summary>
+    /// Refresh the entire screen
+    /// </summary>
+    REFRESH = 32
 }

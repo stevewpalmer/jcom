@@ -23,12 +23,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JCalc.Resources;
 using JComLib;
 
 namespace JCalc;
 
 public static class Screen {
-    private static readonly List<Window> _windowList = new();
+    private static readonly List<Window> _windowList = [];
     private static Window? _activeWindow;
 
     /// <summary>
@@ -37,10 +38,25 @@ public static class Screen {
     public static Colours Colours { get; private set; } = new();
 
     /// <summary>
+    /// Configuration
+    /// </summary>
+    private static Config Config { get; set; } = new();
+
+    /// <summary>
+    /// The command bar
+    /// </summary>
+    private static CommandBar Command { get; } = new();
+
+    /// <summary>
     /// Open the main window.
     /// </summary>
     public static void Open() {
         Terminal.Open();
+
+        Config = Config.Load();
+        Colours = new Colours(Config);
+
+        Command.Refresh();
     }
 
     /// <summary>
@@ -55,6 +71,80 @@ public static class Screen {
     /// exit command.
     /// </summary>
     public static void StartKeyboardLoop() {
+        RenderHint flags;
+        do {
+            ConsoleKeyInfo keyIn = Console.ReadKey(true);
+            flags = HandleCommand(CommandBar.MapKeyToCommand(keyIn));
+        } while (flags != RenderHint.EXIT);
+    }
+
+    /// <summary>
+    /// Handle commands at the screen level and pass on any unhandled
+    /// ones to the active window.
+    /// </summary>
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint HandleCommand(KeyCommand command) {
+        if (_activeWindow == null) {
+            throw new InvalidOperationException();
+        }
+        RenderHint flags = command switch {
+            KeyCommand.KC_QUIT => Exit(true),
+            _ => _activeWindow.HandleCommand(command)
+        };
+        if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
+            UpdateCursorPosition();
+            flags &= ~RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.REFRESH)) {
+            Command.Refresh();
+            _activeWindow.Refresh();
+            flags &= ~RenderHint.REFRESH;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Render the current cursor position on the status bar.
+    /// </summary>
+    private static void UpdateCursorPosition() {
+        if (_activeWindow != null) {
+            Command.UpdateCursorPosition(_activeWindow.Sheet.Row, _activeWindow.Sheet.Column);
+        }
+    }
+
+    /// <summary>
+    /// Exit the editor, saving any buffers if required. If prompt is
+    /// TRUE, we prompt whether to save or exit without saving. If prompt
+    /// is FALSE, we just save all modified buffers and exit.
+    /// </summary>
+    /// <param name="prompt">True to display a confirmation prompt, false to just save and exit</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint Exit(bool prompt) {
+        RenderHint flags = RenderHint.EXIT;
+        bool writeSheets = !prompt;
+        Sheet[] modifiedSheets = _windowList.Where(w => w.Sheet.Modified).Select(b => b.Sheet).ToArray();
+        if (prompt) {
+            if (modifiedSheets.Length != 0) {
+                char[] validInput = ['y', 'n'];
+                if (Command.Prompt(Calc.QuitPrompt, validInput, out char inputChar)) {
+                    switch (inputChar) {
+                        case 'n':
+                            flags = RenderHint.NONE;
+                            break;
+                        case 'y':
+                            writeSheets = true;
+                            break;
+                    }
+                }
+            }
+        }
+        if (writeSheets) {
+            foreach (Sheet buffer in modifiedSheets) {
+                buffer.Write();
+            }
+        }
+        return flags;
     }
 
     /// <summary>
@@ -63,8 +153,7 @@ public static class Screen {
     /// </summary>
     /// <returns>True if file retrieved, false if the user cancelled the prompt</returns>
     public static bool GetInitialFile() {
-        string inputValue = string.Empty;
-        return inputValue != string.Empty;
+        return true;
     }
 
     /// <summary>
@@ -72,11 +161,8 @@ public static class Screen {
     /// active.
     /// </summary>
     public static void AddWindow(Window theWindow) {
-        if (theWindow.Sheet.NewFile) {
-            string message = theWindow.Sheet.Filename == string.Empty ? "New File" : string.Format("Calc.NewFileWarning", theWindow.Sheet.Name);
-        }
         _windowList.Add(theWindow);
-        theWindow.SetViewportBounds(1, 1, Terminal.Width - 2, Terminal.Height - 3);
+        theWindow.SetViewportBounds(0, 0, Terminal.Width, Terminal.Height);
     }
 
     /// <summary>

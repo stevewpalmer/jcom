@@ -79,4 +79,15 @@ public static class Utilities {
         length = Math.Min(length, str.Length - index);
         return str.Substring(index, length);
     }
+
+    /// <summary>
+    /// Centre a string within a given width
+    /// </summary>
+    /// <param name="str">The string to centre</param>
+    /// <param name="length">The width in which to centre</param>
+    /// <returns>String centred within the given width</returns>
+    public static string CentreString(string str, int length) {
+        int padding = Math.Max(0, (length - str.Length) / 2);
+        return str.PadLeft(padding, ' ').PadRight(length, ' ');
+    }
 }

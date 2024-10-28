@@ -18,4 +18,19 @@
     <resheader name="writer">
         <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
     </resheader>
+    <data name="NewFileWarning" xml:space="preserve">
+        <value>New file (unable to open file {0})</value>
+    </data>
+    <data name="NewFile" xml:space="preserve">
+        <value>New File</value>
+    </data>
+    <data name="QuitPrompt" xml:space="preserve">
+        <value>Enter Y to save edits, N to lose edits, or cancel</value>
+    </data>
+    <data name="SelectOptionPrompt" xml:space="preserve">
+        <value>Select option or type command letter</value>
+    </data>
+    <data name="CommandPrompt" xml:space="preserve">
+        <value>COMMAND: </value>
+    </data>
 </root>

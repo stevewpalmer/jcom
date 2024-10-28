@@ -30,12 +30,14 @@ namespace JCalc;
 
 public class Window {
     private Rectangle _viewportBounds;
+    private Rectangle _sheetBounds;
+    private Point _scrollOffset = Point.Empty;
 
     /// <summary>
     /// Create an empty window
     /// </summary>
     public Window() {
-        Sheet = new Sheet(string.Empty);
+        Sheet = new Sheet(1, string.Empty);
     }
 
     /// <summary>
@@ -52,7 +54,7 @@ public class Window {
     public Sheet Sheet { get; }
 
     /// <summary>
-    /// Set the viewport for the window.
+    /// Set the viewport and sheet bounds for the window.
     /// </summary>
     /// <param name="x">Left edge, 0 based</param>
     /// <param name="y">Top edge, 0 based</param>
@@ -60,6 +62,7 @@ public class Window {
     /// <param name="height">Height of window</param>
     public void SetViewportBounds(int x, int y, int width, int height) {
         _viewportBounds = new Rectangle(x, y, width, height);
+        _sheetBounds = new Rectangle(3, 1, width - 3, height - 5);
     }
 
     /// <summary>
@@ -67,48 +70,164 @@ public class Window {
     /// </summary>
     public void Refresh() {
         RenderFrame();
+        Render();
     }
 
     /// <summary>
-    /// Draw the window frame
+    /// Apply the render hint flags to the current window. On completion,
+    /// return just the flags that were not applied.
+    /// </summary>
+    /// <returns>Unapplied render hint</returns>
+    private RenderHint ApplyRenderHint(RenderHint flags) {
+        if (flags.HasFlag(RenderHint.REDRAW)) {
+            Render();
+            flags &= ~RenderHint.REDRAW;
+            flags |= RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.CURSOR)) {
+            PlaceCursor();
+            flags &= ~RenderHint.CURSOR;
+            flags |= RenderHint.CURSOR_STATUS;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Draw the window content showing the row and column headings at their
+    /// scroll offset.
     /// </summary>
     private void RenderFrame() {
+
         Rectangle frameRect = _viewportBounds;
-        frameRect.Inflate(1, 1);
 
-        RenderTitle();
-
+        // Sheet number
+        Terminal.SetCursor(frameRect.Left, frameRect.Top);
+        Terminal.ForegroundColour = Screen.Colours.BackgroundColour;
+        Terminal.BackgroundColour = Screen.Colours.ForegroundColour;
+        Terminal.Write($@"#{Sheet.SheetNumber}");
         Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
 
-        for (int c = frameRect.Top + 1; c < frameRect.Height - 1; c++) {
-            Terminal.SetCursor(frameRect.Left, c);
-            Terminal.Write($"\u2502{new string(' ', frameRect.Width - 2)}\u2502");
+        // Column numbers
+        int columnNumber = 1 + _scrollOffset.X;
+        int x = frameRect.Left + 3;
+        while (x < frameRect.Right && columnNumber <= Sheet.MaxColumns) {
+            int width = Sheet.ColumnWidth(columnNumber);
+            int space = Math.Min(width, frameRect.Width - x);
+            Terminal.SetCursor(x, frameRect.Top);
+            Terminal.Write(Utilities.CentreString(columnNumber.ToString(), width)[..space]);
+            x += width;
+            columnNumber++;
         }
 
-        Terminal.SetCursor(frameRect.Left, frameRect.Height - 1);
-        Terminal.Write($"\u2558{new string('═', frameRect.Width - 2)}\u255b");
+        // Row numbers
+        int y = 1;
+        int rowNumber = 1 + _scrollOffset.Y;
+        while (y < frameRect.Bottom - CommandBar.Height && rowNumber <= Sheet.MaxRows) {
+            Terminal.SetCursor(frameRect.Left, y);
+            Terminal.Write(rowNumber.ToString().PadLeft(3));
+            y += 1;
+            rowNumber++;
+        }
     }
 
     /// <summary>
-    /// Render the sheet filename at the top of the window. If the window
-    /// is narrower than the title then we truncate the title to fit.
+    /// Draw the sheet in its entirety
     /// </summary>
-    private void RenderTitle() {
-        string title = Sheet.Name;
-        Rectangle frameRect = _viewportBounds;
-        frameRect.Inflate(1, 1);
-        Point savedCursor = Terminal.GetCursor();
+    private void Render() {
+        RenderFrame();
+        PlaceCursor();
+    }
 
-        Terminal.SetCursor(frameRect.Left, frameRect.Top);
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
-        Terminal.Write($"\u2552{new string('═', frameRect.Width - 2)}\u2555");
+    /// <summary>
+    /// Draw the cursor
+    /// </summary>
+    private void PlaceCursor() {
+        ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.BackgroundColour, Screen.Colours.ForegroundColour);
+    }
 
-        int realLength = Math.Min(title.Length, frameRect.Width - 4);
-        Terminal.SetCursor((frameRect.Width - realLength - 2) / 2, 0);
-        Terminal.ForegroundColour = Screen.Colours.SelectedTitleColour;
-        Terminal.Write($@" {title[..realLength]} ");
+    /// <summary>
+    /// Draw the cell at the specified column and row in the given foreground and
+    /// background colours
+    /// </summary>
+    /// <param name="column">1-based column offset</param>
+    /// <param name="row">1-based row offset</param>
+    /// <param name="fgColour">Foreground colour</param>
+    /// <param name="bgColour">Background colour</param>
+    private void ShowCell(int column, int row, ConsoleColor fgColour, ConsoleColor bgColour) {
+        int y = _sheetBounds.Top;
+        for (int d = _scrollOffset.Y; d < row - 1; d++) {
+            y += Sheet.RowHeight(d + 1);
+        }
+        Terminal.ForegroundColour = fgColour;
+        Terminal.BackgroundColour = bgColour;
+        Sheet.DrawCell(Sheet.Column, Sheet.Row, GetXPositionOfCell(column), y);
+    }
 
-        Terminal.SetCursor(savedCursor);
+    /// <summary>
+    /// Return the X position of the specified column
+    /// </summary>
+    /// <param name="column">1-based column index</param>
+    /// <returns>X position of column</returns>
+    private int GetXPositionOfCell(int column) {
+        int x = _sheetBounds.Left;
+        for (int c = _scrollOffset.X; c < column - 1; c++) {
+            x += Sheet.ColumnWidth(c + 1);
+        }
+        return x;
+    }
+
+    /// <summary>
+    /// Handle a keyboard command.
+    /// </summary>
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    public RenderHint HandleCommand(KeyCommand command) {
+        RenderHint flags = command switch {
+            KeyCommand.KC_RIGHT => CursorRight(),
+            KeyCommand.KC_LEFT => CursorLeft(),
+            _ => RenderHint.NONE
+        };
+        return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
+    /// Move the cell selector left one cell
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CursorLeft() {
+        RenderHint flags = RenderHint.NONE;
+        if (Sheet.Column > 1) {
+            ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+            --Sheet.Column;
+            if (Sheet.Column <= _scrollOffset.X) {
+                --_scrollOffset.X;
+                flags |= RenderHint.REDRAW;
+            }
+            else {
+                flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Move the cell selector right one cell
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CursorRight() {
+        RenderHint flags = RenderHint.NONE;
+        if (Sheet.Column < Sheet.MaxColumns) {
+            ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+            ++Sheet.Column;
+            if (GetXPositionOfCell(Sheet.Column) + Sheet.ColumnWidth(Sheet.Column) >= _sheetBounds.Right) {
+                ++_scrollOffset.X;
+                flags |= RenderHint.REDRAW;
+            }
+            else {
+                flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
     }
 }

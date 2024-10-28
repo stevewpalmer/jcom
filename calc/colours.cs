@@ -29,7 +29,7 @@ public class Colours {
 
     private readonly Config? _config;
 
-    private readonly ConsoleColor[] _colours = {
+    private readonly ConsoleColor[] _colours = [
         ConsoleColor.Black,
         ConsoleColor.Blue,
         ConsoleColor.Green,
@@ -46,7 +46,7 @@ public class Colours {
         ConsoleColor.DarkMagenta,
         ConsoleColor.Yellow,
         ConsoleColor.DarkYellow
-    };
+    ];
 
     /// <summary>
     /// Initialise a Colors object
@@ -88,7 +88,7 @@ public class Colours {
     /// Retrieve the normal message colour
     /// </summary>
     public ConsoleColor NormalMessageColour =>
-        GetColour(_config?.NormalMessageColour, 2);
+        GetColour(_config?.NormalMessageColour, 7);
 
     /// <summary>
     /// Retrieve the error message colour

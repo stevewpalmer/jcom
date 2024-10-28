@@ -9,32 +9,32 @@
 
 namespace JCalc.Resources {
     using System;
-
-
+    
+    
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Calc {
-
+        
         private static System.Resources.ResourceManager resourceMan;
-
+        
         private static System.Globalization.CultureInfo resourceCulture;
-
+        
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
         internal Calc() {
         }
-
+        
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("calc.Calc", typeof(Calc).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("calc.Resources.Calc", typeof(Calc).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Globalization.CultureInfo Culture {
             get {
@@ -42,6 +42,36 @@ namespace JCalc.Resources {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        internal static string NewFileWarning {
+            get {
+                return ResourceManager.GetString("NewFileWarning", resourceCulture);
+            }
+        }
+        
+        internal static string NewFile {
+            get {
+                return ResourceManager.GetString("NewFile", resourceCulture);
+            }
+        }
+        
+        internal static string QuitPrompt {
+            get {
+                return ResourceManager.GetString("QuitPrompt", resourceCulture);
+            }
+        }
+        
+        internal static string SelectOptionPrompt {
+            get {
+                return ResourceManager.GetString("SelectOptionPrompt", resourceCulture);
+            }
+        }
+        
+        internal static string CommandPrompt {
+            get {
+                return ResourceManager.GetString("CommandPrompt", resourceCulture);
             }
         }
     }
