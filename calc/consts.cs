@@ -36,4 +36,9 @@ public static class Consts {
     /// Backup file extension
     /// </summary>
     public const string BackupExtension = ".bak";
+
+    /// <summary>
+    /// Default filename (for an empty sheet)
+    /// </summary>
+    public const string DefaultFilename = "temp";
 }

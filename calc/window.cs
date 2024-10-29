@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Drawing;
+using JCalc.Resources;
 using JComLib;
 
 namespace JCalc;
@@ -32,12 +33,13 @@ public class Window {
     private Rectangle _viewportBounds;
     private Rectangle _sheetBounds;
     private Point _scrollOffset = Point.Empty;
+    private int _numberOfColumns;
 
     /// <summary>
     /// Create an empty window
     /// </summary>
     public Window() {
-        Sheet = new Sheet(1, string.Empty);
+        Sheet = new Sheet(1, Consts.DefaultFilename);
     }
 
     /// <summary>
@@ -62,13 +64,14 @@ public class Window {
     /// <param name="height">Height of window</param>
     public void SetViewportBounds(int x, int y, int width, int height) {
         _viewportBounds = new Rectangle(x, y, width, height);
-        _sheetBounds = new Rectangle(3, 1, width - 3, height - 5);
+        _sheetBounds = new Rectangle(4, 1, width - 4, height - 5);
     }
 
     /// <summary>
     /// Refresh this window with a full redraw on screen.
     /// </summary>
     public void Refresh() {
+        Screen.Command.UpdateFilename(Sheet.Name);
         RenderFrame();
         Render();
     }
@@ -110,10 +113,14 @@ public class Window {
 
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;
-        int x = frameRect.Left + 3;
+        int x = _sheetBounds.X;
+        _numberOfColumns = 0;
         while (x < frameRect.Right && columnNumber <= Sheet.MaxColumns) {
             int width = Sheet.ColumnWidth(columnNumber);
             int space = Math.Min(width, frameRect.Width - x);
+            if (space == width) {
+                ++_numberOfColumns;
+            }
             Terminal.SetCursor(x, frameRect.Top);
             Terminal.Write(Utilities.CentreString(columnNumber.ToString(), width)[..space]);
             x += width;
@@ -121,11 +128,11 @@ public class Window {
         }
 
         // Row numbers
-        int y = 1;
         int rowNumber = 1 + _scrollOffset.Y;
+        int y = _sheetBounds.Y;
         while (y < frameRect.Bottom - CommandBar.Height && rowNumber <= Sheet.MaxRows) {
             Terminal.SetCursor(frameRect.Left, y);
-            Terminal.Write(rowNumber.ToString().PadLeft(3));
+            Terminal.Write(rowNumber.ToString().PadLeft(4));
             y += 1;
             rowNumber++;
         }
@@ -147,6 +154,13 @@ public class Window {
     }
 
     /// <summary>
+    /// Clear the cursor.
+    /// </summary>
+    private void ResetCursor() {
+        ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+    }
+
+    /// <summary>
     /// Draw the cell at the specified column and row in the given foreground and
     /// background colours
     /// </summary>
@@ -155,13 +169,9 @@ public class Window {
     /// <param name="fgColour">Foreground colour</param>
     /// <param name="bgColour">Background colour</param>
     private void ShowCell(int column, int row, ConsoleColor fgColour, ConsoleColor bgColour) {
-        int y = _sheetBounds.Top;
-        for (int d = _scrollOffset.Y; d < row - 1; d++) {
-            y += Sheet.RowHeight(d + 1);
-        }
         Terminal.ForegroundColour = fgColour;
         Terminal.BackgroundColour = bgColour;
-        Sheet.DrawCell(Sheet.Column, Sheet.Row, GetXPositionOfCell(column), y);
+        Sheet.DrawCell(Sheet.Column, Sheet.Row, GetXPositionOfCell(column), GetYPositionOfCell(row));
     }
 
     /// <summary>
@@ -178,6 +188,19 @@ public class Window {
     }
 
     /// <summary>
+    /// Return the Y position of the specified row
+    /// </summary>
+    /// <param name="row">1-based row index</param>
+    /// <returns>Y position of row</returns>
+    private int GetYPositionOfCell(int row) {
+        int y = _sheetBounds.Top;
+        for (int d = _scrollOffset.Y; d < row - 1; d++) {
+            y += Sheet.RowHeight(d + 1);
+        }
+        return y;
+    }
+
+    /// <summary>
     /// Handle a keyboard command.
     /// </summary>
     /// <param name="command">Editing command</param>
@@ -186,9 +209,34 @@ public class Window {
         RenderHint flags = command switch {
             KeyCommand.KC_RIGHT => CursorRight(),
             KeyCommand.KC_LEFT => CursorLeft(),
+            KeyCommand.KC_UP => CursorUp(),
+            KeyCommand.KC_DOWN => CursorDown(),
+            KeyCommand.KC_HOME => CursorHome(),
+            KeyCommand.KC_PAGEUP => CursorPageUp(),
+            KeyCommand.KC_PAGEDOWN => CursorPageDown(),
+            KeyCommand.KC_GOTO_ROWCOL => GotoRowColumn(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
+    /// Move the cursor to the home position.
+    /// </summary>
+    /// <returns></returns>
+    private RenderHint CursorHome() {
+        RenderHint flags = RenderHint.NONE;
+        if (Sheet is { Column: > 1, Row: > 1 }) {
+            ResetCursor();
+            flags = RenderHint.CURSOR;
+            if (_scrollOffset.X > 0 || _scrollOffset.Y > 0) {
+                flags |= RenderHint.REDRAW;
+                _scrollOffset = new Point(0, 0);
+            }
+            Sheet.Column = 1;
+            Sheet.Row = 1;
+        }
+        return flags;
     }
 
     /// <summary>
@@ -198,7 +246,7 @@ public class Window {
     private RenderHint CursorLeft() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.Column > 1) {
-            ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+            ResetCursor();
             --Sheet.Column;
             if (Sheet.Column <= _scrollOffset.X) {
                 --_scrollOffset.X;
@@ -218,7 +266,7 @@ public class Window {
     private RenderHint CursorRight() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.Column < Sheet.MaxColumns) {
-            ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+            ResetCursor();
             ++Sheet.Column;
             if (GetXPositionOfCell(Sheet.Column) + Sheet.ColumnWidth(Sheet.Column) >= _sheetBounds.Right) {
                 ++_scrollOffset.X;
@@ -226,6 +274,147 @@ public class Window {
             }
             else {
                 flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Move the cell selector up one row
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CursorUp() {
+        RenderHint flags = RenderHint.NONE;
+        if (Sheet.Row > 1) {
+            ResetCursor();
+            --Sheet.Row;
+            if (Sheet.Row <= _scrollOffset.Y) {
+                --_scrollOffset.Y;
+                flags |= RenderHint.REDRAW;
+            }
+            else {
+                flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Move the cell selector up one page
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CursorPageUp() {
+        RenderHint flags = RenderHint.NONE;
+        int pageSize = Math.Min(_sheetBounds.Height, Sheet.Row - 1);
+        if (Sheet.Row > 1) {
+            ResetCursor();
+            Sheet.Row -= pageSize;
+            if (Sheet.Row < _scrollOffset.Y) {
+                _scrollOffset.Y -= pageSize;
+                flags |= RenderHint.REDRAW;
+            }
+            else {
+                flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Move the cell selector down one row
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CursorDown() {
+        RenderHint flags = RenderHint.NONE;
+        if (Sheet.Row < Sheet.MaxRows) {
+            ResetCursor();
+            ++Sheet.Row;
+            if (GetYPositionOfCell(Sheet.Row) + Sheet.RowHeight(Sheet.Row) > _sheetBounds.Bottom) {
+                ++_scrollOffset.Y;
+                flags |= RenderHint.REDRAW;
+            }
+            else {
+                flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Move the cell selector down one page
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint CursorPageDown() {
+        RenderHint flags = RenderHint.NONE;
+        int pageSize = _sheetBounds.Height;
+        if (Sheet.Row + pageSize < Sheet.MaxRows) {
+            ResetCursor();
+            Sheet.Row += pageSize;
+            if (GetYPositionOfCell(Sheet.Row) + pageSize * Sheet.RowHeight(Sheet.Row) > _sheetBounds.Bottom) {
+                _scrollOffset.Y += pageSize;
+                flags |= RenderHint.REDRAW;
+            }
+            else {
+                flags |= RenderHint.CURSOR;
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Sync the Sheet.Row and Sheet.Column to ensure they are visible on the window by
+    /// adjusting the scroll offsets as appropriate.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SyncRowColumnToSheet() {
+        RenderHint flags = RenderHint.CURSOR;
+        if (Sheet.Column <= _scrollOffset.X) {
+            _scrollOffset.X = Sheet.Column - 1;
+            flags |= RenderHint.REDRAW;
+        }
+        if (Sheet.Column > _numberOfColumns + _scrollOffset.X) {
+            _scrollOffset.X =  Sheet.Column - _numberOfColumns;
+            flags |= RenderHint.REDRAW;
+        }
+        if (Sheet.Row <= _scrollOffset.Y) {
+            _scrollOffset.Y = Sheet.Row - 1;
+            flags |= RenderHint.REDRAW;
+        }
+        if (Sheet.Row > _sheetBounds.Height + _scrollOffset.Y) {
+            _scrollOffset.Y = Sheet.Row - _sheetBounds.Height;
+            flags |= RenderHint.REDRAW;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Prompt for a row and column to move the cursor
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint GotoRowColumn() {
+        RenderHint flags = RenderHint.NONE;
+        FormField[] formFields = [
+            new() {
+                Text = Calc.GotoRowPrompt,
+                Type = VariantType.INTEGER,
+                Width = 4,
+                Value = new Variant(Sheet.Row)
+            },
+            new() {
+                Text = Calc.GotoColumnPrompt,
+                Type = VariantType.INTEGER,
+                Width = 3,
+                Value = new Variant(Sheet.Column)
+            }
+        ];
+        if (Screen.Command.PromptForInput(Calc.GotoPrompt, formFields)) {
+            int newRow = formFields[0].Value.IntValue;
+            int newColumn = formFields[1].Value.IntValue;
+            if (newRow >= 1 && newRow <= Sheet.MaxRows && newColumn >= 1 && newColumn <= Sheet.MaxColumns) {
+                ResetCursor();
+                Sheet.Row = newRow;
+                Sheet.Column = newColumn;
+                flags = SyncRowColumnToSheet();
             }
         }
         return flags;

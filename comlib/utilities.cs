@@ -81,6 +81,25 @@ public static class Utilities {
     }
 
     /// <summary>
+    /// Constrain a value between the minimum and maximum points, wrapping the
+    /// value around to the maximum if it is less than the minimum, and to the
+    /// minimum if it exceeds the maximum.
+    /// </summary>
+    /// <param name="value">Value to constrain</param>
+    /// <param name="minimum">Smallest extent</param>
+    /// <param name="maximum">Largest extent</param>
+    /// <returns>Constrained value</returns>
+    public static int ConstrainAndWrap(int value, int minimum, int maximum) {
+        if (value < minimum) {
+            value = maximum - 1;
+        }
+        if (value >= maximum) {
+            value = minimum;
+        }
+        return value;
+    }
+
+    /// <summary>
     /// Centre a string within a given width
     /// </summary>
     /// <param name="str">The string to centre</param>

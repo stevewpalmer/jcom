@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Drawing;
 using JCalc.Resources;
 using JComLib;
@@ -57,23 +58,14 @@ public enum KeyCommand {
     KC_LEFT,
     KC_RIGHT,
     KC_UP,
-    KC_DOWN
-}
-
-/// <summary>
-/// Mapping of command names and their IDs
-/// </summary>
-public class KeyCommands {
-
-    /// <summary>
-    /// Command name
-    /// </summary>
-    public string Name { get; init; } = "";
-
-    /// <summary>
-    /// Associated command ID
-    /// </summary>
-    public KeyCommand CommandId { get; init; }
+    KC_DOWN,
+    KC_HOME,
+    KC_PAGEUP,
+    KC_PAGEDOWN,
+    KC_GOTO_MACRO,
+    KC_GOTO_WINDOW,
+    KC_GOTO_ROWCOL,
+    KC_GOTO_NAME
 }
 
 /// <summary>
@@ -92,6 +84,32 @@ public class KeyMap {
     public KeyCommand CommandId { get; init; }
 }
 
+/// <summary>
+/// An input form field
+/// </summary>
+public class FormField {
+
+    /// <summary>
+    /// Form label
+    /// </summary>
+    public string Text { get; init; } = string.Empty;
+
+    /// <summary>
+    /// Type of input required
+    /// </summary>
+    public VariantType Type { get; init; } = VariantType.NONE;
+
+    /// <summary>
+    /// Initial value and output
+    /// </summary>
+    public Variant Value { get; set; } = new Variant(0);
+
+    /// <summary>
+    /// Input field width (also define the maximum input)
+    /// </summary>
+    public int Width { get; init; } = 5;
+}
+
 public class CommandBar {
     private readonly int _commandBarRow;
     private readonly int _statusRow;
@@ -103,57 +121,27 @@ public class CommandBar {
     private int _cursorRow = 1;
     private int _cursorColumn = 1;
     private string _filename;
-    private int _selectedCommand = 0;
+    private int _selectedCommand;
+    private CommandMapID _currentCommandMapID;
+    private CommandMap? _commandMap;
 
-    private static readonly KeyMap[] KeyMap = [
+    /// <summary>
+    /// Non-command (navigation) key map
+    /// </summary>
+    private static readonly KeyMap[] KeyTable = [
         new() { Key = ConsoleKey.LeftArrow, CommandId = KeyCommand.KC_LEFT },
         new() { Key = ConsoleKey.RightArrow, CommandId = KeyCommand.KC_RIGHT },
         new() { Key = ConsoleKey.UpArrow, CommandId = KeyCommand.KC_UP },
         new() { Key = ConsoleKey.DownArrow, CommandId = KeyCommand.KC_DOWN },
-        new() { Key = ConsoleKey.A, CommandId = KeyCommand.KC_ALPHA },
-        new() { Key = ConsoleKey.B, CommandId = KeyCommand.KC_BLANK },
-        new() { Key = ConsoleKey.C, CommandId = KeyCommand.KC_COPY },
-        new() { Key = ConsoleKey.D, CommandId = KeyCommand.KC_DELETE },
-        new() { Key = ConsoleKey.E, CommandId = KeyCommand.KC_EDIT },
-        new() { Key = ConsoleKey.F, CommandId = KeyCommand.KC_FORMAT },
-        new() { Key = ConsoleKey.G, CommandId = KeyCommand.KC_GOTO },
-        new() { Key = ConsoleKey.H, CommandId = KeyCommand.KC_HELP },
-        new() { Key = ConsoleKey.I, CommandId = KeyCommand.KC_INSERT },
-        new() { Key = ConsoleKey.L, CommandId = KeyCommand.KC_LOCK },
-        new() { Key = ConsoleKey.M, CommandId = KeyCommand.KC_MOVE },
-        new() { Key = ConsoleKey.N, CommandId = KeyCommand.KC_NAME },
-        new() { Key = ConsoleKey.O, CommandId = KeyCommand.KC_OPTIONS },
-        new() { Key = ConsoleKey.P, CommandId = KeyCommand.KC_PRINT },
-        new() { Key = ConsoleKey.Q, CommandId = KeyCommand.KC_QUIT },
-        new() { Key = ConsoleKey.S, CommandId = KeyCommand.KC_SORT },
-        new() { Key = ConsoleKey.T, CommandId = KeyCommand.KC_TRANSFER },
-        new() { Key = ConsoleKey.V, CommandId = KeyCommand.KC_VALUE },
-        new() { Key = ConsoleKey.W, CommandId = KeyCommand.KC_WINDOW },
-        new() { Key = ConsoleKey.X, CommandId = KeyCommand.KC_XTERNAL }
+        new() { Key = ConsoleKey.Home, CommandId = KeyCommand.KC_HOME },
+        new() { Key = ConsoleKey.PageUp, CommandId = KeyCommand.KC_PAGEUP },
+        new() { Key = ConsoleKey.PageDown, CommandId = KeyCommand.KC_PAGEDOWN }
     ];
 
-    private static readonly KeyCommands[] CommandTable = [
-        new() { Name = "Alpha", CommandId = KeyCommand.KC_ALPHA },
-        new() { Name = "Blank", CommandId = KeyCommand.KC_BLANK },
-        new() { Name = "Copy", CommandId = KeyCommand.KC_COPY },
-        new() { Name = "Delete", CommandId = KeyCommand.KC_DELETE },
-        new() { Name = "Edit", CommandId = KeyCommand.KC_EDIT },
-        new() { Name = "Format", CommandId = KeyCommand.KC_FORMAT },
-        new() { Name = "Goto", CommandId = KeyCommand.KC_GOTO },
-        new() { Name = "Help", CommandId = KeyCommand.KC_HELP },
-        new() { Name = "Insert", CommandId = KeyCommand.KC_INSERT },
-        new() { Name = "Lock", CommandId = KeyCommand.KC_LOCK },
-        new() { Name = "Move", CommandId = KeyCommand.KC_MOVE },
-        new() { Name = "Name", CommandId = KeyCommand.KC_NAME },
-        new() { Name = "Options", CommandId = KeyCommand.KC_OPTIONS },
-        new() { Name = "Print", CommandId = KeyCommand.KC_PRINT },
-        new() { Name = "Quit", CommandId = KeyCommand.KC_QUIT },
-        new() { Name = "Sort", CommandId = KeyCommand.KC_SORT },
-        new() { Name = "Transfer", CommandId = KeyCommand.KC_TRANSFER },
-        new() { Name = "Value", CommandId = KeyCommand.KC_VALUE },
-        new() { Name = "Window", CommandId = KeyCommand.KC_WINDOW },
-        new() { Name = "Xternal", CommandId = KeyCommand.KC_XTERNAL }
-    ];
+    /// <summary>
+    /// Command bar height
+    /// </summary>
+    public const int Height = 4;
 
     /// <summary>
     /// Construct a command bar object
@@ -164,16 +152,24 @@ public class CommandBar {
         _statusRow = Terminal.Height - 1;
         _promptRow = _commandBarRow + 2;
         _cursorPositionWidth = 5;
-        _filename = "TEMP";
+        _filename = string.Empty;
+        _currentCommandMapID = CommandMapID.MAIN;
+        _commandMap = Commands.CommandMapForID(_currentCommandMapID);
+        _selectedCommand = 0;
     }
 
     /// <summary>
-    /// Command bar height
+    /// Set the active command map for the command bar.
     /// </summary>
-    public const int Height = 4;
+    public void SetActiveCommandMap(CommandMapID newMap) {
+        _commandMap = Commands.CommandMapForID(newMap);
+        _currentCommandMapID = newMap;
+        _selectedCommand = 0;
+        RenderCommandList(true);
+    }
 
     /// <summary>
-    /// Update the cursor position indicator on the status bar
+    /// Update the cursor position indicator on the command bar
     /// </summary>
     public void UpdateCursorPosition(int line, int column) {
         _cursorRow = line;
@@ -182,7 +178,7 @@ public class CommandBar {
     }
 
     /// <summary>
-    /// Update the cursor position indicator on the status bar
+    /// Update the filename on the command bar
     /// </summary>
     public void UpdateFilename(string newFilename) {
         _filename = newFilename;
@@ -190,12 +186,13 @@ public class CommandBar {
     }
 
     /// <summary>
-    /// Refresh the status line
+    /// Refresh the command bar, for example, when the screen
+    /// colours change.
     /// </summary>
     public void Refresh() {
         _fgColour = Screen.Colours.NormalMessageColour;
         _bgColour = Screen.Colours.BackgroundColour;
-        RenderCommandList();
+        RenderCommandList(true);
         RenderCursorPosition();
         RenderSheetFilename();
     }
@@ -203,14 +200,17 @@ public class CommandBar {
     /// <summary>
     /// Render the list of commands
     /// </summary>
-    private void RenderCommandList() {
-        string commandPrompt = Calc.CommandPrompt;
-        int commandPromptLength = commandPrompt.Length;
+    /// <param name="redraw">True if we do a full redraw, false if we just update</param>
+    private void RenderCommandList(bool redraw) {
+        Debug.Assert(_commandMap != null);
+        string commandPrompt = $"{Utilities.GetEnumDescription(_commandMap.ID)}: ";
         int row = _commandBarRow;
         int column = commandPrompt.Length;
-        RenderText(0, row, commandPromptLength, commandPrompt, _fgColour, _bgColour);
-        for (int i = 0; i < CommandTable.Length; i++) {
-            KeyCommands command = CommandTable[i];
+        if (redraw) {
+            RenderText(0, row, _displayWidth, commandPrompt, _fgColour, _bgColour);
+        }
+        for (int i = 0; i < _commandMap.Commands.Length; i++) {
+            CommandMapEntry command = _commandMap.Commands[i];
             if (column + command.Name.Length >= _displayWidth) {
                 row++;
                 column = commandPrompt.Length;
@@ -220,7 +220,12 @@ public class CommandBar {
             RenderText(column, row, command.Name.Length, command.Name, fgColour, bgColour);
             column += command.Name.Length + 1;
         }
-        RenderText(0, _promptRow, _displayWidth, Calc.SelectOptionPrompt, _fgColour, _bgColour);
+        if (redraw) {
+            if (++row < _promptRow) {
+                RenderText(0, row, _displayWidth, string.Empty, _fgColour, _bgColour);
+            }
+            Message(Calc.SelectOptionPrompt);
+        }
     }
 
     /// <summary>
@@ -231,21 +236,155 @@ public class CommandBar {
         RenderText(0, _statusRow, _cursorPositionWidth, text, _fgColour, _bgColour);
     }
 
+    /// <summary>
+    /// Show the current sheet filename in the bottom left corner
+    /// </summary>
     private void RenderSheetFilename() {
         string text = $@"Calc: {_filename}";
         RenderText(_displayWidth - text.Length - 4, _statusRow, text.Length, text, _fgColour, _bgColour);
     }
 
     /// <summary>
+    /// Activate the highlighted command in the command map.
+    /// </summary>
+    /// <returns>Command ID</returns>
+    private KeyCommand ActivateSelectedCommand() {
+        Debug.Assert(_commandMap != null);
+        CommandMapEntry command = _commandMap.Commands[_selectedCommand];
+        return command.CommandId;
+    }
+
+    /// <summary>
+    /// Update the selected command index.
+    /// </summary>
+    private void MoveSelectedCommand(int direction) {
+        Debug.Assert(_commandMap != null);
+        _selectedCommand = Utilities.ConstrainAndWrap(_selectedCommand + direction, 0, _commandMap.Commands.Length);
+        RenderCommandList(false);
+    }
+
+    /// <summary>
     /// Map a keystroke to a command
     /// </summary>
-    public static KeyCommand MapKeyToCommand(ConsoleKeyInfo keyIn) {
-        foreach (KeyMap command in KeyMap) {
+    public KeyCommand MapKeyToCommand(ConsoleKeyInfo keyIn) {
+        if (keyIn.Key == ConsoleKey.Escape) {
+            if (_currentCommandMapID != CommandMapID.MAIN) {
+                SetActiveCommandMap(CommandMapID.MAIN);
+            }
+            Message(Calc.SelectOptionPrompt);
+            return KeyCommand.KC_NONE;
+        }
+        if (keyIn.Key == ConsoleKey.Spacebar) {
+            MoveSelectedCommand(1);
+            return KeyCommand.KC_NONE;
+        }
+        if (keyIn.Key == ConsoleKey.Backspace) {
+            MoveSelectedCommand(-1);
+            return KeyCommand.KC_NONE;
+        }
+        if (keyIn.Key == ConsoleKey.Enter) {
+            return ActivateSelectedCommand();
+        }
+        foreach (KeyMap command in KeyTable) {
             if (command.Key == keyIn.Key) {
                 return command.CommandId;
             }
         }
+        if (char.IsLetter(keyIn.KeyChar)) {
+            Debug.Assert(_commandMap != null);
+            foreach (CommandMapEntry entry in _commandMap.Commands) {
+                if (entry.Name[0] == char.ToUpper(keyIn.KeyChar)) {
+                    return entry.CommandId;
+                }
+            }
+            Message(Calc.NotAValidOption);
+        }
         return KeyCommand.KC_NONE;
+    }
+
+    /// <summary>
+    /// Display a prompt on the command bar for input using a series of form fields. The form fields
+    /// should specify the prompt for each input, type of each input, a default value and width. On
+    /// completion, the default value will be replaced with the actual value entered.
+    /// </summary>
+    /// <param name="prompt">Prompt</param>
+    /// <param name="fields">List of input fields</param>
+    /// <returns>True if input was provided, false if the user hit Esc to cancel</returns>
+    public bool PromptForInput(string prompt, FormField [] fields) {
+        Point cursorPosition = Terminal.GetCursor();
+        RenderText(0, _commandBarRow, _displayWidth, prompt, _fgColour, _bgColour);
+        int column = prompt.Length + 1;
+        List<Point> fieldPositions = [];
+        foreach (FormField field in fields) {
+            if (!string.IsNullOrEmpty(field.Text)) {
+                RenderText(column, _commandBarRow, _displayWidth, $"{field.Text}:", _fgColour, _bgColour);
+                column += field.Text.Length + 2;
+            }
+            string value = string.Empty;
+            switch (field.Type) {
+                case VariantType.INTEGER:
+                    value = $"{field.Value:-field.Width}";
+                    break;
+
+                default:
+                    Debug.Assert(false, $"{field.Type} is not supported");
+                    break;
+            }
+            fieldPositions.Add(new Point(column, _commandBarRow));
+            RenderText(column, _commandBarRow, field.Width, value, _bgColour, _fgColour);
+            column += field.Width + 1;
+        }
+        ConsoleKeyInfo input;
+        int fieldIndex = 0;
+        int index = 0;
+        bool initialiseField = true;
+        List<char> inputBuffer = new();
+        do {
+            if (initialiseField) {
+                RenderText(0, _promptRow, _displayWidth, Calc.EnterNumber, _fgColour, _bgColour);
+                inputBuffer = fields[fieldIndex].Value.StringValue.ToList();
+                index = inputBuffer.Count;
+                Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
+                initialiseField = false;
+            }
+            input = Console.ReadKey(true);
+            switch (input.Key) {
+                case ConsoleKey.Tab: {
+                    fields[fieldIndex].Value.Set(string.Join("", inputBuffer));
+                    int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
+                    fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Length);
+                    initialiseField = true;
+                    continue;
+                }
+
+                case ConsoleKey.RightArrow when index < inputBuffer.Count:
+                    ++index;
+                    break;
+
+                case ConsoleKey.LeftArrow when index > 0:
+                    --index;
+                    break;
+
+                case ConsoleKey.Backspace when index > 0: {
+                    inputBuffer.RemoveAt(--index);
+                    break;
+                }
+            }
+            if (char.IsDigit(input.KeyChar) && inputBuffer.Count < fields[fieldIndex].Width) {
+                inputBuffer.Insert(index++, input.KeyChar);
+            }
+
+            string text = string.Join("", inputBuffer);
+            RenderText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _bgColour, _fgColour);
+            Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
+
+        } while (input.Key != ConsoleKey.Enter && input.Key != ConsoleKey.Escape);
+
+        fields[fieldIndex].Value.Set(string.Join("", inputBuffer));
+
+        Terminal.SetCursor(cursorPosition);
+        RenderCommandList(true);
+        return input.Key == ConsoleKey.Enter;
     }
 
     /// <summary>
@@ -268,6 +407,14 @@ public class CommandBar {
         Terminal.SetCursor(cursorPosition);
         inputValue = char.ToLower(input.KeyChar);
         return input.Key != ConsoleKey.Escape;
+    }
+
+    /// <summary>
+    /// Display a message on the prompt bar
+    /// </summary>
+    /// <param name="text">Message to display</param>
+    private void Message(string text) {
+        RenderText(0, _promptRow, _displayWidth, text, _fgColour, _bgColour);
     }
 
     /// <summary>

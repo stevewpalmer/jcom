@@ -30,7 +30,31 @@
     <data name="SelectOptionPrompt" xml:space="preserve">
         <value>Select option or type command letter</value>
     </data>
-    <data name="CommandPrompt" xml:space="preserve">
-        <value>COMMAND: </value>
+    <data name="GotoPrompt" xml:space="preserve">
+        <value>GOTO</value>
+    </data>
+    <data name="GotoRowPrompt" xml:space="preserve">
+        <value>row</value>
+    </data>
+    <data name="GotoColumnPrompt" xml:space="preserve">
+        <value>column</value>
+    </data>
+    <data name="EnterNumber" xml:space="preserve">
+        <value>Enter number</value>
+    </data>
+    <data name="GotoMacro" xml:space="preserve">
+        <value>Macro</value>
+    </data>
+    <data name="GotoName" xml:space="preserve">
+        <value>Name</value>
+    </data>
+    <data name="GotoRowCol" xml:space="preserve">
+        <value>Row-col</value>
+    </data>
+    <data name="GotoWindow" xml:space="preserve">
+        <value>Window</value>
+    </data>
+    <data name="NotAValidOption" xml:space="preserve">
+        <value>Not a valid option</value>
     </data>
 </root>

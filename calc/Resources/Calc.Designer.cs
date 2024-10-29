@@ -69,9 +69,57 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string CommandPrompt {
+        internal static string GotoPrompt {
             get {
-                return ResourceManager.GetString("CommandPrompt", resourceCulture);
+                return ResourceManager.GetString("GotoPrompt", resourceCulture);
+            }
+        }
+        
+        internal static string GotoRowPrompt {
+            get {
+                return ResourceManager.GetString("GotoRowPrompt", resourceCulture);
+            }
+        }
+        
+        internal static string GotoColumnPrompt {
+            get {
+                return ResourceManager.GetString("GotoColumnPrompt", resourceCulture);
+            }
+        }
+        
+        internal static string EnterNumber {
+            get {
+                return ResourceManager.GetString("EnterNumber", resourceCulture);
+            }
+        }
+        
+        internal static string GotoMacro {
+            get {
+                return ResourceManager.GetString("GotoMacro", resourceCulture);
+            }
+        }
+        
+        internal static string GotoName {
+            get {
+                return ResourceManager.GetString("GotoName", resourceCulture);
+            }
+        }
+        
+        internal static string GotoRowCol {
+            get {
+                return ResourceManager.GetString("GotoRowCol", resourceCulture);
+            }
+        }
+        
+        internal static string GotoWindow {
+            get {
+                return ResourceManager.GetString("GotoWindow", resourceCulture);
+            }
+        }
+        
+        internal static string NotAValidOption {
+            get {
+                return ResourceManager.GetString("NotAValidOption", resourceCulture);
             }
         }
     }

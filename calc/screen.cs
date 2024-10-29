@@ -45,7 +45,7 @@ public static class Screen {
     /// <summary>
     /// The command bar
     /// </summary>
-    private static CommandBar Command { get; } = new();
+    public static CommandBar Command { get; } = new();
 
     /// <summary>
     /// Open the main window.
@@ -74,7 +74,7 @@ public static class Screen {
         RenderHint flags;
         do {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
-            flags = HandleCommand(CommandBar.MapKeyToCommand(keyIn));
+            flags = HandleCommand(Command.MapKeyToCommand(keyIn));
         } while (flags != RenderHint.EXIT);
     }
 
@@ -90,6 +90,7 @@ public static class Screen {
         }
         RenderHint flags = command switch {
             KeyCommand.KC_QUIT => Exit(true),
+            KeyCommand.KC_GOTO => GotoCommand(),
             _ => _activeWindow.HandleCommand(command)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
@@ -102,6 +103,15 @@ public static class Screen {
             flags &= ~RenderHint.REFRESH;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Handle the Goto command
+    /// </summary>
+    /// <returns></returns>
+    private static RenderHint GotoCommand() {
+        Command.SetActiveCommandMap(CommandMapID.GOTO);
+        return RenderHint.NONE;
     }
 
     /// <summary>
