@@ -63,4 +63,13 @@
     <data name="Value" xml:space="preserve">
         <value>VALUE:</value>
     </data>
+    <data name="AlphaValue" xml:space="preserve">
+        <value>ALPHA/VALUE:</value>
+    </data>
+    <data name="EnterText" xml:space="preserve">
+        <value>Enter text</value>
+    </data>
+    <data name="EnterTextOrValue" xml:space="preserve">
+        <value>Enter text or value</value>
+    </data>
 </root>

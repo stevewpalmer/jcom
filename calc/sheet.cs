@@ -23,12 +23,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using JComLib;
-
 namespace JCalc;
 
 public class Sheet {
     private FileInfo? _fileInfo;
+    private readonly Dictionary<int, Cell> _cells = new();
 
     /// <summary>
     /// Create a new empty sheet not associated with any file.
@@ -78,7 +77,7 @@ public class Sheet {
     /// <summary>
     /// Sheet number
     /// </summary>
-    public int SheetNumber { get; set; }
+    public int SheetNumber { get; init; }
 
     /// <summary>
     /// Return the name of the sheet. This is the base part of the filename if
@@ -133,15 +132,24 @@ public class Sheet {
     }
 
     /// <summary>
-    /// Draw a cell at the given cell position (1-based row and column) at
-    /// the given physical screen offset where (0,0) is the top left corner.
+    /// Return the cell at the given column and row.
     /// </summary>
-    /// <param name="sheetColumn">Column of cell to draw</param>
-    /// <param name="sheetRow">Row of the cell to draw</param>
-    /// <param name="x">X position of cell</param>
-    /// <param name="y">Y position of cell</param>
-    public void DrawCell(int sheetColumn, int sheetRow, int x, int y) {
-        Terminal.SetCursor(x, y);
-        Terminal.Write(new string(' ', ColumnWidth(sheetColumn)));
+    /// <param name="sheetColumn">Column</param>
+    /// <param name="sheetRow">Row</param>
+    /// <param name="createIfEmpty">Create the cell if it is empty</param>
+    /// <returns>The cell at the row</returns>
+    public Cell Cell(int sheetColumn, int sheetRow, bool createIfEmpty) {
+        int cellHash = sheetRow * MaxRows + sheetColumn;
+        if (!_cells.TryGetValue(cellHash, out Cell? _cell)) {
+            _cell = new Cell {
+                Column = sheetColumn,
+                Row = sheetRow
+            };
+            if (createIfEmpty) {
+                _cells.Add(cellHash, _cell);
+                Modified = true;
+            }
+        }
+        return _cell;
     }
 }

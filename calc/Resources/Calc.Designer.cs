@@ -134,5 +134,23 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("Value", resourceCulture);
             }
         }
+        
+        internal static string AlphaValue {
+            get {
+                return ResourceManager.GetString("AlphaValue", resourceCulture);
+            }
+        }
+        
+        internal static string EnterText {
+            get {
+                return ResourceManager.GetString("EnterText", resourceCulture);
+            }
+        }
+        
+        internal static string EnterTextOrValue {
+            get {
+                return ResourceManager.GetString("EnterTextOrValue", resourceCulture);
+            }
+        }
     }
 }

@@ -56,6 +56,11 @@ public class Window {
     public Sheet Sheet { get; }
 
     /// <summary>
+    /// Return the cell at the cursor.
+    /// </summary>
+    public Cell ActiveCell => Sheet.Cell(Sheet.Column, Sheet.Row, false);
+
+    /// <summary>
     /// Set the viewport and sheet bounds for the window.
     /// </summary>
     /// <param name="x">Left edge, 0 based</param>
@@ -64,7 +69,7 @@ public class Window {
     /// <param name="height">Height of window</param>
     public void SetViewportBounds(int x, int y, int width, int height) {
         _viewportBounds = new Rectangle(x, y, width, height);
-        _sheetBounds = new Rectangle(4, 1, width - 4, height - 5);
+        _sheetBounds = new Rectangle(5, 1, width - 5, height - 5);
     }
 
     /// <summary>
@@ -113,6 +118,10 @@ public class Window {
             PlaceCursor();
             flags &= ~RenderHint.CURSOR;
             flags |= RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
+            Screen.UpdateCursorPosition();
+            flags &= ~RenderHint.CURSOR_STATUS;
         }
         return flags;
     }
@@ -193,7 +202,8 @@ public class Window {
     private void ShowCell(int column, int row, ConsoleColor fgColour, ConsoleColor bgColour) {
         Terminal.ForegroundColour = fgColour;
         Terminal.BackgroundColour = bgColour;
-        Sheet.DrawCell(Sheet.Column, Sheet.Row, GetXPositionOfCell(column), GetYPositionOfCell(row));
+        Cell cell = Sheet.Cell(column, row, false);
+        cell.Draw(Sheet, GetXPositionOfCell(column), GetYPositionOfCell(row));
     }
 
     /// <summary>
@@ -227,12 +237,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InputAlpha() {
-        FormField [] fields = [
-            new() { Type = VariantType.STRING, Value = new Variant("")}
-        ];
-        if (Screen.Command.PromptForInput(Calc.Alpha, FormFlags.NONE, fields)) {
-        }
-        return RenderHint.NONE;
+        return InputAlphaOrValue(CellInputFlags.ALPHA);
     }
 
     /// <summary>
@@ -240,12 +245,38 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InputValue() {
-        FormField [] fields = [
-            new() { Type = VariantType.STRING, Value = new Variant("")}
-        ];
-        if (Screen.Command.PromptForInput(Calc.Value, FormFlags.NONE, fields)) {
-        }
-        return RenderHint.NONE;
+        return InputAlphaOrValue(CellInputFlags.VALUE);
+    }
+
+    /// <summary>
+    /// Input alpha or value text into a cell depending on parameter.
+    /// </summary>
+    /// <param name="flags">Input flags</param>
+    /// <returns>Render hint</returns>
+    private RenderHint InputAlphaOrValue(CellInputFlags flags) {
+        RenderHint hint = RenderHint.NONE;
+        do {
+            Cell cell = Sheet.Cell(Sheet.Column, Sheet.Row, true);
+            Variant value = cell.Value;
+            CellInputResponse result = Screen.Command.PromptForCellInput(flags, ref value);
+            if (result == CellInputResponse.CANCEL) {
+                break;
+            }
+            cell.Value = value;
+            cell.Draw(Sheet, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
+            if (result == CellInputResponse.ACCEPT) {
+                hint = RenderHint.CURSOR_STATUS;
+                break;
+            }
+            if (result == CellInputResponse.ACCEPT_UP) {
+                ApplyRenderHint(CursorUp());
+            }
+            if (result == CellInputResponse.ACCEPT_DOWN) {
+                ApplyRenderHint(CursorDown());
+            }
+            flags = CellInputFlags.ALPHAVALUE;
+        } while (true);
+        return hint;
     }
 
     /// <summary>
@@ -435,7 +466,7 @@ public class Window {
                 Value = new Variant(Sheet.Column)
             }
         ];
-        if (Screen.Command.PromptForInput(Calc.GotoPrompt, FormFlags.HIGHLIGHT, formFields)) {
+        if (Screen.Command.PromptForInput(Calc.GotoPrompt, formFields)) {
             int newRow = formFields[0].Value.IntValue;
             int newColumn = formFields[1].Value.IntValue;
             if (newRow >= 1 && newRow <= Sheet.MaxRows && newColumn >= 1 && newColumn <= Sheet.MaxColumns) {

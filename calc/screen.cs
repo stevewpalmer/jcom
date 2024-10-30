@@ -117,8 +117,10 @@ public static class Screen {
     /// <summary>
     /// Render the current cursor position on the status bar.
     /// </summary>
-    private static void UpdateCursorPosition() {
+    public static void UpdateCursorPosition() {
         if (_activeWindow != null) {
+            Cell cell = _activeWindow.ActiveCell;
+            Command.UpdateCellContents(cell.Value);
             Command.UpdateCursorPosition(_activeWindow.Sheet.Row, _activeWindow.Sheet.Column);
         }
     }
