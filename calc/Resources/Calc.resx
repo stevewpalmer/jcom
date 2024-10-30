@@ -57,4 +57,10 @@
     <data name="NotAValidOption" xml:space="preserve">
         <value>Not a valid option</value>
     </data>
+    <data name="Alpha" xml:space="preserve">
+        <value>ALPHA:</value>
+    </data>
+    <data name="Value" xml:space="preserve">
+        <value>VALUE:</value>
+    </data>
 </root>

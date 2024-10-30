@@ -88,35 +88,35 @@ public static class Commands {
         new() {
             ID = CommandMapID.MAIN,
             Commands = [
-                new() { Name = "Alpha", CommandId = KeyCommand.KC_ALPHA },
-                new() { Name = "Blank", CommandId = KeyCommand.KC_BLANK },
-                new() { Name = "Copy", CommandId = KeyCommand.KC_COPY },
-                new() { Name = "Delete", CommandId = KeyCommand.KC_DELETE },
-                new() { Name = "Edit", CommandId = KeyCommand.KC_EDIT },
-                new() { Name = "Format", CommandId = KeyCommand.KC_FORMAT },
-                new() { Name = "Goto", CommandId = KeyCommand.KC_GOTO },
-                new() { Name = "Help", CommandId = KeyCommand.KC_HELP },
-                new() { Name = "Insert", CommandId = KeyCommand.KC_INSERT },
-                new() { Name = "Lock", CommandId = KeyCommand.KC_LOCK },
-                new() { Name = "Move", CommandId = KeyCommand.KC_MOVE },
-                new() { Name = "Name", CommandId = KeyCommand.KC_NAME },
-                new() { Name = "Options", CommandId = KeyCommand.KC_OPTIONS },
-                new() { Name = "Print", CommandId = KeyCommand.KC_PRINT },
-                new() { Name = "Quit", CommandId = KeyCommand.KC_QUIT },
-                new() { Name = "Sort", CommandId = KeyCommand.KC_SORT },
-                new() { Name = "Transfer", CommandId = KeyCommand.KC_TRANSFER },
-                new() { Name = "Value", CommandId = KeyCommand.KC_VALUE },
-                new() { Name = "Window", CommandId = KeyCommand.KC_WINDOW },
-                new() { Name = "Xternal", CommandId = KeyCommand.KC_XTERNAL }
+                new CommandMapEntry { Name = "Alpha", CommandId = KeyCommand.KC_ALPHA },
+                new CommandMapEntry { Name = "Blank", CommandId = KeyCommand.KC_BLANK },
+                new CommandMapEntry { Name = "Copy", CommandId = KeyCommand.KC_COPY },
+                new CommandMapEntry { Name = "Delete", CommandId = KeyCommand.KC_DELETE },
+                new CommandMapEntry { Name = "Edit", CommandId = KeyCommand.KC_EDIT },
+                new CommandMapEntry { Name = "Format", CommandId = KeyCommand.KC_FORMAT },
+                new CommandMapEntry { Name = "Goto", CommandId = KeyCommand.KC_GOTO },
+                new CommandMapEntry { Name = "Help", CommandId = KeyCommand.KC_HELP },
+                new CommandMapEntry { Name = "Insert", CommandId = KeyCommand.KC_INSERT },
+                new CommandMapEntry { Name = "Lock", CommandId = KeyCommand.KC_LOCK },
+                new CommandMapEntry { Name = "Move", CommandId = KeyCommand.KC_MOVE },
+                new CommandMapEntry { Name = "Name", CommandId = KeyCommand.KC_NAME },
+                new CommandMapEntry { Name = "Options", CommandId = KeyCommand.KC_OPTIONS },
+                new CommandMapEntry { Name = "Print", CommandId = KeyCommand.KC_PRINT },
+                new CommandMapEntry { Name = "Quit", CommandId = KeyCommand.KC_QUIT },
+                new CommandMapEntry { Name = "Sort", CommandId = KeyCommand.KC_SORT },
+                new CommandMapEntry { Name = "Transfer", CommandId = KeyCommand.KC_TRANSFER },
+                new CommandMapEntry { Name = "Value", CommandId = KeyCommand.KC_VALUE },
+                new CommandMapEntry { Name = "Window", CommandId = KeyCommand.KC_WINDOW },
+                new CommandMapEntry { Name = "Xternal", CommandId = KeyCommand.KC_XTERNAL }
             ]
         },
         new() {
             ID = CommandMapID.GOTO,
             Commands = [
-                new() { Name = Calc.GotoMacro, CommandId = KeyCommand.KC_GOTO_MACRO },
-                new() { Name = Calc.GotoName, CommandId = KeyCommand.KC_GOTO_NAME },
-                new() { Name = Calc.GotoRowCol, CommandId = KeyCommand.KC_GOTO_ROWCOL },
-                new() { Name = Calc.GotoWindow, CommandId = KeyCommand.KC_GOTO_WINDOW }
+                new CommandMapEntry { Name = Calc.GotoMacro, CommandId = KeyCommand.KC_GOTO_MACRO },
+                new CommandMapEntry { Name = Calc.GotoName, CommandId = KeyCommand.KC_GOTO_NAME },
+                new CommandMapEntry { Name = Calc.GotoRowCol, CommandId = KeyCommand.KC_GOTO_ROWCOL },
+                new CommandMapEntry { Name = Calc.GotoWindow, CommandId = KeyCommand.KC_GOTO_WINDOW }
             ]
         }
     ];

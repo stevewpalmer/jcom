@@ -84,6 +84,20 @@ public class KeyMap {
     public KeyCommand CommandId { get; init; }
 }
 
+[Flags]
+public enum FormFlags {
+
+    /// <summary>
+    /// No flags
+    /// </summary>
+    NONE,
+
+    /// <summary>
+    /// Input fields are highlighted
+    /// </summary>
+    HIGHLIGHT
+}
+
 /// <summary>
 /// An input form field
 /// </summary>
@@ -102,7 +116,7 @@ public class FormField {
     /// <summary>
     /// Initial value and output
     /// </summary>
-    public Variant Value { get; set; } = new Variant(0);
+    public Variant Value { get; init; } = new(0);
 
     /// <summary>
     /// Input field width (also define the maximum input)
@@ -308,13 +322,17 @@ public class CommandBar {
     /// completion, the default value will be replaced with the actual value entered.
     /// </summary>
     /// <param name="prompt">Prompt</param>
+    /// <param name="flags">Form flags</param>
     /// <param name="fields">List of input fields</param>
     /// <returns>True if input was provided, false if the user hit Esc to cancel</returns>
-    public bool PromptForInput(string prompt, FormField [] fields) {
+    public bool PromptForInput(string prompt, FormFlags flags, FormField [] fields) {
         Point cursorPosition = Terminal.GetCursor();
         RenderText(0, _commandBarRow, _displayWidth, prompt, _fgColour, _bgColour);
+        RenderText(0, _commandBarRow + 1, _displayWidth, "", _fgColour, _bgColour);
         int column = prompt.Length + 1;
         List<Point> fieldPositions = [];
+        ConsoleColor fg = flags.HasFlag(FormFlags.HIGHLIGHT) ? _bgColour : _fgColour;
+        ConsoleColor bg = flags.HasFlag(FormFlags.HIGHLIGHT) ? _fgColour : _bgColour;
         foreach (FormField field in fields) {
             if (!string.IsNullOrEmpty(field.Text)) {
                 RenderText(column, _commandBarRow, _displayWidth, $"{field.Text}:", _fgColour, _bgColour);
@@ -326,19 +344,23 @@ public class CommandBar {
                     value = $"{field.Value:-field.Width}";
                     break;
 
+                case VariantType.STRING:
+                    value = field.Value.StringValue;
+                    break;
+
                 default:
                     Debug.Assert(false, $"{field.Type} is not supported");
                     break;
             }
             fieldPositions.Add(new Point(column, _commandBarRow));
-            RenderText(column, _commandBarRow, field.Width, value, _bgColour, _fgColour);
+            RenderText(column, _commandBarRow, field.Width, value, fg, bg);
             column += field.Width + 1;
         }
         ConsoleKeyInfo input;
         int fieldIndex = 0;
         int index = 0;
         bool initialiseField = true;
-        List<char> inputBuffer = new();
+        List<char> inputBuffer = [];
         do {
             if (initialiseField) {
                 RenderText(0, _promptRow, _displayWidth, Calc.EnterNumber, _fgColour, _bgColour);
@@ -370,12 +392,15 @@ public class CommandBar {
                     break;
                 }
             }
-            if (char.IsDigit(input.KeyChar) && inputBuffer.Count < fields[fieldIndex].Width) {
+            if (fields[fieldIndex].Type == VariantType.INTEGER && !char.IsDigit(input.KeyChar)) {
+                continue;
+            }
+            if (!char.IsControl(input.KeyChar) && inputBuffer.Count < fields[fieldIndex].Width) {
                 inputBuffer.Insert(index++, input.KeyChar);
             }
 
             string text = string.Join("", inputBuffer);
-            RenderText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _bgColour, _fgColour);
+            RenderText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, fg, bg);
             Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
 
         } while (input.Key != ConsoleKey.Enter && input.Key != ConsoleKey.Escape);

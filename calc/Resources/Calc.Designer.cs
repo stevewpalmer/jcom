@@ -122,5 +122,17 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("NotAValidOption", resourceCulture);
             }
         }
+        
+        internal static string Alpha {
+            get {
+                return ResourceManager.GetString("Alpha", resourceCulture);
+            }
+        }
+        
+        internal static string Value {
+            get {
+                return ResourceManager.GetString("Value", resourceCulture);
+            }
+        }
     }
 }

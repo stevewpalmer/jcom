@@ -77,6 +77,28 @@ public class Window {
     }
 
     /// <summary>
+    /// Handle a keyboard command.
+    /// </summary>
+    /// <param name="command">Editing command</param>
+    /// <returns>Render hint</returns>
+    public RenderHint HandleCommand(KeyCommand command) {
+        RenderHint flags = command switch {
+            KeyCommand.KC_RIGHT => CursorRight(),
+            KeyCommand.KC_LEFT => CursorLeft(),
+            KeyCommand.KC_UP => CursorUp(),
+            KeyCommand.KC_DOWN => CursorDown(),
+            KeyCommand.KC_HOME => CursorHome(),
+            KeyCommand.KC_PAGEUP => CursorPageUp(),
+            KeyCommand.KC_PAGEDOWN => CursorPageDown(),
+            KeyCommand.KC_GOTO_ROWCOL => GotoRowColumn(),
+            KeyCommand.KC_ALPHA => InputAlpha(),
+            KeyCommand.KC_VALUE => InputValue(),
+            _ => RenderHint.NONE
+        };
+        return ApplyRenderHint(flags);
+    }
+
+    /// <summary>
     /// Apply the render hint flags to the current window. On completion,
     /// return just the flags that were not applied.
     /// </summary>
@@ -201,23 +223,29 @@ public class Window {
     }
 
     /// <summary>
-    /// Handle a keyboard command.
+    /// Input alpha text into a cell
     /// </summary>
-    /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
-    public RenderHint HandleCommand(KeyCommand command) {
-        RenderHint flags = command switch {
-            KeyCommand.KC_RIGHT => CursorRight(),
-            KeyCommand.KC_LEFT => CursorLeft(),
-            KeyCommand.KC_UP => CursorUp(),
-            KeyCommand.KC_DOWN => CursorDown(),
-            KeyCommand.KC_HOME => CursorHome(),
-            KeyCommand.KC_PAGEUP => CursorPageUp(),
-            KeyCommand.KC_PAGEDOWN => CursorPageDown(),
-            KeyCommand.KC_GOTO_ROWCOL => GotoRowColumn(),
-            _ => RenderHint.NONE
-        };
-        return ApplyRenderHint(flags);
+    private RenderHint InputAlpha() {
+        FormField [] fields = [
+            new() { Type = VariantType.STRING, Value = new Variant("")}
+        ];
+        if (Screen.Command.PromptForInput(Calc.Alpha, FormFlags.NONE, fields)) {
+        }
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Input value text into a cell
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint InputValue() {
+        FormField [] fields = [
+            new() { Type = VariantType.STRING, Value = new Variant("")}
+        ];
+        if (Screen.Command.PromptForInput(Calc.Value, FormFlags.NONE, fields)) {
+        }
+        return RenderHint.NONE;
     }
 
     /// <summary>
@@ -407,7 +435,7 @@ public class Window {
                 Value = new Variant(Sheet.Column)
             }
         ];
-        if (Screen.Command.PromptForInput(Calc.GotoPrompt, formFields)) {
+        if (Screen.Command.PromptForInput(Calc.GotoPrompt, FormFlags.HIGHLIGHT, formFields)) {
             int newRow = formFields[0].Value.IntValue;
             int newColumn = formFields[1].Value.IntValue;
             if (newRow >= 1 && newRow <= Sheet.MaxRows && newColumn >= 1 && newColumn <= Sheet.MaxColumns) {
