@@ -23,11 +23,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace JCalc;
 
 public class Sheet {
     private FileInfo? _fileInfo;
-    private readonly Dictionary<int, Cell> _cells = new();
+
+    public Sheet() {}
 
     /// <summary>
     /// Create a new empty sheet not associated with any file.
@@ -46,6 +50,16 @@ public class Sheet {
     public Sheet(int number, string filename) {
 
         if (!string.IsNullOrEmpty(filename) && File.Exists(filename)) {
+            try {
+                using FileStream stream = File.OpenRead(filename);
+                Sheet? inputSheet = JsonSerializer.Deserialize<Sheet>(stream);
+                if (inputSheet != null) {
+                    Row = inputSheet.Row;
+                    Column = inputSheet.Column;
+                    Cells = inputSheet.Cells;
+                }
+            }
+            catch (Exception) { }
         }
         else {
             NewFile = true;
@@ -77,18 +91,25 @@ public class Sheet {
     /// <summary>
     /// Sheet number
     /// </summary>
+    [JsonIgnore]
     public int SheetNumber { get; init; }
+
+    /// <summary>
+    /// Cells
+    /// </summary>
+    public Dictionary<int, Cell> Cells { get; set; } = new();
 
     /// <summary>
     /// Return the name of the sheet. This is the base part of the filename if
     /// there is one, or the New File string otherwise.
     /// </summary>
+    [JsonIgnore]
     public string Name => _fileInfo == null ? "New File" : _fileInfo.Name;
 
     /// <summary>
     /// Return the fully qualified file name with path.
     /// </summary>
-    public string Filename {
+    private string Filename {
         get => _fileInfo == null ? string.Empty : _fileInfo.FullName;
         set => _fileInfo = string.IsNullOrEmpty(value) ? null : new FileInfo(value);
     }
@@ -97,18 +118,34 @@ public class Sheet {
     /// Whether the sheet has been modified since it was last
     /// changed.
     /// </summary>
+    [JsonIgnore]
     public bool Modified { get; private set; }
 
     /// <summary>
     /// Is this a new file (i.e. the file has a name but does not
     /// currently exist on disk).
     /// </summary>
+    [JsonIgnore]
     public bool NewFile { get; private set; }
 
     /// <summary>
     /// Write the sheet back to disk.
     /// </summary>
     public void Write() {
+        try {
+            if (Screen.Config.BackupFile && File.Exists(Filename)) {
+                string backupFile = Filename + Consts.BackupExtension;
+                File.Delete(backupFile);
+                File.Copy(Filename, backupFile);
+            }
+            using FileStream stream = File.Create(Filename);
+            JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
+                WriteIndented = true
+            });
+        }
+        catch (Exception) {
+        }
+
         Modified = false;
         NewFile = false;
     }
@@ -140,13 +177,13 @@ public class Sheet {
     /// <returns>The cell at the row</returns>
     public Cell Cell(int sheetColumn, int sheetRow, bool createIfEmpty) {
         int cellHash = sheetRow * MaxRows + sheetColumn;
-        if (!_cells.TryGetValue(cellHash, out Cell? _cell)) {
+        if (!Cells.TryGetValue(cellHash, out Cell? _cell)) {
             _cell = new Cell {
                 Column = sheetColumn,
                 Row = sheetRow
             };
             if (createIfEmpty) {
-                _cells.Add(cellHash, _cell);
+                Cells.Add(cellHash, _cell);
                 Modified = true;
             }
         }

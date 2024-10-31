@@ -32,7 +32,7 @@ public class Cell {
     /// <summary>
     /// Cell value
     /// </summary>
-    public Variant Value { get; set; } = new();
+    public CellValue Value { get; set; } = new CellValue();
 
     /// <summary>
     /// Cell row
@@ -54,8 +54,8 @@ public class Cell {
     public void Draw(Sheet sheet, int x, int y) {
         Terminal.SetCursor(x, y);
         string cellValue = "";
-        if (Value.Type != VariantType.NONE) {
-            cellValue = Value.ToString();
+        if (Value.Type != CellType.NONE) {
+            cellValue = Value.StringValue.ToString();
         }
         int width = sheet.ColumnWidth(Column);
         Terminal.Write(Utilities.SpanBound(cellValue, 0, width).PadRight(width));

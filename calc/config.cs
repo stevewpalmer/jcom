@@ -88,4 +88,9 @@ public class Config {
     /// Status bar error message colour
     /// </summary>
     public string ErrorMessageColour { get; set; } = "";
-}
+
+    /// <summary>
+    /// Specifies whether or not a backup file is created when a sheet
+    /// is saved.
+    /// </summary>
+    public bool BackupFile { get; set; }}

@@ -4,7 +4,15 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <Description>Calc</Description>
+        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
+        <Title>Spreadsheet</Title>
+        <Authors>Steven Palmer</Authors>
+        <IsPackable>false</IsPackable>
+        <LangVersion>12</LangVersion>
         <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

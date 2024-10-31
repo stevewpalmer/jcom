@@ -40,7 +40,7 @@ public static class Screen {
     /// <summary>
     /// Configuration
     /// </summary>
-    private static Config Config { get; set; } = new();
+    public static Config Config { get; set; } = new();
 
     /// <summary>
     /// The command bar
@@ -76,6 +76,43 @@ public static class Screen {
             ConsoleKeyInfo keyIn = Console.ReadKey(true);
             flags = HandleCommand(Command.MapKeyToCommand(keyIn));
         } while (flags != RenderHint.EXIT);
+    }
+
+    /// <summary>
+    /// Render the current cursor position on the status bar.
+    /// </summary>
+    public static void UpdateCursorPosition() {
+        if (_activeWindow != null) {
+            Cell cell = _activeWindow.ActiveCell;
+            Command.UpdateCellStatus(cell);
+        }
+    }
+
+    /// <summary>
+    /// Prompt for the initial sheet to edit, replacing the one in the
+    /// existing window.
+    /// </summary>
+    /// <returns>True if file retrieved, false if the user cancelled the prompt</returns>
+    public static bool GetInitialFile() {
+        return true;
+    }
+
+    /// <summary>
+    /// Add a window to the window list. This will not make the window
+    /// active.
+    /// </summary>
+    public static void AddWindow(Window theWindow) {
+        _windowList.Add(theWindow);
+        theWindow.SetViewportBounds(0, 0, Terminal.Width, Terminal.Height);
+    }
+
+    /// <summary>
+    /// Activate a window by its index
+    /// </summary>
+    /// <param name="index">Index of the window to be activated</param>
+    public static void ActivateWindow(int index) {
+        _activeWindow = _windowList[index];
+        _activeWindow.Refresh();
     }
 
     /// <summary>
@@ -115,17 +152,6 @@ public static class Screen {
     }
 
     /// <summary>
-    /// Render the current cursor position on the status bar.
-    /// </summary>
-    public static void UpdateCursorPosition() {
-        if (_activeWindow != null) {
-            Cell cell = _activeWindow.ActiveCell;
-            Command.UpdateCellContents(cell.Value);
-            Command.UpdateCursorPosition(_activeWindow.Sheet.Row, _activeWindow.Sheet.Column);
-        }
-    }
-
-    /// <summary>
     /// Exit the editor, saving any buffers if required. If prompt is
     /// TRUE, we prompt whether to save or exit without saving. If prompt
     /// is FALSE, we just save all modified buffers and exit.
@@ -139,11 +165,11 @@ public static class Screen {
         if (prompt) {
             if (modifiedSheets.Length != 0) {
                 char[] validInput = ['y', 'n'];
-                if (Command.Prompt(Calc.QuitPrompt, validInput, out char inputChar)) {
+                if (!Command.Prompt(Calc.Quit, Calc.QuitPrompt, validInput, out char inputChar)) {
+                    flags = RenderHint.NONE;
+                }
+                else {
                     switch (inputChar) {
-                        case 'n':
-                            flags = RenderHint.NONE;
-                            break;
                         case 'y':
                             writeSheets = true;
                             break;
@@ -157,32 +183,5 @@ public static class Screen {
             }
         }
         return flags;
-    }
-
-    /// <summary>
-    /// Prompt for the initial sheet to edit, replacing the one in the
-    /// existing window.
-    /// </summary>
-    /// <returns>True if file retrieved, false if the user cancelled the prompt</returns>
-    public static bool GetInitialFile() {
-        return true;
-    }
-
-    /// <summary>
-    /// Add a window to the window list. This will not make the window
-    /// active.
-    /// </summary>
-    public static void AddWindow(Window theWindow) {
-        _windowList.Add(theWindow);
-        theWindow.SetViewportBounds(0, 0, Terminal.Width, Terminal.Height);
-    }
-
-    /// <summary>
-    /// Activate a window by its index
-    /// </summary>
-    /// <param name="index">Index of the window to be activated</param>
-    public static void ActivateWindow(int index) {
-        _activeWindow = _windowList[index];
-        _activeWindow.Refresh();
     }
 }

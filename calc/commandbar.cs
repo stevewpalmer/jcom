@@ -172,7 +172,7 @@ public class CommandBar {
     private int _selectedCommand;
     private CommandMapID _currentCommandMapID;
     private CommandMap? _commandMap;
-    private Variant _cellValue;
+    private CellValue _cellValue;
 
     /// <summary>
     /// Non-command (navigation) key map
@@ -205,7 +205,7 @@ public class CommandBar {
         _currentCommandMapID = CommandMapID.MAIN;
         _commandMap = Commands.CommandMapForID(_currentCommandMapID);
         _selectedCommand = 0;
-        _cellValue = new Variant();
+        _cellValue = new CellValue();
         _cellContentPosition = _cursorPositionWidth + 1;
         _cellContentWidth = _displayWidth - _cursorPositionWidth - 10;
     }
@@ -221,20 +221,14 @@ public class CommandBar {
     }
 
     /// <summary>
-    /// Update the cursor position indicator on the command bar
+    /// Update the active cell location and contents on the command bar.
     /// </summary>
-    public void UpdateCursorPosition(int line, int column) {
-        _cursorRow = line;
-        _cursorColumn = column;
+    /// <param name="cell">Cell</param>
+    public void UpdateCellStatus(Cell cell) {
+        _cursorRow = cell.Row;
+        _cursorColumn = cell.Column;
+        _cellValue = cell.Value;
         RenderCursorPosition();
-    }
-
-    /// <summary>
-    /// Update the active cell contents on the command bar.
-    /// </summary>
-    /// <param name="cellValue">Cell value</param>
-    public void UpdateCellContents(Variant cellValue) {
-        _cellValue = cellValue;
         RenderCellContents();
     }
 
@@ -307,8 +301,7 @@ public class CommandBar {
     /// <returns>True if input was provided, false if the user hit Esc to cancel</returns>
     public bool PromptForInput(string prompt, FormField [] fields) {
         Point cursorPosition = Terminal.GetCursor();
-        RenderText(0, _commandBarRow, _displayWidth, prompt, _fgColour, _bgColour);
-        RenderText(0, _commandBarRow + 1, _displayWidth, "", _fgColour, _bgColour);
+        RenderText(0, _commandBarRow, _displayWidth * 2, prompt, _fgColour, _bgColour);
         int column = prompt.Length + 1;
         List<Point> fieldPositions = [];
         foreach (FormField field in fields) {
@@ -394,9 +387,9 @@ public class CommandBar {
     /// Prompt for a cell input value.
     /// </summary>
     /// <param name="flags">Type of input permitted</param>
-    /// <param name="variant">Output value</param>
+    /// <param name="cellValue">Output value</param>
     /// <returns>A CellInputResponse indicating how the input was completed</returns>
-    public CellInputResponse PromptForCellInput(CellInputFlags flags, ref Variant variant) {
+    public CellInputResponse PromptForCellInput(CellInputFlags flags, ref CellValue cellValue) {
 
         Point cursorPosition = Terminal.GetCursor();
 
@@ -406,8 +399,8 @@ public class CommandBar {
         int maxWidth = 0;
         bool initalise = true;
         CellInputResponse response;
-        if (variant.Type != VariantType.NONE) {
-            inputBuffer = [..variant.ToString().ToCharArray()];
+        if (cellValue.Type != CellType.NONE) {
+            inputBuffer = [..cellValue.StringValue.ToCharArray()];
         }
         do {
             if (initalise) {
@@ -417,8 +410,7 @@ public class CommandBar {
                     CellInputFlags.ALPHAVALUE => Calc.AlphaValue,
                     _ => string.Empty
                 };
-                RenderText(0, _commandBarRow, _displayWidth, prompt, _fgColour, _bgColour);
-                RenderText(0, _commandBarRow + 1, _displayWidth, string.Empty, _fgColour, _bgColour);
+                RenderText(0, _commandBarRow, _displayWidth * 2, prompt, _fgColour, _bgColour);
                 column = prompt.Length + 1;
                 maxWidth = _displayWidth - column - 1;
 
@@ -476,11 +468,13 @@ public class CommandBar {
             string input = string.Join("", inputBuffer);
             switch (flags) {
                 case CellInputFlags.ALPHA:
-                    variant.Set(input);
+                    cellValue.StringValue = input;
+                    cellValue.Type = CellType.TEXT;
                     break;
 
                 case CellInputFlags.VALUE:
-                    variant.Set(double.TryParse(input, out double _value) ? _value : 0);
+                    cellValue.StringValue = (double.TryParse(input, out double _value) ? _value : 0).ToString();
+                    cellValue.Type = CellType.GENERAL;
                     break;
             }
         }
@@ -496,10 +490,11 @@ public class CommandBar {
     /// Display a prompt on the status bar and prompt for a keystroke input.
     /// </summary>
     /// <returns>True if a value was input, false if empty or cancelled</returns>
-    public bool Prompt(string prompt, char[] validInput, out char inputValue) {
+    public bool Prompt(string commandName, string prompt, char[] validInput, out char inputValue) {
 
         Point cursorPosition = Terminal.GetCursor();
         prompt = prompt.Replace("@@", $"[{string.Join("", validInput)}]");
+        RenderText(0, _commandBarRow, _displayWidth * 2, commandName, _fgColour, _bgColour);
         RenderText(0, _promptRow, _displayWidth, prompt, _fgColour, _bgColour);
         Terminal.SetCursor(prompt.Length, _promptRow);
         ConsoleKeyInfo input = Console.ReadKey(true);
@@ -511,6 +506,7 @@ public class CommandBar {
         }
         Terminal.SetCursor(cursorPosition);
         inputValue = char.ToLower(input.KeyChar);
+        RenderCommandList(true);
         return input.Key != ConsoleKey.Escape;
     }
 
@@ -576,8 +572,8 @@ public class CommandBar {
     /// </summary>
     private void RenderCellContents() {
         string cellValue = string.Empty;
-        if (_cellValue.HasValue) {
-            cellValue = _cellValue.Type == VariantType.STRING ? $"\"{_cellValue.StringValue}\"" : _cellValue.StringValue;
+        if (_cellValue.Type != CellType.NONE) {
+            cellValue = _cellValue.Type == CellType.TEXT ? $"\"{_cellValue.StringValue}\"" : _cellValue.StringValue;
         }
         RenderText(_cellContentPosition, _statusRow, _cellContentWidth, cellValue, _fgColour, _bgColour);
     }

@@ -257,7 +257,7 @@ public class Window {
         RenderHint hint = RenderHint.NONE;
         do {
             Cell cell = Sheet.Cell(Sheet.Column, Sheet.Row, true);
-            Variant value = cell.Value;
+            CellValue value = cell.Value;
             CellInputResponse result = Screen.Command.PromptForCellInput(flags, ref value);
             if (result == CellInputResponse.CANCEL) {
                 break;

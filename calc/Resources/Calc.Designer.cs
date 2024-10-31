@@ -152,5 +152,11 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("EnterTextOrValue", resourceCulture);
             }
         }
+        
+        internal static string Quit {
+            get {
+                return ResourceManager.GetString("Quit", resourceCulture);
+            }
+        }
     }
 }

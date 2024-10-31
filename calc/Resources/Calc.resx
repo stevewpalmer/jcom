@@ -72,4 +72,7 @@
     <data name="EnterTextOrValue" xml:space="preserve">
         <value>Enter text or value</value>
     </data>
+    <data name="Quit" xml:space="preserve">
+        <value>QUIT:</value>
+    </data>
 </root>
