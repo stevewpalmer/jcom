@@ -75,4 +75,28 @@
     <data name="Quit" xml:space="preserve">
         <value>QUIT:</value>
     </data>
+    <data name="FormatCells" xml:space="preserve">
+        <value>Cells</value>
+    </data>
+    <data name="FormatDefault" xml:space="preserve">
+        <value>Default</value>
+    </data>
+    <data name="FormatOptions" xml:space="preserve">
+        <value>Options</value>
+    </data>
+    <data name="FormatWidth" xml:space="preserve">
+        <value>Width</value>
+    </data>
+    <data name="CmdbarFilename" xml:space="preserve">
+        <value>Calc: {0}</value>
+    </data>
+    <data name="FormatWidthPrompt" xml:space="preserve">
+        <value>FORMAT WIDTH in chars or d(efault):</value>
+    </data>
+    <data name="FormatWidthColumn" xml:space="preserve">
+        <value>column</value>
+    </data>
+    <data name="FormatWidthThrough" xml:space="preserve">
+        <value>through</value>
+    </data>
 </root>

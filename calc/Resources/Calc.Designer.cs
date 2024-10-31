@@ -158,5 +158,53 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("Quit", resourceCulture);
             }
         }
+        
+        internal static string FormatCells {
+            get {
+                return ResourceManager.GetString("FormatCells", resourceCulture);
+            }
+        }
+        
+        internal static string FormatDefault {
+            get {
+                return ResourceManager.GetString("FormatDefault", resourceCulture);
+            }
+        }
+        
+        internal static string FormatOptions {
+            get {
+                return ResourceManager.GetString("FormatOptions", resourceCulture);
+            }
+        }
+        
+        internal static string FormatWidth {
+            get {
+                return ResourceManager.GetString("FormatWidth", resourceCulture);
+            }
+        }
+        
+        internal static string CmdbarFilename {
+            get {
+                return ResourceManager.GetString("CmdbarFilename", resourceCulture);
+            }
+        }
+        
+        internal static string FormatWidthPrompt {
+            get {
+                return ResourceManager.GetString("FormatWidthPrompt", resourceCulture);
+            }
+        }
+        
+        internal static string FormatWidthColumn {
+            get {
+                return ResourceManager.GetString("FormatWidthColumn", resourceCulture);
+            }
+        }
+        
+        internal static string FormatWidthThrough {
+            get {
+                return ResourceManager.GetString("FormatWidthThrough", resourceCulture);
+            }
+        }
     }
 }

@@ -32,17 +32,17 @@ public class Cell {
     /// <summary>
     /// Cell value
     /// </summary>
-    public CellValue Value { get; set; } = new CellValue();
+    public CellValue Value { get; set; } = new();
 
     /// <summary>
     /// Cell row
     /// </summary>
-    public int Row { get; set; }
+    public int Row { get; init; }
 
     /// <summary>
     /// Cell column
     /// </summary>
-    public int Column { get; set; }
+    public int Column { get; init; }
 
     /// <summary>
     /// Draw this cell at the given cell position (1-based row and column) at
@@ -53,11 +53,12 @@ public class Cell {
     /// <param name="y">Y position of cell</param>
     public void Draw(Sheet sheet, int x, int y) {
         Terminal.SetCursor(x, y);
-        string cellValue = "";
-        if (Value.Type != CellType.NONE) {
-            cellValue = Value.StringValue.ToString();
-        }
         int width = sheet.ColumnWidth(Column);
-        Terminal.Write(Utilities.SpanBound(cellValue, 0, width).PadRight(width));
+        string cellValue = Value.Type switch {
+            CellType.TEXT => Utilities.SpanBound(Value.StringValue, 0, width).PadRight(width),
+            CellType.NUMBER => Utilities.SpanBound(Value.StringValue, 0, width).PadLeft(width),
+            _ => "".PadRight(width)
+        };
+        Terminal.Write(cellValue);
     }
 }

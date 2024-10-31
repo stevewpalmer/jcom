@@ -8,9 +8,9 @@ public enum CellType {
     NONE,
 
     /// <summary>
-    /// General, unspecified type
+    /// Number
     /// </summary>
-    GENERAL,
+    NUMBER,
 
     /// <summary>
     /// Text

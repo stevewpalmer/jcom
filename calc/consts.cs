@@ -41,4 +41,19 @@ public static class Consts {
     /// Default filename (for an empty sheet)
     /// </summary>
     public const string DefaultFilename = "temp";
+
+    /// <summary>
+    /// Maximum number of columns
+    /// </summary>
+    public const int MaxColumns = 255;
+
+    /// <summary>
+    /// Maximum number of rows
+    /// </summary>
+    public const int MaxRows = 4096;
+
+    /// <summary>
+    /// Default column width
+    /// </summary>
+    public const int DefaultColumnWidth = 10;
 }

@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -57,6 +58,7 @@ public class Sheet {
                     Row = inputSheet.Row;
                     Column = inputSheet.Column;
                     Cells = inputSheet.Cells;
+                    ColumnWidths = inputSheet.ColumnWidths;
                 }
             }
             catch (Exception) { }
@@ -67,16 +69,6 @@ public class Sheet {
         Filename = filename;
         SheetNumber = number;
     }
-
-    /// <summary>
-    /// Maximum number of columns
-    /// </summary>
-    public static int MaxColumns => 255;
-
-    /// <summary>
-    /// Maximum number of rows
-    /// </summary>
-    public static int MaxRows => 4096;
 
     /// <summary>
     /// The current selected row, 1 offset
@@ -98,6 +90,11 @@ public class Sheet {
     /// Cells
     /// </summary>
     public Dictionary<int, Cell> Cells { get; set; } = new();
+
+    /// <summary>
+    /// Column widths
+    /// </summary>
+    public Dictionary<int, int> ColumnWidths { get; set; } = new();
 
     /// <summary>
     /// Return the name of the sheet. This is the base part of the filename if
@@ -156,7 +153,25 @@ public class Sheet {
     /// <param name="columnNumber">Column number, 1-based</param>
     /// <returns>Column width</returns>
     public int ColumnWidth(int columnNumber) {
-        return 10;
+        Debug.Assert(columnNumber is >= 1 and <= Consts.MaxColumns);
+        return ColumnWidths.GetValueOrDefault(columnNumber, Consts.DefaultColumnWidth);
+    }
+
+    /// <summary>
+    /// Set the new width of the specified column.
+    /// </summary>
+    /// <param name="columnNumber">Column number, 1-based</param>
+    /// <param name="width">New width</param>
+    public void SetColumnWidth(int columnNumber, int width) {
+        Debug.Assert(columnNumber is >= 1 and <= Consts.MaxColumns);
+        Debug.Assert(width is >= 0 and <= 100);
+        if (width == Consts.DefaultColumnWidth) {
+            ColumnWidths.Remove(columnNumber);
+        }
+        else {
+            ColumnWidths[columnNumber] = width;
+        }
+        Modified = true;
     }
 
     /// <summary>
@@ -164,7 +179,7 @@ public class Sheet {
     /// </summary>
     /// <param name="rowNumber">Row number, 1-based</param>
     /// <returns>Row height</returns>
-    public int RowHeight(int rowNumber) {
+    public static int RowHeight(int rowNumber) {
         return 1;
     }
 
@@ -176,7 +191,7 @@ public class Sheet {
     /// <param name="createIfEmpty">Create the cell if it is empty</param>
     /// <returns>The cell at the row</returns>
     public Cell Cell(int sheetColumn, int sheetRow, bool createIfEmpty) {
-        int cellHash = sheetRow * MaxRows + sheetColumn;
+        int cellHash = sheetRow * Consts.MaxRows + sheetColumn;
         if (!Cells.TryGetValue(cellHash, out Cell? _cell)) {
             _cell = new Cell {
                 Column = sheetColumn,

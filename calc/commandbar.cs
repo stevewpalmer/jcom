@@ -23,8 +23,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using JCalc.Resources;
 using JComLib;
 
@@ -65,7 +67,11 @@ public enum KeyCommand {
     KC_GOTO_MACRO,
     KC_GOTO_WINDOW,
     KC_GOTO_ROWCOL,
-    KC_GOTO_NAME
+    KC_GOTO_NAME,
+    KC_FORMAT_CELLS,
+    KC_FORMAT_OPTIONS,
+    KC_FORMAT_WIDTH,
+    KC_FORMAT_DEFAULT
 }
 
 /// <summary>
@@ -127,7 +133,38 @@ public enum CellInputResponse {
     /// <summary>
     /// Accept the input and move up
     /// </summary>
-    ACCEPT_UP
+    ACCEPT_UP,
+
+    /// <summary>
+    /// Accept the input and move left
+    /// </summary>
+    ACCEPT_LEFT,
+
+    /// <summary>
+    /// Accept the input and move right
+    /// </summary>
+    ACCEPT_RIGHT
+}
+
+public enum FormFieldType {
+
+    /// <summary>
+    /// Number required
+    /// </summary>
+    [Description("Enter number")]
+    NUMBER,
+
+    /// <summary>
+    /// Any text required
+    /// </summary>
+    [Description("Enter text")]
+    TEXT,
+
+    /// <summary>
+    /// Number required or 'd' for default
+    /// </summary>
+    [Description("Enter number, or d for default")]
+    NUMBER_OR_DEFAULT
 }
 
 /// <summary>
@@ -143,7 +180,7 @@ public class FormField {
     /// <summary>
     /// Type of input required
     /// </summary>
-    public VariantType Type { get; init; } = VariantType.NONE;
+    public FormFieldType Type { get; init; }
 
     /// <summary>
     /// Initial value and output
@@ -154,6 +191,31 @@ public class FormField {
     /// Input field width (also define the maximum input)
     /// </summary>
     public int Width { get; init; } = 5;
+
+    /// <summary>
+    /// Default value to return if default was selected (only used
+    /// if Type is FormFieldType.NUMBER_OR_DEFAULT).
+    /// </summary>
+    public int Default { get; init; }
+
+    /// <summary>
+    /// Save the input buffer to the Value
+    /// </summary>
+    /// <param name="inputBuffer">Input buffer</param>
+    public void Save(List<char> inputBuffer) {
+        string inputValue = string.Join("", inputBuffer);
+        switch (Type) {
+            case FormFieldType.NUMBER_OR_DEFAULT when inputValue == "d":
+                Value.Set(Default);
+                break;
+            case FormFieldType.NUMBER:
+                Value.Set(int.TryParse(inputValue, out int _result) ? _result : 0);
+                break;
+            default:
+                Value.Set(inputValue);
+                break;
+        }
+    }
 }
 
 public class CommandBar {
@@ -162,17 +224,21 @@ public class CommandBar {
     private readonly int _promptRow;
     private ConsoleColor _bgColour;
     private ConsoleColor _fgColour;
+    private ConsoleColor _errColour;
     private readonly int _displayWidth;
     private readonly int _cursorPositionWidth;
     private readonly int _cellContentPosition;
     private readonly int _cellContentWidth;
+    private readonly int _filenamePosition;
+    private readonly int _filenameWidth;
     private int _cursorRow = 1;
     private int _cursorColumn = 1;
-    private string _filename;
+    private readonly string _filename;
     private int _selectedCommand;
     private CommandMapID _currentCommandMapID;
     private CommandMap? _commandMap;
     private CellValue _cellValue;
+    private ConsoleKeyInfo? _pushedKey;
 
     /// <summary>
     /// Non-command (navigation) key map
@@ -200,14 +266,16 @@ public class CommandBar {
         _displayWidth = Terminal.Width;
         _statusRow = Terminal.Height - 1;
         _promptRow = _commandBarRow + 2;
-        _cursorPositionWidth = 9;
-        _filename = string.Empty;
+        _cursorPositionWidth = 10;
+        _filenameWidth = 14;
+        _filename = Consts.DefaultFilename;
         _currentCommandMapID = CommandMapID.MAIN;
         _commandMap = Commands.CommandMapForID(_currentCommandMapID);
         _selectedCommand = 0;
         _cellValue = new CellValue();
-        _cellContentPosition = _cursorPositionWidth + 1;
-        _cellContentWidth = _displayWidth - _cursorPositionWidth - 10;
+        _filenamePosition = _displayWidth - _filenameWidth;
+        _cellContentPosition = _cursorPositionWidth;
+        _cellContentWidth = _displayWidth - (_cursorPositionWidth + _filenameWidth);
     }
 
     /// <summary>
@@ -233,29 +301,36 @@ public class CommandBar {
     }
 
     /// <summary>
-    /// Update the filename on the command bar
-    /// </summary>
-    public void UpdateFilename(string newFilename) {
-        _filename = newFilename;
-        RenderSheetFilename();
-    }
-
-    /// <summary>
     /// Refresh the command bar, for example, when the screen
     /// colours change.
     /// </summary>
     public void Refresh() {
         _fgColour = Screen.Colours.NormalMessageColour;
         _bgColour = Screen.Colours.BackgroundColour;
+        _errColour = Screen.Colours.ErrorMessageColour;
         RenderCommandList(true);
         RenderCursorPosition();
         RenderSheetFilename();
     }
 
     /// <summary>
+    /// Read a key
+    /// </summary>
+    /// <returns>ConsoleKeyInfo for the input key</returns>
+    public ConsoleKeyInfo ReadKey() {
+        if (_pushedKey != null) {
+            ConsoleKeyInfo key = _pushedKey.Value;
+            _pushedKey = null;
+            return key;
+        }
+        return Console.ReadKey(true);
+    }
+
+    /// <summary>
     /// Map a keystroke to a command
     /// </summary>
     public KeyCommand MapKeyToCommand(ConsoleKeyInfo keyIn) {
+        Message(Calc.SelectOptionPrompt);
         if (keyIn.Key == ConsoleKey.Escape) {
             if (_currentCommandMapID != CommandMapID.MAIN) {
                 SetActiveCommandMap(CommandMapID.MAIN);
@@ -286,7 +361,11 @@ public class CommandBar {
                     return entry.CommandId;
                 }
             }
-            Message(Calc.NotAValidOption);
+            Error(Calc.NotAValidOption);
+        }
+        if (char.IsDigit(keyIn.KeyChar)) {
+            PushKey(keyIn);
+            return KeyCommand.KC_VALUE;
         }
         return KeyCommand.KC_NONE;
     }
@@ -311,11 +390,15 @@ public class CommandBar {
             }
             string value = string.Empty;
             switch (field.Type) {
-                case VariantType.INTEGER:
+                case FormFieldType.NUMBER:
                     value = $"{field.Value:-field.Width}";
                     break;
 
-                case VariantType.STRING:
+                case FormFieldType.NUMBER_OR_DEFAULT:
+                    value = "d";
+                    break;
+
+                case FormFieldType.TEXT:
                     value = field.Value.StringValue;
                     break;
 
@@ -334,16 +417,16 @@ public class CommandBar {
         List<char> inputBuffer = [];
         do {
             if (initialiseField) {
-                RenderText(0, _promptRow, _displayWidth, Calc.EnterNumber, _fgColour, _bgColour);
+                RenderText(0, _promptRow, _displayWidth, Utilities.GetEnumDescription(fields[fieldIndex].Type), _fgColour, _bgColour);
                 inputBuffer = fields[fieldIndex].Value.StringValue.ToList();
                 index = inputBuffer.Count;
                 Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
                 initialiseField = false;
             }
-            input = Console.ReadKey(true);
+            input = ReadKey();
             switch (input.Key) {
                 case ConsoleKey.Tab: {
-                    fields[fieldIndex].Value.Set(string.Join("", inputBuffer));
+                    fields[fieldIndex].Save(inputBuffer);
                     int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
                     fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Length);
                     initialiseField = true;
@@ -358,16 +441,21 @@ public class CommandBar {
                     --index;
                     break;
 
-                case ConsoleKey.Backspace when index > 0: {
+                case ConsoleKey.Backspace when index > 0:
                     inputBuffer.RemoveAt(--index);
                     break;
-                }
-            }
-            if (fields[fieldIndex].Type == VariantType.INTEGER && !char.IsDigit(input.KeyChar)) {
-                continue;
-            }
-            if (!char.IsControl(input.KeyChar) && inputBuffer.Count < fields[fieldIndex].Width) {
-                inputBuffer.Insert(index++, input.KeyChar);
+
+                default:
+                    if (fields[fieldIndex].Type == FormFieldType.NUMBER_OR_DEFAULT && !char.IsDigit(input.KeyChar) && input.KeyChar != 'd') {
+                        continue;
+                    }
+                    if (fields[fieldIndex].Type == FormFieldType.NUMBER && !char.IsDigit(input.KeyChar)) {
+                        continue;
+                    }
+                    if (!char.IsControl(input.KeyChar) && inputBuffer.Count < fields[fieldIndex].Width) {
+                        inputBuffer.Insert(index++, input.KeyChar);
+                    }
+                    break;
             }
 
             string text = string.Join("", inputBuffer);
@@ -376,7 +464,7 @@ public class CommandBar {
 
         } while (input.Key != ConsoleKey.Enter && input.Key != ConsoleKey.Escape);
 
-        fields[fieldIndex].Value.Set(string.Join("", inputBuffer));
+        fields[fieldIndex].Save(inputBuffer);
 
         Terminal.SetCursor(cursorPosition);
         RenderCommandList(true);
@@ -428,55 +516,47 @@ public class CommandBar {
             RenderText(column, _commandBarRow, maxWidth, text, _fgColour, _bgColour);
             Terminal.SetCursor(column + index, _commandBarRow);
 
-            ConsoleKeyInfo input = Console.ReadKey(true);
-            response = input.Key switch {
+            ConsoleKeyInfo inputKey = ReadKey();
+            response = inputKey.Key switch {
                 ConsoleKey.Escape => CellInputResponse.CANCEL,
                 ConsoleKey.Enter => CellInputResponse.ACCEPT,
                 ConsoleKey.DownArrow => CellInputResponse.ACCEPT_DOWN,
                 ConsoleKey.UpArrow => CellInputResponse.ACCEPT_UP,
-                _ => 0
+                ConsoleKey.LeftArrow => CellInputResponse.ACCEPT_LEFT,
+                ConsoleKey.RightArrow => CellInputResponse.ACCEPT_RIGHT,
+                _ => CellInputResponse.NONE
             };
-            if (response != 0) {
+            if (response != CellInputResponse.NONE) {
                 break;
             }
-            switch (input.Key) {
-               case ConsoleKey.LeftArrow when index > 0:
-                   --index;
-                   break;
-
-               case ConsoleKey.RightArrow when index < inputBuffer.Count:
-                   ++index;
-                   break;
-
+            switch (inputKey.Key) {
                case ConsoleKey.Backspace when index > 0:
                    inputBuffer.RemoveAt(--index);
                    break;
            }
            if (flags == CellInputFlags.ALPHAVALUE) {
-               flags = IsValueChar(input.KeyChar) ? CellInputFlags.VALUE : CellInputFlags.ALPHA;
+               flags = IsValueChar(inputKey.KeyChar) ? CellInputFlags.VALUE : CellInputFlags.ALPHA;
                initalise = true;
            }
-           else if (flags == CellInputFlags.VALUE && !IsValueChar(input.KeyChar)) {
+           else if (flags == CellInputFlags.VALUE && !IsValueChar(inputKey.KeyChar)) {
                continue;
            }
-           if (!char.IsControl(input.KeyChar) && inputBuffer.Count < maxWidth) {
-               inputBuffer.Insert(index++, input.KeyChar);
+           if (!char.IsControl(inputKey.KeyChar) && inputBuffer.Count < maxWidth) {
+               inputBuffer.Insert(index++, inputKey.KeyChar);
            }
         } while (true);
 
-        if (response != CellInputResponse.CANCEL) {
-            string input = string.Join("", inputBuffer);
-            switch (flags) {
-                case CellInputFlags.ALPHA:
-                    cellValue.StringValue = input;
-                    cellValue.Type = CellType.TEXT;
-                    break;
+        string input = string.Join("", inputBuffer);
+        switch (flags) {
+            case CellInputFlags.ALPHA:
+                cellValue.StringValue = input;
+                cellValue.Type = CellType.TEXT;
+                break;
 
-                case CellInputFlags.VALUE:
-                    cellValue.StringValue = (double.TryParse(input, out double _value) ? _value : 0).ToString();
-                    cellValue.Type = CellType.GENERAL;
-                    break;
-            }
+            case CellInputFlags.VALUE:
+                cellValue.StringValue = (double.TryParse(input, out double _value) ? _value : 0).ToString(CultureInfo.InvariantCulture);
+                cellValue.Type = CellType.NUMBER;
+                break;
         }
 
         Terminal.SetCursor(cursorPosition);
@@ -563,8 +643,8 @@ public class CommandBar {
     /// Show the current sheet filename in the bottom left corner
     /// </summary>
     private void RenderSheetFilename() {
-        string text = $@"Calc: {_filename}";
-        RenderText(_displayWidth - text.Length - 4, _statusRow, text.Length, text, _fgColour, _bgColour);
+        string text = string.Format(Calc.CmdbarFilename, _filename);
+        RenderText(_filenamePosition, _statusRow, _filenameWidth, text, _fgColour, _bgColour);
     }
 
     /// <summary>
@@ -603,11 +683,27 @@ public class CommandBar {
     }
 
     /// <summary>
+    /// Display an error message on the prompt bar
+    /// </summary>
+    /// <param name="text">Error message to display</param>
+    private void Error(string text) {
+        RenderText(0, _promptRow, _displayWidth, text, _errColour, _bgColour);
+    }
+
+    /// <summary>
     /// Write text to the command bar in the specified colour.
     /// </summary>
     private static void RenderText(int x, int y, int w, string text, ConsoleColor fgColor, ConsoleColor bgColour) {
         Point saved = Terminal.GetCursor();
         Terminal.Write(x, y, w, bgColour, fgColor, Utilities.SpanBound(text, 0, w));
         Terminal.SetCursor(saved);
+    }
+
+    /// <summary>
+    /// Push a keystroke back to the input queue.
+    /// </summary>
+    /// <param name="keyToPush">Key to push</param>
+    private void PushKey(ConsoleKeyInfo keyToPush) {
+        _pushedKey = keyToPush;
     }
 }

@@ -34,9 +34,9 @@ public enum RenderHint {
     NONE = 0,
 
     /// <summary>
-    /// Update the current window
+    /// Update the contents of the current window
     /// </summary>
-    REDRAW = 1,
+    CONTENTS = 1,
 
     /// <summary>
     /// Cursor position update needed
@@ -52,11 +52,6 @@ public enum RenderHint {
     /// Exit the program
     /// </summary>
     EXIT = 8,
-
-    /// <summary>
-    /// Update the filename on the command bar
-    /// </summary>
-    TITLE = 16,
 
     /// <summary>
     /// Refresh the entire screen

@@ -37,7 +37,10 @@ public enum CommandMapID {
     MAIN,
 
     [Description("GOTO")]
-    GOTO
+    GOTO,
+
+    [Description("FORMAT")]
+    FORMAT
 }
 
 /// <summary>
@@ -117,6 +120,15 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.GotoName, CommandId = KeyCommand.KC_GOTO_NAME },
                 new CommandMapEntry { Name = Calc.GotoRowCol, CommandId = KeyCommand.KC_GOTO_ROWCOL },
                 new CommandMapEntry { Name = Calc.GotoWindow, CommandId = KeyCommand.KC_GOTO_WINDOW }
+            ]
+        },
+        new() {
+            ID = CommandMapID.FORMAT,
+            Commands = [
+                new CommandMapEntry { Name = Calc.FormatCells, CommandId = KeyCommand.KC_FORMAT_CELLS },
+                new CommandMapEntry { Name = Calc.FormatDefault, CommandId = KeyCommand.KC_FORMAT_DEFAULT },
+                new CommandMapEntry { Name = Calc.FormatOptions, CommandId = KeyCommand.KC_FORMAT_OPTIONS },
+                new CommandMapEntry { Name = Calc.FormatWidth, CommandId = KeyCommand.KC_FORMAT_WIDTH }
             ]
         }
     ];

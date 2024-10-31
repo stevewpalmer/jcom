@@ -38,10 +38,6 @@ internal static class Program {
         if (args.Length == 0) {
             Screen.AddWindow(new Window());
             Screen.ActivateWindow(0);
-            if (!Screen.GetInitialFile()) {
-                Screen.Close();
-                return;
-            }
         }
         Screen.ActivateWindow(0);
         Screen.StartKeyboardLoop();

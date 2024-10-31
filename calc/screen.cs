@@ -40,7 +40,7 @@ public static class Screen {
     /// <summary>
     /// Configuration
     /// </summary>
-    public static Config Config { get; set; } = new();
+    public static Config Config { get; private set; } = new();
 
     /// <summary>
     /// The command bar
@@ -73,7 +73,7 @@ public static class Screen {
     public static void StartKeyboardLoop() {
         RenderHint flags;
         do {
-            ConsoleKeyInfo keyIn = Console.ReadKey(true);
+            ConsoleKeyInfo keyIn = Command.ReadKey();
             flags = HandleCommand(Command.MapKeyToCommand(keyIn));
         } while (flags != RenderHint.EXIT);
     }
@@ -86,15 +86,6 @@ public static class Screen {
             Cell cell = _activeWindow.ActiveCell;
             Command.UpdateCellStatus(cell);
         }
-    }
-
-    /// <summary>
-    /// Prompt for the initial sheet to edit, replacing the one in the
-    /// existing window.
-    /// </summary>
-    /// <returns>True if file retrieved, false if the user cancelled the prompt</returns>
-    public static bool GetInitialFile() {
-        return true;
     }
 
     /// <summary>
@@ -128,6 +119,7 @@ public static class Screen {
         RenderHint flags = command switch {
             KeyCommand.KC_QUIT => Exit(true),
             KeyCommand.KC_GOTO => GotoCommand(),
+            KeyCommand.KC_FORMAT => FormatCommand(),
             _ => _activeWindow.HandleCommand(command)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
@@ -145,9 +137,18 @@ public static class Screen {
     /// <summary>
     /// Handle the Goto command
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Render hint</returns>
     private static RenderHint GotoCommand() {
         Command.SetActiveCommandMap(CommandMapID.GOTO);
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Handle the Format command
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint FormatCommand() {
+        Command.SetActiveCommandMap(CommandMapID.FORMAT);
         return RenderHint.NONE;
     }
 
@@ -169,11 +170,10 @@ public static class Screen {
                     flags = RenderHint.NONE;
                 }
                 else {
-                    switch (inputChar) {
-                        case 'y':
-                            writeSheets = true;
-                            break;
-                    }
+                    writeSheets = inputChar switch {
+                        'y' => true,
+                        _ => writeSheets
+                    };
                 }
             }
         }

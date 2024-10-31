@@ -39,7 +39,7 @@ public class Window {
     /// Create an empty window
     /// </summary>
     public Window() {
-        Sheet = new Sheet(1, Consts.DefaultFilename);
+        Sheet = new Sheet(1);
     }
 
     /// <summary>
@@ -73,10 +73,11 @@ public class Window {
     }
 
     /// <summary>
-    /// Refresh this window with a full redraw on screen.
+    /// Refresh this window with a full redraw on screen. This method should
+    /// be used when row or column titles have changed, including scrolling
+    /// and column width.
     /// </summary>
     public void Refresh() {
-        Screen.Command.UpdateFilename(Sheet.Name);
         RenderFrame();
         Render();
     }
@@ -98,6 +99,7 @@ public class Window {
             KeyCommand.KC_GOTO_ROWCOL => GotoRowColumn(),
             KeyCommand.KC_ALPHA => InputAlpha(),
             KeyCommand.KC_VALUE => InputValue(),
+            KeyCommand.KC_FORMAT_WIDTH => FormatWidth(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -109,9 +111,9 @@ public class Window {
     /// </summary>
     /// <returns>Unapplied render hint</returns>
     private RenderHint ApplyRenderHint(RenderHint flags) {
-        if (flags.HasFlag(RenderHint.REDRAW)) {
+        if (flags.HasFlag(RenderHint.CONTENTS)) {
             Render();
-            flags &= ~RenderHint.REDRAW;
+            flags &= ~RenderHint.CONTENTS;
             flags |= RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.CURSOR)) {
@@ -146,7 +148,7 @@ public class Window {
         int columnNumber = 1 + _scrollOffset.X;
         int x = _sheetBounds.X;
         _numberOfColumns = 0;
-        while (x < frameRect.Right && columnNumber <= Sheet.MaxColumns) {
+        while (x < frameRect.Right && columnNumber <= Consts.MaxColumns) {
             int width = Sheet.ColumnWidth(columnNumber);
             int space = Math.Min(width, frameRect.Width - x);
             if (space == width) {
@@ -161,7 +163,7 @@ public class Window {
         // Row numbers
         int rowNumber = 1 + _scrollOffset.Y;
         int y = _sheetBounds.Y;
-        while (y < frameRect.Bottom - CommandBar.Height && rowNumber <= Sheet.MaxRows) {
+        while (y < frameRect.Bottom - CommandBar.Height && rowNumber <= Consts.MaxRows) {
             Terminal.SetCursor(frameRect.Left, y);
             Terminal.Write(rowNumber.ToString().PadLeft(4));
             y += 1;
@@ -170,11 +172,25 @@ public class Window {
     }
 
     /// <summary>
-    /// Draw the sheet in its entirety
+    /// Draw the sheet in its entirety. Only the sheet contents are changed, not
+    /// the row and column titles, so this method is only applicable where the
+    /// changes are to the cell values. If the rows or column titles need to be
+    /// updated, perhaps due to scrolling or column width changes, call the Refresh
+    /// method instead.
     /// </summary>
     private void Render() {
-        RenderFrame();
+        Point cursorPosition = Terminal.GetCursor();
+        for (int y = _sheetBounds.Top; y < _sheetBounds.Bottom; ++y) {
+            Terminal.SetCursor(_sheetBounds.Left, y);
+            Terminal.Write(new string(' ', _sheetBounds.Width));
+        }
+        foreach (Cell cell in Sheet.Cells.Values) {
+            if (cell.Row >= _scrollOffset.Y && cell.Column >= _scrollOffset.X) {
+                cell.Draw(Sheet, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
+            }
+        }
         PlaceCursor();
+        Terminal.SetCursor(cursorPosition.X, cursorPosition.Y);
     }
 
     /// <summary>
@@ -233,6 +249,44 @@ public class Window {
     }
 
     /// <summary>
+    /// Handle the format width command to set column widths
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint FormatWidth() {
+        RenderHint flags = RenderHint.NONE;
+        FormField[] formFields = [
+            new() {
+                Type = FormFieldType.NUMBER_OR_DEFAULT,
+                Width = 2,
+                Default = Consts.DefaultColumnWidth,
+                Value = new Variant("d")
+            },
+            new() {
+                Text = Calc.FormatWidthColumn,
+                Type = FormFieldType.NUMBER,
+                Width = 3,
+                Value = new Variant(Sheet.Column)
+            },
+            new() {
+                Text = Calc.FormatWidthThrough,
+                Type = FormFieldType.NUMBER,
+                Width = 3,
+                Value = new Variant(Sheet.Column)
+            }
+        ];
+        if (Screen.Command.PromptForInput(Calc.FormatWidthPrompt, formFields)) {
+            int newWidth = formFields[0].Value.IntValue;
+            int startColumn = formFields[1].Value.IntValue;
+            int endColumn = formFields[2].Value.IntValue;
+            while (startColumn <= endColumn) {
+                Sheet.SetColumnWidth(startColumn++, newWidth);
+            }
+            flags = RenderHint.REFRESH;
+        }
+        return flags;
+    }
+
+    /// <summary>
     /// Input alpha text into a cell
     /// </summary>
     /// <returns>Render hint</returns>
@@ -268,11 +322,19 @@ public class Window {
                 hint = RenderHint.CURSOR_STATUS;
                 break;
             }
-            if (result == CellInputResponse.ACCEPT_UP) {
-                ApplyRenderHint(CursorUp());
-            }
-            if (result == CellInputResponse.ACCEPT_DOWN) {
-                ApplyRenderHint(CursorDown());
+            switch (result) {
+                case CellInputResponse.ACCEPT_UP:
+                    ApplyRenderHint(CursorUp());
+                    break;
+                case CellInputResponse.ACCEPT_DOWN:
+                    ApplyRenderHint(CursorDown());
+                    break;
+                case CellInputResponse.ACCEPT_LEFT:
+                    ApplyRenderHint(CursorLeft());
+                    break;
+                case CellInputResponse.ACCEPT_RIGHT:
+                    ApplyRenderHint(CursorRight());
+                    break;
             }
             flags = CellInputFlags.ALPHAVALUE;
         } while (true);
@@ -289,7 +351,7 @@ public class Window {
             ResetCursor();
             flags = RenderHint.CURSOR;
             if (_scrollOffset.X > 0 || _scrollOffset.Y > 0) {
-                flags |= RenderHint.REDRAW;
+                flags |= RenderHint.REFRESH;
                 _scrollOffset = new Point(0, 0);
             }
             Sheet.Column = 1;
@@ -309,7 +371,7 @@ public class Window {
             --Sheet.Column;
             if (Sheet.Column <= _scrollOffset.X) {
                 --_scrollOffset.X;
-                flags |= RenderHint.REDRAW;
+                flags |= RenderHint.REFRESH;
             }
             else {
                 flags |= RenderHint.CURSOR;
@@ -324,12 +386,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorRight() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.Column < Sheet.MaxColumns) {
+        if (Sheet.Column < Consts.MaxColumns) {
             ResetCursor();
             ++Sheet.Column;
             if (GetXPositionOfCell(Sheet.Column) + Sheet.ColumnWidth(Sheet.Column) >= _sheetBounds.Right) {
                 ++_scrollOffset.X;
-                flags |= RenderHint.REDRAW;
+                flags |= RenderHint.REFRESH;
             }
             else {
                 flags |= RenderHint.CURSOR;
@@ -349,7 +411,7 @@ public class Window {
             --Sheet.Row;
             if (Sheet.Row <= _scrollOffset.Y) {
                 --_scrollOffset.Y;
-                flags |= RenderHint.REDRAW;
+                flags |= RenderHint.REFRESH;
             }
             else {
                 flags |= RenderHint.CURSOR;
@@ -370,7 +432,7 @@ public class Window {
             Sheet.Row -= pageSize;
             if (Sheet.Row < _scrollOffset.Y) {
                 _scrollOffset.Y -= pageSize;
-                flags |= RenderHint.REDRAW;
+                flags |= RenderHint.REFRESH;
             }
             else {
                 flags |= RenderHint.CURSOR;
@@ -385,12 +447,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorDown() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.Row < Sheet.MaxRows) {
+        if (Sheet.Row < Consts.MaxRows) {
             ResetCursor();
             ++Sheet.Row;
             if (GetYPositionOfCell(Sheet.Row) + Sheet.RowHeight(Sheet.Row) > _sheetBounds.Bottom) {
                 ++_scrollOffset.Y;
-                flags |= RenderHint.REDRAW;
+                flags |= RenderHint.REFRESH;
             }
             else {
                 flags |= RenderHint.CURSOR;
@@ -406,12 +468,12 @@ public class Window {
     private RenderHint CursorPageDown() {
         RenderHint flags = RenderHint.NONE;
         int pageSize = _sheetBounds.Height;
-        if (Sheet.Row + pageSize < Sheet.MaxRows) {
+        if (Sheet.Row + pageSize < Consts.MaxRows) {
             ResetCursor();
             Sheet.Row += pageSize;
             if (GetYPositionOfCell(Sheet.Row) + pageSize * Sheet.RowHeight(Sheet.Row) > _sheetBounds.Bottom) {
                 _scrollOffset.Y += pageSize;
-                flags |= RenderHint.REDRAW;
+                flags |= RenderHint.REFRESH;
             }
             else {
                 flags |= RenderHint.CURSOR;
@@ -429,19 +491,19 @@ public class Window {
         RenderHint flags = RenderHint.CURSOR;
         if (Sheet.Column <= _scrollOffset.X) {
             _scrollOffset.X = Sheet.Column - 1;
-            flags |= RenderHint.REDRAW;
+            flags |= RenderHint.REFRESH;
         }
         if (Sheet.Column > _numberOfColumns + _scrollOffset.X) {
             _scrollOffset.X =  Sheet.Column - _numberOfColumns;
-            flags |= RenderHint.REDRAW;
+            flags |= RenderHint.REFRESH;
         }
         if (Sheet.Row <= _scrollOffset.Y) {
             _scrollOffset.Y = Sheet.Row - 1;
-            flags |= RenderHint.REDRAW;
+            flags |= RenderHint.REFRESH;
         }
         if (Sheet.Row > _sheetBounds.Height + _scrollOffset.Y) {
             _scrollOffset.Y = Sheet.Row - _sheetBounds.Height;
-            flags |= RenderHint.REDRAW;
+            flags |= RenderHint.REFRESH;
         }
         return flags;
     }
@@ -455,13 +517,13 @@ public class Window {
         FormField[] formFields = [
             new() {
                 Text = Calc.GotoRowPrompt,
-                Type = VariantType.INTEGER,
+                Type = FormFieldType.NUMBER,
                 Width = 4,
                 Value = new Variant(Sheet.Row)
             },
             new() {
                 Text = Calc.GotoColumnPrompt,
-                Type = VariantType.INTEGER,
+                Type = FormFieldType.NUMBER,
                 Width = 3,
                 Value = new Variant(Sheet.Column)
             }
@@ -469,7 +531,7 @@ public class Window {
         if (Screen.Command.PromptForInput(Calc.GotoPrompt, formFields)) {
             int newRow = formFields[0].Value.IntValue;
             int newColumn = formFields[1].Value.IntValue;
-            if (newRow >= 1 && newRow <= Sheet.MaxRows && newColumn >= 1 && newColumn <= Sheet.MaxColumns) {
+            if (newRow is >= 1 and <= Consts.MaxRows && newColumn is >= 1 and <= Consts.MaxColumns) {
                 ResetCursor();
                 Sheet.Row = newRow;
                 Sheet.Column = newColumn;

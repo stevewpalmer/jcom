@@ -93,4 +93,5 @@ public class Config {
     /// Specifies whether or not a backup file is created when a sheet
     /// is saved.
     /// </summary>
-    public bool BackupFile { get; set; }}
+    public bool BackupFile { get; set; }
+}
