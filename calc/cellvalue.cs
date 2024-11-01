@@ -18,6 +18,40 @@ public enum CellType {
     TEXT
 }
 
+public enum CellAlignment {
+
+    /// <summary>
+    /// Numbers right aligned, text left aligned
+    /// </summary>
+    GENERAL,
+
+    /// <summary>
+    /// Left alignment
+    /// </summary>
+    LEFT,
+
+    /// <summary>
+    /// Right alignment
+    /// </summary>
+    RIGHT,
+
+    /// <summary>
+    /// Centered
+    /// </summary>
+    CENTRE
+}
+
+public enum CellFormat {
+    GENERAL,
+    CONTINUOUS,
+    EXPONENTIAL,
+    FIXED,
+    INTEGER,
+    CURRENCY,
+    BAR,
+    PERCENT
+}
+
 public class CellValue {
 
     /// <summary>

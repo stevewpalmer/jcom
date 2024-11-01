@@ -206,5 +206,29 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("FormatWidthThrough", resourceCulture);
             }
         }
+        
+        internal static string FormatDefaultCells {
+            get {
+                return ResourceManager.GetString("FormatDefaultCells", resourceCulture);
+            }
+        }
+        
+        internal static string FormatAlignment {
+            get {
+                return ResourceManager.GetString("FormatAlignment", resourceCulture);
+            }
+        }
+        
+        internal static string FormatCode {
+            get {
+                return ResourceManager.GetString("FormatCode", resourceCulture);
+            }
+        }
+        
+        internal static string FormatDecimals {
+            get {
+                return ResourceManager.GetString("FormatDecimals", resourceCulture);
+            }
+        }
     }
 }

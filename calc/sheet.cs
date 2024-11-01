@@ -195,7 +195,8 @@ public class Sheet {
         if (!Cells.TryGetValue(cellHash, out Cell? _cell)) {
             _cell = new Cell {
                 Column = sheetColumn,
-                Row = sheetRow
+                Row = sheetRow,
+                Alignment = Screen.Config.DefaultCellAlignment
             };
             if (createIfEmpty) {
                 Cells.Add(cellHash, _cell);

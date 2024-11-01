@@ -164,7 +164,13 @@ public enum FormFieldType {
     /// Number required or 'd' for default
     /// </summary>
     [Description("Enter number, or d for default")]
-    NUMBER_OR_DEFAULT
+    NUMBER_OR_DEFAULT,
+
+    /// <summary>
+    /// Picker list
+    /// </summary>
+    [Description("Select option")]
+    PICKER
 }
 
 /// <summary>
@@ -197,6 +203,12 @@ public class FormField {
     /// if Type is FormFieldType.NUMBER_OR_DEFAULT).
     /// </summary>
     public int Default { get; init; }
+
+    /// <summary>
+    /// Picker list. Each entry is the picked value and the text to
+    /// display.
+    /// </summary>
+    public Dictionary<int, string>? PickerList{ get; set; }
 
     /// <summary>
     /// Save the input buffer to the Value
@@ -382,13 +394,15 @@ public class CommandBar {
         Point cursorPosition = Terminal.GetCursor();
         RenderText(0, _commandBarRow, _displayWidth * 2, prompt, _fgColour, _bgColour);
         int column = prompt.Length + 1;
+        int row = _commandBarRow;
         List<Point> fieldPositions = [];
         foreach (FormField field in fields) {
             if (!string.IsNullOrEmpty(field.Text)) {
-                RenderText(column, _commandBarRow, _displayWidth, $"{field.Text}:", _fgColour, _bgColour);
+                RenderText(column, row, _displayWidth, $"{field.Text}:", _fgColour, _bgColour);
                 column += field.Text.Length + 2;
             }
             string value = string.Empty;
+            int width = field.Width;
             switch (field.Type) {
                 case FormFieldType.NUMBER:
                     value = $"{field.Value:-field.Width}";
@@ -396,6 +410,12 @@ public class CommandBar {
 
                 case FormFieldType.NUMBER_OR_DEFAULT:
                     value = "d";
+                    break;
+
+                case FormFieldType.PICKER:
+                    Debug.Assert(field.PickerList != null);
+                    value = string.Join(" ", field.PickerList.Select(p => p.Value.ToString()));
+                    width = value.Length;
                     break;
 
                 case FormFieldType.TEXT:
@@ -406,9 +426,13 @@ public class CommandBar {
                     Debug.Assert(false, $"{field.Type} is not supported");
                     break;
             }
-            fieldPositions.Add(new Point(column, _commandBarRow));
-            RenderText(column, _commandBarRow, field.Width, value, _bgColour, _fgColour);
-            column += field.Width + 1;
+            if (column + width > _displayWidth) {
+                column = 8;
+                ++row;
+            }
+            fieldPositions.Add(new Point(column, row));
+            RenderText(column, row, width, value, _bgColour, _fgColour);
+            column += width + 1;
         }
         ConsoleKeyInfo input;
         int fieldIndex = 0;
@@ -522,15 +546,23 @@ public class CommandBar {
                 ConsoleKey.Enter => CellInputResponse.ACCEPT,
                 ConsoleKey.DownArrow => CellInputResponse.ACCEPT_DOWN,
                 ConsoleKey.UpArrow => CellInputResponse.ACCEPT_UP,
-                ConsoleKey.LeftArrow => CellInputResponse.ACCEPT_LEFT,
-                ConsoleKey.RightArrow => CellInputResponse.ACCEPT_RIGHT,
+                ConsoleKey.LeftArrow when index == 0 => CellInputResponse.ACCEPT_LEFT,
+                ConsoleKey.RightArrow when index == inputBuffer.Count => CellInputResponse.ACCEPT_RIGHT,
                 _ => CellInputResponse.NONE
             };
             if (response != CellInputResponse.NONE) {
                 break;
             }
             switch (inputKey.Key) {
-               case ConsoleKey.Backspace when index > 0:
+                case ConsoleKey.LeftArrow when index > 0:
+                    --index;
+                    break;
+
+                case ConsoleKey.RightArrow when index < inputBuffer.Count:
+                    ++index;
+                    break;
+
+                case ConsoleKey.Backspace when index > 0:
                    inputBuffer.RemoveAt(--index);
                    break;
            }

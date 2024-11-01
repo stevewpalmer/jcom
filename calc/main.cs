@@ -37,7 +37,6 @@ internal static class Program {
         }
         if (args.Length == 0) {
             Screen.AddWindow(new Window());
-            Screen.ActivateWindow(0);
         }
         Screen.ActivateWindow(0);
         Screen.StartKeyboardLoop();

@@ -63,6 +63,7 @@ public static class Screen {
     /// Close the main screen when calc is closed.
     /// </summary>
     public static void Close() {
+        Config.Save();
         Terminal.Close();
     }
 

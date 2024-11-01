@@ -94,4 +94,19 @@ public class Config {
     /// is saved.
     /// </summary>
     public bool BackupFile { get; set; }
+
+    /// <summary>
+    /// Default cell alignment
+    /// </summary>
+    public CellAlignment DefaultCellAlignment { get; set; } = CellAlignment.GENERAL;
+
+    /// <summary>
+    /// Default cell format
+    /// </summary>
+    public CellFormat DefaultCellFormat { get; set; } = CellFormat.GENERAL;
+
+    /// <summary>
+    /// Default number of decimal places
+    /// </summary>
+    public int DefaultDecimals { get; set; } = 2;
 }

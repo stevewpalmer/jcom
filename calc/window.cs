@@ -100,6 +100,7 @@ public class Window {
             KeyCommand.KC_ALPHA => InputAlpha(),
             KeyCommand.KC_VALUE => InputValue(),
             KeyCommand.KC_FORMAT_WIDTH => FormatWidth(),
+            KeyCommand.KC_FORMAT_DEFAULT => FormatDefaults(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -281,6 +282,58 @@ public class Window {
             while (startColumn <= endColumn) {
                 Sheet.SetColumnWidth(startColumn++, newWidth);
             }
+            flags = RenderHint.REFRESH;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Set the default cell formatting.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint FormatDefaults() {
+        RenderHint flags = RenderHint.NONE;
+        FormField[] formFields = [
+            new() {
+                Text = Calc.FormatAlignment,
+                Type = FormFieldType.PICKER,
+                PickerList = new Dictionary<int, string> {
+                    { (int)CellAlignment.CENTRE, "Ctr" },
+                    { (int)CellAlignment.GENERAL, "Gen" },
+                    { (int)CellAlignment.LEFT, "Left" },
+                    { (int)CellAlignment.RIGHT, "Right" }
+                },
+                Value = new Variant((int)Screen.Config.DefaultCellAlignment)
+            },
+            new() {
+                Text = Calc.FormatCode,
+                Type = FormFieldType.PICKER,
+                PickerList = new Dictionary<int, string> {
+                    { (int)CellFormat.CONTINUOUS, "Cont" },
+                    { (int)CellFormat.EXPONENTIAL, "Exp" },
+                    { (int)CellFormat.FIXED, "Fix" },
+                    { (int)CellFormat.GENERAL, "Gen" },
+                    { (int)CellFormat.INTEGER, "Int" },
+                    { (int)CellFormat.CURRENCY, "$" },
+                    { (int)CellFormat.BAR, "*" },
+                    { (int)CellFormat.PERCENT, "%" }
+                },
+                Value = new Variant((int)Screen.Config.DefaultCellFormat)
+            },
+            new() {
+                Text = Calc.FormatDecimals,
+                Type = FormFieldType.NUMBER,
+                Width = 1,
+                Value = new Variant((int)Screen.Config.DefaultDecimals)
+            }
+        ];
+        if (Screen.Command.PromptForInput(Calc.FormatDefaultCells, formFields)) {
+            CellAlignment alignment = (CellAlignment)formFields[0].Value.IntValue;
+            CellFormat format = (CellFormat)formFields[1].Value.IntValue;
+            int decimals = formFields[2].Value.IntValue;
+            Screen.Config.DefaultCellAlignment = alignment;
+            Screen.Config.DefaultDecimals = decimals;
+            Screen.Config.DefaultCellFormat = format;
             flags = RenderHint.REFRESH;
         }
         return flags;

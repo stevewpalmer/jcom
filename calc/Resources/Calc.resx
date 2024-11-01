@@ -99,4 +99,16 @@
     <data name="FormatWidthThrough" xml:space="preserve">
         <value>through</value>
     </data>
+    <data name="FormatDefaultCells" xml:space="preserve">
+        <value>FORMAT DEFAULT CELLS</value>
+    </data>
+    <data name="FormatAlignment" xml:space="preserve">
+        <value>alignment</value>
+    </data>
+    <data name="FormatCode" xml:space="preserve">
+        <value>format code</value>
+    </data>
+    <data name="FormatDecimals" xml:space="preserve">
+        <value># of decimals</value>
+    </data>
 </root>

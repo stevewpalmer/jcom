@@ -35,6 +35,11 @@ public class Cell {
     public CellValue Value { get; set; } = new();
 
     /// <summary>
+    /// Cell alignment
+    /// </summary>
+    public CellAlignment Alignment { get; set; }
+
+    /// <summary>
     /// Cell row
     /// </summary>
     public int Row { get; init; }
@@ -54,11 +59,28 @@ public class Cell {
     public void Draw(Sheet sheet, int x, int y) {
         Terminal.SetCursor(x, y);
         int width = sheet.ColumnWidth(Column);
-        string cellValue = Value.Type switch {
-            CellType.TEXT => Utilities.SpanBound(Value.StringValue, 0, width).PadRight(width),
-            CellType.NUMBER => Utilities.SpanBound(Value.StringValue, 0, width).PadLeft(width),
-            _ => "".PadRight(width)
-        };
+        string cellValue = Utilities.SpanBound(Value.StringValue, 0, width);
+        switch (Alignment) {
+            case CellAlignment.LEFT:
+                cellValue = cellValue.PadLeft(width);
+                break;
+
+            case CellAlignment.RIGHT:
+                cellValue = cellValue.PadRight(width);
+                break;
+
+            case CellAlignment.CENTRE:
+                cellValue = Utilities.CentreString(cellValue, width);
+                break;
+
+            case CellAlignment.GENERAL:
+                cellValue = Value.Type switch {
+                    CellType.TEXT => cellValue.PadRight(width),
+                    CellType.NUMBER => cellValue.PadLeft(width),
+                    _ => "".PadRight(width)
+                };
+                break;
+        }
         Terminal.Write(cellValue);
     }
 }
