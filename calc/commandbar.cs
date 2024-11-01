@@ -397,12 +397,9 @@ public class CommandBar {
         int row = _commandBarRow;
         List<Point> fieldPositions = [];
         foreach (FormField field in fields) {
-            if (!string.IsNullOrEmpty(field.Text)) {
-                RenderText(column, row, _displayWidth, $"{field.Text}:", _fgColour, _bgColour);
-                column += field.Text.Length + 2;
-            }
             string value = string.Empty;
             int width = field.Width;
+            int labelWidth = field.Text.Length + 2;
             switch (field.Type) {
                 case FormFieldType.NUMBER:
                     value = $"{field.Value:-field.Width}";
@@ -414,7 +411,7 @@ public class CommandBar {
 
                 case FormFieldType.PICKER:
                     Debug.Assert(field.PickerList != null);
-                    value = string.Join(" ", field.PickerList.Select(p => p.Value.ToString()));
+                    value = string.Join(" ", field.PickerList.Select(p => p.Value));
                     width = value.Length;
                     break;
 
@@ -426,12 +423,16 @@ public class CommandBar {
                     Debug.Assert(false, $"{field.Type} is not supported");
                     break;
             }
-            if (column + width > _displayWidth) {
-                column = 8;
+            if (column + width + labelWidth > _displayWidth) {
+                column = 7;
                 ++row;
             }
+            if (!string.IsNullOrEmpty(field.Text)) {
+                RenderText(column, row, _displayWidth, $"{field.Text}:", _fgColour, _bgColour);
+                column += labelWidth;
+            }
             fieldPositions.Add(new Point(column, row));
-            RenderText(column, row, width, value, _bgColour, _fgColour);
+            RenderText(column, row, width, value, _fgColour, _bgColour);
             column += width + 1;
         }
         ConsoleKeyInfo input;
@@ -444,13 +445,18 @@ public class CommandBar {
                 RenderText(0, _promptRow, _displayWidth, Utilities.GetEnumDescription(fields[fieldIndex].Type), _fgColour, _bgColour);
                 inputBuffer = fields[fieldIndex].Value.StringValue.ToList();
                 index = inputBuffer.Count;
-                Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
                 initialiseField = false;
             }
+
+            string text = string.Join("", inputBuffer);
+            RenderText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _bgColour, _fgColour);
+            Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
+
             input = ReadKey();
             switch (input.Key) {
                 case ConsoleKey.Tab: {
                     fields[fieldIndex].Save(inputBuffer);
+                    RenderText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _fgColour, _bgColour);
                     int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
                     fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Length);
                     initialiseField = true;
@@ -481,11 +487,6 @@ public class CommandBar {
                     }
                     break;
             }
-
-            string text = string.Join("", inputBuffer);
-            RenderText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _bgColour, _fgColour);
-            Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
-
         } while (input.Key != ConsoleKey.Enter && input.Key != ConsoleKey.Escape);
 
         fields[fieldIndex].Save(inputBuffer);

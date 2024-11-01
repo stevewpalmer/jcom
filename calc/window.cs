@@ -324,7 +324,7 @@ public class Window {
                 Text = Calc.FormatDecimals,
                 Type = FormFieldType.NUMBER,
                 Width = 1,
-                Value = new Variant((int)Screen.Config.DefaultDecimals)
+                Value = new Variant(Screen.Config.DefaultDecimals)
             }
         ];
         if (Screen.Command.PromptForInput(Calc.FormatDefaultCells, formFields)) {
