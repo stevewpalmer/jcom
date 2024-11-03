@@ -106,6 +106,17 @@ public class Window {
             KeyCommand.KC_ALIGN_RIGHT => AlignCells(CellAlignment.RIGHT),
             KeyCommand.KC_ALIGN_CENTRE => AlignCells(CellAlignment.CENTRE),
             KeyCommand.KC_FORMAT_FIXED => FormatCells(CellFormat.FIXED),
+            KeyCommand.KC_FORMAT_PERCENT => FormatCells(CellFormat.PERCENT),
+            KeyCommand.KC_FORMAT_CURRENCY => FormatCells(CellFormat.CURRENCY),
+            KeyCommand.KC_FORMAT_COMMAS => FormatCells(CellFormat.COMMAS),
+            KeyCommand.KC_FORMAT_BAR => FormatCells(CellFormat.BAR),
+            KeyCommand.KC_FORMAT_SCI => FormatCells(CellFormat.SCIENTIFIC),
+            KeyCommand.KC_FORMAT_GENERAL => FormatCells(CellFormat.GENERAL),
+            KeyCommand.KC_FORMAT_TEXT => FormatCells(CellFormat.TEXT),
+            KeyCommand.KC_FORMAT_RESET => FormatCells(Screen.Config.DefaultCellFormat),
+            KeyCommand.KC_DATE_DMY => FormatCells(CellFormat.DATE_DMY),
+            KeyCommand.KC_DATE_DM => FormatCells(CellFormat.DATE_DM),
+            KeyCommand.KC_DATE_MY => FormatCells(CellFormat.DATE_MY),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -249,7 +260,7 @@ public class Window {
     private int GetYPositionOfCell(int row) {
         int y = _sheetBounds.Top;
         for (int d = _scrollOffset.Y; d < row - 1; d++) {
-            y += Sheet.RowHeight(d + 1);
+            y += Sheet.RowHeight;
         }
         return y;
     }
@@ -260,12 +271,11 @@ public class Window {
     /// <param name="alignment">Requested alignment</param>
     /// <returns>Render hint</returns>
     private RenderHint AlignCells(CellAlignment alignment) {
-        RenderHint flags = RenderHint.NONE;
         ActiveCell.Alignment = alignment;
+        Sheet.Modified = true;
         PlaceCursor();
-        return flags;
+        return RenderHint.NONE;
     }
-
 
     /// <summary>
     /// Format a range of cells
@@ -273,10 +283,10 @@ public class Window {
     /// <param name="format">Requested format</param>
     /// <returns>Render hint</returns>
     private RenderHint FormatCells(CellFormat format) {
-        RenderHint flags = RenderHint.NONE;
         ActiveCell.Format = format;
+        Sheet.Modified = true;
         PlaceCursor();
-        return flags;
+        return RenderHint.NONE;
     }
 
     /// <summary>
@@ -445,7 +455,7 @@ public class Window {
         if (Sheet.Row < Consts.MaxRows) {
             ResetCursor();
             ++Sheet.Row;
-            if (GetYPositionOfCell(Sheet.Row) + Sheet.RowHeight(Sheet.Row) > _sheetBounds.Bottom) {
+            if (GetYPositionOfCell(Sheet.Row) + Sheet.RowHeight > _sheetBounds.Bottom) {
                 ++_scrollOffset.Y;
                 flags |= RenderHint.REFRESH;
             }
@@ -466,7 +476,7 @@ public class Window {
         if (Sheet.Row + pageSize < Consts.MaxRows) {
             ResetCursor();
             Sheet.Row += pageSize;
-            if (GetYPositionOfCell(Sheet.Row) + pageSize * Sheet.RowHeight(Sheet.Row) > _sheetBounds.Bottom) {
+            if (GetYPositionOfCell(Sheet.Row) + pageSize * Sheet.RowHeight > _sheetBounds.Bottom) {
                 _scrollOffset.Y += pageSize;
                 flags |= RenderHint.REFRESH;
             }

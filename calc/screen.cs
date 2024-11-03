@@ -50,7 +50,7 @@ public static class Screen {
     /// <summary>
     /// The status bar
     /// </summary>
-    public static StatusBar Status { get; } = new();
+    private static StatusBar Status { get; } = new();
 
     /// <summary>
     /// Open the main window.

@@ -21,35 +21,11 @@
     <data name="QuitPrompt" xml:space="preserve">
         <value>Enter Y to save edits, N to lose edits, or cancel</value>
     </data>
-    <data name="GotoPrompt" xml:space="preserve">
-        <value>GOTO</value>
-    </data>
     <data name="GotoRowPrompt" xml:space="preserve">
         <value>Enter address to go to</value>
     </data>
     <data name="Quit" xml:space="preserve">
         <value>Quit</value>
-    </data>
-    <data name="FormatWidthPrompt" xml:space="preserve">
-        <value>FORMAT WIDTH in chars or d(efault):</value>
-    </data>
-    <data name="FormatWidthColumn" xml:space="preserve">
-        <value>column</value>
-    </data>
-    <data name="FormatWidthThrough" xml:space="preserve">
-        <value>through</value>
-    </data>
-    <data name="FormatDefaultCells" xml:space="preserve">
-        <value>FORMAT DEFAULT CELLS</value>
-    </data>
-    <data name="FormatAlignment" xml:space="preserve">
-        <value>alignment</value>
-    </data>
-    <data name="FormatCode" xml:space="preserve">
-        <value>format code</value>
-    </data>
-    <data name="FormatDecimals" xml:space="preserve">
-        <value># of decimals</value>
     </data>
     <data name="EnterColumnWidth" xml:space="preserve">
         <value>Enter column width (1..72)</value>

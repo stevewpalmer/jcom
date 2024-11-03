@@ -43,9 +43,9 @@ public enum CellFormat {
     FIXED,
 
     /// <summary>
-    /// Integer
+    /// Commas inserted
     /// </summary>
-    INTEGER,
+    COMMAS,
 
     /// <summary>
     /// Currency
@@ -55,5 +55,30 @@ public enum CellFormat {
     /// <summary>
     /// Percentage
     /// </summary>
-    PERCENT
+    PERCENT,
+
+    /// <summary>
+    /// Horizontal bar
+    /// </summary>
+    BAR,
+
+    /// <summary>
+    /// Text format
+    /// </summary>
+    TEXT,
+
+    /// <summary>
+    /// Date in Day-Month-Year format
+    /// </summary>
+    DATE_DMY,
+
+    /// <summary>
+    /// Date in Month-Year format
+    /// </summary>
+    DATE_MY,
+
+    /// <summary>
+    /// Date in Day-Month format
+    /// </summary>
+    DATE_DM,
 }

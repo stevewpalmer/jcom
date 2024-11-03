@@ -80,12 +80,6 @@ public class Colours {
         GetColour(_config?.NormalMessageColour, 7);
 
     /// <summary>
-    /// Retrieve the error message colour
-    /// </summary>
-    public ConsoleColor ErrorMessageColour =>
-        GetColour(_config?.ErrorMessageColour, 4);
-
-    /// <summary>
     /// Parse a colour value from the configuration file. Colours are specified as
     /// an index into the _colours array. Out of bounds values are treated as if
     /// they were absent and the default index is used instead.

@@ -53,8 +53,6 @@ public enum KeyCommand {
     KC_PAGEUP,
     KC_PAGEDOWN,
     KC_GOTO,
-    KC_FORMAT,
-    KC_LABEL_PREFIX,
     KC_NAME,
     KC_JUSTIFY,
     KC_PROTECT,

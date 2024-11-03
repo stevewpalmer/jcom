@@ -91,36 +91,37 @@ public class Cell {
     public void Draw(Sheet sheet, int x, int y) {
         Terminal.SetCursor(x, y);
         int width = sheet.ColumnWidth(Column);
-        string cellValue = Utilities.SpanBound(Value.StringValue, 0, width);
+        string cellValue = Value.StringValue;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
-        switch (Format) {
-            case CellFormat.FIXED:
-                if (isNumber) {
-                    cellValue = doubleValue.ToString("F2");
-                }
-                break;
+        if (isNumber) {
+            DateTime dateTime = DateTime.FromOADate(doubleValue);
+            cellValue = Format switch {
+                CellFormat.FIXED => doubleValue.ToString("F2"),
+                CellFormat.PERCENT => $"{doubleValue * 100:F2}%",
+                CellFormat.CURRENCY => $"\u00a3{doubleValue:N}",
+                CellFormat.COMMAS => doubleValue < 0 ? $"({-doubleValue:N})" : $"{doubleValue:N}",
+                CellFormat.BAR => doubleValue < 0 ? new string('-', -(int)doubleValue) : new string('+', (int)doubleValue),
+                CellFormat.SCIENTIFIC => doubleValue.ToString("E2"),
+                CellFormat.DATE_DM => dateTime.ToString("dd-MMM"),
+                CellFormat.DATE_MY => dateTime.ToString("MMM-yyyy"),
+                CellFormat.DATE_DMY => dateTime.ToString("dd-MMM-yyyy"),
+                _ => cellValue
+            };
         }
-        switch (Alignment) {
-            case CellAlignment.LEFT:
-                cellValue = cellValue.PadRight(width);
-                break;
-
-            case CellAlignment.RIGHT:
-                cellValue = cellValue.PadLeft(width);
-                break;
-
-            case CellAlignment.CENTRE:
-                cellValue = Utilities.CentreString(cellValue, width);
-                break;
-
-            case CellAlignment.GENERAL:
-                cellValue = Value.Type switch {
-                    CellType.TEXT => cellValue.PadRight(width),
-                    CellType.NUMBER => cellValue.PadLeft(width),
-                    _ => "".PadRight(width)
-                };
-                break;
+        if (cellValue.Length > width) {
+            cellValue = new string('*', width);
         }
+        cellValue = Alignment switch {
+            CellAlignment.LEFT => cellValue.PadRight(width),
+            CellAlignment.RIGHT => cellValue.PadLeft(width),
+            CellAlignment.CENTRE => Utilities.CentreString(cellValue, width),
+            CellAlignment.GENERAL => Value.Type switch {
+                CellType.TEXT => cellValue.PadRight(width),
+                CellType.NUMBER => cellValue.PadLeft(width),
+                _ => "".PadRight(width)
+            },
+            _ => cellValue
+        };
         Terminal.Write(cellValue);
     }
 

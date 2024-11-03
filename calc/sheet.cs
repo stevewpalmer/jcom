@@ -120,7 +120,7 @@ public class Sheet {
     /// changed.
     /// </summary>
     [JsonIgnore]
-    public bool Modified { get; private set; }
+    public bool Modified { get; set; }
 
     /// <summary>
     /// Is this a new file (i.e. the file has a name but does not
@@ -187,11 +187,8 @@ public class Sheet {
     /// <summary>
     /// Return the height of the specified row
     /// </summary>
-    /// <param name="rowNumber">Row number, 1-based</param>
     /// <returns>Row height</returns>
-    public static int RowHeight(int rowNumber) {
-        return 1;
-    }
+    public static int RowHeight => 1;
 
     /// <summary>
     /// Return the cell at the given column and row.

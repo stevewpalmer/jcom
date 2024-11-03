@@ -51,12 +51,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string GotoPrompt {
-            get {
-                return ResourceManager.GetString("GotoPrompt", resourceCulture);
-            }
-        }
-        
         internal static string GotoRowPrompt {
             get {
                 return ResourceManager.GetString("GotoRowPrompt", resourceCulture);
@@ -66,48 +60,6 @@ namespace JCalc.Resources {
         internal static string Quit {
             get {
                 return ResourceManager.GetString("Quit", resourceCulture);
-            }
-        }
-        
-        internal static string FormatWidthPrompt {
-            get {
-                return ResourceManager.GetString("FormatWidthPrompt", resourceCulture);
-            }
-        }
-        
-        internal static string FormatWidthColumn {
-            get {
-                return ResourceManager.GetString("FormatWidthColumn", resourceCulture);
-            }
-        }
-        
-        internal static string FormatWidthThrough {
-            get {
-                return ResourceManager.GetString("FormatWidthThrough", resourceCulture);
-            }
-        }
-        
-        internal static string FormatDefaultCells {
-            get {
-                return ResourceManager.GetString("FormatDefaultCells", resourceCulture);
-            }
-        }
-        
-        internal static string FormatAlignment {
-            get {
-                return ResourceManager.GetString("FormatAlignment", resourceCulture);
-            }
-        }
-        
-        internal static string FormatCode {
-            get {
-                return ResourceManager.GetString("FormatCode", resourceCulture);
-            }
-        }
-        
-        internal static string FormatDecimals {
-            get {
-                return ResourceManager.GetString("FormatDecimals", resourceCulture);
             }
         }
         
