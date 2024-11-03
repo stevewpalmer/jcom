@@ -46,6 +46,10 @@ public class KeyMap {
     public KeyCommand CommandId { get; init; }
 }
 
+/// <summary>
+/// Response from the PromptCellInput method indication what action
+/// should be taken after.
+/// </summary>
 public enum CellInputResponse {
 
     /// <summary>
@@ -84,6 +88,9 @@ public enum CellInputResponse {
     ACCEPT_RIGHT
 }
 
+/// <summary>
+/// Type of data input in a form field.
+/// </summary>
 public enum FormFieldType {
 
     /// <summary>
@@ -146,11 +153,7 @@ public class CommandBar {
     private ConsoleColor _bgColour;
     private ConsoleColor _fgColour;
     private readonly int _displayWidth;
-    private readonly int _cursorPositionWidth;
-    private readonly int _cellContentPosition;
-    private readonly int _cellContentWidth;
-    private string _cursorPosition;
-    private CellValue _cellValue;
+    private Cell _currentCell;
     private ConsoleKeyInfo? _pushedKey;
 
     /// <summary>
@@ -178,14 +181,10 @@ public class CommandBar {
     /// </summary>
     public CommandBar() {
         _cellStatusRow = 0;
+        _currentCell = new Cell();
         _promptRow = _cellStatusRow + 1;
         _messageRow = _cellStatusRow + 2;
         _displayWidth = Terminal.Width;
-        _cursorPositionWidth = 10;
-        _cursorPosition = string.Empty;
-        _cellValue = new CellValue();
-        _cellContentPosition = _cursorPositionWidth;
-        _cellContentWidth = _displayWidth - _cursorPositionWidth;
     }
 
     /// <summary>
@@ -193,10 +192,8 @@ public class CommandBar {
     /// </summary>
     /// <param name="cell">Cell</param>
     public void UpdateCellStatus(Cell cell) {
-        _cursorPosition = cell.Position;
-        _cellValue = cell.Value;
-        RenderCursorPosition();
-        RenderCellContents();
+        _currentCell = cell;
+        RenderCellStatus();
     }
 
     /// <summary>
@@ -206,7 +203,7 @@ public class CommandBar {
     public void Refresh() {
         _fgColour = Screen.Colours.NormalMessageColour;
         _bgColour = Screen.Colours.BackgroundColour;
-        RenderCursorPosition();
+        RenderCellStatus();
     }
 
     /// <summary>
@@ -528,19 +525,12 @@ public class CommandBar {
     /// <summary>
     /// Show the current selected row and column position
     /// </summary>
-    private void RenderCursorPosition() {
-        Terminal.WriteText(0, _cellStatusRow, _cursorPositionWidth, _cursorPosition, _fgColour, _bgColour);
-    }
-
-    /// <summary>
-    /// Show the active cell contents
-    /// </summary>
-    private void RenderCellContents() {
-        string cellValue = string.Empty;
-        if (_cellValue.Type != CellType.NONE) {
-            cellValue = _cellValue.Type == CellType.TEXT ? $"\"{_cellValue.StringValue}\"" : _cellValue.StringValue;
+    private void RenderCellStatus() {
+        string text = _currentCell.Position + ": ";
+        if (_currentCell.Value.Type != CellType.NONE) {
+            text += _currentCell.Value.Type == CellType.TEXT ? $"\"{_currentCell.Value.StringValue}\"" : _currentCell.Value.StringValue;
         }
-        Terminal.WriteText(_cellContentPosition, _cellStatusRow, _cellContentWidth, cellValue, _fgColour, _bgColour);
+        Terminal.WriteText(0, _cellStatusRow, _displayWidth, text, _fgColour, _bgColour);
     }
 
     /// <summary>
@@ -565,5 +555,13 @@ public class CommandBar {
     /// <param name="keyToPush">Key to push</param>
     private void PushKey(ConsoleKeyInfo keyToPush) {
         _pushedKey = keyToPush;
+    }
+
+    /// <summary>
+    /// Display an error message on the status line.
+    /// </summary>
+    /// <param name="message">Message to display</param>
+    public void Error(string message) {
+        Terminal.WriteText(0, _messageRow, _displayWidth, message, _fgColour, _bgColour);
     }
 }

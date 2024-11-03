@@ -350,5 +350,101 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("WorksheetErase", resourceCulture);
             }
         }
+        
+        internal static string FormatFixed {
+            get {
+                return ResourceManager.GetString("FormatFixed", resourceCulture);
+            }
+        }
+        
+        internal static string FormatScientific {
+            get {
+                return ResourceManager.GetString("FormatScientific", resourceCulture);
+            }
+        }
+        
+        internal static string FormatCurrency {
+            get {
+                return ResourceManager.GetString("FormatCurrency", resourceCulture);
+            }
+        }
+        
+        internal static string FormatCommas {
+            get {
+                return ResourceManager.GetString("FormatCommas", resourceCulture);
+            }
+        }
+        
+        internal static string FormatGeneral {
+            get {
+                return ResourceManager.GetString("FormatGeneral", resourceCulture);
+            }
+        }
+        
+        internal static string FormatBar {
+            get {
+                return ResourceManager.GetString("FormatBar", resourceCulture);
+            }
+        }
+        
+        internal static string FormatPercent {
+            get {
+                return ResourceManager.GetString("FormatPercent", resourceCulture);
+            }
+        }
+        
+        internal static string FormatDate {
+            get {
+                return ResourceManager.GetString("FormatDate", resourceCulture);
+            }
+        }
+        
+        internal static string FormatText {
+            get {
+                return ResourceManager.GetString("FormatText", resourceCulture);
+            }
+        }
+        
+        internal static string FormatReset {
+            get {
+                return ResourceManager.GetString("FormatReset", resourceCulture);
+            }
+        }
+        
+        internal static string DatesDMY {
+            get {
+                return ResourceManager.GetString("DatesDMY", resourceCulture);
+            }
+        }
+        
+        internal static string DatesDM {
+            get {
+                return ResourceManager.GetString("DatesDM", resourceCulture);
+            }
+        }
+        
+        internal static string DatesMY {
+            get {
+                return ResourceManager.GetString("DatesMY", resourceCulture);
+            }
+        }
+        
+        internal static string LabelPrefixLeft {
+            get {
+                return ResourceManager.GetString("LabelPrefixLeft", resourceCulture);
+            }
+        }
+        
+        internal static string LabelPrefixRight {
+            get {
+                return ResourceManager.GetString("LabelPrefixRight", resourceCulture);
+            }
+        }
+        
+        internal static string LabelPrefixCentre {
+            get {
+                return ResourceManager.GetString("LabelPrefixCentre", resourceCulture);
+            }
+        }
     }
 }

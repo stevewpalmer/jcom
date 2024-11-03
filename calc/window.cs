@@ -100,8 +100,12 @@ public class Window {
             KeyCommand.KC_GOTO => GotoRowColumn(),
             KeyCommand.KC_VALUE => InputValue(false),
             KeyCommand.KC_SET_COLUMN_WIDTH => SetColumnWidth(),
-            KeyCommand.KC_RESET_COLUMN_WIDTH => ReetColumnWidth(),
+            KeyCommand.KC_RESET_COLUMN_WIDTH => ResetColumnWidth(),
             KeyCommand.KC_EDIT => InputValue(true),
+            KeyCommand.KC_ALIGN_LEFT => AlignCells(CellAlignment.LEFT),
+            KeyCommand.KC_ALIGN_RIGHT => AlignCells(CellAlignment.RIGHT),
+            KeyCommand.KC_ALIGN_CENTRE => AlignCells(CellAlignment.CENTRE),
+            KeyCommand.KC_FORMAT_FIXED => FormatCells(CellFormat.FIXED),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -188,10 +192,8 @@ public class Window {
             Terminal.SetCursor(_sheetBounds.Left, y);
             Terminal.Write(new string(' ', _sheetBounds.Width));
         }
-        foreach (Cell cell in Sheet.Cells.Values) {
-            if (cell.Row >= _scrollOffset.Y && cell.Column >= _scrollOffset.X) {
-                cell.Draw(Sheet, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
-            }
+        foreach (Cell cell in Sheet.Cells.Values.Where(cell => cell.Row >= _scrollOffset.Y && cell.Column >= _scrollOffset.X)) {
+            cell.Draw(Sheet, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
         }
         PlaceCursor();
         Terminal.SetCursor(cursorPosition.X, cursorPosition.Y);
@@ -253,6 +255,31 @@ public class Window {
     }
 
     /// <summary>
+    /// Align a range of cells
+    /// </summary>
+    /// <param name="alignment">Requested alignment</param>
+    /// <returns>Render hint</returns>
+    private RenderHint AlignCells(CellAlignment alignment) {
+        RenderHint flags = RenderHint.NONE;
+        ActiveCell.Alignment = alignment;
+        PlaceCursor();
+        return flags;
+    }
+
+
+    /// <summary>
+    /// Format a range of cells
+    /// </summary>
+    /// <param name="format">Requested format</param>
+    /// <returns>Render hint</returns>
+    private RenderHint FormatCells(CellFormat format) {
+        RenderHint flags = RenderHint.NONE;
+        ActiveCell.Format = format;
+        PlaceCursor();
+        return flags;
+    }
+
+    /// <summary>
     /// Handle the format width command to set column widths
     /// </summary>
     /// <returns>Render hint</returns>
@@ -277,7 +304,7 @@ public class Window {
     /// Reset the current column width to the global default.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint ReetColumnWidth() {
+    private RenderHint ResetColumnWidth() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.SetColumnWidth(Sheet.Column, Consts.DefaultColumnWidth)) {
             flags = RenderHint.REFRESH;

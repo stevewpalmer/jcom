@@ -171,4 +171,52 @@
     <data name="WorksheetErase" xml:space="preserve">
         <value>Erase</value>
     </data>
+    <data name="FormatFixed" xml:space="preserve">
+        <value>Fixed</value>
+    </data>
+    <data name="FormatScientific" xml:space="preserve">
+        <value>Scientific</value>
+    </data>
+    <data name="FormatCurrency" xml:space="preserve">
+        <value>Currency</value>
+    </data>
+    <data name="FormatCommas" xml:space="preserve">
+        <value>,</value>
+    </data>
+    <data name="FormatGeneral" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="FormatBar" xml:space="preserve">
+        <value>+/-</value>
+    </data>
+    <data name="FormatPercent" xml:space="preserve">
+        <value>Percent</value>
+    </data>
+    <data name="FormatDate" xml:space="preserve">
+        <value>Date</value>
+    </data>
+    <data name="FormatText" xml:space="preserve">
+        <value>Text</value>
+    </data>
+    <data name="FormatReset" xml:space="preserve">
+        <value>Reset</value>
+    </data>
+    <data name="DatesDMY" xml:space="preserve">
+        <value>1 (DD-MMM-YY)</value>
+    </data>
+    <data name="DatesDM" xml:space="preserve">
+        <value>2 (DD-MMM)</value>
+    </data>
+    <data name="DatesMY" xml:space="preserve">
+        <value>3 (MMM-YY)</value>
+    </data>
+    <data name="LabelPrefixLeft" xml:space="preserve">
+        <value>Left</value>
+    </data>
+    <data name="LabelPrefixRight" xml:space="preserve">
+        <value>Right</value>
+    </data>
+    <data name="LabelPrefixCentre" xml:space="preserve">
+        <value>Centre</value>
+    </data>
 </root>

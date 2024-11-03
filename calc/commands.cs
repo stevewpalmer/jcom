@@ -37,7 +37,10 @@ public enum CommandMapID {
     RANGE,
     FILE,
     DATA,
-    COLUMN_WIDTH
+    COLUMN_WIDTH,
+    DATES,
+    FORMAT,
+    LABELPREFIX
 }
 
 /// <summary>
@@ -63,7 +66,7 @@ public class CommandMapEntry {
     /// <summary>
     /// Description of command
     /// </summary>
-    public string Description { get; set; } = "";
+    public string Description { get; init; } = "";
 }
 
 /// <summary>
@@ -125,14 +128,45 @@ public static class Commands {
         new() {
             ID = CommandMapID.RANGE,
             Commands = [
-                new CommandMapEntry { Name = Calc.RangeFormat, CommandId = KeyCommand.KC_FORMAT },
-                new CommandMapEntry { Name = Calc.RangeLabelPrefix, CommandId = KeyCommand.KC_LABEL_PREFIX },
+                new CommandMapEntry { Name = Calc.RangeFormat, SubCommandId = CommandMapID.FORMAT, Description = "Format a cell or range of cells" },
+                new CommandMapEntry { Name = Calc.RangeLabelPrefix, SubCommandId = CommandMapID.LABELPREFIX, Description = "Align a label or range of labels (Left, Right or Centre)" },
                 new CommandMapEntry { Name = Calc.RangeErase, CommandId = KeyCommand.KC_ERASE },
                 new CommandMapEntry { Name = Calc.RangeName, CommandId = KeyCommand.KC_NAME },
                 new CommandMapEntry { Name = Calc.RangeJustify, CommandId = KeyCommand.KC_JUSTIFY },
                 new CommandMapEntry { Name = Calc.RangeProtect, CommandId = KeyCommand.KC_PROTECT },
                 new CommandMapEntry { Name = Calc.RangeUnprotect, CommandId = KeyCommand.KC_UNPROTECT },
                 new CommandMapEntry { Name = Calc.RangeInput, CommandId = KeyCommand.KC_INPUT }
+            ]
+        },
+        new () {
+            ID = CommandMapID.FORMAT,
+            Commands = [
+                new CommandMapEntry { Name = Calc.FormatFixed, CommandId = KeyCommand.KC_FORMAT_FIXED, Description = "Fixed number of decimal places (x.xx)" },
+                new CommandMapEntry { Name = Calc.FormatScientific, CommandId = KeyCommand.KC_FORMAT_SCI, Description = "Exponential format (x.xxE+xx)" },
+                new CommandMapEntry { Name = Calc.FormatCurrency, CommandId = KeyCommand.KC_FORMAT_CURRENCY, Description = "Currency format (£x,xxx.xx)" },
+                new CommandMapEntry { Name = Calc.FormatCommas, CommandId = KeyCommand.KC_FORMAT_COMMAS, Description = "Commas inserted; negative values parenthised (x,xxx.xx)" },
+                new CommandMapEntry { Name = Calc.FormatGeneral, CommandId = KeyCommand.KC_FORMAT_GENERAL, Description = "Standard format (x.xx or x.xxExx)" },
+                new CommandMapEntry { Name = Calc.FormatBar, CommandId = KeyCommand.KC_FORMAT_BAR, Description = "Horizontal bar graph format (+++ or ---)" },
+                new CommandMapEntry { Name = Calc.FormatPercent, CommandId = KeyCommand.KC_FORMAT_PERCENT, Description = "Percent format (x.xx%)" },
+                new CommandMapEntry { Name = Calc.FormatDate, SubCommandId = CommandMapID.DATES, Description = "Date formats" },
+                new CommandMapEntry { Name = Calc.FormatText, CommandId = KeyCommand.KC_FORMAT_TEXT, Description = "Display formula instead of value" },
+                new CommandMapEntry { Name = Calc.FormatReset, CommandId = KeyCommand.KC_FORMAT_RESET, Description = "Use global format" }
+            ]
+        },
+        new () {
+            ID = CommandMapID.LABELPREFIX,
+            Commands = [
+                new CommandMapEntry { Name = Calc.LabelPrefixLeft, CommandId = KeyCommand.KC_ALIGN_LEFT, Description = "Align labels with left edges of cells" },
+                new CommandMapEntry { Name = Calc.LabelPrefixRight, CommandId = KeyCommand.KC_ALIGN_RIGHT, Description = "Align labels with right edges of cells" },
+                new CommandMapEntry { Name = Calc.LabelPrefixCentre, CommandId = KeyCommand.KC_ALIGN_CENTRE, Description = "Centre labels in cells" }
+            ]
+        },
+        new () {
+            ID = CommandMapID.DATES,
+            Commands = [
+                new CommandMapEntry { Name = Calc.DatesDMY, CommandId = KeyCommand.KC_DATE_DMY, Description = "Day-Month-Year" },
+                new CommandMapEntry { Name = Calc.DatesDM, CommandId = KeyCommand.KC_DATE_DM, Description = "Day-Month" },
+                new CommandMapEntry { Name = Calc.DatesMY, CommandId = KeyCommand.KC_DATE_MY, Description = "Month-Year" }
             ]
         },
         new() {

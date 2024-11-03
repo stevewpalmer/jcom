@@ -55,6 +55,11 @@ public class Cell {
     public string Position => $"{ColumnNumber(Column)}{Row}";
 
     /// <summary>
+    /// Cell format
+    /// </summary>
+    public CellFormat Format { get; set; }
+
+    /// <summary>
     /// Parse a position and return the column and row that
     /// corresponds to that position, or (0,0) if the position
     /// cannot be parsed.
@@ -87,13 +92,21 @@ public class Cell {
         Terminal.SetCursor(x, y);
         int width = sheet.ColumnWidth(Column);
         string cellValue = Utilities.SpanBound(Value.StringValue, 0, width);
+        bool isNumber = double.TryParse(cellValue, out double doubleValue);
+        switch (Format) {
+            case CellFormat.FIXED:
+                if (isNumber) {
+                    cellValue = doubleValue.ToString("F2");
+                }
+                break;
+        }
         switch (Alignment) {
             case CellAlignment.LEFT:
-                cellValue = cellValue.PadLeft(width);
+                cellValue = cellValue.PadRight(width);
                 break;
 
             case CellAlignment.RIGHT:
-                cellValue = cellValue.PadRight(width);
+                cellValue = cellValue.PadLeft(width);
                 break;
 
             case CellAlignment.CENTRE:

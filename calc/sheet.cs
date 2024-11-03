@@ -73,11 +73,13 @@ public class Sheet {
     /// <summary>
     /// The current selected row, 1 offset
     /// </summary>
+    [JsonInclude]
     public int Row { get; set; } = 1;
 
     /// <summary>
     /// The current selected column, 1 offset
     /// </summary>
+    [JsonInclude]
     public int Column { get; set; } = 1;
 
     /// <summary>
@@ -89,11 +91,13 @@ public class Sheet {
     /// <summary>
     /// Cells
     /// </summary>
+    [JsonInclude]
     public Dictionary<int, Cell> Cells { get; set; } = new();
 
     /// <summary>
     /// Column widths
     /// </summary>
+    [JsonInclude]
     public Dictionary<int, int> ColumnWidths { get; set; } = new();
 
     /// <summary>
@@ -140,7 +144,8 @@ public class Sheet {
                 WriteIndented = true
             });
         }
-        catch (Exception) {
+        catch (Exception e) {
+            Screen.Command.Error($"Cannot save {Filename} - {e.Message}");
         }
 
         Modified = false;
