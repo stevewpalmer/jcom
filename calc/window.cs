@@ -69,7 +69,7 @@ public class Window {
     /// <param name="height">Height of window</param>
     public void SetViewportBounds(int x, int y, int width, int height) {
         _viewportBounds = new Rectangle(x, y, width, height);
-        _sheetBounds = new Rectangle(5, 1, width - 5, height - 5);
+        _sheetBounds = new Rectangle(x + 5, y + CommandBar.Height + 1, width - 5, height - (CommandBar.Height + 1 + StatusBar.Height));
     }
 
     /// <summary>
@@ -78,6 +78,7 @@ public class Window {
     /// and column width.
     /// </summary>
     public void Refresh() {
+        Screen.UpdateCursorPosition();
         RenderFrame();
         Render();
     }
@@ -96,11 +97,11 @@ public class Window {
             KeyCommand.KC_HOME => CursorHome(),
             KeyCommand.KC_PAGEUP => CursorPageUp(),
             KeyCommand.KC_PAGEDOWN => CursorPageDown(),
-            KeyCommand.KC_GOTO_ROWCOL => GotoRowColumn(),
-            KeyCommand.KC_ALPHA => InputAlpha(),
-            KeyCommand.KC_VALUE => InputValue(),
-            KeyCommand.KC_FORMAT_WIDTH => FormatWidth(),
-            KeyCommand.KC_FORMAT_DEFAULT => FormatDefaults(),
+            KeyCommand.KC_GOTO => GotoRowColumn(),
+            KeyCommand.KC_VALUE => InputValue(false),
+            KeyCommand.KC_SET_COLUMN_WIDTH => SetColumnWidth(),
+            KeyCommand.KC_RESET_COLUMN_WIDTH => ReetColumnWidth(),
+            KeyCommand.KC_EDIT => InputValue(true),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -134,20 +135,19 @@ public class Window {
     /// scroll offset.
     /// </summary>
     private void RenderFrame() {
-
         Rectangle frameRect = _viewportBounds;
 
-        // Sheet number
-        Terminal.SetCursor(frameRect.Left, frameRect.Top);
         Terminal.ForegroundColour = Screen.Colours.BackgroundColour;
         Terminal.BackgroundColour = Screen.Colours.ForegroundColour;
-        Terminal.Write($@"#{Sheet.SheetNumber}");
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
+
+        // Sheet number
+        int x = _sheetBounds.X;
+        int y = frameRect.Top + CommandBar.Height;
+        Terminal.SetCursor(0, y);
+        Terminal.Write($@"  {(char)(Sheet.SheetNumber + 'A' - 1)}  ");
 
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;
-        int x = _sheetBounds.X;
         _numberOfColumns = 0;
         while (x < frameRect.Right && columnNumber <= Consts.MaxColumns) {
             int width = Sheet.ColumnWidth(columnNumber);
@@ -155,21 +155,23 @@ public class Window {
             if (space == width) {
                 ++_numberOfColumns;
             }
-            Terminal.SetCursor(x, frameRect.Top);
-            Terminal.Write(Utilities.CentreString(columnNumber.ToString(), width)[..space]);
+            Terminal.SetCursor(x, y);
+            Terminal.Write(Utilities.CentreString(Cell.ColumnNumber(columnNumber), width)[..space]);
             x += width;
             columnNumber++;
         }
 
         // Row numbers
         int rowNumber = 1 + _scrollOffset.Y;
-        int y = _sheetBounds.Y;
-        while (y < frameRect.Bottom - CommandBar.Height && rowNumber <= Consts.MaxRows) {
+        y = frameRect.Top + CommandBar.Height + 1;
+        while (y < _sheetBounds.Bottom && rowNumber <= Consts.MaxRows) {
             Terminal.SetCursor(frameRect.Left, y);
-            Terminal.Write(rowNumber.ToString().PadLeft(4));
+            Terminal.Write($" {rowNumber.ToString(),-3} ");
             y += 1;
             rowNumber++;
         }
+        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
     }
 
     /// <summary>
@@ -181,6 +183,7 @@ public class Window {
     /// </summary>
     private void Render() {
         Point cursorPosition = Terminal.GetCursor();
+
         for (int y = _sheetBounds.Top; y < _sheetBounds.Bottom; ++y) {
             Terminal.SetCursor(_sheetBounds.Left, y);
             Terminal.Write(new string(' ', _sheetBounds.Width));
@@ -253,144 +256,56 @@ public class Window {
     /// Handle the format width command to set column widths
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint FormatWidth() {
-        RenderHint flags = RenderHint.NONE;
+    private RenderHint SetColumnWidth() {
+        RenderHint flags = RenderHint.CANCEL;
         FormField[] formFields = [
             new() {
-                Type = FormFieldType.NUMBER_OR_DEFAULT,
+                Text = Calc.EnterColumnWidth,
+                Type = FormFieldType.NUMBER,
                 Width = 2,
-                Default = Consts.DefaultColumnWidth,
-                Value = new Variant("d")
-            },
-            new() {
-                Text = Calc.FormatWidthColumn,
-                Type = FormFieldType.NUMBER,
-                Width = 3,
-                Value = new Variant(Sheet.Column)
-            },
-            new() {
-                Text = Calc.FormatWidthThrough,
-                Type = FormFieldType.NUMBER,
-                Width = 3,
-                Value = new Variant(Sheet.Column)
+                Value = new Variant(Sheet.ColumnWidth(Sheet.Column))
             }
         ];
-        if (Screen.Command.PromptForInput(Calc.FormatWidthPrompt, formFields)) {
+        if (Screen.Command.PromptForInput(formFields)) {
             int newWidth = formFields[0].Value.IntValue;
-            int startColumn = formFields[1].Value.IntValue;
-            int endColumn = formFields[2].Value.IntValue;
-            while (startColumn <= endColumn) {
-                Sheet.SetColumnWidth(startColumn++, newWidth);
-            }
-            flags = RenderHint.REFRESH;
+            flags = Sheet.SetColumnWidth(Sheet.Column, newWidth) ? RenderHint.REFRESH : RenderHint.NONE;
         }
         return flags;
     }
 
     /// <summary>
-    /// Set the default cell formatting.
+    /// Reset the current column width to the global default.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint FormatDefaults() {
+    private RenderHint ReetColumnWidth() {
         RenderHint flags = RenderHint.NONE;
-        FormField[] formFields = [
-            new() {
-                Text = Calc.FormatAlignment,
-                Type = FormFieldType.PICKER,
-                PickerList = new Dictionary<int, string> {
-                    { (int)CellAlignment.CENTRE, "Ctr" },
-                    { (int)CellAlignment.GENERAL, "Gen" },
-                    { (int)CellAlignment.LEFT, "Left" },
-                    { (int)CellAlignment.RIGHT, "Right" }
-                },
-                Value = new Variant((int)Screen.Config.DefaultCellAlignment)
-            },
-            new() {
-                Text = Calc.FormatCode,
-                Type = FormFieldType.PICKER,
-                PickerList = new Dictionary<int, string> {
-                    { (int)CellFormat.CONTINUOUS, "Cont" },
-                    { (int)CellFormat.EXPONENTIAL, "Exp" },
-                    { (int)CellFormat.FIXED, "Fix" },
-                    { (int)CellFormat.GENERAL, "Gen" },
-                    { (int)CellFormat.INTEGER, "Int" },
-                    { (int)CellFormat.CURRENCY, "$" },
-                    { (int)CellFormat.BAR, "*" },
-                    { (int)CellFormat.PERCENT, "%" }
-                },
-                Value = new Variant((int)Screen.Config.DefaultCellFormat)
-            },
-            new() {
-                Text = Calc.FormatDecimals,
-                Type = FormFieldType.NUMBER,
-                Width = 1,
-                Value = new Variant(Screen.Config.DefaultDecimals)
-            }
-        ];
-        if (Screen.Command.PromptForInput(Calc.FormatDefaultCells, formFields)) {
-            CellAlignment alignment = (CellAlignment)formFields[0].Value.IntValue;
-            CellFormat format = (CellFormat)formFields[1].Value.IntValue;
-            int decimals = formFields[2].Value.IntValue;
-            Screen.Config.DefaultCellAlignment = alignment;
-            Screen.Config.DefaultDecimals = decimals;
-            Screen.Config.DefaultCellFormat = format;
+        if (Sheet.SetColumnWidth(Sheet.Column, Consts.DefaultColumnWidth)) {
             flags = RenderHint.REFRESH;
         }
         return flags;
-    }
-
-    /// <summary>
-    /// Input alpha text into a cell
-    /// </summary>
-    /// <returns>Render hint</returns>
-    private RenderHint InputAlpha() {
-        return InputAlphaOrValue(CellInputFlags.ALPHA);
     }
 
     /// <summary>
     /// Input value text into a cell
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint InputValue() {
-        return InputAlphaOrValue(CellInputFlags.VALUE);
-    }
-
-    /// <summary>
-    /// Input alpha or value text into a cell depending on parameter.
-    /// </summary>
-    /// <param name="flags">Input flags</param>
-    /// <returns>Render hint</returns>
-    private RenderHint InputAlphaOrValue(CellInputFlags flags) {
+    private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
-        do {
-            Cell cell = Sheet.Cell(Sheet.Column, Sheet.Row, true);
-            CellValue value = cell.Value;
-            CellInputResponse result = Screen.Command.PromptForCellInput(flags, ref value);
-            if (result == CellInputResponse.CANCEL) {
-                break;
-            }
+        Cell cell = Sheet.Cell(Sheet.Column, Sheet.Row, true);
+        CellValue value = editValue ? cell.Value : new CellValue();
+        CellInputResponse result = Screen.Command.PromptForCellInput(ref value);
+        if (result != CellInputResponse.CANCEL) {
             cell.Value = value;
             cell.Draw(Sheet, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
-            if (result == CellInputResponse.ACCEPT) {
-                hint = RenderHint.CURSOR_STATUS;
-                break;
-            }
-            switch (result) {
-                case CellInputResponse.ACCEPT_UP:
-                    ApplyRenderHint(CursorUp());
-                    break;
-                case CellInputResponse.ACCEPT_DOWN:
-                    ApplyRenderHint(CursorDown());
-                    break;
-                case CellInputResponse.ACCEPT_LEFT:
-                    ApplyRenderHint(CursorLeft());
-                    break;
-                case CellInputResponse.ACCEPT_RIGHT:
-                    ApplyRenderHint(CursorRight());
-                    break;
-            }
-            flags = CellInputFlags.ALPHAVALUE;
-        } while (true);
+            hint = result switch {
+                CellInputResponse.ACCEPT => RenderHint.CURSOR_STATUS,
+                CellInputResponse.ACCEPT_UP => CursorUp(),
+                CellInputResponse.ACCEPT_DOWN => CursorDown(),
+                CellInputResponse.ACCEPT_LEFT => CursorLeft(),
+                CellInputResponse.ACCEPT_RIGHT => CursorRight(),
+                _ => hint
+            };
+        }
         return hint;
     }
 
@@ -566,29 +481,26 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint GotoRowColumn() {
-        RenderHint flags = RenderHint.NONE;
+        RenderHint flags = RenderHint.CANCEL;
         FormField[] formFields = [
             new() {
                 Text = Calc.GotoRowPrompt,
-                Type = FormFieldType.NUMBER,
-                Width = 4,
-                Value = new Variant(Sheet.Row)
-            },
-            new() {
-                Text = Calc.GotoColumnPrompt,
-                Type = FormFieldType.NUMBER,
-                Width = 3,
-                Value = new Variant(Sheet.Column)
+                Type = FormFieldType.TEXT,
+                Width = 7,
+                Value = new Variant(ActiveCell.Position)
             }
         ];
-        if (Screen.Command.PromptForInput(Calc.GotoPrompt, formFields)) {
-            int newRow = formFields[0].Value.IntValue;
-            int newColumn = formFields[1].Value.IntValue;
+        if (Screen.Command.PromptForInput(formFields)) {
+            string newAddress = formFields[0].Value.StringValue;
+            (int newColumn, int newRow) = Cell.ColumnAndRowFromPosition(newAddress);
             if (newRow is >= 1 and <= Consts.MaxRows && newColumn is >= 1 and <= Consts.MaxColumns) {
                 ResetCursor();
                 Sheet.Row = newRow;
                 Sheet.Column = newColumn;
                 flags = SyncRowColumnToSheet();
+            }
+            else {
+                flags |= RenderHint.NONE;
             }
         }
         return flags;

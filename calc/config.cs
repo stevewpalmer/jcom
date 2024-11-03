@@ -75,11 +75,6 @@ public class Config {
     public string ForegroundColour { get; set; } = "";
 
     /// <summary>
-    /// Title of selected window colour
-    /// </summary>
-    public string SelectedTitleColour { get; set; } = "";
-
-    /// <summary>
     /// Normal status bar message colour
     /// </summary>
     public string NormalMessageColour { get; set; } = "";

@@ -162,16 +162,21 @@ public class Sheet {
     /// </summary>
     /// <param name="columnNumber">Column number, 1-based</param>
     /// <param name="width">New width</param>
-    public void SetColumnWidth(int columnNumber, int width) {
+    public bool SetColumnWidth(int columnNumber, int width) {
         Debug.Assert(columnNumber is >= 1 and <= Consts.MaxColumns);
         Debug.Assert(width is >= 0 and <= 100);
-        if (width == Consts.DefaultColumnWidth) {
-            ColumnWidths.Remove(columnNumber);
+        bool success = false;
+        if (ColumnWidth(columnNumber) != width) {
+            if (width == Consts.DefaultColumnWidth) {
+                ColumnWidths.Remove(columnNumber);
+            }
+            else {
+                ColumnWidths[columnNumber] = width;
+            }
+            Modified = true;
+            success = true;
         }
-        else {
-            ColumnWidths[columnNumber] = width;
-        }
-        Modified = true;
+        return success;
     }
 
     /// <summary>

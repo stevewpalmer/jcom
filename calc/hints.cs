@@ -56,5 +56,10 @@ public enum RenderHint {
     /// <summary>
     /// Refresh the entire screen
     /// </summary>
-    REFRESH = 32
+    REFRESH = 32,
+
+    /// <summary>
+    /// User cancelled command
+    /// </summary>
+    CANCEL = 64
 }

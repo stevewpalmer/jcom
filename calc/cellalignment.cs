@@ -25,15 +25,25 @@
 
 namespace JCalc;
 
-public class CellValue {
+public enum CellAlignment {
 
     /// <summary>
-    /// Cell type
+    /// Numbers right aligned, text left aligned
     /// </summary>
-    public CellType Type { get; set; }
+    GENERAL,
 
     /// <summary>
-    /// String representation of content
+    /// Left alignment
     /// </summary>
-    public string StringValue { get; set; } = string.Empty;
+    LEFT,
+
+    /// <summary>
+    /// Right alignment
+    /// </summary>
+    RIGHT,
+
+    /// <summary>
+    /// Centered
+    /// </summary>
+    CENTRE
 }

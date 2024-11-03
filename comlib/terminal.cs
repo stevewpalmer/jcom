@@ -134,6 +134,22 @@ public static class Terminal {
     }
 
     /// <summary>
+    /// Write text to the command bar in the specified colour ensuring that the given text fits
+    /// within the specified width.
+    /// </summary>
+    /// <param name="x">Zero based column of output</param>
+    /// <param name="y">Zero based line of output</param>
+    /// <param name="width">Width of area to write to</param>
+    /// <param name="str">String to output</param>
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="bg">Background colour</param>
+    public static void WriteText(int x, int y, int width, string str, ConsoleColor fg, ConsoleColor bg) {
+        Point saved = GetCursor();
+        Write(x, y, width, bg, fg, Utilities.SpanBound(str, 0, width));
+        SetCursor(saved);
+    }
+
+    /// <summary>
     /// Write the specified text at the current cursor position
     /// </summary>
     /// <param name="str">String to output</param>

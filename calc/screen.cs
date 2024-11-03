@@ -48,6 +48,11 @@ public static class Screen {
     public static CommandBar Command { get; } = new();
 
     /// <summary>
+    /// The status bar
+    /// </summary>
+    public static StatusBar Status { get; } = new();
+
+    /// <summary>
     /// Open the main window.
     /// </summary>
     public static void Open() {
@@ -57,6 +62,7 @@ public static class Screen {
         Colours = new Colours(Config);
 
         Command.Refresh();
+        Status.Refresh();
     }
 
     /// <summary>
@@ -113,14 +119,13 @@ public static class Screen {
     /// </summary>
     /// <param name="command">Editing command</param>
     /// <returns>Render hint</returns>
-    private static RenderHint HandleCommand(KeyCommand command) {
+    public static RenderHint HandleCommand(KeyCommand command) {
         if (_activeWindow == null) {
             throw new InvalidOperationException();
         }
         RenderHint flags = command switch {
+            KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
             KeyCommand.KC_QUIT => Exit(true),
-            KeyCommand.KC_GOTO => GotoCommand(),
-            KeyCommand.KC_FORMAT => FormatCommand(),
             _ => _activeWindow.HandleCommand(command)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
@@ -136,21 +141,11 @@ public static class Screen {
     }
 
     /// <summary>
-    /// Handle the Goto command
+    /// Show the command bar.
     /// </summary>
     /// <returns>Render hint</returns>
-    private static RenderHint GotoCommand() {
-        Command.SetActiveCommandMap(CommandMapID.GOTO);
-        return RenderHint.NONE;
-    }
-
-    /// <summary>
-    /// Handle the Format command
-    /// </summary>
-    /// <returns>Render hint</returns>
-    private static RenderHint FormatCommand() {
-        Command.SetActiveCommandMap(CommandMapID.FORMAT);
-        return RenderHint.NONE;
+    private static RenderHint HandleCommandBar() {
+        return Command.PromptForCommand(CommandMapID.MAIN);
     }
 
     /// <summary>
@@ -167,7 +162,7 @@ public static class Screen {
         if (prompt) {
             if (modifiedSheets.Length != 0) {
                 char[] validInput = ['y', 'n'];
-                if (!Command.Prompt(Calc.Quit, Calc.QuitPrompt, validInput, out char inputChar)) {
+                if (!Command.Prompt(Calc.QuitPrompt, validInput, out char inputChar)) {
                     flags = RenderHint.NONE;
                 }
                 else {

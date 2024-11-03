@@ -25,15 +25,20 @@
 
 namespace JCalc;
 
-public class CellValue {
+public enum CellType {
 
     /// <summary>
-    /// Cell type
+    /// Empty cell
     /// </summary>
-    public CellType Type { get; set; }
+    NONE,
 
     /// <summary>
-    /// String representation of content
+    /// Number
     /// </summary>
-    public string StringValue { get; set; } = string.Empty;
+    NUMBER,
+
+    /// <summary>
+    /// Text
+    /// </summary>
+    TEXT
 }

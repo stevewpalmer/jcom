@@ -45,27 +45,9 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string NewFileWarning {
-            get {
-                return ResourceManager.GetString("NewFileWarning", resourceCulture);
-            }
-        }
-        
-        internal static string NewFile {
-            get {
-                return ResourceManager.GetString("NewFile", resourceCulture);
-            }
-        }
-        
         internal static string QuitPrompt {
             get {
                 return ResourceManager.GetString("QuitPrompt", resourceCulture);
-            }
-        }
-        
-        internal static string SelectOptionPrompt {
-            get {
-                return ResourceManager.GetString("SelectOptionPrompt", resourceCulture);
             }
         }
         
@@ -81,111 +63,9 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string GotoColumnPrompt {
-            get {
-                return ResourceManager.GetString("GotoColumnPrompt", resourceCulture);
-            }
-        }
-        
-        internal static string EnterNumber {
-            get {
-                return ResourceManager.GetString("EnterNumber", resourceCulture);
-            }
-        }
-        
-        internal static string GotoMacro {
-            get {
-                return ResourceManager.GetString("GotoMacro", resourceCulture);
-            }
-        }
-        
-        internal static string GotoName {
-            get {
-                return ResourceManager.GetString("GotoName", resourceCulture);
-            }
-        }
-        
-        internal static string GotoRowCol {
-            get {
-                return ResourceManager.GetString("GotoRowCol", resourceCulture);
-            }
-        }
-        
-        internal static string GotoWindow {
-            get {
-                return ResourceManager.GetString("GotoWindow", resourceCulture);
-            }
-        }
-        
-        internal static string NotAValidOption {
-            get {
-                return ResourceManager.GetString("NotAValidOption", resourceCulture);
-            }
-        }
-        
-        internal static string Alpha {
-            get {
-                return ResourceManager.GetString("Alpha", resourceCulture);
-            }
-        }
-        
-        internal static string Value {
-            get {
-                return ResourceManager.GetString("Value", resourceCulture);
-            }
-        }
-        
-        internal static string AlphaValue {
-            get {
-                return ResourceManager.GetString("AlphaValue", resourceCulture);
-            }
-        }
-        
-        internal static string EnterText {
-            get {
-                return ResourceManager.GetString("EnterText", resourceCulture);
-            }
-        }
-        
-        internal static string EnterTextOrValue {
-            get {
-                return ResourceManager.GetString("EnterTextOrValue", resourceCulture);
-            }
-        }
-        
         internal static string Quit {
             get {
                 return ResourceManager.GetString("Quit", resourceCulture);
-            }
-        }
-        
-        internal static string FormatCells {
-            get {
-                return ResourceManager.GetString("FormatCells", resourceCulture);
-            }
-        }
-        
-        internal static string FormatDefault {
-            get {
-                return ResourceManager.GetString("FormatDefault", resourceCulture);
-            }
-        }
-        
-        internal static string FormatOptions {
-            get {
-                return ResourceManager.GetString("FormatOptions", resourceCulture);
-            }
-        }
-        
-        internal static string FormatWidth {
-            get {
-                return ResourceManager.GetString("FormatWidth", resourceCulture);
-            }
-        }
-        
-        internal static string CmdbarFilename {
-            get {
-                return ResourceManager.GetString("CmdbarFilename", resourceCulture);
             }
         }
         
@@ -228,6 +108,246 @@ namespace JCalc.Resources {
         internal static string FormatDecimals {
             get {
                 return ResourceManager.GetString("FormatDecimals", resourceCulture);
+            }
+        }
+        
+        internal static string EnterColumnWidth {
+            get {
+                return ResourceManager.GetString("EnterColumnWidth", resourceCulture);
+            }
+        }
+        
+        internal static string Worksheet {
+            get {
+                return ResourceManager.GetString("Worksheet", resourceCulture);
+            }
+        }
+        
+        internal static string Range {
+            get {
+                return ResourceManager.GetString("Range", resourceCulture);
+            }
+        }
+        
+        internal static string Copy {
+            get {
+                return ResourceManager.GetString("Copy", resourceCulture);
+            }
+        }
+        
+        internal static string Move {
+            get {
+                return ResourceManager.GetString("Move", resourceCulture);
+            }
+        }
+        
+        internal static string File {
+            get {
+                return ResourceManager.GetString("File", resourceCulture);
+            }
+        }
+        
+        internal static string Print {
+            get {
+                return ResourceManager.GetString("Print", resourceCulture);
+            }
+        }
+        
+        internal static string Graph {
+            get {
+                return ResourceManager.GetString("Graph", resourceCulture);
+            }
+        }
+        
+        internal static string Data {
+            get {
+                return ResourceManager.GetString("Data", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetGlobal {
+            get {
+                return ResourceManager.GetString("WorksheetGlobal", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetInsert {
+            get {
+                return ResourceManager.GetString("WorksheetInsert", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetDelete {
+            get {
+                return ResourceManager.GetString("WorksheetDelete", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetColumnWidth {
+            get {
+                return ResourceManager.GetString("WorksheetColumnWidth", resourceCulture);
+            }
+        }
+        
+        internal static string RangeErase {
+            get {
+                return ResourceManager.GetString("RangeErase", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetTitles {
+            get {
+                return ResourceManager.GetString("WorksheetTitles", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetWindow {
+            get {
+                return ResourceManager.GetString("WorksheetWindow", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetStatus {
+            get {
+                return ResourceManager.GetString("WorksheetStatus", resourceCulture);
+            }
+        }
+        
+        internal static string RangeFormat {
+            get {
+                return ResourceManager.GetString("RangeFormat", resourceCulture);
+            }
+        }
+        
+        internal static string RangeLabelPrefix {
+            get {
+                return ResourceManager.GetString("RangeLabelPrefix", resourceCulture);
+            }
+        }
+        
+        internal static string RangeName {
+            get {
+                return ResourceManager.GetString("RangeName", resourceCulture);
+            }
+        }
+        
+        internal static string RangeJustify {
+            get {
+                return ResourceManager.GetString("RangeJustify", resourceCulture);
+            }
+        }
+        
+        internal static string RangeProtect {
+            get {
+                return ResourceManager.GetString("RangeProtect", resourceCulture);
+            }
+        }
+        
+        internal static string RangeUnprotect {
+            get {
+                return ResourceManager.GetString("RangeUnprotect", resourceCulture);
+            }
+        }
+        
+        internal static string RangeInput {
+            get {
+                return ResourceManager.GetString("RangeInput", resourceCulture);
+            }
+        }
+        
+        internal static string FileRetrieve {
+            get {
+                return ResourceManager.GetString("FileRetrieve", resourceCulture);
+            }
+        }
+        
+        internal static string FileSave {
+            get {
+                return ResourceManager.GetString("FileSave", resourceCulture);
+            }
+        }
+        
+        internal static string FileCombine {
+            get {
+                return ResourceManager.GetString("FileCombine", resourceCulture);
+            }
+        }
+        
+        internal static string FileXtract {
+            get {
+                return ResourceManager.GetString("FileXtract", resourceCulture);
+            }
+        }
+        
+        internal static string FileErase {
+            get {
+                return ResourceManager.GetString("FileErase", resourceCulture);
+            }
+        }
+        
+        internal static string FileList {
+            get {
+                return ResourceManager.GetString("FileList", resourceCulture);
+            }
+        }
+        
+        internal static string Fileimport {
+            get {
+                return ResourceManager.GetString("Fileimport", resourceCulture);
+            }
+        }
+        
+        internal static string FileDirectory {
+            get {
+                return ResourceManager.GetString("FileDirectory", resourceCulture);
+            }
+        }
+        
+        internal static string DataFill {
+            get {
+                return ResourceManager.GetString("DataFill", resourceCulture);
+            }
+        }
+        
+        internal static string DataTable {
+            get {
+                return ResourceManager.GetString("DataTable", resourceCulture);
+            }
+        }
+        
+        internal static string DataSort {
+            get {
+                return ResourceManager.GetString("DataSort", resourceCulture);
+            }
+        }
+        
+        internal static string DataQuery {
+            get {
+                return ResourceManager.GetString("DataQuery", resourceCulture);
+            }
+        }
+        
+        internal static string DataDistribution {
+            get {
+                return ResourceManager.GetString("DataDistribution", resourceCulture);
+            }
+        }
+        
+        internal static string ColumnWidthSet {
+            get {
+                return ResourceManager.GetString("ColumnWidthSet", resourceCulture);
+            }
+        }
+        
+        internal static string ColumnWidthReset {
+            get {
+                return ResourceManager.GetString("ColumnWidthReset", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetErase {
+            get {
+                return ResourceManager.GetString("WorksheetErase", resourceCulture);
             }
         }
     }

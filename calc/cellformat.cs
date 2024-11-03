@@ -25,15 +25,35 @@
 
 namespace JCalc;
 
-public class CellValue {
+public enum CellFormat {
 
     /// <summary>
-    /// Cell type
+    /// General - contents are formatted according to type
     /// </summary>
-    public CellType Type { get; set; }
+    GENERAL,
 
     /// <summary>
-    /// String representation of content
+    /// Exponential number
     /// </summary>
-    public string StringValue { get; set; } = string.Empty;
+    SCIENTIFIC,
+
+    /// <summary>
+    /// Fixed format
+    /// </summary>
+    FIXED,
+
+    /// <summary>
+    /// Integer
+    /// </summary>
+    INTEGER,
+
+    /// <summary>
+    /// Currency
+    /// </summary>
+    CURRENCY,
+
+    /// <summary>
+    /// Percentage
+    /// </summary>
+    PERCENT
 }

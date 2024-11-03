@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.ComponentModel;
 using JCalc.Resources;
 
 namespace JCalc;
@@ -32,15 +31,13 @@ namespace JCalc;
 /// List of command IDs
 /// </summary>
 public enum CommandMapID {
-
-    [Description("COMMAND")]
+    NONE,
     MAIN,
-
-    [Description("GOTO")]
-    GOTO,
-
-    [Description("FORMAT")]
-    FORMAT
+    WORKSHEET,
+    RANGE,
+    FILE,
+    DATA,
+    COLUMN_WIDTH
 }
 
 /// <summary>
@@ -57,6 +54,16 @@ public class CommandMapEntry {
     /// Associated command ID
     /// </summary>
     public KeyCommand CommandId { get; init; }
+
+    /// <summary>
+    /// ID of sub-command map
+    /// </summary>
+    public CommandMapID SubCommandId { get; init; } = CommandMapID.NONE;
+
+    /// <summary>
+    /// Description of command
+    /// </summary>
+    public string Description { get; set; } = "";
 }
 
 /// <summary>
@@ -91,44 +98,71 @@ public static class Commands {
         new() {
             ID = CommandMapID.MAIN,
             Commands = [
-                new CommandMapEntry { Name = "Alpha", CommandId = KeyCommand.KC_ALPHA },
-                new CommandMapEntry { Name = "Blank", CommandId = KeyCommand.KC_BLANK },
-                new CommandMapEntry { Name = "Copy", CommandId = KeyCommand.KC_COPY },
-                new CommandMapEntry { Name = "Delete", CommandId = KeyCommand.KC_DELETE },
-                new CommandMapEntry { Name = "Edit", CommandId = KeyCommand.KC_EDIT },
-                new CommandMapEntry { Name = "Format", CommandId = KeyCommand.KC_FORMAT },
-                new CommandMapEntry { Name = "Goto", CommandId = KeyCommand.KC_GOTO },
-                new CommandMapEntry { Name = "Help", CommandId = KeyCommand.KC_HELP },
-                new CommandMapEntry { Name = "Insert", CommandId = KeyCommand.KC_INSERT },
-                new CommandMapEntry { Name = "Lock", CommandId = KeyCommand.KC_LOCK },
-                new CommandMapEntry { Name = "Move", CommandId = KeyCommand.KC_MOVE },
-                new CommandMapEntry { Name = "Name", CommandId = KeyCommand.KC_NAME },
-                new CommandMapEntry { Name = "Options", CommandId = KeyCommand.KC_OPTIONS },
-                new CommandMapEntry { Name = "Print", CommandId = KeyCommand.KC_PRINT },
-                new CommandMapEntry { Name = "Quit", CommandId = KeyCommand.KC_QUIT },
-                new CommandMapEntry { Name = "Sort", CommandId = KeyCommand.KC_SORT },
-                new CommandMapEntry { Name = "Transfer", CommandId = KeyCommand.KC_TRANSFER },
-                new CommandMapEntry { Name = "Value", CommandId = KeyCommand.KC_VALUE },
-                new CommandMapEntry { Name = "Window", CommandId = KeyCommand.KC_WINDOW },
-                new CommandMapEntry { Name = "Xternal", CommandId = KeyCommand.KC_XTERNAL }
+                new CommandMapEntry { Name = Calc.Worksheet, SubCommandId = CommandMapID.WORKSHEET },
+                new CommandMapEntry { Name = Calc.Range, SubCommandId = CommandMapID.RANGE },
+                new CommandMapEntry { Name = Calc.Copy, CommandId = KeyCommand.KC_COPY, Description = "Copy a range of cells"},
+                new CommandMapEntry { Name = Calc.Move, CommandId = KeyCommand.KC_MOVE, Description = "Move a cell or range of cells"},
+                new CommandMapEntry { Name = Calc.File, CommandId = KeyCommand.KC_FILE, SubCommandId = CommandMapID.FILE },
+                new CommandMapEntry { Name = Calc.Print, CommandId = KeyCommand.KC_PRINT, Description = "Output a range to the printer or print file" },
+                new CommandMapEntry { Name = Calc.Graph, CommandId = KeyCommand.KC_GRAPH, Description = "Create a graph"},
+                new CommandMapEntry { Name = Calc.Data, SubCommandId = CommandMapID.DATA },
+                new CommandMapEntry { Name = Calc.Quit, CommandId = KeyCommand.KC_QUIT, Description = "Quit Calc"}
             ]
         },
         new() {
-            ID = CommandMapID.GOTO,
+            ID = CommandMapID.WORKSHEET,
             Commands = [
-                new CommandMapEntry { Name = Calc.GotoMacro, CommandId = KeyCommand.KC_GOTO_MACRO },
-                new CommandMapEntry { Name = Calc.GotoName, CommandId = KeyCommand.KC_GOTO_NAME },
-                new CommandMapEntry { Name = Calc.GotoRowCol, CommandId = KeyCommand.KC_GOTO_ROWCOL },
-                new CommandMapEntry { Name = Calc.GotoWindow, CommandId = KeyCommand.KC_GOTO_WINDOW }
+                new CommandMapEntry { Name = Calc.WorksheetGlobal, CommandId = KeyCommand.KC_GLOBAL, Description = "Set worksheet settings" },
+                new CommandMapEntry { Name = Calc.WorksheetInsert, CommandId = KeyCommand.KC_INSERT, Description = "Insert blank column(s) or row(s)"},
+                new CommandMapEntry { Name = Calc.WorksheetDelete, CommandId = KeyCommand.KC_DELETE, Description = "Delete entire column(s) or row(s)" },
+                new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = "Set display width of the current column"},
+                new CommandMapEntry { Name = Calc.WorksheetErase, CommandId = KeyCommand.KC_ERASE, Description = "Erase the entire worksheet" },
+                new CommandMapEntry { Name = Calc.WorksheetTitles, CommandId = KeyCommand.KC_TITLES, Description = "Set horizontal or vertical titles" },
+                new CommandMapEntry { Name = Calc.WorksheetWindow, CommandId = KeyCommand.KC_WINDOW, Description = "Set split-screen and synchronised scrolling" },
+                new CommandMapEntry { Name = Calc.WorksheetStatus, CommandId = KeyCommand.KC_STATUS, Description = "Display worksheet settings" }
             ]
         },
         new() {
-            ID = CommandMapID.FORMAT,
+            ID = CommandMapID.RANGE,
             Commands = [
-                new CommandMapEntry { Name = Calc.FormatCells, CommandId = KeyCommand.KC_FORMAT_CELLS },
-                new CommandMapEntry { Name = Calc.FormatDefault, CommandId = KeyCommand.KC_FORMAT_DEFAULT },
-                new CommandMapEntry { Name = Calc.FormatOptions, CommandId = KeyCommand.KC_FORMAT_OPTIONS },
-                new CommandMapEntry { Name = Calc.FormatWidth, CommandId = KeyCommand.KC_FORMAT_WIDTH }
+                new CommandMapEntry { Name = Calc.RangeFormat, CommandId = KeyCommand.KC_FORMAT },
+                new CommandMapEntry { Name = Calc.RangeLabelPrefix, CommandId = KeyCommand.KC_LABEL_PREFIX },
+                new CommandMapEntry { Name = Calc.RangeErase, CommandId = KeyCommand.KC_ERASE },
+                new CommandMapEntry { Name = Calc.RangeName, CommandId = KeyCommand.KC_NAME },
+                new CommandMapEntry { Name = Calc.RangeJustify, CommandId = KeyCommand.KC_JUSTIFY },
+                new CommandMapEntry { Name = Calc.RangeProtect, CommandId = KeyCommand.KC_PROTECT },
+                new CommandMapEntry { Name = Calc.RangeUnprotect, CommandId = KeyCommand.KC_UNPROTECT },
+                new CommandMapEntry { Name = Calc.RangeInput, CommandId = KeyCommand.KC_INPUT }
+            ]
+        },
+        new() {
+            ID = CommandMapID.FILE,
+            Commands = [
+                new CommandMapEntry { Name = Calc.FileRetrieve, CommandId = KeyCommand.KC_RETRIEVE },
+                new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_SAVE },
+                new CommandMapEntry { Name = Calc.FileCombine, CommandId = KeyCommand.KC_COMBINE },
+                new CommandMapEntry { Name = Calc.FileXtract, CommandId = KeyCommand.KC_XTRACT },
+                new CommandMapEntry { Name = Calc.FileErase, CommandId = KeyCommand.KC_ERASE },
+                new CommandMapEntry { Name = Calc.FileList, CommandId = KeyCommand.KC_LIST },
+                new CommandMapEntry { Name = Calc.Fileimport, CommandId = KeyCommand.KC_IMPORT },
+                new CommandMapEntry { Name = Calc.FileDirectory, CommandId = KeyCommand.KC_DIRECTORY }
+            ]
+        },
+        new() {
+            ID = CommandMapID.DATA,
+            Commands = [
+                new CommandMapEntry { Name = Calc.DataFill, CommandId = KeyCommand.KC_FILL },
+                new CommandMapEntry { Name = Calc.DataTable, CommandId = KeyCommand.KC_TABLE },
+                new CommandMapEntry { Name = Calc.DataSort, CommandId = KeyCommand.KC_SORT },
+                new CommandMapEntry { Name = Calc.DataQuery, CommandId = KeyCommand.KC_QUERY },
+                new CommandMapEntry { Name = Calc.DataDistribution, CommandId = KeyCommand.KC_DISTRIBUTION }
+            ]
+        },
+        new () {
+            ID = CommandMapID.COLUMN_WIDTH,
+            Commands = [
+                new CommandMapEntry { Name = Calc.ColumnWidthSet, CommandId = KeyCommand.KC_SET_COLUMN_WIDTH, Description = "Set width of current column" },
+                new CommandMapEntry { Name = Calc.ColumnWidthReset, CommandId = KeyCommand.KC_RESET_COLUMN_WIDTH, Description = "Use global column width" }
             ]
         }
     ];

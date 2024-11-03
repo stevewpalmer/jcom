@@ -1,5 +1,5 @@
 // JCalc
-// Cell format types
+// Sheet management
 //
 // Authors:
 //  Steve Palmer
@@ -25,15 +25,54 @@
 
 namespace JCalc;
 
-public class CellValue {
-
-    /// <summary>
-    /// Cell type
-    /// </summary>
-    public CellType Type { get; set; }
-
-    /// <summary>
-    /// String representation of content
-    /// </summary>
-    public string StringValue { get; set; } = string.Empty;
+/// <summary>
+/// List of command IDs
+/// </summary>
+public enum KeyCommand {
+    KC_NONE,
+    KC_EDIT,
+    KC_GRAPH,
+    KC_FILE,
+    KC_COPY,
+    KC_MOVE,
+    KC_PRINT,
+    KC_QUIT,
+    KC_GLOBAL,
+    KC_INSERT,
+    KC_DELETE,
+    KC_ERASE,
+    KC_TITLES,
+    KC_WINDOW,
+    KC_STATUS,
+    KC_VALUE,
+    KC_LEFT,
+    KC_RIGHT,
+    KC_UP,
+    KC_DOWN,
+    KC_HOME,
+    KC_PAGEUP,
+    KC_PAGEDOWN,
+    KC_GOTO,
+    KC_FORMAT,
+    KC_LABEL_PREFIX,
+    KC_NAME,
+    KC_JUSTIFY,
+    KC_PROTECT,
+    KC_UNPROTECT,
+    KC_INPUT,
+    KC_RETRIEVE,
+    KC_SAVE,
+    KC_COMBINE,
+    KC_XTRACT,
+    KC_LIST,
+    KC_IMPORT,
+    KC_DIRECTORY,
+    KC_FILL,
+    KC_TABLE,
+    KC_SORT,
+    KC_QUERY,
+    KC_DISTRIBUTION,
+    KC_SET_COLUMN_WIDTH,
+    KC_RESET_COLUMN_WIDTH,
+    KC_COMMAND_BAR
 }

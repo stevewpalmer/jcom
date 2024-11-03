@@ -50,6 +50,33 @@ public class Cell {
     public int Column { get; init; }
 
     /// <summary>
+    /// Return the current cell location as a string.
+    /// </summary>
+    public string Position => $"{ColumnNumber(Column)}{Row}";
+
+    /// <summary>
+    /// Parse a position and return the column and row that
+    /// corresponds to that position, or (0,0) if the position
+    /// cannot be parsed.
+    /// </summary>
+    /// <param name="position">Position string</param>
+    /// <returns>Tuple containing column and row</returns>
+    public static (int, int) ColumnAndRowFromPosition(string position) {
+        int newColumn = 0;
+        int newRow = 0;
+        int index = 0;
+        while (index < position.Length && char.IsLetter(position[index])) {
+            newColumn = newColumn * 26 + char.ToUpper(position[index]) - 'A' + 1;
+            index++;
+        }
+        while (index < position.Length && char.IsDigit(position[index])) {
+            newRow = newRow * 10 + position[index] - '0';
+            index++;
+        }
+        return (newColumn, newRow);
+    }
+
+    /// <summary>
     /// Draw this cell at the given cell position (1-based row and column) at
     /// the given physical screen offset where (0,0) is the top left corner.
     /// </summary>
@@ -82,5 +109,19 @@ public class Cell {
                 break;
         }
         Terminal.Write(cellValue);
+    }
+
+    /// <summary>
+    /// Convert a column offset to its location.
+    /// </summary>
+    /// <param name="column">Column offset, 1-based</param>
+    /// <returns>Column location</returns>
+    public static string ColumnNumber(int column) {
+        string columnNumber = "";
+        while (--column >= 0) {
+            columnNumber = (char)(column % 26 + 'A') + columnNumber;
+            column /= 26;
+        }
+        return columnNumber;
     }
 }
