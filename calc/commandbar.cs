@@ -130,6 +130,17 @@ public class FormField {
     public int Width { get; init; } = 5;
 
     /// <summary>
+    /// Allow filename completion in the input field. This is only
+    /// valid if there is a single input field in the form.
+    /// </summary>
+    public bool AllowFilenameCompletion { get; init; }
+
+    /// <summary>
+    /// Filter used to limit filename completion.
+    /// </summary>
+    public string FilenameCompletionFilter { get; init; } = "*";
+
+    /// <summary>
     /// Save the input buffer to the Value
     /// </summary>
     /// <param name="inputBuffer">Input buffer</param>
@@ -284,6 +295,8 @@ public class CommandBar {
         int fieldIndex = 0;
         int index = 0;
         bool initialiseField = true;
+        string[]? allfiles = null;
+        int allfilesIndex = 0;
         List<char> inputBuffer = [];
         do {
             if (initialiseField) {
@@ -298,13 +311,30 @@ public class CommandBar {
 
             input = Console.ReadKey(true);
             switch (input.Key) {
-                case ConsoleKey.Tab: {
+                case ConsoleKey.Tab when fields.Length > 1: {
                     fields[fieldIndex].Save(inputBuffer);
                     Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _fgColour, _bgColour);
                     int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
                     fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Length);
                     initialiseField = true;
-                    continue;
+                    break;
+                }
+
+                case ConsoleKey.Tab when fields.Length == 1 && fields[fieldIndex].AllowFilenameCompletion: {
+                    if (allfiles == null) {
+                        string partialName = string.Join("", inputBuffer) + fields[fieldIndex].FilenameCompletionFilter;
+                        allfiles = Directory.GetFiles(".", partialName, SearchOption.TopDirectoryOnly);
+                        allfilesIndex = 0;
+                    }
+                    if (allfiles.Length > 0) {
+                        string completedName = new FileInfo(allfiles[allfilesIndex++]).Name;
+                        if (allfilesIndex == allfiles.Length) {
+                            allfilesIndex = 0;
+                        }
+                        fields[fieldIndex].Save(completedName.ToList());
+                        initialiseField = true;
+                    }
+                    break;
                 }
 
                 case ConsoleKey.RightArrow when index < inputBuffer.Count:

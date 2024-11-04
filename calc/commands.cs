@@ -172,11 +172,10 @@ public static class Commands {
         new() {
             ID = CommandMapID.FILE,
             Commands = [
-                new CommandMapEntry { Name = Calc.FileRetrieve, CommandId = KeyCommand.KC_RETRIEVE, Description = "Erase the worksheet and read a worksheet file" },
+                new CommandMapEntry { Name = Calc.FileRetrieve, CommandId = KeyCommand.KC_RETRIEVE, Description = "Load a worksheet file into a new window" },
                 new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_SAVE, Description = "Store the enter worksheet in a worksheet file"},
                 new CommandMapEntry { Name = Calc.FileCombine, CommandId = KeyCommand.KC_COMBINE, Description = "Incorporate all or part of a worksheet file into the worksheet" },
                 new CommandMapEntry { Name = Calc.FileXtract, CommandId = KeyCommand.KC_XTRACT, Description = "Store a cell range in a worksheet file"},
-                new CommandMapEntry { Name = Calc.FileErase, CommandId = KeyCommand.KC_ERASE, Description = "Erase a worksheet, print or graph file" },
                 new CommandMapEntry { Name = Calc.FileList, CommandId = KeyCommand.KC_LIST, Description = "Display names of calc files in the current directory" },
                 new CommandMapEntry { Name = Calc.Fileimport, CommandId = KeyCommand.KC_IMPORT, Description = "Read text or numbers from a print file into the worksheet" },
                 new CommandMapEntry { Name = Calc.FileDirectory, CommandId = KeyCommand.KC_DIRECTORY, Description = "Display and/or set the current directory"}

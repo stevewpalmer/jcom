@@ -231,12 +231,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string FileErase {
-            get {
-                return ResourceManager.GetString("FileErase", resourceCulture);
-            }
-        }
-        
         internal static string FileList {
             get {
                 return ResourceManager.GetString("FileList", resourceCulture);
@@ -402,6 +396,24 @@ namespace JCalc.Resources {
         internal static string EnterSaveFilename {
             get {
                 return ResourceManager.GetString("EnterSaveFilename", resourceCulture);
+            }
+        }
+        
+        internal static string EnterEditFilename {
+            get {
+                return ResourceManager.GetString("EnterEditFilename", resourceCulture);
+            }
+        }
+        
+        internal static string CannotOpenFile {
+            get {
+                return ResourceManager.GetString("CannotOpenFile", resourceCulture);
+            }
+        }
+        
+        internal static string CannotSaveFile {
+            get {
+                return ResourceManager.GetString("CannotSaveFile", resourceCulture);
             }
         }
     }

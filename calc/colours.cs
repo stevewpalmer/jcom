@@ -77,7 +77,7 @@ public class Colours {
     /// Retrieve the normal message colour
     /// </summary>
     public ConsoleColor NormalMessageColour =>
-        GetColour(_config?.NormalMessageColour, 7);
+        GetColour(_config?.NormalMessageColour, 2);
 
     /// <summary>
     /// Parse a colour value from the configuration file. Colours are specified as

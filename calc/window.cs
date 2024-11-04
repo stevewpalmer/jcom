@@ -335,11 +335,15 @@ public class Window {
                 Text = Calc.EnterSaveFilename,
                 Type = FormFieldType.TEXT,
                 Width = 50,
+                AllowFilenameCompletion = true,
+                FilenameCompletionFilter = $"*{Consts.DefaultExtension}",
                 Value = new Variant(Sheet.Name)
             }
         ];
         if (Screen.Command.PromptForInput(formFields)) {
-            Sheet.Filename = formFields[0].Value.StringValue;
+            string inputValue = formFields[0].Value.StringValue;
+            inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.DefaultExtension);
+            Sheet.Filename = inputValue;
             Sheet.Write();
             Screen.Status.UpdateFilename(Sheet.Name);
             flags = RenderHint.NONE;

@@ -157,23 +157,37 @@ public static class Screen {
         RenderHint flags = RenderHint.CANCEL;
         FormField[] formFields = [
             new() {
-                Text = "Enter name of file to retrieve",
+                Text = Calc.EnterEditFilename,
                 Type = FormFieldType.TEXT,
                 Width = 50,
-                Value = new Variant()
+                AllowFilenameCompletion = true,
+                FilenameCompletionFilter = $"*{Consts.DefaultExtension}",
+                Value = new Variant(string.Empty)
             }
         ];
         if (Command.PromptForInput(formFields)) {
-            int sheetNumber = 1;
-            foreach (Window _ in _windowList.TakeWhile(window => window.Sheet.SheetNumber == sheetNumber)) {
-                ++sheetNumber;
+            string inputValue = formFields[0].Value.StringValue;
+
+            inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.DefaultExtension);
+            FileInfo fileInfo = new FileInfo(inputValue);
+            inputValue = fileInfo.FullName;
+
+            Window? newWindow = _windowList.FirstOrDefault(window => window.Sheet.Filename == inputValue);
+            if (newWindow == null) {
+                int sheetNumber = 1;
+                foreach (Window _ in _windowList.TakeWhile(window => window.Sheet.SheetNumber == sheetNumber)) {
+                    ++sheetNumber;
+                }
+                Sheet sheet = new Sheet(sheetNumber, inputValue);
+                newWindow = new Window(sheet);
+                AddWindow(newWindow);
             }
-            Sheet sheet = new Sheet(sheetNumber, formFields[0].Value.StringValue);
-            _activeWindow = new Window(sheet);
-            AddWindow(_activeWindow);
-            flags = RenderHint.REFRESH;
+            _activeWindow = newWindow;
+            _activeWindow.Refresh();
+            flags = RenderHint.NONE;
         }
-        return flags;    }
+        return flags;
+    }
 
     /// <summary>
     /// Exit the editor, saving any buffers if required. If prompt is

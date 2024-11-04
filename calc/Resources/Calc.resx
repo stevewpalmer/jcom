@@ -100,7 +100,7 @@
         <value>Input</value>
     </data>
     <data name="FileRetrieve" xml:space="preserve">
-        <value>Retrieve</value>
+        <value>Edit</value>
     </data>
     <data name="FileSave" xml:space="preserve">
         <value>Save</value>
@@ -110,9 +110,6 @@
     </data>
     <data name="FileXtract" xml:space="preserve">
         <value>Xtract</value>
-    </data>
-    <data name="FileErase" xml:space="preserve">
-        <value>Erase</value>
     </data>
     <data name="FileList" xml:space="preserve">
         <value>List</value>
@@ -197,5 +194,14 @@
     </data>
     <data name="EnterSaveFilename" xml:space="preserve">
         <value>Enter save file name</value>
+    </data>
+    <data name="EnterEditFilename" xml:space="preserve">
+        <value>Enter name of file to edit</value>
+    </data>
+    <data name="CannotOpenFile" xml:space="preserve">
+        <value>Cannot open {0} - {1}</value>
+    </data>
+    <data name="CannotSaveFile" xml:space="preserve">
+        <value>Cannot save {0} - {1}</value>
     </data>
 </root>

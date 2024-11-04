@@ -33,6 +33,11 @@ public static class Consts {
     public const string ConfigurationFilename = "calc.json";
 
     /// <summary>
+    /// Default file extension
+    /// </summary>
+    public const string DefaultExtension = ".clc";
+
+    /// <summary>
     /// Backup file extension
     /// </summary>
     public const string BackupExtension = ".bak";
@@ -40,7 +45,7 @@ public static class Consts {
     /// <summary>
     /// Default filename (for an empty sheet)
     /// </summary>
-    public const string DefaultFilename = "temp";
+    public const string DefaultFilename = "temp" + DefaultExtension;
 
     /// <summary>
     /// Maximum number of columns

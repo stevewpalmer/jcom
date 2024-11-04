@@ -26,6 +26,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JCalc.Resources;
 
 namespace JCalc;
 
@@ -60,7 +61,9 @@ public class Sheet {
                     ColumnWidths = inputSheet.ColumnWidths;
                 }
             }
-            catch (Exception) { }
+            catch (Exception e) {
+                Screen.Command.Error(string.Format(Calc.CannotOpenFile, filename, e.Message));
+            }
         }
         Filename = filename;
         SheetNumber = number;
@@ -82,7 +85,7 @@ public class Sheet {
     /// Sheet number
     /// </summary>
     [JsonIgnore]
-    public int SheetNumber { get; init; }
+    public int SheetNumber { get; }
 
     /// <summary>
     /// Cells
@@ -106,6 +109,7 @@ public class Sheet {
     /// <summary>
     /// Return the fully qualified file name with path.
     /// </summary>
+    [JsonIgnore]
     public string Filename {
         get => _fileInfo == null ? Consts.DefaultFilename : _fileInfo.FullName;
         set => _fileInfo = string.IsNullOrEmpty(value) ? null : new FileInfo(value);
@@ -134,7 +138,7 @@ public class Sheet {
             });
         }
         catch (Exception e) {
-            Screen.Command.Error($"Cannot save {Filename} - {e.Message}");
+            Screen.Command.Error(string.Format(Calc.CannotSaveFile, Filename, e.Message));
         }
 
         Modified = false;

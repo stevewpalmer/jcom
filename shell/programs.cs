@@ -76,6 +76,15 @@ public static partial class Commands {
     }
 
     /// <summary>
+    /// Run the spreadsheet
+    /// </summary>
+    /// <param name="cmdLine">Command line</param>
+    /// <returns>The result of the proces</returns>
+    public static bool CmdCalc(Parser cmdLine) {
+        return RunProgram("calc", cmdLine);
+    }
+
+    /// <summary>
     /// Run the accounts program
     /// </summary>
     /// <param name="cmdLine">Command line</param>
