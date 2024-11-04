@@ -50,7 +50,7 @@ public static class Screen {
     /// <summary>
     /// The status bar
     /// </summary>
-    private static StatusBar Status { get; } = new();
+    public static StatusBar Status { get; } = new();
 
     /// <summary>
     /// Open the main window.
@@ -125,7 +125,8 @@ public static class Screen {
         }
         RenderHint flags = command switch {
             KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
-            KeyCommand.KC_QUIT => Exit(true),
+            KeyCommand.KC_RETRIEVE => RetrieveFile(),
+            KeyCommand.KC_QUIT => Exit(),
             _ => _activeWindow.HandleCommand(command)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
@@ -149,33 +150,49 @@ public static class Screen {
     }
 
     /// <summary>
+    /// Retrieve a file and add it to the sheet list.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint RetrieveFile() {
+        RenderHint flags = RenderHint.CANCEL;
+        FormField[] formFields = [
+            new() {
+                Text = "Enter name of file to retrieve",
+                Type = FormFieldType.TEXT,
+                Width = 50,
+                Value = new Variant()
+            }
+        ];
+        if (Command.PromptForInput(formFields)) {
+            int sheetNumber = 1;
+            foreach (Window _ in _windowList.TakeWhile(window => window.Sheet.SheetNumber == sheetNumber)) {
+                ++sheetNumber;
+            }
+            Sheet sheet = new Sheet(sheetNumber, formFields[0].Value.StringValue);
+            _activeWindow = new Window(sheet);
+            AddWindow(_activeWindow);
+            flags = RenderHint.REFRESH;
+        }
+        return flags;    }
+
+    /// <summary>
     /// Exit the editor, saving any buffers if required. If prompt is
     /// TRUE, we prompt whether to save or exit without saving. If prompt
     /// is FALSE, we just save all modified buffers and exit.
     /// </summary>
-    /// <param name="prompt">True to display a confirmation prompt, false to just save and exit</param>
     /// <returns>Render hint</returns>
-    private static RenderHint Exit(bool prompt) {
+    private static RenderHint Exit() {
         RenderHint flags = RenderHint.EXIT;
-        bool writeSheets = !prompt;
         Sheet[] modifiedSheets = _windowList.Where(w => w.Sheet.Modified).Select(b => b.Sheet).ToArray();
-        if (prompt) {
-            if (modifiedSheets.Length != 0) {
-                char[] validInput = ['y', 'n'];
-                if (!Command.Prompt(Calc.QuitPrompt, validInput, out char inputChar)) {
-                    flags = RenderHint.NONE;
-                }
-                else {
-                    writeSheets = inputChar switch {
-                        'y' => true,
-                        _ => writeSheets
-                    };
-                }
+        if (modifiedSheets.Length != 0) {
+            char[] validInput = ['y', 'n'];
+            if (!Command.Prompt(Calc.QuitPrompt, validInput, out char inputChar)) {
+                flags = RenderHint.CANCEL;
             }
-        }
-        if (writeSheets) {
-            foreach (Sheet buffer in modifiedSheets) {
-                buffer.Write();
+            else if (inputChar == 'y') {
+                foreach (Sheet sheet in modifiedSheets) {
+                    sheet.Write();
+                }
             }
         }
         return flags;

@@ -79,6 +79,7 @@ public class Window {
     /// </summary>
     public void Refresh() {
         Screen.UpdateCursorPosition();
+        Screen.Status.UpdateFilename(Sheet.Name);
         RenderFrame();
         Render();
     }
@@ -117,6 +118,7 @@ public class Window {
             KeyCommand.KC_DATE_DMY => FormatCells(CellFormat.DATE_DMY),
             KeyCommand.KC_DATE_DM => FormatCells(CellFormat.DATE_DM),
             KeyCommand.KC_DATE_MY => FormatCells(CellFormat.DATE_MY),
+            KeyCommand.KC_SAVE => SaveSheet(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -318,6 +320,29 @@ public class Window {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.SetColumnWidth(Sheet.Column, Consts.DefaultColumnWidth)) {
             flags = RenderHint.REFRESH;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Save the changes to this sheet.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SaveSheet() {
+        RenderHint flags = RenderHint.CANCEL;
+        FormField[] formFields = [
+            new() {
+                Text = Calc.EnterSaveFilename,
+                Type = FormFieldType.TEXT,
+                Width = 50,
+                Value = new Variant(Sheet.Name)
+            }
+        ];
+        if (Screen.Command.PromptForInput(formFields)) {
+            Sheet.Filename = formFields[0].Value.StringValue;
+            Sheet.Write();
+            Screen.Status.UpdateFilename(Sheet.Name);
+            flags = RenderHint.NONE;
         }
         return flags;
     }

@@ -41,7 +41,7 @@ public class StatusBar {
     public StatusBar() {
         _statusBarRow = Terminal.Height - 1;
         _statusBarWidth = Terminal.Width;
-        _filename = Consts.DefaultFilename;
+        _filename = string.Empty;
     }
 
     /// <summary>
@@ -71,6 +71,6 @@ public class StatusBar {
     /// Display the filename on the status bar
     /// </summary>
     private void RenderFilename() {
-        Terminal.WriteText(0, _statusBarRow, _statusBarWidth, _filename, _fgColour, _bgColour);
+        Terminal.WriteText(0, _statusBarRow, _statusBarWidth, $"Calc: {_filename}", _fgColour, _bgColour);
     }
 }

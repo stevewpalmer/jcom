@@ -39,7 +39,6 @@ public class Sheet {
     /// </summary>
     /// <param name="number">Sheet number</param>
     public Sheet(int number) {
-        NewFile = true;
         SheetNumber = number;
     }
 
@@ -62,9 +61,6 @@ public class Sheet {
                 }
             }
             catch (Exception) { }
-        }
-        else {
-            NewFile = true;
         }
         Filename = filename;
         SheetNumber = number;
@@ -110,8 +106,8 @@ public class Sheet {
     /// <summary>
     /// Return the fully qualified file name with path.
     /// </summary>
-    private string Filename {
-        get => _fileInfo == null ? string.Empty : _fileInfo.FullName;
+    public string Filename {
+        get => _fileInfo == null ? Consts.DefaultFilename : _fileInfo.FullName;
         set => _fileInfo = string.IsNullOrEmpty(value) ? null : new FileInfo(value);
     }
 
@@ -121,13 +117,6 @@ public class Sheet {
     /// </summary>
     [JsonIgnore]
     public bool Modified { get; set; }
-
-    /// <summary>
-    /// Is this a new file (i.e. the file has a name but does not
-    /// currently exist on disk).
-    /// </summary>
-    [JsonIgnore]
-    public bool NewFile { get; private set; }
 
     /// <summary>
     /// Write the sheet back to disk.
@@ -149,7 +138,6 @@ public class Sheet {
         }
 
         Modified = false;
-        NewFile = false;
     }
 
     /// <summary>
@@ -203,7 +191,9 @@ public class Sheet {
             _cell = new Cell {
                 Column = sheetColumn,
                 Row = sheetRow,
-                Alignment = Screen.Config.DefaultCellAlignment
+                Alignment = Screen.Config.DefaultCellAlignment,
+                Format = Screen.Config.DefaultCellFormat,
+                DecimalPlaces = Screen.Config.DefaultDecimals
             };
             if (createIfEmpty) {
                 Cells.Add(cellHash, _cell);

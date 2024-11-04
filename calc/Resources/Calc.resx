@@ -195,4 +195,7 @@
     <data name="LabelPrefixCentre" xml:space="preserve">
         <value>Centre</value>
     </data>
+    <data name="EnterSaveFilename" xml:space="preserve">
+        <value>Enter save file name</value>
+    </data>
 </root>

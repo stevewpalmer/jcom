@@ -398,5 +398,11 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("LabelPrefixCentre", resourceCulture);
             }
         }
+        
+        internal static string EnterSaveFilename {
+            get {
+                return ResourceManager.GetString("EnterSaveFilename", resourceCulture);
+            }
+        }
     }
 }

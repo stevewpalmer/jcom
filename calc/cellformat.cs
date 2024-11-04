@@ -80,5 +80,5 @@ public enum CellFormat {
     /// <summary>
     /// Date in Day-Month format
     /// </summary>
-    DATE_DM,
+    DATE_DM
 }

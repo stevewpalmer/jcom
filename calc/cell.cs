@@ -60,6 +60,30 @@ public class Cell {
     public CellFormat Format { get; set; }
 
     /// <summary>
+    /// Number of decimal places
+    /// </summary>
+    public int DecimalPlaces { get; set; }
+
+    /// <summary>
+    /// Try and convert a value to a date and time string.
+    /// </summary>
+    /// <param name="pattern">The date/time pattern to use</param>
+    /// <returns>The date and time as a string</returns>
+    private string ToDateTime(string pattern) {
+        if (!double.TryParse(Value.StringValue, out double value)) {
+            return Value.StringValue;
+        }
+        if (value < -657435.0) {
+            return Value.StringValue;
+        }
+        if (value > 2958465.99999999) {
+            return Value.StringValue;
+        }
+        DateTime dateTime = DateTime.FromOADate(value);
+        return dateTime.ToString(pattern);
+    }
+
+    /// <summary>
     /// Parse a position and return the column and row that
     /// corresponds to that position, or (0,0) if the position
     /// cannot be parsed.
@@ -94,17 +118,17 @@ public class Cell {
         string cellValue = Value.StringValue;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
         if (isNumber) {
-            DateTime dateTime = DateTime.FromOADate(doubleValue);
+            int maxBar = Math.Min(width + 1, (int)Math.Abs(doubleValue));
             cellValue = Format switch {
-                CellFormat.FIXED => doubleValue.ToString("F2"),
-                CellFormat.PERCENT => $"{doubleValue * 100:F2}%",
-                CellFormat.CURRENCY => $"\u00a3{doubleValue:N}",
-                CellFormat.COMMAS => doubleValue < 0 ? $"({-doubleValue:N})" : $"{doubleValue:N}",
-                CellFormat.BAR => doubleValue < 0 ? new string('-', -(int)doubleValue) : new string('+', (int)doubleValue),
-                CellFormat.SCIENTIFIC => doubleValue.ToString("E2"),
-                CellFormat.DATE_DM => dateTime.ToString("dd-MMM"),
-                CellFormat.DATE_MY => dateTime.ToString("MMM-yyyy"),
-                CellFormat.DATE_DMY => dateTime.ToString("dd-MMM-yyyy"),
+                CellFormat.FIXED => doubleValue.ToString($"F{DecimalPlaces}"),
+                CellFormat.PERCENT => $"{(doubleValue * 100).ToString($"F{DecimalPlaces}")}%",
+                CellFormat.CURRENCY => $"\u00a3{doubleValue.ToString($"N{DecimalPlaces}")}",
+                CellFormat.COMMAS => doubleValue < 0 ? $"({(-doubleValue).ToString($"N{DecimalPlaces}")})" : $"{doubleValue.ToString($"N{DecimalPlaces}")}",
+                CellFormat.BAR => new string(doubleValue < 0 ? '-' : '+', maxBar),
+                CellFormat.SCIENTIFIC => doubleValue.ToString("E" + DecimalPlaces),
+                CellFormat.DATE_DM => ToDateTime("dd-MMM"),
+                CellFormat.DATE_MY => ToDateTime("MMM-yyyy"),
+                CellFormat.DATE_DMY => ToDateTime("dd-MMM-yyyy"),
                 _ => cellValue
             };
         }
