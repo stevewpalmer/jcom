@@ -16,6 +16,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\calclib\calclib.csproj" />
       <ProjectReference Include="..\comlib\comlib.csproj" />
     </ItemGroup>
 

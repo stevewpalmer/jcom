@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Text.Json;
+using JCalcLib;
 
 namespace JCalc;
 

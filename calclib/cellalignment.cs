@@ -1,4 +1,4 @@
-// JCalc
+// JCalcLib
 // Cell format types
 //
 // Authors:
@@ -23,62 +23,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JCalc;
+namespace JCalcLib;
 
-public enum CellFormat {
+public enum CellAlignment {
 
     /// <summary>
-    /// General - contents are formatted according to type
+    /// Numbers right aligned, text left aligned
     /// </summary>
     GENERAL,
 
     /// <summary>
-    /// Exponential number
+    /// Left alignment
     /// </summary>
-    SCIENTIFIC,
+    LEFT,
 
     /// <summary>
-    /// Fixed format
+    /// Right alignment
     /// </summary>
-    FIXED,
+    RIGHT,
 
     /// <summary>
-    /// Commas inserted
+    /// Centered
     /// </summary>
-    COMMAS,
-
-    /// <summary>
-    /// Currency
-    /// </summary>
-    CURRENCY,
-
-    /// <summary>
-    /// Percentage
-    /// </summary>
-    PERCENT,
-
-    /// <summary>
-    /// Horizontal bar
-    /// </summary>
-    BAR,
-
-    /// <summary>
-    /// Text format
-    /// </summary>
-    TEXT,
-
-    /// <summary>
-    /// Date in Day-Month-Year format
-    /// </summary>
-    DATE_DMY,
-
-    /// <summary>
-    /// Date in Month-Year format
-    /// </summary>
-    DATE_MY,
-
-    /// <summary>
-    /// Date in Day-Month format
-    /// </summary>
-    DATE_DM
+    CENTRE
 }

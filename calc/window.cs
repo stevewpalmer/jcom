@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Drawing;
+using JCalcLib;
 using JCalc.Resources;
 using JComLib;
 
@@ -210,7 +211,7 @@ public class Window {
             Terminal.Write(new string(' ', _sheetBounds.Width));
         }
         foreach (Cell cell in Sheet.Cells.Values.Where(cell => cell.Row >= _scrollOffset.Y && cell.Column >= _scrollOffset.X)) {
-            cell.Draw(Sheet, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
+            Sheet.DrawCell(cell, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
         }
         PlaceCursor();
         Terminal.SetCursor(cursorPosition.X, cursorPosition.Y);
@@ -242,7 +243,7 @@ public class Window {
         Terminal.ForegroundColour = fgColour;
         Terminal.BackgroundColour = bgColour;
         Cell cell = Sheet.Cell(column, row, false);
-        cell.Draw(Sheet, GetXPositionOfCell(column), GetYPositionOfCell(row));
+        Sheet.DrawCell(cell, GetXPositionOfCell(column), GetYPositionOfCell(row));
     }
 
     /// <summary>
@@ -417,7 +418,7 @@ public class Window {
         CellInputResponse result = Screen.Command.PromptForCellInput(ref value);
         if (result != CellInputResponse.CANCEL) {
             cell.Value = value;
-            cell.Draw(Sheet, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
+            Sheet.DrawCell(cell, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
             hint = result switch {
                 CellInputResponse.ACCEPT => RenderHint.CURSOR_STATUS,
                 CellInputResponse.ACCEPT_UP => CursorUp(),

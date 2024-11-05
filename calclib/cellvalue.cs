@@ -1,4 +1,4 @@
-// JCalc
+// JCalcLib
 // Cell format types
 //
 // Authors:
@@ -23,7 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JCalc;
+namespace JCalcLib;
 
 public class CellValue {
 

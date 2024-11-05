@@ -26,6 +26,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using JCalcLib;
 using JComLib;
 
 namespace JCalc;

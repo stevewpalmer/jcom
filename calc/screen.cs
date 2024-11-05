@@ -24,6 +24,7 @@
 // under the License.
 
 using JCalc.Resources;
+using JCalcLib;
 using JComLib;
 
 namespace JCalc;

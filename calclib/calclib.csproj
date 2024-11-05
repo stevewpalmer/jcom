@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>12</LangVersion>
+        <ReleaseVersion>0.3</ReleaseVersion>
+        <AssemblyName>calclib</AssemblyName>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RootNamespace>JCalcLib</RootNamespace>
+        <Title>Calc Common Library</Title>
+        <Authors>Steven Palmer</Authors>
+        <Description>Calc Common Library</Description>
+        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\comlib\comlib.csproj" />
+    </ItemGroup>
+
+</Project>

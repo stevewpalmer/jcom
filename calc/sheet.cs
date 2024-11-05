@@ -26,7 +26,9 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using JCalcLib;
 using JCalc.Resources;
+using JComLib;
 
 namespace JCalc;
 
@@ -181,6 +183,19 @@ public class Sheet {
     /// </summary>
     /// <returns>Row height</returns>
     public static int RowHeight => 1;
+
+
+    /// <summary>
+    /// Draw this cell at the given cell position (1-based row and column) at
+    /// the given physical screen offset where (0,0) is the top left corner.
+    /// </summary>
+    /// <param name="cell">Cell to draw</param>
+    /// <param name="x">X position of cell</param>
+    /// <param name="y">Y position of cell</param>
+    public void DrawCell(Cell cell, int x, int y) {
+        Terminal.SetCursor(x, y);
+        Terminal.Write(cell.ToString(ColumnWidth(Column)));
+    }
 
     /// <summary>
     /// Return the cell at the given column and row.
