@@ -171,9 +171,9 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string RangeLabelPrefix {
+        internal static string RangeAlign {
             get {
-                return ResourceManager.GetString("RangeLabelPrefix", resourceCulture);
+                return ResourceManager.GetString("RangeAlign", resourceCulture);
             }
         }
         
@@ -414,6 +414,186 @@ namespace JCalc.Resources {
         internal static string CannotSaveFile {
             get {
                 return ResourceManager.GetString("CannotSaveFile", resourceCulture);
+            }
+        }
+        
+        internal static string Column {
+            get {
+                return ResourceManager.GetString("Column", resourceCulture);
+            }
+        }
+        
+        internal static string Row {
+            get {
+                return ResourceManager.GetString("Row", resourceCulture);
+            }
+        }
+        
+        internal static string RangeAlignDescription {
+            get {
+                return ResourceManager.GetString("RangeAlignDescription", resourceCulture);
+            }
+        }
+        
+        internal static string RangeFormatDescription {
+            get {
+                return ResourceManager.GetString("RangeFormatDescription", resourceCulture);
+            }
+        }
+        
+        internal static string InsertColumnDescription {
+            get {
+                return ResourceManager.GetString("InsertColumnDescription", resourceCulture);
+            }
+        }
+        
+        internal static string InsertRowDescription {
+            get {
+                return ResourceManager.GetString("InsertRowDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SheetInsertDescription {
+            get {
+                return ResourceManager.GetString("SheetInsertDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SheetDeleteDescription {
+            get {
+                return ResourceManager.GetString("SheetDeleteDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SheetColumnWidthDescription {
+            get {
+                return ResourceManager.GetString("SheetColumnWidthDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatFixedDescription {
+            get {
+                return ResourceManager.GetString("FormatFixedDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatScientificDescription {
+            get {
+                return ResourceManager.GetString("FormatScientificDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatCurrencyDescription {
+            get {
+                return ResourceManager.GetString("FormatCurrencyDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatCommasDescription {
+            get {
+                return ResourceManager.GetString("FormatCommasDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatGeneralDescription {
+            get {
+                return ResourceManager.GetString("FormatGeneralDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatBarDescription {
+            get {
+                return ResourceManager.GetString("FormatBarDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatPercentDescription {
+            get {
+                return ResourceManager.GetString("FormatPercentDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatDatesDescription {
+            get {
+                return ResourceManager.GetString("FormatDatesDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FormatResetDescription {
+            get {
+                return ResourceManager.GetString("FormatResetDescription", resourceCulture);
+            }
+        }
+        
+        internal static string AlignLeftDescription {
+            get {
+                return ResourceManager.GetString("AlignLeftDescription", resourceCulture);
+            }
+        }
+        
+        internal static string AlignRightDescription {
+            get {
+                return ResourceManager.GetString("AlignRightDescription", resourceCulture);
+            }
+        }
+        
+        internal static string AlignCentreDescription {
+            get {
+                return ResourceManager.GetString("AlignCentreDescription", resourceCulture);
+            }
+        }
+        
+        internal static string DatesDMYDescription {
+            get {
+                return ResourceManager.GetString("DatesDMYDescription", resourceCulture);
+            }
+        }
+        
+        internal static string DatesDMDescription {
+            get {
+                return ResourceManager.GetString("DatesDMDescription", resourceCulture);
+            }
+        }
+        
+        internal static string DatesMYDescription {
+            get {
+                return ResourceManager.GetString("DatesMYDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FileEditDescription {
+            get {
+                return ResourceManager.GetString("FileEditDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FileSaveDescription {
+            get {
+                return ResourceManager.GetString("FileSaveDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SetColumnWidthDescription {
+            get {
+                return ResourceManager.GetString("SetColumnWidthDescription", resourceCulture);
+            }
+        }
+        
+        internal static string ResetColumnWidthDescription {
+            get {
+                return ResourceManager.GetString("ResetColumnWidthDescription", resourceCulture);
+            }
+        }
+        
+        internal static string QuitCalc {
+            get {
+                return ResourceManager.GetString("QuitCalc", resourceCulture);
+            }
+        }
+        
+        internal static string EnterDecimalPlaces {
+            get {
+                return ResourceManager.GetString("EnterDecimalPlaces", resourceCulture);
             }
         }
     }

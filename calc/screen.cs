@@ -125,7 +125,7 @@ public static class Screen {
         }
         RenderHint flags = command switch {
             KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
-            KeyCommand.KC_RETRIEVE => RetrieveFile(),
+            KeyCommand.KC_FILE_RETRIEVE => RetrieveFile(),
             KeyCommand.KC_QUIT => Exit(),
             _ => _activeWindow.HandleCommand(command)
         };

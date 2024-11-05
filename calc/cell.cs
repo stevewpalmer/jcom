@@ -42,12 +42,12 @@ public class Cell {
     /// <summary>
     /// Cell row
     /// </summary>
-    public int Row { get; init; }
+    public int Row { get; set; }
 
     /// <summary>
     /// Cell column
     /// </summary>
-    public int Column { get; init; }
+    public int Column { get; set; }
 
     /// <summary>
     /// Return the current cell location as a string.

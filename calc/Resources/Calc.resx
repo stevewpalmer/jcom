@@ -81,8 +81,8 @@
     <data name="RangeFormat" xml:space="preserve">
         <value>Format</value>
     </data>
-    <data name="RangeLabelPrefix" xml:space="preserve">
-        <value>Label-Prefix</value>
+    <data name="RangeAlign" xml:space="preserve">
+        <value>Align</value>
     </data>
     <data name="RangeName" xml:space="preserve">
         <value>Name</value>
@@ -203,5 +203,95 @@
     </data>
     <data name="CannotSaveFile" xml:space="preserve">
         <value>Cannot save {0} - {1}</value>
+    </data>
+    <data name="Column" xml:space="preserve">
+        <value>Column</value>
+    </data>
+    <data name="Row" xml:space="preserve">
+        <value>Row</value>
+    </data>
+    <data name="RangeAlignDescription" xml:space="preserve">
+        <value>Align a label or range of labels (Left, Right or Centre)</value>
+    </data>
+    <data name="RangeFormatDescription" xml:space="preserve">
+        <value>Format a cell or range of cells</value>
+    </data>
+    <data name="InsertColumnDescription" xml:space="preserve">
+        <value>Insert one or more blank columns to the left of the cell pointer</value>
+    </data>
+    <data name="InsertRowDescription" xml:space="preserve">
+        <value>Insert one or more blank rows above the cell pointer</value>
+    </data>
+    <data name="SheetInsertDescription" xml:space="preserve">
+        <value>Insert blank column(s) or row(s)</value>
+    </data>
+    <data name="SheetDeleteDescription" xml:space="preserve">
+        <value>Delete entire column(s) or row(s)</value>
+    </data>
+    <data name="SheetColumnWidthDescription" xml:space="preserve">
+        <value>Set display width of the current column</value>
+    </data>
+    <data name="FormatFixedDescription" xml:space="preserve">
+        <value>Fixed number of decimal places (x.xx)</value>
+    </data>
+    <data name="FormatScientificDescription" xml:space="preserve">
+        <value>Exponential format (x.xxE+xx)</value>
+    </data>
+    <data name="FormatCurrencyDescription" xml:space="preserve">
+        <value>Currency format (£x,xxx.xx)</value>
+    </data>
+    <data name="FormatCommasDescription" xml:space="preserve">
+        <value>Commas inserted; negative values parenthised (x,xxx.xx)</value>
+    </data>
+    <data name="FormatGeneralDescription" xml:space="preserve">
+        <value>Standard format (x.xx or x.xxExx)</value>
+    </data>
+    <data name="FormatBarDescription" xml:space="preserve">
+        <value>Horizontal bar graph format (+++ or ---)</value>
+    </data>
+    <data name="FormatPercentDescription" xml:space="preserve">
+        <value>Percent format (x.xx%)</value>
+    </data>
+    <data name="FormatDatesDescription" xml:space="preserve">
+        <value>Date formats</value>
+    </data>
+    <data name="FormatResetDescription" xml:space="preserve">
+        <value>Use global format</value>
+    </data>
+    <data name="AlignLeftDescription" xml:space="preserve">
+        <value>Align labels with left edges of cells</value>
+    </data>
+    <data name="AlignRightDescription" xml:space="preserve">
+        <value>Align labels with right edges of cells</value>
+    </data>
+    <data name="AlignCentreDescription" xml:space="preserve">
+        <value>Centre labels in cells</value>
+    </data>
+    <data name="DatesDMYDescription" xml:space="preserve">
+        <value>Day-Month-Year</value>
+    </data>
+    <data name="DatesDMDescription" xml:space="preserve">
+        <value>Day-Month</value>
+    </data>
+    <data name="DatesMYDescription" xml:space="preserve">
+        <value>Month-Year</value>
+    </data>
+    <data name="FileEditDescription" xml:space="preserve">
+        <value>Load a worksheet file into a new window</value>
+    </data>
+    <data name="FileSaveDescription" xml:space="preserve">
+        <value>Store the enter worksheet in a worksheet file</value>
+    </data>
+    <data name="SetColumnWidthDescription" xml:space="preserve">
+        <value>Set width of current column</value>
+    </data>
+    <data name="ResetColumnWidthDescription" xml:space="preserve">
+        <value>Use global column width</value>
+    </data>
+    <data name="QuitCalc" xml:space="preserve">
+        <value>Quit Calc</value>
+    </data>
+    <data name="EnterDecimalPlaces" xml:space="preserve">
+        <value>Enter number of decimal places (0..15)</value>
     </data>
 </root>

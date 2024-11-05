@@ -100,9 +100,9 @@ public class Window {
             KeyCommand.KC_PAGEDOWN => CursorPageDown(),
             KeyCommand.KC_GOTO => GotoRowColumn(),
             KeyCommand.KC_VALUE => InputValue(false),
+            KeyCommand.KC_EDIT => InputValue(true),
             KeyCommand.KC_SET_COLUMN_WIDTH => SetColumnWidth(),
             KeyCommand.KC_RESET_COLUMN_WIDTH => ResetColumnWidth(),
-            KeyCommand.KC_EDIT => InputValue(true),
             KeyCommand.KC_ALIGN_LEFT => AlignCells(CellAlignment.LEFT),
             KeyCommand.KC_ALIGN_RIGHT => AlignCells(CellAlignment.RIGHT),
             KeyCommand.KC_ALIGN_CENTRE => AlignCells(CellAlignment.CENTRE),
@@ -118,7 +118,11 @@ public class Window {
             KeyCommand.KC_DATE_DMY => FormatCells(CellFormat.DATE_DMY),
             KeyCommand.KC_DATE_DM => FormatCells(CellFormat.DATE_DM),
             KeyCommand.KC_DATE_MY => FormatCells(CellFormat.DATE_MY),
-            KeyCommand.KC_SAVE => SaveSheet(),
+            KeyCommand.KC_FILE_SAVE => SaveSheet(),
+            KeyCommand.KC_INSERT_COLUMN => InsertColumn(),
+            KeyCommand.KC_INSERT_ROW => InsertRow(),
+            KeyCommand.KC_DELETE_COLUMN => DeleteColumn(),
+            KeyCommand.KC_DELETE_ROW => DeleteRow(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -285,8 +289,23 @@ public class Window {
     /// <param name="format">Requested format</param>
     /// <returns>Render hint</returns>
     private RenderHint FormatCells(CellFormat format) {
-        ActiveCell.Format = format;
-        Sheet.Modified = true;
+        Cell cell = ActiveCell;
+        int decimalPlaces = 0;
+        if (format is CellFormat.FIXED or CellFormat.SCIENTIFIC or CellFormat.CURRENCY or CellFormat.PERCENT) {
+            FormField[] formFields = [
+                new() {
+                    Text = Calc.EnterDecimalPlaces,
+                    Type = FormFieldType.NUMBER,
+                    Width = 2,
+                    Value = new Variant(cell.DecimalPlaces)
+                }
+            ];
+            if (!Screen.Command.PromptForInput(formFields)) {
+                return RenderHint.CANCEL;
+            }
+            decimalPlaces = Math.Min(formFields[0].Value.IntValue, 15);
+        }
+        Sheet.SetCellFormat(cell, format, decimalPlaces);
         PlaceCursor();
         return RenderHint.NONE;
     }
@@ -322,6 +341,42 @@ public class Window {
             flags = RenderHint.REFRESH;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Insert a column to the left of the cursor position
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint InsertColumn() {
+        Sheet.InsertColumn(Sheet.Column);
+        return RenderHint.CONTENTS;
+    }
+
+    /// <summary>
+    /// Insert a row above the cursor position
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint InsertRow() {
+        Sheet.InsertRow(Sheet.Row);
+        return RenderHint.CONTENTS;
+    }
+
+    /// <summary>
+    /// Delete a column at the cursor position
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint DeleteColumn() {
+        Sheet.DeleteColumn(Sheet.Column);
+        return RenderHint.CONTENTS;
+    }
+
+    /// <summary>
+    /// Delete a row at the cursor position
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint DeleteRow() {
+        Sheet.DeleteRow(Sheet.Row);
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>

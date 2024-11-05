@@ -206,4 +206,73 @@ public class Sheet {
         }
         return _cell;
     }
+
+    /// <summary>
+    /// Delete the specified cell
+    /// </summary>
+    /// <param name="cell">Cell to delete</param>
+    private void DeleteCell(Cell cell) {
+        int cellHash = cell.Row * Consts.MaxRows + cell.Column;
+        Cells.Remove(cellHash);
+    }
+
+    /// <summary>
+    /// Insert a new column at the specified column position.
+    /// </summary>
+    /// <param name="column">Insertion column</param>
+    public void InsertColumn(int column) {
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Column >= column)) {
+            ++cell.Column;
+        }
+    }
+
+    /// <summary>
+    /// Insert a new row at the specified row position.
+    /// </summary>
+    /// <param name="row">Insertion row</param>
+    public void InsertRow(int row) {
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Row >= row)) {
+            ++cell.Row;
+        }
+    }
+
+    /// <summary>
+    /// Delete the specified column.
+    /// </summary>
+    /// <param name="column">Deletion column</param>
+    public void DeleteColumn(int column) {
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Column >= column)) {
+            if (cell.Column == column) {
+                DeleteCell(cell);
+            } else {
+                --cell.Column;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Delete the specified row.
+    /// </summary>
+    /// <param name="row">Deletion row</param>
+    public void DeleteRow(int row) {
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Row >= row)) {
+            if (cell.Row == row) {
+                DeleteCell(cell);
+            } else {
+                --cell.Row;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Set the new cell format and number of decimal places.
+    /// </summary>
+    /// <param name="cell">Cell to format</param>
+    /// <param name="format">New format</param>
+    /// <param name="decimalPlaces">Number of decimal places</param>
+    public void SetCellFormat(Cell cell, CellFormat format, int decimalPlaces) {
+        cell.Format = format;
+        cell.DecimalPlaces = decimalPlaces;
+        Modified = true;
+    }
 }
