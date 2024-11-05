@@ -106,7 +106,8 @@ public static class Utilities {
     /// <param name="length">The width in which to centre</param>
     /// <returns>String centred within the given width</returns>
     public static string CentreString(string str, int length) {
-        int padding = Math.Max(0, ((length - str.Length) / 2) + str.Length);
-        return str.PadLeft(padding, ' ').PadRight(length, ' ');
+        ArgumentNullException.ThrowIfNull(str);
+        int padding = Math.Max(0, (length - str.Length) / 2 + str.Length);
+        return str.PadLeft(padding, ' ').PadRight(length, ' ').Substring(0, length);
     }
 }

@@ -133,7 +133,7 @@ public class Parser {
 
     /// Push back the last character read so that the next call to GetChar will
     /// retrieve that character.
-    private void PushChar(char ch) {
+    public void PushChar(char ch) {
         Debug.Assert(_pushedChar == '\0');
         _pushedChar = ch;
     }
@@ -146,7 +146,7 @@ public class Parser {
     /// Read the next character from the stream. If we reach the end of the line check
     /// the next one for a continuation character. If one is found, consume
     /// the new line and return the next character. Otherwise return EOL.
-    private char GetChar() {
+    public char GetChar() {
         if (_pushedChar != '\0') {
             char ch = _pushedChar;
             _pushedChar = '\0';

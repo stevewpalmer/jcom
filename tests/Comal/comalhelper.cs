@@ -26,32 +26,31 @@
 using CCompiler;
 using JComal;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace ComalTests {
+namespace ComalTests;
 
-    public class ComalHelper : Helper {
+public class ComalHelper : Helper {
 
-        // Compile the given code and return the error count.
-        public static Compiler HelperCompile(string code, ComalOptions opts) {
-            opts.Run = true;
-            Compiler comp = new(opts);
-            comp.CompileString(code, true);
-            Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
-            return comp;
-        }
+    // Compile the given code and return the error count.
+    public static Compiler HelperCompile(string code, ComalOptions opts) {
+        opts.Run = true;
+        Compiler comp = new(opts);
+        comp.CompileString(code, true);
+        Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
+        return comp;
+    }
 
-        // Compile the given code and check the specified errors occurred.
-        public static void HelperCompileAndCheckErrors(string code, ComalOptions opts, Message[] expectedErrors) {
-            opts.Run = true;
-            Compiler comp = new(opts);
-            comp.CompileString(code, true);
-            Assert.AreEqual(expectedErrors.Length, comp.Messages.ErrorCount);
-            for (int index = 0; index < expectedErrors.Length; index++) {
-                Assert.AreEqual(expectedErrors[index].Code, comp.Messages[index].Code);
-                Assert.AreEqual(expectedErrors[index].Line, comp.Messages[index].Line);
-                Assert.AreEqual(expectedErrors[index].Level, comp.Messages[index].Level);
-            }
+    // Compile the given code and check the specified errors occurred.
+    public static void HelperCompileAndCheckErrors(string code, ComalOptions opts, Message[] expectedErrors) {
+        opts.Run = true;
+        Compiler comp = new(opts);
+        comp.CompileString(code, true);
+        Assert.AreEqual(expectedErrors.Length, comp.Messages.ErrorCount);
+        for (int index = 0; index < expectedErrors.Length; index++) {
+            Assert.AreEqual(expectedErrors[index].Code, comp.Messages[index].Code);
+            Assert.AreEqual(expectedErrors[index].Line, comp.Messages[index].Line);
+            Assert.AreEqual(expectedErrors[index].Level, comp.Messages[index].Level);
         }
     }
 }

@@ -27,16 +27,17 @@ using CCompiler;
 using JComal;
 using JComLib;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace ComalTests {
-    [TestFixture]
-    public class ProcFunc {
+namespace ComalTests;
 
-        // Test calling a procedure.
-        [Test]
-        public void TestProc1() {
-            string code = @"
+[TestFixture]
+public class ProcFunc {
+
+    // Test calling a procedure.
+    [Test]
+    public void TestProc1() {
+        string code = @"
                 FUNC test1
                   PROC1
                   RETURN TRUE
@@ -45,14 +46,14 @@ namespace ComalTests {
                   RETURN
                 ENDPROC PROC1
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test1", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test1", 1);
+    }
 
-        // Test calling an open function.
-        [Test]
-        public void TestFunc1() {
-            string code = @"
+    // Test calling an open function.
+    [Test]
+    public void TestFunc1() {
+        string code = @"
                 FUNC test1
                   RETURN FUNC1
                 ENDFUNC test1
@@ -60,14 +61,14 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC FUNC1
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test1", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test1", 1);
+    }
 
-        // Test calling a procedure with a reference parameter
-        [Test]
-        public void TestProc2() {
-            string code = @"
+    // Test calling a procedure with a reference parameter
+    [Test]
+    public void TestProc2() {
+        string code = @"
                 FUNC test1
                   A#:=0
                   PROC1(A#)
@@ -81,14 +82,14 @@ namespace ComalTests {
                   V#:=0
                 ENDPROC PROC2
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test1", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test1", 1);
+    }
 
-        // Test calling a function
-        [Test]
-        public void TestFunc2() {
-            string code = @"
+    // Test calling a function
+    [Test]
+    public void TestFunc2() {
+        string code = @"
                 FUNC test'lower
                     DIM foo$ OF 7
                     foo$:=""HELLO""
@@ -106,14 +107,14 @@ namespace ComalTests {
                   RETURN text$
                 ENDFUNC lower$
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'lower", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'lower", 1);
+    }
 
-        // Test using IMPORT in an open procedure is an error
-        [Test]
-        public void TestBadImport1() {
-            string code = @"
+    // Test using IMPORT in an open procedure is an error
+    [Test]
+    public void TestBadImport1() {
+        string code = @"
                 PROC test'proc'1
                    IMPORT foo
                 ENDPROC
@@ -129,17 +130,17 @@ namespace ComalTests {
                    return TRUE
                 ENDFUNC
             ";
-            Message[] expectedErrors = {
-                new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 110, null),
-                new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 140, null)
-            };
-            ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
-        }
+        Message[] expectedErrors = {
+            new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 110, null),
+            new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 140, null)
+        };
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
+    }
 
-        // Test using duplicate IMPORT statements
-        [Test]
-        public void TestBadImport2() {
-            string code = @"
+    // Test using duplicate IMPORT statements
+    [Test]
+    public void TestBadImport2() {
+        string code = @"
                 PROC test'proc'1 CLOSED
                    IMPORT foo,foo
                 ENDPROC
@@ -147,16 +148,16 @@ namespace ComalTests {
                    return TRUE
                 ENDFUNC
             ";
-            Message[] expectedErrors = {
-                new Message(null, MessageLevel.Error, MessageCode.ALREADYIMPORTED, 110, null)
-            };
-            ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
-        }
+        Message[] expectedErrors = {
+            new Message(null, MessageLevel.Error, MessageCode.ALREADYIMPORTED, 110, null)
+        };
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
+    }
 
-        // Test scope.
-        [Test]
-        public void TestProcFuncScope() {
-            string code = @"
+    // Test scope.
+    [Test]
+    public void TestProcFuncScope() {
+        string code = @"
                 FUNC scopetest$
                   DIM text$ OF 10
                   text$:=""happy""
@@ -167,16 +168,16 @@ namespace ComalTests {
                   text$:=""sad""
                 ENDPROC testing
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunString(comp, "scopetest$", "happy");
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunString(comp, "scopetest$", "happy");
+    }
 
-        // Test scope of a variable in an open procedure. This should succeed
-        // since PROC1 is not CLOSED so it should have access to Foo# in the
-        // main scope.
-        [Test]
-        public void TestProc3() {
-            string code = @"
+    // Test scope of a variable in an open procedure. This should succeed
+    // since PROC1 is not CLOSED so it should have access to Foo# in the
+    // main scope.
+    [Test]
+    public void TestProc3() {
+        string code = @"
                 Foo# := 1234
                 PROC1
                 RETURN
@@ -186,13 +187,12 @@ namespace ComalTests {
                 ENDPROC PROC
             ";
 
-            // Turn on interactive mode to prevent us generating the top level exception
-            // handler in the code.
-            ComalOptions opts = new() {
-                Interactive = true
-            };
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Assert.Throws(typeof(JComRuntimeException), delegate { comp.Execute("Main"); });
-        }
+        // Turn on interactive mode to prevent us generating the top level exception
+        // handler in the code.
+        ComalOptions opts = new() {
+            Interactive = true
+        };
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Assert.Throws(typeof(JComRuntimeException), delegate { comp.Execute("Main"); });
     }
 }

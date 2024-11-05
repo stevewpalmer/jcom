@@ -25,16 +25,17 @@
 
 using JComal;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace ComalTests {
-    [TestFixture]
-    public class Operators {
+namespace ComalTests;
 
-        // Test assignments.
-        [Test]
-        public void TestAssignment() {
-            string code = @"
+[TestFixture]
+public class Operators {
+
+    // Test assignments.
+    [Test]
+    public void TestAssignment() {
+        string code = @"
                 FUNC test'assign CLOSED
                   LET A# := 14
                   IF A# <> 14 THEN RETURN FALSE
@@ -46,14 +47,14 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC test'assign
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'assign", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'assign", 1);
+    }
 
-        // Test the bitwise AND operator.
-        [Test]
-        public void TestAnd() {
-            string code = @"
+    // Test the bitwise AND operator.
+    [Test]
+    public void TestAnd() {
+        string code = @"
                 FUNC test'and CLOSED
                   IF (TRUE AND TRUE)<> TRUE THEN RETURN FALSE
                   IF (TRUE AND FALSE)<> FALSE THEN RETURN FALSE
@@ -62,14 +63,14 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC test'and
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'and", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'and", 1);
+    }
 
-        // Verify BITOR operator
-        [Test]
-        public void TestBitOR() {
-            string code = @"
+    // Verify BITOR operator
+    [Test]
+    public void TestBitOR() {
+        string code = @"
                 FUNC test'bitor CLOSED
                     IF (3 BITOR 3)<>3 THEN RETURN FALSE
                     IF (3 BITOR 0)<>3 THEN RETURN FALSE
@@ -78,14 +79,14 @@ namespace ComalTests {
                     RETURN TRUE
                 ENDFUNC test'bitor
                 ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'bitor", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'bitor", 1);
+    }
 
-        // Verify BITAND operator
-        [Test]
-        public void TestBitAND() {
-            string code = @"
+    // Verify BITAND operator
+    [Test]
+    public void TestBitAND() {
+        string code = @"
                 FUNC test'bitand CLOSED
                     IF (3 BITAND 3)<>3 THEN RETURN FALSE
                     IF (3 BITAND 0)<>0 THEN RETURN FALSE
@@ -94,14 +95,14 @@ namespace ComalTests {
                     RETURN TRUE
                 ENDFUNC test'bitand
                 ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'bitand", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'bitand", 1);
+    }
 
-        // Verify BITXOR operator
-        [Test]
-        public void TestBitXOR() {
-            string code = @"
+    // Verify BITXOR operator
+    [Test]
+    public void TestBitXOR() {
+        string code = @"
                 FUNC test'bitxor CLOSED
                     IF (3 BITXOR 3)<>0 THEN RETURN FALSE
                     IF (3 BITXOR 0)<>3 THEN RETURN FALSE
@@ -110,14 +111,14 @@ namespace ComalTests {
                     RETURN TRUE
                 ENDFUNC test'bitxor
                 ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'bitxor", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'bitxor", 1);
+    }
 
-        // Verify logical AND operator
-        [Test]
-        public void TestLogicalAND() {
-            string code = @"
+    // Verify logical AND operator
+    [Test]
+    public void TestLogicalAND() {
+        string code = @"
                 FUNC test'logical'and
                     counter := 0
                     p := 12 AND THEN inc'counter()
@@ -131,14 +132,14 @@ namespace ComalTests {
                     RETURN 1
                 ENDFUNC
                 ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'logical'and", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'logical'and", 1);
+    }
 
-        // Verify logical OR operator
-        [Test]
-        public void TestLogicalOR() {
-            string code = @"
+    // Verify logical OR operator
+    [Test]
+    public void TestLogicalOR() {
+        string code = @"
                 FUNC test'logical'or
                     counter := 0
                     p := 12 OR THEN inc'counter()
@@ -152,8 +153,7 @@ namespace ComalTests {
                     RETURN 1
                 ENDFUNC
                 ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'logical'or", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'logical'or", 1);
     }
 }

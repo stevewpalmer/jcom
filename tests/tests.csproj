@@ -39,7 +39,6 @@
         <Folder Include="Fortran\"/>
         <Folder Include="Comal\"/>
         <Folder Include="Utilities\"/>
-        <Folder Include="ComLib\"/>
     </ItemGroup>
     <ItemGroup>
         <None Remove="fcvs21\run.out"/>

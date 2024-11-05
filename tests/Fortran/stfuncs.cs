@@ -25,42 +25,42 @@
 
 using JFortran;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace FortranTests {
-    [TestFixture]
-    public class StatementFunctions {
+namespace FortranTests;
 
-        // A simple statement function. Verify that the scope of
-        // arguments is constrained to the statement function.
-        [Test]
-        public void StatementFunction1() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        INTEGER B",
-                "        B=12",
-                "        F(B)=B*B",
-                "        RETURN B+F(7)",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 61);
-        }
+[TestFixture]
+public class StatementFunctions {
 
-        // A statement function that calls another statement function.
-        [Test]
-        public void StatementFunction2() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        INTEGER B",
-                "        B=12",
-                "        G(H,I)=(H*I)+H+I",
-                "        F(B)=G(B,3)*G(B,4)",
-                "        RETURN B+F(7)",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 1221);
-        }
+    // A simple statement function. Verify that the scope of
+    // arguments is constrained to the statement function.
+    [Test]
+    public void StatementFunction1() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        INTEGER B",
+            "        B=12",
+            "        F(B)=B*B",
+            "        RETURN B+F(7)",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 61);
+    }
+
+    // A statement function that calls another statement function.
+    [Test]
+    public void StatementFunction2() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        INTEGER B",
+            "        B=12",
+            "        G(H,I)=(H*I)+H+I",
+            "        F(B)=G(B,3)*G(B,4)",
+            "        RETURN B+F(7)",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 1221);
     }
 }

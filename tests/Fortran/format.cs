@@ -25,83 +25,83 @@
 
 using JFortran;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace FortranTests {
-    [TestFixture]
-    public class FormatTests {
+namespace FortranTests;
 
-        // Basic FORMAT verification
-        [Test]
-        public void FormatBasic() {
-            string[] code = {
-                "      FUNCTION FMTTEST",
-                "        CHARACTER*26 STR, FMTTEST",
-                "3       FORMAT (\"The sum of \",I,\" and \",I,\" is \",I)",
-                "        WRITE (STR, 3) 12,36,12+36",
-                "        FMTTEST = STR",
-                "        RETURN",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunString(comp, "FMTTEST", "The sum of 12 and 36 is 48");
-        }
+[TestFixture]
+public class FormatTests {
 
-        // Array FORMAT verification
-        [Test]
-        public void FormatArrayRef() {
-            string[] code = {
-                "      FUNCTION FMTTEST",
-                "        CHARACTER*18 STR, FMTTEST",
-                "        INTEGER V(3)",
-                "        V(1) = 12",
-                "        V(2) = 24",
-                "        V(3) = 36",
-                "        WRITE (STR, \"3I6\") V",
-                "        FMTTEST = STR",
-                "        RETURN",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunString(comp, "FMTTEST", "    12    24    36");
-        }
+    // Basic FORMAT verification
+    [Test]
+    public void FormatBasic() {
+        string[] code = {
+            "      FUNCTION FMTTEST",
+            "        CHARACTER*26 STR, FMTTEST",
+            "3       FORMAT (\"The sum of \",I,\" and \",I,\" is \",I)",
+            "        WRITE (STR, 3) 12,36,12+36",
+            "        FMTTEST = STR",
+            "        RETURN",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunString(comp, "FMTTEST", "The sum of 12 and 36 is 48");
+    }
 
-        // Exponential format tests.
-        [Test]
-        public void FormatExpTests() {
-            string[] code = {
-                "      FUNCTION EXPTEST1",
-                "        CHARACTER*7 STR, EXPTEST1",
-                "        WRITE (STR, \"E7.2\") 678912.0",
-                "        RETURN STR",
-                "      END",
-                "      FUNCTION EXPTEST2",
-                "        CHARACTER*9 STR, EXPTEST2",
-                "        WRITE (STR, \"E9.2\") -678912.0",
-                "        RETURN STR",
-                "      END",
-                "      FUNCTION EXPTEST3",
-                "        CHARACTER*11 STR, EXPTEST3",
-                "        WRITE (STR, \"E11.2E4\") -678912.0",
-                "        RETURN STR",
-                "      END",
-                "      FUNCTION EXPTEST4",
-                "        CHARACTER*7 STR, EXPTEST4",
-                "        WRITE (STR, \"E7.2\") 8.12D112",
-                "        RETURN STR",
-                "      END",
-                "      FUNCTION EXPTEST5",
-                "        CHARACTER*8 STR, EXPTEST5",
-                "        WRITE (STR, \"E8.2\") 8.12D3",
-                "        RETURN STR",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunString(comp, "EXPTEST1", ".68E+06");
-            Helper.HelperRunString(comp, "EXPTEST2", "-0.68E+06");
-            Helper.HelperRunString(comp, "EXPTEST3", "-0.68E+0006");
-            Helper.HelperRunString(comp, "EXPTEST4", ".81+113");
-            Helper.HelperRunString(comp, "EXPTEST5", "0.81E+04");
-        }
+    // Array FORMAT verification
+    [Test]
+    public void FormatArrayRef() {
+        string[] code = {
+            "      FUNCTION FMTTEST",
+            "        CHARACTER*18 STR, FMTTEST",
+            "        INTEGER V(3)",
+            "        V(1) = 12",
+            "        V(2) = 24",
+            "        V(3) = 36",
+            "        WRITE (STR, \"3I6\") V",
+            "        FMTTEST = STR",
+            "        RETURN",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunString(comp, "FMTTEST", "    12    24    36");
+    }
+
+    // Exponential format tests.
+    [Test]
+    public void FormatExpTests() {
+        string[] code = {
+            "      FUNCTION EXPTEST1",
+            "        CHARACTER*7 STR, EXPTEST1",
+            "        WRITE (STR, \"E7.2\") 678912.0",
+            "        RETURN STR",
+            "      END",
+            "      FUNCTION EXPTEST2",
+            "        CHARACTER*9 STR, EXPTEST2",
+            "        WRITE (STR, \"E9.2\") -678912.0",
+            "        RETURN STR",
+            "      END",
+            "      FUNCTION EXPTEST3",
+            "        CHARACTER*11 STR, EXPTEST3",
+            "        WRITE (STR, \"E11.2E4\") -678912.0",
+            "        RETURN STR",
+            "      END",
+            "      FUNCTION EXPTEST4",
+            "        CHARACTER*7 STR, EXPTEST4",
+            "        WRITE (STR, \"E7.2\") 8.12D112",
+            "        RETURN STR",
+            "      END",
+            "      FUNCTION EXPTEST5",
+            "        CHARACTER*8 STR, EXPTEST5",
+            "        WRITE (STR, \"E8.2\") 8.12D3",
+            "        RETURN STR",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunString(comp, "EXPTEST1", ".68E+06");
+        Helper.HelperRunString(comp, "EXPTEST2", "-0.68E+06");
+        Helper.HelperRunString(comp, "EXPTEST3", "-0.68E+0006");
+        Helper.HelperRunString(comp, "EXPTEST4", ".81+113");
+        Helper.HelperRunString(comp, "EXPTEST5", "0.81E+04");
     }
 }

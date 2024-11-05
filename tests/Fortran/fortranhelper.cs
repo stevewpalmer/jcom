@@ -25,18 +25,17 @@
 
 using JFortran;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace FortranTests {
+namespace FortranTests;
 
-    public class FortranHelper : Helper {
+public class FortranHelper : Helper {
 
-        // Compile the given code and return the error count.
-        public static Compiler HelperCompile(string[] code, FortranOptions opts) {
-            Compiler comp = new(opts);
-            comp.CompileString(code);
-            Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
-            return comp;
-        }
+    // Compile the given code and return the error count.
+    public static Compiler HelperCompile(string[] code, FortranOptions opts) {
+        Compiler comp = new(opts);
+        comp.CompileString(code);
+        Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
+        return comp;
     }
 }

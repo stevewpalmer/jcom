@@ -25,25 +25,25 @@
 
 using JFortran;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace FortranTests {
-    [TestFixture]
-    public class Strings {
+namespace FortranTests;
 
-        // Test substring manipulation
-        [Test]
-        public void SubstringSet() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        CHARACTER METAL(2)*10, ITEST",
-                "        METAL(1) = 'CADMIUM'",
-                "        METAL(1)(3:4) = 'LO'",
-                "        RETURN METAL(1)",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunString(comp, "ITEST", "CALOIUM");
-        }
+[TestFixture]
+public class Strings {
+
+    // Test substring manipulation
+    [Test]
+    public void SubstringSet() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        CHARACTER METAL(2)*10, ITEST",
+            "        METAL(1) = 'CADMIUM'",
+            "        METAL(1)(3:4) = 'LO'",
+            "        RETURN METAL(1)",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunString(comp, "ITEST", "CALOIUM");
     }
 }

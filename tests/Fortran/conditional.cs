@@ -25,150 +25,149 @@
 
 using JFortran;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace FortranTests {
+namespace FortranTests;
 
-    public class ConditionalTests {
+public class ConditionalTests {
 
-        // Arithmetic IF block validation
-        [Test]
-        public void ConditionalArithmeticIF1() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 45",
-                "        IF (A.LT.47) A= 90",
-                "        ITEST = A",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 90);
-        }
+    // Arithmetic IF block validation
+    [Test]
+    public void ConditionalArithmeticIF1() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 45",
+            "        IF (A.LT.47) A= 90",
+            "        ITEST = A",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 90);
+    }
 
-        // Arithmetic IF block validation
-        [Test]
-        public void ConditionalArithmeticIF2() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 88",
-                "        IF (A.LT.47) A= 90",
-                "        ITEST = A",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 88);
-        }
+    // Arithmetic IF block validation
+    [Test]
+    public void ConditionalArithmeticIF2() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 88",
+            "        IF (A.LT.47) A= 90",
+            "        ITEST = A",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 88);
+    }
 
-        // Block IF block validation
-        [Test]
-        public void ConditionalBlockIF1() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 45",
-                "        IF (A.LT.47) THEN",
-                "          ITEST = 33",
-                "        ENDIF",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 33);
-        }
+    // Block IF block validation
+    [Test]
+    public void ConditionalBlockIF1() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 45",
+            "        IF (A.LT.47) THEN",
+            "          ITEST = 33",
+            "        ENDIF",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 33);
+    }
 
-        // Block IF block validation
-        [Test]
-        public void ConditionalBlockIF2() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 45",
-                "        IF (A.GT.47) THEN",
-                "          ITEST = 33",
-                "        ELSE",
-                "          ITEST = 67",
-                "        ENDIF",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 67);
-        }
+    // Block IF block validation
+    [Test]
+    public void ConditionalBlockIF2() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 45",
+            "        IF (A.GT.47) THEN",
+            "          ITEST = 33",
+            "        ELSE",
+            "          ITEST = 67",
+            "        ENDIF",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 67);
+    }
 
-        // Block IF block validation
-        [Test]
-        public void ConditionalBlockIF3() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 45",
-                "        IF (A.GT.47) THEN",
-                "          ITEST = 33",
-                "        ELSE IF (A.EQ.45) THEN",
-                "          ITEST = 81",
-                "        ELSE",
-                "          ITEST = 67",
-                "        ENDIF",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 81);
-        }
+    // Block IF block validation
+    [Test]
+    public void ConditionalBlockIF3() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 45",
+            "        IF (A.GT.47) THEN",
+            "          ITEST = 33",
+            "        ELSE IF (A.EQ.45) THEN",
+            "          ITEST = 81",
+            "        ELSE",
+            "          ITEST = 67",
+            "        ENDIF",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 81);
+    }
 
-        // Block IF block validation
-        [Test]
-        public void ConditionalBlockIF4() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 45",
-                "        IF (A.GT.47) THEN",
-                "          ITEST = 33",
-                "        ELSE IF (A.EQ.43) THEN",
-                "          ITEST = 11",
-                "        ELSE IF (A.EQ.45) THEN",
-                "          ITEST = 81",
-                "        ELSE",
-                "          ITEST = 67",
-                "        ENDIF",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 81);
-        }
+    // Block IF block validation
+    [Test]
+    public void ConditionalBlockIF4() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 45",
+            "        IF (A.GT.47) THEN",
+            "          ITEST = 33",
+            "        ELSE IF (A.EQ.43) THEN",
+            "          ITEST = 11",
+            "        ELSE IF (A.EQ.45) THEN",
+            "          ITEST = 81",
+            "        ELSE",
+            "          ITEST = 67",
+            "        ENDIF",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 81);
+    }
 
-        // Block IF block validation
-        [Test]
-        public void ConditionalBlockIF5() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 45",
-                "        IF (A.LT.47) THEN",
-                "           IF (A.EQ.46) THEN",
-                "             ITEST=-44",
-                "           ELSE",
-                "             ITEST=177",
-                "           ENDIF",
-                "        ENDIF",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 177);
-        }
+    // Block IF block validation
+    [Test]
+    public void ConditionalBlockIF5() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 45",
+            "        IF (A.LT.47) THEN",
+            "           IF (A.EQ.46) THEN",
+            "             ITEST=-44",
+            "           ELSE",
+            "             ITEST=177",
+            "           ENDIF",
+            "        ENDIF",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 177);
+    }
 
-        // Block IF block validation
-        [Test]
-        public void ConditionalBlockIF6() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        A = 55",
-                "        IF (A.LT.47) THEN",
-                "           IF (A.EQ.46) THEN",
-                "             ITEST=-44",
-                "           ELSE",
-                "             ITEST=177",
-                "           ENDIF",
-                "        ELSE",
-                "          ITEST=94",
-                "        ENDIF",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 94);
-        }
+    // Block IF block validation
+    [Test]
+    public void ConditionalBlockIF6() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        A = 55",
+            "        IF (A.LT.47) THEN",
+            "           IF (A.EQ.46) THEN",
+            "             ITEST=-44",
+            "           ELSE",
+            "             ITEST=177",
+            "           ENDIF",
+            "        ELSE",
+            "          ITEST=94",
+            "        ENDIF",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 94);
     }
 }

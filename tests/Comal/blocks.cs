@@ -26,29 +26,30 @@
 using JComal;
 using JComLib;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace ComalTests {
-    [TestFixture]
-    public class Blocks {
+namespace ComalTests;
 
-        // Test NULL statement
-        [Test]
-        public void TestNull() {
-            string code = @"
+[TestFixture]
+public class Blocks {
+
+    // Test NULL statement
+    [Test]
+    public void TestNull() {
+        string code = @"
                 func test closed
                   null
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-        // Test ERR in trap handler
-        [Test]
-        public void TestErrInTrap() {
-            string code = @"
+    // Test ERR in trap handler
+    [Test]
+    public void TestErrInTrap() {
+        string code = @"
                 func test closed
                   trap
                     if err<>0 then return false
@@ -59,14 +60,14 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-        // Test ERRTEXT$ in trap handler
-        [Test]
-        public void TestErrTextInTrap() {
-            string code = @"
+    // Test ERRTEXT$ in trap handler
+    [Test]
+    public void TestErrTextInTrap() {
+        string code = @"
                 func test closed
                   trap
                     if len(errtext$)<>0 then return false
@@ -77,15 +78,15 @@ namespace ComalTests {
                   return false
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-        // Test trapping divisions by zero for both integer and
-        // floating point.
-        [Test]
-        public void TestDivisionByZeroTrap() {
-            string code = @"
+    // Test trapping divisions by zero for both integer and
+    // floating point.
+    [Test]
+    public void TestDivisionByZeroTrap() {
+        string code = @"
                 func test closed
                   trap
                     a# := 10
@@ -104,15 +105,15 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-        // Test END doesn't get caught by trap handler since it raises its own
-        // exception.
-        [Test]
-        public void TestEndInTrap() {
-            string code = @"
+    // Test END doesn't get caught by trap handler since it raises its own
+    // exception.
+    [Test]
+    public void TestEndInTrap() {
+        string code = @"
                 func test closed
                   trap
                     end
@@ -122,8 +123,7 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Assert.Throws(typeof(JComRuntimeException), delegate { comp.Execute("test"); });
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Assert.Throws(typeof(JComRuntimeException), delegate { comp.Execute("test"); });
     }
 }

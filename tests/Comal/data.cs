@@ -25,44 +25,45 @@
 
 using JComal;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace ComalTests {
-    [TestFixture]
-    public class Data {
+namespace ComalTests;
 
-        // Test simple DATA read
-        [Test]
-        public void TestRead1Data() {
-            string code = @"
+[TestFixture]
+public class Data {
+
+    // Test simple DATA read
+    [Test]
+    public void TestRead1Data() {
+        string code = @"
                 FUNC read'simple'data
                   READ A
                   RETURN A
                 ENDFUNC
                 DATA 15
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "read'simple'data", 15);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "read'simple'data", 15);
+    }
 
-        // Test multiple DATA reads
-        [Test]
-        public void TestReadXData() {
-            string code = @"
+    // Test multiple DATA reads
+    [Test]
+    public void TestReadXData() {
+        string code = @"
                 FUNC read'multiple'data
                   READ A,B#,C,D#
                   RETURN (A+B#)*(C-D#)
                 ENDFUNC
                 DATA 47,13,10,8
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "read'multiple'data", 120);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "read'multiple'data", 120);
+    }
 
-        // Test EOD
-        [Test]
-        public void TestEOD() {
-            string code = @"
+    // Test EOD
+    [Test]
+    public void TestEOD() {
+        string code = @"
                 FUNC test'eod
                   IF EOD THEN RETURN 0
                   READ A,B#,C,D#
@@ -70,28 +71,28 @@ namespace ComalTests {
                 ENDFUNC test'eod
                 DATA 47,13,10,8
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'eod", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'eod", 1);
+    }
 
-        // Test that EOD is 1 if there are no DATA statements
-        // in the program.
-        [Test]
-        public void TestDefaultEOD() {
-            string code = @"
+    // Test that EOD is 1 if there are no DATA statements
+    // in the program.
+    [Test]
+    public void TestDefaultEOD() {
+        string code = @"
                 FUNC test'default'eod
                   IF EOD THEN RETURN 1
                   RETURN FALSE
                 ENDFUNC test'default'eod
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'default'eod", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'default'eod", 1);
+    }
 
-        // Test RESTORE
-        [Test]
-        public void TestRestore() {
-            string code = @"
+    // Test RESTORE
+    [Test]
+    public void TestRestore() {
+        string code = @"
                 FUNC test'restore
                   READ A,B#
                   RESTORE
@@ -100,14 +101,14 @@ namespace ComalTests {
                 ENDFUNC
                 DATA 47,13,10,8
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'restore", 2040);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'restore", 2040);
+    }
 
-        // Test RESTORE resets EOD
-        [Test]
-        public void TestRestoreResetEOD() {
-            string code = @"
+    // Test RESTORE resets EOD
+    [Test]
+    public void TestRestoreResetEOD() {
+        string code = @"
                 FUNC test'restore'reset
                   READ A,B#,C,D#
                   IF NOT EOD THEN RETURN FALSE
@@ -116,8 +117,7 @@ namespace ComalTests {
                 ENDFUNC
                 DATA 47,13,10,8
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test'restore'reset", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test'restore'reset", 1);
     }
 }

@@ -27,60 +27,60 @@ using CCompiler;
 using JFortran;
 using NUnit.Framework;
 
-namespace FortranTests {
-    [TestFixture]
-    public class OptionsTest {
+namespace FortranTests;
 
-        // Validate the MessageCode table hasn't been borked
-        [Test]
-        public void ValidateMessageCodeTable() {
-            Assert.AreEqual((int)MessageCode.NONE, 0);
-            Assert.AreEqual((int)MessageCode.EXPECTEDTOKEN, 0x1000);
-            Assert.AreEqual((int)MessageCode.BADOPTION, 0x103E);
-        }
+[TestFixture]
+public class OptionsTest {
 
-        // Verify that the default options are what we expect.
-        [Test]
-        public void ValidateDefaultOptions() {
-            FortranOptions opts = new();
+    // Validate the MessageCode table hasn't been borked
+    [Test]
+    public void ValidateMessageCodeTable() {
+        Assert.AreEqual((int)MessageCode.NONE, 0);
+        Assert.AreEqual((int)MessageCode.EXPECTEDTOKEN, 0x1000);
+        Assert.AreEqual((int)MessageCode.BADOPTION, 0x103E);
+    }
 
-            Assert.IsFalse(opts.Backslash);
-            Assert.IsFalse(opts.GenerateDebug);
-        }
+    // Verify that the default options are what we expect.
+    [Test]
+    public void ValidateDefaultOptions() {
+        FortranOptions opts = new();
 
-        // Verify that options are correctly parsed.
-        [Test]
-        public void ValidateOptionParsing() {
-            FortranOptions opts = new();
-            string[] args = {
-                "--backslash",
-                "--invalidoption",
-                "--debug"
-            };
-            Assert.IsFalse(opts.Parse(args));
+        Assert.IsFalse(opts.Backslash);
+        Assert.IsFalse(opts.GenerateDebug);
+    }
 
-            Assert.IsTrue(opts.Backslash);
-            Assert.IsTrue(opts.Messages.Count == 1);
-            Assert.IsTrue(opts.Messages[0].Code == MessageCode.BADOPTION);
-        }
+    // Verify that options are correctly parsed.
+    [Test]
+    public void ValidateOptionParsing() {
+        FortranOptions opts = new();
+        string[] args = {
+            "--backslash",
+            "--invalidoption",
+            "--debug"
+        };
+        Assert.IsFalse(opts.Parse(args));
 
-        // Verify that input filenames are correctly parsed
-        [Test]
-        public void ValidateFilenameParsing() {
-            FortranOptions opts = new();
-            string[] args = {
-                "--backslash",
-                "testfile1.f",
-                "--debug",
-                "testfile2.f"
-            };
+        Assert.IsTrue(opts.Backslash);
+        Assert.IsTrue(opts.Messages.Count == 1);
+        Assert.IsTrue(opts.Messages[0].Code == MessageCode.BADOPTION);
+    }
 
-            Assert.IsTrue(opts.Parse(args));
-            Assert.IsTrue(opts.SourceFiles.Count == 2);
-            Assert.AreEqual(opts.SourceFiles[0], "testfile1.f");
-            Assert.AreEqual(opts.SourceFiles[1], "testfile2.f");
-            Assert.IsTrue(opts.Backslash);
-            Assert.IsTrue(opts.GenerateDebug);
-        }
+    // Verify that input filenames are correctly parsed
+    [Test]
+    public void ValidateFilenameParsing() {
+        FortranOptions opts = new();
+        string[] args = {
+            "--backslash",
+            "testfile1.f",
+            "--debug",
+            "testfile2.f"
+        };
+
+        Assert.IsTrue(opts.Parse(args));
+        Assert.IsTrue(opts.SourceFiles.Count == 2);
+        Assert.AreEqual(opts.SourceFiles[0], "testfile1.f");
+        Assert.AreEqual(opts.SourceFiles[1], "testfile2.f");
+        Assert.IsTrue(opts.Backslash);
+        Assert.IsTrue(opts.GenerateDebug);
     }
 }

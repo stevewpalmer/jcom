@@ -25,16 +25,17 @@
 
 using JComal;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace ComalTests {
-    [TestFixture]
-    public class Functions {
+namespace ComalTests;
 
-        // Test Abs() function.
-        [Test]
-        public void TestAbs() {
-            string code = @"
+[TestFixture]
+public class Functions {
+
+    // Test Abs() function.
+    [Test]
+    public void TestAbs() {
+        string code = @"
                 func test'abs closed
                   if abs(1)<>1 then return false
                   if abs(-1)<>1 then return false
@@ -43,18 +44,18 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'abs", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'abs", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'abs", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'abs", 1);
+    }
 
-        // Test Atn() function.
-        [Test]
-        public void TestAtn() {
-            string code = @"
+    // Test Atn() function.
+    [Test]
+    public void TestAtn() {
+        string code = @"
                 FUNC test'atn CLOSED
                   B := 0.5
                   B# := 4
@@ -66,18 +67,18 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'atn", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'atn", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'atn", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'atn", 1);
+    }
 
-        // Test Sqr() function.
-        [Test]
-        public void TestSqr() {
-            string code = @"
+    // Test Sqr() function.
+    [Test]
+    public void TestSqr() {
+        string code = @"
                 FUNC test'sqr CLOSED
                   BVS := SQR(1.6)
                   AVS := SQR(0.625) * BVS
@@ -87,18 +88,18 @@ namespace ComalTests {
                 RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'sqr", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'sqr", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'sqr", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'sqr", 1);
+    }
 
-        // Test Cos() function.
-        [Test]
-        public void TestCos() {
-            string code = @"
+    // Test Cos() function.
+    [Test]
+    public void TestCos() {
+        string code = @"
                 FUNC test'cos CLOSED
                   B := 0.5
                   B# := 4
@@ -109,18 +110,18 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'cos", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'cos", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'cos", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'cos", 1);
+    }
 
-        // Test Sin() function.
-        [Test]
-        public void TestSin() {
-            string code = @"
+    // Test Sin() function.
+    [Test]
+    public void TestSin() {
+        string code = @"
                 FUNC test'sin CLOSED
                   B := 0.5
                   B# := 4
@@ -131,36 +132,36 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'sin", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'sin", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'sin", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'sin", 1);
+    }
 
-        // Test Ord() function.
-        [Test]
-        public void TestOrd() {
-            string code = @"
+    // Test Ord() function.
+    [Test]
+    public void TestOrd() {
+        string code = @"
                 FUNC test'ord CLOSED
                   IF CHR$(53)<>""5"" THEN RETURN FALSE
                   IF ORD(CHR$(53))<>53 THEN RETURN FALSE
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'ord", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'ord", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'ord", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'ord", 1);
+    }
 
-        // Test Log() function.
-        [Test]
-        public void TestLog() {
-            string code = @"
+    // Test Log() function.
+    [Test]
+    public void TestLog() {
+        string code = @"
                 FUNC test'log CLOSED
                   IF LOG(1)<>0 THEN RETURN FALSE
                   A := ABS(LOG(2.71828)-1)
@@ -170,19 +171,19 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'log", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'log", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'log", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'log", 1);
+    }
 
-        // Test RANDOMIZE
-        // Calls to RND in between must return the same value
-        [Test]
-        public void TestRandomize() {
-            string code = @"
+    // Test RANDOMIZE
+    // Calls to RND in between must return the same value
+    [Test]
+    public void TestRandomize() {
+        string code = @"
                 FUNC test'randomize CLOSED
                   RANDOMIZE 9
                   a:=RND
@@ -195,18 +196,18 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'randomize", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'randomize", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'randomize", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'randomize", 1);
+    }
 
-        // Test RND and RND(range)
-        [Test]
-        public void TestRndRange() {
-            string code = @"
+    // Test RND and RND(range)
+    [Test]
+    public void TestRndRange() {
+        string code = @"
                 FUNC test'rnd'range CLOSED
                   FOR x:=1 TO 50 DO
                     r:=RND(1,20)
@@ -217,18 +218,18 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'rnd'range", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'rnd'range", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'rnd'range", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'rnd'range", 1);
+    }
 
-        // Test SPC$
-        [Test]
-        public void TestSpc() {
-            string code = @"
+    // Test SPC$
+    [Test]
+    public void TestSpc() {
+        string code = @"
                 FUNC test'spc CLOSED
                   DIM A$ OF 11
                   A$ := ""HELLO"" + SPC$(1) + ""WORLD""
@@ -240,12 +241,11 @@ namespace ComalTests {
                   RETURN TRUE
                 ENDFUNC
             ";
-            ComalOptions opts = new();
-            Compiler comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'spc", 1);
-            opts.Inline = false;
-            comp = ComalHelper.HelperCompile(code, opts);
-            Helper.HelperRunFloat(comp, "test'spc", 1);
-        }
+        ComalOptions opts = new();
+        Compiler comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'spc", 1);
+        opts.Inline = false;
+        comp = ComalHelper.HelperCompile(code, opts);
+        Helper.HelperRunFloat(comp, "test'spc", 1);
     }
 }

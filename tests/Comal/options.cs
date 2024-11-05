@@ -27,80 +27,80 @@ using CCompiler;
 using JComal;
 using NUnit.Framework;
 
-namespace ComalTests {
-    [TestFixture]
-    public class OptionsTest {
+namespace ComalTests;
 
-        // Validate the Tokens IDs are consistent.
-        [Test]
-        public void ValidateTokenEnums() {
-            Assert.AreEqual((int)TokenID.KENDCASE, 50);
-            Assert.AreEqual((int)TokenID.KMOD, 100);
-            Assert.AreEqual((int)TokenID.KRESTORE, 123);
-        }
+[TestFixture]
+public class OptionsTest {
 
-        // Verify that the default options are what we expect.
-        [Test]
-        public void ValidateDefaultOptions() {
-            ComalOptions opts = new();
+    // Validate the Tokens IDs are consistent.
+    [Test]
+    public void ValidateTokenEnums() {
+        Assert.AreEqual((int)TokenID.KENDCASE, 50);
+        Assert.AreEqual((int)TokenID.KMOD, 100);
+        Assert.AreEqual((int)TokenID.KRESTORE, 123);
+    }
 
-            Assert.IsFalse(opts.Interactive);
-            Assert.IsFalse(opts.GenerateDebug);
-            Assert.IsFalse(opts.Run);
-        }
+    // Verify that the default options are what we expect.
+    [Test]
+    public void ValidateDefaultOptions() {
+        ComalOptions opts = new();
 
-        // Verify that options are correctly parsed.
-        // Because no filename is specified, Interactive will be set.
-        [Test]
-        public void ValidateOptionParsing() {
-            ComalOptions opts = new();
-            string[] args = {
-                "--noinline",
-                "--invalidoption",
-                "--debug"
-            };
-            Assert.IsFalse(opts.Parse(args));
+        Assert.IsFalse(opts.Interactive);
+        Assert.IsFalse(opts.GenerateDebug);
+        Assert.IsFalse(opts.Run);
+    }
 
-            Assert.IsFalse(opts.Inline);
-            Assert.IsTrue(opts.GenerateDebug);
-            Assert.IsFalse(opts.Interactive);
-            Assert.IsTrue(opts.Messages.Count == 1);
-            Assert.IsTrue(opts.Messages[0].Code == MessageCode.BADOPTION);
-        }
+    // Verify that options are correctly parsed.
+    // Because no filename is specified, Interactive will be set.
+    [Test]
+    public void ValidateOptionParsing() {
+        ComalOptions opts = new();
+        string[] args = {
+            "--noinline",
+            "--invalidoption",
+            "--debug"
+        };
+        Assert.IsFalse(opts.Parse(args));
 
-        // Verify that input filenames are correctly parsed
-        [Test]
-        public void ValidateFilenameParsing() {
-            ComalOptions opts = new();
-            string[] args = {
-                "testfile1.cml",
-                "--debug",
-                "testfile2.cml"
-            };
+        Assert.IsFalse(opts.Inline);
+        Assert.IsTrue(opts.GenerateDebug);
+        Assert.IsFalse(opts.Interactive);
+        Assert.IsTrue(opts.Messages.Count == 1);
+        Assert.IsTrue(opts.Messages[0].Code == MessageCode.BADOPTION);
+    }
 
-            Assert.IsTrue(opts.Parse(args));
-            Assert.IsTrue(opts.SourceFiles.Count == 2);
-            Assert.AreEqual(opts.SourceFiles[0], "testfile1.cml");
-            Assert.AreEqual(opts.SourceFiles[1], "testfile2.cml");
-            Assert.IsTrue(opts.GenerateDebug);
-        }
+    // Verify that input filenames are correctly parsed
+    [Test]
+    public void ValidateFilenameParsing() {
+        ComalOptions opts = new();
+        string[] args = {
+            "testfile1.cml",
+            "--debug",
+            "testfile2.cml"
+        };
 
-        // Verify that a filename without an extension is assumed to
-        // have the list file extension by default.
-        [Test]
-        public void ValidateFilenameExtension() {
-            ComalOptions opts = new();
-            string[] args = {
-                "testfile1.",
-                "--debug",
-                "testfile2"
-            };
+        Assert.IsTrue(opts.Parse(args));
+        Assert.IsTrue(opts.SourceFiles.Count == 2);
+        Assert.AreEqual(opts.SourceFiles[0], "testfile1.cml");
+        Assert.AreEqual(opts.SourceFiles[1], "testfile2.cml");
+        Assert.IsTrue(opts.GenerateDebug);
+    }
 
-            Assert.IsTrue(opts.Parse(args));
-            Assert.IsTrue(opts.SourceFiles.Count == 2);
-            Assert.AreEqual(opts.SourceFiles[0], "testfile1.lst");
-            Assert.AreEqual(opts.SourceFiles[1], "testfile2.lst");
-            Assert.IsTrue(opts.GenerateDebug);
-        }
+    // Verify that a filename without an extension is assumed to
+    // have the list file extension by default.
+    [Test]
+    public void ValidateFilenameExtension() {
+        ComalOptions opts = new();
+        string[] args = {
+            "testfile1.",
+            "--debug",
+            "testfile2"
+        };
+
+        Assert.IsTrue(opts.Parse(args));
+        Assert.IsTrue(opts.SourceFiles.Count == 2);
+        Assert.AreEqual(opts.SourceFiles[0], "testfile1.lst");
+        Assert.AreEqual(opts.SourceFiles[1], "testfile2.lst");
+        Assert.IsTrue(opts.GenerateDebug);
     }
 }

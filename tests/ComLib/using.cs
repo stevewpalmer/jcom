@@ -26,45 +26,45 @@
 using JComalLib;
 using NUnit.Framework;
 
-namespace ComLibTests {
-    [TestFixture]
-    public class Using {
+namespace ComLibTests;
 
-        // Test simple USING patterns.
-        [Test]
-        public void Using1() {
-            object[] args = { 12.34f };
-            Assert.AreEqual("12.34", Intrinsics.USING("##.##", args));
-            Assert.AreEqual(" 12.340", Intrinsics.USING("###.###", args));
-            Assert.AreEqual("*****", Intrinsics.USING("#.###", args));
-        }
+[TestFixture]
+public class Using {
 
-        // Test USING with negative numbers.
-        [Test]
-        public void Using2() {
-            object[] args = { -89.45f };
-            Assert.AreEqual("-89.45", Intrinsics.USING("-##.##", args));
-            Assert.AreEqual(" -89.450", Intrinsics.USING("-###.###", args));
-            Assert.AreEqual("-89.450", Intrinsics.USING("###.###", args));
-        }
+    // Test simple USING patterns.
+    [Test]
+    public void Using1() {
+        object[] args = { 12.34f };
+        Assert.AreEqual("12.34", Intrinsics.USING("##.##", args));
+        Assert.AreEqual(" 12.340", Intrinsics.USING("###.###", args));
+        Assert.AreEqual("*****", Intrinsics.USING("#.###", args));
+    }
 
-        // Test USING with extra characters.
-        [Test]
-        public void Using3() {
-            object[] args = { 67543 };
-            Assert.AreEqual("The number is 67543 exactly", Intrinsics.USING("The number is ##### exactly", args));
-            Assert.AreEqual("£67543.00ex.VAT", Intrinsics.USING("£#####.##ex.VAT", args));
-            Assert.AreEqual("Overflow ****test", Intrinsics.USING("Overflow ####test", args));
-        }
+    // Test USING with negative numbers.
+    [Test]
+    public void Using2() {
+        object[] args = { -89.45f };
+        Assert.AreEqual("-89.45", Intrinsics.USING("-##.##", args));
+        Assert.AreEqual(" -89.450", Intrinsics.USING("-###.###", args));
+        Assert.AreEqual("-89.450", Intrinsics.USING("###.###", args));
+    }
 
-        // Pathological cases.
-        [Test]
-        public void Using4() {
-            object[] args = { 0.78 };
-            Assert.AreEqual("", Intrinsics.USING("", args));
-            Assert.AreEqual("-", Intrinsics.USING("-", args));
-            Assert.AreEqual("---...---", Intrinsics.USING("---...---", args));
-            Assert.AreEqual("....", Intrinsics.USING("....", args));
-        }
+    // Test USING with extra characters.
+    [Test]
+    public void Using3() {
+        object[] args = { 67543 };
+        Assert.AreEqual("The number is 67543 exactly", Intrinsics.USING("The number is ##### exactly", args));
+        Assert.AreEqual("£67543.00ex.VAT", Intrinsics.USING("£#####.##ex.VAT", args));
+        Assert.AreEqual("Overflow ****test", Intrinsics.USING("Overflow ####test", args));
+    }
+
+    // Pathological cases.
+    [Test]
+    public void Using4() {
+        object[] args = { 0.78 };
+        Assert.AreEqual("", Intrinsics.USING("", args));
+        Assert.AreEqual("-", Intrinsics.USING("-", args));
+        Assert.AreEqual("---...---", Intrinsics.USING("---...---", args));
+        Assert.AreEqual("....", Intrinsics.USING("....", args));
     }
 }

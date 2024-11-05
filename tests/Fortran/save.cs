@@ -25,53 +25,53 @@
 
 using JFortran;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace FortranTests {
-    [TestFixture]
-    public class SaveTests {
+namespace FortranTests;
 
-        // Verify basic SAVE to save the state of a single
-        // keyword.
-        [Test]
-        public void SaveInFunction() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        DO 10 I=1,10",
-                "          ITEST = ITEST + FOO()",
-                " 10     CONTINUE",
-                "      END",
-                "      FUNCTION FOO()",
-                "        INTEGER B",
-                "        SAVE B",
-                "        B = B + 1",
-                "        RETURN B",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 55);
-        }
+[TestFixture]
+public class SaveTests {
 
-        // Verify the use of SAVE to save all local identifiers
-        [Test]
-        public void SaveAllInFunction() {
-            string[] code = {
-                "      FUNCTION ITEST",
-                "        DO 10 I=1,10",
-                "          ITEST = ITEST + FOO()",
-                " 10     CONTINUE",
-                "      END",
-                "      FUNCTION FOO()",
-                "        INTEGER B,C,D",
-                "        SAVE",
-                "        B = B + 1",
-                "        C = C + 2",
-                "        D = D + 4",
-                "        RETURN B+C+D",
-                "      END"
-            };
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunInteger(comp, "ITEST", 385);
-        }
+    // Verify basic SAVE to save the state of a single
+    // keyword.
+    [Test]
+    public void SaveInFunction() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        DO 10 I=1,10",
+            "          ITEST = ITEST + FOO()",
+            " 10     CONTINUE",
+            "      END",
+            "      FUNCTION FOO()",
+            "        INTEGER B",
+            "        SAVE B",
+            "        B = B + 1",
+            "        RETURN B",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 55);
+    }
+
+    // Verify the use of SAVE to save all local identifiers
+    [Test]
+    public void SaveAllInFunction() {
+        string[] code = {
+            "      FUNCTION ITEST",
+            "        DO 10 I=1,10",
+            "          ITEST = ITEST + FOO()",
+            " 10     CONTINUE",
+            "      END",
+            "      FUNCTION FOO()",
+            "        INTEGER B,C,D",
+            "        SAVE",
+            "        B = B + 1",
+            "        C = C + 2",
+            "        D = D + 4",
+            "        RETURN B+C+D",
+            "      END"
+        };
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunInteger(comp, "ITEST", 385);
     }
 }

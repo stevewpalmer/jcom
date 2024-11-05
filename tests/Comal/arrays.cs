@@ -27,16 +27,17 @@ using System;
 using CCompiler;
 using JComal;
 using NUnit.Framework;
-using Utilities;
+using TestUtilities;
 
-namespace ComalTests {
-    [TestFixture]
-    public class Arrays {
+namespace ComalTests;
 
-        // Test Simple 1D array
-        [Test]
-        public void TestSimple1DArray() {
-            string code = @"
+[TestFixture]
+public class Arrays {
+
+    // Test Simple 1D array
+    [Test]
+    public void TestSimple1DArray() {
+        string code = @"
                 func test closed
                   dim a(10)
                   for x:=1 to 10 do
@@ -48,14 +49,14 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-        // Test Simple 2D array
-        [Test]
-        public void TestSimple2DArray() {
-            string code = @"
+    // Test Simple 2D array
+    [Test]
+    public void TestSimple2DArray() {
+        string code = @"
                 func array'2d closed
                   dim a(10,10)
                   for x:=1 to 10 do
@@ -71,14 +72,14 @@ namespace ComalTests {
                   return true
                 endfunc array'2d
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'2d", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'2d", 1);
+    }
 
-        // Test 1D string array
-        [Test]
-        public void TestString1DArray() {
-            string code = @"
+    // Test 1D string array
+    [Test]
+    public void TestString1DArray() {
+        string code = @"
                 func test closed
                   dim a$(10) of 5
                   for x:=1 to 10 do
@@ -90,14 +91,14 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-        // Test 2D string array
-        [Test]
-        public void TestString2DArray() {
-            string code = @"
+    // Test 2D string array
+    [Test]
+    public void TestString2DArray() {
+        string code = @"
                 func array'string'2d closed
                   dim a$(5,10) of 4
                   for x:=1 to 5 do
@@ -113,14 +114,14 @@ namespace ComalTests {
                   return true
                 endfunc array'string'2d
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'string'2d", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'string'2d", 1);
+    }
 
-        // Test 1D dynamic array
-        [Test]
-        public void Test1DDynamicArray() {
-            string code = @"
+    // Test 1D dynamic array
+    [Test]
+    public void Test1DDynamicArray() {
+        string code = @"
                 func array'dynamic'1d closed
                   arysize := 13
                   dim a(arysize)
@@ -133,14 +134,14 @@ namespace ComalTests {
                   return true
                 endfunc array'dynamic'1d
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'dynamic'1d", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'dynamic'1d", 1);
+    }
 
-        // Test 1D dynamic array with a range
-        [Test]
-        public void Test1DDynamicArrayWithRange() {
-            string code = @"
+    // Test 1D dynamic array with a range
+    [Test]
+    public void Test1DDynamicArrayWithRange() {
+        string code = @"
                 func array'dynamic'1d'range closed
                   lowr := -5
                   highr := 5
@@ -154,14 +155,14 @@ namespace ComalTests {
                   return true
                 endfunc array'dynamic'1d'range
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'dynamic'1d'range", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'dynamic'1d'range", 1);
+    }
 
-        // Test 1D dynamic string array
-        [Test]
-        public void Test1DDynamicStringArray() {
-            string code = @"
+    // Test 1D dynamic string array
+    [Test]
+    public void Test1DDynamicStringArray() {
+        string code = @"
                 func array'dynamic'string'1d closed
                   arysize := 13
                   dim a$(arysize) of 5
@@ -174,15 +175,15 @@ namespace ComalTests {
                   return true
                 endfunc array'dynamic'string'1d
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
-            Helper.HelperRunFloat(comp, "array'dynamic'string'1d", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
+        Helper.HelperRunFloat(comp, "array'dynamic'string'1d", 1);
+    }
 
-        // Test redimensioning 1D dynamic array. After redimensioning,
-        // all array elements will have been reset to 0.
-        [Test]
-        public void Test1DRedimDynamicArray() {
-            string code = @"
+    // Test redimensioning 1D dynamic array. After redimensioning,
+    // all array elements will have been reset to 0.
+    [Test]
+    public void Test1DRedimDynamicArray() {
+        string code = @"
                 func array'redim'dynamic'1d closed
                   arysize := 13
                   dim a(arysize)
@@ -197,14 +198,14 @@ namespace ComalTests {
                   return true
                 endfunc array'redim'dynamic'1d
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'redim'dynamic'1d", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'redim'dynamic'1d", 1);
+    }
 
-        // Test 2D dynamic array
-        [Test]
-        public void Test2DDynamicStringArray() {
-            string code = @"
+    // Test 2D dynamic array
+    [Test]
+    public void Test2DDynamicStringArray() {
+        string code = @"
                 func array'dynamic'2d closed
                   max'x := 5
                   max'y := 7
@@ -222,14 +223,14 @@ namespace ComalTests {
                   return true
                 endfunc array'dynamic'2d
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
-            Helper.HelperRunFloat(comp, "array'dynamic'2d", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions { Strict = true });
+        Helper.HelperRunFloat(comp, "array'dynamic'2d", 1);
+    }
 
-        // Test 1D dynamic array with a range
-        [Test]
-        public void Test2DDynamicArrayWithRange() {
-            string code = @"
+    // Test 1D dynamic array with a range
+    [Test]
+    public void Test2DDynamicArrayWithRange() {
+        string code = @"
                 func array'dynamic'2d'range closed
                   max'x'low := 0
                   max'x'high := 20
@@ -249,14 +250,14 @@ namespace ComalTests {
                   return true
                 endfunc array'dynamic'2d'range
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'dynamic'2d'range", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'dynamic'2d'range", 1);
+    }
 
-        // Test catching inconsistent array dimensions
-        [Test]
-        public void TestInconsistentDimensions() {
-            string code = @"
+    // Test catching inconsistent array dimensions
+    [Test]
+    public void TestInconsistentDimensions() {
+        string code = @"
                 func array'badd closed
                   dim a(10,10)
                   for x:=1 to 10 do
@@ -272,17 +273,17 @@ namespace ComalTests {
                   return true
                 endfunc array'badd
             ";
-            Message[] expectedErrors = {
-                new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 140, null),
-                new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 190, null)
-            };
-            ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
-        }
+        Message[] expectedErrors = {
+            new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 140, null),
+            new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 190, null)
+        };
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
+    }
 
-        // Test Simple bounded array
-        [Test]
-        public void TestSimpleBoundedArray() {
-            string code = @"
+    // Test Simple bounded array
+    [Test]
+    public void TestSimpleBoundedArray() {
+        string code = @"
                 func test closed
                   dim a(30:40)
                   for x:=30 to 40 do
@@ -294,14 +295,14 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "test", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-        // Test catching out of bounds error
-        [Test]
-        public void TestArrayOutOfBounds() {
-            string code = @"
+    // Test catching out of bounds error
+    [Test]
+    public void TestArrayOutOfBounds() {
+        string code = @"
                 func array'oob closed
                   dim a(30:40)
                   for x:=20 to 40 do
@@ -310,14 +311,14 @@ namespace ComalTests {
                   return false
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Assert.Throws(typeof(IndexOutOfRangeException), delegate { comp.Execute("array'oob"); });
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Assert.Throws(typeof(IndexOutOfRangeException), delegate { comp.Execute("array'oob"); });
+    }
 
-        // Test calling a function with an array by value.
-        [Test]
-        public void TestPassArrayByVal() {
-            string code = @"
+    // Test calling a function with an array by value.
+    [Test]
+    public void TestPassArrayByVal() {
+        string code = @"
                 func array'byval
                   dim a(10)
                   for x=1 to 10 do
@@ -332,14 +333,14 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'byval", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'byval", 1);
+    }
 
-        // Test calling a function with an array by reference.
-        [Test]
-        public void TestPassArrayByRef() {
-            string code = @"
+    // Test calling a function with an array by reference.
+    [Test]
+    public void TestPassArrayByRef() {
+        string code = @"
                 func array'byref
                   dim a(10)
                   init'by'ref(a)
@@ -357,8 +358,7 @@ namespace ComalTests {
                   return true
                 endfunc
             ";
-            Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-            Helper.HelperRunFloat(comp, "array'byref", 1);
-        }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "array'byref", 1);
     }
 }
