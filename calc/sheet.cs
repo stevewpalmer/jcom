@@ -224,6 +224,7 @@ public class Sheet {
         foreach (Cell cell in Cells.Values.Where(cell => cell.Column >= column)) {
             ++cell.Column;
         }
+        Modified = true;
     }
 
     /// <summary>
@@ -234,6 +235,7 @@ public class Sheet {
         foreach (Cell cell in Cells.Values.Where(cell => cell.Row >= row)) {
             ++cell.Row;
         }
+        Modified = true;
     }
 
     /// <summary>
@@ -248,6 +250,7 @@ public class Sheet {
                 --cell.Column;
             }
         }
+        Modified = true;
     }
 
     /// <summary>
@@ -262,6 +265,7 @@ public class Sheet {
                 --cell.Row;
             }
         }
+        Modified = true;
     }
 
     /// <summary>
