@@ -8,7 +8,7 @@
         <WarningLevel>4</WarningLevel>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <Description>Fortran Compiler</Description>
-        <Copyright>(c) Steven Palmer 2013-2023</Copyright>
+        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
         <ReleaseVersion>0.3</ReleaseVersion>
         <RootNamespace>JFortran</RootNamespace>
         <Title>Fortran Compiler</Title>
