@@ -24,8 +24,8 @@
 // under the License.
 
 using System.Drawing;
-using JCalcLib;
 using JCalc.Resources;
+using JCalcLib;
 using JComLib;
 
 namespace JCalc;
@@ -278,8 +278,7 @@ public class Window {
     /// <param name="alignment">Requested alignment</param>
     /// <returns>Render hint</returns>
     private RenderHint AlignCells(CellAlignment alignment) {
-        ActiveCell.Alignment = alignment;
-        Sheet.Modified = true;
+        Sheet.SetCellAlignment(ActiveCell, alignment);
         PlaceCursor();
         return RenderHint.NONE;
     }

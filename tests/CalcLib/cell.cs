@@ -113,6 +113,20 @@ public class CellTests {
         });
     }
 
+    // Verify the TEXT format
+    [Test]
+    public void VerifyTextFormat() {
+        Assert.AreEqual("45.8794 ", new Cell {
+            Value = new CellValue {
+                StringValue = "45.8794",
+                Type = CellType.NUMBER
+            },
+            Alignment = CellAlignment.LEFT,
+            Format = CellFormat.TEXT,
+            DecimalPlaces = 2
+        }.ToString(8));
+    }
+
     // Verify alignments
     [Test]
     public void VerifyAlignments() {

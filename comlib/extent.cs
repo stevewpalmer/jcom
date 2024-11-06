@@ -1,4 +1,4 @@
-// JEdit
+// JComLib
 // Extent class
 //
 // Authors:
@@ -25,7 +25,7 @@
 
 using System.Drawing;
 
-namespace JEdit;
+namespace JComLib;
 
 public class Extent {
     private static readonly Point Uninitalised = new(-1, -1);

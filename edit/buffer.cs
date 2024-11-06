@@ -26,6 +26,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
+using JComLib;
 using JEdit.Resources;
 
 namespace JEdit;

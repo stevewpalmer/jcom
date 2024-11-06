@@ -129,7 +129,8 @@ public class Cell {
                 CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
                 CellFormat.DATE_DMY => ToDateTime("dd-MMM-yyyy", doubleValue),
                 CellFormat.GENERAL => cellValue,
-                _ => throw new ArgumentException($"Unknown Cell Format: {Format}"),
+                CellFormat.TEXT => cellValue,
+                _ => throw new ArgumentException($"Unknown Cell Format: {Format}")
             };
         }
         if (cellValue.Length > width) {
@@ -148,7 +149,7 @@ public class Cell {
                     CellType.NUMBER => cellValue.PadLeft(width),
                     _ => "".PadRight(width)
                 },
-                _ => throw new ArgumentException($"Unknown Cell Alignment: {Alignment}"),
+                _ => throw new ArgumentException($"Unknown Cell Alignment: {Alignment}")
             };
         }
         return cellValue;

@@ -26,8 +26,8 @@
 using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using JCalcLib;
 using JCalc.Resources;
+using JCalcLib;
 using JComLib;
 
 namespace JCalc;
@@ -122,7 +122,13 @@ public class Sheet {
     /// changed.
     /// </summary>
     [JsonIgnore]
-    public bool Modified { get; set; }
+    public bool Modified { get; private set; }
+
+    /// <summary>
+    /// Return the height of the specified row
+    /// </summary>
+    /// <returns>Row height</returns>
+    public static int RowHeight => 1;
 
     /// <summary>
     /// Write the sheet back to disk.
@@ -179,13 +185,6 @@ public class Sheet {
     }
 
     /// <summary>
-    /// Return the height of the specified row
-    /// </summary>
-    /// <returns>Row height</returns>
-    public static int RowHeight => 1;
-
-
-    /// <summary>
     /// Draw this cell at the given cell position (1-based row and column) at
     /// the given physical screen offset where (0,0) is the top left corner.
     /// </summary>
@@ -220,15 +219,6 @@ public class Sheet {
             }
         }
         return _cell;
-    }
-
-    /// <summary>
-    /// Delete the specified cell
-    /// </summary>
-    /// <param name="cell">Cell to delete</param>
-    private void DeleteCell(Cell cell) {
-        int cellHash = cell.Row * Consts.MaxRows + cell.Column;
-        Cells.Remove(cellHash);
     }
 
     /// <summary>
@@ -293,5 +283,24 @@ public class Sheet {
         cell.Format = format;
         cell.DecimalPlaces = decimalPlaces;
         Modified = true;
+    }
+
+    /// <summary>
+    /// Set the cell alignment.
+    /// </summary>
+    /// <param name="cell">Cell to align</param>
+    /// <param name="alignment">New alignment</param>
+    public void SetCellAlignment(Cell cell, CellAlignment alignment) {
+        cell.Alignment = alignment;
+        Modified = true;
+    }
+
+    /// <summary>
+    /// Delete the specified cell
+    /// </summary>
+    /// <param name="cell">Cell to delete</param>
+    private void DeleteCell(Cell cell) {
+        int cellHash = cell.Row * Consts.MaxRows + cell.Column;
+        Cells.Remove(cellHash);
     }
 }

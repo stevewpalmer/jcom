@@ -23,8 +23,8 @@
 // specific language governing permissions and limitations
 // under the License
 
-using NUnit.Framework;
 using System;
+using NUnit.Framework;
 
 namespace ComLibTests;
 
@@ -39,7 +39,7 @@ public enum EnumTester {
 public class Utilities {
 
     [Test]
-    public void Test_AddExtensionIfMissing() {
+    public void TestAddExtensionIfMissing() {
         Assert.AreEqual("Filename.extension", JComLib.Utilities.AddExtensionIfMissing("Filename", "extension"));
         Assert.AreEqual("Filename.extension", JComLib.Utilities.AddExtensionIfMissing("Filename.extension", "ext"));
         Assert.AreEqual(null, JComLib.Utilities.AddExtensionIfMissing(null, "extension"));
@@ -47,14 +47,16 @@ public class Utilities {
     }
 
     [Test]
-    public void Test_GetEnumDescription() {
-        EnumTester data = EnumTester.TESTVALUE1;
-        Assert.AreEqual("Test value 1", JComLib.Utilities.GetEnumDescription(data));
+    public void TestGetEnumDescription() {
+        Assert.AreEqual("Test value 1", JComLib.Utilities.GetEnumDescription(EnumTester.TESTVALUE1));
+        Assert.AreEqual("NONE", JComLib.Utilities.GetEnumDescription(EnumTester.NONE));
     }
 
+    // Test the SpanBound function.
     [Test]
-    public void Test_SpanBound() {
+    public void TestSpanBound() {
         Assert.AreEqual("abcdef", JComLib.Utilities.SpanBound("abcdefghi", 0, 6));
+        Assert.AreEqual("abcdefghi", JComLib.Utilities.SpanBound("abcdefghi", 0, 20));
         Assert.AreEqual("", JComLib.Utilities.SpanBound("abcdefghi", 5, 0));
         Assert.AreEqual("", JComLib.Utilities.SpanBound("abcdefghi", 15, 20));
         Assert.AreEqual("", JComLib.Utilities.SpanBound("abcdefghi", 60, 20));
@@ -62,7 +64,7 @@ public class Utilities {
 
     // Test the ConstrainAndWrap function
     [Test]
-    public void Test_ConstrainAndWrap() {
+    public void TestConstrainAndWrap() {
         Assert.AreEqual(10, JComLib.Utilities.ConstrainAndWrap(15, 10, 11));
         Assert.AreEqual(14, JComLib.Utilities.ConstrainAndWrap(5, 10, 15));
         Assert.AreEqual(41, JComLib.Utilities.ConstrainAndWrap(55, 41, 43));
@@ -71,7 +73,7 @@ public class Utilities {
 
     // Test the CentreString function
     [Test]
-    public void Test_CentreString() {
+    public void TestCentreString() {
         Assert.AreEqual("  abcdef  ", JComLib.Utilities.CentreString("abcdef", 10));
         Assert.AreEqual("abcdef", JComLib.Utilities.CentreString("abcdef", 6));
         Assert.AreEqual("a", JComLib.Utilities.CentreString("abcdef", 1));
