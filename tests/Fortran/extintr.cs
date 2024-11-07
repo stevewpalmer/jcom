@@ -40,7 +40,7 @@ public class IntrinsicsTests {
     [Test]
     public void ExtIntrExternal() {
         if (Type.GetType("Mono.Runtime") == null) {
-            string[] code = {
+            string[] code = [
                 "      DOUBLE PRECISION FUNCTION INTRTEST",
                 "      INTRINSIC DSIN",
                 "      INTRTEST=CALCIT(DSIN,23.0D0)",
@@ -50,7 +50,7 @@ public class IntrinsicsTests {
                 "      EXTERNAL F",
                 "      CALCIT=F(Y)",
                 "      END"
-            };
+            ];
             Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
             Helper.HelperRunDouble(comp, "INTRTEST", -0.8462204);
         }
@@ -59,7 +59,7 @@ public class IntrinsicsTests {
     // Verify ABS()
     [Test]
     public void ExtIntrAbs() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION IABS",
             "        IABS = ABS(-94)",
             "        RETURN",
@@ -73,7 +73,7 @@ public class IntrinsicsTests {
             "        DABS = ABS(-2.6D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "IABS", 94);
@@ -90,7 +90,7 @@ public class IntrinsicsTests {
     // Verify ACOS().
     [Test]
     public void ExtIntrAcos() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RACOS",
             "        RACOS = ACOS(0.4)",
             "        RETURN",
@@ -101,7 +101,7 @@ public class IntrinsicsTests {
             "        DACOS = ACOS(V)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Acos(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -116,7 +116,7 @@ public class IntrinsicsTests {
     // Verify AINT().
     [Test]
     public void ExtIntrAInt() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RAINT",
             "        RAINT = AINT(3.2)",
             "        RETURN",
@@ -126,7 +126,7 @@ public class IntrinsicsTests {
             "        DAINT = AINT(9.8)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunFloat(comp, "RAINT", 3);
@@ -139,12 +139,12 @@ public class IntrinsicsTests {
     // Verify ALOG().
     [Test]
     public void ExtIntrALog() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RALOG",
             "        RALOG = ALOG(0.4)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         float expected = (float)Math.Log(0.4);
@@ -157,7 +157,7 @@ public class IntrinsicsTests {
     // Verify ALOG10() and LOG10().
     [Test]
     public void ExtIntrALog10() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RALOG10",
             "        RETURN ALOG10(0.4)",
             "      END",
@@ -168,7 +168,7 @@ public class IntrinsicsTests {
             "        DOUBLE PRECISION DDLOG10",
             "        RETURN LOG10(0.4D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Log10(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -185,13 +185,13 @@ public class IntrinsicsTests {
     // Verify AMOD().
     [Test]
     public void ExtIntrAMod() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RAMOD",
             "        RETURN AMOD(97.75, 4.75)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
-        float expected = 97.75f % 4.75f;
+        const float expected = 97.75f % 4.75f;
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunFloat(comp, "RAMOD", expected);
         opts.Inline = false;
@@ -202,7 +202,7 @@ public class IntrinsicsTests {
     // Verify ANINT() and DNINT().
     [Test]
     public void ExtIntrNInt() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RANINT",
             "        RANINT = ANINT(3.2)",
             "        RETURN",
@@ -217,7 +217,7 @@ public class IntrinsicsTests {
             "        DDNINT = DNINT(-9.8D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunFloat(comp, "RANINT", 3);
@@ -233,7 +233,7 @@ public class IntrinsicsTests {
     // Verify ASIN().
     [Test]
     public void ExtIntrAsin() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RASIN",
             "        RASIN = ASIN(0.4)",
             "        RETURN",
@@ -244,7 +244,7 @@ public class IntrinsicsTests {
             "        DASIN = ASIN(V)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Asin(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -259,7 +259,7 @@ public class IntrinsicsTests {
     // Verify ATAN().
     [Test]
     public void ExtIntrAtan() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RATAN",
             "        RATAN = ATAN(0.4)",
             "        RETURN",
@@ -270,7 +270,7 @@ public class IntrinsicsTests {
             "        DATAN = ATAN(V)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Atan(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -285,7 +285,7 @@ public class IntrinsicsTests {
     // Verify ATAN2().
     [Test]
     public void ExtIntrAtan2() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RATAN2",
             "        RATAN2 = ATAN2(-71.2,9.3)",
             "        RETURN",
@@ -294,7 +294,7 @@ public class IntrinsicsTests {
             "        DOUBLE PRECISION DATAN2",
             "        RETURN ATAN2(-71.2D0,9.3D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Atan2(-71.2, 9.3);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -309,12 +309,12 @@ public class IntrinsicsTests {
     // Verify CABS()
     [Test]
     public void ExtIntrCabs() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RCABS",
             "        REAL RCABS",
             "        RETURN CABS((-12,3))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         float expected = (float)Complex.Abs(new Complex(-12, 3));
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -327,12 +327,12 @@ public class IntrinsicsTests {
     // Verify CCOS()
     [Test]
     public void ExtIntrCcos() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RCCOS",
             "        COMPLEX RCCOS",
             "        RETURN CCOS((32,1))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Complex expected = Complex.Cos(new Complex(32, 1));
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -345,13 +345,13 @@ public class IntrinsicsTests {
     // Verify CHAR()
     [Test]
     public void ExtIntrChar() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION CCHAR",
             "        CHARACTER CCHAR",
             "        CCHAR = CHAR(65)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunString(comp, "CCHAR", "A");
@@ -363,12 +363,12 @@ public class IntrinsicsTests {
     // Verify CLOG()
     [Test]
     public void ExtIntrClog() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RCLOG",
             "        COMPLEX RCLOG",
             "        RETURN CLOG((32,1))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Complex expected = Complex.Log(new Complex(32, 1));
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -381,12 +381,12 @@ public class IntrinsicsTests {
     // Verify CMPLX()
     [Test]
     public void ExtIntrCmplx() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION CCMPLX",
             "        COMPLEX CCMPLX",
             "        RETURN CMPLX(65,12)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Complex expected = new(65, 12);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -399,7 +399,7 @@ public class IntrinsicsTests {
     // Verify COS().
     [Test]
     public void ExtIntrCos() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RCOS",
             "        RCOS = COS(0.4)",
             "        RETURN",
@@ -414,7 +414,7 @@ public class IntrinsicsTests {
             "        COMPLEX CCOS",
             "        RETURN COS((12,3))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Cos(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -431,7 +431,7 @@ public class IntrinsicsTests {
     // Verify COSH().
     [Test]
     public void ExtIntrCosh() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RCOSH",
             "        RETURN COSH(0.8)",
             "      END",
@@ -441,7 +441,7 @@ public class IntrinsicsTests {
             "        DCOSH = COSH(V)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Cosh(0.8);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -456,12 +456,12 @@ public class IntrinsicsTests {
     // Verify CSIN()
     [Test]
     public void ExtIntrCsin() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION CCSIN",
             "        COMPLEX CCSIN",
             "        RETURN CSIN((32,1))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Complex expected = Complex.Sin(new Complex(32, 1));
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -474,12 +474,12 @@ public class IntrinsicsTests {
     // Verify CSQRT()
     [Test]
     public void ExtIntrCsqrt() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION CCSQRT",
             "        COMPLEX CCSQRT",
             "        RETURN CSQRT((49,5))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Complex expected = Complex.Sqrt(new Complex(49, 5));
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -492,13 +492,13 @@ public class IntrinsicsTests {
     // Verify DABS()
     [Test]
     public void ExtIntrDabs() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDABS",
             "        DOUBLE PRECISION DDABS",
             "        DDABS = DABS(-2.6D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Abs(-2.6);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -511,13 +511,13 @@ public class IntrinsicsTests {
     // Verify DACOS().
     [Test]
     public void ExtIntrDacos() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDACOS",
             "        DOUBLE PRECISION DDACOS",
             "        DDACOS = DACOS(0.5D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Acos(0.5);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -530,13 +530,13 @@ public class IntrinsicsTests {
     // Verify DASIN().
     [Test]
     public void ExtIntrDasin() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDASIN",
             "        DOUBLE PRECISION DDASIN",
             "        DDASIN = DASIN(0.5D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Asin(0.5);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -549,13 +549,13 @@ public class IntrinsicsTests {
     // Verify DATAN().
     [Test]
     public void ExtIntrDatan() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDATAN",
             "        DOUBLE PRECISION DDATAN",
             "        DDATAN = DATAN(0.5D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Atan(0.5);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -568,12 +568,12 @@ public class IntrinsicsTests {
     // Verify DATAN2().
     [Test]
     public void ExtIntrDatan2() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDATAN2",
             "        DOUBLE PRECISION DDATAN2",
             "        RETURN DATAN2(0.5D0, 0.45D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Atan2(0.5, 0.45);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -586,7 +586,7 @@ public class IntrinsicsTests {
     // Verify DBLE().
     [Test]
     public void ExtIntrDble() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDBLEI",
             "        DOUBLE PRECISION DDBLEI",
             "        RETURN DBLE(12)",
@@ -603,7 +603,7 @@ public class IntrinsicsTests {
             "        DOUBLE PRECISION DDBLEC",
             "        RETURN DBLE((13,5))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunDouble(comp, "DDBLEI", 12);
@@ -621,13 +621,13 @@ public class IntrinsicsTests {
     // Verify DCOS().
     [Test]
     public void ExtIntrDcos() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDCOS",
             "        DOUBLE PRECISION DDCOS",
             "        DDCOS = DCOS(0.5D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Cos(0.5);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -640,12 +640,12 @@ public class IntrinsicsTests {
     // Verify DCOSH().
     [Test]
     public void ExtIntrDcosh() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDCOSH",
             "        DOUBLE PRECISION DDCOSH",
             "        RETURN DCOSH(0.147D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Cosh(0.147);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -658,7 +658,7 @@ public class IntrinsicsTests {
     // Verify EXP() and DEXP().
     [Test]
     public void ExtIntrDexp() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION REXP",
             "        REAL REXP",
             "        RETURN EXP(3.2)",
@@ -675,7 +675,7 @@ public class IntrinsicsTests {
             "        COMPLEX CCEXP",
             "        RETURN EXP((3.2,0))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Exp(3.2);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -694,12 +694,12 @@ public class IntrinsicsTests {
     // Verify DINT().
     [Test]
     public void ExtIntrDint() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDINT",
             "        DOUBLE PRECISION DDINT",
             "        RETURN DINT(89.38D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunDouble(comp, "DDINT", 89);
@@ -711,13 +711,13 @@ public class IntrinsicsTests {
     // Verify DLOG().
     [Test]
     public void ExtIntrDLog() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RDLOG",
             "        DOUBLE PRECISION RDLOG",
             "        RDLOG = DLOG(0.4D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Log(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -730,13 +730,13 @@ public class IntrinsicsTests {
     // Verify DLOG10().
     [Test]
     public void ExtIntrDLog10() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RDLOG10",
             "        DOUBLE PRECISION RDLOG10",
             "        RDLOG10 = DLOG10(3.72D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Log10(3.72);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -751,7 +751,7 @@ public class IntrinsicsTests {
     // Test both inline and library versions.
     [Test]
     public void ExtIntrMod() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION IMODTEST",
             "        IMODTEST = MOD(65, 11)",
             "        RETURN",
@@ -765,7 +765,7 @@ public class IntrinsicsTests {
             "        DMODTEST = DMOD(63.5D0, 3.5D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "IMODTEST", 10);
@@ -781,15 +781,15 @@ public class IntrinsicsTests {
     // Verify DPROD().
     [Test]
     public void ExtIntrDprod() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDPROD",
             "        DOUBLE PRECISION DDPROD",
             "        DDPROD = DPROD(12.4,3.8)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
-        double expected = 12.4 * 3.8;
+        const double expected = 12.4 * 3.8;
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunDouble(comp, "DDPROD", expected);
         opts.Inline = false;
@@ -800,13 +800,13 @@ public class IntrinsicsTests {
     // Verify DSIN().
     [Test]
     public void ExtIntrDsin() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDSIN",
             "        DOUBLE PRECISION DDSIN",
             "        DDSIN = DSIN(0.5D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Sin(0.5);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -819,12 +819,12 @@ public class IntrinsicsTests {
     // Verify DSINH().
     [Test]
     public void ExtIntrDsinh() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDSINH",
             "        DOUBLE PRECISION DDSINH",
             "        RETURN DSINH(0.147D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Sinh(0.147);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -837,12 +837,12 @@ public class IntrinsicsTests {
     // Verify DSQRT()
     [Test]
     public void ExtIntrDsqrt() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDSQRT",
             "        DOUBLE PRECISION DDSQRT",
             "        RETURN DSQRT(49D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Sqrt(49);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -855,13 +855,13 @@ public class IntrinsicsTests {
     // Verify DTAN().
     [Test]
     public void ExtIntrDtan() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDTAN",
             "        DOUBLE PRECISION DDTAN",
             "        DDTAN = DTAN(0.5D0)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Tan(0.5);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -874,12 +874,12 @@ public class IntrinsicsTests {
     // Verify DTANH().
     [Test]
     public void ExtIntrDtanh() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DDTANH",
             "        DOUBLE PRECISION DDTANH",
             "        RETURN DTANH(0.147D0)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Tanh(0.147);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -892,11 +892,11 @@ public class IntrinsicsTests {
     // Verify FLOAT().
     [Test]
     public void ExtIntrFloat() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RFLOATI",
             "        RETURN FLOAT(12)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunFloat(comp, "RFLOATI", 12f);
@@ -908,14 +908,14 @@ public class IntrinsicsTests {
     // Verify IABS().
     [Test]
     public void ExtIntrIabs() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST1",
             "        RETURN IABS(-12)",
             "      END",
             "      FUNCTION ITEST2",
             "        RETURN IABS(73)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "ITEST1", 12);
@@ -929,7 +929,7 @@ public class IntrinsicsTests {
     // Verify ICHAR().
     [Test]
     public void ExtIntrIchar() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST1",
             "        RETURN ICHAR(\"foo\")",
             "      END",
@@ -938,7 +938,7 @@ public class IntrinsicsTests {
             "        STR1 = 'HELLO'",
             "        RETURN ICHAR(STR1)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "ITEST1", 102);
@@ -952,11 +952,11 @@ public class IntrinsicsTests {
     // Verify IDINT().
     [Test]
     public void ExtIntrIdint() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        RETURN IDINT(12.45D1)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "ITEST", 124);
@@ -968,14 +968,14 @@ public class IntrinsicsTests {
     // Verify IFIX() and INT().
     [Test]
     public void ExtIntrIfix() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        RETURN IFIX(12.45E1)",
             "      END",
             "      FUNCTION ITEST2",
             "        RETURN INT(12.45E1)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "ITEST", 124);
@@ -989,7 +989,7 @@ public class IntrinsicsTests {
     // Verify INT().
     [Test]
     public void ExtIntrInt() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION JINTI",
             "        RETURN INT(12)",
             "      END",
@@ -1002,7 +1002,7 @@ public class IntrinsicsTests {
             "      FUNCTION JINTC",
             "        RETURN INT((13,5))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "JINTI", 12);
@@ -1020,7 +1020,7 @@ public class IntrinsicsTests {
     // Verify LEN().
     [Test]
     public void ExtIntrLen() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST1",
             "        RETURN LEN('HALO3')",
             "      END",
@@ -1032,7 +1032,7 @@ public class IntrinsicsTests {
             "        STR='FORTRAN'//'77'",
             "        RETURN LEN(STR)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunInteger(comp, "ITEST1", 5);
@@ -1048,7 +1048,7 @@ public class IntrinsicsTests {
     // Verify LOG().
     [Test]
     public void ExtIntrLog() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RLOG",
             "        RLOG = LOG(0.4)",
             "        RETURN",
@@ -1063,7 +1063,7 @@ public class IntrinsicsTests {
             "        COMPLEX CCLOG",
             "        RETURN LOG((12,3))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Log(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -1080,7 +1080,7 @@ public class IntrinsicsTests {
     // Verify REAL().
     [Test]
     public void ExtIntrReal() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION DREALI",
             "        RETURN REAL(12)",
             "      END",
@@ -1093,7 +1093,7 @@ public class IntrinsicsTests {
             "      FUNCTION DREALC",
             "        RETURN REAL((13,5))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunFloat(comp, "DREALI", 12);
@@ -1111,7 +1111,7 @@ public class IntrinsicsTests {
     // Verify SIN().
     [Test]
     public void ExtIntrSin() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RSIN",
             "        RSIN = SIN(0.4)",
             "        RETURN",
@@ -1126,7 +1126,7 @@ public class IntrinsicsTests {
             "        COMPLEX CSIN",
             "        RETURN SIN((12,3))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Sin(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -1143,7 +1143,7 @@ public class IntrinsicsTests {
     // Verify SINH().
     [Test]
     public void ExtIntrSinh() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RSINH",
             "        RETURN SINH(0.8)",
             "      END",
@@ -1153,7 +1153,7 @@ public class IntrinsicsTests {
             "        DSINH = SINH(V)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Sinh(0.8);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -1168,11 +1168,11 @@ public class IntrinsicsTests {
     // Verify SNGL().
     [Test]
     public void ExtIntrSngl() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RTEST",
             "        RETURN SNGL(12.45D1)",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         Compiler comp = FortranHelper.HelperCompile(code, opts);
         Helper.HelperRunFloat(comp, "RTEST", 12.45E1f);
@@ -1184,7 +1184,7 @@ public class IntrinsicsTests {
     // Verify SQRT().
     [Test]
     public void ExtIntrSqrt() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RSQRT",
             "        RSQRT = SQRT(0.4)",
             "        RETURN",
@@ -1199,7 +1199,7 @@ public class IntrinsicsTests {
             "        COMPLEX CSQRT",
             "        RETURN SQRT((12,3))",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Sqrt(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -1216,7 +1216,7 @@ public class IntrinsicsTests {
     // Verify TAN().
     [Test]
     public void ExtIntrTan() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RTAN",
             "        RTAN = TAN(0.4)",
             "        RETURN",
@@ -1227,7 +1227,7 @@ public class IntrinsicsTests {
             "        DTAN = TAN(V)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Tan(0.4);
         Compiler comp = FortranHelper.HelperCompile(code, opts);
@@ -1242,7 +1242,7 @@ public class IntrinsicsTests {
     // Verify TANH().
     [Test]
     public void ExtIntrTanh() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION RTANH",
             "        RETURN TANH(0.8)",
             "      END",
@@ -1252,7 +1252,7 @@ public class IntrinsicsTests {
             "        DTANH = TANH(V)",
             "        RETURN",
             "      END"
-        };
+        ];
         FortranOptions opts = new();
         double expected = Math.Tanh(0.8);
         Compiler comp = FortranHelper.HelperCompile(code, opts);

@@ -36,7 +36,7 @@ public class SaveTests {
     // keyword.
     [Test]
     public void SaveInFunction() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        DO 10 I=1,10",
             "          ITEST = ITEST + FOO()",
@@ -48,7 +48,7 @@ public class SaveTests {
             "        B = B + 1",
             "        RETURN B",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 55);
     }
@@ -56,7 +56,7 @@ public class SaveTests {
     // Verify the use of SAVE to save all local identifiers
     [Test]
     public void SaveAllInFunction() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        DO 10 I=1,10",
             "          ITEST = ITEST + FOO()",
@@ -70,7 +70,7 @@ public class SaveTests {
             "        D = D + 4",
             "        RETURN B+C+D",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 385);
     }

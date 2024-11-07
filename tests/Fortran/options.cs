@@ -53,11 +53,11 @@ public class OptionsTest {
     [Test]
     public void ValidateOptionParsing() {
         FortranOptions opts = new();
-        string[] args = {
+        string[] args = [
             "--backslash",
             "--invalidoption",
             "--debug"
-        };
+        ];
         Assert.IsFalse(opts.Parse(args));
 
         Assert.IsTrue(opts.Backslash);
@@ -69,12 +69,12 @@ public class OptionsTest {
     [Test]
     public void ValidateFilenameParsing() {
         FortranOptions opts = new();
-        string[] args = {
+        string[] args = [
             "--backslash",
             "testfile1.f",
             "--debug",
             "testfile2.f"
-        };
+        ];
 
         Assert.IsTrue(opts.Parse(args));
         Assert.IsTrue(opts.SourceFiles.Count == 2);

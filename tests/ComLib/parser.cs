@@ -29,56 +29,55 @@ using System.Linq;
 using JComLib;
 using NUnit.Framework;
 
-namespace ComLibTests {
+namespace ComLibTests;
 
-    [TestFixture]
-    public class ParserTest {
-        [TestCase("test input", ExpectedResult = new[] { "test", "input" })]
-        [TestCase("   test input   ", ExpectedResult = new[] { "test", "input" })]
-        [TestCase("'test input'", ExpectedResult = new[] { "test input" })]
-        [TestCase("\"test input\"", ExpectedResult = new[] { "test input" })]
-        [TestCase("'test' input", ExpectedResult = new[] { "test", "input" })]
-        [TestCase("\"test\" input", ExpectedResult = new[] { "test", "input" })]
-        public string[] TestRestOfLine(string input) {
-            Parser parser = new Parser(input);
-            return parser.RestOfLine();
-        }
+[TestFixture]
+public class ParserTest {
+    [TestCase("test input", ExpectedResult = new[] { "test", "input" })]
+    [TestCase("   test input   ", ExpectedResult = new[] { "test", "input" })]
+    [TestCase("'test input'", ExpectedResult = new[] { "test input" })]
+    [TestCase("\"test input\"", ExpectedResult = new[] { "test input" })]
+    [TestCase("'test' input", ExpectedResult = new[] { "test", "input" })]
+    [TestCase("\"test\" input", ExpectedResult = new[] { "test", "input" })]
+    public string[] TestRestOfLine(string input) {
+        Parser parser = new Parser(input);
+        return parser.RestOfLine();
+    }
 
-        [TestCase("*.txt", "*.cs")]
-        public void TestReadAndExpandWildcards(string pattern1, string pattern2) {
-            string[] content = new[] { $"{pattern1} -p \"{pattern2}\"" };
-            File.WriteAllLines("test.txt", content);
+    [TestCase("*.txt", "*.cs")]
+    public void TestReadAndExpandWildcards(string pattern1, string pattern2) {
+        string[] content = [$"{pattern1} -p \"{pattern2}\""];
+        File.WriteAllLines("test.txt", content);
+        File.WriteAllLines("test.cs", content);
 
-            Parser parser = new Parser(File.ReadAllText("test.txt"));
-            IEnumerable<string> result = parser.ReadAndExpandWildcards();
-            Assert.That(result.Count(), Is.GreaterThan(0));
-        }
+        Parser parser = new Parser(File.ReadAllText("test.txt"));
+        IEnumerable<string> result = parser.ReadAndExpandWildcards();
+        Assert.AreEqual(result.Count(), 2);
+    }
 
-        // Test the behaviour of the NextWord method to return the next word from the
-        // string, allowing for quoted phrases.
-        [TestCase("test string", ExpectedResult = "test")]
-        [TestCase("   test string   ", ExpectedResult = "test")]
-        [TestCase("\"test string\"", ExpectedResult = "test string")]
-        [TestCase("\'test string\'", ExpectedResult = "test string")]
-        public string TestNextWord(string input) {
-            Parser parser = new Parser(input);
-            return parser.NextWord();
-        }
+    // Test the behaviour of the NextWord method to return the next word from the
+    // string, allowing for quoted phrases.
+    [TestCase("test string", ExpectedResult = "test")]
+    [TestCase("   test string   ", ExpectedResult = "test")]
+    [TestCase("\"test string\"", ExpectedResult = "test string")]
+    [TestCase("\'test string\'", ExpectedResult = "test string")]
+    [TestCase("\'test string", ExpectedResult = "test string")]
+    public string TestNextWord(string input) {
+        Parser parser = new Parser(input);
+        return parser.NextWord();
+    }
 
-        // Test the behaviour of GetChar and PushChar.
-        [Test]
-        public void TestPushChar_GetChar() {
-            Parser parser = new Parser("abcdef");
-            Assert.AreEqual('a', parser.GetChar());
+    // Test the behaviour of GetChar and PushChar.
+    [Test]
+    public void TestPushChar_GetChar() {
+        Parser parser = new Parser("abcdef");
+        Assert.AreEqual('a', parser.GetChar());
 
-            // Push character back
-            parser.PushChar('a');
-            Assert.AreEqual('a', parser.GetChar());
+        // Push character back
+        parser.PushChar('a');
+        Assert.AreEqual('a', parser.GetChar());
 
-            // Test reaching end of input
-            parser = new Parser(string.Empty);
-
-            //Assert.Throws<System.IndexOutOfRangeException>(() => parser.GetChar());
-        }
+        // Test reaching end of input
+        _ = new Parser(string.Empty);
     }
 }

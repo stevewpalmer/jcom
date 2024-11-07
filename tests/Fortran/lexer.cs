@@ -39,10 +39,10 @@ public class LexicalTests {
     // and that it is not present on the second line.
     [Test]
     public void ValidateHasLabel() {
-        string[] code = {
+        string[] code = [
             "100   INTEGER A",
             "      STOP"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -56,10 +56,10 @@ public class LexicalTests {
     // Validate continuation character support
     [Test]
     public void ValidateContinuationCharacter() {
-        string[] code = {
+        string[] code = [
             "100   INTEGER STA",
             "     1TION"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -75,10 +75,10 @@ public class LexicalTests {
     // Validate that digit 0 specifies a new line.
     [Test]
     public void ValidateDigit0ContinuationCharacter() {
-        string[] code = {
+        string[] code = [
             "100   INTEGER BAR",
             "     0INTEGER FOO"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -97,10 +97,10 @@ public class LexicalTests {
     // Validate Fortran 77 extension continuation character support
     [Test]
     public void ValidateF77ExtContinuationCharacter() {
-        string[] code = {
+        string[] code = [
             "100   INTEGER STA&",
             "      TION"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -116,7 +116,7 @@ public class LexicalTests {
     // Verify we maximum 19 continuation lines allowed
     [Test]
     public void ValidateMaximumContinuationLines() {
-        string[] code = {
+        string[] code = [
             "      INTEGER A,",
             "     1B,",
             "     2C,",
@@ -137,7 +137,7 @@ public class LexicalTests {
             "     HR,",
             "     IS,",
             "     JT"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -148,7 +148,7 @@ public class LexicalTests {
     // for the maximum line.
     [Test]
     public void ValidateExceedMaximumContinuationLines() {
-        string[] code = {
+        string[] code = [
             "      INTEGER A,",
             "     1B,",
             "     2C,",
@@ -170,7 +170,7 @@ public class LexicalTests {
             "     IS,",
             "     JT",
             "     KU"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -183,7 +183,7 @@ public class LexicalTests {
     // Spacing between tokens.
     [Test]
     public void ValidateFixedFormat1() {
-        string[] code = {
+        string[] code = [
             "      A=1.                                                              01110010",
             "      B =2.                                                             01120010",
             "      C =3.                                                             01130010",
@@ -196,12 +196,12 @@ public class LexicalTests {
             "      J  =  10                                                          01200010",
             "          K        =          11                                        01210010",
             "      L                                 =                             1201220010"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
 
-        List<(string, int)> testValues = new List<(string, int)> {
+        List<(string, int)> testValues = [
             ("A", 1),
             ("B", 2),
             ("C", 3),
@@ -213,8 +213,8 @@ public class LexicalTests {
             ("I", 9),
             ("J", 10),
             ("K", 11),
-            ("L", 12),
-        };
+            ("L", 12)
+        ];
 
         foreach ((string name, int value) in testValues) {
             SimpleToken token = ls.GetToken();
@@ -245,7 +245,7 @@ public class LexicalTests {
     // Spaces in identifiers.
     [Test]
     public void ValidateFixedFormat2() {
-        string[] code = {
+        string[] code = [
             "      K 5 6 78  9=37                                                    01470010",
             "       L 2 L 2 L 2 =38                                                  01480010",
             "        M  3   M           3                      M3   =              3901490010",
@@ -259,12 +259,12 @@ public class LexicalTests {
             "      TYPE I = 63.                                                      01570010",
             "      TRUE   =71.                                                       01580010",
             "      FALSE  = 72.                                                      01590010"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
 
-        List<(string, int)> testValues = new List<(string, int)> {
+        List<(string, int)> testValues = [
             ("K56789", 37),
             ("L2L2L2", 38),
             ("M3M3M3", 39),
@@ -278,7 +278,7 @@ public class LexicalTests {
             ("TYPEI", 63),
             ("TRUE", 71),
             ("FALSE", 72)
-        };
+        ];
 
         foreach ((string name, int value) in testValues) {
             SimpleToken token = ls.GetToken();
@@ -308,10 +308,10 @@ public class LexicalTests {
     // Validate tab support
     [Test]
     public void ValidateTabDelimiter() {
-        string[] code = {
+        string[] code = [
             "100\tINTEGER A",
             "\tREAL B"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -338,11 +338,11 @@ public class LexicalTests {
     // Validate debug lines support
     [Test]
     public void ValidateDebug() {
-        string[] code = {
+        string[] code = [
             "      INTEGER A",
             "D     REAL B",
             "      INTEGER C"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -363,9 +363,9 @@ public class LexicalTests {
     // Validate integer parsing
     [Test]
     public void ValidateIntegerParsing() {
-        string[] code = {
+        string[] code = [
             "      1230976AA"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -379,11 +379,11 @@ public class LexicalTests {
     // Validate real number parsing
     [Test]
     public void ValidateRealParsing() {
-        string[] code = {
+        string[] code = [
             "      123.0976AA",
             "      123.0976E-2",
             "      .5"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -412,10 +412,10 @@ public class LexicalTests {
     // Validate double precision number parsing
     [Test]
     public void ValidateDoublePrecisionParsing() {
-        string[] code = {
+        string[] code = [
             "      123.0976D4AA",
             "      123.0976D-2"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -437,12 +437,12 @@ public class LexicalTests {
     // Validate hexadecimal number parsing
     [Test]
     public void ValidateHexParsing() {
-        string[] code = {
+        string[] code = [
             "      $CC4DE",
             "      Z'CC4DE'",
             "      Z\"CC4DE\"",
             "      $AGG"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -479,11 +479,11 @@ public class LexicalTests {
     // Validate octal number parsing
     [Test]
     public void ValidateOctalParsing() {
-        string[] code = {
+        string[] code = [
             "      O'745'",
             "      O\"340\"",
             "      O'892'"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -511,11 +511,11 @@ public class LexicalTests {
     // Validate binary number parsing
     [Test]
     public void ValidateBinaryParsing() {
-        string[] code = {
+        string[] code = [
             "      B'1010101111'",
             "      b\"111\"",
             "      B'121'"
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -543,9 +543,9 @@ public class LexicalTests {
     // Validate string parsing
     [Test]
     public void ValidateStringParsing() {
-        string[] code = {
+        string[] code = [
             "      PRINT \"AbCDEf\""
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -561,9 +561,9 @@ public class LexicalTests {
     // Validate backslash handling
     [Test]
     public void ValidateBackslashStringParsing() {
-        string[] code = {
+        string[] code = [
             "      \"Ab\\tCDEf\\n\""
-        };
+        ];
         FortranOptions opts = new();
         MessageCollection messages = new(opts);
         Lexer ls = new(code, opts, messages);
@@ -581,6 +581,6 @@ public class LexicalTests {
         Assert.IsTrue(token.ID == TokenID.STRING);
 
         stringToken = (StringToken)token;
-        Assert.AreEqual(stringToken.String, "Ab\\tCDEf\\n");
+        Assert.AreEqual(stringToken.String, @"Ab\tCDEf\n");
     }
 }

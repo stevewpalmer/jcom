@@ -36,7 +36,7 @@ public class ArrayTests {
     // Verify all array declarations are valid.
     [Test]
     public void ArrayVerifySyntax() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM ARRAYVERIFY",
             "      IMPLICIT NONE",
             "      INTEGER A(12), B(90), C(4:9)",
@@ -44,21 +44,21 @@ public class ArrayTests {
             "      REAL F",
             "      DIMENSION F(23)",
             "      END"
-        };
+        ];
         FortranHelper.HelperCompile(code, new FortranOptions());
     }
 
     // Verify basic arrays.
     [Test]
     public void ArrayVerifyArraySyntax() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(2)",
             "        A(1) = 45",
             "        A(2) = 78",
             "        RETURN A(1) + A(2)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 123);
     }
@@ -66,7 +66,7 @@ public class ArrayTests {
     // Verify non 1-based array references.
     [Test]
     public void ArrayVerifyNon1ArraySyntax() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(-3:2), B",
             "        A(-3) = 45",
@@ -74,7 +74,7 @@ public class ArrayTests {
             "        A(B-2) = 78",
             "        RETURN A(-3) + A(B-2)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 123);
     }
@@ -82,7 +82,7 @@ public class ArrayTests {
     // Verify passing arrays to functions
     [Test]
     public void ArrayVerifyArrayToFunction() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION TEST",
             "      PARAMETER (MAXVAL = 10)",
             "      REAL ARRAY(MAXVAL)",
@@ -94,7 +94,7 @@ public class ArrayTests {
             "      REAL R(MAXVAL)",
             "      RETURN R(2)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunFloat(comp, "TEST", 4.2f);
     }
@@ -103,7 +103,7 @@ public class ArrayTests {
     // function
     [Test]
     public void ArrayVerifyDynamicArrays() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION TEST",
             "      PARAMETER (MAXVAL = 10)",
             "      REAL ARRAY(MAXVAL)",
@@ -115,7 +115,7 @@ public class ArrayTests {
             "      REAL R(N)",
             "      RETURN R(N-8)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunFloat(comp, "TEST", 4.2f);
     }
@@ -125,14 +125,14 @@ public class ArrayTests {
     // the compiler should catch it.
     [Test]
     public void ArrayVerifyIllegalDeclaration() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM FOO",
             "      INTEGER MAXVAL",
             "      REAL ARRAY(MAXVAL)",
             "      ARRAY(2) = 4.2",
             "      TEST=FOO(ARRAY,MAXVAL)",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -145,7 +145,7 @@ public class ArrayTests {
     // not modify the actual array dimensions.
     [Test]
     public void ArrayVerifyDimensions1() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION TEST",
             "      REAL ARRAY(2,2)",
             "      ARRAY(2,2) = 4.2",
@@ -157,7 +157,7 @@ public class ArrayTests {
             "      M=0",
             "      RETURN R(2,2)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunFloat(comp, "TEST", 4.2f);
     }
@@ -165,7 +165,7 @@ public class ArrayTests {
     // Verify assumed sized arrays
     [Test]
     public void ArrayAssumedSizeArrays() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION TEST",
             "      REAL ARRAY(2)",
             "      ARRAY(1) = 45",
@@ -176,7 +176,7 @@ public class ArrayTests {
             "      REAL R(*)",
             "      RETURN R(1)+R(2)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunFloat(comp, "TEST", 118);
     }

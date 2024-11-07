@@ -36,14 +36,14 @@ public class StatementFunctions {
     // arguments is constrained to the statement function.
     [Test]
     public void StatementFunction1() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER B",
             "        B=12",
             "        F(B)=B*B",
             "        RETURN B+F(7)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 61);
     }
@@ -51,7 +51,7 @@ public class StatementFunctions {
     // A statement function that calls another statement function.
     [Test]
     public void StatementFunction2() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER B",
             "        B=12",
@@ -59,7 +59,7 @@ public class StatementFunctions {
             "        F(B)=G(B,3)*G(B,4)",
             "        RETURN B+F(7)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 1221);
     }

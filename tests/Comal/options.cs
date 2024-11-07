@@ -55,11 +55,11 @@ public class OptionsTest {
     [Test]
     public void ValidateOptionParsing() {
         ComalOptions opts = new();
-        string[] args = {
+        string[] args = [
             "--noinline",
             "--invalidoption",
             "--debug"
-        };
+        ];
         Assert.IsFalse(opts.Parse(args));
 
         Assert.IsFalse(opts.Inline);
@@ -73,11 +73,11 @@ public class OptionsTest {
     [Test]
     public void ValidateFilenameParsing() {
         ComalOptions opts = new();
-        string[] args = {
+        string[] args = [
             "testfile1.cml",
             "--debug",
             "testfile2.cml"
-        };
+        ];
 
         Assert.IsTrue(opts.Parse(args));
         Assert.IsTrue(opts.SourceFiles.Count == 2);
@@ -91,11 +91,11 @@ public class OptionsTest {
     [Test]
     public void ValidateFilenameExtension() {
         ComalOptions opts = new();
-        string[] args = {
+        string[] args = [
             "testfile1.",
             "--debug",
             "testfile2"
-        };
+        ];
 
         Assert.IsTrue(opts.Parse(args));
         Assert.IsTrue(opts.SourceFiles.Count == 2);

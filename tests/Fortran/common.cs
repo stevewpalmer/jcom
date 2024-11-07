@@ -36,7 +36,7 @@ public class CommonTests {
     // and two subroutines that modify the global values.
     [Test]
     public void BasicCommonTest() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM COMMONTEST",
             "      COMMON A,B",
             "      COMMON /FOO/ C,D",
@@ -60,7 +60,7 @@ public class CommonTests {
             "      J=10",
             "      B1=20",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 60);
     }
@@ -70,7 +70,7 @@ public class CommonTests {
     // in the sub-programs match up.
     [Test]
     public void MultipartCommonTest() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ICOMMONTEST",
             "      COMMON A,B",
             "      COMMON // J,K",
@@ -82,7 +82,7 @@ public class CommonTests {
             "      ITEST=X+Y+I+L",
             "      RETURN",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ICOMMONTEST", 187);
     }
@@ -92,7 +92,7 @@ public class CommonTests {
     // in the sub-programs match up.
     [Test]
     public void SplitMultipartCommonTest() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ICOMMONTEST",
             "      COMMON A,B",
             "      COMMON /FOO/ J",
@@ -106,7 +106,7 @@ public class CommonTests {
             "      ITEST=X+Y+M+I+J2",
             "      RETURN",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ICOMMONTEST", 197);
     }

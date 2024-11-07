@@ -36,13 +36,13 @@ public class DataTests {
     // variables where there's a 1:1 match.
     [Test]
     public void DataBasicSyntax() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A,B,C,D",
             "        DATA A,B,C,D /12,13,14,15/",
             "        RETURN A+B+C+D",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 54);
     }
@@ -51,13 +51,13 @@ public class DataTests {
     // variables to the same value.
     [Test]
     public void DataRepeatCount() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A,B,C,D",
             "        DATA A,B,C,D /4*17/",
             "        RETURN A+B+C+D",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 68);
     }
@@ -66,13 +66,13 @@ public class DataTests {
     // variables to the same minus value.
     [Test]
     public void DataRepeatCountWithMinus() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A,B,C,D",
             "        DATA A,B,C,D /4*-17/",
             "        RETURN A+B+C+D",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", -68);
     }
@@ -80,13 +80,13 @@ public class DataTests {
     // Verify DATA syntax to set an array.
     [Test]
     public void DataArrayNonRepeat() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A /34,67,90,-12/",
             "        RETURN A(1)+A(2)+A(3)+A(4)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 179);
     }
@@ -94,13 +94,13 @@ public class DataTests {
     // Verify DATA syntax to set an array using a repeat.
     [Test]
     public void DataArrayWithRepeat() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A /4*65/",
             "        RETURN A(1)+A(2)+A(3)+A(4)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 260);
     }
@@ -108,13 +108,13 @@ public class DataTests {
     // Verify DATA syntax to set an array using separate repeats.
     [Test]
     public void DataArrayWithSeparateRepeats() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A /2*65, 2*12/",
             "        RETURN A(1)+A(2)+A(3)+A(4)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 154);
     }
@@ -123,13 +123,13 @@ public class DataTests {
     // A(3) is omitted.
     [Test]
     public void DataSpecificArrayElements() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A(1),A(2),A(4) /34,67,99/",
             "        RETURN A(1)+A(2)+A(4)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 200);
     }
@@ -138,14 +138,14 @@ public class DataTests {
     // set even if it precedes DATA.
     [Test]
     public void DataSpecificArrayElementsWithOverride() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        A(1)=450",
             "        DATA A(1),A(2),A(4) /19,34,99/",
             "        RETURN A(1)+A(2)+A(3)+A(4)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 583);
     }
@@ -154,13 +154,13 @@ public class DataTests {
     // elements.
     [Test]
     public void DataSpecificArrayElementsWithRepeat() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A(1),A(2),A(4) /3*77/",
             "        RETURN A(1)+A(2)+A(3)+A(4)",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 231);
     }
@@ -169,7 +169,7 @@ public class DataTests {
     // for the values.
     [Test]
     public void DataImpliedDo1() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER ODD(10)",
             "        DATA (ODD(I),I=1,10,2)/ 5 * 43/",
@@ -183,7 +183,7 @@ public class DataTests {
             "           SUM=SUM+JRY(I)",
             "100     CONTINUE",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 215);
     }
@@ -192,7 +192,7 @@ public class DataTests {
     // discrete values.
     [Test]
     public void DataImpliedDo2() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        INTEGER NUMBER(10)",
             "        DATA (NUMBER(I),I=1,10)/1,1,2,3,5,8,13,21,34,55/",
@@ -205,7 +205,7 @@ public class DataTests {
             "           SUM=SUM+JRY(I)",
             "100     CONTINUE",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 143);
     }
@@ -213,13 +213,13 @@ public class DataTests {
     // Test initialisation of a CHARACTER with DATA
     [Test]
     public void DataCharacterSet() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        CHARACTER * 20 B, ITEST",
             "        DATA B /20*'A'/",
             "        RETURN B",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunString(comp, "ITEST", "AAAAAAAAAAAAAAAAAAAA");
     }

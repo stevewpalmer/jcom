@@ -35,14 +35,14 @@ public class LoopTests {
     // Verify basic loop operation
     [Test]
     public void Loops1() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        DO 20,I=1,10",
             "          J=J+I",
             "20      CONTINUE",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 55);
     }
@@ -50,7 +50,7 @@ public class LoopTests {
     // Verify nested loop operation
     [Test]
     public void Loops2() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        DO 20,I=1,10",
             "          DO 20,K=1,10",
@@ -58,7 +58,7 @@ public class LoopTests {
             "20      CONTINUE",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 550);
     }
@@ -67,7 +67,7 @@ public class LoopTests {
     // of the loops.
     [Test]
     public void Loops3() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        DO 20,I=1,10",
             "          DO 20,K=1,10",
@@ -75,7 +75,7 @@ public class LoopTests {
             "20      CONTINUE",
             "        RETURN I+K",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 22);
     }
@@ -84,7 +84,7 @@ public class LoopTests {
     // not affect the number of iterations.
     [Test]
     public void Loops4() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        LSTART=2",
             "        LEND=10",
@@ -97,7 +97,7 @@ public class LoopTests {
             "20      CONTINUE",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 5);
     }
@@ -105,7 +105,7 @@ public class LoopTests {
     // Verify negative iterations.
     [Test]
     public void Loops5() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        LSTART=40",
             "        LEND=4",
@@ -115,7 +115,7 @@ public class LoopTests {
             "20      CONTINUE",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 19);
     }
@@ -124,7 +124,7 @@ public class LoopTests {
     // than the start value.
     [Test]
     public void Loops6() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        LSTART=50",
             "        LEND=30",
@@ -133,7 +133,7 @@ public class LoopTests {
             "20      CONTINUE",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 0);
     }
@@ -141,7 +141,7 @@ public class LoopTests {
     // Verify ENDDO to terminate the loop.
     [Test]
     public void Loops7() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        LSTART=1",
             "        LEND=20",
@@ -150,7 +150,7 @@ public class LoopTests {
             "        ENDDO",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 20);
     }
@@ -158,7 +158,7 @@ public class LoopTests {
     // Verify DO WHILE loop.
     [Test]
     public void Loops8() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        LSTART=1",
             "        LEND=20",
@@ -168,7 +168,7 @@ public class LoopTests {
             "        ENDDO",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 20);
     }
@@ -177,7 +177,7 @@ public class LoopTests {
     // as the final statement
     [Test]
     public void Loops9() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        LSTART=1",
             "        LEND=20",
@@ -187,7 +187,7 @@ public class LoopTests {
             "100     CONTINUE",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 20);
     }
@@ -195,7 +195,7 @@ public class LoopTests {
     // Verify zero start loop optimisation
     [Test]
     public void Loops10() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION ITEST",
             "        LEND=9",
             "        DO 20,I=0,LEND",
@@ -203,7 +203,7 @@ public class LoopTests {
             "20      CONTINUE",
             "        RETURN J",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 45);
     }

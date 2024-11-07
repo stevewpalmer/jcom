@@ -35,7 +35,7 @@ public class FormatTests {
     // Basic FORMAT verification
     [Test]
     public void FormatBasic() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION FMTTEST",
             "        CHARACTER*26 STR, FMTTEST",
             "3       FORMAT (\"The sum of \",I,\" and \",I,\" is \",I)",
@@ -43,7 +43,7 @@ public class FormatTests {
             "        FMTTEST = STR",
             "        RETURN",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunString(comp, "FMTTEST", "The sum of 12 and 36 is 48");
     }
@@ -51,7 +51,7 @@ public class FormatTests {
     // Array FORMAT verification
     [Test]
     public void FormatArrayRef() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION FMTTEST",
             "        CHARACTER*18 STR, FMTTEST",
             "        INTEGER V(3)",
@@ -62,7 +62,7 @@ public class FormatTests {
             "        FMTTEST = STR",
             "        RETURN",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunString(comp, "FMTTEST", "    12    24    36");
     }
@@ -70,7 +70,7 @@ public class FormatTests {
     // Exponential format tests.
     [Test]
     public void FormatExpTests() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION EXPTEST1",
             "        CHARACTER*7 STR, EXPTEST1",
             "        WRITE (STR, \"E7.2\") 678912.0",
@@ -96,7 +96,7 @@ public class FormatTests {
             "        WRITE (STR, \"E8.2\") 8.12D3",
             "        RETURN STR",
             "      END"
-        };
+        ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunString(comp, "EXPTEST1", ".68E+06");
         Helper.HelperRunString(comp, "EXPTEST2", "-0.68E+06");

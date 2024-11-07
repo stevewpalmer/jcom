@@ -130,10 +130,10 @@ public class ProcFunc {
                    return TRUE
                 ENDFUNC
             ";
-        Message[] expectedErrors = {
+        Message[] expectedErrors = [
             new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 110, null),
             new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 140, null)
-        };
+        ];
         ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
     }
 
@@ -148,9 +148,9 @@ public class ProcFunc {
                    return TRUE
                 ENDFUNC
             ";
-        Message[] expectedErrors = {
+        Message[] expectedErrors = [
             new Message(null, MessageLevel.Error, MessageCode.ALREADYIMPORTED, 110, null)
-        };
+        ];
         ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
     }
 

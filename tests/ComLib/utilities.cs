@@ -68,7 +68,7 @@ public class Utilities {
         Assert.AreEqual(10, JComLib.Utilities.ConstrainAndWrap(15, 10, 11));
         Assert.AreEqual(14, JComLib.Utilities.ConstrainAndWrap(5, 10, 15));
         Assert.AreEqual(41, JComLib.Utilities.ConstrainAndWrap(55, 41, 43));
-        Assert.AreEqual(Int32.MinValue, JComLib.Utilities.ConstrainAndWrap(Int32.MaxValue, Int32.MinValue, Int32.MaxValue));
+        Assert.AreEqual(int.MinValue, JComLib.Utilities.ConstrainAndWrap(int.MaxValue, int.MinValue, int.MaxValue));
     }
 
     // Test the CentreString function

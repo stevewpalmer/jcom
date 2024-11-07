@@ -88,7 +88,7 @@ public class Helper {
     /// </summary>
     /// <param name="d1">First value</param>
     /// <param name="d2">Second value</param>
-    public static bool ComplexCompare(Complex d1, Complex d2) {
+    private static bool ComplexCompare(Complex d1, Complex d2) {
         return DoubleCompare(d1.Real, d2.Real) && DoubleCompare(d1.Imaginary, d2.Imaginary);
     }
 

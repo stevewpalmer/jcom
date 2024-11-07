@@ -35,13 +35,13 @@ public class ParsingTests {
     // Make sure all valid type formats are recognised.
     [Test]
     public void ParseVerifyTypeFormats() {
-        string[] code = {
+        string[] code = [
             "      INTEGER A",
             "      REAL B",
             "      CHARACTER C*5,D",
             "      DOUBLE PRECISION E",
             "      LOGICAL F,G,H"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -51,13 +51,13 @@ public class ParsingTests {
     // Make sure redefinitions are caught.
     [Test]
     public void ParseVerifyRedefinitions() {
-        string[] code = {
+        string[] code = [
             "      INTEGER A",
             "      REAL B",
             "      CHARACTER B",
             "      DOUBLE PRECISION B",
             "      LOGICAL F,G,H"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -75,7 +75,7 @@ public class ParsingTests {
     // 4. Can assign a real to an integer type.
     [Test]
     public void ParseVerifyAssignments() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      INTEGER A,C",
             "      REAL B",
@@ -84,7 +84,7 @@ public class ParsingTests {
             "      B = A",
             "      C = 12.78",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -96,7 +96,7 @@ public class ParsingTests {
     // 2. Cannot assign an integer to a character
     [Test]
     public void ParseVerifyIllegalChar() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      INTEGER A",
             "      CHARACTER B",
@@ -104,7 +104,7 @@ public class ParsingTests {
             "      A = B",
             "      B = 89",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -118,12 +118,12 @@ public class ParsingTests {
     // Make sure constants can't be assigned-to.
     [Test]
     public void ParseVerifyConstantAssignment() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      PARAMETER (I=12)",
             "      I = 45",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -137,13 +137,13 @@ public class ParsingTests {
     // error and handled separately.
     [Test]
     public void ParseConstantDivisionByZero() {
-        string[] code = {
+        string[] code = [
             "      FUNCTION TEST",
             "        INTEGER I",
             "        I = 10/0",
             "        RETURN I",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -155,13 +155,13 @@ public class ParsingTests {
     // Verify a general use of IMPLICIT
     [Test]
     public void ParseVerifyImplicit1() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      IMPLICIT INTEGER(A-Z)",
             "      A = 20",
             "      B = A",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -171,14 +171,14 @@ public class ParsingTests {
     // Verify implicit none reports an undefined variable error
     [Test]
     public void ParseVerifyImplicitNone() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      IMPLICIT NONE",
             "      INTEGER A",
             "      A = 20",
             "      B = A",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -191,12 +191,12 @@ public class ParsingTests {
     // implicit
     [Test]
     public void ParseVerifyImplicitOrdering() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      IMPLICIT LOGICAL(L)",
             "      IMPLICIT NONE",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -207,7 +207,7 @@ public class ParsingTests {
     // Verify logical can only be assigned truth values
     [Test]
     public void ParseVerifyLogicalAssignment() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      IMPLICIT NONE",
             "      LOGICAL L1,L2",
@@ -216,7 +216,7 @@ public class ParsingTests {
             "      L1 = L2",
             "      L1 = 90 .GT. 45",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -227,7 +227,7 @@ public class ParsingTests {
     // to logical variables.
     [Test]
     public void ParseVerifyBadLogicalAssignment() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      IMPLICIT NONE",
             "      LOGICAL L1,L2",
@@ -235,7 +235,7 @@ public class ParsingTests {
             "      L2 = 9.67",
             "      L1 = 'Ch'",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
@@ -248,12 +248,12 @@ public class ParsingTests {
     // Verify constant expression collapsing.
     [Test]
     public void ParseVerifyExpressionCollapsing() {
-        string[] code = {
+        string[] code = [
             "      PROGRAM PARSETEST",
             "      IMPLICIT NONE",
             "      INTEGER A(12+34), B(90-10), C(4-2:9-3)",
             "      END"
-        };
+        ];
 
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
