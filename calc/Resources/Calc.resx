@@ -51,12 +51,6 @@
     <data name="Graph" xml:space="preserve">
         <value>Graph</value>
     </data>
-    <data name="Data" xml:space="preserve">
-        <value>Data</value>
-    </data>
-    <data name="WorksheetGlobal" xml:space="preserve">
-        <value>Global</value>
-    </data>
     <data name="WorksheetInsert" xml:space="preserve">
         <value>Insert</value>
     </data>
@@ -104,36 +98,6 @@
     </data>
     <data name="FileSave" xml:space="preserve">
         <value>Save</value>
-    </data>
-    <data name="FileCombine" xml:space="preserve">
-        <value>Combine</value>
-    </data>
-    <data name="FileXtract" xml:space="preserve">
-        <value>Xtract</value>
-    </data>
-    <data name="FileList" xml:space="preserve">
-        <value>List</value>
-    </data>
-    <data name="Fileimport" xml:space="preserve">
-        <value>Import</value>
-    </data>
-    <data name="FileDirectory" xml:space="preserve">
-        <value>Directory</value>
-    </data>
-    <data name="DataFill" xml:space="preserve">
-        <value>Fill</value>
-    </data>
-    <data name="DataTable" xml:space="preserve">
-        <value>Table</value>
-    </data>
-    <data name="DataSort" xml:space="preserve">
-        <value>Sort</value>
-    </data>
-    <data name="DataQuery" xml:space="preserve">
-        <value>Query</value>
-    </data>
-    <data name="DataDistribution" xml:space="preserve">
-        <value>Distribution</value>
     </data>
     <data name="ColumnWidthSet" xml:space="preserve">
         <value>Set</value>
@@ -293,5 +257,44 @@
     </data>
     <data name="EnterDecimalPlaces" xml:space="preserve">
         <value>Enter number of decimal places (0..15)</value>
+    </data>
+    <data name="Settings" xml:space="preserve">
+        <value>Settings</value>
+    </data>
+    <data name="SettingsColours" xml:space="preserve">
+        <value>Colours</value>
+    </data>
+    <data name="SettingsFormat" xml:space="preserve">
+        <value>Format</value>
+    </data>
+    <data name="SettingsAlignment" xml:space="preserve">
+        <value>Alignment</value>
+    </data>
+    <data name="SettingsDecimalPoints" xml:space="preserve">
+        <value>Decimal Points</value>
+    </data>
+    <data name="SettingsBackups" xml:space="preserve">
+        <value>Backups</value>
+    </data>
+    <data name="InvalidColourIndex" xml:space="preserve">
+        <value>Invalid colour number {0}</value>
+    </data>
+    <data name="FormatTextDescription" xml:space="preserve">
+        <value>Display formula instead of value</value>
+    </data>
+    <data name="SettingsColourDescription" xml:space="preserve">
+        <value>Configure colour settings</value>
+    </data>
+    <data name="SettingsFormatDescription" xml:space="preserve">
+        <value>Configure the default cell format</value>
+    </data>
+    <data name="SettingsAlignmentDescription" xml:space="preserve">
+        <value>Configure the default cell alignment</value>
+    </data>
+    <data name="SettingsDecimalPointDescription" xml:space="preserve">
+        <value>Configure the default number of decimal points</value>
+    </data>
+    <data name="SettingsBackupDescription" xml:space="preserve">
+        <value>Set whether or not to create backups when saving</value>
     </data>
 </root>

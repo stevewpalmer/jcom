@@ -280,11 +280,13 @@ public class Window {
     /// original marked block area.
     /// </summary>
     private void ClearBlock() {
-        _isMarkMode = false;
-        Extent extent = new Extent()
-            .Add(_markAnchor)
-            .Add(new Point(Sheet.Column, Sheet.Row));
-        RenderExtent(extent);
+        if (_isMarkMode) {
+            _isMarkMode = false;
+            Extent extent = new Extent()
+                .Add(_markAnchor)
+                .Add(new Point(Sheet.Column, Sheet.Row));
+            RenderExtent(extent);
+        }
     }
 
     /// <summary>

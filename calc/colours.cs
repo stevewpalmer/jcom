@@ -62,6 +62,11 @@ public class Colours {
     }
 
     /// <summary>
+    /// Maximum colour index
+    /// </summary>
+    public int MaxColourIndex => _colours.Length - 1;
+
+    /// <summary>
     /// Retrieve the background colour
     /// </summary>
     public ConsoleColor BackgroundColour =>

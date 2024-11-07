@@ -61,7 +61,8 @@ public class Config {
                 WriteIndented = true
             });
         }
-        catch (Exception) {
+        catch (Exception e) {
+            Screen.Command.Error($"Could not save the configuration - {e.Message}");
         }
     }
 

@@ -445,7 +445,7 @@ public class CommandBar {
         Point cursorPosition = Terminal.GetCursor();
         prompt = prompt.Replace("@@", $"[{string.Join("", validInput)}]");
         Terminal.WriteText(0, _promptRow, _displayWidth, prompt, _fgColour, _bgColour);
-        Terminal.SetCursor(prompt.Length, _promptRow);
+        Terminal.SetCursor(prompt.Length + 1, _promptRow);
         ConsoleKeyInfo input = Console.ReadKey(true);
         while (!validInput.Contains(char.ToLower(input.KeyChar))) {
             if (input.Key is ConsoleKey.Escape) {

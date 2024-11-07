@@ -111,18 +111,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string Data {
-            get {
-                return ResourceManager.GetString("Data", resourceCulture);
-            }
-        }
-        
-        internal static string WorksheetGlobal {
-            get {
-                return ResourceManager.GetString("WorksheetGlobal", resourceCulture);
-            }
-        }
-        
         internal static string WorksheetInsert {
             get {
                 return ResourceManager.GetString("WorksheetInsert", resourceCulture);
@@ -216,66 +204,6 @@ namespace JCalc.Resources {
         internal static string FileSave {
             get {
                 return ResourceManager.GetString("FileSave", resourceCulture);
-            }
-        }
-        
-        internal static string FileCombine {
-            get {
-                return ResourceManager.GetString("FileCombine", resourceCulture);
-            }
-        }
-        
-        internal static string FileXtract {
-            get {
-                return ResourceManager.GetString("FileXtract", resourceCulture);
-            }
-        }
-        
-        internal static string FileList {
-            get {
-                return ResourceManager.GetString("FileList", resourceCulture);
-            }
-        }
-        
-        internal static string Fileimport {
-            get {
-                return ResourceManager.GetString("Fileimport", resourceCulture);
-            }
-        }
-        
-        internal static string FileDirectory {
-            get {
-                return ResourceManager.GetString("FileDirectory", resourceCulture);
-            }
-        }
-        
-        internal static string DataFill {
-            get {
-                return ResourceManager.GetString("DataFill", resourceCulture);
-            }
-        }
-        
-        internal static string DataTable {
-            get {
-                return ResourceManager.GetString("DataTable", resourceCulture);
-            }
-        }
-        
-        internal static string DataSort {
-            get {
-                return ResourceManager.GetString("DataSort", resourceCulture);
-            }
-        }
-        
-        internal static string DataQuery {
-            get {
-                return ResourceManager.GetString("DataQuery", resourceCulture);
-            }
-        }
-        
-        internal static string DataDistribution {
-            get {
-                return ResourceManager.GetString("DataDistribution", resourceCulture);
             }
         }
         
@@ -594,6 +522,84 @@ namespace JCalc.Resources {
         internal static string EnterDecimalPlaces {
             get {
                 return ResourceManager.GetString("EnterDecimalPlaces", resourceCulture);
+            }
+        }
+        
+        internal static string Settings {
+            get {
+                return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsColours {
+            get {
+                return ResourceManager.GetString("SettingsColours", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsFormat {
+            get {
+                return ResourceManager.GetString("SettingsFormat", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsAlignment {
+            get {
+                return ResourceManager.GetString("SettingsAlignment", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsDecimalPoints {
+            get {
+                return ResourceManager.GetString("SettingsDecimalPoints", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsBackups {
+            get {
+                return ResourceManager.GetString("SettingsBackups", resourceCulture);
+            }
+        }
+        
+        internal static string InvalidColourIndex {
+            get {
+                return ResourceManager.GetString("InvalidColourIndex", resourceCulture);
+            }
+        }
+        
+        internal static string FormatTextDescription {
+            get {
+                return ResourceManager.GetString("FormatTextDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsColourDescription {
+            get {
+                return ResourceManager.GetString("SettingsColourDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsFormatDescription {
+            get {
+                return ResourceManager.GetString("SettingsFormatDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsAlignmentDescription {
+            get {
+                return ResourceManager.GetString("SettingsAlignmentDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsDecimalPointDescription {
+            get {
+                return ResourceManager.GetString("SettingsDecimalPointDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsBackupDescription {
+            get {
+                return ResourceManager.GetString("SettingsBackupDescription", resourceCulture);
             }
         }
     }
