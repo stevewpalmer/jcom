@@ -24,6 +24,7 @@
 // under the License
 
 using System;
+using System.Drawing;
 using JCalcLib;
 using NUnit.Framework;
 
@@ -60,6 +61,13 @@ public class CellTests {
         Assert.AreEqual("A1", new Cell { Row = 1, Column = 1}.Position);
         Assert.AreEqual("Z1", new Cell { Row = 1, Column = 26}.Position);
         Assert.AreEqual("IU4095", new Cell { Row = 4095, Column = 255}.Position);
+    }
+
+    // Verify the Location property
+    [Test]
+    public void VerifyLocation() {
+        Assert.AreEqual(new Point(1, 1), new Cell { Row = 1, Column = 1}.Location);
+        Assert.AreEqual(new Point(12, 12), new Cell { Row = 12, Column = 12}.Location);
     }
 
     // Verify general alignment

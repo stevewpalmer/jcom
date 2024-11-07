@@ -46,6 +46,8 @@ public class Extents {
         Assert.AreEqual(_uninitialised, _extent.End);
     }
 
+    // Verify the Add method that extends an extent to
+    // include the specified point
     [Test]
     public void TestAdd() {
         Point point = new Point(1, 1);
@@ -55,6 +57,8 @@ public class Extents {
         Assert.AreEqual(point, _extent.End);
     }
 
+    // Verify the Subtract method that reduces an extent to
+    // exclude the specifie point
     [Test]
     public void TestSubtract() {
         Point start = new Point(1, 1);
@@ -70,6 +74,45 @@ public class Extents {
         Assert.AreEqual(newEnd, _extent.End);
     }
 
+    // Verify the Contains method that tests whether a point
+    // is contained within an extent.
+    [Test]
+    public void TestContains() {
+        _extent.Add(new Point(4, 4));
+        _extent.Add(new Point(12, 30));
+        Assert.IsTrue(_extent.Contains(new Point(4, 4)));
+        Assert.IsTrue(_extent.Contains(new Point(800, 4)));
+        Assert.IsTrue(_extent.Contains(new Point(12, 30)));
+        Assert.IsTrue(_extent.Contains(new Point(0, 16)));
+        Assert.IsTrue(_extent.Contains(new Point(000, 16)));
+        Assert.IsTrue(_extent.Contains(new Point(0, 16)));
+        Assert.IsTrue(_extent.Contains(new Point(90, 12)));
+        Assert.IsFalse(_extent.Contains(new Point(3, 4)));
+        Assert.IsFalse(_extent.Contains(new Point(13, 30)));
+        Assert.IsFalse(_extent.Contains(new Point(0, 0)));
+        Assert.IsFalse(_extent.Contains(new Point(-1, -1)));
+    }
+
+
+    // Verify the RContains method that tests whether a point
+    // is contained within the rectangle formed by an extent.
+    [Test]
+    public void TestRContains() {
+        _extent.Add(new Point(4, 4));
+        _extent.Add(new Point(12, 30));
+        Assert.IsTrue(_extent.RContains(new Point(4, 4)));
+        Assert.IsTrue(_extent.RContains(new Point(12, 30)));
+        Assert.IsTrue(_extent.RContains(new Point(9, 12)));
+        Assert.IsFalse(_extent.RContains(new Point(000, 16)));
+        Assert.IsFalse(_extent.RContains(new Point(0, 16)));
+        Assert.IsFalse(_extent.RContains(new Point(3, 4)));
+        Assert.IsFalse(_extent.RContains(new Point(13, 30)));
+        Assert.IsFalse(_extent.RContains(new Point(0, 0)));
+        Assert.IsFalse(_extent.RContains(new Point(-1, -1)));
+    }
+
+    // Verify the Clear method that resets an extent to
+    // uninitialised.
     [Test]
     public void TestClear() {
         Point point = new Point(1, 1);

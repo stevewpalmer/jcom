@@ -61,5 +61,10 @@ public enum RenderHint {
     /// <summary>
     /// User cancelled command
     /// </summary>
-    CANCEL = 64
+    CANCEL = 64,
+
+    /// <summary>
+    /// Update a range selection
+    /// </summary>
+    BLOCK = 128
 }

@@ -69,6 +69,7 @@ public enum KeyCommand {
     KC_INSERT_COLUMN,
     KC_INSERT_ROW,
     KC_LEFT,
+    KC_MARK,
     KC_MOVE,
     KC_PAGEDOWN,
     KC_PAGEUP,

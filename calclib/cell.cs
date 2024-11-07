@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Drawing;
 using JComLib;
 
 namespace JCalcLib;
@@ -48,6 +49,11 @@ public class Cell {
     /// Cell column
     /// </summary>
     public int Column { get; set; }
+
+    /// <summary>
+    /// Return the cell row and column as a 1-based location
+    /// </summary>
+    public Point Location => new(Column, Row);
 
     /// <summary>
     /// Return the current cell location as a string.

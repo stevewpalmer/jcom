@@ -34,6 +34,9 @@ public class Window {
     private Rectangle _viewportBounds;
     private Rectangle _sheetBounds;
     private Point _scrollOffset = Point.Empty;
+    private Point _markAnchor;
+    private Point _lastMarkPoint;
+    private bool _isMarkMode;
     private int _numberOfColumns;
 
     /// <summary>
@@ -71,6 +74,8 @@ public class Window {
     public void SetViewportBounds(int x, int y, int width, int height) {
         _viewportBounds = new Rectangle(x, y, width, height);
         _sheetBounds = new Rectangle(x + 5, y + CommandBar.Height + 1, width - 5, height - (CommandBar.Height + 1 + StatusBar.Height));
+        _markAnchor = Point.Empty;
+        _isMarkMode = false;
     }
 
     /// <summary>
@@ -99,6 +104,7 @@ public class Window {
             KeyCommand.KC_HOME => CursorHome(),
             KeyCommand.KC_PAGEUP => CursorPageUp(),
             KeyCommand.KC_PAGEDOWN => CursorPageDown(),
+            KeyCommand.KC_MARK => ToggleMarkMode(),
             KeyCommand.KC_GOTO => GotoRowColumn(),
             KeyCommand.KC_VALUE => InputValue(false),
             KeyCommand.KC_EDIT => InputValue(true),
@@ -137,7 +143,12 @@ public class Window {
     private RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.CONTENTS)) {
             Render();
-            flags &= ~RenderHint.CONTENTS;
+            flags &= ~RenderHint.CONTENTS | RenderHint.BLOCK;
+            flags |= RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.BLOCK)) {
+            RenderBlock();
+            flags &= ~RenderHint.BLOCK;
             flags |= RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.CURSOR)) {
@@ -205,16 +216,111 @@ public class Window {
     /// </summary>
     private void Render() {
         Point cursorPosition = Terminal.GetCursor();
+        ConsoleColor bg = Screen.Colours.BackgroundColour;
+        ConsoleColor fg = Screen.Colours.ForegroundColour;
 
-        for (int y = _sheetBounds.Top; y < _sheetBounds.Bottom; ++y) {
-            Terminal.SetCursor(_sheetBounds.Left, y);
-            Terminal.Write(new string(' ', _sheetBounds.Width));
+        Extent renderExtent = new Extent()
+            .Add(new Point(1, _scrollOffset.Y + 1))
+            .Add(new Point(_sheetBounds.Width, _scrollOffset.Y + _sheetBounds.Height));
+        Extent markExtent = new Extent();
+        if (_isMarkMode) {
+            markExtent = new Extent()
+                .Add(_markAnchor)
+                .Add(new Point(Sheet.Column, Sheet.Row));
         }
-        foreach (Cell cell in Sheet.Cells.Values.Where(cell => cell.Row >= _scrollOffset.Y && cell.Column >= _scrollOffset.X)) {
-            Sheet.DrawCell(cell, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
+
+        Screen.Command.Error($"Render extent: {renderExtent.Start.Y} .. {renderExtent.End.Y}");
+        Cell [] cells = Sheet.Cells.Values.Where(cell => renderExtent.RContains(cell.Location)).ToArray();
+        int i = renderExtent.Start.Y;
+        while (i <= renderExtent.End.Y) {
+            string line = Sheet.GetRow(cells.Where(c => c.Row == i).OrderBy(c => c.Column).ToArray());
+            int y = _sheetBounds.Top + (i - 1 - _scrollOffset.Y);
+            int x = _sheetBounds.Left;
+            int w = _sheetBounds.Width;
+            int left = Math.Min(_scrollOffset.X, line.Length);
+            int length = Math.Min(w, line.Length - left);
+
+            if (i >= markExtent.Start.Y && i <= markExtent.End.Y) {
+                int extentStart = GetXPositionOfCell(markExtent.Start.X);
+                int extentEnd = GetXPositionOfCell(markExtent.End.X);
+                if (extentStart > _scrollOffset.X) {
+                    int diff = extentStart - x;
+                    Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
+                    x += diff;
+                    w -= diff;
+                    left += diff;
+                    length -= diff;
+                }
+                if (extentEnd > _scrollOffset.X) {
+                    int diff = Math.Min(extentEnd - extentStart + 1, line.Length - left);
+                    int diff2 = extentEnd - extentStart + 1;
+                    bg = Screen.Colours.ForegroundColour;
+                    fg = Screen.Colours.BackgroundColour;
+                    Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
+                    x += diff2;
+                    w -= diff2;
+                    left += diff;
+                    length -= diff;
+                }
+                bg = Screen.Colours.BackgroundColour;
+                fg = Screen.Colours.ForegroundColour;
+            }
+            Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, length));
+
+            bg = Screen.Colours.BackgroundColour;
+            fg = Screen.Colours.ForegroundColour;
+            ++i;
         }
         PlaceCursor();
         Terminal.SetCursor(cursorPosition.X, cursorPosition.Y);
+    }
+
+    /// <summary>
+    /// Clear the marked block from the window by rendering the
+    /// original marked block area.
+    /// </summary>
+    private void ClearBlock() {
+        _isMarkMode = false;
+        Extent extent = new Extent()
+            .Add(_markAnchor)
+            .Add(new Point(Sheet.Column, Sheet.Row));
+        RenderExtent(extent);
+    }
+
+    /// <summary>
+    /// Render the area covered by the mark including any area
+    /// uncovered as indicated by the _lastMarkPoint anchor.
+    /// </summary>
+    private void RenderBlock() {
+        Extent extent = new Extent()
+            .Add(_markAnchor)
+            .Add(new Point(Sheet.Column, Sheet.Row))
+            .Add(_lastMarkPoint);
+        RenderExtent(extent);
+    }
+
+    /// <summary>
+    /// Render the area of the window specified by the extent
+    /// which indicates the top left and bottom right portion
+    /// of the sheet to be rendered.
+    /// </summary>
+    /// <param name="extent">Extent to be rendered</param>
+    private void RenderExtent(Extent extent) {
+        Extent markExtent = new Extent();
+        if (_isMarkMode) {
+            markExtent
+                .Add(_markAnchor)
+                .Add(new Point(Sheet.Column, Sheet.Row));
+        }
+        Screen.Command.Error($"Render extent: ({extent.Start.X},{extent.Start.Y})..({extent.End.X},{extent.End.Y})");
+        for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
+            for (int column = extent.Start.X; column <= extent.End.X; column++) {
+                bool inMarked = markExtent.RContains(new Point(column, row));
+                ConsoleColor fg = inMarked ? Screen.Colours.BackgroundColour : Screen.Colours.ForegroundColour;
+                ConsoleColor bg = inMarked ? Screen.Colours.ForegroundColour : Screen.Colours.BackgroundColour;
+                ShowCell(column, row, fg, bg);
+            }
+        }
     }
 
     /// <summary>
@@ -229,6 +335,23 @@ public class Window {
     /// </summary>
     private void ResetCursor() {
         ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+    }
+
+    /// <summary>
+    /// Return an iterator over the marked block extent, or just the current
+    /// cursor position if no block is marked.
+    /// </summary>
+    /// <returns>The next tuple in the iterator, or null</returns>
+    private IEnumerable<Point> RangeIterator() {
+        Extent markExtent = new Extent().Add(ActiveCell.Location);
+        if (_isMarkMode) {
+            markExtent.Add(_markAnchor);
+        }
+        for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
+            for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
+                yield return new Point(column, row);
+            }
+        }
     }
 
     /// <summary>
@@ -278,9 +401,12 @@ public class Window {
     /// <param name="alignment">Requested alignment</param>
     /// <returns>Render hint</returns>
     private RenderHint AlignCells(CellAlignment alignment) {
-        Sheet.SetCellAlignment(ActiveCell, alignment);
-        PlaceCursor();
-        return RenderHint.NONE;
+        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
+        foreach (Point location in RangeIterator()) {
+            Sheet.SetCellAlignment(Sheet.Cell(location.X, location.Y, true), alignment);
+        }
+        ClearBlock();
+        return flags;
     }
 
     /// <summary>
@@ -289,6 +415,7 @@ public class Window {
     /// <param name="format">Requested format</param>
     /// <returns>Render hint</returns>
     private RenderHint FormatCells(CellFormat format) {
+        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         Cell cell = ActiveCell;
         int decimalPlaces = 0;
         if (format is CellFormat.FIXED or CellFormat.SCIENTIFIC or CellFormat.CURRENCY or CellFormat.PERCENT) {
@@ -305,9 +432,11 @@ public class Window {
             }
             decimalPlaces = Math.Min(formFields[0].Value.IntValue, 15);
         }
-        Sheet.SetCellFormat(cell, format, decimalPlaces);
-        PlaceCursor();
-        return RenderHint.NONE;
+        foreach (Point location in RangeIterator()) {
+            Sheet.SetCellFormat(Sheet.Cell(location.X, location.Y, true), format, decimalPlaces);
+        }
+        ClearBlock();
+        return flags;
     }
 
     /// <summary>
@@ -431,14 +560,54 @@ public class Window {
     }
 
     /// <summary>
+    /// Toggle whether we are in mark mode when moving the
+    /// cursor over the screen.
+    /// </summary>
+    /// <returns></returns>
+    private RenderHint ToggleMarkMode() {
+        RenderHint flags;
+        if (_isMarkMode) {
+            _isMarkMode = false;
+            ClearBlock();
+            flags = RenderHint.CURSOR;
+        }
+        else {
+            _markAnchor = new Point(Sheet.Column, Sheet.Row);
+            _lastMarkPoint = _markAnchor;
+            _isMarkMode = true;
+            flags = RenderHint.BLOCK;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Save the last mark point at the start or end of marking a
+    /// range. If the Shift key is down, we either drop the mark
+    /// anchor if we are not currently in mark mode or update the
+    /// mark point to where the cursor currently is before it gets
+    /// moved by the caller.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SaveLastMarkPoint() {
+        RenderHint flags = RenderHint.NONE;
+        if (_isMarkMode) {
+           _lastMarkPoint = new Point(Sheet.Column, Sheet.Row);
+            flags = RenderHint.BLOCK;
+        }
+        if (!_isMarkMode) {
+            ResetCursor();
+        }
+        return flags;
+    }
+
+    /// <summary>
     /// Move the cursor to the home position.
     /// </summary>
     /// <returns></returns>
     private RenderHint CursorHome() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet is { Column: > 1, Row: > 1 }) {
-            ResetCursor();
-            flags = RenderHint.CURSOR;
+            flags = SaveLastMarkPoint();
             if (_scrollOffset.X > 0 || _scrollOffset.Y > 0) {
                 flags |= RenderHint.REFRESH;
                 _scrollOffset = new Point(0, 0);
@@ -456,7 +625,7 @@ public class Window {
     private RenderHint CursorLeft() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.Column > 1) {
-            ResetCursor();
+            flags = SaveLastMarkPoint();
             --Sheet.Column;
             if (Sheet.Column <= _scrollOffset.X) {
                 --_scrollOffset.X;
@@ -476,7 +645,7 @@ public class Window {
     private RenderHint CursorRight() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.Column < Consts.MaxColumns) {
-            ResetCursor();
+            flags = SaveLastMarkPoint();
             ++Sheet.Column;
             if (GetXPositionOfCell(Sheet.Column) + Sheet.ColumnWidth(Sheet.Column) >= _sheetBounds.Right) {
                 ++_scrollOffset.X;
@@ -496,7 +665,7 @@ public class Window {
     private RenderHint CursorUp() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.Row > 1) {
-            ResetCursor();
+            flags = SaveLastMarkPoint();
             --Sheet.Row;
             if (Sheet.Row <= _scrollOffset.Y) {
                 --_scrollOffset.Y;
@@ -517,7 +686,7 @@ public class Window {
         RenderHint flags = RenderHint.NONE;
         int pageSize = Math.Min(_sheetBounds.Height, Sheet.Row - 1);
         if (Sheet.Row > 1) {
-            ResetCursor();
+            flags = SaveLastMarkPoint();
             Sheet.Row -= pageSize;
             if (Sheet.Row < _scrollOffset.Y) {
                 _scrollOffset.Y -= pageSize;
@@ -537,7 +706,7 @@ public class Window {
     private RenderHint CursorDown() {
         RenderHint flags = RenderHint.NONE;
         if (Sheet.Row < Consts.MaxRows) {
-            ResetCursor();
+            flags = SaveLastMarkPoint();
             ++Sheet.Row;
             if (GetYPositionOfCell(Sheet.Row) + Sheet.RowHeight > _sheetBounds.Bottom) {
                 ++_scrollOffset.Y;
@@ -558,7 +727,7 @@ public class Window {
         RenderHint flags = RenderHint.NONE;
         int pageSize = _sheetBounds.Height;
         if (Sheet.Row + pageSize < Consts.MaxRows) {
-            ResetCursor();
+            flags = SaveLastMarkPoint();
             Sheet.Row += pageSize;
             if (GetYPositionOfCell(Sheet.Row) + pageSize * Sheet.RowHeight > _sheetBounds.Bottom) {
                 _scrollOffset.Y += pageSize;

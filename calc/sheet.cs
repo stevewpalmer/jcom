@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JCalc.Resources;
@@ -193,7 +194,7 @@ public class Sheet {
     /// <param name="y">Y position of cell</param>
     public void DrawCell(Cell cell, int x, int y) {
         Terminal.SetCursor(x, y);
-        Terminal.Write(cell.ToString(ColumnWidth(Column)));
+        Terminal.Write(cell.ToString(ColumnWidth(cell.Column)));
     }
 
     /// <summary>
@@ -302,5 +303,26 @@ public class Sheet {
     private void DeleteCell(Cell cell) {
         int cellHash = cell.Row * Consts.MaxRows + cell.Column;
         Cells.Remove(cellHash);
+    }
+
+    /// <summary>
+    /// Render a row of cells using the specified data
+    /// </summary>
+    /// <param name="cells">Cells on the row</param>
+    /// <returns>String representation of row</returns>
+    public string GetRow(Cell [] cells) {
+        StringBuilder line = new();
+        int column = 1;
+        int cellIndex = 0;
+        Cell emptyCell = new();
+        while (cellIndex < cells.Length) {
+            while (column < cells[cellIndex].Column) {
+                line.Append(emptyCell.ToString(ColumnWidth(column)));
+                column++;
+            }
+            line.Append(cells[cellIndex++].ToString(ColumnWidth(column)));
+            column++;
+        }
+        return line.ToString();
     }
 }

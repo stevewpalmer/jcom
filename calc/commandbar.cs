@@ -159,14 +159,11 @@ public class FormField {
 }
 
 public class CommandBar {
-    private readonly int _cellStatusRow;
-    private readonly int _promptRow;
-    private readonly int _messageRow;
-    private ConsoleColor _bgColour;
-    private ConsoleColor _fgColour;
-    private readonly int _displayWidth;
-    private Cell _currentCell;
-    private ConsoleKeyInfo? _pushedKey;
+
+    /// <summary>
+    /// Command bar height
+    /// </summary>
+    public const int Height = 3;
 
     /// <summary>
     /// Non-command (navigation) key map
@@ -183,10 +180,14 @@ public class CommandBar {
         new() { Key = ConsoleKey.F5, CommandId = KeyCommand.KC_GOTO }
     ];
 
-    /// <summary>
-    /// Command bar height
-    /// </summary>
-    public const int Height = 3;
+    private readonly int _cellStatusRow;
+    private readonly int _displayWidth;
+    private readonly int _messageRow;
+    private readonly int _promptRow;
+    private ConsoleColor _bgColour;
+    private Cell _currentCell;
+    private ConsoleColor _fgColour;
+    private ConsoleKeyInfo? _pushedKey;
 
     /// <summary>
     /// Construct a command bar object
@@ -237,6 +238,9 @@ public class CommandBar {
     public KeyCommand MapKeyToCommand(ConsoleKeyInfo keyIn) {
         if (keyIn.KeyChar == '/') {
             return KeyCommand.KC_COMMAND_BAR;
+        }
+        if (keyIn.KeyChar == 181) {
+            return KeyCommand.KC_MARK;
         }
         foreach (KeyMap command in KeyTable) {
             if (command.Key == keyIn.Key) {

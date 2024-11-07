@@ -88,6 +88,26 @@ public class Extent {
     public bool Valid => Start != Uninitalised && End != Uninitalised;
 
     /// <summary>
+    /// Return whether point is contained within this extent.
+    /// </summary>
+    /// <param name="point">Point to test</param>
+    /// <returns>True if the point is within the extent, false otherwise</returns>
+    public bool Contains(Point point) =>
+        (point.Y > Start.Y || (point.Y == Start.Y && point.X >= Start.X)) &&
+        (point.Y < End.Y || (point.Y == End.Y && point.X <= End.X));
+
+
+    /// <summary>
+    /// Return whether point is contained within the rectangle formed by
+    /// this extent. Here, Start represents the top left corner of the rectangle
+    /// and End is the bottom right corner..
+    /// </summary>
+    /// <param name="point">Point to test</param>
+    /// <returns>True if the point is within the extent, false otherwise</returns>
+    public bool RContains(Point point) =>
+        Rectangle.FromLTRB(Start.X, Start.Y, End.X + 1, End.Y + 1).Contains(point);
+
+    /// <summary>
     /// Return whether point p1 is before point p2 in the extent.
     /// </summary>
     /// <param name="p1">First point to test</param>
