@@ -542,5 +542,41 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("DeleteRowDescription", resourceCulture);
             }
         }
+        
+        internal static string FileExport {
+            get {
+                return ResourceManager.GetString("FileExport", resourceCulture);
+            }
+        }
+        
+        internal static string FileExportDescription {
+            get {
+                return ResourceManager.GetString("FileExportDescription", resourceCulture);
+            }
+        }
+        
+        internal static string ExportFilename {
+            get {
+                return ResourceManager.GetString("ExportFilename", resourceCulture);
+            }
+        }
+        
+        internal static string Calc_FileImportDescription {
+            get {
+                return ResourceManager.GetString("Calc_FileImportDescription", resourceCulture);
+            }
+        }
+        
+        internal static string FileImport {
+            get {
+                return ResourceManager.GetString("FileImport", resourceCulture);
+            }
+        }
+        
+        internal static string EnterImportFilename {
+            get {
+                return ResourceManager.GetString("EnterImportFilename", resourceCulture);
+            }
+        }
     }
 }

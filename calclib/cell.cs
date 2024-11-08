@@ -33,7 +33,7 @@ public class Cell {
     /// <summary>
     /// Cell value
     /// </summary>
-    public CellValue Value { get; set; } = new();
+    public CellValue CellValue { get; set; } = new();
 
     /// <summary>
     /// Cell alignment
@@ -78,10 +78,10 @@ public class Cell {
     /// <returns>The date and time as a string</returns>
     private string ToDateTime(string pattern, double value) {
         if (value < -657435.0) {
-            return Value.StringValue;
+            return CellValue.Value;
         }
         if (value > 2958465.99999999) {
-            return Value.StringValue;
+            return CellValue.Value;
         }
         DateTime dateTime = DateTime.FromOADate(value);
         return dateTime.ToString(pattern);
@@ -116,7 +116,7 @@ public class Cell {
     /// <param name="width">Column width to use</param>
     /// <returns>String value of cell</returns>
     public string ToString(int width) {
-        string cellValue = Value.StringValue;
+        string cellValue = CellValue.Value;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
         if (isNumber) {
             int maxBar = Math.Min(width + 1, (int)Math.Abs(doubleValue));
@@ -150,7 +150,7 @@ public class Cell {
                 CellAlignment.LEFT => cellValue.PadRight(width),
                 CellAlignment.RIGHT => cellValue.PadLeft(width),
                 CellAlignment.CENTRE => Utilities.CentreString(cellValue, width),
-                CellAlignment.GENERAL => Value.Type switch {
+                CellAlignment.GENERAL => CellValue.Type switch {
                     CellType.TEXT => cellValue.PadRight(width),
                     CellType.NUMBER => cellValue.PadLeft(width),
                     _ => "".PadRight(width)

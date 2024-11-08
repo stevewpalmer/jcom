@@ -61,4 +61,9 @@ public static class Consts {
     /// Default column width
     /// </summary>
     public const int DefaultColumnWidth = 10;
+
+    /// <summary>
+    /// Extension for CSV files
+    /// </summary>
+    public const string CSVExtension = ".csv";
 }

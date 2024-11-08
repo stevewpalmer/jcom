@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Globalization;
+using CsvHelper;
 using JCalc.Resources;
 using JCalcLib;
 using JComLib;
@@ -127,6 +129,7 @@ public static class Screen {
         RenderHint flags = command switch {
             KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
             KeyCommand.KC_FILE_RETRIEVE => RetrieveFile(),
+            KeyCommand.KC_FILE_IMPORT => ImportFile(),
             KeyCommand.KC_SETTINGS_COLOURS => ConfigureColours(),
             KeyCommand.KC_DEFAULT_DATE_DM => SetDefaultFormat(CellFormat.DATE_DM),
             KeyCommand.KC_DEFAULT_DATE_DMY => SetDefaultFormat(CellFormat.DATE_DMY),
@@ -157,6 +160,18 @@ public static class Screen {
             flags &= ~RenderHint.REFRESH;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Return the next available sheet number.
+    /// </summary>
+    /// <returns>Sheet number</returns>
+    private static int NextSheetNumber() {
+        int sheetNumber = 1;
+        foreach (Window _ in _windowList.TakeWhile(window => window.Sheet.SheetNumber == sheetNumber)) {
+            ++sheetNumber;
+        }
+        return sheetNumber;
     }
 
     /// <summary>
@@ -192,14 +207,67 @@ public static class Screen {
 
             Window? newWindow = _windowList.FirstOrDefault(window => window.Sheet.Filename == inputValue);
             if (newWindow == null) {
-                int sheetNumber = 1;
-                foreach (Window _ in _windowList.TakeWhile(window => window.Sheet.SheetNumber == sheetNumber)) {
-                    ++sheetNumber;
-                }
+                int sheetNumber = NextSheetNumber();
                 Sheet sheet = new Sheet(sheetNumber, inputValue);
                 newWindow = new Window(sheet);
                 AddWindow(newWindow);
             }
+            _activeWindow = newWindow;
+            _activeWindow.Refresh();
+            flags = RenderHint.NONE;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Import a CSV file into a new sheet and add it to the sheet list.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint ImportFile() {
+        RenderHint flags = RenderHint.CANCEL;
+        FormField[] formFields = [
+            new() {
+                Text = Calc.EnterImportFilename,
+                Type = FormFieldType.TEXT,
+                Width = 50,
+                AllowFilenameCompletion = true,
+                FilenameCompletionFilter = $"*{Consts.CSVExtension}",
+                Value = new Variant(string.Empty)
+            }
+        ];
+        if (Command.PromptForInput(formFields)) {
+            string inputValue = formFields[0].Value.StringValue;
+
+            inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
+            FileInfo fileInfo = new FileInfo(inputValue);
+            inputValue = fileInfo.FullName;
+
+            int sheetNumber = NextSheetNumber();
+            Sheet sheet = new Sheet(sheetNumber);
+            Window newWindow = new Window(sheet);
+            AddWindow(newWindow);
+
+            try {
+                using TextReader stream = new StreamReader(inputValue);
+                using CsvParser parser = new CsvParser(stream, CultureInfo.InvariantCulture);
+
+                int row = 1;
+                while (parser.Read()) {
+                    int column = 1;
+                    string[]? fields = parser.Record;
+                    if (fields != null) {
+                        foreach (string field in fields) {
+                            Cell cell = sheet.Cell(column++, row, true);
+                            cell.CellValue.Value = field;
+                        }
+                    }
+                    row++;
+                }
+            }
+            catch (Exception e) {
+                Command.Error($"Error reading from {inputValue} - {e.Message}");
+            }
+
             _activeWindow = newWindow;
             _activeWindow.Refresh();
             flags = RenderHint.NONE;
@@ -217,7 +285,6 @@ public static class Screen {
         Config.Save();
         return RenderHint.NONE;
     }
-
 
     /// <summary>
     /// Set the default cell alignment.

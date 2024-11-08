@@ -384,7 +384,7 @@ public class CommandBar {
         List<char> inputBuffer = [];
         CellInputResponse response;
         if (cellValue.Type != CellType.NONE) {
-            inputBuffer = [..cellValue.StringValue.ToCharArray()];
+            inputBuffer = [..cellValue.Value.ToCharArray()];
         }
         int column = inputBuffer.Count;
         do {
@@ -423,15 +423,7 @@ public class CommandBar {
            }
         } while (true);
 
-        string input = string.Join("", inputBuffer);
-        if (double.TryParse(input, out double _value)) {
-            cellValue.StringValue = _value.ToString(CultureInfo.InvariantCulture);
-            cellValue.Type = CellType.NUMBER;
-        } else {
-            cellValue.StringValue = input;
-            cellValue.Type = CellType.TEXT;
-        }
-
+        cellValue.Value = string.Join("", inputBuffer);
         ClearRow(_promptRow);
         Terminal.SetCursor(cursorPosition);
         return response;
@@ -563,8 +555,8 @@ public class CommandBar {
     /// </summary>
     private void RenderCellStatus() {
         string text = _currentCell.Position + ": ";
-        if (_currentCell.Value.Type != CellType.NONE) {
-            text += _currentCell.Value.Type == CellType.TEXT ? $"\"{_currentCell.Value.StringValue}\"" : _currentCell.Value.StringValue;
+        if (_currentCell.CellValue.Type != CellType.NONE) {
+            text += _currentCell.CellValue.ToString();
         }
         Terminal.WriteText(0, _cellStatusRow, _displayWidth, text, _fgColour, _bgColour);
     }

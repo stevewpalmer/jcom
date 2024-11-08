@@ -208,7 +208,7 @@
         <value>Load a worksheet file into a new window</value>
     </data>
     <data name="FileSaveDescription" xml:space="preserve">
-        <value>Store the enter worksheet in a worksheet file</value>
+        <value>Save the worksheet to a file</value>
     </data>
     <data name="SetColumnWidthDescription" xml:space="preserve">
         <value>Set width of current column</value>
@@ -266,5 +266,23 @@
     </data>
     <data name="DeleteRowDescription" xml:space="preserve">
         <value>Delete row at cursor</value>
+    </data>
+    <data name="FileExport" xml:space="preserve">
+        <value>Export</value>
+    </data>
+    <data name="FileExportDescription" xml:space="preserve">
+        <value>Export the worksheet to a CSV file</value>
+    </data>
+    <data name="ExportFilename" xml:space="preserve">
+        <value>Enter name of file to export</value>
+    </data>
+    <data name="Calc_FileImportDescription" xml:space="preserve">
+        <value>Import a CSV file as a worksheet</value>
+    </data>
+    <data name="FileImport" xml:space="preserve">
+        <value>Import</value>
+    </data>
+    <data name="EnterImportFilename" xml:space="preserve">
+        <value>Enter name of CSV file to import</value>
     </data>
 </root>

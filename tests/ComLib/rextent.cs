@@ -27,7 +27,7 @@ using System.Drawing;
 using JComLib;
 using NUnit.Framework;
 
-namespace tests.ComLib;
+namespace ComLibTests;
 
 [TestFixture]
 [TestOf(typeof(RExtent))]

@@ -149,7 +149,6 @@ public class Sheet {
         catch (Exception e) {
             Screen.Command.Error(string.Format(Calc.CannotSaveFile, Filename, e.Message));
         }
-
         Modified = false;
     }
 
@@ -205,7 +204,7 @@ public class Sheet {
     /// <param name="createIfEmpty">Create the cell if it is empty</param>
     /// <returns>The cell at the row</returns>
     public Cell Cell(int sheetColumn, int sheetRow, bool createIfEmpty) {
-        int cellHash = sheetRow * Consts.MaxRows + sheetColumn;
+        int cellHash = sheetRow * Consts.MaxColumns + sheetColumn;
         if (!Cells.TryGetValue(cellHash, out Cell? _cell)) {
             _cell = new Cell {
                 Column = sheetColumn,
@@ -301,7 +300,7 @@ public class Sheet {
     /// </summary>
     /// <param name="cell">Cell to delete</param>
     public void DeleteCell(Cell cell) {
-        int cellHash = cell.Row * Consts.MaxRows + cell.Column;
+        int cellHash = cell.Row * Consts.MaxColumns + cell.Column;
         Cells.Remove(cellHash);
     }
 

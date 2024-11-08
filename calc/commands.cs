@@ -141,7 +141,8 @@ public static class Commands {
             ID = CommandMapID.RANGE,
             Commands = [
                 new CommandMapEntry { Name = Calc.RangeFormat, SubCommandId = CommandMapID.FORMAT, Description = Calc.RangeFormatDescription },
-                new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription }
+                new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription },
+                new CommandMapEntry { Name = "Export", CommandId = KeyCommand.KC_RANGE_EXPORT, Description = "Export a range of cells to a CSV file" }
             ]
         },
         new () {
@@ -179,7 +180,9 @@ public static class Commands {
             ID = CommandMapID.FILE,
             Commands = [
                 new CommandMapEntry { Name = Calc.FileRetrieve, CommandId = KeyCommand.KC_FILE_RETRIEVE, Description = Calc.FileEditDescription },
-                new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_FILE_SAVE, Description = Calc.FileSaveDescription}
+                new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_FILE_SAVE, Description = Calc.FileSaveDescription},
+                new CommandMapEntry { Name = Calc.FileImport, CommandId = KeyCommand.KC_FILE_IMPORT, Description = Calc.Calc_FileImportDescription},
+                new CommandMapEntry { Name = Calc.FileExport, CommandId = KeyCommand.KC_FILE_EXPORT, Description = Calc.FileExportDescription},
             ]
         },
         new() {

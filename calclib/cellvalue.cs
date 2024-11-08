@@ -26,14 +26,28 @@
 namespace JCalcLib;
 
 public class CellValue {
+    private string _value = string.Empty;
 
     /// <summary>
     /// Cell type
     /// </summary>
-    public CellType Type { get; set; }
+    public CellType Type { get; private set; } = CellType.NONE;
 
     /// <summary>
     /// String representation of content
     /// </summary>
-    public string StringValue { get; set; } = string.Empty;
+    public string Value {
+        get => _value;
+        set {
+            _value = value;
+            Type = double.TryParse(_value, out double _) ? CellType.NUMBER : CellType.TEXT;
+        }
+    }
+
+    /// <summary>
+    /// Return the cell value as a string for display.
+    /// </summary>
+    public new string ToString() {
+        return Type == CellType.NUMBER ? Value : $"\"{Value}\"";
+    }
 }

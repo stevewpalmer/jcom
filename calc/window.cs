@@ -24,6 +24,8 @@
 // under the License.
 
 using System.Drawing;
+using System.Text;
+using CsvHelper;
 using JCalc.Resources;
 using JCalcLib;
 using JComLib;
@@ -131,6 +133,7 @@ public class Window {
             KeyCommand.KC_DELETE_COLUMN => DeleteColumn(),
             KeyCommand.KC_DELETE_ROW => DeleteRow(),
             KeyCommand.KC_DELETE => DeleteCells(),
+            KeyCommand.KC_RANGE_EXPORT => ExportRange(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -522,6 +525,54 @@ public class Window {
     }
 
     /// <summary>
+    /// Export the selected range of cells to a CSV file.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint ExportRange() {
+
+        RenderHint flags = RenderHint.CANCEL;
+        FormField[] formFields = [
+            new() {
+                Text = Calc.ExportFilename,
+                Type = FormFieldType.TEXT,
+                Width = 50,
+                AllowFilenameCompletion = true,
+                FilenameCompletionFilter = $"*{Consts.CSVExtension}",
+                Value = new Variant(string.Empty)
+            }
+        ];
+        if (Screen.Command.PromptForInput(formFields)) {
+            string inputValue = formFields[0].Value.StringValue;
+            inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
+
+            RExtent markExtent = new RExtent().Add(ActiveCell.Location);
+            if (_isMarkMode) {
+                markExtent.Add(_markAnchor);
+            }
+
+            try {
+                using FileStream stream = File.Create(inputValue);
+                using StreamWriter textStream = new(stream);
+
+                for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
+                    List<string> line = new();
+                    for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
+                        Cell cell = Sheet.Cell(column, row, false);
+                        line.Add(cell.CellValue.ToString());
+                    }
+                    textStream.WriteLine(string.Join(",", line));
+                }
+            }
+            catch (Exception e) {
+                Screen.Command.Error($"Error writing to {inputValue} - {e.Message}");
+            }
+
+            flags = RenderHint.NONE;
+        }
+        return flags;
+    }
+
+    /// <summary>
     /// Save the changes to this sheet.
     /// </summary>
     /// <returns>Render hint</returns>
@@ -556,10 +607,10 @@ public class Window {
     private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
         Cell cell = Sheet.Cell(Sheet.Column, Sheet.Row, true);
-        CellValue value = editValue ? cell.Value : new CellValue();
+        CellValue value = editValue ? cell.CellValue : new CellValue();
         CellInputResponse result = Screen.Command.PromptForCellInput(ref value);
         if (result != CellInputResponse.CANCEL) {
-            cell.Value = value;
+            cell.CellValue = value;
             Sheet.DrawCell(cell, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
             hint = result switch {
                 CellInputResponse.ACCEPT => RenderHint.CURSOR_STATUS,
