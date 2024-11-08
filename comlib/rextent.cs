@@ -1,10 +1,10 @@
-// JComLib
-// Extent class
+// comlib
+// Rectangular extent
 //
 // Authors:
-//  Steve Palmer
+//  Steve
 //
-// Copyright (C) 2023 Steve Palmer
+// Copyright (C) 2024 Steve
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -27,13 +27,13 @@ using System.Drawing;
 
 namespace JComLib;
 
-public class Extent {
+public class RExtent {
     private static readonly Point Uninitalised = new(-1, -1);
 
     /// <summary>
     /// Create an empty Extent
     /// </summary>
-    public Extent() {
+    public RExtent() {
         Start = Uninitalised;
         End = Uninitalised;
     }
@@ -42,34 +42,16 @@ public class Extent {
     /// Add a new point to the extent, increasing the size of the
     /// extent if the point falls outside its existing range.
     /// </summary>
-    public Extent Add(Point point) {
-        if (Before(point, Start)) {
-            Start = point;
+    public RExtent Add(Point point) {
+        if (Valid) {
+            Start = new Point(Math.Min(Start.X, point.X), Math.Min(Start.Y, point.Y));
+            End = new Point(Math.Max(End.X, point.X), Math.Max(End.Y, point.Y));
         }
-        if (After(point, End)) {
+        else {
+            Start = point;
             End = point;
         }
         return this;
-    }
-
-    /// <summary>
-    /// Reduce the extent to the specified points.
-    /// </summary>
-    public void Subtract(Point p1, Point p2) {
-        if (After(p1, Start)) {
-            Start = p1;
-        }
-        if (Before(p2, End)) {
-            End = p2;
-        }
-    }
-
-    /// <summary>
-    /// Clear the extent
-    /// </summary>
-    public void Clear() {
-        Start = Uninitalised;
-        End = Uninitalised;
     }
 
     /// <summary>
@@ -85,7 +67,7 @@ public class Extent {
     /// <summary>
     /// Returns whether the extent has a valid range
     /// </summary>
-    public bool Valid => Start != Uninitalised && End != Uninitalised;
+    private bool Valid => Start != Uninitalised && End != Uninitalised;
 
     /// <summary>
     /// Return whether point is contained within this extent.
@@ -93,26 +75,5 @@ public class Extent {
     /// <param name="point">Point to test</param>
     /// <returns>True if the point is within the extent, false otherwise</returns>
     public bool Contains(Point point) =>
-        (point.Y > Start.Y || (point.Y == Start.Y && point.X >= Start.X)) &&
-        (point.Y < End.Y || (point.Y == End.Y && point.X <= End.X));
-
-    /// <summary>
-    /// Return whether point p1 is before point p2 in the extent.
-    /// </summary>
-    /// <param name="p1">First point to test</param>
-    /// <param name="p2">Second point to test</param>
-    /// <returns>True if point p1 is before point p2, false otherwise.</returns>
-    private static bool Before(Point p1, Point p2) =>
-        p1 == Uninitalised || p2 == Uninitalised ||
-        p1.Y < p2.Y || p1.Y == p2.Y && p1.X < p2.X;
-
-    /// <summary>
-    /// Return whether point p1 is after point p2 in the extent.
-    /// </summary>
-    /// <param name="p1">First point to test</param>
-    /// <param name="p2">Second point to test</param>
-    /// <returns>True if point p1 is after point p2, false otherwise.</returns>
-    private static bool After(Point p1, Point p2) =>
-        p1 == Uninitalised || p2 == Uninitalised ||
-        p1.Y > p2.Y || p1.Y == p2.Y && p1.X > p2.X;
+        Valid && Rectangle.FromLTRB(Start.X, Start.Y, End.X + 1, End.Y + 1).Contains(point);
 }

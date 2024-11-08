@@ -45,12 +45,6 @@
     <data name="File" xml:space="preserve">
         <value>File</value>
     </data>
-    <data name="Print" xml:space="preserve">
-        <value>Print</value>
-    </data>
-    <data name="Graph" xml:space="preserve">
-        <value>Graph</value>
-    </data>
     <data name="WorksheetInsert" xml:space="preserve">
         <value>Insert</value>
     </data>
@@ -60,38 +54,11 @@
     <data name="WorksheetColumnWidth" xml:space="preserve">
         <value>Column-Width</value>
     </data>
-    <data name="RangeErase" xml:space="preserve">
-        <value>Erase</value>
-    </data>
-    <data name="WorksheetTitles" xml:space="preserve">
-        <value>Titles</value>
-    </data>
-    <data name="WorksheetWindow" xml:space="preserve">
-        <value>Window</value>
-    </data>
-    <data name="WorksheetStatus" xml:space="preserve">
-        <value>Status</value>
-    </data>
     <data name="RangeFormat" xml:space="preserve">
         <value>Format</value>
     </data>
     <data name="RangeAlign" xml:space="preserve">
         <value>Align</value>
-    </data>
-    <data name="RangeName" xml:space="preserve">
-        <value>Name</value>
-    </data>
-    <data name="RangeJustify" xml:space="preserve">
-        <value>Justify</value>
-    </data>
-    <data name="RangeProtect" xml:space="preserve">
-        <value>Protect</value>
-    </data>
-    <data name="RangeUnprotect" xml:space="preserve">
-        <value>Unprotect</value>
-    </data>
-    <data name="RangeInput" xml:space="preserve">
-        <value>Input</value>
     </data>
     <data name="FileRetrieve" xml:space="preserve">
         <value>Edit</value>
@@ -104,9 +71,6 @@
     </data>
     <data name="ColumnWidthReset" xml:space="preserve">
         <value>Reset</value>
-    </data>
-    <data name="WorksheetErase" xml:space="preserve">
-        <value>Erase</value>
     </data>
     <data name="FormatFixed" xml:space="preserve">
         <value>Fixed</value>
@@ -147,13 +111,13 @@
     <data name="DatesMY" xml:space="preserve">
         <value>3 (MMM-YY)</value>
     </data>
-    <data name="LabelPrefixLeft" xml:space="preserve">
+    <data name="AlignLeft" xml:space="preserve">
         <value>Left</value>
     </data>
-    <data name="LabelPrefixRight" xml:space="preserve">
+    <data name="AlignRight" xml:space="preserve">
         <value>Right</value>
     </data>
-    <data name="LabelPrefixCentre" xml:space="preserve">
+    <data name="AlignCentre" xml:space="preserve">
         <value>Centre</value>
     </data>
     <data name="EnterSaveFilename" xml:space="preserve">
@@ -296,5 +260,11 @@
     </data>
     <data name="SettingsBackupDescription" xml:space="preserve">
         <value>Set whether or not to create backups when saving</value>
+    </data>
+    <data name="DeleteColumnDescription" xml:space="preserve">
+        <value>Delete column at cursor</value>
+    </data>
+    <data name="DeleteRowDescription" xml:space="preserve">
+        <value>Delete row at cursor</value>
     </data>
 </root>

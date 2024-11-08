@@ -99,18 +99,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string Print {
-            get {
-                return ResourceManager.GetString("Print", resourceCulture);
-            }
-        }
-        
-        internal static string Graph {
-            get {
-                return ResourceManager.GetString("Graph", resourceCulture);
-            }
-        }
-        
         internal static string WorksheetInsert {
             get {
                 return ResourceManager.GetString("WorksheetInsert", resourceCulture);
@@ -129,30 +117,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string RangeErase {
-            get {
-                return ResourceManager.GetString("RangeErase", resourceCulture);
-            }
-        }
-        
-        internal static string WorksheetTitles {
-            get {
-                return ResourceManager.GetString("WorksheetTitles", resourceCulture);
-            }
-        }
-        
-        internal static string WorksheetWindow {
-            get {
-                return ResourceManager.GetString("WorksheetWindow", resourceCulture);
-            }
-        }
-        
-        internal static string WorksheetStatus {
-            get {
-                return ResourceManager.GetString("WorksheetStatus", resourceCulture);
-            }
-        }
-        
         internal static string RangeFormat {
             get {
                 return ResourceManager.GetString("RangeFormat", resourceCulture);
@@ -162,36 +126,6 @@ namespace JCalc.Resources {
         internal static string RangeAlign {
             get {
                 return ResourceManager.GetString("RangeAlign", resourceCulture);
-            }
-        }
-        
-        internal static string RangeName {
-            get {
-                return ResourceManager.GetString("RangeName", resourceCulture);
-            }
-        }
-        
-        internal static string RangeJustify {
-            get {
-                return ResourceManager.GetString("RangeJustify", resourceCulture);
-            }
-        }
-        
-        internal static string RangeProtect {
-            get {
-                return ResourceManager.GetString("RangeProtect", resourceCulture);
-            }
-        }
-        
-        internal static string RangeUnprotect {
-            get {
-                return ResourceManager.GetString("RangeUnprotect", resourceCulture);
-            }
-        }
-        
-        internal static string RangeInput {
-            get {
-                return ResourceManager.GetString("RangeInput", resourceCulture);
             }
         }
         
@@ -216,12 +150,6 @@ namespace JCalc.Resources {
         internal static string ColumnWidthReset {
             get {
                 return ResourceManager.GetString("ColumnWidthReset", resourceCulture);
-            }
-        }
-        
-        internal static string WorksheetErase {
-            get {
-                return ResourceManager.GetString("WorksheetErase", resourceCulture);
             }
         }
         
@@ -303,21 +231,21 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string LabelPrefixLeft {
+        internal static string AlignLeft {
             get {
-                return ResourceManager.GetString("LabelPrefixLeft", resourceCulture);
+                return ResourceManager.GetString("AlignLeft", resourceCulture);
             }
         }
         
-        internal static string LabelPrefixRight {
+        internal static string AlignRight {
             get {
-                return ResourceManager.GetString("LabelPrefixRight", resourceCulture);
+                return ResourceManager.GetString("AlignRight", resourceCulture);
             }
         }
         
-        internal static string LabelPrefixCentre {
+        internal static string AlignCentre {
             get {
-                return ResourceManager.GetString("LabelPrefixCentre", resourceCulture);
+                return ResourceManager.GetString("AlignCentre", resourceCulture);
             }
         }
         
@@ -600,6 +528,18 @@ namespace JCalc.Resources {
         internal static string SettingsBackupDescription {
             get {
                 return ResourceManager.GetString("SettingsBackupDescription", resourceCulture);
+            }
+        }
+        
+        internal static string DeleteColumnDescription {
+            get {
+                return ResourceManager.GetString("DeleteColumnDescription", resourceCulture);
+            }
+        }
+        
+        internal static string DeleteRowDescription {
+            get {
+                return ResourceManager.GetString("DeleteRowDescription", resourceCulture);
             }
         }
     }

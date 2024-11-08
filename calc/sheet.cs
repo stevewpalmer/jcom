@@ -300,7 +300,7 @@ public class Sheet {
     /// Delete the specified cell
     /// </summary>
     /// <param name="cell">Cell to delete</param>
-    private void DeleteCell(Cell cell) {
+    public void DeleteCell(Cell cell) {
         int cellHash = cell.Row * Consts.MaxRows + cell.Column;
         Cells.Remove(cellHash);
     }
@@ -308,13 +308,16 @@ public class Sheet {
     /// <summary>
     /// Render a row of cells using the specified data
     /// </summary>
+    /// <param name="column">Start column, 1-based</param>
     /// <param name="cells">Cells on the row</param>
     /// <returns>String representation of row</returns>
-    public string GetRow(Cell [] cells) {
+    public string GetRow(int column, Cell [] cells) {
         StringBuilder line = new();
-        int column = 1;
         int cellIndex = 0;
         Cell emptyCell = new();
+        while (cellIndex < cells.Length && column > cells[cellIndex].Column) {
+            ++cellIndex;
+        }
         while (cellIndex < cells.Length) {
             while (column < cells[cellIndex].Column) {
                 line.Append(emptyCell.ToString(ColumnWidth(column)));

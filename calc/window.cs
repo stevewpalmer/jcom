@@ -130,6 +130,7 @@ public class Window {
             KeyCommand.KC_INSERT_ROW => InsertRow(),
             KeyCommand.KC_DELETE_COLUMN => DeleteColumn(),
             KeyCommand.KC_DELETE_ROW => DeleteRow(),
+            KeyCommand.KC_DELETE => DeleteCells(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -219,48 +220,46 @@ public class Window {
         ConsoleColor bg = Screen.Colours.BackgroundColour;
         ConsoleColor fg = Screen.Colours.ForegroundColour;
 
-        Extent renderExtent = new Extent()
+        RExtent renderExtent = new RExtent()
             .Add(new Point(1, _scrollOffset.Y + 1))
             .Add(new Point(_sheetBounds.Width, _scrollOffset.Y + _sheetBounds.Height));
-        Extent markExtent = new Extent();
+        RExtent markExtent = new RExtent();
         if (_isMarkMode) {
-            markExtent = new Extent()
+            markExtent
                 .Add(_markAnchor)
                 .Add(new Point(Sheet.Column, Sheet.Row));
         }
 
-        Screen.Command.Error($"Render extent: {renderExtent.Start.Y} .. {renderExtent.End.Y}");
-        Cell [] cells = Sheet.Cells.Values.Where(cell => renderExtent.RContains(cell.Location)).ToArray();
+        Cell [] cells = Sheet.Cells.Values.Where(cell => renderExtent.Contains(cell.Location)).ToArray();
         int i = renderExtent.Start.Y;
+        int y = _sheetBounds.Top;
         while (i <= renderExtent.End.Y) {
-            string line = Sheet.GetRow(cells.Where(c => c.Row == i).OrderBy(c => c.Column).ToArray());
-            int y = _sheetBounds.Top + (i - 1 - _scrollOffset.Y);
+            string line = Sheet.GetRow(_scrollOffset.X + 1, cells.Where(c => c.Row == i).OrderBy(c => c.Column).ToArray());
             int x = _sheetBounds.Left;
             int w = _sheetBounds.Width;
-            int left = Math.Min(_scrollOffset.X, line.Length);
+            int left = 0;
             int length = Math.Min(w, line.Length - left);
 
             if (i >= markExtent.Start.Y && i <= markExtent.End.Y) {
                 int extentStart = GetXPositionOfCell(markExtent.Start.X);
-                int extentEnd = GetXPositionOfCell(markExtent.End.X);
-                if (extentStart > _scrollOffset.X) {
+                int extentEnd = GetXPositionOfCell(markExtent.End.X + 1);
+                if (extentStart > x) {
                     int diff = extentStart - x;
-                    Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
+                    Terminal.Write(x, y, diff, bg, fg, Utilities.SpanBound(line, left, diff));
                     x += diff;
                     w -= diff;
                     left += diff;
                     length -= diff;
                 }
                 if (extentEnd > _scrollOffset.X) {
-                    int diff = Math.Min(extentEnd - extentStart + 1, line.Length - left);
-                    int diff2 = extentEnd - extentStart + 1;
+                    int extentWidth = extentEnd - extentStart;
                     bg = Screen.Colours.ForegroundColour;
                     fg = Screen.Colours.BackgroundColour;
-                    Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, diff));
-                    x += diff2;
-                    w -= diff2;
-                    left += diff;
-                    length -= diff;
+                    Terminal.Write(x, y, extentWidth, bg, fg, Utilities.SpanBound(line, left, extentWidth));
+                    x += extentWidth;
+                    w -= extentWidth;
+                    left += extentWidth;
+                    length -= extentWidth;
                 }
                 bg = Screen.Colours.BackgroundColour;
                 fg = Screen.Colours.ForegroundColour;
@@ -270,6 +269,7 @@ public class Window {
             bg = Screen.Colours.BackgroundColour;
             fg = Screen.Colours.ForegroundColour;
             ++i;
+            ++y;
         }
         PlaceCursor();
         Terminal.SetCursor(cursorPosition.X, cursorPosition.Y);
@@ -282,7 +282,7 @@ public class Window {
     private void ClearBlock() {
         if (_isMarkMode) {
             _isMarkMode = false;
-            Extent extent = new Extent()
+            RExtent extent = new RExtent()
                 .Add(_markAnchor)
                 .Add(new Point(Sheet.Column, Sheet.Row));
             RenderExtent(extent);
@@ -294,7 +294,7 @@ public class Window {
     /// uncovered as indicated by the _lastMarkPoint anchor.
     /// </summary>
     private void RenderBlock() {
-        Extent extent = new Extent()
+        RExtent extent = new RExtent()
             .Add(_markAnchor)
             .Add(new Point(Sheet.Column, Sheet.Row))
             .Add(_lastMarkPoint);
@@ -307,17 +307,16 @@ public class Window {
     /// of the sheet to be rendered.
     /// </summary>
     /// <param name="extent">Extent to be rendered</param>
-    private void RenderExtent(Extent extent) {
-        Extent markExtent = new Extent();
+    private void RenderExtent(RExtent extent) {
+        RExtent markExtent = new RExtent();
         if (_isMarkMode) {
             markExtent
                 .Add(_markAnchor)
                 .Add(new Point(Sheet.Column, Sheet.Row));
         }
-        Screen.Command.Error($"Render extent: ({extent.Start.X},{extent.Start.Y})..({extent.End.X},{extent.End.Y})");
         for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
             for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                bool inMarked = markExtent.RContains(new Point(column, row));
+                bool inMarked = markExtent.Contains(new Point(column, row));
                 ConsoleColor fg = inMarked ? Screen.Colours.BackgroundColour : Screen.Colours.ForegroundColour;
                 ConsoleColor bg = inMarked ? Screen.Colours.ForegroundColour : Screen.Colours.BackgroundColour;
                 ShowCell(column, row, fg, bg);
@@ -345,7 +344,7 @@ public class Window {
     /// </summary>
     /// <returns>The next tuple in the iterator, or null</returns>
     private IEnumerable<Point> RangeIterator() {
-        Extent markExtent = new Extent().Add(ActiveCell.Location);
+        RExtent markExtent = new RExtent().Add(ActiveCell.Location);
         if (_isMarkMode) {
             markExtent.Add(_markAnchor);
         }
@@ -409,6 +408,18 @@ public class Window {
         }
         ClearBlock();
         return flags;
+    }
+
+    /// <summary>
+    /// Delete a range of cells
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint DeleteCells() {
+        foreach (Point location in RangeIterator()) {
+            Sheet.DeleteCell(Sheet.Cell(location.X, location.Y, false));
+        }
+        ClearBlock();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>
@@ -538,8 +549,9 @@ public class Window {
     }
 
     /// <summary>
-    /// Input value text into a cell
+    /// Input value text into a cell or edit the existing value in the cell.
     /// </summary>
+    /// <param name='editValue'>True if we're editing the existing cell, false otherwise</param>
     /// <returns>Render hint</returns>
     private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
@@ -569,7 +581,6 @@ public class Window {
     private RenderHint ToggleMarkMode() {
         RenderHint flags;
         if (_isMarkMode) {
-            _isMarkMode = false;
             ClearBlock();
             flags = RenderHint.CURSOR;
         }
@@ -685,18 +696,17 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint CursorPageUp() {
-        RenderHint flags = RenderHint.NONE;
-        int pageSize = Math.Min(_sheetBounds.Height, Sheet.Row - 1);
-        if (Sheet.Row > 1) {
-            flags = SaveLastMarkPoint();
-            Sheet.Row -= pageSize;
-            if (Sheet.Row < _scrollOffset.Y) {
-                _scrollOffset.Y -= pageSize;
-                flags |= RenderHint.REFRESH;
+        RenderHint flags = SaveLastMarkPoint();
+        int previousRow = Sheet.Row;
+        Sheet.Row = Math.Max(Sheet.Row - _sheetBounds.Height, 1);
+        if (Sheet.Row == previousRow) {
+            PlaceCursor();
+        } else {
+            _scrollOffset.Y -= previousRow - Sheet.Row;
+            if (_scrollOffset.Y < 0) {
+                _scrollOffset.Y = 0;
             }
-            else {
-                flags |= RenderHint.CURSOR;
-            }
+            flags |= RenderHint.REFRESH;
         }
         return flags;
     }
@@ -726,18 +736,14 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint CursorPageDown() {
-        RenderHint flags = RenderHint.NONE;
-        int pageSize = _sheetBounds.Height;
-        if (Sheet.Row + pageSize < Consts.MaxRows) {
-            flags = SaveLastMarkPoint();
-            Sheet.Row += pageSize;
-            if (GetYPositionOfCell(Sheet.Row) + pageSize * Sheet.RowHeight > _sheetBounds.Bottom) {
-                _scrollOffset.Y += pageSize;
-                flags |= RenderHint.REFRESH;
-            }
-            else {
-                flags |= RenderHint.CURSOR;
-            }
+        RenderHint flags = SaveLastMarkPoint();
+        int previousRow = Sheet.Row;
+        Sheet.Row = Math.Min(Sheet.Row + _sheetBounds.Height, Consts.MaxRows);
+        if (Sheet.Row == previousRow) {
+            PlaceCursor();
+        } else {
+            _scrollOffset.Y += Sheet.Row - previousRow;
+            flags |= RenderHint.REFRESH;
         }
         return flags;
     }

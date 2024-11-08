@@ -177,7 +177,8 @@ public class CommandBar {
         new() { Key = ConsoleKey.PageUp, CommandId = KeyCommand.KC_PAGEUP },
         new() { Key = ConsoleKey.PageDown, CommandId = KeyCommand.KC_PAGEDOWN },
         new() { Key = ConsoleKey.F2, CommandId = KeyCommand.KC_EDIT },
-        new() { Key = ConsoleKey.F5, CommandId = KeyCommand.KC_GOTO }
+        new() { Key = ConsoleKey.F5, CommandId = KeyCommand.KC_GOTO },
+        new() { Key = ConsoleKey.Delete, CommandId = KeyCommand.KC_DELETE }
     ];
 
     private readonly int _cellStatusRow;

@@ -44,8 +44,8 @@ public enum CommandMapID {
     INSERT,
     MAIN,
     RANGE,
-    WORKSHEET,
-    SETTINGS
+    SETTINGS,
+    WORKSHEET
 }
 
 /// <summary>
@@ -111,8 +111,6 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.Copy, CommandId = KeyCommand.KC_COPY, Description = "Copy a range of cells"},
                 new CommandMapEntry { Name = Calc.Move, CommandId = KeyCommand.KC_MOVE, Description = "Move a cell or range of cells"},
                 new CommandMapEntry { Name = Calc.File, SubCommandId = CommandMapID.FILE },
-                new CommandMapEntry { Name = Calc.Print, CommandId = KeyCommand.KC_PRINT, Description = "Output a range to the printer or print file" },
-                new CommandMapEntry { Name = Calc.Graph, CommandId = KeyCommand.KC_GRAPH, Description = "Create a graph"},
                 new CommandMapEntry { Name = Calc.Settings, SubCommandId = CommandMapID.SETTINGS },
                 new CommandMapEntry { Name = Calc.Quit, CommandId = KeyCommand.KC_QUIT, Description = Calc.QuitCalc}
             ]
@@ -122,11 +120,7 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.WorksheetInsert, SubCommandId = CommandMapID.INSERT, Description = Calc.SheetInsertDescription},
                 new CommandMapEntry { Name = Calc.WorksheetDelete, SubCommandId = CommandMapID.DELETE, Description = Calc.SheetDeleteDescription },
-                new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = Calc.SheetColumnWidthDescription},
-                new CommandMapEntry { Name = Calc.WorksheetErase, CommandId = KeyCommand.KC_WORKSHEET_ERASE, Description = "Erase the entire worksheet" },
-                new CommandMapEntry { Name = Calc.WorksheetTitles, CommandId = KeyCommand.KC_WORKSHEET_TITLES, Description = "Set horizontal or vertical titles" },
-                new CommandMapEntry { Name = Calc.WorksheetWindow, CommandId = KeyCommand.KC_WORKSHEET_WINDOW, Description = "Set split-screen and synchronised scrolling" },
-                new CommandMapEntry { Name = Calc.WorksheetStatus, CommandId = KeyCommand.KC_WORKSHEET_STATUS, Description = "Display worksheet settings" }
+                new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = Calc.SheetColumnWidthDescription}
             ]
         },
         new() {
@@ -139,21 +133,15 @@ public static class Commands {
         new() {
             ID = CommandMapID.DELETE,
             Commands = [
-                new CommandMapEntry { Name = Calc.Column, CommandId = KeyCommand.KC_DELETE_COLUMN, Description = "Delete column at cursor" },
-                new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_DELETE_ROW, Description = "Delete row at cursor" }
+                new CommandMapEntry { Name = Calc.Column, CommandId = KeyCommand.KC_DELETE_COLUMN, Description = Calc.DeleteColumnDescription },
+                new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_DELETE_ROW, Description = Calc.DeleteRowDescription }
             ]
         },
         new() {
             ID = CommandMapID.RANGE,
             Commands = [
                 new CommandMapEntry { Name = Calc.RangeFormat, SubCommandId = CommandMapID.FORMAT, Description = Calc.RangeFormatDescription },
-                new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription },
-                new CommandMapEntry { Name = Calc.RangeErase, CommandId = KeyCommand.KC_RANGE_ERASE },
-                new CommandMapEntry { Name = Calc.RangeName, CommandId = KeyCommand.KC_RANGE_NAME },
-                new CommandMapEntry { Name = Calc.RangeJustify, CommandId = KeyCommand.KC_RANGE_JUSTIFY },
-                new CommandMapEntry { Name = Calc.RangeProtect, CommandId = KeyCommand.KC_RANGE_PROTECT },
-                new CommandMapEntry { Name = Calc.RangeUnprotect, CommandId = KeyCommand.KC_RANGE_UNPROTECT },
-                new CommandMapEntry { Name = Calc.RangeInput, CommandId = KeyCommand.KC_RANGE_INPUT }
+                new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription }
             ]
         },
         new () {
@@ -174,9 +162,9 @@ public static class Commands {
         new () {
             ID = CommandMapID.ALIGN,
             Commands = [
-                new CommandMapEntry { Name = Calc.LabelPrefixLeft, CommandId = KeyCommand.KC_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
-                new CommandMapEntry { Name = Calc.LabelPrefixRight, CommandId = KeyCommand.KC_ALIGN_RIGHT, Description = Calc.AlignRightDescription },
-                new CommandMapEntry { Name = Calc.LabelPrefixCentre, CommandId = KeyCommand.KC_ALIGN_CENTRE, Description = Calc.AlignCentreDescription }
+                new CommandMapEntry { Name = Calc.AlignLeft, CommandId = KeyCommand.KC_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
+                new CommandMapEntry { Name = Calc.AlignRight, CommandId = KeyCommand.KC_ALIGN_RIGHT, Description = Calc.AlignRightDescription },
+                new CommandMapEntry { Name = Calc.AlignCentre, CommandId = KeyCommand.KC_ALIGN_CENTRE, Description = Calc.AlignCentreDescription }
             ]
         },
         new () {
@@ -236,9 +224,9 @@ public static class Commands {
         new () {
             ID = CommandMapID.DEFAULT_ALIGNMENT,
             Commands = [
-                new CommandMapEntry { Name = Calc.LabelPrefixLeft, CommandId = KeyCommand.KC_DEFAULT_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
-                new CommandMapEntry { Name = Calc.LabelPrefixRight, CommandId = KeyCommand.KC_DEFAULT_ALIGN_RIGHT, Description = Calc.AlignRightDescription },
-                new CommandMapEntry { Name = Calc.LabelPrefixCentre, CommandId = KeyCommand.KC_DEFAULT_ALIGN_CENTRE, Description = Calc.AlignCentreDescription }
+                new CommandMapEntry { Name = Calc.AlignLeft, CommandId = KeyCommand.KC_DEFAULT_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
+                new CommandMapEntry { Name = Calc.AlignRight, CommandId = KeyCommand.KC_DEFAULT_ALIGN_RIGHT, Description = Calc.AlignRightDescription },
+                new CommandMapEntry { Name = Calc.AlignCentre, CommandId = KeyCommand.KC_DEFAULT_ALIGN_CENTRE, Description = Calc.AlignCentreDescription }
             ]
         }
     ];
