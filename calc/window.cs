@@ -24,7 +24,7 @@
 // under the License.
 
 using System.Drawing;
-using System.Text;
+using System.Globalization;
 using CsvHelper;
 using JCalc.Resources;
 using JCalcLib;
@@ -64,7 +64,7 @@ public class Window {
     /// <summary>
     /// Return the cell at the cursor.
     /// </summary>
-    public Cell ActiveCell => Sheet.Cell(Sheet.Column, Sheet.Row, false);
+    public Cell ActiveCell => Sheet.Cell(Sheet.Location, false);
 
     /// <summary>
     /// Set the viewport and sheet bounds for the window.
@@ -230,14 +230,14 @@ public class Window {
         if (_isMarkMode) {
             markExtent
                 .Add(_markAnchor)
-                .Add(new Point(Sheet.Column, Sheet.Row));
+                .Add(Sheet.Location.Point);
         }
 
-        Cell [] cells = Sheet.Cells.Values.Where(cell => renderExtent.Contains(cell.Location)).ToArray();
+        Cell [] cells = Sheet.Cells.Values.Where(cell => renderExtent.Contains(cell.Location.Point)).ToArray();
         int i = renderExtent.Start.Y;
         int y = _sheetBounds.Top;
         while (i <= renderExtent.End.Y) {
-            string line = Sheet.GetRow(_scrollOffset.X + 1, cells.Where(c => c.Row == i).OrderBy(c => c.Column).ToArray());
+            string line = Sheet.GetRow(_scrollOffset.X + 1, cells.Where(c => c.Location.Row == i).OrderBy(c => c.Location.Column).ToArray());
             int x = _sheetBounds.Left;
             int w = _sheetBounds.Width;
             int left = 0;
@@ -287,7 +287,7 @@ public class Window {
             _isMarkMode = false;
             RExtent extent = new RExtent()
                 .Add(_markAnchor)
-                .Add(new Point(Sheet.Column, Sheet.Row));
+                .Add(Sheet.Location.Point);
             RenderExtent(extent);
         }
     }
@@ -299,7 +299,7 @@ public class Window {
     private void RenderBlock() {
         RExtent extent = new RExtent()
             .Add(_markAnchor)
-            .Add(new Point(Sheet.Column, Sheet.Row))
+            .Add(Sheet.Location.Point)
             .Add(_lastMarkPoint);
         RenderExtent(extent);
     }
@@ -315,14 +315,14 @@ public class Window {
         if (_isMarkMode) {
             markExtent
                 .Add(_markAnchor)
-                .Add(new Point(Sheet.Column, Sheet.Row));
+                .Add(Sheet.Location.Point);
         }
         for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
             for (int column = extent.Start.X; column <= extent.End.X; column++) {
                 bool inMarked = markExtent.Contains(new Point(column, row));
                 ConsoleColor fg = inMarked ? Screen.Colours.BackgroundColour : Screen.Colours.ForegroundColour;
                 ConsoleColor bg = inMarked ? Screen.Colours.ForegroundColour : Screen.Colours.BackgroundColour;
-                ShowCell(column, row, fg, bg);
+                ShowCell(new CellLocation { Column = column, Row = row}, fg, bg);
             }
         }
     }
@@ -331,14 +331,14 @@ public class Window {
     /// Draw the cursor
     /// </summary>
     private void PlaceCursor() {
-        ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.BackgroundColour, Screen.Colours.ForegroundColour);
+        ShowCell(Sheet.Location, Screen.Colours.BackgroundColour, Screen.Colours.ForegroundColour);
     }
 
     /// <summary>
     /// Clear the cursor.
     /// </summary>
     private void ResetCursor() {
-        ShowCell(Sheet.Column, Sheet.Row, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+        ShowCell(Sheet.Location, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
     }
 
     /// <summary>
@@ -346,14 +346,14 @@ public class Window {
     /// cursor position if no block is marked.
     /// </summary>
     /// <returns>The next tuple in the iterator, or null</returns>
-    private IEnumerable<Point> RangeIterator() {
-        RExtent markExtent = new RExtent().Add(ActiveCell.Location);
+    private IEnumerable<CellLocation> RangeIterator() {
+        RExtent markExtent = new RExtent().Add(ActiveCell.Location.Point);
         if (_isMarkMode) {
             markExtent.Add(_markAnchor);
         }
         for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
             for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
-                yield return new Point(column, row);
+                yield return new CellLocation { Column = column, Row = row };
             }
         }
     }
@@ -362,15 +362,14 @@ public class Window {
     /// Draw the cell at the specified column and row in the given foreground and
     /// background colours
     /// </summary>
-    /// <param name="column">1-based column offset</param>
-    /// <param name="row">1-based row offset</param>
+    /// <param name="location">Cell location</param>
     /// <param name="fgColour">Foreground colour</param>
     /// <param name="bgColour">Background colour</param>
-    private void ShowCell(int column, int row, ConsoleColor fgColour, ConsoleColor bgColour) {
+    private void ShowCell(CellLocation location, ConsoleColor fgColour, ConsoleColor bgColour) {
         Terminal.ForegroundColour = fgColour;
         Terminal.BackgroundColour = bgColour;
-        Cell cell = Sheet.Cell(column, row, false);
-        Sheet.DrawCell(cell, GetXPositionOfCell(column), GetYPositionOfCell(row));
+        Cell cell = Sheet.Cell(location, false);
+        Sheet.DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row));
     }
 
     /// <summary>
@@ -406,8 +405,8 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint AlignCells(CellAlignment alignment) {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
-        foreach (Point location in RangeIterator()) {
-            Sheet.SetCellAlignment(Sheet.Cell(location.X, location.Y, true), alignment);
+        foreach (CellLocation location in RangeIterator()) {
+            Sheet.SetCellAlignment(Sheet.Cell(location, true), alignment);
         }
         ClearBlock();
         return flags;
@@ -418,8 +417,8 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteCells() {
-        foreach (Point location in RangeIterator()) {
-            Sheet.DeleteCell(Sheet.Cell(location.X, location.Y, false));
+        foreach (CellLocation location in RangeIterator()) {
+            Sheet.DeleteCell(Sheet.Cell(location, false));
         }
         ClearBlock();
         return RenderHint.CONTENTS;
@@ -448,8 +447,8 @@ public class Window {
             }
             decimalPlaces = Math.Min(formFields[0].Value.IntValue, 15);
         }
-        foreach (Point location in RangeIterator()) {
-            Sheet.SetCellFormat(Sheet.Cell(location.X, location.Y, true), format, decimalPlaces);
+        foreach (CellLocation location in RangeIterator()) {
+            Sheet.SetCellFormat(Sheet.Cell(location, true), format, decimalPlaces);
         }
         ClearBlock();
         return flags;
@@ -466,12 +465,12 @@ public class Window {
                 Text = Calc.EnterColumnWidth,
                 Type = FormFieldType.NUMBER,
                 Width = 2,
-                Value = new Variant(Sheet.ColumnWidth(Sheet.Column))
+                Value = new Variant(Sheet.ColumnWidth(Sheet.Location.Column))
             }
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             int newWidth = formFields[0].Value.IntValue;
-            flags = Sheet.SetColumnWidth(Sheet.Column, newWidth) ? RenderHint.REFRESH : RenderHint.NONE;
+            flags = Sheet.SetColumnWidth(Sheet.Location.Column, newWidth) ? RenderHint.REFRESH : RenderHint.NONE;
         }
         return flags;
     }
@@ -482,7 +481,7 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint ResetColumnWidth() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.SetColumnWidth(Sheet.Column, Consts.DefaultColumnWidth)) {
+        if (Sheet.SetColumnWidth(Sheet.Location.Column, Consts.DefaultColumnWidth)) {
             flags = RenderHint.REFRESH;
         }
         return flags;
@@ -493,7 +492,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertColumn() {
-        Sheet.InsertColumn(Sheet.Column);
+        Sheet.InsertColumn(Sheet.Location.Column);
         return RenderHint.CONTENTS;
     }
 
@@ -502,7 +501,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertRow() {
-        Sheet.InsertRow(Sheet.Row);
+        Sheet.InsertRow(Sheet.Location.Row);
         return RenderHint.CONTENTS;
     }
 
@@ -511,7 +510,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteColumn() {
-        Sheet.DeleteColumn(Sheet.Column);
+        Sheet.DeleteColumn(Sheet.Location.Column);
         return RenderHint.CONTENTS;
     }
 
@@ -520,7 +519,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteRow() {
-        Sheet.DeleteRow(Sheet.Row);
+        Sheet.DeleteRow(Sheet.Location.Row);
         return RenderHint.CONTENTS;
     }
 
@@ -543,9 +542,13 @@ public class Window {
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             string inputValue = formFields[0].Value.StringValue;
+            if (string.IsNullOrWhiteSpace(inputValue)) {
+                return RenderHint.NONE;
+            }
+
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
 
-            RExtent markExtent = new RExtent().Add(ActiveCell.Location);
+            RExtent markExtent = new RExtent().Add(ActiveCell.Location.Point);
             if (_isMarkMode) {
                 markExtent.Add(_markAnchor);
             }
@@ -553,20 +556,22 @@ public class Window {
             try {
                 using FileStream stream = File.Create(inputValue);
                 using StreamWriter textStream = new(stream);
+                using CsvWriter csvWriter = new CsvWriter(textStream, CultureInfo.InvariantCulture);
 
                 for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
-                    List<string> line = new();
+                    List<string> line = [];
                     for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
-                        Cell cell = Sheet.Cell(column, row, false);
+                        Cell cell = Sheet.Cell(new CellLocation { Column = column, Row = row}, false);
                         line.Add(cell.CellValue.ToString());
+                        csvWriter.WriteField(cell.CellValue.Value);
                     }
-                    textStream.WriteLine(string.Join(",", line));
+                    csvWriter.NextRecord();
                 }
+                csvWriter.Flush();
             }
             catch (Exception e) {
-                Screen.Command.Error($"Error writing to {inputValue} - {e.Message}");
+                Screen.Command.Error(string.Format(Calc.ErrorExportingFile, inputValue, e.Message));
             }
-
             flags = RenderHint.NONE;
         }
         return flags;
@@ -606,12 +611,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
-        Cell cell = Sheet.Cell(Sheet.Column, Sheet.Row, true);
+        Cell cell = Sheet.Cell(Sheet.Location, true);
         CellValue value = editValue ? cell.CellValue : new CellValue();
         CellInputResponse result = Screen.Command.PromptForCellInput(ref value);
         if (result != CellInputResponse.CANCEL) {
             cell.CellValue = value;
-            Sheet.DrawCell(cell, GetXPositionOfCell(cell.Column), GetYPositionOfCell(cell.Row));
+            Sheet.DrawCell(cell, GetXPositionOfCell(cell.Location.Column), GetYPositionOfCell(cell.Location.Row));
             hint = result switch {
                 CellInputResponse.ACCEPT => RenderHint.CURSOR_STATUS,
                 CellInputResponse.ACCEPT_UP => CursorUp(),
@@ -636,7 +641,7 @@ public class Window {
             flags = RenderHint.CURSOR;
         }
         else {
-            _markAnchor = new Point(Sheet.Column, Sheet.Row);
+            _markAnchor = Sheet.Location.Point;
             _lastMarkPoint = _markAnchor;
             _isMarkMode = true;
             flags = RenderHint.BLOCK;
@@ -655,7 +660,7 @@ public class Window {
     private RenderHint SaveLastMarkPoint() {
         RenderHint flags = RenderHint.NONE;
         if (_isMarkMode) {
-           _lastMarkPoint = new Point(Sheet.Column, Sheet.Row);
+           _lastMarkPoint = Sheet.Location.Point;
             flags = RenderHint.BLOCK;
         }
         if (!_isMarkMode) {
@@ -670,14 +675,13 @@ public class Window {
     /// <returns></returns>
     private RenderHint CursorHome() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet is { Column: > 1, Row: > 1 }) {
+        if (Sheet is { Location: { Column: > 1, Row: > 1 } }) {
             flags = SaveLastMarkPoint();
             if (_scrollOffset.X > 0 || _scrollOffset.Y > 0) {
                 flags |= RenderHint.REFRESH;
                 _scrollOffset = new Point(0, 0);
             }
-            Sheet.Column = 1;
-            Sheet.Row = 1;
+            Sheet.Location = new CellLocation { Column = 1, Row = 1 };
         }
         return flags;
     }
@@ -688,10 +692,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorLeft() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.Column > 1) {
+        CellLocation sheetLocation = Sheet.Location;
+        if (sheetLocation.Column > 1) {
             flags = SaveLastMarkPoint();
-            --Sheet.Column;
-            if (Sheet.Column <= _scrollOffset.X) {
+            --sheetLocation.Column;
+            Sheet.Location = sheetLocation;
+            if (sheetLocation.Column <= _scrollOffset.X) {
                 --_scrollOffset.X;
                 flags |= RenderHint.REFRESH;
             }
@@ -708,10 +714,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorRight() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.Column < Consts.MaxColumns) {
+        CellLocation sheetLocation = Sheet.Location;
+        if (sheetLocation.Column < Consts.MaxColumns) {
             flags = SaveLastMarkPoint();
-            ++Sheet.Column;
-            if (GetXPositionOfCell(Sheet.Column) + Sheet.ColumnWidth(Sheet.Column) >= _sheetBounds.Right) {
+            ++sheetLocation.Column;
+            Sheet.Location = sheetLocation;
+            if (GetXPositionOfCell(sheetLocation.Column) + Sheet.ColumnWidth(sheetLocation.Column) >= _sheetBounds.Right) {
                 ++_scrollOffset.X;
                 flags |= RenderHint.REFRESH;
             }
@@ -728,10 +736,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorUp() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.Row > 1) {
+        CellLocation sheetLocation = Sheet.Location;
+        if (sheetLocation.Row > 1) {
             flags = SaveLastMarkPoint();
-            --Sheet.Row;
-            if (Sheet.Row <= _scrollOffset.Y) {
+            --sheetLocation.Row;
+            Sheet.Location = sheetLocation;
+            if (sheetLocation.Row <= _scrollOffset.Y) {
                 --_scrollOffset.Y;
                 flags |= RenderHint.REFRESH;
             }
@@ -748,12 +758,14 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorPageUp() {
         RenderHint flags = SaveLastMarkPoint();
-        int previousRow = Sheet.Row;
-        Sheet.Row = Math.Max(Sheet.Row - _sheetBounds.Height, 1);
-        if (Sheet.Row == previousRow) {
+        CellLocation sheetLocation = Sheet.Location;
+        int previousRow = sheetLocation.Row;
+        sheetLocation.Row = Math.Max(sheetLocation.Row - _sheetBounds.Height, 1);
+        Sheet.Location = sheetLocation;
+        if (sheetLocation.Row == previousRow) {
             PlaceCursor();
         } else {
-            _scrollOffset.Y -= previousRow - Sheet.Row;
+            _scrollOffset.Y -= previousRow - sheetLocation.Row;
             if (_scrollOffset.Y < 0) {
                 _scrollOffset.Y = 0;
             }
@@ -768,10 +780,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorDown() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.Row < Consts.MaxRows) {
+        CellLocation sheetLocation = Sheet.Location;
+        if (sheetLocation.Row < Consts.MaxRows) {
             flags = SaveLastMarkPoint();
-            ++Sheet.Row;
-            if (GetYPositionOfCell(Sheet.Row) + Sheet.RowHeight > _sheetBounds.Bottom) {
+            ++sheetLocation.Row;
+            Sheet.Location = sheetLocation;
+            if (GetYPositionOfCell(sheetLocation.Row) + Sheet.RowHeight > _sheetBounds.Bottom) {
                 ++_scrollOffset.Y;
                 flags |= RenderHint.REFRESH;
             }
@@ -788,12 +802,14 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint CursorPageDown() {
         RenderHint flags = SaveLastMarkPoint();
-        int previousRow = Sheet.Row;
-        Sheet.Row = Math.Min(Sheet.Row + _sheetBounds.Height, Consts.MaxRows);
-        if (Sheet.Row == previousRow) {
+        CellLocation sheetLocation = Sheet.Location;
+        int previousRow = sheetLocation.Row;
+        sheetLocation.Row = Math.Min(sheetLocation.Row + _sheetBounds.Height, Consts.MaxRows);
+        Sheet.Location = sheetLocation;
+        if (sheetLocation.Row == previousRow) {
             PlaceCursor();
         } else {
-            _scrollOffset.Y += Sheet.Row - previousRow;
+            _scrollOffset.Y += sheetLocation.Row - previousRow;
             flags |= RenderHint.REFRESH;
         }
         return flags;
@@ -806,20 +822,20 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint SyncRowColumnToSheet() {
         RenderHint flags = RenderHint.CURSOR;
-        if (Sheet.Column <= _scrollOffset.X) {
-            _scrollOffset.X = Sheet.Column - 1;
+        if (Sheet.Location.Column <= _scrollOffset.X) {
+            _scrollOffset.X = Sheet.Location.Column - 1;
             flags |= RenderHint.REFRESH;
         }
-        if (Sheet.Column > _numberOfColumns + _scrollOffset.X) {
-            _scrollOffset.X =  Sheet.Column - _numberOfColumns;
+        if (Sheet.Location.Column > _numberOfColumns + _scrollOffset.X) {
+            _scrollOffset.X =  Sheet.Location.Column - _numberOfColumns;
             flags |= RenderHint.REFRESH;
         }
-        if (Sheet.Row <= _scrollOffset.Y) {
-            _scrollOffset.Y = Sheet.Row - 1;
+        if (Sheet.Location.Row <= _scrollOffset.Y) {
+            _scrollOffset.Y = Sheet.Location.Row - 1;
             flags |= RenderHint.REFRESH;
         }
-        if (Sheet.Row > _sheetBounds.Height + _scrollOffset.Y) {
-            _scrollOffset.Y = Sheet.Row - _sheetBounds.Height;
+        if (Sheet.Location.Row > _sheetBounds.Height + _scrollOffset.Y) {
+            _scrollOffset.Y = Sheet.Location.Row - _sheetBounds.Height;
             flags |= RenderHint.REFRESH;
         }
         return flags;
@@ -836,16 +852,15 @@ public class Window {
                 Text = Calc.GotoRowPrompt,
                 Type = FormFieldType.TEXT,
                 Width = 7,
-                Value = new Variant(ActiveCell.Position)
+                Value = new Variant(ActiveCell.Address)
             }
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             string newAddress = formFields[0].Value.StringValue;
-            (int newColumn, int newRow) = Cell.ColumnAndRowFromPosition(newAddress);
-            if (newRow is >= 1 and <= Consts.MaxRows && newColumn is >= 1 and <= Consts.MaxColumns) {
+            CellLocation location = Cell.LocationFromAddress(newAddress);
+            if (location.Row is >= 1 and <= Consts.MaxRows && location.Column is >= 1 and <= Consts.MaxColumns) {
                 ResetCursor();
-                Sheet.Row = newRow;
-                Sheet.Column = newColumn;
+                Sheet.Location = location;
                 flags = SyncRowColumnToSheet();
             }
             else {

@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Text.Json;
+using JCalc.Resources;
 using JCalcLib;
 
 namespace JCalc;
@@ -62,7 +63,7 @@ public class Config {
             });
         }
         catch (Exception e) {
-            Screen.Command.Error($"Could not save the configuration - {e.Message}");
+            Screen.Command.Error(string.Format(Calc.CannotSaveConfigError, e.Message));
         }
     }
 

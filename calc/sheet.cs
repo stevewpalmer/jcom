@@ -58,14 +58,14 @@ public class Sheet {
                 using FileStream stream = File.OpenRead(filename);
                 Sheet? inputSheet = JsonSerializer.Deserialize<Sheet>(stream);
                 if (inputSheet != null) {
-                    Row = inputSheet.Row;
-                    Column = inputSheet.Column;
+                    Location = inputSheet.Location;
                     Cells = inputSheet.Cells;
                     ColumnWidths = inputSheet.ColumnWidths;
                 }
             }
-            catch (Exception e) {
-                Screen.Command.Error(string.Format(Calc.CannotOpenFile, filename, e.Message));
+            catch (JsonException) {
+                FileInfo info = new FileInfo(filename);
+                Screen.Command.Error(string.Format(Calc.ErrorReadingFile, info.Name));
             }
         }
         Filename = filename;
@@ -73,16 +73,10 @@ public class Sheet {
     }
 
     /// <summary>
-    /// The current selected row, 1 offset
+    /// The current selected cell location, 1 offset
     /// </summary>
     [JsonInclude]
-    public int Row { get; set; } = 1;
-
-    /// <summary>
-    /// The current selected column, 1 offset
-    /// </summary>
-    [JsonInclude]
-    public int Column { get; set; } = 1;
+    public CellLocation Location { get; set; } = new();
 
     /// <summary>
     /// Sheet number
@@ -126,7 +120,7 @@ public class Sheet {
     public bool Modified { get; private set; }
 
     /// <summary>
-    /// Return the height of the specified row
+    /// Return the height of a row
     /// </summary>
     /// <returns>Row height</returns>
     public static int RowHeight => 1;
@@ -155,28 +149,28 @@ public class Sheet {
     /// <summary>
     /// Return the width of the specified column.
     /// </summary>
-    /// <param name="columnNumber">Column number, 1-based</param>
+    /// <param name="column">Column number, 1-based</param>
     /// <returns>Column width</returns>
-    public int ColumnWidth(int columnNumber) {
-        Debug.Assert(columnNumber is >= 1 and <= Consts.MaxColumns);
-        return ColumnWidths.GetValueOrDefault(columnNumber, Consts.DefaultColumnWidth);
+    public int ColumnWidth(int column) {
+        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        return ColumnWidths.GetValueOrDefault(column, Consts.DefaultColumnWidth);
     }
 
     /// <summary>
     /// Set the new width of the specified column.
     /// </summary>
-    /// <param name="columnNumber">Column number, 1-based</param>
+    /// <param name="column">Column number, 1-based</param>
     /// <param name="width">New width</param>
-    public bool SetColumnWidth(int columnNumber, int width) {
-        Debug.Assert(columnNumber is >= 1 and <= Consts.MaxColumns);
+    public bool SetColumnWidth(int column, int width) {
+        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
         Debug.Assert(width is >= 0 and <= 100);
         bool success = false;
-        if (ColumnWidth(columnNumber) != width) {
+        if (ColumnWidth(column) != width) {
             if (width == Consts.DefaultColumnWidth) {
-                ColumnWidths.Remove(columnNumber);
+                ColumnWidths.Remove(column);
             }
             else {
-                ColumnWidths[columnNumber] = width;
+                ColumnWidths[column] = width;
             }
             Modified = true;
             success = true;
@@ -193,22 +187,20 @@ public class Sheet {
     /// <param name="y">Y position of cell</param>
     public void DrawCell(Cell cell, int x, int y) {
         Terminal.SetCursor(x, y);
-        Terminal.Write(cell.ToString(ColumnWidth(cell.Column)));
+        Terminal.Write(cell.ToString(ColumnWidth(cell.Location.Column)));
     }
 
     /// <summary>
     /// Return the cell at the given column and row.
     /// </summary>
-    /// <param name="sheetColumn">Column</param>
-    /// <param name="sheetRow">Row</param>
+    /// <param name="location">Location of cell</param>
     /// <param name="createIfEmpty">Create the cell if it is empty</param>
     /// <returns>The cell at the row</returns>
-    public Cell Cell(int sheetColumn, int sheetRow, bool createIfEmpty) {
-        int cellHash = sheetRow * Consts.MaxColumns + sheetColumn;
+    public Cell Cell(CellLocation location, bool createIfEmpty) {
+        int cellHash = location.Row * Consts.MaxColumns + location.Column;
         if (!Cells.TryGetValue(cellHash, out Cell? _cell)) {
             _cell = new Cell {
-                Column = sheetColumn,
-                Row = sheetRow,
+                Location = location,
                 Alignment = Screen.Config.DefaultCellAlignment,
                 Format = Screen.Config.DefaultCellFormat,
                 DecimalPlaces = Screen.Config.DefaultDecimals
@@ -226,8 +218,11 @@ public class Sheet {
     /// </summary>
     /// <param name="column">Insertion column</param>
     public void InsertColumn(int column) {
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Column >= column)) {
-            ++cell.Column;
+        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Column >= column)) {
+            CellLocation cellLocation = cell.Location;
+            ++cellLocation.Column;
+            cell.Location = cellLocation;
         }
         Modified = true;
     }
@@ -237,8 +232,11 @@ public class Sheet {
     /// </summary>
     /// <param name="row">Insertion row</param>
     public void InsertRow(int row) {
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Row >= row)) {
-            ++cell.Row;
+        Debug.Assert(row is >= 1 and <= Consts.MaxRows);
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Row >= row)) {
+            CellLocation cellLocation = cell.Location;
+            ++cellLocation.Row;
+            cell.Location = cellLocation;
         }
         Modified = true;
     }
@@ -248,11 +246,14 @@ public class Sheet {
     /// </summary>
     /// <param name="column">Deletion column</param>
     public void DeleteColumn(int column) {
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Column >= column)) {
-            if (cell.Column == column) {
+        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Column >= column)) {
+            CellLocation cellLocation = cell.Location;
+            if (cellLocation.Column == column) {
                 DeleteCell(cell);
             } else {
-                --cell.Column;
+                --cellLocation.Column;
+                cell.Location = cellLocation;
             }
         }
         Modified = true;
@@ -263,11 +264,14 @@ public class Sheet {
     /// </summary>
     /// <param name="row">Deletion row</param>
     public void DeleteRow(int row) {
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Row >= row)) {
-            if (cell.Row == row) {
+        Debug.Assert(row is >= 1 and <= Consts.MaxRows);
+        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Row >= row)) {
+            CellLocation cellLocation = cell.Location;
+            if (cellLocation.Row == row) {
                 DeleteCell(cell);
             } else {
-                --cell.Row;
+                --cellLocation.Row;
+                cell.Location = cellLocation;
             }
         }
         Modified = true;
@@ -300,8 +304,9 @@ public class Sheet {
     /// </summary>
     /// <param name="cell">Cell to delete</param>
     public void DeleteCell(Cell cell) {
-        int cellHash = cell.Row * Consts.MaxColumns + cell.Column;
+        int cellHash = cell.Location.Row * Consts.MaxColumns + cell.Location.Column;
         Cells.Remove(cellHash);
+        Modified = true;
     }
 
     /// <summary>
@@ -311,14 +316,15 @@ public class Sheet {
     /// <param name="cells">Cells on the row</param>
     /// <returns>String representation of row</returns>
     public string GetRow(int column, Cell [] cells) {
+        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
         StringBuilder line = new();
         int cellIndex = 0;
         Cell emptyCell = new();
-        while (cellIndex < cells.Length && column > cells[cellIndex].Column) {
+        while (cellIndex < cells.Length && column > cells[cellIndex].Location.Column) {
             ++cellIndex;
         }
         while (cellIndex < cells.Length) {
-            while (column < cells[cellIndex].Column) {
+            while (column < cells[cellIndex].Location.Column) {
                 line.Append(emptyCell.ToString(ColumnWidth(column)));
                 column++;
             }

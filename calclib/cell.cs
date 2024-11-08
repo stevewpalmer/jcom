@@ -23,7 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Drawing;
+using System.Diagnostics;
+using System.Text.Json.Serialization;
 using JComLib;
 
 namespace JCalcLib;
@@ -41,24 +42,16 @@ public class Cell {
     public CellAlignment Alignment { get; set; }
 
     /// <summary>
-    /// Cell row
+    /// Cell location
     /// </summary>
-    public int Row { get; set; }
+    public CellLocation Location { get; set; } = new();
 
     /// <summary>
-    /// Cell column
+    /// Return the current cell location as a string that
+    /// represents the cell address on the screen.
     /// </summary>
-    public int Column { get; set; }
-
-    /// <summary>
-    /// Return the cell row and column as a 1-based location
-    /// </summary>
-    public Point Location => new(Column, Row);
-
-    /// <summary>
-    /// Return the current cell location as a string.
-    /// </summary>
-    public string Position => $"{ColumnNumber(Column)}{Row}";
+    [JsonIgnore]
+    public string Address => $"{ColumnNumber(Location.Column)}{Location.Row}";
 
     /// <summary>
     /// Cell format
@@ -88,26 +81,26 @@ public class Cell {
     }
 
     /// <summary>
-    /// Parse a position and return the column and row that
-    /// corresponds to that position, or (0,0) if the position
+    /// Parse a cell address and return the cell location that
+    /// corresponds to that address, or (0,0) if the address
     /// cannot be parsed.
     /// </summary>
-    /// <param name="position">Position string</param>
-    /// <returns>Tuple containing column and row</returns>
-    public static (int, int) ColumnAndRowFromPosition(string position) {
-        ArgumentNullException.ThrowIfNull(position);
+    /// <param name="address">Address string</param>
+    /// <returns>CellLocation contain the cell column and row</returns>
+    public static CellLocation LocationFromAddress(string address) {
+        ArgumentNullException.ThrowIfNull(address);
         int newColumn = 0;
         int newRow = 0;
         int index = 0;
-        while (index < position.Length && char.IsLetter(position[index])) {
-            newColumn = newColumn * 26 + char.ToUpper(position[index]) - 'A' + 1;
+        while (index < address.Length && char.IsLetter(address[index])) {
+            newColumn = newColumn * 26 + char.ToUpper(address[index]) - 'A' + 1;
             index++;
         }
-        while (index < position.Length && char.IsDigit(position[index])) {
-            newRow = newRow * 10 + position[index] - '0';
+        while (index < address.Length && char.IsDigit(address[index])) {
+            newRow = newRow * 10 + address[index] - '0';
             index++;
         }
-        return (newColumn, newRow);
+        return new CellLocation { Column = newColumn, Row = newRow };
     }
 
     /// <summary>
@@ -116,6 +109,7 @@ public class Cell {
     /// <param name="width">Column width to use</param>
     /// <returns>String value of cell</returns>
     public string ToString(int width) {
+        Debug.Assert(width >= 0);
         string cellValue = CellValue.Value;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
         if (isNumber) {
@@ -167,6 +161,7 @@ public class Cell {
     /// <param name="column">Column offset, 1-based</param>
     /// <returns>Column location</returns>
     public static string ColumnNumber(int column) {
+        Debug.Assert(column is >= 1);
         string columnNumber = "";
         while (--column >= 0) {
             columnNumber = (char)(column % 26 + 'A') + columnNumber;

@@ -578,5 +578,29 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("EnterImportFilename", resourceCulture);
             }
         }
+        
+        internal static string CannotSaveConfigError {
+            get {
+                return ResourceManager.GetString("CannotSaveConfigError", resourceCulture);
+            }
+        }
+        
+        internal static string BadCSVImportFile {
+            get {
+                return ResourceManager.GetString("BadCSVImportFile", resourceCulture);
+            }
+        }
+        
+        internal static string ErrorReadingFile {
+            get {
+                return ResourceManager.GetString("ErrorReadingFile", resourceCulture);
+            }
+        }
+        
+        internal static string ErrorExportingFile {
+            get {
+                return ResourceManager.GetString("ErrorExportingFile", resourceCulture);
+            }
+        }
     }
 }

@@ -25,7 +25,6 @@
 
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using JCalcLib;
 using JComLib;
 
@@ -527,7 +526,6 @@ public class CommandBar {
             }
         } while (true);
         ClearRow(_promptRow);
-        ClearRow(_messageRow);
         return flags;
     }
 
@@ -554,7 +552,7 @@ public class CommandBar {
     /// Show the current selected row and column position
     /// </summary>
     private void RenderCellStatus() {
-        string text = _currentCell.Position + ": ";
+        string text = _currentCell.Address + ": ";
         if (_currentCell.CellValue.Type != CellType.NONE) {
             text += _currentCell.CellValue.ToString();
         }

@@ -182,7 +182,7 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.FileRetrieve, CommandId = KeyCommand.KC_FILE_RETRIEVE, Description = Calc.FileEditDescription },
                 new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_FILE_SAVE, Description = Calc.FileSaveDescription},
                 new CommandMapEntry { Name = Calc.FileImport, CommandId = KeyCommand.KC_FILE_IMPORT, Description = Calc.Calc_FileImportDescription},
-                new CommandMapEntry { Name = Calc.FileExport, CommandId = KeyCommand.KC_FILE_EXPORT, Description = Calc.FileExportDescription},
+                new CommandMapEntry { Name = Calc.FileExport, CommandId = KeyCommand.KC_FILE_EXPORT, Description = Calc.FileExportDescription}
             ]
         },
         new() {

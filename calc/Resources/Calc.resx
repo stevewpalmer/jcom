@@ -127,7 +127,7 @@
         <value>Enter name of file to edit</value>
     </data>
     <data name="CannotOpenFile" xml:space="preserve">
-        <value>Cannot open {0} - {1}</value>
+        <value>Cannot open file {0}</value>
     </data>
     <data name="CannotSaveFile" xml:space="preserve">
         <value>Cannot save {0} - {1}</value>
@@ -284,5 +284,17 @@
     </data>
     <data name="EnterImportFilename" xml:space="preserve">
         <value>Enter name of CSV file to import</value>
+    </data>
+    <data name="CannotSaveConfigError" xml:space="preserve">
+        <value>Could not save the configuration - {0}</value>
+    </data>
+    <data name="BadCSVImportFile" xml:space="preserve">
+        <value>Error reading from {0}. File may contain bad CSV data.</value>
+    </data>
+    <data name="ErrorReadingFile" xml:space="preserve">
+        <value>Error reading from {0}. File is not a valid worksheet.</value>
+    </data>
+    <data name="ErrorExportingFile" xml:space="preserve">
+        <value>Error writing to {0} - {1}</value>
     </data>
 </root>

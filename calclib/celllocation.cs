@@ -1,10 +1,10 @@
-// JCalcLib
-// Cell format types
+// calclib
+// Window management
 //
 // Authors:
-//  Steve Palmer
+//  Steve
 //
-// Copyright (C) 2024 Steve Palmer
+// Copyright (C) 2024 Steve
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -23,34 +23,43 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
+using System.Drawing;
 using System.Text.Json.Serialization;
 
 namespace JCalcLib;
 
-public class CellValue {
-    private string _value = string.Empty;
+public struct CellLocation {
+    private int _row = 1;
+    private int _column = 1;
+
+    public CellLocation() { }
 
     /// <summary>
-    /// Cell type
+    /// 1-based row
     /// </summary>
-    [JsonIgnore]
-    public CellType Type { get; private set; } = CellType.NONE;
-
-    /// <summary>
-    /// String representation of content
-    /// </summary>
-    public string Value {
-        get => _value;
+    public int Row {
+        get => _row;
         set {
-            _value = value;
-            Type = double.TryParse(_value, out double _) ? CellType.NUMBER : CellType.TEXT;
+            Debug.Assert(value >= 1);
+            _row = value;
         }
     }
 
     /// <summary>
-    /// Return the cell value as a string for display.
+    /// 1-based column
     /// </summary>
-    public new string ToString() {
-        return Type == CellType.NUMBER ? Value : $"\"{Value}\"";
+    public int Column {
+        get => _column;
+        set {
+            Debug.Assert(value >= 1);
+            _column = value;
+        }
     }
+
+    /// <summary>
+    /// Returns the location as a Point
+    /// </summary>
+    [JsonIgnore]
+    public Point Point => new(Column, Row);
 }

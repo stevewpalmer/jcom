@@ -237,6 +237,9 @@ public static class Screen {
         ];
         if (Command.PromptForInput(formFields)) {
             string inputValue = formFields[0].Value.StringValue;
+            if (string.IsNullOrWhiteSpace(inputValue)) {
+                return RenderHint.NONE;
+            }
 
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
             FileInfo fileInfo = new FileInfo(inputValue);
@@ -244,8 +247,6 @@ public static class Screen {
 
             int sheetNumber = NextSheetNumber();
             Sheet sheet = new Sheet(sheetNumber);
-            Window newWindow = new Window(sheet);
-            AddWindow(newWindow);
 
             try {
                 using TextReader stream = new StreamReader(inputValue);
@@ -253,21 +254,26 @@ public static class Screen {
 
                 int row = 1;
                 while (parser.Read()) {
-                    int column = 1;
                     string[]? fields = parser.Record;
                     if (fields != null) {
-                        foreach (string field in fields) {
-                            Cell cell = sheet.Cell(column++, row, true);
-                            cell.CellValue.Value = field;
+                        for (int column = 1; column <= fields.Length; column++) {
+                            Cell cell = sheet.Cell(new CellLocation { Column = column, Row = row }, true);
+                            cell.CellValue.Value = fields[column - 1];
                         }
                     }
                     row++;
                 }
             }
-            catch (Exception e) {
-                Command.Error($"Error reading from {inputValue} - {e.Message}");
+            catch (CsvHelperException) {
+                Command.Error(string.Format(Calc.BadCSVImportFile, fileInfo.Name));
+                return RenderHint.NONE;
             }
-
+            catch (FileNotFoundException) {
+                Command.Error(string.Format(Calc.CannotOpenFile, fileInfo.Name));
+                return RenderHint.NONE;
+            }
+            Window newWindow = new Window(sheet);
+            AddWindow(newWindow);
             _activeWindow = newWindow;
             _activeWindow.Refresh();
             flags = RenderHint.NONE;

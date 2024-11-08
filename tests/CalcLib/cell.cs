@@ -37,8 +37,8 @@ public class CellTests {
     [Test]
     public void VerifyDefaultProperties() {
         Cell cell = new Cell();
-        Assert.AreEqual(0, cell.Row);
-        Assert.AreEqual(0, cell.Column);
+        Assert.AreEqual(1, cell.Location.Row);
+        Assert.AreEqual(1, cell.Location.Column);
         Assert.AreEqual(CellAlignment.GENERAL, cell.Alignment);
         Assert.AreEqual(CellFormat.GENERAL, cell.Format);
     }
@@ -46,28 +46,38 @@ public class CellTests {
     // Verify that we correctly translate positions to cell locations
     [Test]
     public void VerifyRowAndColumnFromPositions() {
-        Assert.AreEqual((1, 1), Cell.ColumnAndRowFromPosition("A1"));
-        Assert.AreEqual((26, 1), Cell.ColumnAndRowFromPosition("Z1"));
-        Assert.AreEqual((255, 1), Cell.ColumnAndRowFromPosition("IU1"));
-        Assert.AreEqual((1, 4095), Cell.ColumnAndRowFromPosition("A4095"));
-        Assert.AreEqual((0, 78), Cell.ColumnAndRowFromPosition("78"));
-        Assert.AreEqual((0, 0), Cell.ColumnAndRowFromPosition(""));
-        Assert.Throws(typeof(ArgumentNullException), delegate { Cell.ColumnAndRowFromPosition(null!); });
+        CellLocation a1 = Cell.LocationFromAddress("A1");
+        Assert.AreEqual(1, a1.Row);
+        Assert.AreEqual(1, a1.Column);
+
+        CellLocation z1 = Cell.LocationFromAddress("Z1");
+        Assert.AreEqual(1, z1.Row);
+        Assert.AreEqual(26, z1.Column);
+
+        CellLocation iu1 = Cell.LocationFromAddress("IU1");
+        Assert.AreEqual(1, iu1.Row);
+        Assert.AreEqual(255, iu1.Column);
+
+        CellLocation a4095 = Cell.LocationFromAddress("A4095");
+        Assert.AreEqual(4095, a4095.Row);
+        Assert.AreEqual(1, a4095.Column);
+
+        Assert.Throws(typeof(ArgumentNullException), delegate { Cell.LocationFromAddress(null!); });
     }
 
     // Verify the correct position is returned for a cell
     [Test]
     public void VerifyPositionForColumnAndRow() {
-        Assert.AreEqual("A1", new Cell { Row = 1, Column = 1}.Position);
-        Assert.AreEqual("Z1", new Cell { Row = 1, Column = 26}.Position);
-        Assert.AreEqual("IU4095", new Cell { Row = 4095, Column = 255}.Position);
+        Assert.AreEqual("A1", new Cell().Address);
+        Assert.AreEqual("Z1", new Cell { Location = new CellLocation { Column = 26, Row = 1}}.Address);
+        Assert.AreEqual("IU4095", new Cell { Location = new CellLocation { Column = 255, Row = 4095}}.Address);
     }
 
     // Verify the Location property
     [Test]
     public void VerifyLocation() {
-        Assert.AreEqual(new Point(1, 1), new Cell { Row = 1, Column = 1}.Location);
-        Assert.AreEqual(new Point(12, 12), new Cell { Row = 12, Column = 12}.Location);
+        Assert.AreEqual(new Point(1, 1), new Cell().Location.Point);
+        Assert.AreEqual(new Point(12, 12), new Cell { Location = new CellLocation { Column = 12, Row = 12}}.Location.Point);
     }
 
     // Verify the cell ToString
