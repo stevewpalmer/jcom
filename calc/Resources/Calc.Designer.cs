@@ -662,5 +662,11 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("FormFieldInputRange", resourceCulture);
             }
         }
+        
+        internal static string RangeSort {
+            get {
+                return ResourceManager.GetString("RangeSort", resourceCulture);
+            }
+        }
     }
 }

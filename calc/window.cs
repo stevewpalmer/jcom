@@ -347,7 +347,7 @@ public class Window {
     /// Return an iterator over the marked block extent, or just the current
     /// cursor position if no block is marked.
     /// </summary>
-    /// <returns>The next tuple in the iterator, or null</returns>
+    /// <returns>The next cell location in the iterator, or null</returns>
     private IEnumerable<CellLocation> RangeIterator() {
         RExtent markExtent = new RExtent().Add(ActiveCell.Location.Point);
         if (_isMarkMode) {

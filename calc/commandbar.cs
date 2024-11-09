@@ -25,7 +25,6 @@
 
 using System.Diagnostics;
 using System.Drawing;
-using JCalc.Resources;
 using JCalcLib;
 using JComLib;
 
@@ -327,7 +326,6 @@ public class CommandBar {
         }
 
         ClearRow(_messageRow);
-        ConsoleKeyInfo input;
         int fieldIndex = 0;
         int index = 0;
         bool initialiseField = true;
@@ -351,7 +349,7 @@ public class CommandBar {
             Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, currentField.Width, text, fg, bg);
             Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
 
-            input = Console.ReadKey(true);
+            ConsoleKeyInfo input = Console.ReadKey(true);
             switch (input.Key) {
                 case ConsoleKey.Tab when fields.Length > 1: {
                     if (currentField.Save(inputBuffer)) {
@@ -387,6 +385,10 @@ public class CommandBar {
 
                 case ConsoleKey.LeftArrow when index > 0:
                     --index;
+                    break;
+
+                case ConsoleKey.Delete when index < inputBuffer.Count:
+                    inputBuffer.RemoveAt(index);
                     break;
 
                 case ConsoleKey.Backspace when index > 0 && selection:
@@ -469,6 +471,10 @@ public class CommandBar {
 
                 case ConsoleKey.RightArrow when column < inputBuffer.Count:
                     ++column;
+                    break;
+
+                case ConsoleKey.Delete when column < inputBuffer.Count:
+                    inputBuffer.RemoveAt(column);
                     break;
 
                 case ConsoleKey.Backspace when column > 0:

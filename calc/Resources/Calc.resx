@@ -327,4 +327,7 @@
     <data name="FormFieldInputRange" xml:space="preserve">
         <value>Enter a value between {0} and {1}</value>
     </data>
+    <data name="RangeSort" xml:space="preserve">
+        <value>Sort</value>
+    </data>
 </root>

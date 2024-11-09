@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace JCalcLib;
@@ -42,7 +43,7 @@ public class CellValue {
     public string Value {
         get => _value;
         set {
-            _value = value;
+            _value = TryParseDate(value);
             Type = double.TryParse(_value, out double _) ? CellType.NUMBER : CellType.TEXT;
         }
     }
@@ -52,5 +53,26 @@ public class CellValue {
     /// </summary>
     public new string ToString() {
         return Type == CellType.NUMBER ? Value : $"\"{Value}\"";
+    }
+
+    /// <summary>
+    /// Try to parse the value as a date and, if we succeed, return the OADate
+    /// value as a string. Otherwise. return the original value.
+    /// </summary>
+    /// <param name="value">Value to parse</param>
+    /// <returns>OADate value of date, or the original value</returns>
+    private static string TryParseDate(string value) {
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        string compactValue = value.Replace(" ", "");
+        if (DateTime.TryParseExact(compactValue, "dd-MMM", culture, DateTimeStyles.None, out DateTime _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        if (DateTime.TryParseExact(compactValue, "MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        if (DateTime.TryParseExact(compactValue, "dd-MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        return value;
     }
 }
