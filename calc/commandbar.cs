@@ -25,6 +25,7 @@
 
 using System.Diagnostics;
 using System.Drawing;
+using JCalc.Resources;
 using JCalcLib;
 using JComLib;
 
@@ -141,19 +142,42 @@ public class FormField {
     public string FilenameCompletionFilter { get; init; } = "*";
 
     /// <summary>
-    /// Save the input buffer to the Value
+    /// Minimum allowed value, for numeric input
+    /// </summary>
+    public int MinimumValue { get; init; }
+
+    /// <summary>
+    /// Maximum allowed value, for numeric input
+    /// </summary>
+    public int MaximumValue { get; init; }
+
+    /// <summary>
+    /// Returns whether there is a valid minimum and maximum range.
+    /// </summary>
+    private bool HasMinMaxRange => MinimumValue + MaximumValue > 0;
+
+    /// <summary>
+    /// Save the input buffer to the Value. String values have leading and trailing
+    /// spaces removed. Numeric values are validated against the minimum and maximum
+    /// value permitted.
     /// </summary>
     /// <param name="inputBuffer">Input buffer</param>
-    public void Save(List<char> inputBuffer) {
+    /// <returns>True if value was saved, false if it failed validation</returns>
+    public bool Save(List<char> inputBuffer) {
         string inputValue = string.Join("", inputBuffer);
         switch (Type) {
             case FormFieldType.NUMBER:
-                Value.Set(int.TryParse(inputValue, out int _result) ? _result : 0);
+                int value = int.TryParse(inputValue, out int _result) ? _result : 0;
+                if (HasMinMaxRange && (value < MinimumValue || value > MaximumValue)) {
+                    return false;
+                }
+                Value.Set(value);
                 break;
             default:
-                Value.Set(inputValue);
+                Value.Set(inputValue.Trim());
                 break;
         }
+        return true;
     }
 }
 
@@ -268,14 +292,16 @@ public class CommandBar {
         Point cursorPosition = Terminal.GetCursor();
         int column = 0;
         int row = _promptRow;
+
         List<Point> fieldPositions = [];
         foreach (FormField field in fields) {
             string value = string.Empty;
             int width = field.Width;
-            int labelWidth = field.Text.Length + 2;
+            string prompt = field.Text;
             switch (field.Type) {
                 case FormFieldType.NUMBER:
                     value = $"{field.Value:-field.Width}";
+                    prompt = prompt.Replace("@@", $"({field.MinimumValue}..{field.MaximumValue})");
                     break;
 
                 case FormFieldType.TEXT:
@@ -286,18 +312,20 @@ public class CommandBar {
                     Debug.Assert(false, $"{field.Type} is not supported");
                     break;
             }
+            int labelWidth = prompt.Length + 2;
             if (column + width + labelWidth > _displayWidth) {
                 column = 7;
                 ++row;
             }
-            if (!string.IsNullOrEmpty(field.Text)) {
-                Terminal.WriteText(column, row, _displayWidth, $"{field.Text}:", _fgColour, _bgColour);
+            if (!string.IsNullOrEmpty(prompt)) {
+                Terminal.WriteText(column, row, _displayWidth, $"{prompt}:", _fgColour, _bgColour);
                 column += labelWidth;
             }
             fieldPositions.Add(new Point(column, row));
             Terminal.WriteText(column, row, width, value, _fgColour, _bgColour);
             column += width + 1;
         }
+
         ClearRow(_messageRow);
         ConsoleKeyInfo input;
         int fieldIndex = 0;
@@ -306,31 +334,39 @@ public class CommandBar {
         string[]? allfiles = null;
         int allfilesIndex = 0;
         List<char> inputBuffer = [];
+        bool selection = false;
+        FormField currentField = fields[0];
+
         do {
             if (initialiseField) {
-                inputBuffer = fields[fieldIndex].Value.StringValue.ToList();
+                inputBuffer = currentField.Value.StringValue.ToList();
                 index = inputBuffer.Count;
                 initialiseField = false;
+                selection = true;
             }
 
             string text = string.Join("", inputBuffer);
-            Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _bgColour, _selColour);
+            ConsoleColor fg = selection ? _bgColour : _fgColour;
+            ConsoleColor bg = selection ? _selColour : _bgColour;
+            Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, currentField.Width, text, fg, bg);
             Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
 
             input = Console.ReadKey(true);
             switch (input.Key) {
                 case ConsoleKey.Tab when fields.Length > 1: {
-                    fields[fieldIndex].Save(inputBuffer);
-                    Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _fgColour, _bgColour);
-                    int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
-                    fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Length);
-                    initialiseField = true;
+                    if (currentField.Save(inputBuffer)) {
+                        Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _fgColour, _bgColour);
+                        int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
+                        fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Length);
+                        currentField = fields[fieldIndex];
+                        initialiseField = true;
+                    }
                     break;
                 }
 
-                case ConsoleKey.Tab when fields.Length == 1 && fields[fieldIndex].AllowFilenameCompletion: {
+                case ConsoleKey.Tab when fields.Length == 1 && currentField.AllowFilenameCompletion: {
                     if (allfiles == null) {
-                        string partialName = string.Join("", inputBuffer) + fields[fieldIndex].FilenameCompletionFilter;
+                        string partialName = string.Join("", inputBuffer) + currentField.FilenameCompletionFilter;
                         allfiles = Directory.GetFiles(".", partialName, SearchOption.TopDirectoryOnly);
                         allfilesIndex = 0;
                     }
@@ -339,7 +375,7 @@ public class CommandBar {
                         if (allfilesIndex == allfiles.Length) {
                             allfilesIndex = 0;
                         }
-                        fields[fieldIndex].Save(completedName.ToList());
+                        currentField.Save(completedName.ToList());
                         initialiseField = true;
                     }
                     break;
@@ -353,26 +389,45 @@ public class CommandBar {
                     --index;
                     break;
 
-                case ConsoleKey.Backspace when index > 0:
+                case ConsoleKey.Backspace when index > 0 && selection:
+                    inputBuffer.Clear();
+                    index = 0;
+                    break;
+
+                case ConsoleKey.Backspace when index > 0 && !selection:
                     inputBuffer.RemoveAt(--index);
                     break;
 
+                case ConsoleKey.Enter:
+                    if (currentField.Save(inputBuffer)) {
+                        ClearRow(_promptRow);
+                        Terminal.SetCursor(cursorPosition);
+                        return !string.IsNullOrEmpty(currentField.Value.StringValue);
+                    }
+                    break;
+
+                case ConsoleKey.Escape:
+                    ClearRow(_promptRow);
+                    Terminal.SetCursor(cursorPosition);
+                    return false;
+
                 default:
-                    if (fields[fieldIndex].Type == FormFieldType.NUMBER && !char.IsDigit(input.KeyChar)) {
+                    if (currentField.Type == FormFieldType.NUMBER && !char.IsDigit(input.KeyChar)) {
                         continue;
                     }
-                    if (!char.IsControl(input.KeyChar) && inputBuffer.Count < fields[fieldIndex].Width) {
-                        inputBuffer.Insert(index++, input.KeyChar);
+                    if (!char.IsControl(input.KeyChar)) {
+                        if (selection) {
+                            inputBuffer.Clear();
+                            index = 0;
+                        }
+                        if (inputBuffer.Count < currentField.Width) {
+                            inputBuffer.Insert(index++, input.KeyChar);
+                        }
                     }
                     break;
             }
-        } while (input.Key != ConsoleKey.Enter && input.Key != ConsoleKey.Escape);
-
-        fields[fieldIndex].Save(inputBuffer);
-
-        ClearRow(_promptRow);
-        Terminal.SetCursor(cursorPosition);
-        return input.Key == ConsoleKey.Enter;
+            selection = false;
+        } while (true);
     }
 
     /// <summary>

@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using CsvHelper;
@@ -440,13 +441,16 @@ public class Window {
                     Text = Calc.EnterDecimalPlaces,
                     Type = FormFieldType.NUMBER,
                     Width = 2,
+                    MinimumValue = 0,
+                    MaximumValue = 15,
                     Value = new Variant(cell.DecimalPlaces)
                 }
             ];
             if (!Screen.Command.PromptForInput(formFields)) {
                 return RenderHint.CANCEL;
             }
-            decimalPlaces = Math.Min(formFields[0].Value.IntValue, 15);
+            decimalPlaces = formFields[0].Value.IntValue;
+            Debug.Assert(decimalPlaces >= formFields[0].MinimumValue && decimalPlaces <= formFields[0].MaximumValue);
         }
         foreach (CellLocation location in RangeIterator()) {
             Sheet.SetCellFormat(Sheet.Cell(location, true), format, decimalPlaces);
@@ -466,11 +470,14 @@ public class Window {
                 Text = Calc.EnterColumnWidth,
                 Type = FormFieldType.NUMBER,
                 Width = 2,
+                MinimumValue = 1,
+                MaximumValue = 72,
                 Value = new Variant(Sheet.ColumnWidth(Sheet.Location.Column))
             }
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             int newWidth = formFields[0].Value.IntValue;
+            Debug.Assert(newWidth >= formFields[0].MinimumValue && newWidth <= formFields[0].MaximumValue);
             flags = Sheet.SetColumnWidth(Sheet.Location.Column, newWidth) ? RenderHint.REFRESH : RenderHint.NONE;
         }
         return flags;
@@ -543,9 +550,7 @@ public class Window {
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             string inputValue = formFields[0].Value.StringValue;
-            if (string.IsNullOrWhiteSpace(inputValue)) {
-                return RenderHint.NONE;
-            }
+            Debug.Assert(!string.IsNullOrEmpty(inputValue));
 
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
 
@@ -594,6 +599,7 @@ public class Window {
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             string inputValue = formFields[0].Value.StringValue;
+            Debug.Assert(!string.IsNullOrEmpty(inputValue));
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.DefaultExtension);
             Sheet.Filename = inputValue;
             Sheet.Write();

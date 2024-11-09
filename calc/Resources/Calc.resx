@@ -28,7 +28,7 @@
         <value>Quit</value>
     </data>
     <data name="EnterColumnWidth" xml:space="preserve">
-        <value>Enter column width (1..72)</value>
+        <value>Enter column width @@</value>
     </data>
     <data name="Worksheet" xml:space="preserve">
         <value>Worksheet</value>
@@ -220,7 +220,7 @@
         <value>Quit Calc</value>
     </data>
     <data name="EnterDecimalPlaces" xml:space="preserve">
-        <value>Enter number of decimal places (0..15)</value>
+        <value>Enter number of decimal places @@</value>
     </data>
     <data name="Settings" xml:space="preserve">
         <value>Settings</value>
@@ -323,5 +323,8 @@
     </data>
     <data name="RangeSortDescription" xml:space="preserve">
         <value>Sort the selected range of cells</value>
+    </data>
+    <data name="FormFieldInputRange" xml:space="preserve">
+        <value>Enter a value between {0} and {1}</value>
     </data>
 </root>

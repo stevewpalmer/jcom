@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Globalization;
 using CsvHelper;
 using JCalc.Resources;
@@ -223,6 +224,7 @@ public static class Screen {
         ];
         if (Command.PromptForInput(formFields)) {
             string inputValue = formFields[0].Value.StringValue;
+            Debug.Assert(!string.IsNullOrEmpty(inputValue));
 
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.DefaultExtension);
             FileInfo fileInfo = new FileInfo(inputValue);
@@ -260,9 +262,7 @@ public static class Screen {
         ];
         if (Command.PromptForInput(formFields)) {
             string inputValue = formFields[0].Value.StringValue;
-            if (string.IsNullOrWhiteSpace(inputValue)) {
-                return RenderHint.NONE;
-            }
+            Debug.Assert(!string.IsNullOrEmpty(inputValue));
 
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
             FileInfo fileInfo = new FileInfo(inputValue);
@@ -336,13 +336,17 @@ public static class Screen {
                 Text = Calc.EnterDecimalPlaces,
                 Type = FormFieldType.NUMBER,
                 Width = 2,
+                MinimumValue = 0,
+                MaximumValue = 15,
                 Value = new Variant(Config.DefaultDecimals)
             }
         ];
         if (!Command.PromptForInput(formFields)) {
             return RenderHint.CANCEL;
         }
-        Config.DefaultDecimals = Math.Min(formFields[0].Value.IntValue, 15);
+        int decimalPlaces = formFields[0].Value.IntValue;
+        Debug.Assert(decimalPlaces >= formFields[0].MinimumValue && decimalPlaces <= formFields[0].MaximumValue);
+        Config.DefaultDecimals = decimalPlaces;
         return RenderHint.NONE;
     }
 
