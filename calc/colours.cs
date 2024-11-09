@@ -82,7 +82,13 @@ public class Colours {
     /// Retrieve the normal message colour
     /// </summary>
     public ConsoleColor NormalMessageColour =>
-        GetColour(_config?.NormalMessageColour, 2);
+        GetColour(_config?.NormalMessageColour, 7);
+
+    /// <summary>
+    /// Retrieve the selection colour
+    /// </summary>
+    public ConsoleColor SelectionColour =>
+        GetColour(_config?.SelectionColour, 3);
 
     /// <summary>
     /// Parse a colour value from the configuration file. Colours are specified as

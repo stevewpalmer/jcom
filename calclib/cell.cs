@@ -161,7 +161,7 @@ public class Cell {
     /// <param name="column">Column offset, 1-based</param>
     /// <returns>Column location</returns>
     public static string ColumnNumber(int column) {
-        Debug.Assert(column is >= 1);
+        Debug.Assert(column >= 1);
         string columnNumber = "";
         while (--column >= 0) {
             columnNumber = (char)(column % 26 + 'A') + columnNumber;

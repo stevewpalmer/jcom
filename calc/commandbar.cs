@@ -177,7 +177,8 @@ public class CommandBar {
         new() { Key = ConsoleKey.PageDown, CommandId = KeyCommand.KC_PAGEDOWN },
         new() { Key = ConsoleKey.F2, CommandId = KeyCommand.KC_EDIT },
         new() { Key = ConsoleKey.F5, CommandId = KeyCommand.KC_GOTO },
-        new() { Key = ConsoleKey.Delete, CommandId = KeyCommand.KC_DELETE }
+        new() { Key = ConsoleKey.Delete, CommandId = KeyCommand.KC_DELETE },
+        new() { Key = ConsoleKey.F6, CommandId = KeyCommand.KC_NEXT_WINDOW }
     ];
 
     private readonly int _cellStatusRow;
@@ -185,8 +186,9 @@ public class CommandBar {
     private readonly int _messageRow;
     private readonly int _promptRow;
     private ConsoleColor _bgColour;
-    private Cell _currentCell;
     private ConsoleColor _fgColour;
+    private ConsoleColor _selColour;
+    private Cell _currentCell;
     private ConsoleKeyInfo? _pushedKey;
 
     /// <summary>
@@ -216,6 +218,7 @@ public class CommandBar {
     public void Refresh() {
         _fgColour = Screen.Colours.NormalMessageColour;
         _bgColour = Screen.Colours.BackgroundColour;
+        _selColour = Screen.Colours.SelectionColour;
         RenderCellStatus();
     }
 
@@ -311,7 +314,7 @@ public class CommandBar {
             }
 
             string text = string.Join("", inputBuffer);
-            Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _bgColour, _fgColour);
+            Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _bgColour, _selColour);
             Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
 
             input = Console.ReadKey(true);
@@ -455,7 +458,7 @@ public class CommandBar {
     /// Render the list of commands
     /// </summary>
     public RenderHint PromptForCommand(CommandMapID commandMapID) {
-        Stack<CommandMapID> commandMapStack = new Stack<CommandMapID>();
+        Stack<(CommandMapID, int)> commandMapStack = new Stack<(CommandMapID, int)>();
         int selectedCommand = 0;
         bool redraw = true;
         RenderHint flags = RenderHint.NONE;
@@ -487,7 +490,7 @@ public class CommandBar {
             }
             if (actionCommand) {
                 if (current.SubCommandId != CommandMapID.NONE) {
-                    commandMapStack.Push(commandMapID);
+                    commandMapStack.Push((commandMapID, selectedCommand));
                     commandMapID = current.SubCommandId;
                     selectedCommand = 0;
                     redraw = true;
@@ -502,11 +505,13 @@ public class CommandBar {
                 continue;
             }
             if (input.Key == ConsoleKey.Escape) {
-                if (commandMapStack.TryPop(out commandMapID)) {
-                    selectedCommand = 0;
+                if (commandMapStack.TryPop(out (CommandMapID, int) tuple)) {
+                    commandMapID = tuple.Item1;
+                    selectedCommand = tuple.Item2;
                     redraw = true;
                     continue;
                 }
+                ClearRow(_messageRow);
                 break;
             }
             switch (input.Key) {
@@ -542,7 +547,7 @@ public class CommandBar {
         for (int i = 0; i < commandMap.Commands.Length; i++) {
             CommandMapEntry command = commandMap.Commands[i];
             ConsoleColor fgColour = i == selectedCommand ? _bgColour : _fgColour;
-            ConsoleColor bgColour = i == selectedCommand ? _fgColour : _bgColour;
+            ConsoleColor bgColour = i == selectedCommand ? _selColour : _bgColour;
             Terminal.WriteText(column, row, command.Name.Length, command.Name, fgColour, bgColour);
             column += command.Name.Length + 1;
         }

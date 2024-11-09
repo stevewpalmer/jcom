@@ -83,6 +83,11 @@ public class Config {
     public string NormalMessageColour { get; set; } = "";
 
     /// <summary>
+    /// Selection colour
+    /// </summary>
+    public string? SelectionColour { get; set; } = "";
+
+    /// <summary>
     /// Specifies whether or not a backup file is created when a sheet
     /// is saved.
     /// </summary>

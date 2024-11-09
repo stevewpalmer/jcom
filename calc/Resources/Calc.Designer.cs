@@ -602,5 +602,59 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("ErrorExportingFile", resourceCulture);
             }
         }
+        
+        internal static string EnterBackgroundColour {
+            get {
+                return ResourceManager.GetString("EnterBackgroundColour", resourceCulture);
+            }
+        }
+        
+        internal static string EnterForegroundColour {
+            get {
+                return ResourceManager.GetString("EnterForegroundColour", resourceCulture);
+            }
+        }
+        
+        internal static string EnterMessageColour {
+            get {
+                return ResourceManager.GetString("EnterMessageColour", resourceCulture);
+            }
+        }
+        
+        internal static string EnterSelectionColour {
+            get {
+                return ResourceManager.GetString("EnterSelectionColour", resourceCulture);
+            }
+        }
+        
+        internal static string BackgroundColourError {
+            get {
+                return ResourceManager.GetString("BackgroundColourError", resourceCulture);
+            }
+        }
+        
+        internal static string CreateBackupFilePrompt {
+            get {
+                return ResourceManager.GetString("CreateBackupFilePrompt", resourceCulture);
+            }
+        }
+        
+        internal static string RangeExportDescription {
+            get {
+                return ResourceManager.GetString("RangeExportDescription", resourceCulture);
+            }
+        }
+        
+        internal static string RangeExport {
+            get {
+                return ResourceManager.GetString("RangeExport", resourceCulture);
+            }
+        }
+        
+        internal static string RangeSortDescription {
+            get {
+                return ResourceManager.GetString("RangeSortDescription", resourceCulture);
+            }
+        }
     }
 }

@@ -142,7 +142,8 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.RangeFormat, SubCommandId = CommandMapID.FORMAT, Description = Calc.RangeFormatDescription },
                 new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription },
-                new CommandMapEntry { Name = "Export", CommandId = KeyCommand.KC_RANGE_EXPORT, Description = "Export a range of cells to a CSV file" }
+                new CommandMapEntry { Name = Calc.RangeExport, CommandId = KeyCommand.KC_RANGE_EXPORT, Description = Calc.RangeExportDescription },
+                new CommandMapEntry { Name = "Sort", CommandId = KeyCommand.KC_RANGE_SORT, Description = Calc.RangeSortDescription },
             ]
         },
         new () {

@@ -134,6 +134,7 @@ public class Window {
             KeyCommand.KC_DELETE_ROW => DeleteRow(),
             KeyCommand.KC_DELETE => DeleteCells(),
             KeyCommand.KC_RANGE_EXPORT => ExportRange(),
+            KeyCommand.KC_RANGE_SORT => SortRange(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -175,7 +176,7 @@ public class Window {
         Rectangle frameRect = _viewportBounds;
 
         Terminal.ForegroundColour = Screen.Colours.BackgroundColour;
-        Terminal.BackgroundColour = Screen.Colours.ForegroundColour;
+        Terminal.BackgroundColour = Screen.Colours.SelectionColour;
 
         // Sheet number
         int x = _sheetBounds.X;
@@ -256,7 +257,7 @@ public class Window {
                 }
                 if (extentEnd > _scrollOffset.X) {
                     int extentWidth = extentEnd - extentStart;
-                    bg = Screen.Colours.ForegroundColour;
+                    bg = Screen.Colours.SelectionColour;
                     fg = Screen.Colours.BackgroundColour;
                     Terminal.Write(x, y, extentWidth, bg, fg, Utilities.SpanBound(line, left, extentWidth));
                     x += extentWidth;
@@ -321,7 +322,7 @@ public class Window {
             for (int column = extent.Start.X; column <= extent.End.X; column++) {
                 bool inMarked = markExtent.Contains(new Point(column, row));
                 ConsoleColor fg = inMarked ? Screen.Colours.BackgroundColour : Screen.Colours.ForegroundColour;
-                ConsoleColor bg = inMarked ? Screen.Colours.ForegroundColour : Screen.Colours.BackgroundColour;
+                ConsoleColor bg = inMarked ? Screen.Colours.SelectionColour : Screen.Colours.BackgroundColour;
                 ShowCell(new CellLocation { Column = column, Row = row}, fg, bg);
             }
         }
@@ -331,7 +332,7 @@ public class Window {
     /// Draw the cursor
     /// </summary>
     private void PlaceCursor() {
-        ShowCell(Sheet.Location, Screen.Colours.BackgroundColour, Screen.Colours.ForegroundColour);
+        ShowCell(Sheet.Location, Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
     }
 
     /// <summary>
@@ -559,10 +560,8 @@ public class Window {
                 using CsvWriter csvWriter = new CsvWriter(textStream, CultureInfo.InvariantCulture);
 
                 for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
-                    List<string> line = [];
                     for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
                         Cell cell = Sheet.Cell(new CellLocation { Column = column, Row = row}, false);
-                        line.Add(cell.CellValue.ToString());
                         csvWriter.WriteField(cell.CellValue.Value);
                     }
                     csvWriter.NextRecord();
@@ -602,6 +601,14 @@ public class Window {
             flags = RenderHint.NONE;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Sort a marked range of cells
+    /// </summary>
+    /// <returns></returns>
+    private RenderHint SortRange() {
+        return RenderHint.CANCEL;
     }
 
     /// <summary>

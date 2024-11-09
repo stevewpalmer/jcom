@@ -235,7 +235,7 @@
         <value>Alignment</value>
     </data>
     <data name="SettingsDecimalPoints" xml:space="preserve">
-        <value>Decimal Points</value>
+        <value>Decimal-Points</value>
     </data>
     <data name="SettingsBackups" xml:space="preserve">
         <value>Backups</value>
@@ -296,5 +296,32 @@
     </data>
     <data name="ErrorExportingFile" xml:space="preserve">
         <value>Error writing to {0} - {1}</value>
+    </data>
+    <data name="EnterBackgroundColour" xml:space="preserve">
+        <value>Enter background colour number</value>
+    </data>
+    <data name="EnterForegroundColour" xml:space="preserve">
+        <value>Enter foreground colour number</value>
+    </data>
+    <data name="EnterMessageColour" xml:space="preserve">
+        <value>Enter message colour number</value>
+    </data>
+    <data name="EnterSelectionColour" xml:space="preserve">
+        <value>Enter selection colour number</value>
+    </data>
+    <data name="BackgroundColourError" xml:space="preserve">
+        <value>Background colour is already set to foreground colour.</value>
+    </data>
+    <data name="CreateBackupFilePrompt" xml:space="preserve">
+        <value>Create backup files when saving? @@</value>
+    </data>
+    <data name="RangeExportDescription" xml:space="preserve">
+        <value>Export a range of cells to a CSV file</value>
+    </data>
+    <data name="RangeExport" xml:space="preserve">
+        <value>Export</value>
+    </data>
+    <data name="RangeSortDescription" xml:space="preserve">
+        <value>Sort the selected range of cells</value>
     </data>
 </root>

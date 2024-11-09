@@ -102,6 +102,7 @@ public static class Screen {
     /// Add a window to the window list. This will not make the window
     /// active.
     /// </summary>
+    /// <param name="theWindow">Window to be added</param>
     public static void AddWindow(Window theWindow) {
         _windowList.Add(theWindow);
         theWindow.SetViewportBounds(0, 0, Terminal.Width, Terminal.Height);
@@ -147,6 +148,7 @@ public static class Screen {
             KeyCommand.KC_DEFAULT_ALIGN_CENTRE => SetDefaultAlignment(CellAlignment.CENTRE),
             KeyCommand.KC_SETTINGS_DECIMAL_POINTS => SetDefaultDecimalPoints(),
             KeyCommand.KC_SETTINGS_BACKUPS => ConfigureBackups(),
+            KeyCommand.KC_NEXT_WINDOW => SelectWindow(1),
             KeyCommand.KC_QUIT => Exit(),
             _ => _activeWindow.HandleCommand(command)
         };
@@ -156,6 +158,7 @@ public static class Screen {
         }
         if (flags.HasFlag(RenderHint.REFRESH)) {
             Command.Refresh();
+            Status.Refresh();
             _activeWindow.Refresh();
             flags &= ~RenderHint.REFRESH;
         }
@@ -172,6 +175,26 @@ public static class Screen {
             ++sheetNumber;
         }
         return sheetNumber;
+    }
+
+    /// <summary>
+    /// Select the next window in the specified direction in the window list.
+    /// </summary>
+    /// <param name="direction">Direction</param>
+    /// <returns>Render hint</returns>
+    private static RenderHint SelectWindow(int direction) {
+        if (_windowList.Count == 1 || _activeWindow == null) {
+            return RenderHint.NONE;
+        }
+        int currentBufferIndex = _windowList.IndexOf(_activeWindow) + direction;
+        if (currentBufferIndex == _windowList.Count) {
+            currentBufferIndex = 0;
+        }
+        if (currentBufferIndex < 0) {
+            currentBufferIndex = _windowList.Count - 1;
+        }
+        ActivateWindow(currentBufferIndex);
+        return RenderHint.CURSOR_STATUS;
     }
 
     /// <summary>
@@ -284,8 +307,8 @@ public static class Screen {
     /// <summary>
     /// Set the default cell format.
     /// </summary>
-    /// <param name="format"></param>
-    /// <returns></returns>
+    /// <param name="format">Format to be set as default</param>
+    /// <returns>Render hint</returns>
     private static RenderHint SetDefaultFormat(CellFormat format) {
         Config.DefaultCellFormat = format;
         Config.Save();
@@ -295,8 +318,8 @@ public static class Screen {
     /// <summary>
     /// Set the default cell alignment.
     /// </summary>
-    /// <param name="alignment"></param>
-    /// <returns></returns>
+    /// <param name="alignment">Alignment to be set as default</param>
+    /// <returns>Render hint</returns>
     private static RenderHint SetDefaultAlignment(CellAlignment alignment) {
         Config.DefaultCellAlignment = alignment;
         Config.Save();
@@ -329,7 +352,7 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint ConfigureBackups() {
         char[] validInput = ['y', 'n'];
-        if (!Command.Prompt("Create backup files when saving? @@", validInput, out char inputChar)) {
+        if (!Command.Prompt(Calc.CreateBackupFilePrompt, validInput, out char inputChar)) {
             return RenderHint.CANCEL;
         }
         Config.BackupFile = inputChar == 'y';
@@ -345,22 +368,27 @@ public static class Screen {
         int backgroundColour = int.TryParse(Config.BackgroundColour, out int _bgColour) ? _bgColour : 0;
         int foregroundColour = int.TryParse(Config.ForegroundColour, out int _fgColour) ? _fgColour : 7;
         int normalMessageColour = int.TryParse(Config.NormalMessageColour, out int _nmColour) ? _nmColour : 3;
-        if (!GetColourInput("Enter background colour number", ref backgroundColour)) {
+        int selectionMessageColour = int.TryParse(Config.SelectionColour, out int _selColour) ? _selColour : 3;
+        if (!GetColourInput(Calc.EnterBackgroundColour, ref backgroundColour)) {
             return RenderHint.NONE;
         }
-        if (!GetColourInput("Enter foreground colour number", ref foregroundColour)) {
+        if (!GetColourInput(Calc.EnterForegroundColour, ref foregroundColour)) {
             return RenderHint.NONE;
         }
         if (foregroundColour == backgroundColour) {
-            Command.Error("Background colour is already set to foreground colour.");
+            Command.Error(Calc.BackgroundColourError);
             return RenderHint.NONE;
         }
-        if (!GetColourInput("Enter message colour number", ref normalMessageColour)) {
+        if (!GetColourInput(Calc.EnterMessageColour, ref normalMessageColour)) {
+            return RenderHint.NONE;
+        }
+        if (!GetColourInput(Calc.EnterSelectionColour, ref selectionMessageColour)) {
             return RenderHint.NONE;
         }
         Config.BackgroundColour = backgroundColour.ToString();
         Config.ForegroundColour = foregroundColour.ToString();
         Config.NormalMessageColour = normalMessageColour.ToString();
+        Config.SelectionColour = selectionMessageColour.ToString();
         Config.Save();
         return RenderHint.REFRESH;
     }
