@@ -58,7 +58,7 @@ public class CellValue : IComparable<CellValue> {
             switch (Type) {
                 case CellType.NUMBER: {
                     double value1 = double.Parse(Value);
-                    double value2 = double.Parse(other.Value);
+                    double value2 = double.TryParse(other.Value, out double value) ? value : 0;
                     return value1.CompareTo(value2);
                 }
                 case CellType.TEXT:

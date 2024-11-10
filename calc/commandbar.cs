@@ -101,7 +101,12 @@ public enum FormFieldType {
     /// <summary>
     /// Any text required
     /// </summary>
-    TEXT
+    TEXT,
+
+    /// <summary>
+    /// Pick a range of values
+    /// </summary>
+    PICKER
 }
 
 /// <summary>
@@ -151,9 +156,37 @@ public class FormField {
     public int MaximumValue { get; init; }
 
     /// <summary>
+    /// Pick list values
+    /// </summary>
+    public string [] List { get; init; } = [];
+}
+
+internal class FormFieldInternal(FormField inner) {
+
+    /// <summary>
+    /// Encapsulated form field
+    /// </summary>
+    public FormField Inner { get; } = inner;
+
+    /// <summary>
+    /// X position of form field on screen.
+    /// </summary>
+    public int X { get; set; }
+
+    /// <summary>
+    /// Y position of form field on screen.
+    /// </summary>
+    public int Y { get; set; }
+
+    /// <summary>
     /// Returns whether there is a valid minimum and maximum range.
     /// </summary>
-    private bool HasMinMaxRange => MinimumValue + MaximumValue > 0;
+    private bool HasMinMaxRange => Inner.MinimumValue + Inner.MaximumValue > 0;
+
+    /// <summary>
+    /// Maximum width of input field
+    /// </summary>
+    public int MaxWidth { get; set; }
 
     /// <summary>
     /// Save the input buffer to the Value. String values have leading and trailing
@@ -164,16 +197,16 @@ public class FormField {
     /// <returns>True if value was saved, false if it failed validation</returns>
     public bool Save(List<char> inputBuffer) {
         string inputValue = string.Join("", inputBuffer);
-        switch (Type) {
+        switch (Inner.Type) {
             case FormFieldType.NUMBER:
                 int value = int.TryParse(inputValue, out int _result) ? _result : 0;
-                if (HasMinMaxRange && (value < MinimumValue || value > MaximumValue)) {
+                if (HasMinMaxRange && (value < Inner.MinimumValue || value > Inner.MaximumValue)) {
                     return false;
                 }
-                Value.Set(value);
+                Inner.Value.Set(value);
                 break;
             default:
-                Value.Set(inputValue.Trim());
+                Inner.Value.Set(inputValue.Trim());
                 break;
         }
         return true;
@@ -285,30 +318,37 @@ public class CommandBar {
     /// should specify the prompt for each input, type of each input, a default value and width. On
     /// completion, the default value will be replaced with the actual value entered.
     /// </summary>
-    /// <param name="fields">List of input fields</param>
+    /// <param name="userfields">List of input fields</param>
     /// <returns>True if input was provided, false if the user hit Esc to cancel</returns>
-    public bool PromptForInput(FormField [] fields) {
+    public bool PromptForInput(FormField [] userfields) {
         Point cursorPosition = Terminal.GetCursor();
         int column = 0;
         int row = _promptRow;
 
-        List<Point> fieldPositions = [];
-        foreach (FormField field in fields) {
+        List<FormFieldInternal> fields = [];
+        foreach (FormField userfield in userfields) {
+            FormFieldInternal field = new FormFieldInternal(userfield);
+            fields.Add(field);
             string value = string.Empty;
-            int width = field.Width;
-            string prompt = field.Text;
-            switch (field.Type) {
+            int width = userfield.Width;
+            string prompt = userfield.Text;
+            switch (userfield.Type) {
                 case FormFieldType.NUMBER:
-                    value = $"{field.Value:-field.Width}";
-                    prompt = prompt.Replace("@@", $"({field.MinimumValue}..{field.MaximumValue})");
+                    value = $"{userfield.Value:-field.Width}";
+                    prompt = prompt.Replace("@@", $"({userfield.MinimumValue}..{userfield.MaximumValue})");
+                    break;
+
+                case FormFieldType.PICKER:
+                    value = userfield.Value.StringValue;
+                    width = userfield.List.Max(p => p.Length);
                     break;
 
                 case FormFieldType.TEXT:
-                    value = field.Value.StringValue;
+                    value = userfield.Value.StringValue;
                     break;
 
                 default:
-                    Debug.Assert(false, $"{field.Type} is not supported");
+                    Debug.Assert(false, $"{userfield.Type} is not supported");
                     break;
             }
             int labelWidth = prompt.Length + 2;
@@ -320,7 +360,9 @@ public class CommandBar {
                 Terminal.WriteText(column, row, _displayWidth, $"{prompt}:", _fgColour, _bgColour);
                 column += labelWidth;
             }
-            fieldPositions.Add(new Point(column, row));
+            field.X = column;
+            field.Y = row;
+            field.MaxWidth = width;
             Terminal.WriteText(column, row, width, value, _fgColour, _bgColour);
             column += width + 2;
         }
@@ -333,11 +375,17 @@ public class CommandBar {
         int allfilesIndex = 0;
         List<char> inputBuffer = [];
         bool selection = false;
-        FormField currentField = fields[0];
+        FormFieldInternal currentField = fields[0];
 
         do {
             if (initialiseField) {
-                inputBuffer = currentField.Value.StringValue.ToList();
+                inputBuffer = currentField.Inner.Value.StringValue.ToList();
+                if (currentField.Inner.Type == FormFieldType.PICKER) {
+                    string pickList = string.Join(" ", currentField.Inner.List);
+                    Terminal.WriteText(0, row + 1, _displayWidth, pickList, _fgColour, _bgColour);
+                } else {
+                    ClearRow(row + 1);
+                }
                 index = inputBuffer.Count;
                 initialiseField = false;
                 selection = true;
@@ -346,25 +394,25 @@ public class CommandBar {
             string text = string.Join("", inputBuffer);
             ConsoleColor fg = selection ? _bgColour : _fgColour;
             ConsoleColor bg = selection ? _selColour : _bgColour;
-            Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, currentField.Width, text, fg, bg);
-            Terminal.SetCursor(fieldPositions[fieldIndex].X + index, fieldPositions[fieldIndex].Y);
+            Terminal.WriteText(currentField.X, currentField.Y, currentField.MaxWidth, text, fg, bg);
+            Terminal.SetCursor(currentField.X + index, currentField.Y);
 
             ConsoleKeyInfo input = Console.ReadKey(true);
             switch (input.Key) {
-                case ConsoleKey.Tab when fields.Length > 1: {
+                case ConsoleKey.Tab when fields.Count > 1: {
                     if (currentField.Save(inputBuffer)) {
-                        Terminal.WriteText(fieldPositions[fieldIndex].X, fieldPositions[fieldIndex].Y, fields[fieldIndex].Width, text, _fgColour, _bgColour);
+                        Terminal.WriteText(currentField.X, currentField.Y, currentField.Inner.Width, text, _fgColour, _bgColour);
                         int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
-                        fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Length);
+                        fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Count);
                         currentField = fields[fieldIndex];
                         initialiseField = true;
                     }
                     break;
                 }
 
-                case ConsoleKey.Tab when fields.Length == 1 && currentField.AllowFilenameCompletion: {
+                case ConsoleKey.Tab when fields.Count == 1 && currentField.Inner.AllowFilenameCompletion: {
                     if (allfiles == null) {
-                        string partialName = string.Join("", inputBuffer) + currentField.FilenameCompletionFilter;
+                        string partialName = string.Join("", inputBuffer) + currentField.Inner.FilenameCompletionFilter;
                         allfiles = Directory.GetFiles(".", partialName, SearchOption.TopDirectoryOnly);
                         allfilesIndex = 0;
                     }
@@ -402,19 +450,29 @@ public class CommandBar {
 
                 case ConsoleKey.Enter:
                     if (currentField.Save(inputBuffer)) {
-                        ClearRow(_promptRow);
+                        ClearRow(row);
+                        ClearRow(row + 1);
                         Terminal.SetCursor(cursorPosition);
-                        return !string.IsNullOrEmpty(currentField.Value.StringValue);
+                        return !string.IsNullOrEmpty(currentField.Inner.Value.StringValue);
                     }
                     break;
 
                 case ConsoleKey.Escape:
-                    ClearRow(_promptRow);
+                    ClearRow(row);
+                    ClearRow(row + 1);
                     Terminal.SetCursor(cursorPosition);
                     return false;
 
                 default:
-                    if (currentField.Type == FormFieldType.NUMBER && !char.IsDigit(input.KeyChar)) {
+                    if (currentField.Inner.Type == FormFieldType.NUMBER && !char.IsDigit(input.KeyChar)) {
+                        continue;
+                    }
+                    if (currentField.Inner.Type == FormFieldType.PICKER) {
+                        string? pickIndex = currentField.Inner.List.FirstOrDefault(p => p.StartsWith(char.ToUpper(input.KeyChar)));
+                        if (pickIndex != null) {
+                            inputBuffer = pickIndex.ToList();
+                            index = inputBuffer.Count;
+                        }
                         continue;
                     }
                     if (!char.IsControl(input.KeyChar)) {
@@ -422,7 +480,7 @@ public class CommandBar {
                             inputBuffer.Clear();
                             index = 0;
                         }
-                        if (inputBuffer.Count < currentField.Width) {
+                        if (inputBuffer.Count < currentField.Inner.Width) {
                             inputBuffer.Insert(index++, input.KeyChar);
                         }
                     }

@@ -624,15 +624,15 @@ public class Window {
             },
             new() {
                 Text = Calc.EnterSortOrder,
-                Type = FormFieldType.TEXT,
-                Width = 3,
+                Type = FormFieldType.PICKER,
+                List = ["ASC", "DESC"],
                 Value = new Variant("ASC")
-            },
+            }
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             RExtent markExtent = GetMarkExtent();
             int sortColumn = Cell.AddressToColumn(formFields[0].Value.StringValue);
-            bool descending = formFields[1].Value.StringValue == "DSC";
+            bool descending = formFields[1].Value.StringValue == "DESC";
             if (sortColumn >= markExtent.Start.X && sortColumn <= markExtent.End.X) {
                 Sheet.SortCells(sortColumn, descending, markExtent);
             }
