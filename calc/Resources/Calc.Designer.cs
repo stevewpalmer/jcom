@@ -668,5 +668,17 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("RangeSort", resourceCulture);
             }
         }
+        
+        internal static string EnterSortColumn {
+            get {
+                return ResourceManager.GetString("EnterSortColumn", resourceCulture);
+            }
+        }
+        
+        internal static string EnterSortOrder {
+            get {
+                return ResourceManager.GetString("EnterSortOrder", resourceCulture);
+            }
+        }
     }
 }

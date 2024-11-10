@@ -63,11 +63,6 @@ public class Window {
     public Sheet Sheet { get; }
 
     /// <summary>
-    /// Return the cell at the cursor.
-    /// </summary>
-    public Cell ActiveCell => Sheet.Cell(Sheet.Location, false);
-
-    /// <summary>
     /// Set the viewport and sheet bounds for the window.
     /// </summary>
     /// <param name="x">Left edge, 0 based</param>
@@ -195,7 +190,7 @@ public class Window {
                 ++_numberOfColumns;
             }
             Terminal.SetCursor(x, y);
-            Terminal.Write(Utilities.CentreString(Cell.ColumnNumber(columnNumber), width)[..space]);
+            Terminal.Write(Utilities.CentreString(Cell.ColumnToAddress(columnNumber), width)[..space]);
             x += width;
             columnNumber++;
         }
@@ -281,15 +276,26 @@ public class Window {
     }
 
     /// <summary>
+    /// Return the mark extent.
+    /// </summary>
+    /// <returns>An RExtent with the mark extent</returns>
+    private RExtent GetMarkExtent() {
+        RExtent markExtent = new RExtent()
+            .Add(Sheet.Location.Point);
+        if (_isMarkMode) {
+            markExtent.Add(_markAnchor);
+        }
+        return markExtent;
+    }
+
+    /// <summary>
     /// Clear the marked block from the window by rendering the
     /// original marked block area.
     /// </summary>
     private void ClearBlock() {
         if (_isMarkMode) {
+            RExtent extent = GetMarkExtent();
             _isMarkMode = false;
-            RExtent extent = new RExtent()
-                .Add(_markAnchor)
-                .Add(Sheet.Location.Point);
             RenderExtent(extent);
         }
     }
@@ -349,10 +355,7 @@ public class Window {
     /// </summary>
     /// <returns>The next cell location in the iterator, or null</returns>
     private IEnumerable<CellLocation> RangeIterator() {
-        RExtent markExtent = new RExtent().Add(ActiveCell.Location.Point);
-        if (_isMarkMode) {
-            markExtent.Add(_markAnchor);
-        }
+        RExtent markExtent = GetMarkExtent();
         for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
             for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
                 yield return new CellLocation { Column = column, Row = row };
@@ -433,7 +436,7 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint FormatCells(CellFormat format) {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
-        Cell cell = ActiveCell;
+        Cell cell = Sheet.ActiveCell;
         int decimalPlaces = 0;
         if (format is CellFormat.FIXED or CellFormat.SCIENTIFIC or CellFormat.CURRENCY or CellFormat.PERCENT) {
             FormField[] formFields = [
@@ -554,15 +557,12 @@ public class Window {
 
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
 
-            RExtent markExtent = new RExtent().Add(ActiveCell.Location.Point);
-            if (_isMarkMode) {
-                markExtent.Add(_markAnchor);
-            }
-
             try {
                 using FileStream stream = File.Create(inputValue);
                 using StreamWriter textStream = new(stream);
                 using CsvWriter csvWriter = new CsvWriter(textStream, CultureInfo.InvariantCulture);
+
+                RExtent markExtent = GetMarkExtent();
 
                 for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
                     for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
@@ -614,7 +614,32 @@ public class Window {
     /// </summary>
     /// <returns></returns>
     private RenderHint SortRange() {
-        return RenderHint.CANCEL;
+        RenderHint flags = RenderHint.CANCEL;
+        FormField[] formFields = [
+            new() {
+                Text = Calc.EnterSortColumn,
+                Type = FormFieldType.TEXT,
+                Width = 2,
+                Value = new Variant(Cell.ColumnToAddress(Sheet.Location.Column))
+            },
+            new() {
+                Text = Calc.EnterSortOrder,
+                Type = FormFieldType.TEXT,
+                Width = 3,
+                Value = new Variant("ASC")
+            },
+        ];
+        if (Screen.Command.PromptForInput(formFields)) {
+            RExtent markExtent = GetMarkExtent();
+            int sortColumn = Cell.AddressToColumn(formFields[0].Value.StringValue);
+            bool descending = formFields[1].Value.StringValue == "DSC";
+            if (sortColumn >= markExtent.Start.X && sortColumn <= markExtent.End.X) {
+                Sheet.SortCells(sortColumn, descending, markExtent);
+            }
+            flags = RenderHint.CURSOR;
+        }
+        ClearBlock();
+        return flags;
     }
 
     /// <summary>
@@ -865,7 +890,7 @@ public class Window {
                 Text = Calc.GotoRowPrompt,
                 Type = FormFieldType.TEXT,
                 Width = 7,
-                Value = new Variant(ActiveCell.Address)
+                Value = new Variant(Sheet.ActiveCell.Address)
             }
         ];
         if (Screen.Command.PromptForInput(formFields)) {

@@ -120,6 +120,12 @@ public class Sheet {
     public bool Modified { get; private set; }
 
     /// <summary>
+    /// Returns the active cell
+    /// </summary>
+    [JsonIgnore]
+    public Cell ActiveCell => Cell(Location, false);
+
+    /// <summary>
     /// Return the height of a row
     /// </summary>
     /// <returns>Row height</returns>
@@ -332,5 +338,35 @@ public class Sheet {
             column++;
         }
         return line.ToString();
+    }
+
+    /// <summary>
+    /// Sort a range of cells using the specified sort column and order. The sort
+    /// column must lie within the swapExtent column range otherwise an assertion is
+    /// thrown.
+    /// </summary>
+    /// <param name="sortColumn">1-based index of sort column</param>
+    /// <param name="descending">True if we sort descending</param>
+    /// <param name="swapExtent">Range of cells to sort</param>
+    public void SortCells(int sortColumn, bool descending, RExtent swapExtent) {
+        Debug.Assert(sortColumn >= swapExtent.Start.X && sortColumn <= swapExtent.End.X);
+        int ordering = descending ? -1 : 1;
+        bool sorted;
+        do {
+            sorted = true;
+            for (int r = swapExtent.Start.Y; r < swapExtent.End.Y; r++) {
+                Cell cell1 = Cell(new CellLocation { Row = r, Column = sortColumn}, false);
+                Cell cell2 = Cell(new CellLocation { Row = r + 1, Column = sortColumn}, false);
+                if (cell1.CellValue.CompareTo(cell2.CellValue) * ordering > 0) {
+                    for (int c = swapExtent.Start.X; c <= swapExtent.End.X; c++) {
+                        cell1 = Cell(new CellLocation { Row = r, Column = c}, false);
+                        cell2 = Cell(new CellLocation { Row = r + 1, Column = c}, false);
+                        cell1.Swap(cell2);
+                    }
+                    sorted = false;
+                    Modified = true;
+                }
+            }
+        } while (!sorted);
     }
 }

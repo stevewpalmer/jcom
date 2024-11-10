@@ -211,7 +211,7 @@ public class CommandBar {
     private ConsoleColor _bgColour;
     private ConsoleColor _fgColour;
     private ConsoleColor _selColour;
-    private Cell _currentCell;
+    private Sheet? _currentSheet;
     private ConsoleKeyInfo? _pushedKey;
 
     /// <summary>
@@ -219,18 +219,18 @@ public class CommandBar {
     /// </summary>
     public CommandBar() {
         _cellStatusRow = 0;
-        _currentCell = new Cell();
+        _currentSheet = null;
         _promptRow = _cellStatusRow + 1;
         _messageRow = _cellStatusRow + 2;
         _displayWidth = Terminal.Width;
     }
 
     /// <summary>
-    /// Update the active cell location and contents on the command bar.
+    /// Update the active sheet details on the command bar.
     /// </summary>
-    /// <param name="cell">Cell</param>
-    public void UpdateCellStatus(Cell cell) {
-        _currentCell = cell;
+    /// <param name="sheet">Cell</param>
+    public void UpdateCellStatus(Sheet sheet) {
+        _currentSheet = sheet;
         RenderCellStatus();
     }
 
@@ -322,7 +322,7 @@ public class CommandBar {
             }
             fieldPositions.Add(new Point(column, row));
             Terminal.WriteText(column, row, width, value, _fgColour, _bgColour);
-            column += width + 1;
+            column += width + 2;
         }
 
         ClearRow(_messageRow);
@@ -537,7 +537,7 @@ public class CommandBar {
             }
             ConsoleKeyInfo input = Console.ReadKey(true);
             bool actionCommand = false;
-            if (char.IsLetter(input.KeyChar)) {
+            if (char.IsLetterOrDigit(input.KeyChar)) {
                 char inputKey = char.ToUpper(input.KeyChar);
                 CommandMapEntry? commandId = commandMap.Commands.FirstOrDefault(c => c.Name[0] == inputKey);
                 if (commandId == null) {
@@ -618,11 +618,15 @@ public class CommandBar {
     /// Show the current selected row and column position
     /// </summary>
     private void RenderCellStatus() {
-        string text = _currentCell.Address + ": ";
-        if (_currentCell.CellValue.Type != CellType.NONE) {
-            text += _currentCell.CellValue.ToString();
+        if (_currentSheet != null) {
+            string text = $"{(char)(_currentSheet.SheetNumber - 1 + 'A')}:";
+            Cell activeCell = _currentSheet.ActiveCell;
+            text += $"{activeCell.Address}: {activeCell.FormatDescription} ";
+            if (activeCell.CellValue.Type != CellType.NONE) {
+                text += activeCell.CellValue.ToString();
+            }
+            Terminal.WriteText(0, _cellStatusRow, _displayWidth, text, _fgColour, _bgColour);
         }
-        Terminal.WriteText(0, _cellStatusRow, _displayWidth, text, _fgColour, _bgColour);
     }
 
     /// <summary>

@@ -330,4 +330,10 @@
     <data name="RangeSort" xml:space="preserve">
         <value>Sort</value>
     </data>
+    <data name="EnterSortColumn" xml:space="preserve">
+        <value>Enter sort column</value>
+    </data>
+    <data name="EnterSortOrder" xml:space="preserve">
+        <value>Enter sort order</value>
+    </data>
 </root>

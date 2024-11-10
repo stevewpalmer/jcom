@@ -94,8 +94,7 @@ public static class Screen {
     /// </summary>
     public static void UpdateCursorPosition() {
         if (_activeWindow != null) {
-            Cell cell = _activeWindow.ActiveCell;
-            Command.UpdateCellStatus(cell);
+            Command.UpdateCellStatus(_activeWindow.Sheet);
         }
     }
 

@@ -28,7 +28,7 @@ using System.Text.Json.Serialization;
 
 namespace JCalcLib;
 
-public class CellValue {
+public class CellValue : IComparable<CellValue> {
     private string _value = string.Empty;
 
     /// <summary>
@@ -49,6 +49,46 @@ public class CellValue {
     }
 
     /// <summary>
+    /// Compare this cell value with another for use when sorting.
+    /// </summary>
+    /// <param name="other">Other cell value to compare</param>
+    /// <returns>Sort relationship</returns>
+    public int CompareTo(CellValue? other) {
+        if (other != null) {
+            switch (Type) {
+                case CellType.NUMBER: {
+                    double value1 = double.Parse(Value);
+                    double value2 = double.Parse(other.Value);
+                    return value1.CompareTo(value2);
+                }
+                case CellType.TEXT:
+                    return string.Compare(Value, other.Value, StringComparison.Ordinal);
+            }
+        }
+        return 1;
+    }
+
+    /// <summary>
+    /// Implement greater than operator
+    /// </summary>
+    /// <param name="operand1">First cell value</param>
+    /// <param name="operand2">Second cell value</param>
+    /// <returns>True if operand1 is greater than operand2, false otherwise</returns>
+    public static bool operator > (CellValue operand1, CellValue operand2) {
+        return operand1.CompareTo(operand2) > 0;
+    }
+
+    /// <summary>
+    /// Implement less than operator
+    /// </summary>
+    /// <param name="operand1">First cell value</param>
+    /// <param name="operand2">Second cell value</param>
+    /// <returns>True if operand1 is less than operand2, false otherwise</returns>
+    public static bool operator < (CellValue operand1, CellValue operand2) {
+        return operand1.CompareTo(operand2) < 0;
+    }
+
+    /// <summary>
     /// Return the cell value as a string for display.
     /// </summary>
     public new string ToString() {
@@ -64,13 +104,13 @@ public class CellValue {
     private static string TryParseDate(string value) {
         CultureInfo culture = CultureInfo.CurrentCulture;
         string compactValue = value.Replace(" ", "");
-        if (DateTime.TryParseExact(compactValue, "dd-MMM", culture, DateTimeStyles.None, out DateTime _date)) {
+        if (DateTime.TryParseExact(compactValue, "d-MMM", culture, DateTimeStyles.None, out DateTime _date)) {
             return _date.ToOADate().ToString(culture);
         }
         if (DateTime.TryParseExact(compactValue, "MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
             return _date.ToOADate().ToString(culture);
         }
-        if (DateTime.TryParseExact(compactValue, "dd-MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
+        if (DateTime.TryParseExact(compactValue, "d-MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
             return _date.ToOADate().ToString(culture);
         }
         return value;

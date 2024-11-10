@@ -51,7 +51,31 @@ public class Cell {
     /// represents the cell address on the screen.
     /// </summary>
     [JsonIgnore]
-    public string Address => $"{ColumnNumber(Location.Column)}{Location.Row}";
+    public string Address => $"{ColumnToAddress(Location.Column)}{Location.Row}";
+
+    /// <summary>
+    /// Return the format description of the current cell.
+    /// </summary>
+    [JsonIgnore]
+    public string FormatDescription {
+        get {
+            string text = Format switch {
+                CellFormat.BAR => "B",
+                CellFormat.FIXED => $"F{DecimalPlaces}",
+                CellFormat.SCIENTIFIC => $"S{DecimalPlaces}",
+                CellFormat.TEXT => "T",
+                CellFormat.GENERAL => "G",
+                CellFormat.PERCENT => $"P{DecimalPlaces}",
+                CellFormat.COMMAS => $",{DecimalPlaces}",
+                CellFormat.CURRENCY => $"C{DecimalPlaces}",
+                CellFormat.DATE_DM => "D2",
+                CellFormat.DATE_MY => "D3",
+                CellFormat.DATE_DMY => "D1",
+                _ => "?"
+            };
+            return $"({text})";
+        }
+    }
 
     /// <summary>
     /// Cell format
@@ -70,6 +94,7 @@ public class Cell {
     /// <param name="value">Value</param>
     /// <returns>The date and time as a string</returns>
     private string ToDateTime(string pattern, double value) {
+        ArgumentNullException.ThrowIfNull(pattern);
         if (value < -657435.0) {
             return CellValue.Value;
         }
@@ -104,6 +129,37 @@ public class Cell {
     }
 
     /// <summary>
+    /// Convert a column offset to its address (A, B, etc).
+    /// </summary>
+    /// <param name="column">Column offset, 1-based</param>
+    /// <returns>Column address</returns>
+    public static string ColumnToAddress(int column) {
+        ArgumentOutOfRangeException.ThrowIfLessThan(column, 1);
+        string columnNumber = "";
+        while (--column >= 0) {
+            columnNumber = (char)(column % 26 + 'A') + columnNumber;
+            column /= 26;
+        }
+        return columnNumber;
+    }
+
+    /// <summary>
+    /// Convert a column address to its column offset.
+    /// </summary>
+    /// <param name="address">Column address</param>
+    /// <returns>Column offset</returns>
+    public static int AddressToColumn(string address) {
+        ArgumentNullException.ThrowIfNull(address);
+        int newColumn = 0;
+        int index = 0;
+        while (index < address.Length && char.IsLetter(address[index])) {
+            newColumn = newColumn * 26 + char.ToUpper(address[index]) - 'A' + 1;
+            index++;
+        }
+        return newColumn;
+    }
+
+    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
@@ -125,9 +181,9 @@ public class Cell {
                         $"{doubleValue.ToString($"N{DecimalPlaces}")}",
                 CellFormat.BAR => new string(doubleValue < 0 ? '-' : '+', maxBar),
                 CellFormat.SCIENTIFIC => doubleValue.ToString($"0.{new string('#', DecimalPlaces)}E+00"),
-                CellFormat.DATE_DM => ToDateTime("dd-MMM", doubleValue),
+                CellFormat.DATE_DM => ToDateTime("d-MMM", doubleValue),
                 CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
-                CellFormat.DATE_DMY => ToDateTime("dd-MMM-yyyy", doubleValue),
+                CellFormat.DATE_DMY => ToDateTime("d-MMM-yyyy", doubleValue),
                 CellFormat.GENERAL => cellValue,
                 CellFormat.TEXT => cellValue,
                 _ => throw new ArgumentException($"Unknown Cell Format: {Format}")
@@ -156,17 +212,13 @@ public class Cell {
     }
 
     /// <summary>
-    /// Convert a column offset to its location.
+    /// Exchange the contents of this cell with another cell.
     /// </summary>
-    /// <param name="column">Column offset, 1-based</param>
-    /// <returns>Column location</returns>
-    public static string ColumnNumber(int column) {
-        Debug.Assert(column >= 1);
-        string columnNumber = "";
-        while (--column >= 0) {
-            columnNumber = (char)(column % 26 + 'A') + columnNumber;
-            column /= 26;
-        }
-        return columnNumber;
+    /// <param name="other">Cell to swap</param>
+    public void Swap(Cell other) {
+        (CellValue, other.CellValue) = (other.CellValue, CellValue);
+        (Format, other.Format) = (other.Format, Format);
+        (Alignment, other.Alignment) = (other.Alignment, Alignment);
+        (DecimalPlaces, other.DecimalPlaces) = (other.DecimalPlaces, DecimalPlaces);
     }
 }
