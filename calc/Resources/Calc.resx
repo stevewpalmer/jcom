@@ -61,7 +61,7 @@
         <value>Align</value>
     </data>
     <data name="FileRetrieve" xml:space="preserve">
-        <value>Edit</value>
+        <value>Open</value>
     </data>
     <data name="FileSave" xml:space="preserve">
         <value>Save</value>

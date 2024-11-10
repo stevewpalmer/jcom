@@ -106,6 +106,7 @@ public class Window {
             KeyCommand.KC_GOTO => GotoRowColumn(),
             KeyCommand.KC_VALUE => InputValue(false),
             KeyCommand.KC_EDIT => InputValue(true),
+            KeyCommand.KC_FILE_EXPORT => ExportFile(),
             KeyCommand.KC_SET_COLUMN_WIDTH => SetColumnWidth(),
             KeyCommand.KC_RESET_COLUMN_WIDTH => ResetColumnWidth(),
             KeyCommand.KC_ALIGN_LEFT => AlignCells(CellAlignment.LEFT),
@@ -535,11 +536,27 @@ public class Window {
     }
 
     /// <summary>
+    /// Export the entire worksheet to a CSV file.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint ExportFile() {
+        return ExportExtent(Sheet.GetCellExtent());
+    }
+
+    /// <summary>
     /// Export the selected range of cells to a CSV file.
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint ExportRange() {
+        return ExportExtent(GetMarkExtent());
+    }
 
+    /// <summary>
+    /// Export the specified extent to a CSV file
+    /// </summary>
+    /// <param name="extent">Extent to export</param>
+    /// <returns>Render hints</returns>
+    private RenderHint ExportExtent(RExtent extent) {
         RenderHint flags = RenderHint.CANCEL;
         FormField[] formFields = [
             new() {
@@ -562,10 +579,8 @@ public class Window {
                 using StreamWriter textStream = new(stream);
                 using CsvWriter csvWriter = new CsvWriter(textStream, CultureInfo.InvariantCulture);
 
-                RExtent markExtent = GetMarkExtent();
-
-                for (int row = markExtent.Start.Y; row <= markExtent.End.Y; row++) {
-                    for (int column = markExtent.Start.X; column <= markExtent.End.X; column++) {
+                for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
+                    for (int column = extent.Start.X; column <= extent.End.X; column++) {
                         Cell cell = Sheet.Cell(new CellLocation { Column = column, Row = row}, false);
                         csvWriter.WriteField(cell.CellValue.Value);
                     }

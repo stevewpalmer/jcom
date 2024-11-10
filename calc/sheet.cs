@@ -369,4 +369,16 @@ public class Sheet {
             }
         } while (!sorted);
     }
+
+    /// <summary>
+    /// Get the extent of all cells on the sheet.
+    /// </summary>
+    /// <returns>Extent that covers all cells on the sheet</returns>
+    public RExtent GetCellExtent() {
+        RExtent extent = new RExtent();
+        foreach (Cell cell in Cells.Values) {
+            extent.Add(cell.Location.Point);
+        }
+        return extent;
+    }
 }

@@ -39,4 +39,8 @@
       <PackageReference Include="CsvHelper" Version="33.0.1" />
     </ItemGroup>
 
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="cp $(OutputPath)* $(SolutionDir)drop/bin" />
+    </Target>
+
 </Project>
