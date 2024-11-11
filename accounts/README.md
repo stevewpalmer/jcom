@@ -4,6 +4,8 @@ Accounts implements a very simple disk-based personal finance tracking
 program that was originally implemented in FreeBasic. It should be
 relatively easy to understand how it works.
 
+<img width="741" alt="accounts" src="https://github.com/user-attachments/assets/0401bf15-6325-48cc-b7b6-d7fa4b60455d">
+
 The key features are:
 
 * Addition of fixed monthly expenses which are automatically applied to all months.
