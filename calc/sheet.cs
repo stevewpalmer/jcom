@@ -33,6 +33,25 @@ using JComLib;
 
 namespace JCalc;
 
+public class CellList {
+
+    /// <summary>
+    /// Row or column 1-based index of cells
+    /// </summary>
+    public int Index { get; set; }
+
+    /// <summary>
+    /// List of cells in the row or column
+    /// </summary>
+    [JsonInclude]
+    public List<Cell> Cells { get; set; } = [];
+
+    /// <summary>
+    /// Size of the row or column
+    /// </summary>
+    public int Size { get; set; }
+}
+
 public class Sheet {
     private FileInfo? _fileInfo;
 
@@ -59,8 +78,7 @@ public class Sheet {
                 Sheet? inputSheet = JsonSerializer.Deserialize<Sheet>(stream);
                 if (inputSheet != null) {
                     Location = inputSheet.Location;
-                    Cells = inputSheet.Cells;
-                    ColumnWidths = inputSheet.ColumnWidths;
+                    ColumnList = inputSheet.ColumnList;
                 }
             }
             catch (JsonException) {
@@ -73,6 +91,12 @@ public class Sheet {
     }
 
     /// <summary>
+    /// Column list
+    /// </summary>
+    [JsonInclude]
+    public List<CellList> ColumnList { get; set; } = [];
+
+    /// <summary>
     /// The current selected cell location, 1 offset
     /// </summary>
     [JsonInclude]
@@ -83,18 +107,6 @@ public class Sheet {
     /// </summary>
     [JsonIgnore]
     public int SheetNumber { get; }
-
-    /// <summary>
-    /// Cells
-    /// </summary>
-    [JsonInclude]
-    public Dictionary<int, Cell> Cells { get; set; } = new();
-
-    /// <summary>
-    /// Column widths
-    /// </summary>
-    [JsonInclude]
-    public Dictionary<int, int> ColumnWidths { get; set; } = new();
 
     /// <summary>
     /// Return the name of the sheet. This is the base part of the filename if
@@ -159,7 +171,8 @@ public class Sheet {
     /// <returns>Column width</returns>
     public int ColumnWidth(int column) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
-        return ColumnWidths.GetValueOrDefault(column, Consts.DefaultColumnWidth);
+        CellList? cellList = ColumnList.Find(c => c.Index == column);
+        return cellList?.Size ?? Consts.DefaultColumnWidth;
     }
 
     /// <summary>
@@ -170,16 +183,20 @@ public class Sheet {
     public bool SetColumnWidth(int column, int width) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
         Debug.Assert(width is >= 0 and <= 100);
+        int c = 0;
         bool success = false;
-        if (ColumnWidth(column) != width) {
-            if (width == Consts.DefaultColumnWidth) {
-                ColumnWidths.Remove(column);
+        while (c < ColumnList.Count) {
+            if (ColumnList[c].Index == column) {
+                success = ColumnList[c].Size != width;
+                ColumnList[c].Size = width;
+                break;
             }
-            else {
-                ColumnWidths[column] = width;
+            if (ColumnList[c].Index > column) {
+                ColumnList.Insert(c, new CellList { Index = column, Size = width });
+                success = true;
+                break;
             }
-            Modified = true;
-            success = true;
+            c++;
         }
         return success;
     }
@@ -203,20 +220,29 @@ public class Sheet {
     /// <param name="createIfEmpty">Create the cell if it is empty</param>
     /// <returns>The cell at the row</returns>
     public Cell Cell(CellLocation location, bool createIfEmpty) {
-        int cellHash = location.Row * Consts.MaxColumns + location.Column;
-        if (!Cells.TryGetValue(cellHash, out Cell? _cell)) {
-            _cell = new Cell {
-                Location = location,
-                Alignment = Screen.Config.DefaultCellAlignment,
-                Format = Screen.Config.DefaultCellFormat,
-                DecimalPlaces = Screen.Config.DefaultDecimals
-            };
+        CellList? cellList = CellListForColumn(location.Column, createIfEmpty);
+        Cell cell = new Cell {
+            Alignment = Screen.Config.DefaultCellAlignment,
+            Format = Screen.Config.DefaultCellFormat,
+            DecimalPlaces = Screen.Config.DefaultDecimals,
+            Location = location,
+        };
+        if (cellList != null) {
+            int c = 0;
+            while (c < cellList.Cells.Count) {
+                if (cellList.Cells[c].Location.Row == location.Row) {
+                    return cellList.Cells[c];
+                }
+                if (cellList.Cells[c].Location.Row > location.Row) {
+                    break;
+                }
+                c++;
+            }
             if (createIfEmpty) {
-                Cells.Add(cellHash, _cell);
-                Modified = true;
+                cellList.Cells.Insert(c, cell);
             }
         }
-        return _cell;
+        return cell;
     }
 
     /// <summary>
@@ -225,10 +251,20 @@ public class Sheet {
     /// <param name="column">Insertion column</param>
     public void InsertColumn(int column) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Column >= column)) {
-            CellLocation cellLocation = cell.Location;
-            ++cellLocation.Column;
-            cell.Location = cellLocation;
+        int c = 0;
+        while (c < ColumnList.Count) {
+            if (ColumnList[c].Index >= column) {
+                break;
+            }
+            c++;
+        }
+        while (++c < ColumnList.Count) {
+            ++ColumnList[c].Index;
+            foreach (Cell cell in ColumnList[c].Cells) {
+                CellLocation cellLocation = cell.Location;
+                ++cellLocation.Column;
+                cell.Location = cellLocation;
+            }
         }
         Modified = true;
     }
@@ -239,10 +275,16 @@ public class Sheet {
     /// <param name="row">Insertion row</param>
     public void InsertRow(int row) {
         Debug.Assert(row is >= 1 and <= Consts.MaxRows);
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Row >= row)) {
-            CellLocation cellLocation = cell.Location;
-            ++cellLocation.Row;
-            cell.Location = cellLocation;
+        int c = 0;
+        while (c < ColumnList.Count) {
+            foreach (Cell cell in ColumnList[c].Cells) {
+                if (cell.Location.Row >= row) {
+                    CellLocation cellLocation = cell.Location;
+                    ++cellLocation.Row;
+                    cell.Location = cellLocation;
+                }
+            }
+            c++;
         }
         Modified = true;
     }
@@ -253,14 +295,22 @@ public class Sheet {
     /// <param name="column">Deletion column</param>
     public void DeleteColumn(int column) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Column >= column)) {
-            CellLocation cellLocation = cell.Location;
-            if (cellLocation.Column == column) {
-                DeleteCell(cell);
-            } else {
+        int c = ColumnList.Count - 1;
+        while (c >= 0) {
+            if (ColumnList[c].Index == column) {
+                ColumnList.RemoveAt(c);
+                break;
+            }
+            if (ColumnList[c].Index < column) {
+                break;
+            }
+            --ColumnList[c].Index;
+            foreach (Cell cell in ColumnList[c].Cells) {
+                CellLocation cellLocation = cell.Location;
                 --cellLocation.Column;
                 cell.Location = cellLocation;
             }
+            c--;
         }
         Modified = true;
     }
@@ -271,14 +321,23 @@ public class Sheet {
     /// <param name="row">Deletion row</param>
     public void DeleteRow(int row) {
         Debug.Assert(row is >= 1 and <= Consts.MaxRows);
-        foreach (Cell cell in Cells.Values.Where(cell => cell.Location.Row >= row)) {
-            CellLocation cellLocation = cell.Location;
-            if (cellLocation.Row == row) {
-                DeleteCell(cell);
-            } else {
-                --cellLocation.Row;
-                cell.Location = cellLocation;
+        int c = ColumnList.Count - 1;
+        while (c >= 0) {
+            int r = ColumnList[c].Index - 1;
+            while (r >= 0) {
+                Cell cell = ColumnList[c].Cells[r];
+                if (cell.Location.Row == row) {
+                    ColumnList[c].Cells.RemoveAt(c);
+                    break;
+                }
+                if (cell.Location.Row > row) {
+                    CellLocation cellLocation = cell.Location;
+                    --cellLocation.Row;
+                    cell.Location = cellLocation;
+                }
+                r--;
             }
+            c--;
         }
         Modified = true;
     }
@@ -310,8 +369,6 @@ public class Sheet {
     /// </summary>
     /// <param name="cell">Cell to delete</param>
     public void DeleteCell(Cell cell) {
-        int cellHash = cell.Location.Row * Consts.MaxColumns + cell.Location.Column;
-        Cells.Remove(cellHash);
         Modified = true;
     }
 
@@ -319,23 +376,27 @@ public class Sheet {
     /// Render a row of cells using the specified data
     /// </summary>
     /// <param name="column">Start column, 1-based</param>
-    /// <param name="cells">Cells on the row</param>
+    /// <param name="row">Row index to return</param>
     /// <returns>String representation of row</returns>
-    public string GetRow(int column, Cell [] cells) {
+    public string GetRow(int column, int row) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
         StringBuilder line = new();
-        int cellIndex = 0;
+        int columnIndex = column;
         Cell emptyCell = new();
-        while (cellIndex < cells.Length && column > cells[cellIndex].Location.Column) {
-            ++cellIndex;
+        int c = 0;
+        while (c < ColumnList.Count && ColumnList[c].Index < column) {
+            c++;
         }
-        while (cellIndex < cells.Length) {
-            while (column < cells[cellIndex].Location.Column) {
-                line.Append(emptyCell.ToString(ColumnWidth(column)));
-                column++;
+        while (c < ColumnList.Count) {
+            while (ColumnList[c].Index > columnIndex) {
+                line.Append(emptyCell.ToString(Consts.DefaultColumnWidth));
+                columnIndex++;
             }
-            line.Append(cells[cellIndex++].ToString(ColumnWidth(column)));
-            column++;
+            int width = ColumnList[c].Size;
+            Cell? cell = ColumnList[c].Cells.Find(c => c.Location.Row == row);
+            line.Append(cell == null ? emptyCell.ToString(width) : cell.ToString(width));
+            columnIndex++;
+            c++;
         }
         return line.ToString();
     }
@@ -376,9 +437,34 @@ public class Sheet {
     /// <returns>Extent that covers all cells on the sheet</returns>
     public RExtent GetCellExtent() {
         RExtent extent = new RExtent();
-        foreach (Cell cell in Cells.Values) {
+        foreach (Cell cell in ColumnList.SelectMany(cellList => cellList.Cells)) {
             extent.Add(cell.Location.Point);
         }
         return extent;
+    }
+
+    /// <summary>
+    /// Return the CellList for the specified column, creating it in
+    /// column order if needed.
+    /// </summary>
+    /// <param name="column">Column required</param>
+    /// <param name="createIfEmpty">True if we create the cell list</param>
+    /// <returns>CellList for the column</returns>
+    private CellList? CellListForColumn(int column, bool createIfEmpty) {
+        int c = 0;
+        while (c < ColumnList.Count) {
+            if (ColumnList[c].Index == column) {
+                return ColumnList[c];
+            }
+            if (ColumnList[c].Index > column) {
+                break;
+            }
+            c++;
+        }
+        if (!createIfEmpty) {
+            return null;
+        }
+        ColumnList.Insert(c, new CellList { Index = column, Size = Consts.DefaultColumnWidth });
+        return ColumnList[c];
     }
 }

@@ -231,11 +231,10 @@ public class Window {
                 .Add(Sheet.Location.Point);
         }
 
-        Cell [] cells = Sheet.Cells.Values.Where(cell => renderExtent.Contains(cell.Location.Point)).ToArray();
         int i = renderExtent.Start.Y;
         int y = _sheetBounds.Top;
         while (i <= renderExtent.End.Y) {
-            string line = Sheet.GetRow(_scrollOffset.X + 1, cells.Where(c => c.Location.Row == i).OrderBy(c => c.Location.Column).ToArray());
+            string line = Sheet.GetRow(_scrollOffset.X + 1, i);
             int x = _sheetBounds.Left;
             int w = _sheetBounds.Width;
             int left = 0;
