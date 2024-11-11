@@ -3,6 +3,8 @@
 This folder contains the source files for a simple text editor
 based on the DOS Brief editor from the 1990s.
 
+<img width="707" alt="edit" src="https://github.com/user-attachments/assets/bf281f80-8fb1-47ae-9425-661f1eab7c1c">
+
 Run the editor from the shell with the `edit` command. By default
 this opens the editor and prompts you for the name of the file to edit.
 Specify one or more filenames after the command to open those files,
