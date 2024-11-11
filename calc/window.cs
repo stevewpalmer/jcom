@@ -578,12 +578,14 @@ public class Window {
                 using StreamWriter textStream = new(stream);
                 using CsvWriter csvWriter = new CsvWriter(textStream, CultureInfo.InvariantCulture);
 
-                for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
-                    for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                        Cell cell = Sheet.Cell(new CellLocation { Column = column, Row = row}, false);
-                        csvWriter.WriteField(cell.CellValue.Value);
+                if (extent.Valid) {
+                    for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
+                        for (int column = extent.Start.X; column <= extent.End.X; column++) {
+                            Cell cell = Sheet.Cell(new CellLocation { Column = column, Row = row }, false);
+                            csvWriter.WriteField(cell.CellValue.Value);
+                        }
+                        csvWriter.NextRecord();
                     }
-                    csvWriter.NextRecord();
                 }
                 csvWriter.Flush();
             }

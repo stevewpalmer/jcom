@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -171,7 +172,7 @@ public class Sheet {
     /// <returns>Column width</returns>
     public int ColumnWidth(int column) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
-        CellList? cellList = ColumnList.Find(c => c.Index == column);
+        CellList? cellList = CellListForColumn(column, false);
         return cellList?.Size ?? Consts.DefaultColumnWidth;
     }
 
@@ -225,7 +226,7 @@ public class Sheet {
             Alignment = Screen.Config.DefaultCellAlignment,
             Format = Screen.Config.DefaultCellFormat,
             DecimalPlaces = Screen.Config.DefaultDecimals,
-            Location = location,
+            Location = location
         };
         if (cellList != null) {
             int c = 0;
@@ -252,19 +253,17 @@ public class Sheet {
     public void InsertColumn(int column) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
         int c = 0;
-        while (c < ColumnList.Count) {
-            if (ColumnList[c].Index >= column) {
-                break;
-            }
+        while (c < ColumnList.Count && ColumnList[c].Index < column) {
             c++;
         }
-        while (++c < ColumnList.Count) {
+        while (c < ColumnList.Count) {
             ++ColumnList[c].Index;
             foreach (Cell cell in ColumnList[c].Cells) {
                 CellLocation cellLocation = cell.Location;
                 ++cellLocation.Column;
                 cell.Location = cellLocation;
             }
+            c++;
         }
         Modified = true;
     }
@@ -369,7 +368,11 @@ public class Sheet {
     /// </summary>
     /// <param name="cell">Cell to delete</param>
     public void DeleteCell(Cell cell) {
-        Modified = true;
+        CellList? cellList = CellListForColumn(cell.Location.Column, false);
+        if (cellList != null) {
+            cellList.Cells.Remove(cell);
+            Modified = true;
+        }
     }
 
     /// <summary>
@@ -393,7 +396,7 @@ public class Sheet {
                 columnIndex++;
             }
             int width = ColumnList[c].Size;
-            Cell? cell = ColumnList[c].Cells.Find(c => c.Location.Row == row);
+            Cell? cell = ColumnList[c].Cells.Find(l => l.Location.Row == row);
             line.Append(cell == null ? emptyCell.ToString(width) : cell.ToString(width));
             columnIndex++;
             c++;
@@ -437,8 +440,12 @@ public class Sheet {
     /// <returns>Extent that covers all cells on the sheet</returns>
     public RExtent GetCellExtent() {
         RExtent extent = new RExtent();
-        foreach (Cell cell in ColumnList.SelectMany(cellList => cellList.Cells)) {
-            extent.Add(cell.Location.Point);
+        Point? topLeft = ColumnList.FirstOrDefault()?.Cells.FirstOrDefault()?.Location.Point;
+        Point? bottomRight = ColumnList.LastOrDefault()?.Cells.LastOrDefault()?.Location.Point;
+        if (topLeft != null) {
+            extent.Add(topLeft.Value);
+            Debug.Assert(bottomRight.HasValue);
+            extent.Add(bottomRight.Value);
         }
         return extent;
     }

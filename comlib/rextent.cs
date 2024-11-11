@@ -67,7 +67,7 @@ public class RExtent {
     /// <summary>
     /// Returns whether the extent has a valid range
     /// </summary>
-    private bool Valid => Start != Uninitalised && End != Uninitalised;
+    public bool Valid => Start != Uninitalised && End != Uninitalised;
 
     /// <summary>
     /// Return whether point is contained within this extent.
