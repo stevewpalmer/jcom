@@ -3,6 +3,8 @@
 This folder contains the source files for a simple spreadsheet.
 This is currently a work in progress.
 
+<img width="750" alt="calc" src="https://github.com/user-attachments/assets/2fa1812d-99d5-41f6-a02f-2840a03d37f9">
+
 Run calc from the shell with the `calc` command. By default,
 this opens calc with an empty worksheet and a default filename.
 Specify one or more filenames after the command to open those files,
