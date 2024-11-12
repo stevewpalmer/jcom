@@ -62,6 +62,27 @@ public class CellParseNode(TokenID tokenID) {
     /// Operator
     /// </summary>
     public TokenID Op { get; } = tokenID;
+
+    /// <summary>
+    /// Convert a token ID to its string representation.
+    /// </summary>
+    /// <param name="tokenId">Token ID</param>
+    /// <returns>String</returns>
+    public static string TokenToString(TokenID tokenId) =>
+        tokenId switch {
+            TokenID.PLUS => "+",
+            TokenID.EXP => "^",
+            TokenID.MINUS => "-",
+            TokenID.MULTIPLY => "*",
+            TokenID.DIVIDE => "/",
+            TokenID.KLE => "<=",
+            TokenID.KLT => "<",
+            TokenID.KGE => ">=",
+            TokenID.KGT => ">",
+            TokenID.KEQ => "=",
+            TokenID.KNE => "<>",
+            _ => ""
+        };
 }
 
 /// <summary>
@@ -81,6 +102,24 @@ public class BinaryOpParseNode(TokenID tokenID, CellParseNode left, CellParseNod
     /// Right child node
     /// </summary>
     public CellParseNode Right { get; } = right;
+
+    /// <summary>
+    /// Convert this parse node to its string. For binary operations we
+    /// add the appropriate parenthesis if the precedence of either side
+    /// of the expression is less than this one.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToString() {
+        string? left = Left.ToString();
+        string? right = Right.ToString();
+        if (FormulaParser.Precedence(Op) > FormulaParser.Precedence(Left.Op)) {
+            left = $"({left})";
+        }
+        if (FormulaParser.Precedence(Op) > FormulaParser.Precedence(Right.Op)) {
+            right = $"({right})";
+        }
+        return left + TokenToString(Op) + right;
+    }
 }
 
 /// <summary>
@@ -93,19 +132,54 @@ public class NumberParseNode(double value) : CellParseNode(TokenID.NUMBER) {
     /// Value of node
     /// </summary>
     public Variant Value { get; } = new(value);
+
+    /// <summary>
+    /// Convert this parse node to its string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToString() {
+        return Value.StringValue;
+    }
 }
 
 /// <summary>
 /// Represents a parse node that holds a string value.
 /// </summary>
-/// <param name="tokenID">Node token ID</param>
 /// <param name="value">String value</param>
-public class TextParseNode(TokenID tokenID, string value) : CellParseNode(tokenID) {
+public class TextParseNode(string value) : CellParseNode(TokenID.TEXT) {
 
     /// <summary>
     /// Value of node
     /// </summary>
     public string Value { get; } = value;
+
+    /// <summary>
+    /// Convert this parse node to its string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToString() {
+        return Value;
+    }
+}
+
+/// <summary>
+/// Represents a parse node that holds a relative cell location.
+/// </summary>
+/// <param name="value">String value</param>
+public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRESS) {
+
+    /// <summary>
+    /// Value of node
+    /// </summary>
+    public CellLocation Value { get; } = value;
+
+    /// <summary>
+    /// Convert this parse node to its string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToString() {
+        return Cell.LocationToAddress(Value);
+    }
 }
 
 /// <summary>
@@ -362,38 +436,18 @@ public class FormulaParser {
             SimpleToken token = GetNextToken();
             int preced;
             switch (token.ID) {
-                case TokenID.KGT:
-                    preced = 5;
-                    break;
-                case TokenID.KGE:
-                    preced = 5;
-                    break;
                 case TokenID.KLE:
-                    preced = 5;
-                    break;
+                case TokenID.KGE:
+                case TokenID.KGT:
                 case TokenID.KNE:
-                    preced = 5;
-                    break;
                 case TokenID.KEQ:
-                    preced = 5;
-                    break;
                 case TokenID.KLT:
-                    preced = 5;
-                    break;
-                case TokenID.PLUS:
-                    preced = 6;
-                    break;
                 case TokenID.MINUS:
-                    preced = 6;
-                    break;
+                case TokenID.PLUS:
                 case TokenID.MULTIPLY:
-                    preced = 7;
-                    break;
                 case TokenID.DIVIDE:
-                    preced = 7;
-                    break;
                 case TokenID.EXP:
-                    preced = 10;
+                    preced = Precedence(token.ID);
                     break;
                 default:
                     PushToken(token);
@@ -437,11 +491,35 @@ public class FormulaParser {
 
             case TokenID.ADDRESS: {
                 CellAddressToken identToken = (CellAddressToken)token;
-                return new TextParseNode(TokenID.ADDRESS, identToken.Address);
+                return new LocationParseNode(Cell.LocationFromAddress(identToken.Address));
             }
         }
         throw new FormatException("Invalid operand.");
     }
+
+    /// <summary>
+    /// Return the operator precedence of the specified operator
+    /// token. Higher values have higher precedence.
+    /// </summary>
+    /// <param name="id">Token ID</param>
+    /// <returns>Precedence level</returns>
+    internal static int Precedence(TokenID id) =>
+        id switch {
+            TokenID.NUMBER => 20,
+            TokenID.ADDRESS => 20,
+            TokenID.KGT => 5,
+            TokenID.KGE => 5,
+            TokenID.KLE => 5,
+            TokenID.KNE => 5,
+            TokenID.KEQ => 5,
+            TokenID.KLT => 5,
+            TokenID.PLUS => 6,
+            TokenID.MINUS => 6,
+            TokenID.MULTIPLY => 7,
+            TokenID.DIVIDE => 7,
+            TokenID.EXP => 10,
+            _ => 0
+        };
 
     private class SimpleToken {
 

@@ -34,7 +34,6 @@ public class StatusBar {
     private string _filename;
     private string _message;
     private int _maxFilenameWidth;
-    private int _messageWidth;
     private ConsoleColor _bgColour;
     private ConsoleColor _fgColour;
 
@@ -44,7 +43,6 @@ public class StatusBar {
     public StatusBar() {
         _statusBarRow = Terminal.Height - 1;
         _statusBarWidth = Terminal.Width;
-        _messageWidth = _statusBarWidth;
         _filename = string.Empty;
         _message = string.Empty;
     }

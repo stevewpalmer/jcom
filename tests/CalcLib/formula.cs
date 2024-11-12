@@ -48,18 +48,21 @@ public class FormulaTests {
         Assert.AreEqual(TokenID.TEXT, cell2.ParseNode.Op);
         Assert.AreEqual("HELLO", ((TextParseNode)cell2.ParseNode).Value);
         Assert.AreEqual(TokenID.PLUS, cell3.ParseNode.Op);
+
+        Assert.AreEqual("", CellParseNode.TokenToString(TokenID.EOL));
     }
 
     // Verify the creation of a BinaryOpParseNode
     [Test]
     public void VerifyBinaryOpParseNode() {
         NumberParseNode left = new NumberParseNode(16);
-        TextParseNode right = new TextParseNode(TokenID.ADDRESS, "B4");
+        LocationParseNode right = new LocationParseNode(Cell.LocationFromAddress("B4"));
         BinaryOpParseNode pn = new BinaryOpParseNode(TokenID.KGT, left, right);
 
         Assert.AreEqual(pn.Op, TokenID.KGT);
         Assert.AreEqual(pn.Left, left);
         Assert.AreEqual(pn.Right, right);
+        Assert.AreEqual("16>B4", pn.ToString());
     }
 
     // Verify a binary addition formula
@@ -70,16 +73,16 @@ public class FormulaTests {
 
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.PLUS, pn.Op);
-        Assert.IsTrue(pn.Left is TextParseNode);
-        Assert.IsTrue(pn.Right is TextParseNode);
+        Assert.IsTrue(pn.Left is LocationParseNode);
+        Assert.IsTrue(pn.Right is LocationParseNode);
 
-        TextParseNode left = (TextParseNode)pn.Left;
+        LocationParseNode left = (LocationParseNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
-        Assert.AreEqual("A1", left.Value);
+        Assert.AreEqual(Cell.LocationFromAddress("A1"), left.Value);
 
-        TextParseNode right = (TextParseNode)pn.Right;
+        LocationParseNode right = (LocationParseNode)pn.Right;
         Assert.AreEqual(TokenID.ADDRESS, right.Op);
-        Assert.AreEqual("A2", right.Value);
+        Assert.AreEqual(Cell.LocationFromAddress("A2"), right.Value);
     }
 
     // Verify a binary multiplication formula
@@ -90,12 +93,12 @@ public class FormulaTests {
 
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.MULTIPLY, pn.Op);
-        Assert.IsTrue(pn.Left is TextParseNode);
+        Assert.IsTrue(pn.Left is LocationParseNode);
         Assert.IsTrue(pn.Right is NumberParseNode);
 
-        TextParseNode left = (TextParseNode)pn.Left;
+        LocationParseNode left = (LocationParseNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
-        Assert.AreEqual("A1", left.Value);
+        Assert.AreEqual(Cell.LocationFromAddress("A1"), left.Value);
 
         NumberParseNode right = (NumberParseNode)pn.Right;
         Assert.AreEqual(TokenID.NUMBER, right.Op);
@@ -112,15 +115,15 @@ public class FormulaTests {
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.MINUS, pn.Op);
         Assert.IsTrue(pn.Left is NumberParseNode);
-        Assert.IsTrue(pn.Right is TextParseNode);
+        Assert.IsTrue(pn.Right is LocationParseNode);
 
         NumberParseNode left = (NumberParseNode)pn.Left;
         Assert.AreEqual(TokenID.NUMBER, left.Op);
         Assert.AreEqual(0, left.Value.DoubleValue);
 
-        TextParseNode right = (TextParseNode)pn.Right;
+        LocationParseNode right = (LocationParseNode)pn.Right;
         Assert.AreEqual(TokenID.ADDRESS, right.Op);
-        Assert.AreEqual("B3", right.Value);
+        Assert.AreEqual(Cell.LocationFromAddress("B3"), right.Value);
     }
 
     // Verify a compound expression of multiple operators
@@ -141,6 +144,8 @@ public class FormulaTests {
         NumberParseNode right = (NumberParseNode)pn.Right;
         Assert.AreEqual(TokenID.NUMBER, right.Op);
         Assert.IsTrue(Math.Abs(0.67 - right.Value.DoubleValue) < 0.01);
+
+        Assert.AreEqual("=G190^0.5*(H190+40)>0.67", cell1.Content);
     }
 
     // Verify the <> operator
@@ -150,6 +155,7 @@ public class FormulaTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KNE, pn.Op);
+        Assert.AreEqual("=B4<>0.67", cell1.Content);
     }
 
     // Verify the < operator
@@ -159,6 +165,7 @@ public class FormulaTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KLT, pn.Op);
+        Assert.AreEqual("=B4<P87", cell1.Content);
     }
 
     // Verify the <= operator
@@ -168,6 +175,7 @@ public class FormulaTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KLE, pn.Op);
+        Assert.AreEqual("=896675<=P87", cell1.Content);
     }
 
     // Verify the >= operator
@@ -177,6 +185,7 @@ public class FormulaTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KGE, pn.Op);
+        Assert.AreEqual("=896675>=P87", cell1.Content);
     }
 
     // Verify the = operator
@@ -186,6 +195,7 @@ public class FormulaTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KEQ, pn.Op);
+        Assert.AreEqual("=B4=901200", cell1.Content);
     }
 
     // Verify an exception is thrown when a bad operand is
@@ -217,8 +227,9 @@ public class FormulaTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.MINUS, pn.Op);
-        Assert.IsTrue(pn.Left is TextParseNode);
-        Assert.IsTrue(pn.Right is TextParseNode);
+        Assert.IsTrue(pn.Left is LocationParseNode);
+        Assert.IsTrue(pn.Right is LocationParseNode);
+        Assert.AreEqual("=B4-I87", cell1.Content);
     }
 
     // Verify that specifying a percentage in a number converts it
@@ -234,6 +245,7 @@ public class FormulaTests {
 
         NumberParseNode right = (NumberParseNode)pn.Right;
         Assert.IsTrue(Math.Abs(0.16 - right.Value.DoubleValue) < 0.01);
+        Assert.AreEqual("=A3/0.16", cell1.Content);
     }
 
     // Verify an expression with parenthesis creates the correct
@@ -245,15 +257,20 @@ public class FormulaTests {
 
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.MULTIPLY, pn.Op);
-        Assert.IsTrue(pn.Left is TextParseNode);
+        Assert.IsTrue(pn.Left is LocationParseNode);
         Assert.IsTrue(pn.Right is BinaryOpParseNode);
 
-        TextParseNode left = (TextParseNode)pn.Left;
+        LocationParseNode left = (LocationParseNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
-        Assert.AreEqual("A1", left.Value);
+        Assert.AreEqual(Cell.LocationFromAddress("A1"), left.Value);
 
         BinaryOpParseNode right = (BinaryOpParseNode)pn.Right;
         Assert.AreEqual(TokenID.PLUS, right.Op);
+
+        Assert.AreEqual("=A1*(A2+A3)", cell1.Content);
+
+        CellValue cell3 = new CellValue { Content = "= ( A1 + A2 ) * A3"};
+        Assert.AreEqual("=(A1+A2)*A3", cell3.Content);
 
         // Missing closing parenthesis should throw an exception
         CellValue cell2 = new CellValue { Content = "=A1*(A2+A3"};

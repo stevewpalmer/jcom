@@ -502,7 +502,7 @@ public class CommandBar {
         List<char> inputBuffer = [];
         CellInputResponse response;
         if (cellValue.Type != CellType.NONE) {
-            inputBuffer = [..cellValue.Value.ToCharArray()];
+            inputBuffer = [..cellValue.Content.ToCharArray()];
         }
         int column = inputBuffer.Count;
         do {

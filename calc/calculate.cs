@@ -47,8 +47,8 @@ public class Calculate(Sheet sheet) {
         }
         foreach (Cell cell in formulaCells) {
             try {
-                List<string> referenceList = [
-                    cell.Address
+                List<CellLocation> referenceList = [
+                    cell.Location
                 ];
                 CellParseNode parseNode = cell.CellValue.ParseNode;
                 cell.CellValue.Value = EvaluateNode(parseNode, referenceList).StringValue;
@@ -67,7 +67,7 @@ public class Calculate(Sheet sheet) {
     /// <param name="node">Node to evaluate</param>
     /// <param name="referenceList">List of references</param>
     /// <returns>Value of node</returns>
-    private Variant EvaluateNode(CellParseNode node, List<string> referenceList) {
+    private Variant EvaluateNode(CellParseNode node, List<CellLocation> referenceList) {
         switch (node.Op) {
             case TokenID.NUMBER:
                 NumberParseNode numberNode = (NumberParseNode)node;
@@ -155,11 +155,11 @@ public class Calculate(Sheet sheet) {
             }
 
             case TokenID.ADDRESS: {
-                TextParseNode addressNode = (TextParseNode)node;
+                LocationParseNode addressNode = (LocationParseNode)node;
                 if (referenceList.Contains(addressNode.Value)) {
                     throw new Exception("Circular reference");
                 }
-                Cell cell = sheet.GetCell(Cell.LocationFromAddress(addressNode.Value), false);
+                Cell cell = sheet.GetCell(addressNode.Value, false);
                 CellParseNode parseNode = cell.CellValue.ParseNode;
                 return EvaluateNode(parseNode, referenceList);
             }

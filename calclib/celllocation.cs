@@ -29,7 +29,7 @@ using System.Text.Json.Serialization;
 
 namespace JCalcLib;
 
-public struct CellLocation {
+public struct CellLocation : IEquatable<CellLocation> {
     private int _row = 1;
     private int _column = 1;
 
@@ -62,4 +62,43 @@ public struct CellLocation {
     /// </summary>
     [JsonIgnore]
     public Point Point => new(Column, Row);
+
+    /// <summary>
+    /// Check two cell locations for equality
+    /// </summary>
+    /// <param name="other">CellLocation to compare</param>
+    /// <returns>True if the locations are equal</returns>
+    public bool Equals(CellLocation other) {
+        return _row == other._row && _column == other._column;
+
+    }
+
+    /// <summary>
+    /// Check two cell locations for equality
+    /// </summary>
+    /// <param name="obj">A CellLocation object or null</param>
+    /// <returns>True if the locations are equal</returns>
+    public override bool Equals(object? obj) {
+        return obj is CellLocation other && Equals(other);
+    }
+
+    /// <summary>
+    /// Computes the hash code for the cell location.
+    /// </summary>
+    /// <returns>Hash code value</returns>
+    public override int GetHashCode() {
+        return HashCode.Combine(_row, _column);
+    }
+
+    /// <summary>
+    /// Equality operator
+    /// </summary>
+    public static bool operator ==(CellLocation left, CellLocation right) =>
+        left.Equals(right);
+
+    /// <summary>
+    /// Not equality operator.
+    /// </summary>
+    public static bool operator !=(CellLocation left, CellLocation right) =>
+        !(left == right);
 }

@@ -52,7 +52,7 @@ public class CellValue : IComparable<CellValue> {
             if (_cellParseNode == null) {
                 switch (Type) {
                     case CellType.TEXT:
-                        _cellParseNode = new TextParseNode(TokenID.TEXT, _content);
+                        _cellParseNode = new TextParseNode(_content);
                         break;
                     case CellType.NUMBER:
                         _cellParseNode = new NumberParseNode(double.Parse(_content));
@@ -83,7 +83,7 @@ public class CellValue : IComparable<CellValue> {
     /// </summary>
     [JsonInclude]
     public string Content {
-        get => _content;
+        get => Type == CellType.FORMULA ? $"={ParseNode}" : ParseNode.ToString() ?? "";
         set {
             if (value.Length > 0 && value[0] == '=') {
                 _content = value;
@@ -149,7 +149,7 @@ public class CellValue : IComparable<CellValue> {
     /// Return the raw cell contents.
     /// </summary>
     public string ToText() {
-        return Type == CellType.FORMULA ? _content : ToString();
+        return Type == CellType.FORMULA ? Content : ToString();
     }
 
     /// <summary>

@@ -65,6 +65,19 @@ public class CellTests {
         Assert.Throws(typeof(ArgumentNullException), delegate { Cell.LocationFromAddress(null!); });
     }
 
+    // Verify comparing two cell locations. This exercises the equality
+    // operations on CellLocation.
+    [Test]
+    public void VerifyCompareCellLocations() {
+        CellLocation a1 = Cell.LocationFromAddress("A1");
+        CellLocation a2 = new CellLocation { Row = 1, Column = 1 };
+        Assert.AreEqual(a1, a2);
+        Assert.IsTrue(a1 == a2);
+        Assert.IsFalse(a1 != a2);
+        Assert.IsTrue(a1.Equals((object)a2));
+        Assert.AreEqual(a1.GetHashCode(), a2.GetHashCode());
+    }
+
     // Verify the correct address is returned for a cell
     [Test]
     public void VerifyAddressForColumnAndRow() {

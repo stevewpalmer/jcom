@@ -51,7 +51,7 @@ public class Cell {
     /// represents the cell address on the screen.
     /// </summary>
     [JsonIgnore]
-    public string Address => $"{ColumnToAddress(Location.Column)}{Location.Row}";
+    public string Address => LocationToAddress(Location);
 
     /// <summary>
     /// Return the format description of the current cell.
@@ -104,6 +104,14 @@ public class Cell {
         DateTime dateTime = DateTime.FromOADate(value);
         return dateTime.ToString(pattern);
     }
+
+    /// <summary>
+    /// Convert a CellLocation to its address.
+    /// </summary>
+    /// <param name="location">A CellLocation</param>
+    /// <returns></returns>
+    public static string LocationToAddress(CellLocation location) =>
+        $"{ColumnToAddress(location.Column)}{location.Row}";
 
     /// <summary>
     /// Parse a cell address and return the cell location that
