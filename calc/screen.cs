@@ -67,6 +67,7 @@ public static class Screen {
 
         Command.Refresh();
         Status.Refresh();
+        Version();
     }
 
     /// <summary>
@@ -163,6 +164,13 @@ public static class Screen {
             flags &= ~RenderHint.REFRESH;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Show the editor version on the status bar.
+    /// </summary>
+    private static void Version() {
+        Status.Message($"{AssemblySupport.AssemblyDescription} v{AssemblySupport.AssemblyVersion} - {AssemblySupport.AssemblyCopyright}");
     }
 
     /// <summary>
@@ -279,8 +287,8 @@ public static class Screen {
                     string[]? fields = parser.Record;
                     if (fields != null) {
                         for (int column = 1; column <= fields.Length; column++) {
-                            Cell cell = sheet.Cell(new CellLocation { Column = column, Row = row }, true);
-                            cell.CellValue.Value = fields[column - 1];
+                            Cell cell = sheet.GetCell(new CellLocation { Column = column, Row = row }, true);
+                            cell.CellValue.Content = fields[column - 1];
                         }
                     }
                     row++;

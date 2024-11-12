@@ -1,5 +1,5 @@
-// calclib
-// Window management
+// JCalcLib
+// A cell location
 //
 // Authors:
 //  Steve

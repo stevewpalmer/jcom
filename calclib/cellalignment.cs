@@ -1,5 +1,5 @@
 // JCalcLib
-// Cell format types
+// Cell alignment types
 //
 // Authors:
 //  Steve Palmer

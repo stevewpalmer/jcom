@@ -545,7 +545,7 @@ public class CommandBar {
            }
         } while (true);
 
-        cellValue.Value = string.Join("", inputBuffer);
+        cellValue.Content = string.Join("", inputBuffer);
         ClearRow(_promptRow);
         Terminal.SetCursor(cursorPosition);
         return response;
@@ -682,7 +682,7 @@ public class CommandBar {
             Cell activeCell = _currentSheet.ActiveCell;
             text += $"{activeCell.Address}: {activeCell.FormatDescription} ";
             if (activeCell.CellValue.Type != CellType.NONE) {
-                text += activeCell.CellValue.ToString();
+                text += activeCell.CellValue.ToText();
             }
             Terminal.WriteText(0, _cellStatusRow, _displayWidth, text, _fgColour, _bgColour);
         }

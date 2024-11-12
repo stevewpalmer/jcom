@@ -1,5 +1,5 @@
-// JCalc
-// A single spreadsheet cell
+// JCalcLib
+// A single worksheet cell
 //
 // Authors:
 //  Steve Palmer
@@ -185,7 +185,7 @@ public class Cell {
                 CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
                 CellFormat.DATE_DMY => ToDateTime("d-MMM-yyyy", doubleValue),
                 CellFormat.GENERAL => cellValue,
-                CellFormat.TEXT => cellValue,
+                CellFormat.TEXT => CellValue.ToText(),
                 _ => throw new ArgumentException($"Unknown Cell Format: {Format}")
             };
         }
@@ -200,11 +200,7 @@ public class Cell {
                 CellAlignment.LEFT => cellValue.PadRight(width),
                 CellAlignment.RIGHT => cellValue.PadLeft(width),
                 CellAlignment.CENTRE => Utilities.CentreString(cellValue, width),
-                CellAlignment.GENERAL => CellValue.Type switch {
-                    CellType.TEXT => cellValue.PadRight(width),
-                    CellType.NUMBER => cellValue.PadLeft(width),
-                    _ => "".PadRight(width)
-                },
+                CellAlignment.GENERAL => !isNumber ? cellValue.PadRight(width) : cellValue.PadLeft(width),
                 _ => throw new ArgumentException($"Unknown Cell Alignment: {Alignment}")
             };
         }

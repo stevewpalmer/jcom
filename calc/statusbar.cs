@@ -32,6 +32,7 @@ public class StatusBar {
     private readonly int _statusBarRow;
     private readonly int _statusBarWidth;
     private string _filename;
+    private string _message;
     private ConsoleColor _bgColour;
     private ConsoleColor _fgColour;
 
@@ -42,6 +43,7 @@ public class StatusBar {
         _statusBarRow = Terminal.Height - 1;
         _statusBarWidth = Terminal.Width;
         _filename = string.Empty;
+        _message = string.Empty;
     }
 
     /// <summary>
@@ -55,7 +57,17 @@ public class StatusBar {
     public void Refresh() {
         _fgColour = Screen.Colours.NormalMessageColour;
         _bgColour = Screen.Colours.BackgroundColour;
+        RenderMessage();
         RenderFilename();
+    }
+
+    /// <summary>
+    /// Write a message to the status bar
+    /// </summary>
+    /// <param name="newMessage">Message to display</param>
+    public void Message(string newMessage) {
+        _message = newMessage;
+        RenderMessage();
     }
 
     /// <summary>
@@ -68,9 +80,17 @@ public class StatusBar {
     }
 
     /// <summary>
+    /// Display the application version
+    /// </summary>
+    private void RenderMessage() {
+        Terminal.WriteText(0, _statusBarRow, _statusBarWidth, _message, _fgColour, _bgColour);
+    }
+
+    /// <summary>
     /// Display the filename on the status bar
     /// </summary>
     private void RenderFilename() {
-        Terminal.WriteText(0, _statusBarRow, _statusBarWidth, $"Calc: {_filename}", _fgColour, _bgColour);
+        int pos = _statusBarWidth - _filename.Length;
+        Terminal.WriteText(pos, _statusBarRow, _filename.Length, _filename, _fgColour, _bgColour);
     }
 }

@@ -1,5 +1,5 @@
 // JCalcLib
-// Cell format types
+// Cell value
 //
 // Authors:
 //  Steve Palmer
@@ -23,13 +23,15 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace JCalcLib;
 
 public class CellValue : IComparable<CellValue> {
-    private string _value = string.Empty;
+    private CellParseNode? _cellParseNode;
+    private string _content = string.Empty;
 
     /// <summary>
     /// Cell type
@@ -38,13 +40,61 @@ public class CellValue : IComparable<CellValue> {
     public CellType Type { get; private set; } = CellType.NONE;
 
     /// <summary>
-    /// String representation of content
+    /// Returns the cell parse node that represents this cell value. If
+    /// the cell is a simple literal text or number, it returns a node
+    /// representing that number. If it is a formula, it parses the formula
+    /// and returns the root parse node of the expression tree generated
+    /// from the formula.
     /// </summary>
-    public string Value {
-        get => _value;
+    [JsonIgnore]
+    public CellParseNode ParseNode {
+        get {
+            if (_cellParseNode == null) {
+                switch (Type) {
+                    case CellType.TEXT:
+                        _cellParseNode = new TextParseNode(TokenID.TEXT, _content);
+                        break;
+                    case CellType.NUMBER:
+                        _cellParseNode = new NumberParseNode(double.Parse(_content));
+                        break;
+                    case CellType.FORMULA: {
+                        FormulaParser parser = new FormulaParser(_content[1..]);
+                        _cellParseNode = parser.Parse();
+                        break;
+                    }
+                }
+            }
+            Debug.Assert(_cellParseNode != null);
+            return _cellParseNode;
+        }
+    }
+
+    /// <summary>
+    /// The computed or literal value of the cell.
+    /// </summary>
+    [JsonIgnore]
+    public string Value { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Contents of the cell. This differs from the value in that it holds
+    /// the raw cell content as entered by the user. If the content is a
+    /// formula, the value is evaluated from the content. For other types,
+    /// the content and value are identical.
+    /// </summary>
+    [JsonInclude]
+    public string Content {
+        get => _content;
         set {
-            _value = TryParseDate(value);
-            Type = double.TryParse(_value, out double _) ? CellType.NUMBER : CellType.TEXT;
+            if (value.Length > 0 && value[0] == '=') {
+                _content = value;
+                Value = "0";
+                Type = CellType.FORMULA;
+            }
+            else {
+                _content = TryParseDate(value);
+                Value = _content;
+                Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
+            }
         }
     }
 
@@ -92,7 +142,14 @@ public class CellValue : IComparable<CellValue> {
     /// Return the cell value as a string for display.
     /// </summary>
     public new string ToString() {
-        return Type == CellType.NUMBER ? Value : $"\"{Value}\"";
+        return Type == CellType.TEXT ? $"\"{Value}\"" : Value;
+    }
+
+    /// <summary>
+    /// Return the raw cell contents.
+    /// </summary>
+    public string ToText() {
+        return Type == CellType.FORMULA ? _content : ToString();
     }
 
     /// <summary>

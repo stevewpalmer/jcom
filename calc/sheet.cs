@@ -80,6 +80,8 @@ public class Sheet {
                 if (inputSheet != null) {
                     Location = inputSheet.Location;
                     ColumnList = inputSheet.ColumnList;
+                    Calculate calc = new Calculate(this);
+                    calc.Update();
                 }
             }
             catch (JsonException) {
@@ -114,7 +116,7 @@ public class Sheet {
     /// there is one, or the New File string otherwise.
     /// </summary>
     [JsonIgnore]
-    public string Name => _fileInfo == null ? "New File" : _fileInfo.Name;
+    public string Name => _fileInfo == null ? Consts.DefaultFilename : _fileInfo.Name;
 
     /// <summary>
     /// Return the fully qualified file name with path.
@@ -136,7 +138,7 @@ public class Sheet {
     /// Returns the active cell
     /// </summary>
     [JsonIgnore]
-    public Cell ActiveCell => Cell(Location, false);
+    public Cell ActiveCell => GetCell(Location, false);
 
     /// <summary>
     /// Return the height of a row
@@ -220,7 +222,7 @@ public class Sheet {
     /// <param name="location">Location of cell</param>
     /// <param name="createIfEmpty">Create the cell if it is empty</param>
     /// <returns>The cell at the row</returns>
-    public Cell Cell(CellLocation location, bool createIfEmpty) {
+    public Cell GetCell(CellLocation location, bool createIfEmpty) {
         CellList? cellList = CellListForColumn(location.Column, createIfEmpty);
         Cell cell = new Cell {
             Alignment = Screen.Config.DefaultCellAlignment,
@@ -419,12 +421,12 @@ public class Sheet {
         do {
             sorted = true;
             for (int r = swapExtent.Start.Y; r < swapExtent.End.Y; r++) {
-                Cell cell1 = Cell(new CellLocation { Row = r, Column = sortColumn}, false);
-                Cell cell2 = Cell(new CellLocation { Row = r + 1, Column = sortColumn}, false);
+                Cell cell1 = GetCell(new CellLocation { Row = r, Column = sortColumn}, false);
+                Cell cell2 = GetCell(new CellLocation { Row = r + 1, Column = sortColumn}, false);
                 if (cell1.CellValue.CompareTo(cell2.CellValue) * ordering > 0) {
                     for (int c = swapExtent.Start.X; c <= swapExtent.End.X; c++) {
-                        cell1 = Cell(new CellLocation { Row = r, Column = c}, false);
-                        cell2 = Cell(new CellLocation { Row = r + 1, Column = c}, false);
+                        cell1 = GetCell(new CellLocation { Row = r, Column = c}, false);
+                        cell2 = GetCell(new CellLocation { Row = r + 1, Column = c}, false);
                         cell1.Swap(cell2);
                     }
                     sorted = false;
@@ -473,5 +475,15 @@ public class Sheet {
         }
         ColumnList.Insert(c, new CellList { Index = column, Size = Consts.DefaultColumnWidth });
         return ColumnList[c];
+    }
+
+    /// <summary>
+    /// Set a cell's value and mark the sheet as modified.
+    /// </summary>
+    /// <param name="cell">Cell to be updated</param>
+    /// <param name="value">New value for cell</param>
+    public void SetCellValue(Cell cell, CellValue value) {
+        cell.CellValue = value;
+        Modified = true;
     }
 }

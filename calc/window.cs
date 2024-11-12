@@ -373,7 +373,7 @@ public class Window {
     private void ShowCell(CellLocation location, ConsoleColor fgColour, ConsoleColor bgColour) {
         Terminal.ForegroundColour = fgColour;
         Terminal.BackgroundColour = bgColour;
-        Cell cell = Sheet.Cell(location, false);
+        Cell cell = Sheet.GetCell(location, false);
         Sheet.DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row));
     }
 
@@ -411,7 +411,7 @@ public class Window {
     private RenderHint AlignCells(CellAlignment alignment) {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
-            Sheet.SetCellAlignment(Sheet.Cell(location, true), alignment);
+            Sheet.SetCellAlignment(Sheet.GetCell(location, true), alignment);
         }
         ClearBlock();
         return flags;
@@ -423,7 +423,7 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint DeleteCells() {
         foreach (CellLocation location in RangeIterator()) {
-            Sheet.DeleteCell(Sheet.Cell(location, false));
+            Sheet.DeleteCell(Sheet.GetCell(location, false));
         }
         ClearBlock();
         return RenderHint.CONTENTS;
@@ -456,7 +456,7 @@ public class Window {
             Debug.Assert(decimalPlaces >= formFields[0].MinimumValue && decimalPlaces <= formFields[0].MaximumValue);
         }
         foreach (CellLocation location in RangeIterator()) {
-            Sheet.SetCellFormat(Sheet.Cell(location, true), format, decimalPlaces);
+            Sheet.SetCellFormat(Sheet.GetCell(location, true), format, decimalPlaces);
         }
         ClearBlock();
         return flags;
@@ -581,7 +581,7 @@ public class Window {
                 if (extent.Valid) {
                     for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
                         for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                            Cell cell = Sheet.Cell(new CellLocation { Column = column, Row = row }, false);
+                            Cell cell = Sheet.GetCell(new CellLocation { Column = column, Row = row }, false);
                             csvWriter.WriteField(cell.CellValue.Value);
                         }
                         csvWriter.NextRecord();
@@ -665,14 +665,20 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
-        Cell cell = Sheet.Cell(Sheet.Location, true);
+        Cell cell = Sheet.GetCell(Sheet.Location, true);
         CellValue value = editValue ? cell.CellValue : new CellValue();
         CellInputResponse result = Screen.Command.PromptForCellInput(ref value);
         if (result != CellInputResponse.CANCEL) {
-            cell.CellValue = value;
-            Sheet.DrawCell(cell, GetXPositionOfCell(cell.Location.Column), GetYPositionOfCell(cell.Location.Row));
+
+            Sheet.SetCellValue(cell, value);
+
+            Calculate calc = new Calculate(Sheet);
+            calc.Update();
+            UpdateCells([cell]);
+            UpdateCells(calc.CellsToUpdate);
+
             hint = result switch {
-                CellInputResponse.ACCEPT => RenderHint.CURSOR_STATUS,
+                CellInputResponse.ACCEPT => RenderHint.CURSOR,
                 CellInputResponse.ACCEPT_UP => CursorUp(),
                 CellInputResponse.ACCEPT_DOWN => CursorDown(),
                 CellInputResponse.ACCEPT_LEFT => CursorLeft(),
@@ -681,6 +687,22 @@ public class Window {
             };
         }
         return hint;
+    }
+
+    /// <summary>
+    /// Render a collection of cells
+    /// </summary>
+    /// <param name="cells">List of cells to update</param>
+    private void UpdateCells(List<Cell> cells) {
+        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
+        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
+        foreach (Cell cell in cells) {
+            int x = GetXPositionOfCell(cell.Location.Column);
+            int y = GetYPositionOfCell(cell.Location.Row);
+            if (_sheetBounds.Contains(new Point(x, y))) {
+                Sheet.DrawCell(cell, x, y);
+            }
+        }
     }
 
     /// <summary>

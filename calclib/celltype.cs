@@ -40,5 +40,10 @@ public enum CellType {
     /// <summary>
     /// Text
     /// </summary>
-    TEXT
+    TEXT,
+
+    /// <summary>
+    /// A formula
+    /// </summary>
+    FORMULA
 }
