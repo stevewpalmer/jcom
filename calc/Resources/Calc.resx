@@ -241,7 +241,7 @@
         <value>Backups</value>
     </data>
     <data name="InvalidColourIndex" xml:space="preserve">
-        <value>Invalid colour number {0}</value>
+        <value>Invalid colour number. Colour number range is 0 to {0}</value>
     </data>
     <data name="FormatTextDescription" xml:space="preserve">
         <value>Display formula instead of value</value>

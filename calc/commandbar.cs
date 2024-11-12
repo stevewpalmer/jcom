@@ -711,12 +711,4 @@ public class CommandBar {
     private void PushKey(ConsoleKeyInfo keyToPush) {
         _pushedKey = keyToPush;
     }
-
-    /// <summary>
-    /// Display an error message on the status line.
-    /// </summary>
-    /// <param name="message">Message to display</param>
-    public void Error(string message) {
-        Terminal.WriteText(0, _messageRow, _displayWidth, message, _fgColour, _bgColour);
-    }
 }

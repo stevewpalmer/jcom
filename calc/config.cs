@@ -63,7 +63,7 @@ public class Config {
             });
         }
         catch (Exception e) {
-            Screen.Command.Error(string.Format(Calc.CannotSaveConfigError, e.Message));
+            Screen.Status.Message(string.Format(Calc.CannotSaveConfigError, e.Message));
         }
     }
 

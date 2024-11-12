@@ -374,7 +374,7 @@ public class Window {
         Terminal.ForegroundColour = fgColour;
         Terminal.BackgroundColour = bgColour;
         Cell cell = Sheet.GetCell(location, false);
-        Sheet.DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row));
+        DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row));
     }
 
     /// <summary>
@@ -590,7 +590,7 @@ public class Window {
                 csvWriter.Flush();
             }
             catch (Exception e) {
-                Screen.Command.Error(string.Format(Calc.ErrorExportingFile, inputValue, e.Message));
+                Screen.Status.Message(string.Format(Calc.ErrorExportingFile, inputValue, e.Message));
             }
             flags = RenderHint.NONE;
         }
@@ -700,9 +700,21 @@ public class Window {
             int x = GetXPositionOfCell(cell.Location.Column);
             int y = GetYPositionOfCell(cell.Location.Row);
             if (_sheetBounds.Contains(new Point(x, y))) {
-                Sheet.DrawCell(cell, x, y);
+                DrawCell(cell, x, y);
             }
         }
+    }
+
+    /// <summary>
+    /// Draw this cell at the given cell position (1-based row and column) at
+    /// the given physical screen offset where (0,0) is the top left corner.
+    /// </summary>
+    /// <param name="cell">Cell to draw</param>
+    /// <param name="x">X position of cell</param>
+    /// <param name="y">Y position of cell</param>
+    private void DrawCell(Cell cell, int x, int y) {
+        Terminal.SetCursor(x, y);
+        Terminal.Write(cell.ToString(Sheet.ColumnWidth(cell.Location.Column)));
     }
 
     /// <summary>

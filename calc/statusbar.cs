@@ -33,6 +33,8 @@ public class StatusBar {
     private readonly int _statusBarWidth;
     private string _filename;
     private string _message;
+    private int _maxFilenameWidth;
+    private int _messageWidth;
     private ConsoleColor _bgColour;
     private ConsoleColor _fgColour;
 
@@ -42,6 +44,7 @@ public class StatusBar {
     public StatusBar() {
         _statusBarRow = Terminal.Height - 1;
         _statusBarWidth = Terminal.Width;
+        _messageWidth = _statusBarWidth;
         _filename = string.Empty;
         _message = string.Empty;
     }
@@ -59,6 +62,14 @@ public class StatusBar {
         _bgColour = Screen.Colours.BackgroundColour;
         RenderMessage();
         RenderFilename();
+    }
+
+    /// <summary>
+    /// Clear the message on the status bar.
+    /// </summary>
+    public void ClearMessage() {
+        _message = string.Empty;
+        RenderMessage();
     }
 
     /// <summary>
@@ -80,17 +91,19 @@ public class StatusBar {
     }
 
     /// <summary>
-    /// Display the application version
+    /// Display the message on the status bar.
     /// </summary>
     private void RenderMessage() {
-        Terminal.WriteText(0, _statusBarRow, _statusBarWidth, _message, _fgColour, _bgColour);
+        int width = _statusBarWidth - _maxFilenameWidth;
+        Terminal.WriteText(0, _statusBarRow, width, _message, _fgColour, _bgColour);
     }
 
     /// <summary>
     /// Display the filename on the status bar
     /// </summary>
     private void RenderFilename() {
-        int pos = _statusBarWidth - _filename.Length;
-        Terminal.WriteText(pos, _statusBarRow, _filename.Length, _filename, _fgColour, _bgColour);
+        _maxFilenameWidth = Math.Max(_maxFilenameWidth, _filename.Length);
+        int pos = _statusBarWidth - _maxFilenameWidth;
+        Terminal.WriteText(pos, _statusBarRow, _maxFilenameWidth, _filename.PadLeft(_maxFilenameWidth), _fgColour, _bgColour);
     }
 }

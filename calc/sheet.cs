@@ -86,7 +86,7 @@ public class Sheet {
             }
             catch (JsonException) {
                 FileInfo info = new FileInfo(filename);
-                Screen.Command.Error(string.Format(Calc.ErrorReadingFile, info.Name));
+                Screen.Status.Message(string.Format(Calc.ErrorReadingFile, info.Name));
             }
         }
         Filename = filename;
@@ -162,7 +162,7 @@ public class Sheet {
             });
         }
         catch (Exception e) {
-            Screen.Command.Error(string.Format(Calc.CannotSaveFile, Filename, e.Message));
+            Screen.Status.Message(string.Format(Calc.CannotSaveFile, Filename, e.Message));
         }
         Modified = false;
     }
@@ -202,18 +202,6 @@ public class Sheet {
             c++;
         }
         return success;
-    }
-
-    /// <summary>
-    /// Draw this cell at the given cell position (1-based row and column) at
-    /// the given physical screen offset where (0,0) is the top left corner.
-    /// </summary>
-    /// <param name="cell">Cell to draw</param>
-    /// <param name="x">X position of cell</param>
-    /// <param name="y">Y position of cell</param>
-    public void DrawCell(Cell cell, int x, int y) {
-        Terminal.SetCursor(x, y);
-        Terminal.Write(cell.ToString(ColumnWidth(cell.Location.Column)));
     }
 
     /// <summary>

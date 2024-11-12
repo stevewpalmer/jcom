@@ -16,4 +16,4 @@ the Fortran compiler.
 * stats.f ... Computes the mean and standard deviation of a set of data points.
 * triang.f ... Computes the area of a triangle.
 * vowels.f ... Counts the number of vowels in a string.
-*
+

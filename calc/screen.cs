@@ -128,6 +128,7 @@ public static class Screen {
         if (_activeWindow == null) {
             throw new InvalidOperationException();
         }
+        Status.ClearMessage();
         RenderHint flags = command switch {
             KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
             KeyCommand.KC_FILE_RETRIEVE => RetrieveFile(),
@@ -295,11 +296,11 @@ public static class Screen {
                 }
             }
             catch (CsvHelperException) {
-                Command.Error(string.Format(Calc.BadCSVImportFile, fileInfo.Name));
+                Status.Message(string.Format(Calc.BadCSVImportFile, fileInfo.Name));
                 return RenderHint.NONE;
             }
             catch (FileNotFoundException) {
-                Command.Error(string.Format(Calc.CannotOpenFile, fileInfo.Name));
+                Status.Message(string.Format(Calc.CannotOpenFile, fileInfo.Name));
                 return RenderHint.NONE;
             }
             Window newWindow = new Window(sheet);
@@ -387,7 +388,7 @@ public static class Screen {
             return RenderHint.NONE;
         }
         if (foregroundColour == backgroundColour) {
-            Command.Error(Calc.BackgroundColourError);
+            Status.Message(Calc.BackgroundColourError);
             return RenderHint.NONE;
         }
         if (!GetColourInput(Calc.EnterMessageColour, ref normalMessageColour)) {
@@ -424,7 +425,7 @@ public static class Screen {
         }
         colourValue = formFields[0].Value.IntValue;
         if (colourValue < 0 || colourValue > Colours.MaxColourIndex) {
-            Command.Error(string.Format(Calc.InvalidColourIndex, Colours.MaxColourIndex));
+            Status.Message(string.Format(Calc.InvalidColourIndex, Colours.MaxColourIndex));
             return false;
         }
         return true;
