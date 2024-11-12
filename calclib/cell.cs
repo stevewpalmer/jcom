@@ -225,4 +225,19 @@ public class Cell {
         (Alignment, other.Alignment) = (other.Alignment, Alignment);
         (DecimalPlaces, other.DecimalPlaces) = (other.DecimalPlaces, DecimalPlaces);
     }
+
+    /// <summary>
+    /// If this is a formula cell, this fixes up the address references in the
+    /// formula that refer to the specified row or column by the given offset.
+    /// This method would typically be called when columns or rows are added.
+    /// If either column or row are set to 0, no change is made to that part
+    /// of the location.
+    /// </summary>
+    /// <param name="column">Column to fix</param>
+    /// <param name="row">Row to fix</param>
+    /// <param name="offset">Offset to be applied to the column and/or row</param>
+    public void FixupFormula(int column, int row, int offset) {
+        Debug.Assert(CellValue.Type == CellType.FORMULA);
+        CellValue.ParseNode.FixupAddress(column, row, offset);
+    }
 }

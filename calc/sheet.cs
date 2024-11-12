@@ -51,6 +51,11 @@ public class CellList {
     /// Size of the row or column
     /// </summary>
     public int Size { get; set; }
+
+    /// <summary>
+    /// Return all formula cells on this column
+    /// </summary>
+    public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.CellValue.Type == CellType.FORMULA);
 }
 
 public class Sheet {
@@ -255,6 +260,7 @@ public class Sheet {
             }
             c++;
         }
+        FixupFormulaCells(column, 0, 1);
         Modified = true;
     }
 
@@ -275,6 +281,7 @@ public class Sheet {
             }
             c++;
         }
+        FixupFormulaCells(0, row, 1);
         Modified = true;
     }
 
@@ -301,6 +308,7 @@ public class Sheet {
             }
             c--;
         }
+        FixupFormulaCells(column, 0, -1);
         Modified = true;
     }
 
@@ -328,6 +336,7 @@ public class Sheet {
             }
             c--;
         }
+        FixupFormulaCells(0, row, -1);
         Modified = true;
     }
 
@@ -438,6 +447,19 @@ public class Sheet {
             extent.Add(bottomRight.Value);
         }
         return extent;
+    }
+
+    /// <summary>
+    /// Iterate over all formula cells and fix up any address references
+    /// to the specified column or row by the given offset.
+    /// </summary>
+    /// <param name="column">Column to fix</param>
+    /// <param name="row">Row to fix</param>
+    /// <param name="offset">Offset to be applied to the column and/or row</param>
+    private void FixupFormulaCells(int column, int row, int offset) {
+        foreach (Cell cell in ColumnList.SelectMany(cellList => cellList.FormulaCells)) {
+            cell.FixupFormula(column, row, offset);
+        }
     }
 
     /// <summary>

@@ -83,6 +83,15 @@ public class CellParseNode(TokenID tokenID) {
             TokenID.KNE => "<>",
             _ => ""
         };
+
+    /// <summary>
+    /// Fix up any address references on the node.
+    /// </summary>
+    /// <param name="column">Column to fix</param>
+    /// <param name="row">Row to fix</param>
+    /// <param name="offset">Offset to be applied to the column and/or row</param>
+    public virtual void FixupAddress(int column, int row, int offset) {
+    }
 }
 
 /// <summary>
@@ -102,6 +111,17 @@ public class BinaryOpParseNode(TokenID tokenID, CellParseNode left, CellParseNod
     /// Right child node
     /// </summary>
     public CellParseNode Right { get; } = right;
+
+    /// <summary>
+    /// Fix up any address references on the node.
+    /// </summary>
+    /// <param name="column">Column to fix</param>
+    /// <param name="row">Row to fix</param>
+    /// <param name="offset">Offset to be applied to the column and/or row</param>
+    public override void FixupAddress(int column, int row, int offset) {
+        Left.FixupAddress(column, row, offset);
+        Right.FixupAddress(column, row, offset);
+    }
 
     /// <summary>
     /// Convert this parse node to its string. For binary operations we
@@ -171,7 +191,25 @@ public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRE
     /// <summary>
     /// Value of node
     /// </summary>
-    public CellLocation Value { get; } = value;
+    public CellLocation Value { get; private set; } = value;
+
+    /// <summary>
+    /// Fix up any address references on the node.
+    /// </summary>
+    /// <param name="column">Column to fix</param>
+    /// <param name="row">Row to fix</param>
+    /// <param name="offset">Offset to be applied to the column and/or row</param>
+    public override void FixupAddress(int column, int row, int offset) {
+        CellLocation cellLocation = Value;
+        if (column > 0 && cellLocation.Column >= column) {
+            cellLocation.Column += offset;
+            Value = cellLocation;
+        }
+        if (row > 0 && cellLocation.Row >= row) {
+            cellLocation.Row += offset;
+            Value = cellLocation;
+        }
+    }
 
     /// <summary>
     /// Convert this parse node to its string.

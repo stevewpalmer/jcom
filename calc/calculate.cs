@@ -43,7 +43,7 @@ public class Calculate(Sheet sheet) {
     public void Update() {
         List<Cell> formulaCells = [];
         foreach (CellList cellList in sheet.ColumnList) {
-            formulaCells.AddRange(cellList.Cells.Where(d => d.CellValue.Type == CellType.FORMULA));
+            formulaCells.AddRange(cellList.FormulaCells);
         }
         foreach (Cell cell in formulaCells) {
             try {

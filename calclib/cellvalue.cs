@@ -85,6 +85,7 @@ public class CellValue : IComparable<CellValue> {
     public string Content {
         get => Type == CellType.FORMULA ? $"={ParseNode}" : ParseNode.ToString() ?? "";
         set {
+            _cellParseNode = null;
             if (value.Length > 0 && value[0] == '=') {
                 _content = value;
                 Value = "0";
