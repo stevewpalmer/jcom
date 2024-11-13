@@ -143,6 +143,15 @@ public class Window {
     /// </summary>
     /// <returns>Unapplied render hint</returns>
     private RenderHint ApplyRenderHint(RenderHint flags) {
+        if (flags.HasFlag(RenderHint.RECALCULATE)) {
+            Calculate calc = new Calculate(Sheet);
+            calc.Update();
+            if (!flags.HasFlag(RenderHint.CONTENTS)) {
+                UpdateCells(calc.CellsToUpdate);
+            }
+            Sheet.NeedRecalculate = false;
+            flags &= ~RenderHint.RECALCULATE;
+        }
         if (flags.HasFlag(RenderHint.CONTENTS)) {
             Render();
             flags &= ~RenderHint.CONTENTS | RenderHint.BLOCK;
@@ -503,8 +512,12 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertColumn() {
+        RenderHint flags = RenderHint.CONTENTS;
         Sheet.InsertColumn(Sheet.Location.Column);
-        return RenderHint.CONTENTS;
+        if (Sheet.NeedRecalculate) {
+            flags |= RenderHint.RECALCULATE;
+        }
+        return flags;
     }
 
     /// <summary>
@@ -512,8 +525,12 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertRow() {
+        RenderHint flags = RenderHint.CONTENTS;
         Sheet.InsertRow(Sheet.Location.Row);
-        return RenderHint.CONTENTS;
+        if (Sheet.NeedRecalculate) {
+            flags |= RenderHint.RECALCULATE;
+        }
+        return flags;
     }
 
     /// <summary>
@@ -521,8 +538,12 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteColumn() {
+        RenderHint flags = RenderHint.CONTENTS;
         Sheet.DeleteColumn(Sheet.Location.Column);
-        return RenderHint.CONTENTS;
+        if (Sheet.NeedRecalculate) {
+            flags |= RenderHint.RECALCULATE;
+        }
+        return flags;
     }
 
     /// <summary>
@@ -530,8 +551,12 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteRow() {
+        RenderHint flags = RenderHint.CONTENTS;
         Sheet.DeleteRow(Sheet.Location.Row);
-        return RenderHint.CONTENTS;
+        if (Sheet.NeedRecalculate) {
+            flags |= RenderHint.RECALCULATE;
+        }
+        return flags;
     }
 
     /// <summary>

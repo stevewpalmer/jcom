@@ -90,7 +90,8 @@ public class CellParseNode(TokenID tokenID) {
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public virtual void FixupAddress(int column, int row, int offset) {
+    public virtual bool FixupAddress(int column, int row, int offset) {
+        return false;
     }
 }
 
@@ -118,9 +119,10 @@ public class BinaryOpParseNode(TokenID tokenID, CellParseNode left, CellParseNod
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override void FixupAddress(int column, int row, int offset) {
-        Left.FixupAddress(column, row, offset);
-        Right.FixupAddress(column, row, offset);
+    public override bool FixupAddress(int column, int row, int offset) {
+        bool left = Left.FixupAddress(column, row, offset);
+        bool right = Right.FixupAddress(column, row, offset);
+        return left || right;
     }
 
     /// <summary>
@@ -194,21 +196,40 @@ public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRE
     public CellLocation Value { get; private set; } = value;
 
     /// <summary>
+    /// True if the cell location now contains an error.
+    /// </summary>
+    public bool Error { get; private set; }
+
+    /// <summary>
     /// Fix up any address references on the node.
     /// </summary>
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override void FixupAddress(int column, int row, int offset) {
+    public override bool FixupAddress(int column, int row, int offset) {
         CellLocation cellLocation = Value;
+        bool needRecalculate = false;
         if (column > 0 && cellLocation.Column >= column) {
-            cellLocation.Column += offset;
-            Value = cellLocation;
+            if (cellLocation.Column + offset < 1) {
+                Error = true;
+            }
+            else {
+                cellLocation.Column += offset;
+                Value = cellLocation;
+            }
+            needRecalculate = true;
         }
         if (row > 0 && cellLocation.Row >= row) {
-            cellLocation.Row += offset;
-            Value = cellLocation;
+            if (cellLocation.Row + offset < 1) {
+                Error = true;
+            }
+            else {
+                cellLocation.Row += offset;
+                Value = cellLocation;
+            }
+            needRecalculate = true;
         }
+        return needRecalculate;
     }
 
     /// <summary>
@@ -216,7 +237,7 @@ public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRE
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        return Cell.LocationToAddress(Value);
+        return Error ? "!ERR" : Cell.LocationToAddress(Value);
     }
 }
 

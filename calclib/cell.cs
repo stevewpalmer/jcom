@@ -239,8 +239,8 @@ public class Cell {
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public void FixupFormula(int column, int row, int offset) {
+    public bool FixupFormula(int column, int row, int offset) {
         Debug.Assert(CellValue.Type == CellType.FORMULA);
-        CellValue.ParseNode.FixupAddress(column, row, offset);
+        return CellValue.ParseNode.FixupAddress(column, row, offset);
     }
 }

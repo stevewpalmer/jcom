@@ -117,6 +117,12 @@ public class Sheet {
     public int SheetNumber { get; }
 
     /// <summary>
+    /// Do changes to the sheet require a recalculation?
+    /// </summary>
+    [JsonIgnore]
+    public bool NeedRecalculate { get; set; }
+
+    /// <summary>
     /// Return the name of the sheet. This is the base part of the filename if
     /// there is one, or the New File string otherwise.
     /// </summary>
@@ -457,8 +463,11 @@ public class Sheet {
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     private void FixupFormulaCells(int column, int row, int offset) {
+        NeedRecalculate = false;
         foreach (Cell cell in ColumnList.SelectMany(cellList => cellList.FormulaCells)) {
-            cell.FixupFormula(column, row, offset);
+            if (cell.FixupFormula(column, row, offset)) {
+                NeedRecalculate = true;
+            }
         }
     }
 

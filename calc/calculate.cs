@@ -159,7 +159,13 @@ public class Calculate(Sheet sheet) {
                 if (referenceList.Contains(addressNode.Value)) {
                     throw new Exception("Circular reference");
                 }
+                if (addressNode.Error) {
+                    throw new Exception("Error in address");
+                }
                 Cell cell = sheet.GetCell(addressNode.Value, false);
+                if (cell.CellValue.Type == CellType.NONE) {
+                    return new Variant(0);
+                }
                 CellParseNode parseNode = cell.CellValue.ParseNode;
                 return EvaluateNode(parseNode, referenceList);
             }

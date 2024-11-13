@@ -66,5 +66,10 @@ public enum RenderHint {
     /// <summary>
     /// Update a range selection
     /// </summary>
-    BLOCK = 128
+    BLOCK = 128,
+
+    /// <summary>
+    /// Sheet requires recalculation
+    /// </summary>
+    RECALCULATE = 256
 }
