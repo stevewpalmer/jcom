@@ -714,7 +714,16 @@ public class Window {
     /// <param name="y">Y position of cell</param>
     private void DrawCell(Cell cell, int x, int y) {
         Terminal.SetCursor(x, y);
-        Terminal.Write(cell.ToString(Sheet.ColumnWidth(cell.Location.Column)));
+        int width = Sheet.ColumnWidth(cell.Location.Column);
+        string text = cell.ToString(width);
+        if (x + width > _sheetBounds.Right) {
+            width = _sheetBounds.Right - x;
+            if (width <= 0) {
+                return;
+            }
+            text = text[..width];
+        }
+        Terminal.Write(text);
     }
 
     /// <summary>
@@ -807,12 +816,10 @@ public class Window {
             flags = SaveLastMarkPoint();
             ++sheetLocation.Column;
             Sheet.Location = sheetLocation;
-            if (GetXPositionOfCell(sheetLocation.Column) + Sheet.ColumnWidth(sheetLocation.Column) >= _sheetBounds.Right) {
+            flags |= RenderHint.CURSOR;
+            while (GetXPositionOfCell(sheetLocation.Column) + Sheet.ColumnWidth(sheetLocation.Column) >= _sheetBounds.Right) {
                 ++_scrollOffset.X;
                 flags |= RenderHint.REFRESH;
-            }
-            else {
-                flags |= RenderHint.CURSOR;
             }
         }
         return flags;

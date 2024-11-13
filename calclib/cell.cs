@@ -196,11 +196,14 @@ public class Cell {
                 CellFormat.TEXT => CellValue.ToText(),
                 _ => throw new ArgumentException($"Unknown Cell Format: {Format}")
             };
+            if (cellValue.Length > width) {
+                cellValue = new string('*', width);
+            }
         }
-        if (cellValue.Length > width) {
-            cellValue = new string('*', width);
+        else if (cellValue.Length > width) {
+            cellValue = cellValue[..width];
         }
-        else if (Format == CellFormat.BAR) {
+        if (Format == CellFormat.BAR) {
             cellValue = cellValue.PadRight(width);
         }
         else {
