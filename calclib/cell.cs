@@ -24,16 +24,21 @@
 // under the License.
 
 using System.Diagnostics;
+using System.Drawing;
+using System.Globalization;
 using System.Text.Json.Serialization;
 using JComLib;
 
 namespace JCalcLib;
 
 public class Cell {
+    private CellParseNode? _cellParseNode;
+    private string _content = string.Empty;
 
     /// <summary>
     /// Cell value
     /// </summary>
+    [JsonIgnore]
     public CellValue CellValue { get; set; } = new();
 
     /// <summary>
@@ -88,30 +93,103 @@ public class Cell {
     public int DecimalPlaces { get; set; }
 
     /// <summary>
-    /// Try and convert a value to a date and time string.
+    /// Is this a blank cell?
     /// </summary>
-    /// <param name="pattern">The date/time pattern to use</param>
-    /// <param name="value">Value</param>
-    /// <returns>The date and time as a string</returns>
-    private string ToDateTime(string pattern, double value) {
-        ArgumentNullException.ThrowIfNull(pattern);
-        if (value < -657435.0) {
-            return CellValue.Value;
+    [JsonIgnore]
+    public bool IsEmptyCell => CellValue.Type == CellType.NONE;
+
+    /// <summary>
+    /// Returns the cell parse node that represents this cell value. If
+    /// the cell is a simple literal text or number, it returns a node
+    /// representing that number. If it is a formula, it parses the formula
+    /// and returns the root parse node of the expression tree generated
+    /// from the formula.
+    /// </summary>
+    [JsonIgnore]
+    public CellParseNode ParseNode {
+        get {
+            if (_cellParseNode == null) {
+                if (_cellParseNode == null) {
+                    switch (CellValue.Type) {
+                        case CellType.TEXT:
+                            _cellParseNode = new TextParseNode(_content);
+                            break;
+                        case CellType.NUMBER:
+                            _cellParseNode = new NumberParseNode(double.Parse(_content));
+                            break;
+                        case CellType.FORMULA: {
+                            FormulaParser parser = new FormulaParser(_content[1..], Location);
+                            _cellParseNode = parser.Parse();
+                            break;
+                        }
+                    }
+                }
+            }
+            Debug.Assert(_cellParseNode != null);
+            return _cellParseNode;
         }
-        if (value > 2958465.99999999) {
-            return CellValue.Value;
-        }
-        DateTime dateTime = DateTime.FromOADate(value);
-        return dateTime.ToString(pattern);
     }
 
     /// <summary>
-    /// Convert a CellLocation to its address.
+    /// Contents of the cell. This differs from the value in that it holds
+    /// the raw cell content as entered by the user. If the content is a
+    /// formula, the value is evaluated from the content. For other types,
+    /// the content and value are identical.
+    /// </summary>
+    [JsonInclude]
+    public string Content {
+        get => CellValue.Type == CellType.FORMULA ? $"={ParseNode.ToRawString()}" : CellValue.Value;
+        set {
+            _cellParseNode = null;
+            _content = value;
+            if (value.Length > 0 && value[0] == '=') {
+                CellValue.Value = "0";
+                CellValue.Type = CellType.FORMULA;
+            }
+            else {
+                CellValue.Value = _content;
+                CellValue.Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
+            }
+        }
+    }
+
+    /// <summary>
+    /// The UI view of the content.
+    /// </summary>
+    [JsonIgnore]
+    public string UIContent {
+        get => CellValue.Type == CellType.FORMULA ? $"={ParseNode}" : CellValue.Value;
+        set {
+            _cellParseNode = null;
+            if (value.Length > 0 && value[0] == '=') {
+                _content = value;
+                CellValue.Value = "0";
+                CellValue.Type = CellType.FORMULA;
+            }
+            else {
+                _content = TryParseDate(value);
+                CellValue.Value = _content;
+                CellValue.Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Convert a CellLocation to its absolute address.
+    /// </summary>
+    /// <param name="location">A CellLocation</param>
+    /// <returns>String containing the absolute location</returns>
+    public static string LocationToAddress(CellLocation location) =>
+        $"{ColumnToAddress(location.Column)}{location.Row}";
+
+    /// <summary>
+    /// Convert a CellLocation to its relative address in the format
+    /// R(y)C(x) where y and x are row and column offsets respectively.
     /// </summary>
     /// <param name="location">A CellLocation</param>
     /// <returns></returns>
-    public static string LocationToAddress(CellLocation location) =>
-        $"{ColumnToAddress(location.Column)}{location.Row}";
+    public static string LocationToAddress(Point location) =>
+        $"R({location.Y})C({location.X})";
 
     /// <summary>
     /// Parse a cell address and return the cell location that
@@ -134,6 +212,50 @@ public class Cell {
             index++;
         }
         return new CellLocation { Column = newColumn, Row = newRow };
+    }
+
+    /// <summary>
+    /// Parse a cell relative address of the format R(y)C(x) and return
+    /// a Point that contains (x,y).
+    /// </summary>
+    /// <param name="address">Address string</param>
+    /// <returns>Point contain a relative row and column</returns>
+    public static Point PointFromRelativeAddress(string address) {
+        ArgumentNullException.ThrowIfNull(address);
+        string exceptionString = $"Invalid relative address: {address}";
+        int newColumn = 0;
+        int newRow = 0;
+        int index = 0;
+        int factor = 1;
+        if (address[index++] != 'R' || address[index++] != '(') {
+            throw new ArgumentException(exceptionString);
+        }
+        if (address[index] == '-') {
+            factor = -1;
+            index++;
+        }
+        while (index < address.Length && char.IsDigit(address[index])) {
+            newRow = newRow * 10 + address[index] - '0';
+            index++;
+        }
+        newRow *= factor;
+        if (address[index++] != ')' || address[index++] != 'C' || address[index++] != '(') {
+            throw new ArgumentException(exceptionString);
+        }
+        factor = 1;
+        if (address[index] == '-') {
+            factor = -1;
+            index++;
+        }
+        while (index < address.Length && char.IsDigit(address[index])) {
+            newColumn = newColumn * 10 + address[index] - '0';
+            index++;
+        }
+        newColumn *= factor;
+        if (address[index] != ')') {
+            throw new ArgumentException(exceptionString);
+        }
+        return new Point { X = newColumn, Y = newRow };
     }
 
     /// <summary>
@@ -168,6 +290,13 @@ public class Cell {
     }
 
     /// <summary>
+    /// Return the raw cell contents.
+    /// </summary>
+    public string ToText() {
+        return CellValue.Type == CellType.FORMULA ? UIContent : CellValue.ToString();
+    }
+
+    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
@@ -193,7 +322,7 @@ public class Cell {
                 CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
                 CellFormat.DATE_DMY => ToDateTime("d-MMM-yyyy", doubleValue),
                 CellFormat.GENERAL => cellValue,
-                CellFormat.TEXT => CellValue.ToText(),
+                CellFormat.TEXT => ToText(),
                 _ => throw new ArgumentException($"Unknown Cell Format: {Format}")
             };
             if (cellValue.Length > width) {
@@ -241,6 +370,45 @@ public class Cell {
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     public bool FixupFormula(int column, int row, int offset) {
         Debug.Assert(CellValue.Type == CellType.FORMULA);
-        return CellValue.ParseNode.FixupAddress(column, row, offset);
+        return ParseNode.FixupAddress(column, row, offset);
+    }
+
+    /// <summary>
+    /// Try and convert a value to a date and time string.
+    /// </summary>
+    /// <param name="pattern">The date/time pattern to use</param>
+    /// <param name="value">Value</param>
+    /// <returns>The date and time as a string</returns>
+    private string ToDateTime(string pattern, double value) {
+        ArgumentNullException.ThrowIfNull(pattern);
+        if (value < -657435.0) {
+            return CellValue.Value;
+        }
+        if (value > 2958465.99999999) {
+            return CellValue.Value;
+        }
+        DateTime dateTime = DateTime.FromOADate(value);
+        return dateTime.ToString(pattern);
+    }
+
+    /// <summary>
+    /// Try to parse the value as a date and, if we succeed, return the OADate
+    /// value as a string. Otherwise. return the original value.
+    /// </summary>
+    /// <param name="value">Value to parse</param>
+    /// <returns>OADate value of date, or the original value</returns>
+    private static string TryParseDate(string value) {
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        string compactValue = value.Replace(" ", "");
+        if (DateTime.TryParseExact(compactValue, "d-MMM", culture, DateTimeStyles.None, out DateTime _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        if (DateTime.TryParseExact(compactValue, "MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        if (DateTime.TryParseExact(compactValue, "d-MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        return value;
     }
 }

@@ -336,4 +336,16 @@
     <data name="EnterSortOrder" xml:space="preserve">
         <value>Enter sort order</value>
     </data>
+    <data name="CopyDescription" xml:space="preserve">
+        <value>Copy a range of cells to the clipboard</value>
+    </data>
+    <data name="CutDescription" xml:space="preserve">
+        <value>Delete a range of cells to the clipboard</value>
+    </data>
+    <data name="PasteDescription" xml:space="preserve">
+        <value>Paste cells from the clipboard to the current location</value>
+    </data>
+    <data name="Paste" xml:space="preserve">
+        <value>Paste</value>
+    </data>
 </root>

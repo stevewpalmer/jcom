@@ -47,11 +47,8 @@ public class Calculate(Sheet sheet) {
         }
         foreach (Cell cell in formulaCells) {
             try {
-                List<CellLocation> referenceList = [
-                    cell.Location
-                ];
-                CellParseNode parseNode = cell.CellValue.ParseNode;
-                cell.CellValue.Value = EvaluateNode(parseNode, referenceList).StringValue;
+                CellParseNode parseNode = cell.ParseNode;
+                cell.CellValue.Value = EvaluateNode(parseNode, cell.Location).StringValue;
                 CellsToUpdate.Add(cell);
             }
             catch (Exception) {
@@ -65,9 +62,9 @@ public class Calculate(Sheet sheet) {
     /// the evaluation.
     /// </summary>
     /// <param name="node">Node to evaluate</param>
-    /// <param name="referenceList">List of references</param>
+    /// <param name="sourceCell">Source cell</param>
     /// <returns>Value of node</returns>
-    private Variant EvaluateNode(CellParseNode node, List<CellLocation> referenceList) {
+    private Variant EvaluateNode(CellParseNode node, CellLocation sourceCell) {
         switch (node.Op) {
             case TokenID.NUMBER:
                 NumberParseNode numberNode = (NumberParseNode)node;
@@ -79,95 +76,99 @@ public class Calculate(Sheet sheet) {
 
             case TokenID.EXP: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(Math.Pow(left, right));
             }
 
             case TokenID.PLUS: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left + right);
             }
 
             case TokenID.MINUS: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left - right);
             }
 
             case TokenID.MULTIPLY: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left * right);
             }
 
             case TokenID.DIVIDE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left / right);
             }
 
             case TokenID.KEQ: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(Math.Abs(left - right) < 0.01);
             }
 
             case TokenID.KNE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(Math.Abs(left - right) > 0.01);
             }
 
             case TokenID.KGT: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left > right);
             }
 
             case TokenID.KGE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left >= right);
             }
 
             case TokenID.KLT: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left < right);
             }
 
             case TokenID.KLE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left, referenceList).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right, referenceList).DoubleValue;
+                double left = EvaluateNode(binaryNode.Left, sourceCell).DoubleValue;
+                double right = EvaluateNode(binaryNode.Right, sourceCell).DoubleValue;
                 return new Variant(left <= right);
             }
 
             case TokenID.ADDRESS: {
                 LocationParseNode addressNode = (LocationParseNode)node;
-                if (referenceList.Contains(addressNode.Value)) {
+                if (sourceCell == addressNode.AbsoluteLocation) {
                     throw new Exception("Circular reference");
                 }
                 if (addressNode.Error) {
                     throw new Exception("Error in address");
                 }
-                Cell cell = sheet.GetCell(addressNode.Value, false);
+                CellLocation absoluteLocation = new() {
+                    Column = sourceCell.Column + addressNode.RelativeLocation.X,
+                    Row = sourceCell.Row + addressNode.RelativeLocation.Y
+                };
+                Cell cell = sheet.GetCell(absoluteLocation, false);
                 if (cell.CellValue.Type == CellType.NONE) {
                     return new Variant(0);
                 }
-                CellParseNode parseNode = cell.CellValue.ParseNode;
-                return EvaluateNode(parseNode, referenceList);
+                CellParseNode parseNode = cell.ParseNode;
+                return EvaluateNode(parseNode, cell.Location);
             }
 
             default:

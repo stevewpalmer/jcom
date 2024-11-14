@@ -680,5 +680,29 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("EnterSortOrder", resourceCulture);
             }
         }
+        
+        internal static string CopyDescription {
+            get {
+                return ResourceManager.GetString("CopyDescription", resourceCulture);
+            }
+        }
+        
+        internal static string CutDescription {
+            get {
+                return ResourceManager.GetString("CutDescription", resourceCulture);
+            }
+        }
+        
+        internal static string PasteDescription {
+            get {
+                return ResourceManager.GetString("PasteDescription", resourceCulture);
+            }
+        }
+        
+        internal static string Paste {
+            get {
+                return ResourceManager.GetString("Paste", resourceCulture);
+            }
+        }
     }
 }

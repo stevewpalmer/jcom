@@ -108,8 +108,9 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.Worksheet, SubCommandId = CommandMapID.WORKSHEET },
                 new CommandMapEntry { Name = Calc.Range, SubCommandId = CommandMapID.RANGE },
-                new CommandMapEntry { Name = Calc.Copy, CommandId = KeyCommand.KC_COPY, Description = "Copy a range of cells"},
-                new CommandMapEntry { Name = Calc.Move, CommandId = KeyCommand.KC_MOVE, Description = "Move a cell or range of cells"},
+                new CommandMapEntry { Name = Calc.Copy, CommandId = KeyCommand.KC_COPY, Description = Calc.CopyDescription},
+                new CommandMapEntry { Name = Calc.Move, CommandId = KeyCommand.KC_CUT, Description = Calc.CutDescription},
+                new CommandMapEntry { Name = Calc.Paste, CommandId = KeyCommand.KC_PASTE, Description = Calc.PasteDescription},
                 new CommandMapEntry { Name = Calc.File, SubCommandId = CommandMapID.FILE },
                 new CommandMapEntry { Name = Calc.Settings, SubCommandId = CommandMapID.SETTINGS },
                 new CommandMapEntry { Name = Calc.Quit, CommandId = KeyCommand.KC_QUIT, Description = Calc.QuitCalc}

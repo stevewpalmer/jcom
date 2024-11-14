@@ -55,6 +55,7 @@ public class CellList {
     /// <summary>
     /// Return all formula cells on this column
     /// </summary>
+    [JsonIgnore]
     public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.CellValue.Type == CellType.FORMULA);
 }
 
@@ -497,12 +498,12 @@ public class Sheet {
     }
 
     /// <summary>
-    /// Set a cell's value and mark the sheet as modified.
+    /// Set a cell's content and mark the sheet as modified.
     /// </summary>
     /// <param name="cell">Cell to be updated</param>
-    /// <param name="value">New value for cell</param>
-    public void SetCellValue(Cell cell, CellValue value) {
-        cell.CellValue = value;
+    /// <param name="value">New content for cell</param>
+    public void SetCellContent(Cell cell, string value) {
+        cell.UIContent = value;
         Modified = true;
     }
 }

@@ -26,6 +26,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.Text.Json;
 using CsvHelper;
 using JCalc.Resources;
 using JCalcLib;
@@ -129,9 +130,12 @@ public class Window {
             KeyCommand.KC_INSERT_ROW => InsertRow(),
             KeyCommand.KC_DELETE_COLUMN => DeleteColumn(),
             KeyCommand.KC_DELETE_ROW => DeleteRow(),
-            KeyCommand.KC_DELETE => DeleteCells(),
+            KeyCommand.KC_DELETE => PerformBlockAction(BlockAction.DELETE),
             KeyCommand.KC_RANGE_EXPORT => ExportRange(),
             KeyCommand.KC_RANGE_SORT => SortRange(),
+            KeyCommand.KC_COPY => PerformBlockAction(BlockAction.COPY),
+            KeyCommand.KC_CUT => PerformBlockAction(BlockAction.CUT),
+            KeyCommand.KC_PASTE => Paste(),
             _ => RenderHint.NONE
         };
         return ApplyRenderHint(flags);
@@ -427,15 +431,47 @@ public class Window {
     }
 
     /// <summary>
-    /// Delete a range of cells
+    /// Carry out a block action on the marked range of cells.
     /// </summary>
+    /// <param name="blockAction">Block action to perform</param>
     /// <returns>Render hint</returns>
-    private RenderHint DeleteCells() {
-        foreach (CellLocation location in RangeIterator()) {
-            Sheet.DeleteCell(Sheet.GetCell(location, false));
+    private RenderHint PerformBlockAction(BlockAction blockAction) {
+        RenderHint flags = RenderHint.CURSOR;
+        if (blockAction.HasFlag(BlockAction.COPY)) {
+            IEnumerable<Cell> cells = RangeIterator().Select(location => Sheet.GetCell(location, false)).Where(cell => !cell.IsEmptyCell);
+            Clipboard.Data = JsonSerializer.Serialize(cells);
+        }
+        if (blockAction.HasFlag(BlockAction.DELETE)) {
+            foreach (CellLocation location in RangeIterator()) {
+                Sheet.DeleteCell(Sheet.GetCell(location, false));
+            }
         }
         ClearBlock();
-        return RenderHint.CONTENTS;
+        return flags;
+    }
+
+    /// <summary>
+    /// Paste cells from the clipboard to the current location.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint Paste() {
+        RenderHint flags = RenderHint.NONE;
+        List<Cell>? cellsToPaste = JsonSerializer.Deserialize<List<Cell>>(Clipboard.Data);
+        if (cellsToPaste != null) {
+            CellLocation current = Sheet.Location;
+
+            foreach (Cell cellToPaste in cellsToPaste) {
+                Cell cell = Sheet.GetCell(current, true);
+                cell.Format = cellToPaste.Format;
+                cell.Alignment = cellToPaste.Alignment;
+                cell.CellValue = cellToPaste.CellValue;
+                cell.DecimalPlaces = cellToPaste.DecimalPlaces;
+                cell.Content = cellToPaste.Content;
+                ++current.Row;
+            }
+            flags = RenderHint.RECALCULATE | RenderHint.CONTENTS;
+        }
+        return flags;
     }
 
     /// <summary>
@@ -691,11 +727,11 @@ public class Window {
     private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
         Cell cell = Sheet.GetCell(Sheet.Location, true);
-        CellValue value = editValue ? cell.CellValue : new CellValue();
-        CellInputResponse result = Screen.Command.PromptForCellInput(ref value);
+        string cellValue = editValue ? cell.UIContent : string.Empty;
+        CellInputResponse result = Screen.Command.PromptForCellInput(ref cellValue);
         if (result != CellInputResponse.CANCEL) {
 
-            Sheet.SetCellValue(cell, value);
+            Sheet.SetCellContent(cell, cellValue);
 
             Calculate calc = new Calculate(Sheet);
             calc.Update();

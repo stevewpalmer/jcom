@@ -492,17 +492,17 @@ public class CommandBar {
     }
 
     /// <summary>
-    /// Prompt for a cell input value.
+    /// Edit a cell content.
     /// </summary>
-    /// <param name="cellValue">Output value</param>
+    /// <param name="cellValue">Reference to value being edited</param>
     /// <returns>A CellInputResponse indicating how the input was completed</returns>
-    public CellInputResponse PromptForCellInput(ref CellValue cellValue) {
+    public CellInputResponse PromptForCellInput(ref string cellValue) {
         Point cursorPosition = Terminal.GetCursor();
 
         List<char> inputBuffer = [];
         CellInputResponse response;
-        if (cellValue.Type != CellType.NONE) {
-            inputBuffer = [..cellValue.Content.ToCharArray()];
+        if (!string.IsNullOrEmpty(cellValue)) {
+            inputBuffer = [..cellValue.ToCharArray()];
         }
         int column = inputBuffer.Count;
         do {
@@ -545,7 +545,7 @@ public class CommandBar {
            }
         } while (true);
 
-        cellValue.Content = string.Join("", inputBuffer);
+        cellValue = string.Join("", inputBuffer);
         ClearRow(_promptRow);
         Terminal.SetCursor(cursorPosition);
         return response;
@@ -681,8 +681,8 @@ public class CommandBar {
             string text = $"{(char)(_currentSheet.SheetNumber - 1 + 'A')}:";
             Cell activeCell = _currentSheet.ActiveCell;
             text += $"{activeCell.Address}: {activeCell.FormatDescription} ";
-            if (activeCell.CellValue.Type != CellType.NONE) {
-                text += activeCell.CellValue.ToText();
+            if (!activeCell.IsEmptyCell) {
+                text += activeCell.ToText();
             }
             Terminal.WriteText(0, _cellStatusRow, _displayWidth, text, _fgColour, _bgColour);
         }

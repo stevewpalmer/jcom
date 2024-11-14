@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using JComLib;
 
@@ -85,6 +86,12 @@ public class CellParseNode(TokenID tokenID) {
         };
 
     /// <summary>
+    /// Convert this parse node to its raw string.
+    /// </summary>
+    /// <returns>String</returns>
+    public virtual string ToRawString() => string.Empty;
+
+    /// <summary>
     /// Fix up any address references on the node.
     /// </summary>
     /// <param name="column">Column to fix</param>
@@ -126,14 +133,28 @@ public class BinaryOpParseNode(TokenID tokenID, CellParseNode left, CellParseNod
     }
 
     /// <summary>
+    /// Convert this parse node to its raw string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToRawString() {
+        string left = Left.ToRawString();
+        string right = Right.ToRawString();
+        return FormatToString(left, right);
+    }
+
+    /// <summary>
     /// Convert this parse node to its string. For binary operations we
     /// add the appropriate parenthesis if the precedence of either side
     /// of the expression is less than this one.
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        string? left = Left.ToString();
-        string? right = Right.ToString();
+        string left = Left.ToString()!;
+        string right = Right.ToString()!;
+        return FormatToString(left, right);
+    }
+
+    private string FormatToString(string left, string right) {
         if (FormulaParser.Precedence(Op) > FormulaParser.Precedence(Left.Op)) {
             left = $"({left})";
         }
@@ -156,6 +177,12 @@ public class NumberParseNode(double value) : CellParseNode(TokenID.NUMBER) {
     public Variant Value { get; } = new(value);
 
     /// <summary>
+    /// Convert this parse node to its raw string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToRawString() => ToString();
+
+    /// <summary>
     /// Convert this parse node to its string.
     /// </summary>
     /// <returns>String</returns>
@@ -176,6 +203,12 @@ public class TextParseNode(string value) : CellParseNode(TokenID.TEXT) {
     public string Value { get; } = value;
 
     /// <summary>
+    /// Convert this parse node to its raw string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToRawString() => ToString();
+
+    /// <summary>
     /// Convert this parse node to its string.
     /// </summary>
     /// <returns>String</returns>
@@ -187,13 +220,18 @@ public class TextParseNode(string value) : CellParseNode(TokenID.TEXT) {
 /// <summary>
 /// Represents a parse node that holds a relative cell location.
 /// </summary>
-/// <param name="value">String value</param>
-public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRESS) {
+/// <param name="absoluteLocation">String value</param>
+public class LocationParseNode(CellLocation absoluteLocation, Point relativeLocation) : CellParseNode(TokenID.ADDRESS) {
 
     /// <summary>
-    /// Value of node
+    /// Absolute location
     /// </summary>
-    public CellLocation Value { get; private set; } = value;
+    public CellLocation AbsoluteLocation { get; private set; } = absoluteLocation;
+
+    /// <summary>
+    /// Absolute location
+    /// </summary>
+    public Point RelativeLocation { get; private set; } = relativeLocation;
 
     /// <summary>
     /// True if the cell location now contains an error.
@@ -207,7 +245,7 @@ public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRE
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     public override bool FixupAddress(int column, int row, int offset) {
-        CellLocation cellLocation = Value;
+        CellLocation cellLocation = AbsoluteLocation;
         bool needRecalculate = false;
         if (column > 0 && cellLocation.Column >= column) {
             if (cellLocation.Column + offset < 1) {
@@ -215,7 +253,8 @@ public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRE
             }
             else {
                 cellLocation.Column += offset;
-                Value = cellLocation;
+                RelativeLocation = RelativeLocation with { X = RelativeLocation.X + offset };
+                AbsoluteLocation = cellLocation;
             }
             needRecalculate = true;
         }
@@ -225,7 +264,8 @@ public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRE
             }
             else {
                 cellLocation.Row += offset;
-                Value = cellLocation;
+                RelativeLocation = RelativeLocation with { Y = RelativeLocation.Y + offset };
+                AbsoluteLocation = cellLocation;
             }
             needRecalculate = true;
         }
@@ -233,11 +273,20 @@ public class LocationParseNode(CellLocation value) : CellParseNode(TokenID.ADDRE
     }
 
     /// <summary>
+    /// Convert this parse node to its raw string. The raw string is the internal
+    /// representation used for copying cells in a location independent way.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToRawString() {
+        return Error ? "!ERR" : Cell.LocationToAddress(RelativeLocation);
+    }
+
+    /// <summary>
     /// Convert this parse node to its string.
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        return Error ? "!ERR" : Cell.LocationToAddress(Value);
+        return Error ? "!ERR" : Cell.LocationToAddress(AbsoluteLocation);
     }
 }
 
@@ -254,15 +303,18 @@ public class FormulaParser {
     private char _pushedChar;
     private SimpleToken? _pushedToken;
     private int _tindex;
+    private readonly CellLocation _location;
 
     /// <summary>
     /// Initialise a formula parser with the specified input and create
     /// a token queue.
     /// </summary>
     /// <param name="line">Formula to be parsed</param>
+    /// <param name="location">Location of cell containing formula being parsed</param>
     /// <exception cref="Exception">Errors found in the formula expression</exception>
-    public FormulaParser(string line) {
+    public FormulaParser(string line, CellLocation location) {
         _line = line.Trim();
+        _location = location;
         _index = 0;
         _tindex = 0;
         _pushedToken = null;
@@ -282,6 +334,31 @@ public class FormulaParser {
                         tokens.Add(ParseNumber());
                     }
                     break;
+
+                case 'R' when PeekChar() == '(': {
+                    StringBuilder str = new();
+                    str.Append(ch);
+                    ch = GetChar();
+                    str.Append(ch);
+                    ch = GetChar();
+                    while (char.IsDigit(ch) || ch == '-') {
+                        str.Append(ch);
+                        ch = GetChar();
+                    }
+                    str.Append(ch);
+                    ch = GetChar();
+                    str.Append(ch);
+                    ch = GetChar();
+                    str.Append(ch);
+                    ch = GetChar();
+                    while (char.IsDigit(ch) || ch == '-') {
+                        str.Append(ch);
+                        ch = GetChar();
+                    }
+                    str.Append(ch);
+                    tokens.Add(new CellAddressToken(str.ToString()));
+                    break;
+                }
 
                 case >= 'A' and <= 'Z' or >= 'a' and <= 'z': {
                     StringBuilder str = new();
@@ -550,7 +627,17 @@ public class FormulaParser {
 
             case TokenID.ADDRESS: {
                 CellAddressToken identToken = (CellAddressToken)token;
-                return new LocationParseNode(Cell.LocationFromAddress(identToken.Address));
+                CellLocation absoluteLocation;
+                Point relativeLocation;
+                if (identToken.Address.StartsWith('R')) {
+                    relativeLocation = Cell.PointFromRelativeAddress(identToken.Address);
+                    absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row};
+                }
+                else {
+                    absoluteLocation = Cell.LocationFromAddress(identToken.Address);
+                    relativeLocation = new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
+                }
+                return new LocationParseNode(absoluteLocation, relativeLocation);
             }
         }
         throw new FormatException("Invalid operand.");

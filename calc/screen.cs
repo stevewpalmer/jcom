@@ -289,7 +289,7 @@ public static class Screen {
                     if (fields != null) {
                         for (int column = 1; column <= fields.Length; column++) {
                             Cell cell = sheet.GetCell(new CellLocation { Column = column, Row = row }, true);
-                            cell.CellValue.Content = fields[column - 1];
+                            cell.Content = fields[column - 1];
                         }
                     }
                     row++;
