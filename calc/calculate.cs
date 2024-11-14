@@ -75,6 +75,8 @@ public class Calculate(Sheet sheet) {
                 TextParseNode textNode = (TextParseNode)node;
                 return new Variant(textNode.Value);
 
+            case TokenID.KSUM: return KSum(node);
+
             case TokenID.EXP: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
                 double left = EvaluateNode(binaryNode.Left).DoubleValue;
@@ -161,10 +163,7 @@ public class Calculate(Sheet sheet) {
                     throw new Exception("Error in address");
                 }
                 CellLocation sourceCell = referenceList.First();
-                CellLocation absoluteLocation = new() {
-                    Column = sourceCell.Column + addressNode.RelativeLocation.X,
-                    Row = sourceCell.Row + addressNode.RelativeLocation.Y
-                };
+                CellLocation absoluteLocation = addressNode.ToAbsolute(sourceCell);
                 Cell cell = sheet.GetCell(absoluteLocation, false);
                 if (cell.IsEmptyCell) {
                     return new Variant(0);
@@ -179,5 +178,31 @@ public class Calculate(Sheet sheet) {
                 Debug.Assert(false, "Unhandled Token");
                 return null;
         }
+    }
+
+    /// <summary>
+    /// Calculate the result of the SUM function
+    /// </summary>
+    /// <param name="node">SUM function parse node</param>
+    /// <returns>The result of the function as a Variant</returns>
+    private Variant KSum(CellParseNode node) {
+        Debug.Assert(node is RangeParseNode);
+        RangeParseNode rangeNode = (RangeParseNode)node;
+        CellLocation sourceCell = referenceList.First();
+        Variant sumTotal = new Variant(0);
+        foreach (CellLocation location in rangeNode.RangeIterator(sourceCell)) {
+            Variant result;
+            Cell cell = sheet.GetCell(location, false);
+            if (cell.IsEmptyCell) {
+                result = new Variant(0);
+            }
+            else {
+                referenceList.Push(cell.Location);
+                result = EvaluateNode(cell.ParseNode);
+                referenceList.Pop();
+            }
+            sumTotal += result;
+        }
+        return sumTotal;
     }
 }

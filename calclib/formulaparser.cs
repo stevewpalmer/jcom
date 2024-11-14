@@ -50,7 +50,9 @@ public enum TokenID {
     KGT,
     EXP,
     EOL,
-    TEXT
+    TEXT,
+    KSUM,
+    COLON
 }
 
 /// <summary>
@@ -90,6 +92,8 @@ public class CellParseNode(TokenID tokenID) {
             TokenID.KGT => ">",
             TokenID.KEQ => "=",
             TokenID.KNE => "<>",
+            TokenID.COLON => ":",
+            TokenID.KSUM => "SUM",
             _ => ""
         };
 
@@ -228,7 +232,8 @@ public class TextParseNode(string value) : CellParseNode(TokenID.TEXT) {
 /// <summary>
 /// Represents a parse node that holds a relative cell location.
 /// </summary>
-/// <param name="absoluteLocation">String value</param>
+/// <param name="absoluteLocation">Absolute location</param>
+/// <param name="relativeLocation">Relative location</param>
 public class LocationParseNode(CellLocation absoluteLocation, Point relativeLocation) : CellParseNode(TokenID.ADDRESS) {
 
     /// <summary>
@@ -296,6 +301,84 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
     public override string ToString() {
         return Error ? "!ERR" : Cell.LocationToAddress(AbsoluteLocation);
     }
+
+    /// <summary>
+    /// Convert the relative address to an absolute cell reference
+    /// </summary>
+    /// <returns>CellLocation</returns>
+    public CellLocation ToAbsolute(CellLocation sourceCell) {
+        return new CellLocation {
+            Column = sourceCell.Column + RelativeLocation.X,
+            Row = sourceCell.Row + RelativeLocation.Y
+        };
+    }
+}
+
+/// <summary>
+/// A cell range of the format Start:End where Start and End are each
+/// a LocationParseNode.
+/// </summary>
+/// <param name="start">Start of range</param>
+/// <param name="end">End of range</param>
+public class RangeParseNode(TokenID tokenID, LocationParseNode start, LocationParseNode end) : CellParseNode(tokenID) {
+
+    /// <summary>
+    /// Start of range
+    /// </summary>
+    public LocationParseNode RangeStart { get; } = start;
+
+    /// <summary>
+    /// End of range
+    /// </summary>
+    public LocationParseNode RangeEnd { get; } = end;
+
+    /// <summary>
+    /// Fix up any address references on the node.
+    /// </summary>
+    /// <param name="column">Column to fix</param>
+    /// <param name="row">Row to fix</param>
+    /// <param name="offset">Offset to be applied to the column and/or row</param>
+    public override bool FixupAddress(int column, int row, int offset) {
+        bool start = RangeStart.FixupAddress(column, row, offset);
+        bool end = RangeEnd.FixupAddress(column, row, offset);
+        return start || end;
+    }
+
+    /// <summary>
+    /// Convert this parse node to its raw string. The raw string is the internal
+    /// representation used for copying cells in a location independent way.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToRawString() {
+        return $"{TokenToString(Op)}({RangeStart.ToRawString()}:{RangeEnd.ToRawString()})";
+    }
+
+    /// <summary>
+    /// Convert this parse node to its string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToString() {
+        return $"{TokenToString(Op)}({RangeStart}:{RangeEnd})";
+    }
+
+    /// <summary>
+    /// Return an iterator over the range defined by the start and end.
+    /// </summary>
+    /// <returns>The next cell location in the iterator, or null</returns>
+    public IEnumerable<CellLocation> RangeIterator(CellLocation sourceCell) {
+        CellLocation rangeStart = RangeStart.ToAbsolute(sourceCell);
+        CellLocation rangeEnd = RangeEnd.ToAbsolute(sourceCell);
+        int startColumn = Math.Min(rangeStart.Column, rangeEnd.Column);
+        int endColumn = Math.Max(rangeStart.Column, rangeEnd.Column);
+        int startRow = Math.Min(rangeStart.Row, rangeEnd.Row);
+        int endRow = Math.Max(rangeStart.Row, rangeEnd.Row);
+
+        for (int column = startColumn; column <= endColumn; column++) {
+            for (int row = startRow; row <= endRow; row++) {
+                yield return new CellLocation { Column = column, Row = row };
+            }
+        }
+    }
 }
 
 /// <summary>
@@ -314,6 +397,13 @@ public class FormulaParser {
     private readonly CellLocation _location;
 
     private const string InvalidFormulaError = "Invalid formula";
+
+    /// <summary>
+    /// List of built-in functions
+    /// </summary>
+    private readonly Dictionary<string, TokenID> _functions = new() {
+        { "SUM", TokenID.KSUM }
+    };
 
     /// <summary>
     /// Initialise a formula parser with the specified input and create
@@ -391,10 +481,15 @@ public class FormulaParser {
                         ch = GetChar();
                     }
                     PushChar(ch);
-                    if (str.Length > 6) {
-                        throw new FormatException(InvalidFormulaError);
+                    if (_functions.TryGetValue(str.ToString().ToUpper(), out TokenID tokenId)) {
+                        tokens.Add(new SimpleToken(tokenId));
                     }
-                    tokens.Add(new CellAddressToken(CellAddressFormat.ABSOLUTE, str.ToString()));
+                    else {
+                        if (str.Length > 6) {
+                            throw new FormatException(InvalidFormulaError);
+                        }
+                        tokens.Add(new CellAddressToken(CellAddressFormat.ABSOLUTE, str.ToString()));
+                    }
                     break;
                 }
 
@@ -414,6 +509,7 @@ public class FormulaParser {
                 case '*': tokens.Add(new SimpleToken(TokenID.MULTIPLY)); break;
                 case '/': tokens.Add(new SimpleToken(TokenID.DIVIDE)); break;
                 case '^': tokens.Add(new SimpleToken(TokenID.EXP)); break;
+                case ':': tokens.Add(new SimpleToken(TokenID.COLON)); break;
 
                 case '<':
                     ch = GetChar();
@@ -550,7 +646,7 @@ public class FormulaParser {
 
     /// Read the next character from the stream. If we reach the end of the line check
     /// the next one for a continuation character. If one is found, consume
-    /// the new line and return the next character. Otherwise return EOL.
+    /// the new line and return the next character. Otherwise, return EOL.
     private char GetChar() {
         if (_pushedChar != '\0') {
             char ch = _pushedChar;
@@ -650,6 +746,22 @@ public class FormulaParser {
                 return node;
             }
 
+            case TokenID.KSUM: {
+                ExpectToken(TokenID.LPAREN);
+                CellParseNode start = Operand();
+                if (start is not LocationParseNode startRange) {
+                    throw new FormatException(InvalidFormulaError);
+                }
+                ExpectToken(TokenID.COLON);
+                CellParseNode end = Operand();
+                if (end is not LocationParseNode endRange) {
+                    throw new FormatException(InvalidFormulaError);
+                }
+                RangeParseNode rangeNode = new(TokenID.KSUM, startRange, endRange);
+                ExpectToken(TokenID.RPAREN);
+                return rangeNode;
+            }
+
             case TokenID.PLUS:
                 return Operand();
 
@@ -734,7 +846,7 @@ public class FormulaParser {
         /// <summary>
         /// Format of cell address. Relative or absolute
         /// </summary>
-        public CellAddressFormat Format { get; init; }
+        public CellAddressFormat Format { get; }
 
         /// <summary>
         /// Returns the identifier name.
