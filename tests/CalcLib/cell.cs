@@ -300,6 +300,13 @@ public class CellTests {
             Format = CellFormat.TEXT,
             DecimalPlaces = 2
         }.ToString(8));
+        Assert.AreEqual("HELLO WO", new Cell {
+            CellValue = new CellValue {
+                Value = "HELLO WORLD!"
+            },
+            Alignment = CellAlignment.LEFT,
+            Format = CellFormat.TEXT
+        }.ToString(8));
     }
 
     // Verify alignments

@@ -40,5 +40,5 @@ public enum BlockAction {
     /// <summary>
     /// Cut selected cells to the clipboard
     /// </summary>
-    CUT = COPY | DELETE,
+    CUT = COPY | DELETE
 }

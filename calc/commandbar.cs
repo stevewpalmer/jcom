@@ -44,6 +44,11 @@ public class KeyMap {
     /// Associated command ID
     /// </summary>
     public KeyCommand CommandId { get; init; }
+
+    /// <summary>
+    /// Modifier key, if applicable
+    /// </summary>
+    public ConsoleModifiers Modifier { get; init; } = ConsoleModifiers.None;
 }
 
 /// <summary>
@@ -234,7 +239,10 @@ public class CommandBar {
         new() { Key = ConsoleKey.F2, CommandId = KeyCommand.KC_EDIT },
         new() { Key = ConsoleKey.F5, CommandId = KeyCommand.KC_GOTO },
         new() { Key = ConsoleKey.Delete, CommandId = KeyCommand.KC_DELETE },
-        new() { Key = ConsoleKey.F6, CommandId = KeyCommand.KC_NEXT_WINDOW }
+        new() { Key = ConsoleKey.F6, CommandId = KeyCommand.KC_NEXT_WINDOW },
+        new() { Key = ConsoleKey.C, Modifier = ConsoleModifiers.Control, CommandId = KeyCommand.KC_COPY },
+        new() { Key = ConsoleKey.X, Modifier = ConsoleModifiers.Control, CommandId = KeyCommand.KC_CUT },
+        new() { Key = ConsoleKey.V, Modifier = ConsoleModifiers.Control, CommandId = KeyCommand.KC_PASTE }
     ];
 
     private readonly int _cellStatusRow;
@@ -302,7 +310,7 @@ public class CommandBar {
             return KeyCommand.KC_MARK;
         }
         foreach (KeyMap command in KeyTable) {
-            if (command.Key == keyIn.Key) {
+            if (command.Key == keyIn.Key && command.Modifier == keyIn.Modifiers) {
                 return command.CommandId;
             }
         }

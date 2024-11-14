@@ -118,8 +118,7 @@ public class Cell {
                             _cellParseNode = new NumberParseNode(double.Parse(_content));
                             break;
                         case CellType.FORMULA: {
-                            FormulaParser parser = new FormulaParser(_content[1..], Location);
-                            _cellParseNode = parser.Parse();
+                            TryParseFormula(_content, Location, out _cellParseNode);
                             break;
                         }
                     }
@@ -131,10 +130,7 @@ public class Cell {
     }
 
     /// <summary>
-    /// Contents of the cell. This differs from the value in that it holds
-    /// the raw cell content as entered by the user. If the content is a
-    /// formula, the value is evaluated from the content. For other types,
-    /// the content and value are identical.
+    /// Contents of the cell as set from a data file.
     /// </summary>
     [JsonInclude]
     public string Content {
@@ -142,7 +138,7 @@ public class Cell {
         set {
             _cellParseNode = null;
             _content = value;
-            if (value.Length > 0 && value[0] == '=') {
+            if (TryParseFormula(value, Location, out CellParseNode? _)) {
                 CellValue.Value = "0";
                 CellValue.Type = CellType.FORMULA;
             }
@@ -161,7 +157,7 @@ public class Cell {
         get => CellValue.Type == CellType.FORMULA ? $"={ParseNode}" : CellValue.Value;
         set {
             _cellParseNode = null;
-            if (value.Length > 0 && value[0] == '=') {
+            if (TryParseFormula(value, Location, out CellParseNode? _)) {
                 _content = value;
                 CellValue.Value = "0";
                 CellValue.Type = CellType.FORMULA;
@@ -227,10 +223,10 @@ public class Cell {
         int newRow = 0;
         int index = 0;
         int factor = 1;
-        if (address[index++] != 'R' || address[index++] != '(') {
+        if (index < address.Length - 2 && address[index++] != 'R' || address[index++] != '(') {
             throw new ArgumentException(exceptionString);
         }
-        if (address[index] == '-') {
+        if (index < address.Length && address[index] == '-') {
             factor = -1;
             index++;
         }
@@ -239,11 +235,11 @@ public class Cell {
             index++;
         }
         newRow *= factor;
-        if (address[index++] != ')' || address[index++] != 'C' || address[index++] != '(') {
+        if (index < address.Length - 3 && address[index++] != ')' || address[index++] != 'C' || address[index++] != '(') {
             throw new ArgumentException(exceptionString);
         }
         factor = 1;
-        if (address[index] == '-') {
+        if (index < address.Length && address[index] == '-') {
             factor = -1;
             index++;
         }
@@ -252,7 +248,7 @@ public class Cell {
             index++;
         }
         newColumn *= factor;
-        if (address[index] != ')') {
+        if (index >= address.Length || address[index] != ')') {
             throw new ArgumentException(exceptionString);
         }
         return new Point { X = newColumn, Y = newRow };
@@ -389,6 +385,29 @@ public class Cell {
         }
         DateTime dateTime = DateTime.FromOADate(value);
         return dateTime.ToString(pattern);
+    }
+
+    /// <summary>
+    /// Validate that a string parses to a valid formula. It only checks the
+    /// formula syntax and does not attempt to evaluate it.
+    /// </summary>
+    /// <param name="formula">String to verify</param>
+    /// <param name="location">Location of cell containing formula</param>
+    /// <param name="cellParseNode">Set to the generated parse tree root</param>
+    /// <returns>True if formula is valid, false otherwise</returns>
+    private static bool TryParseFormula(string formula, CellLocation location, out CellParseNode? cellParseNode) {
+        if (formula.Length == 0 || formula[0] != '=') {
+            cellParseNode = null;
+            return false;
+        }
+        try {
+            FormulaParser parser = new FormulaParser(formula[1..], location);
+            cellParseNode = parser.Parse();
+            return true;
+        } catch (FormatException) {
+            cellParseNode = null;
+            return false;
+        }
     }
 
     /// <summary>

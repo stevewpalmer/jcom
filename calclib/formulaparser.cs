@@ -54,6 +54,14 @@ public enum TokenID {
 }
 
 /// <summary>
+/// Cell address format
+/// </summary>
+public enum CellAddressFormat {
+    RELATIVE,
+    ABSOLUTE
+}
+
+/// <summary>
 /// Basic cell parse node
 /// </summary>
 /// <param name="tokenID">Node token ID</param>
@@ -305,6 +313,8 @@ public class FormulaParser {
     private int _tindex;
     private readonly CellLocation _location;
 
+    private const string InvalidFormulaError = "Invalid formula";
+
     /// <summary>
     /// Initialise a formula parser with the specified input and create
     /// a token queue.
@@ -338,25 +348,35 @@ public class FormulaParser {
                 case 'R' when PeekChar() == '(': {
                     StringBuilder str = new();
                     str.Append(ch);
+                    str.Append(ExpectChar('('));
                     ch = GetChar();
-                    str.Append(ch);
-                    ch = GetChar();
-                    while (char.IsDigit(ch) || ch == '-') {
+                    if (ch == '-') {
                         str.Append(ch);
                         ch = GetChar();
                     }
-                    str.Append(ch);
-                    ch = GetChar();
-                    str.Append(ch);
-                    ch = GetChar();
-                    str.Append(ch);
-                    ch = GetChar();
-                    while (char.IsDigit(ch) || ch == '-') {
+                    while (char.IsDigit(ch)) {
                         str.Append(ch);
                         ch = GetChar();
                     }
-                    str.Append(ch);
-                    tokens.Add(new CellAddressToken(str.ToString()));
+                    PushChar(ch);
+                    str.Append(ExpectChar(')'));
+                    str.Append(ExpectChar('C'));
+                    str.Append(ExpectChar('('));
+                    ch = GetChar();
+                    if (ch == '-') {
+                        str.Append(ch);
+                        ch = GetChar();
+                    }
+                    while (char.IsDigit(ch)) {
+                        str.Append(ch);
+                        ch = GetChar();
+                    }
+                    PushChar(ch);
+                    str.Append(ExpectChar(')'));
+                    if (str.Length > 15) { // R(-4096)C(-255)
+                        throw new FormatException(InvalidFormulaError);
+                    }
+                    tokens.Add(new CellAddressToken(CellAddressFormat.RELATIVE, str.ToString()));
                     break;
                 }
 
@@ -372,9 +392,9 @@ public class FormulaParser {
                     }
                     PushChar(ch);
                     if (str.Length > 6) {
-                        throw new FormatException("Invalid formula.");
+                        throw new FormatException(InvalidFormulaError);
                     }
-                    tokens.Add(new CellAddressToken(str.ToString()));
+                    tokens.Add(new CellAddressToken(CellAddressFormat.ABSOLUTE, str.ToString()));
                     break;
                 }
 
@@ -425,17 +445,33 @@ public class FormulaParser {
                     break;
 
                 default:
-                    throw new FormatException("Invalid formula.");
+                    throw new FormatException(InvalidFormulaError);
             }
         } while (!endOfLine);
     }
 
     /// <summary>
-    /// Parse the formula and return the root of the parse node that
+    /// Run the formula and return the root of the parse node that
     /// represents the formula.
     /// </summary>
     /// <returns>A CellParseNode</returns>
     public CellParseNode Parse() => ParseExpression(0);
+
+    /// <summary>
+    /// Make sure the next character read is the specified
+    /// character and then return it. Throw a FormatException
+    /// otherwise.
+    /// </summary>
+    /// <param name="expectedChar">Character expected</param>
+    /// <returns>The character read</returns>
+    /// <exception cref="FormatException"></exception>
+    private char ExpectChar(char expectedChar) {
+        char ch = GetChar();
+        if (ch != expectedChar) {
+            throw new FormatException(InvalidFormulaError);
+        }
+        return ch;
+    }
 
     /// <summary>
     /// Take a peep at the next non-space character in the input stream
@@ -497,7 +533,7 @@ public class FormulaParser {
         if (double.TryParse(str.ToString(), out double result)) {
             return new NumberToken(result / factor);
         }
-        throw new FormatException("Invalid number.");
+        throw new FormatException(InvalidFormulaError);
     }
 
     // Check whether we're at the end of the line.
@@ -555,7 +591,7 @@ public class FormulaParser {
     private void ExpectToken(TokenID expectedID) {
         SimpleToken token = GetNextToken();
         if (token.ID != expectedID) {
-            throw new FormatException("Invalid token.");
+            throw new FormatException(InvalidFormulaError);
         }
     }
 
@@ -629,7 +665,7 @@ public class FormulaParser {
                 CellAddressToken identToken = (CellAddressToken)token;
                 CellLocation absoluteLocation;
                 Point relativeLocation;
-                if (identToken.Address.StartsWith('R')) {
+                if (identToken.Format == CellAddressFormat.RELATIVE) {
                     relativeLocation = Cell.PointFromRelativeAddress(identToken.Address);
                     absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row};
                 }
@@ -640,7 +676,7 @@ public class FormulaParser {
                 return new LocationParseNode(absoluteLocation, relativeLocation);
             }
         }
-        throw new FormatException("Invalid operand.");
+        throw new FormatException(InvalidFormulaError);
     }
 
     /// <summary>
@@ -688,10 +724,17 @@ public class FormulaParser {
         /// <summary>
         /// Creates a cell address token with the given address.
         /// </summary>
+        /// <param name="format">Format of this cell address</param>
         /// <param name="address">A cell address</param>
-        public CellAddressToken(string address) : base(TokenID.ADDRESS) {
+        public CellAddressToken(CellAddressFormat format, string address) : base(TokenID.ADDRESS) {
             Address = address;
+            Format = format;
         }
+
+        /// <summary>
+        /// Format of cell address. Relative or absolute
+        /// </summary>
+        public CellAddressFormat Format { get; init; }
 
         /// <summary>
         /// Returns the identifier name.

@@ -51,6 +51,10 @@ public class FormulaTests {
         Assert.AreEqual(TokenID.PLUS, cell3.ParseNode.Op);
 
         Assert.AreEqual("", CellParseNode.TokenToString(TokenID.EOL));
+
+        Cell cell4 = new Cell { UIContent = "=A1+A2" };
+        Assert.IsTrue(cell4.CellValue.Type == CellType.FORMULA);
+        Assert.AreEqual("=A1+A2", cell4.UIContent);
     }
 
     // Verify the creation of a BinaryOpParseNode
@@ -182,7 +186,7 @@ public class FormulaTests {
     // Verify the >= operator
     [Test]
     public void VerifyGreaterThanOrEquals() {
-        Cell cell1 = new Cell { Content = "=896675>=P87"};
+        Cell cell1 = new Cell { Content = "=+896675>=P87"};
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KGE, pn.Op);
@@ -199,26 +203,55 @@ public class FormulaTests {
         Assert.AreEqual("=B4=901200", cell1.UIContent);
     }
 
+    [Test]
+    public void VerifyAddressParsing() {
+        Cell cell1 = new Cell { Location = new CellLocation { Row = 1, Column = 8}};
+        FormulaParser parser = new FormulaParser("R(4)C(-3)", cell1.Location);
+        CellParseNode node = parser.Parse();
+        Assert.IsTrue(node.Op == TokenID.ADDRESS);
+        LocationParseNode addressNode = (LocationParseNode)node;
+        Assert.AreEqual(new CellLocation {Row = 5, Column = 5}, addressNode.AbsoluteLocation);
+        Assert.AreEqual(new Point {X = -3, Y = 4}, addressNode.RelativeLocation);
+
+        // Apply a fixup to the location
+        addressNode.FixupAddress(2, 2, 1);
+        Assert.AreEqual(new CellLocation {Row = 6, Column = 6}, addressNode.AbsoluteLocation);
+        Assert.AreEqual(new Point {X = -2, Y = 5}, addressNode.RelativeLocation);
+
+        Assert.AreEqual(new Point(-13, 44), Cell.PointFromRelativeAddress("R(44)C(-13)"));
+        Assert.AreEqual(new Point(7, -8), Cell.PointFromRelativeAddress("R(-8)C(7)"));
+        Assert.AreEqual(new Point(-25, -20), Cell.PointFromRelativeAddress("R(-20)C(-25)"));
+
+        Assert.AreEqual("R(2)C(3)", Cell.LocationToAddress(new Point(3, 2)));
+        Assert.AreEqual("R(-2)C(-3)", Cell.LocationToAddress(new Point(-3, -2)));
+
+        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("P(-20)C(-25)"); });
+        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("R-20C-25"); });
+        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("R(-20)C-25"); });
+        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("R(-20)C(-25"); });
+    }
+
     // Verify an exception is thrown when a bad operand is
     // specified in the formula.
     [Test]
     public void VerifyBadOperand() {
-        Cell cell1 = new Cell { Content = "=+B4**H7"};
-        Assert.Throws(typeof(FormatException), delegate { CellParseNode _ = cell1.ParseNode; });
-
-        Cell cell2 = new Cell { Content = "={}{}"};
-        Assert.Throws(typeof(FormatException), delegate { CellParseNode _ = cell2.ParseNode; });
-
-        Cell cell3 = new Cell { Content = "=AAB7656"};
-        Assert.Throws(typeof(FormatException), delegate { CellParseNode _ = cell3.ParseNode; });
+        Cell cell1 = new Cell();
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("{}{}", cell1.Location); });
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("AAB7656", cell1.Location); });
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("R(-12)C", cell1.Location); });
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("R(-12902)C(4000)", cell1.Location); });
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("+B4_H7", cell1.Location); });
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("*89", cell1.Location).Parse(); });
     }
 
     // Verify an exception is thrown when a bad number is
     // specified in the formula.
     [Test]
     public void VerifyBadNumber() {
-        Cell cell1 = new Cell { Content = "=+B4*07E "};
-        Assert.Throws(typeof(FormatException), delegate { CellParseNode _ = cell1.ParseNode; });
+        const string badNumber = "=+B4*07E ";
+        Cell cell1 = new Cell { Content = badNumber };
+        Assert.AreEqual(CellType.TEXT, cell1.CellValue.Type);
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser(badNumber[1..], cell1.Location); });
     }
 
     // Verify spaces in an expression are ignored.
@@ -274,7 +307,7 @@ public class FormulaTests {
         Assert.AreEqual("=(A1+A2)*A3", cell3.UIContent);
 
         // Missing closing parenthesis should throw an exception
-        Cell cell2 = new Cell { Content = "=A1*(A2+A3"};
-        Assert.Throws(typeof(FormatException), delegate { CellParseNode _ = cell2.ParseNode; });
+        Cell cell2 = new Cell();
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("A1*(A2+A3", cell2.Location).Parse(); });
     }
 }

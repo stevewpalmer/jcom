@@ -144,7 +144,7 @@ public class Sheet {
     /// changed.
     /// </summary>
     [JsonIgnore]
-    public bool Modified { get; private set; }
+    public bool Modified { get; set; }
 
     /// <summary>
     /// Returns the active cell
@@ -495,15 +495,5 @@ public class Sheet {
         }
         ColumnList.Insert(c, new CellList { Index = column, Size = Consts.DefaultColumnWidth });
         return ColumnList[c];
-    }
-
-    /// <summary>
-    /// Set a cell's content and mark the sheet as modified.
-    /// </summary>
-    /// <param name="cell">Cell to be updated</param>
-    /// <param name="value">New content for cell</param>
-    public void SetCellContent(Cell cell, string value) {
-        cell.UIContent = value;
-        Modified = true;
     }
 }

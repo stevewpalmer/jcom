@@ -436,7 +436,6 @@ public class Window {
     /// <param name="blockAction">Block action to perform</param>
     /// <returns>Render hint</returns>
     private RenderHint PerformBlockAction(BlockAction blockAction) {
-        RenderHint flags = RenderHint.CURSOR;
         if (blockAction.HasFlag(BlockAction.COPY)) {
             IEnumerable<Cell> cells = RangeIterator().Select(location => Sheet.GetCell(location, false)).Where(cell => !cell.IsEmptyCell);
             Clipboard.Data = JsonSerializer.Serialize(cells);
@@ -447,7 +446,7 @@ public class Window {
             }
         }
         ClearBlock();
-        return flags;
+        return RenderHint.CURSOR;
     }
 
     /// <summary>
@@ -457,7 +456,7 @@ public class Window {
     private RenderHint Paste() {
         RenderHint flags = RenderHint.NONE;
         List<Cell>? cellsToPaste = JsonSerializer.Deserialize<List<Cell>>(Clipboard.Data);
-        if (cellsToPaste != null) {
+        if (cellsToPaste?.Count > 0) {
             CellLocation current = Sheet.Location;
 
             foreach (Cell cellToPaste in cellsToPaste) {
@@ -469,6 +468,7 @@ public class Window {
                 cell.Content = cellToPaste.Content;
                 ++current.Row;
             }
+            Sheet.Modified = true;
             flags = RenderHint.RECALCULATE | RenderHint.CONTENTS;
         }
         return flags;
@@ -731,7 +731,8 @@ public class Window {
         CellInputResponse result = Screen.Command.PromptForCellInput(ref cellValue);
         if (result != CellInputResponse.CANCEL) {
 
-            Sheet.SetCellContent(cell, cellValue);
+            cell.UIContent = cellValue;
+            Sheet.Modified = true;
 
             Calculate calc = new Calculate(Sheet);
             calc.Update();
