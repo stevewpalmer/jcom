@@ -366,7 +366,7 @@ public class Cell {
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     public bool FixupFormula(int column, int row, int offset) {
         Debug.Assert(CellValue.Type == CellType.FORMULA);
-        return ParseNode.FixupAddress(column, row, offset);
+        return ParseNode.FixupAddress(Location, column, row, offset);
     }
 
     /// <summary>

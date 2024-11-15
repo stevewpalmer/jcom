@@ -106,10 +106,11 @@ public class CellParseNode(TokenID tokenID) {
     /// <summary>
     /// Fix up any address references on the node.
     /// </summary>
+    /// <param name="location"></param>
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public virtual bool FixupAddress(int column, int row, int offset) {
+    public virtual bool FixupAddress(CellLocation location, int column, int row, int offset) {
         return false;
     }
 }
@@ -135,12 +136,13 @@ public class BinaryOpParseNode(TokenID tokenID, CellParseNode left, CellParseNod
     /// <summary>
     /// Fix up any address references on the node.
     /// </summary>
+    /// <param name="location"></param>
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override bool FixupAddress(int column, int row, int offset) {
-        bool left = Left.FixupAddress(column, row, offset);
-        bool right = Right.FixupAddress(column, row, offset);
+    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
+        bool left = Left.FixupAddress(location, column, row, offset);
+        bool right = Right.FixupAddress(location, column, row, offset);
         return left || right;
     }
 
@@ -254,10 +256,11 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
     /// <summary>
     /// Fix up any address references on the node.
     /// </summary>
+    /// <param name="location"></param>
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override bool FixupAddress(int column, int row, int offset) {
+    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
         CellLocation cellLocation = AbsoluteLocation;
         bool needRecalculate = false;
         if (column > 0 && cellLocation.Column >= column) {
@@ -265,9 +268,8 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
                 Error = true;
             }
             else {
-                cellLocation.Column += offset;
-                RelativeLocation = RelativeLocation with { X = RelativeLocation.X + offset };
-                AbsoluteLocation = cellLocation;
+                AbsoluteLocation = AbsoluteLocation with { Column = cellLocation.Column + offset };
+                RelativeLocation = RelativeLocation with { X = AbsoluteLocation.Column - location.Column };
             }
             needRecalculate = true;
         }
@@ -276,9 +278,8 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
                 Error = true;
             }
             else {
-                cellLocation.Row += offset;
-                RelativeLocation = RelativeLocation with { Y = RelativeLocation.Y + offset };
-                AbsoluteLocation = cellLocation;
+                AbsoluteLocation = AbsoluteLocation with { Row = cellLocation.Row + offset };
+                RelativeLocation = RelativeLocation with { Y = AbsoluteLocation.Row - location.Row };
             }
             needRecalculate = true;
         }
@@ -335,12 +336,13 @@ public class RangeParseNode(TokenID tokenID, LocationParseNode start, LocationPa
     /// <summary>
     /// Fix up any address references on the node.
     /// </summary>
+    /// <param name="location"></param>
     /// <param name="column">Column to fix</param>
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override bool FixupAddress(int column, int row, int offset) {
-        bool start = RangeStart.FixupAddress(column, row, offset);
-        bool end = RangeEnd.FixupAddress(column, row, offset);
+    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
+        bool start = RangeStart.FixupAddress(location, column, row, offset);
+        bool end = RangeEnd.FixupAddress(location, column, row, offset);
         return start || end;
     }
 

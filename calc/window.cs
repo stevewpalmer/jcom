@@ -548,7 +548,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertColumn() {
-        RenderHint flags = RenderHint.CONTENTS;
+        RenderHint flags = RenderHint.REFRESH;
         Sheet.InsertColumn(Sheet.Location.Column);
         if (Sheet.NeedRecalculate) {
             flags |= RenderHint.RECALCULATE;
@@ -561,7 +561,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertRow() {
-        RenderHint flags = RenderHint.CONTENTS;
+        RenderHint flags = RenderHint.REFRESH;
         Sheet.InsertRow(Sheet.Location.Row);
         if (Sheet.NeedRecalculate) {
             flags |= RenderHint.RECALCULATE;
@@ -574,7 +574,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteColumn() {
-        RenderHint flags = RenderHint.CONTENTS;
+        RenderHint flags = RenderHint.REFRESH;
         Sheet.DeleteColumn(Sheet.Location.Column);
         if (Sheet.NeedRecalculate) {
             flags |= RenderHint.RECALCULATE;
@@ -587,7 +587,7 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteRow() {
-        RenderHint flags = RenderHint.CONTENTS;
+        RenderHint flags = RenderHint.REFRESH;
         Sheet.DeleteRow(Sheet.Location.Row);
         if (Sheet.NeedRecalculate) {
             flags |= RenderHint.RECALCULATE;

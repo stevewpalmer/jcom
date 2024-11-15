@@ -48,6 +48,7 @@ public class FormulaTests {
         Assert.AreEqual(12, ((NumberParseNode)cell1.ParseNode).Value.DoubleValue);
         Assert.AreEqual(TokenID.TEXT, cell2.ParseNode.Op);
         Assert.AreEqual("HELLO", ((TextParseNode)cell2.ParseNode).Value);
+        Assert.AreEqual("HELLO", ((TextParseNode)cell2.ParseNode).ToRawString());
         Assert.AreEqual(TokenID.PLUS, cell3.ParseNode.Op);
 
         Assert.AreEqual("", CellParseNode.TokenToString(TokenID.EOL));
@@ -203,6 +204,31 @@ public class FormulaTests {
         Assert.AreEqual("=B4=901200", cell1.UIContent);
     }
 
+    // Verify applying a fixup to a node
+    [Test]
+    public void VerifyFixup() {
+        Cell cell1 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=E5"};
+        cell1.FixupFormula(2, 2, 1);
+        Assert.AreEqual(cell1.UIContent, "=F6");
+
+        Cell cell2 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=E5*F7"};
+        cell2.FixupFormula(2, 2, 1);
+        Assert.AreEqual(cell2.UIContent, "=F6*G8");
+
+        // Test bad fixup
+        Cell cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=A1"};
+        cell3.FixupFormula(0, 1, -1);
+        Assert.IsTrue(cell3.ParseNode is LocationParseNode);
+        Assert.IsTrue(((LocationParseNode)cell3.ParseNode).Error);
+        Assert.AreEqual("=!ERR", cell3.Content);
+
+        cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=A1"};
+        cell3.FixupFormula(1, 0, -1);
+        Assert.IsTrue(cell3.ParseNode is LocationParseNode);
+        Assert.IsTrue(((LocationParseNode)cell3.ParseNode).Error);
+        Assert.AreEqual("=!ERR", cell3.Content);
+    }
+
     [Test]
     public void VerifyAddressParsing() {
         Cell cell1 = new Cell { Location = new CellLocation { Row = 1, Column = 8}};
@@ -212,9 +238,10 @@ public class FormulaTests {
         LocationParseNode addressNode = (LocationParseNode)node;
         Assert.AreEqual(new CellLocation {Row = 5, Column = 5}, addressNode.AbsoluteLocation);
         Assert.AreEqual(new Point {X = -3, Y = 4}, addressNode.RelativeLocation);
+        Assert.AreEqual(new CellLocation {Row = 5, Column = 5}, addressNode.ToAbsolute(cell1.Location));
 
         // Apply a fixup to the location
-        addressNode.FixupAddress(2, 2, 1);
+        addressNode.FixupAddress(cell1.Location, 2, 2, 1);
         Assert.AreEqual(new CellLocation {Row = 6, Column = 6}, addressNode.AbsoluteLocation);
         Assert.AreEqual(new Point {X = -2, Y = 5}, addressNode.RelativeLocation);
 
@@ -276,6 +303,8 @@ public class FormulaTests {
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.DIVIDE, pn.Op);
         Assert.IsTrue(pn.Right is NumberParseNode);
+        Assert.AreEqual("R(2)C(0)/0.16", pn.ToRawString());
+        Assert.AreEqual("0.16", pn.Right.ToRawString());
 
         NumberParseNode right = (NumberParseNode)pn.Right;
         Assert.IsTrue(Math.Abs(0.16 - right.Value.DoubleValue) < 0.01);
