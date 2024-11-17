@@ -605,6 +605,7 @@ public class CellTests {
         Cell cell3 = new Cell {
             Decimal = 4,
             Align = CellAlignment.CENTRE,
+            Format = CellFormat.BAR,
             Style = new CellStyle {
                 Foreground = AnsiColour.Blue,
                 Background = AnsiColour.BrightGreen
@@ -612,12 +613,14 @@ public class CellTests {
         };
         Assert.AreEqual(2, cell1.DecimalPlaces);
         Assert.AreEqual(CellAlignment.GENERAL, cell1.Alignment);
+        Assert.AreEqual(CellFormat.GENERAL, cell1.CellFormat);
 
         // Save cell factory
         int dp = CellFactory.DecimalPlaces;
         CellAlignment align = CellFactory.Alignment;
         int fg = CellFactory.ForegroundColour;
         int bg = CellFactory.BackgroundColour;
+        CellFormat fmt = CellFactory.Format;
 
         // cell1 should inherit factory defaults as no explicit change
         // to the properties were made. cell3 should retain the explicit
@@ -626,13 +629,17 @@ public class CellTests {
         CellFactory.Alignment = CellAlignment.LEFT;
         CellFactory.ForegroundColour = AnsiColour.BrightYellow;
         CellFactory.BackgroundColour = AnsiColour.Blue;
+        CellFactory.Format = CellFormat.SCIENTIFIC;
+
         Assert.AreEqual(5, cell1.DecimalPlaces);
         Assert.AreEqual(CellAlignment.LEFT, cell1.Alignment);
+        Assert.AreEqual(CellFormat.SCIENTIFIC, cell1.CellFormat);
         Assert.AreEqual(AnsiColour.BrightYellow, cell1.Style.ForegroundColour);
         Assert.AreEqual(AnsiColour.Blue, cell1.Style.BackgroundColour);
 
         Assert.AreEqual(4, cell3.DecimalPlaces);
         Assert.AreEqual(CellAlignment.CENTRE, cell3.Alignment);
+        Assert.AreEqual(CellFormat.BAR, cell3.CellFormat);
         Assert.AreEqual(AnsiColour.Blue, cell3.Style.ForegroundColour);
         Assert.AreEqual(AnsiColour.BrightGreen, cell3.Style.BackgroundColour);
 
@@ -641,6 +648,7 @@ public class CellTests {
         Cell cell2 = new Cell();
         Assert.AreEqual(5, cell2.DecimalPlaces);
         Assert.AreEqual(CellAlignment.LEFT, cell2.Alignment);
+        Assert.AreEqual(CellFormat.SCIENTIFIC, cell2.CellFormat);
         Assert.AreEqual(AnsiColour.BrightYellow, cell2.Style.ForegroundColour);
         Assert.AreEqual(AnsiColour.Blue, cell2.Style.BackgroundColour);
 
@@ -649,5 +657,6 @@ public class CellTests {
         CellFactory.Alignment = align;
         CellFactory.ForegroundColour = fg;
         CellFactory.BackgroundColour = bg;
+        CellFactory.Format = fmt;
     }
 }
