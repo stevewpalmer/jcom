@@ -31,72 +31,165 @@ namespace ComLibTests;
 
 public class TestANSIText {
 
-    // Test parsing a plain text string with no ANSI escape sequences.
+    // Test a plain ANSI text string with no formatting.
     [Test]
     public void TestPlainString() {
-        AnsiText ansi = new AnsiText("HELLO WORLD");
+        AnsiText ansi = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO WORLD")
+        ]);
         Assert.IsTrue(ansi.Spans.Count == 1);
         Assert.AreEqual("HELLO WORLD", ansi.Spans[0].Text);
-        Assert.AreEqual(ConsoleColor.White, ansi.Spans[0].Foreground);
-        Assert.AreEqual(ConsoleColor.Black, ansi.Spans[0].Background);
+        Assert.AreEqual("HELLO WORLD", ansi.Text);
+        Assert.AreEqual("\u001b[97;40m", ansi.Spans[0].CS);
     }
 
-    // Test parsing a text string with the ANSI colour escape sequence that
-    // sets the foreground colour to red and the background colour to cyan.
+    // Test creating an ANSI text string with the foreground colour
+    // set to red and the background colour to cyan.
     [Test]
     public void TestInitialString() {
-        AnsiText ansi = new AnsiText("\u001b[31;36mHELLO WORLD");
+        AnsiText ansi = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO WORLD") {
+                ForegroundColour = AnsiColour.Red,
+                BackgroundColour = AnsiColour.Cyan
+            }
+        ]);
         Assert.IsTrue(ansi.Spans.Count == 1);
         Assert.AreEqual("HELLO WORLD", ansi.Spans[0].Text);
-        Assert.AreEqual(ConsoleColor.Red, ansi.Spans[0].Foreground);
-        Assert.AreEqual(ConsoleColor.Cyan, ansi.Spans[0].Background);
-    }
-
-    // Test parsing a malformed escape sequence.
-    [Test]
-    public void TestBadEscapeString() {
-        Assert.Throws(typeof(FormatException), delegate { _ = new AnsiText("\u001bHELLO WORLD");});
-        Assert.Throws(typeof(FormatException), delegate { _ = new AnsiText("\u001b[12;12HELLO WORLD");});
-        Assert.Throws(typeof(FormatException), delegate { _ = new AnsiText("\u001b[");});
-
-        AnsiText ansi = new AnsiText("\u001b[40;40mHELLO WORLD");
-        Assert.IsTrue(ansi.Spans.Count == 1);
-        Assert.AreEqual("HELLO WORLD", ansi.Spans[0].Text);
-        Assert.AreEqual(ConsoleColor.Gray, ansi.Spans[0].Foreground);
-        Assert.AreEqual(ConsoleColor.Gray, ansi.Spans[0].Background);
+        Assert.AreEqual("HELLO WORLD", ansi.Text);
+        Assert.AreEqual("\u001b[31;46m", ansi.Spans[0].CS);
     }
 
     // Test parsing a text string with the ANSI colour escape sequence that
     // sets the foreground colour to red and the background colour to cyan.
     [Test]
     public void TestEmbeddedSequence() {
-        AnsiText ansi = new AnsiText("HELLO \u001b[31;32mWORLD");
+        AnsiText ansi = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO "),
+            new AnsiText.AnsiTextSpan("WORLD") {
+                ForegroundColour = AnsiColour.Red,
+                BackgroundColour = AnsiColour.Green
+            },
+        ]);
+
         Assert.IsTrue(ansi.Spans.Count == 2);
         Assert.AreEqual("HELLO ", ansi.Spans[0].Text);
-        Assert.AreEqual(ConsoleColor.White, ansi.Spans[0].Foreground);
-        Assert.AreEqual(ConsoleColor.Black, ansi.Spans[0].Background);
+        Assert.AreEqual("\u001b[97;40m", ansi.Spans[0].CS);
         Assert.AreEqual("WORLD", ansi.Spans[1].Text);
-        Assert.AreEqual(ConsoleColor.Red, ansi.Spans[1].Foreground);
-        Assert.AreEqual(ConsoleColor.Green, ansi.Spans[1].Background);
+        Assert.AreEqual("\u001b[31;42m", ansi.Spans[1].CS);
+        Assert.AreEqual("HELLO WORLD", ansi.Text);
     }
 
     // Test parsing a text string with the ANSI colour escape sequence that
     // sets the foreground colour to red and the background colour to cyan.
     [Test]
     public void TestMultipleSequences() {
-        AnsiText ansi = new AnsiText("HELLO \u001b[33;36mWORLD\u001b[0m WELCOME TO LAS \u001b[34;35mVEGAS");
+        AnsiText ansi = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO "),
+            new AnsiText.AnsiTextSpan("WORLD") {
+                ForegroundColour = AnsiColour.Yellow,
+                BackgroundColour = AnsiColour.Cyan
+            },
+            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiText.AnsiTextSpan("VEGAS") {
+                ForegroundColour = AnsiColour.Blue,
+                BackgroundColour = AnsiColour.Magenta
+            }
+        ]);
+
         Assert.IsTrue(ansi.Spans.Count == 4);
         Assert.AreEqual("HELLO ", ansi.Spans[0].Text);
-        Assert.AreEqual(ConsoleColor.White, ansi.Spans[0].Foreground);
-        Assert.AreEqual(ConsoleColor.Black, ansi.Spans[0].Background);
+        Assert.AreEqual("\u001b[97;40m", ansi.Spans[0].CS);
         Assert.AreEqual("WORLD", ansi.Spans[1].Text);
-        Assert.AreEqual(ConsoleColor.Yellow, ansi.Spans[1].Foreground);
-        Assert.AreEqual(ConsoleColor.Cyan, ansi.Spans[1].Background);
+        Assert.AreEqual("\u001b[33;46m", ansi.Spans[1].CS);
         Assert.AreEqual(" WELCOME TO LAS ", ansi.Spans[2].Text);
-        Assert.AreEqual(ConsoleColor.White, ansi.Spans[2].Foreground);
-        Assert.AreEqual(ConsoleColor.Black, ansi.Spans[2].Background);
+        Assert.AreEqual("\u001b[97;40m", ansi.Spans[2].CS);
         Assert.AreEqual("VEGAS", ansi.Spans[3].Text);
-        Assert.AreEqual(ConsoleColor.Blue, ansi.Spans[3].Foreground);
-        Assert.AreEqual(ConsoleColor.Magenta, ansi.Spans[3].Background);
+        Assert.AreEqual("\u001b[34;45m", ansi.Spans[3].CS);
+        Assert.AreEqual("HELLO WORLD WELCOME TO LAS VEGAS", ansi.Text);
+    }
+
+    // Test that the Length property returns the raw string length
+    [Test]
+    public void TestLength() {
+        AnsiText ansi = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO "),
+            new AnsiText.AnsiTextSpan("WORLD") {
+                ForegroundColour = AnsiColour.Yellow,
+                BackgroundColour = AnsiColour.Cyan
+            },
+            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiText.AnsiTextSpan("VEGAS") {
+                ForegroundColour = AnsiColour.Blue,
+                BackgroundColour = AnsiColour.Magenta
+            }
+        ]);
+        Assert.AreEqual(32, ansi.Length);
+        Assert.AreEqual(0, new AnsiText(Array.Empty<AnsiText.AnsiTextSpan>()).Length);
+    }
+
+    // Test substring extraction
+    [Test]
+    public void TestSubstring() {
+        AnsiText simple = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO WORLD!")
+        ]);
+        Assert.AreEqual("LO WO", simple.Substring(3, 5).Text);
+        Assert.AreEqual("WORLD!", simple.Substring(6, 20).Text);
+        Assert.AreEqual("", simple.Substring(12, 20).Text);
+        Assert.AreEqual("", simple.Substring(0, 0).Text);
+
+        AnsiText ansi = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO "),
+            new AnsiText.AnsiTextSpan("WORLD") {
+                ForegroundColour = AnsiColour.Yellow,
+                BackgroundColour = AnsiColour.Cyan
+            },
+            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiText.AnsiTextSpan("VEGAS") {
+                ForegroundColour = AnsiColour.Blue,
+                BackgroundColour = AnsiColour.Magenta
+            }
+        ]);
+        Assert.AreEqual("HELLO WORLD ", ansi.Substring(0, 12).Text);
+        Assert.AreEqual(3, ansi.Substring(0, 12).Spans.Count);
+        Assert.AreEqual("WORLD ", ansi.Substring(6, 6).Text);
+        Assert.AreEqual(2, ansi.Substring(6, 6).Spans.Count);
+        Assert.AreEqual("VEGAS", ansi.Substring(27, 10).Text);
+        Assert.AreEqual(1, ansi.Substring(27, 10).Spans.Count);
+    }
+
+    // Test changing the style of a portion of an AnsiText
+    [Test]
+    public void TestStyle() {
+        AnsiText simple = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO WORLD!")
+        ]);
+        simple.Style(0, 5, AnsiColour.Cyan, AnsiColour.Green);
+        Assert.AreEqual(2, simple.Spans.Count);
+        Assert.AreEqual("\u001b[36;42m", simple.Spans[0].CS);
+        Assert.AreEqual(" WORLD!", simple.Spans[1].Text);
+        Assert.AreEqual("\u001b[97;40m", simple.Spans[1].CS);
+
+        AnsiText ansi = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO "),
+            new AnsiText.AnsiTextSpan("WORLD") {
+                ForegroundColour = AnsiColour.Yellow,
+                BackgroundColour = AnsiColour.Cyan
+            },
+            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiText.AnsiTextSpan("VEGAS") {
+                ForegroundColour = AnsiColour.Blue,
+                BackgroundColour = AnsiColour.Magenta
+            }
+        ]);
+        ansi.Style(8, 10, AnsiColour.Cyan, AnsiColour.Green);
+        Assert.AreEqual(5, ansi.Spans.Count);
+        Assert.AreEqual("HELLO ", ansi.Spans[0].Text);
+        Assert.AreEqual("WO", ansi.Spans[1].Text);
+        Assert.AreEqual("RLD WELCOM", ansi.Spans[2].Text);
+        Assert.AreEqual(AnsiColour.Cyan, ansi.Spans[2].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Green, ansi.Spans[2].BackgroundColour);
+        Assert.AreEqual("E TO LAS ", ansi.Spans[3].Text);
+        Assert.AreEqual("VEGAS", ansi.Spans[4].Text);
     }
 }

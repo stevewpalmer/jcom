@@ -45,6 +45,7 @@ public enum CommandMapID {
     MAIN,
     RANGE,
     SETTINGS,
+    STYLE,
     WORKSHEET
 }
 
@@ -143,6 +144,7 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.RangeFormat, SubCommandId = CommandMapID.FORMAT, Description = Calc.RangeFormatDescription },
                 new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription },
+                new CommandMapEntry { Name = "Text", SubCommandId = CommandMapID.STYLE, Description = "Set the cell text style" },
                 new CommandMapEntry { Name = Calc.RangeExport, CommandId = KeyCommand.KC_RANGE_EXPORT, Description = Calc.RangeExportDescription },
                 new CommandMapEntry { Name = Calc.RangeSort, CommandId = KeyCommand.KC_RANGE_SORT, Description = Calc.RangeSortDescription }
             ]
@@ -160,6 +162,16 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.FormatDate, SubCommandId = CommandMapID.DATES, Description = Calc.FormatDatesDescription },
                 new CommandMapEntry { Name = Calc.FormatText, CommandId = KeyCommand.KC_FORMAT_TEXT, Description = Calc.FormatTextDescription },
                 new CommandMapEntry { Name = Calc.FormatReset, CommandId = KeyCommand.KC_FORMAT_RESET, Description = Calc.FormatResetDescription }
+            ]
+        },
+        new() {
+            ID = CommandMapID.STYLE,
+            Commands = [
+                new CommandMapEntry { Name = Calc.StyleForeground, CommandId = KeyCommand.KC_STYLE_FG, Description = Calc.StyleForegroundDescription },
+                new CommandMapEntry { Name = Calc.StyleBackground, CommandId = KeyCommand.KC_STYLE_BG, Description = Calc.StyleBackgroundDescription },
+                new CommandMapEntry { Name = Calc.StyleBold, CommandId = KeyCommand.KC_STYLE_BOLD, Description = Calc.StyleBoldDescription },
+                new CommandMapEntry { Name = Calc.StyleItalic, CommandId = KeyCommand.KC_STYLE_ITALIC, Description = Calc.StyleItalicDescription },
+                new CommandMapEntry { Name = Calc.StyleUnderline, CommandId = KeyCommand.KC_STYLE_UNDERLINE, Description = Calc.StyleUnderlineDescription }
             ]
         },
         new () {

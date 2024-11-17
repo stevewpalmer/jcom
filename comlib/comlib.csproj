@@ -14,4 +14,8 @@
         <Description>Common Library</Description>
         <Copyright>(c) Steven Palmer 2013-2024</Copyright>
     </PropertyGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="cp $(OutputPath)* $(SolutionDir)drop/bin" />
+    </Target>
 </Project>

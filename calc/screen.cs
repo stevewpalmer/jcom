@@ -61,9 +61,13 @@ public static class Screen {
     /// </summary>
     public static void Open() {
         Terminal.Open();
+        Terminal.ShowCursor(false);
 
         Config = Config.Load();
         Colours = new Colours(Config);
+
+        CellStyle.DefaultBackgroundColour = Colours.BackgroundColour;
+        CellStyle.DefaultForegroundColour = Colours.ForegroundColour;
 
         Command.Refresh();
         Status.Refresh();
@@ -377,10 +381,10 @@ public static class Screen {
     /// </summary>
     /// <returns>Render hint</returns>
     private static RenderHint ConfigureColours() {
-        int backgroundColour = int.TryParse(Config.BackgroundColour, out int _bgColour) ? _bgColour : 0;
-        int foregroundColour = int.TryParse(Config.ForegroundColour, out int _fgColour) ? _fgColour : 7;
-        int normalMessageColour = int.TryParse(Config.NormalMessageColour, out int _nmColour) ? _nmColour : 3;
-        int selectionMessageColour = int.TryParse(Config.SelectionColour, out int _selColour) ? _selColour : 3;
+        int backgroundColour = Colours.BackgroundColour;
+        int foregroundColour = Colours.ForegroundColour;
+        int normalMessageColour = Colours.NormalMessageColour;
+        int selectionMessageColour = Colours.SelectionColour;
         if (!GetColourInput(Calc.EnterBackgroundColour, ref backgroundColour)) {
             return RenderHint.NONE;
         }
@@ -397,11 +401,13 @@ public static class Screen {
         if (!GetColourInput(Calc.EnterSelectionColour, ref selectionMessageColour)) {
             return RenderHint.NONE;
         }
-        Config.BackgroundColour = backgroundColour.ToString();
-        Config.ForegroundColour = foregroundColour.ToString();
-        Config.NormalMessageColour = normalMessageColour.ToString();
-        Config.SelectionColour = selectionMessageColour.ToString();
+        Config.BackgroundColour = backgroundColour;
+        Config.ForegroundColour = foregroundColour;
+        Config.NormalMessageColour = normalMessageColour;
+        Config.SelectionColour = selectionMessageColour;
         Config.Save();
+        CellStyle.DefaultBackgroundColour = Colours.BackgroundColour;
+        CellStyle.DefaultForegroundColour = Colours.ForegroundColour;
         return RenderHint.REFRESH;
     }
 
@@ -411,7 +417,7 @@ public static class Screen {
     /// <param name="prompt">Prompt to display</param>
     /// <param name="colourValue">Output value</param>
     /// <returns>True if the output value is valid, false otherwise.</returns>
-    private static bool GetColourInput(string prompt, ref int colourValue) {
+    public static bool GetColourInput(string prompt, ref int colourValue) {
         FormField [] formFields = [
             new() {
                 Text = prompt,
@@ -424,8 +430,8 @@ public static class Screen {
             return false;
         }
         colourValue = formFields[0].Value.IntValue;
-        if (colourValue < 0 || colourValue > Colours.MaxColourIndex) {
-            Status.Message(string.Format(Calc.InvalidColourIndex, Colours.MaxColourIndex));
+        if (colourValue is (< 30 or > 37) and (< 90 or > 97)) {
+            Status.Message(string.Format(Calc.InvalidColourIndex));
             return false;
         }
         return true;

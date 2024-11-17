@@ -249,11 +249,11 @@ public class CommandBar {
     private readonly int _displayWidth;
     private readonly int _messageRow;
     private readonly int _promptRow;
-    private ConsoleColor _bgColour;
-    private ConsoleColor _fgColour;
-    private ConsoleColor _selColour;
+    private int _bgColour;
     private Sheet? _currentSheet;
+    private int _fgColour;
     private ConsoleKeyInfo? _pushedKey;
+    private int _selColour;
 
     /// <summary>
     /// Construct a command bar object
@@ -283,6 +283,9 @@ public class CommandBar {
         _fgColour = Screen.Colours.NormalMessageColour;
         _bgColour = Screen.Colours.BackgroundColour;
         _selColour = Screen.Colours.SelectionColour;
+        ClearRow(_cellStatusRow);
+        ClearRow(_promptRow);
+        ClearRow(_messageRow);
         RenderCellStatus();
     }
 
@@ -329,7 +332,6 @@ public class CommandBar {
     /// <param name="userfields">List of input fields</param>
     /// <returns>True if input was provided, false if the user hit Esc to cancel</returns>
     public bool PromptForInput(FormField [] userfields) {
-        Point cursorPosition = Terminal.GetCursor();
         int column = 0;
         int row = _promptRow;
 
@@ -365,13 +367,13 @@ public class CommandBar {
                 ++row;
             }
             if (!string.IsNullOrEmpty(prompt)) {
-                Terminal.WriteText(column, row, _displayWidth, $"{prompt}:", _fgColour, _bgColour);
+                Terminal.Write(column, row, _displayWidth, _fgColour, _bgColour, $"{prompt}:");
                 column += labelWidth;
             }
             field.X = column;
             field.Y = row;
             field.MaxWidth = width;
-            Terminal.WriteText(column, row, width, value, _fgColour, _bgColour);
+            Terminal.Write(column, row, width, _fgColour, _bgColour, value);
             column += width + 2;
         }
 
@@ -390,9 +392,11 @@ public class CommandBar {
                 inputBuffer = currentField.Inner.Value.StringValue.ToList();
                 if (currentField.Inner.Type == FormFieldType.PICKER) {
                     string pickList = string.Join(" ", currentField.Inner.List);
-                    Terminal.WriteText(0, row + 1, _displayWidth, pickList, _fgColour, _bgColour);
+                    Terminal.Write(0, row + 1, _displayWidth, _fgColour, _bgColour, pickList);
+                    Terminal.ShowCursor(false);
                 } else {
                     ClearRow(row + 1);
+                    Terminal.ShowCursor(true);
                 }
                 index = inputBuffer.Count;
                 initialiseField = false;
@@ -400,16 +404,16 @@ public class CommandBar {
             }
 
             string text = string.Join("", inputBuffer);
-            ConsoleColor fg = selection ? _bgColour : _fgColour;
-            ConsoleColor bg = selection ? _selColour : _bgColour;
-            Terminal.WriteText(currentField.X, currentField.Y, currentField.MaxWidth, text, fg, bg);
+            int fg = selection ? _bgColour : _fgColour;
+            int bg = selection ? _selColour : _bgColour;
+            Terminal.Write(currentField.X, currentField.Y, currentField.MaxWidth, fg, bg, text);
             Terminal.SetCursor(currentField.X + index, currentField.Y);
 
             ConsoleKeyInfo input = Console.ReadKey(true);
             switch (input.Key) {
                 case ConsoleKey.Tab when fields.Count > 1: {
                     if (currentField.Save(inputBuffer)) {
-                        Terminal.WriteText(currentField.X, currentField.Y, currentField.Inner.Width, text, _fgColour, _bgColour);
+                        Terminal.Write(currentField.X, currentField.Y, currentField.Inner.Width, _fgColour, _bgColour, text);
                         int direction = input.Modifiers.HasFlag(ConsoleModifiers.Shift) ? -1 : 1;
                         fieldIndex = Utilities.ConstrainAndWrap(fieldIndex + direction, 0, fields.Count);
                         currentField = fields[fieldIndex];
@@ -460,7 +464,7 @@ public class CommandBar {
                     if (currentField.Save(inputBuffer)) {
                         ClearRow(row);
                         ClearRow(row + 1);
-                        Terminal.SetCursor(cursorPosition);
+                        Terminal.ShowCursor(false);
                         return !string.IsNullOrEmpty(currentField.Inner.Value.StringValue);
                     }
                     break;
@@ -468,7 +472,7 @@ public class CommandBar {
                 case ConsoleKey.Escape:
                     ClearRow(row);
                     ClearRow(row + 1);
-                    Terminal.SetCursor(cursorPosition);
+                    Terminal.ShowCursor(false);
                     return false;
 
                 default:
@@ -505,7 +509,6 @@ public class CommandBar {
     /// <param name="cellValue">Reference to value being edited</param>
     /// <returns>A CellInputResponse indicating how the input was completed</returns>
     public CellInputResponse PromptForCellInput(ref string cellValue) {
-        Point cursorPosition = Terminal.GetCursor();
 
         List<char> inputBuffer = [];
         CellInputResponse response;
@@ -513,9 +516,10 @@ public class CommandBar {
             inputBuffer = [..cellValue.ToCharArray()];
         }
         int column = inputBuffer.Count;
+        Terminal.ShowCursor(true);
         do {
             string text = string.Join("", inputBuffer);
-            Terminal.WriteText(0, _promptRow, _displayWidth, text, _fgColour, _bgColour);
+            Terminal.Write(0, _promptRow, _displayWidth, _fgColour, _bgColour, text);
             Terminal.SetCursor(column, _promptRow);
 
             ConsoleKeyInfo inputKey = ReadKey();
@@ -555,7 +559,7 @@ public class CommandBar {
 
         cellValue = string.Join("", inputBuffer);
         ClearRow(_promptRow);
-        Terminal.SetCursor(cursorPosition);
+        Terminal.ShowCursor(false);
         return response;
     }
 
@@ -565,10 +569,10 @@ public class CommandBar {
     /// <returns>True if a value was input, false if empty or cancelled</returns>
     public bool Prompt(string prompt, char[] validInput, out char inputValue) {
 
-        Point cursorPosition = Terminal.GetCursor();
         prompt = prompt.Replace("@@", $"[{string.Join("", validInput)}]");
-        Terminal.WriteText(0, _promptRow, _displayWidth, prompt, _fgColour, _bgColour);
+        Terminal.Write(0, _promptRow, _displayWidth, _fgColour, _bgColour, prompt);
         Terminal.SetCursor(prompt.Length + 1, _promptRow);
+        Terminal.ShowCursor(true);
         ConsoleKeyInfo input = Console.ReadKey(true);
         while (!validInput.Contains(char.ToLower(input.KeyChar))) {
             if (input.Key is ConsoleKey.Escape) {
@@ -576,7 +580,7 @@ public class CommandBar {
             }
             input = Console.ReadKey(true);
         }
-        Terminal.SetCursor(cursorPosition);
+        Terminal.ShowCursor(false);
         inputValue = char.ToLower(input.KeyChar);
         ClearRow(_promptRow);
         return input.Key != ConsoleKey.Escape;
@@ -674,9 +678,9 @@ public class CommandBar {
         int column = 0;
         for (int i = 0; i < commandMap.Commands.Length; i++) {
             CommandMapEntry command = commandMap.Commands[i];
-            ConsoleColor fgColour = i == selectedCommand ? _bgColour : _fgColour;
-            ConsoleColor bgColour = i == selectedCommand ? _selColour : _bgColour;
-            Terminal.WriteText(column, row, command.Name.Length, command.Name, fgColour, bgColour);
+            int fgColour = i == selectedCommand ? _bgColour : _fgColour;
+            int bgColour = i == selectedCommand ? _selColour : _bgColour;
+            Terminal.Write(column, row, command.Name.Length, fgColour, bgColour, command.Name);
             column += command.Name.Length + 1;
         }
     }
@@ -692,7 +696,7 @@ public class CommandBar {
             if (!activeCell.IsEmptyCell) {
                 text += activeCell.ToText();
             }
-            Terminal.WriteText(0, _cellStatusRow, _displayWidth, text, _fgColour, _bgColour);
+            Terminal.Write(0, _cellStatusRow, _displayWidth, _fgColour, _bgColour, text);
         }
     }
 
@@ -701,7 +705,7 @@ public class CommandBar {
     /// </summary>
     /// <param name="text">Message to display</param>
     private void Message(string text) {
-        Terminal.WriteText(0, _messageRow, _displayWidth, text, _fgColour, _bgColour);
+        Terminal.Write(0, _messageRow, _displayWidth, _fgColour, _bgColour, text);
     }
 
     /// <summary>
@@ -709,7 +713,7 @@ public class CommandBar {
     /// </summary>
     /// <param name="row">Row to clear</param>
     private void ClearRow(int row) {
-        Terminal.WriteText(0, row, _displayWidth, string.Empty, _fgColour, _bgColour);
+        Terminal.Write(0, row, _displayWidth, _fgColour, _bgColour, string.Empty);
     }
 
     /// <summary>

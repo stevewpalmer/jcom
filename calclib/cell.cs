@@ -47,6 +47,11 @@ public class Cell {
     public CellAlignment Alignment { get; set; }
 
     /// <summary>
+    /// Cell text style
+    /// </summary>
+    public CellStyle Style { get; set; } = new();
+
+    /// <summary>
     /// Cell location
     /// </summary>
     public CellLocation Location { get; set; } = new();
@@ -344,6 +349,21 @@ public class Cell {
     }
 
     /// <summary>
+    /// Return an AnsiTextSpan for the current cell.
+    /// </summary>
+    /// <param name="width">Column width to use</param>
+    /// <returns>AnsiTextSpan</returns>
+    public AnsiText.AnsiTextSpan AnsiTextSpan(int width) {
+        return new AnsiText.AnsiTextSpan(ToString(width)) {
+            ForegroundColour = Style.ForegroundColour,
+            BackgroundColour = Style.BackgroundColour,
+            Bold = Style.Bold,
+            Italic = Style.Italic,
+            Underline = Style.Underline
+        };
+    }
+
+    /// <summary>
     /// Exchange the contents of this cell with another cell.
     /// </summary>
     /// <param name="other">Cell to swap</param>
@@ -352,6 +372,7 @@ public class Cell {
         (Format, other.Format) = (other.Format, Format);
         (Alignment, other.Alignment) = (other.Alignment, Alignment);
         (DecimalPlaces, other.DecimalPlaces) = (other.DecimalPlaces, DecimalPlaces);
+        (Style, other.Style) = (other.Style, Style);
     }
 
     /// <summary>

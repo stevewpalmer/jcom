@@ -23,30 +23,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JComLib;
+
 namespace JCalc;
 
 public class Colours {
 
     private readonly Config? _config;
-
-    private readonly ConsoleColor[] _colours = [
-        ConsoleColor.Black,
-        ConsoleColor.Blue,
-        ConsoleColor.Green,
-        ConsoleColor.Cyan,
-        ConsoleColor.Red,
-        ConsoleColor.Magenta,
-        ConsoleColor.DarkMagenta,
-        ConsoleColor.White,
-        ConsoleColor.DarkGray,
-        ConsoleColor.DarkBlue,
-        ConsoleColor.DarkGreen,
-        ConsoleColor.DarkCyan,
-        ConsoleColor.DarkRed,
-        ConsoleColor.DarkMagenta,
-        ConsoleColor.Yellow,
-        ConsoleColor.DarkYellow
-    ];
 
     /// <summary>
     /// Initialise a Colors object
@@ -62,46 +45,22 @@ public class Colours {
     }
 
     /// <summary>
-    /// Maximum colour index
-    /// </summary>
-    public int MaxColourIndex => _colours.Length - 1;
-
-    /// <summary>
     /// Retrieve the background colour
     /// </summary>
-    public ConsoleColor BackgroundColour =>
-        GetColour(_config?.BackgroundColour, 0);
+    public int BackgroundColour => _config?.BackgroundColour ?? AnsiColour.Black;
 
     /// <summary>
     /// Retrieve the foreground colour
     /// </summary>
-    public ConsoleColor ForegroundColour =>
-        GetColour(_config?.ForegroundColour, 7);
+    public int ForegroundColour => _config?.ForegroundColour ?? AnsiColour.BrightWhite;
 
     /// <summary>
     /// Retrieve the normal message colour
     /// </summary>
-    public ConsoleColor NormalMessageColour =>
-        GetColour(_config?.NormalMessageColour, 7);
+    public int NormalMessageColour => _config?.NormalMessageColour ?? AnsiColour.BrightWhite;
 
     /// <summary>
     /// Retrieve the selection colour
     /// </summary>
-    public ConsoleColor SelectionColour =>
-        GetColour(_config?.SelectionColour, 3);
-
-    /// <summary>
-    /// Parse a colour value from the configuration file. Colours are specified as
-    /// an index into the _colours array. Out of bounds values are treated as if
-    /// they were absent and the default index is used instead.
-    /// </summary>
-    /// <param name="value">Configuration value</param>
-    /// <param name="defaultIndex">Default index if config not present</param>
-    /// <returns>Colour</returns>
-    private ConsoleColor GetColour(string? value, int defaultIndex) {
-        if (value == null || !int.TryParse(value, out int index) || index < 0 || index >= _colours.Length) {
-            index = defaultIndex;
-        }
-        return _colours[index];
-    }
+    public int SelectionColour => _config?.SelectionColour ?? AnsiColour.BrightCyan;
 }

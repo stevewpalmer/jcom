@@ -241,7 +241,7 @@
         <value>Backups</value>
     </data>
     <data name="InvalidColourIndex" xml:space="preserve">
-        <value>Invalid colour number. Colour number range is 0 to {0}</value>
+        <value>Invalid colour number.</value>
     </data>
     <data name="FormatTextDescription" xml:space="preserve">
         <value>Display formula instead of value</value>
@@ -347,5 +347,44 @@
     </data>
     <data name="Paste" xml:space="preserve">
         <value>Paste</value>
+    </data>
+    <data name="Colour" xml:space="preserve">
+        <value>Colour</value>
+    </data>
+    <data name="RangeColourDescription" xml:space="preserve">
+        <value>Set the colour of a range of cells</value>
+    </data>
+    <data name="EnterCellColour" xml:space="preserve">
+        <value>Enter cell colour</value>
+    </data>
+    <data name="StyleForeground" xml:space="preserve">
+        <value>Colour</value>
+    </data>
+    <data name="StyleBackground" xml:space="preserve">
+        <value>Background</value>
+    </data>
+    <data name="StyleBold" xml:space="preserve">
+        <value>Bold</value>
+    </data>
+    <data name="StyleItalic" xml:space="preserve">
+        <value>Italic</value>
+    </data>
+    <data name="StyleUnderline" xml:space="preserve">
+        <value>Underline</value>
+    </data>
+    <data name="StyleForegroundDescription" xml:space="preserve">
+        <value>Set the text foreground colour</value>
+    </data>
+    <data name="StyleBackgroundDescription" xml:space="preserve">
+        <value>Set the text background color</value>
+    </data>
+    <data name="StyleBoldDescription" xml:space="preserve">
+        <value>Mark the text in the cell as bold</value>
+    </data>
+    <data name="StyleItalicDescription" xml:space="preserve">
+        <value>Mark the text in the cell as italic</value>
+    </data>
+    <data name="StyleUnderlineDescription" xml:space="preserve">
+        <value>Mark the text in the cell as underlined</value>
     </data>
 </root>

@@ -704,5 +704,83 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("Paste", resourceCulture);
             }
         }
+        
+        internal static string Colour {
+            get {
+                return ResourceManager.GetString("Colour", resourceCulture);
+            }
+        }
+        
+        internal static string RangeColourDescription {
+            get {
+                return ResourceManager.GetString("RangeColourDescription", resourceCulture);
+            }
+        }
+        
+        internal static string EnterCellColour {
+            get {
+                return ResourceManager.GetString("EnterCellColour", resourceCulture);
+            }
+        }
+        
+        internal static string StyleForeground {
+            get {
+                return ResourceManager.GetString("StyleForeground", resourceCulture);
+            }
+        }
+        
+        internal static string StyleBackground {
+            get {
+                return ResourceManager.GetString("StyleBackground", resourceCulture);
+            }
+        }
+        
+        internal static string StyleBold {
+            get {
+                return ResourceManager.GetString("StyleBold", resourceCulture);
+            }
+        }
+        
+        internal static string StyleItalic {
+            get {
+                return ResourceManager.GetString("StyleItalic", resourceCulture);
+            }
+        }
+        
+        internal static string StyleUnderline {
+            get {
+                return ResourceManager.GetString("StyleUnderline", resourceCulture);
+            }
+        }
+        
+        internal static string StyleForegroundDescription {
+            get {
+                return ResourceManager.GetString("StyleForegroundDescription", resourceCulture);
+            }
+        }
+        
+        internal static string StyleBackgroundDescription {
+            get {
+                return ResourceManager.GetString("StyleBackgroundDescription", resourceCulture);
+            }
+        }
+        
+        internal static string StyleBoldDescription {
+            get {
+                return ResourceManager.GetString("StyleBoldDescription", resourceCulture);
+            }
+        }
+        
+        internal static string StyleItalicDescription {
+            get {
+                return ResourceManager.GetString("StyleItalicDescription", resourceCulture);
+            }
+        }
+        
+        internal static string StyleUnderlineDescription {
+            get {
+                return ResourceManager.GetString("StyleUnderlineDescription", resourceCulture);
+            }
+        }
     }
 }

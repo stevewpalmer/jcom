@@ -133,6 +133,11 @@ public class Window {
             KeyCommand.KC_DELETE => PerformBlockAction(BlockAction.DELETE),
             KeyCommand.KC_RANGE_EXPORT => ExportRange(),
             KeyCommand.KC_RANGE_SORT => SortRange(),
+            KeyCommand.KC_STYLE_FG => SetCellForegroundColour(),
+            KeyCommand.KC_STYLE_BG => SetCellBackgroundColour(),
+            KeyCommand.KC_STYLE_BOLD => SetCellBold(),
+            KeyCommand.KC_STYLE_ITALIC => SetCellItalic(),
+            KeyCommand.KC_STYLE_UNDERLINE => SetCellUnderline(),
             KeyCommand.KC_COPY => PerformBlockAction(BlockAction.COPY),
             KeyCommand.KC_CUT => PerformBlockAction(BlockAction.CUT),
             KeyCommand.KC_PASTE => Paste(),
@@ -185,14 +190,13 @@ public class Window {
     private void RenderFrame() {
         Rectangle frameRect = _viewportBounds;
 
-        Terminal.ForegroundColour = Screen.Colours.BackgroundColour;
-        Terminal.BackgroundColour = Screen.Colours.SelectionColour;
+        int fg = Screen.Colours.BackgroundColour;
+        int bg = Screen.Colours.SelectionColour;
 
         // Sheet number
         int x = _sheetBounds.X;
         int y = frameRect.Top + CommandBar.Height;
-        Terminal.SetCursor(0, y);
-        Terminal.Write($@"  {(char)(Sheet.SheetNumber + 'A' - 1)}  ");
+        Terminal.Write(0, y, 5, fg, bg, $@"  {(char)(Sheet.SheetNumber + 'A' - 1)}  ");
 
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;
@@ -203,8 +207,7 @@ public class Window {
             if (space == width) {
                 ++_numberOfColumns;
             }
-            Terminal.SetCursor(x, y);
-            Terminal.Write(Utilities.CentreString(Cell.ColumnToAddress(columnNumber), width)[..space]);
+            Terminal.Write(x, y, width, fg, bg, Utilities.CentreString(Cell.ColumnToAddress(columnNumber), width)[..space]);
             x += width;
             columnNumber++;
         }
@@ -213,13 +216,10 @@ public class Window {
         int rowNumber = 1 + _scrollOffset.Y;
         y = frameRect.Top + CommandBar.Height + 1;
         while (y < _sheetBounds.Bottom && rowNumber <= Consts.MaxRows) {
-            Terminal.SetCursor(frameRect.Left, y);
-            Terminal.Write($" {rowNumber.ToString(),-3} ");
+            Terminal.Write(frameRect.Left, y, 5, fg, bg, $" {rowNumber.ToString(),-3} ");
             y += 1;
             rowNumber++;
         }
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
     }
 
     /// <summary>
@@ -231,8 +231,6 @@ public class Window {
     /// </summary>
     private void Render() {
         Point cursorPosition = Terminal.GetCursor();
-        ConsoleColor bg = Screen.Colours.BackgroundColour;
-        ConsoleColor fg = Screen.Colours.ForegroundColour;
 
         RExtent renderExtent = new RExtent()
             .Add(new Point(1, _scrollOffset.Y + 1))
@@ -247,40 +245,24 @@ public class Window {
         int i = renderExtent.Start.Y;
         int y = _sheetBounds.Top;
         while (i <= renderExtent.End.Y) {
-            string line = Sheet.GetRow(_scrollOffset.X + 1, i);
+            AnsiText line = Sheet.GetRow(_scrollOffset.X + 1, i, _sheetBounds.Width);
             int x = _sheetBounds.Left;
             int w = _sheetBounds.Width;
-            int left = 0;
-            int length = Math.Min(w, line.Length - left);
+            int length = Math.Min(w, line.Length);
 
             if (i >= markExtent.Start.Y && i <= markExtent.End.Y) {
                 int extentStart = GetXPositionOfCell(markExtent.Start.X);
                 int extentEnd = GetXPositionOfCell(markExtent.End.X + 1);
+                int left = 0;
                 if (extentStart > x) {
-                    int diff = extentStart - x;
-                    Terminal.Write(x, y, diff, bg, fg, Utilities.SpanBound(line, left, diff));
-                    x += diff;
-                    w -= diff;
-                    left += diff;
-                    length -= diff;
+                    left = extentStart - x;
                 }
                 if (extentEnd > _scrollOffset.X) {
                     int extentWidth = extentEnd - extentStart;
-                    bg = Screen.Colours.SelectionColour;
-                    fg = Screen.Colours.BackgroundColour;
-                    Terminal.Write(x, y, extentWidth, bg, fg, Utilities.SpanBound(line, left, extentWidth));
-                    x += extentWidth;
-                    w -= extentWidth;
-                    left += extentWidth;
-                    length -= extentWidth;
+                    line.Style(left, extentWidth, Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
                 }
-                bg = Screen.Colours.BackgroundColour;
-                fg = Screen.Colours.ForegroundColour;
             }
-            Terminal.Write(x, y, w, bg, fg, Utilities.SpanBound(line, left, length));
-
-            bg = Screen.Colours.BackgroundColour;
-            fg = Screen.Colours.ForegroundColour;
+            Terminal.Write(x, y, _sheetBounds.Width, line.Substring(0, length));
             ++i;
             ++y;
         }
@@ -341,9 +323,11 @@ public class Window {
         for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
             for (int column = extent.Start.X; column <= extent.End.X; column++) {
                 bool inMarked = markExtent.Contains(new Point(column, row));
-                ConsoleColor fg = inMarked ? Screen.Colours.BackgroundColour : Screen.Colours.ForegroundColour;
-                ConsoleColor bg = inMarked ? Screen.Colours.SelectionColour : Screen.Colours.BackgroundColour;
-                ShowCell(new CellLocation { Column = column, Row = row}, fg, bg);
+                CellLocation location = new CellLocation { Column = column, Row = row };
+                Cell cell = Sheet.GetCell(location, false);
+                int fg = inMarked ? Screen.Colours.BackgroundColour : cell.Style.ForegroundColour;
+                int bg = inMarked ? Screen.Colours.SelectionColour : cell.Style.BackgroundColour;
+                DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row), fg, bg);
             }
         }
     }
@@ -359,7 +343,7 @@ public class Window {
     /// Clear the cursor.
     /// </summary>
     private void ResetCursor() {
-        ShowCell(Sheet.Location, Screen.Colours.ForegroundColour, Screen.Colours.BackgroundColour);
+        ShowCell(Sheet.Location, Sheet.ActiveCell.Style.ForegroundColour, Sheet.ActiveCell.Style.BackgroundColour);
     }
 
     /// <summary>
@@ -381,13 +365,11 @@ public class Window {
     /// background colours
     /// </summary>
     /// <param name="location">Cell location</param>
-    /// <param name="fgColour">Foreground colour</param>
-    /// <param name="bgColour">Background colour</param>
-    private void ShowCell(CellLocation location, ConsoleColor fgColour, ConsoleColor bgColour) {
-        Terminal.ForegroundColour = fgColour;
-        Terminal.BackgroundColour = bgColour;
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="bg">Background colour</param>
+    private void ShowCell(CellLocation location, int fg, int bg) {
         Cell cell = Sheet.GetCell(location, false);
-        DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row));
+        DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row), fg, bg);
     }
 
     /// <summary>
@@ -687,9 +669,90 @@ public class Window {
     }
 
     /// <summary>
+    /// Prompt for a colour value for a range of cells and set
+    /// those cell foreground colour.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SetCellForegroundColour() {
+        int cellColour = Sheet.ActiveCell.Style.ForegroundColour;
+        if (!Screen.GetColourInput(Calc.EnterCellColour, ref cellColour)) {
+            return RenderHint.NONE;
+        }
+        foreach (CellLocation location in RangeIterator()) {
+            Cell cell = Sheet.GetCell(location, true);
+            cell.Style.Foreground = cellColour;
+        }
+        Sheet.Modified = true;
+        return RenderHint.CONTENTS;
+    }
+
+    /// <summary>
+    /// Prompt for a colour value for a range of cells and set
+    /// those cell background colour.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SetCellBackgroundColour() {
+        int cellColour = Sheet.ActiveCell.Style.BackgroundColour;
+        if (!Screen.GetColourInput(Calc.EnterCellColour, ref cellColour)) {
+            return RenderHint.NONE;
+        }
+        foreach (CellLocation location in RangeIterator()) {
+            Cell cell = Sheet.GetCell(location, true);
+            cell.Style.Background = cellColour;
+        }
+        Sheet.Modified = true;
+        return RenderHint.CONTENTS;
+    }
+
+    /// <summary>
+    /// Toggle bold style in the active cell.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SetCellBold() {
+        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
+        foreach (CellLocation location in RangeIterator()) {
+            Cell cell = Sheet.GetCell(location, true);
+            cell.Style.Bold = !cell.Style.Bold;
+        }
+        Sheet.Modified = true;
+        ClearBlock();
+        return flags;
+    }
+
+    /// <summary>
+    /// Toggle italic style in the active cell.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SetCellItalic() {
+        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
+        foreach (CellLocation location in RangeIterator()) {
+            Cell cell = Sheet.GetCell(location, true);
+            cell.Style.Italic = !cell.Style.Italic;
+        }
+        Sheet.Modified = true;
+        ClearBlock();
+        return flags;
+    }
+
+    /// <summary>
+    /// Toggle underline style in the active cell.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint SetCellUnderline() {
+        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
+        foreach (CellLocation location in RangeIterator()) {
+            Cell cell = Sheet.GetCell(location, true);
+            cell.Style.Underline = !cell.Style.Underline;
+        }
+        Sheet.Modified = true;
+        ClearBlock();
+        return flags;
+    }
+
+    /// <summary>
     /// Sort a marked range of cells
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Render hint</returns>
     private RenderHint SortRange() {
         RenderHint flags = RenderHint.CANCEL;
         FormField[] formFields = [
@@ -756,13 +819,11 @@ public class Window {
     /// </summary>
     /// <param name="cells">List of cells to update</param>
     private void UpdateCells(List<Cell> cells) {
-        Terminal.ForegroundColour = Screen.Colours.ForegroundColour;
-        Terminal.BackgroundColour = Screen.Colours.BackgroundColour;
         foreach (Cell cell in cells) {
             int x = GetXPositionOfCell(cell.Location.Column);
             int y = GetYPositionOfCell(cell.Location.Row);
             if (_sheetBounds.Contains(new Point(x, y))) {
-                DrawCell(cell, x, y);
+                DrawCell(cell, x, y, cell.Style.ForegroundColour, cell.Style.BackgroundColour);
             }
         }
     }
@@ -774,18 +835,25 @@ public class Window {
     /// <param name="cell">Cell to draw</param>
     /// <param name="x">X position of cell</param>
     /// <param name="y">Y position of cell</param>
-    private void DrawCell(Cell cell, int x, int y) {
-        Terminal.SetCursor(x, y);
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="bg">Background colour</param>
+    private void DrawCell(Cell cell, int x, int y, int fg, int bg) {
         int width = Sheet.ColumnWidth(cell.Location.Column);
-        string text = cell.ToString(width);
         if (x + width > _sheetBounds.Right) {
             width = _sheetBounds.Right - x;
             if (width <= 0) {
                 return;
             }
-            text = text[..width];
         }
-        Terminal.Write(text);
+        string cellText = cell.ToString(width)[..width];
+        Terminal.SetCursor(x, y);
+        Terminal.Write(new AnsiText.AnsiTextSpan(cellText) {
+            ForegroundColour = fg,
+            BackgroundColour = bg,
+            Bold = cell.Style.Bold,
+            Italic = cell.Style.Italic,
+            Underline = cell.Style.Underline
+        }.EscapedString());
     }
 
     /// <summary>

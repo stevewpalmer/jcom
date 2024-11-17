@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using JCalc.Resources;
 using JCalcLib;
 
@@ -59,6 +60,7 @@ public class Config {
         try {
             using FileStream stream = File.Create(Consts.ConfigurationFilename);
             JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
                 WriteIndented = true
             });
         }
@@ -70,22 +72,22 @@ public class Config {
     /// <summary>
     /// Background colour
     /// </summary>
-    public string BackgroundColour { get; set; } = "";
+    public int? BackgroundColour { get; set; }
 
     /// <summary>
     /// Foreground colour
     /// </summary>
-    public string ForegroundColour { get; set; } = "";
+    public int? ForegroundColour { get; set; }
 
     /// <summary>
     /// Normal status bar message colour
     /// </summary>
-    public string NormalMessageColour { get; set; } = "";
+    public int? NormalMessageColour { get; set; }
 
     /// <summary>
     /// Selection colour
     /// </summary>
-    public string? SelectionColour { get; set; } = "";
+    public int? SelectionColour { get; set; }
 
     /// <summary>
     /// Specifies whether or not a backup file is created when a sheet

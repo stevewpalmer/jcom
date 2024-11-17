@@ -170,6 +170,7 @@ public class Sheet {
             }
             using FileStream stream = File.Create(Filename);
             JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
                 WriteIndented = true
             });
         }
@@ -228,7 +229,8 @@ public class Sheet {
             Alignment = Screen.Config.DefaultCellAlignment,
             Format = Screen.Config.DefaultCellFormat,
             DecimalPlaces = Screen.Config.DefaultDecimals,
-            Location = location
+            Location = location,
+            Style = new CellStyle()
         };
         if (cellList != null) {
             int c = 0;
@@ -386,10 +388,11 @@ public class Sheet {
     /// </summary>
     /// <param name="column">Start column, 1-based</param>
     /// <param name="row">Row index to return</param>
+    /// <param name="width">Line width</param>
     /// <returns>String representation of row</returns>
-    public string GetRow(int column, int row) {
+    public AnsiText GetRow(int column, int row, int width) {
         Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
-        StringBuilder line = new();
+        List<AnsiText.AnsiTextSpan> spans = [];
         int columnIndex = column;
         Cell emptyCell = new();
         int c = 0;
@@ -398,16 +401,20 @@ public class Sheet {
         }
         while (c < ColumnList.Count) {
             while (ColumnList[c].Index > columnIndex) {
-                line.Append(emptyCell.ToString(Consts.DefaultColumnWidth));
+                spans.Add(emptyCell.AnsiTextSpan(Consts.DefaultColumnWidth));
                 columnIndex++;
             }
-            int width = ColumnList[c].Size;
+            int size = ColumnList[c].Size;
             Cell? cell = ColumnList[c].Cells.Find(l => l.Location.Row == row);
-            line.Append(cell == null ? emptyCell.ToString(width) : cell.ToString(width));
+            spans.Add(cell == null ? emptyCell.AnsiTextSpan(size) : cell.AnsiTextSpan(size));
             columnIndex++;
             c++;
         }
-        return line.ToString();
+        width -= spans.Sum(sp => sp.Text.Length);
+        if (width > 0) {
+            spans.Add(emptyCell.AnsiTextSpan(width));
+        }
+        return new AnsiText(spans);
     }
 
     /// <summary>

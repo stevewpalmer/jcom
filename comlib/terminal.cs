@@ -87,6 +87,14 @@ public static class Terminal {
     }
 
     /// <summary>
+    /// Show or hide the cursor
+    /// </summary>
+    /// <param name="show">True to show the cursor, false to hide it</param>
+    public static void ShowCursor(bool show) {
+        Console.Write(show ? @"[?25h" : @"[?25l");
+    }
+
+    /// <summary>
     /// Set the default cursor.
     /// </summary>
     public static void SetDefaultCursor() {
@@ -117,6 +125,46 @@ public static class Terminal {
     /// <param name="x">Zero based column of output</param>
     /// <param name="y">Zero based line of output</param>
     /// <param name="width">Width of area to write to</param>
+    /// <param name="str">String to output</param>
+    public static void Write(int x, int y, int width, AnsiText str) {
+        lock (LockObj) {
+            Console.SetCursorPosition(x, y);
+            foreach (AnsiText.AnsiTextSpan span in str.Spans) {
+                Console.Write(span.EscapedString());
+                width -= span.Text.Length;
+            }
+            if (width > 0) {
+                Console.Write(string.Empty.PadRight(width));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Write to the console at the specified position, padding out to the width
+    /// with spaces if required. The cursor position is left at the end of the
+    /// string.
+    /// </summary>
+    /// <param name="x">Zero based column of output</param>
+    /// <param name="y">Zero based line of output</param>
+    /// <param name="width">Width of area to write to</param>
+    /// <param name="fg">Foreground colour</param>
+    /// <param name="bg">Background colour</param>
+    /// <param name="str">String to output</param>
+    public static void Write(int x, int y, int width, int fg, int bg, string str) {
+        lock (LockObj) {
+            Console.SetCursorPosition(x, y);
+            Console.Write(str.PadRight(width).AnsiColour(fg, bg));
+        }
+    }
+
+    /// <summary>
+    /// Write to the console at the specified position, padding out to the width
+    /// with spaces if required. The cursor position is left at the end of the
+    /// string.
+    /// </summary>
+    /// <param name="x">Zero based column of output</param>
+    /// <param name="y">Zero based line of output</param>
+    /// <param name="width">Width of area to write to</param>
     /// <param name="bg">Background colour</param>
     /// <param name="fg">Foreground colour</param>
     /// <param name="str">String to output</param>
@@ -131,22 +179,6 @@ public static class Terminal {
             Console.ForegroundColor = fgSaved;
             Console.BackgroundColor = bgSaved;
         }
-    }
-
-    /// <summary>
-    /// Write text to the command bar in the specified colour ensuring that the given text fits
-    /// within the specified width.
-    /// </summary>
-    /// <param name="x">Zero based column of output</param>
-    /// <param name="y">Zero based line of output</param>
-    /// <param name="width">Width of area to write to</param>
-    /// <param name="str">String to output</param>
-    /// <param name="fg">Foreground colour</param>
-    /// <param name="bg">Background colour</param>
-    public static void WriteText(int x, int y, int width, string str, ConsoleColor fg, ConsoleColor bg) {
-        Point saved = GetCursor();
-        Write(x, y, width, bg, fg, Utilities.SpanBound(str, 0, width));
-        SetCursor(saved);
     }
 
     /// <summary>
