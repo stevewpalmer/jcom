@@ -75,7 +75,7 @@ public class Cell {
     [JsonIgnore]
     public string FormatDescription {
         get {
-            string text = Format switch {
+            string text = CellFormat switch {
                 CellFormat.BAR => "B",
                 CellFormat.FIXED => $"F{DecimalPlaces}",
                 CellFormat.SCIENTIFIC => $"S{DecimalPlaces}",
@@ -96,7 +96,12 @@ public class Cell {
     /// <summary>
     /// Cell format
     /// </summary>
-    public CellFormat Format { get; set; }
+    public CellFormat? Format { get; set; }
+
+    /// <summary>
+    /// Cell format
+    /// </summary>
+    public CellFormat CellFormat => Format.GetValueOrDefault(CellFactory.Format);
 
     /// <summary>
     /// Number of decimal places
@@ -319,7 +324,7 @@ public class Cell {
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
         if (isNumber) {
             int maxBar = Math.Min(width + 1, (int)Math.Abs(doubleValue));
-            cellValue = Format switch {
+            cellValue = CellFormat switch {
                 CellFormat.FIXED => doubleValue.ToString($"F{DecimalPlaces}"),
                 CellFormat.PERCENT => $"{(doubleValue * 100).ToString($"F{DecimalPlaces}")}%",
                 CellFormat.CURRENCY => doubleValue < 0 ?
@@ -335,7 +340,7 @@ public class Cell {
                 CellFormat.DATE_DMY => ToDateTime("d-MMM-yyyy", doubleValue),
                 CellFormat.GENERAL => cellValue,
                 CellFormat.TEXT => ToText(),
-                _ => throw new ArgumentException($"Unknown Cell Format: {Format}")
+                _ => throw new ArgumentException($"Unknown Cell Format: {CellFormat}")
             };
             if (cellValue.Length > width) {
                 cellValue = new string('*', width);
@@ -344,7 +349,7 @@ public class Cell {
         else if (cellValue.Length > width) {
             cellValue = cellValue[..width];
         }
-        if (Format == CellFormat.BAR) {
+        if (CellFormat == CellFormat.BAR) {
             cellValue = cellValue.PadRight(width);
         }
         else {

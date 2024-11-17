@@ -41,7 +41,7 @@ public class CellTests {
         Assert.AreEqual(1, cell.Location.Row);
         Assert.AreEqual(1, cell.Location.Column);
         Assert.AreEqual(CellAlignment.GENERAL, cell.Alignment);
-        Assert.AreEqual(CellFormat.GENERAL, cell.Format);
+        Assert.AreEqual(CellFormat.GENERAL, cell.CellFormat);
         Assert.IsTrue(cell.IsEmptyCell);
     }
 
@@ -84,29 +84,29 @@ public class CellTests {
     [Test]
     public void VerifyAddressForColumnAndRow() {
         Assert.AreEqual("A1", new Cell().Address);
-        Assert.AreEqual("Z1", new Cell { Location = new CellLocation { Column = 26, Row = 1}}.Address);
-        Assert.AreEqual("IU4095", new Cell { Location = new CellLocation { Column = 255, Row = 4095}}.Address);
+        Assert.AreEqual("Z1", new Cell { Location = new CellLocation { Column = 26, Row = 1 } }.Address);
+        Assert.AreEqual("IU4095", new Cell { Location = new CellLocation { Column = 255, Row = 4095 } }.Address);
         Assert.AreEqual(1, Cell.AddressToColumn(new Cell().Address));
-        Assert.AreEqual(26, Cell.AddressToColumn(new Cell { Location = new CellLocation { Column = 26, Row = 1}}.Address));
-        Assert.AreEqual(255, Cell.AddressToColumn(new Cell { Location = new CellLocation { Column = 255, Row = 4095}}.Address));
+        Assert.AreEqual(26, Cell.AddressToColumn(new Cell { Location = new CellLocation { Column = 26, Row = 1 } }.Address));
+        Assert.AreEqual(255, Cell.AddressToColumn(new Cell { Location = new CellLocation { Column = 255, Row = 4095 } }.Address));
     }
 
     // Verify that setting a cell value to a date string converts it
     // to the correct OADate representation.
     [Test]
     public void VerifyTryParseDate() {
-        Assert.AreEqual("45387", new Cell { UIContent = "5-Apr"}.CellValue.Value);
-        Assert.AreEqual("45017", new Cell { UIContent = "Apr-2023"}.CellValue.Value);
-        Assert.AreEqual("45069", new Cell { UIContent = "23-May-2023"}.CellValue.Value);
-        Assert.AreEqual("45387", new Cell { UIContent = "5 - Apr"}.CellValue.Value);
-        Assert.AreEqual("12-XYZ", new Cell { UIContent = "12-XYZ"}.CellValue.Value);
+        Assert.AreEqual("45387", new Cell { UIContent = "5-Apr" }.CellValue.Value);
+        Assert.AreEqual("45017", new Cell { UIContent = "Apr-2023" }.CellValue.Value);
+        Assert.AreEqual("45069", new Cell { UIContent = "23-May-2023" }.CellValue.Value);
+        Assert.AreEqual("45387", new Cell { UIContent = "5 - Apr" }.CellValue.Value);
+        Assert.AreEqual("12-XYZ", new Cell { UIContent = "12-XYZ" }.CellValue.Value);
     }
 
     // Verify the Location property
     [Test]
     public void VerifyLocation() {
         Assert.AreEqual(new Point(1, 1), new Cell().Location.Point);
-        Assert.AreEqual(new Point(12, 12), new Cell { Location = new CellLocation { Column = 12, Row = 12}}.Location.Point);
+        Assert.AreEqual(new Point(12, 12), new Cell { Location = new CellLocation { Column = 12, Row = 12 } }.Location.Point);
     }
 
     // Verify that cell content and value match
@@ -159,7 +159,7 @@ public class CellTests {
         Assert.AreEqual(cell1.CellValue.Value, "67.9");
         Assert.AreEqual(cell1.Location.Column, 3);
         Assert.AreEqual(cell1.Location.Row, 8);
-        Assert.AreEqual(cell1.Format, CellFormat.PERCENT);
+        Assert.AreEqual(cell1.CellFormat, CellFormat.PERCENT);
         Assert.AreEqual(cell1.Decimal, 1);
         Assert.AreEqual(cell1.Alignment, CellAlignment.RIGHT);
     }

@@ -27,12 +27,6 @@
       </EmbeddedResource>
     </ItemGroup>
 
-<PropertyGroup>
-  <ExampleTitle>Foo</ExampleTitle>
-  <ExampleDescription>This is the description of the example.</ExampleDescription>
-  <ExampleOrder>5</ExampleOrder>
-</PropertyGroup>
-
     <ItemGroup>
       <Compile Update="Resources\Calc.Designer.cs">
         <DesignTime>True</DesignTime>

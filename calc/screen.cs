@@ -190,6 +190,7 @@ public static class Screen {
         CellFactory.ForegroundColour = Colours.ForegroundColour;
         CellFactory.DecimalPlaces = Config.DefaultDecimals;
         CellFactory.Alignment = Config.DefaultCellAlignment;
+        CellFactory.Format = Config.DefaultCellFormat;
     }
 
     /// <summary>
@@ -338,7 +339,8 @@ public static class Screen {
     private static RenderHint SetDefaultFormat(CellFormat format) {
         Config.DefaultCellFormat = format;
         Config.Save();
-        return RenderHint.NONE;
+        SetCellFactory();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>

@@ -28,9 +28,12 @@ Press the '/' key to open the command menu.
 | Page Down         | PgDn        | PgDn        |
 | Page Up           | PgUp        | PgUp        |
 | Start Cell        | Home        | Home        |
-| Start Cell        | Home        | Home        |
 | Open Menu         | /           | /           |
 | Edit Current Cell | F2          | F2          |
+| Delete Cell       | Del         | Del         |
 | Go To Cell        | F5          | F5          |
 | Next Worksheet    | F6          | F6          |
 | Enter Mark Mode   | Alt+M       | Alt+M       |
+| Copy              | Ctrl+C      | Ctrl+C      |
+| Cut               | Ctrl+X      | Ctrl+X      |
+| Paste             | Ctrl+V      | Ctrl+V      |

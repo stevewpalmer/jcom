@@ -48,4 +48,9 @@ public static class CellFactory {
     /// Default cell alignment
     /// </summary>
     public static CellAlignment Alignment { get; set; } = CellAlignment.GENERAL;
+
+    /// <summary>
+    /// Default cell format
+    /// </summary>
+    public static CellFormat Format { get; set; } = CellFormat.GENERAL;
 }
