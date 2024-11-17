@@ -657,12 +657,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string FormFieldInputRange {
-            get {
-                return ResourceManager.GetString("FormFieldInputRange", resourceCulture);
-            }
-        }
-        
         internal static string RangeSort {
             get {
                 return ResourceManager.GetString("RangeSort", resourceCulture);
@@ -702,12 +696,6 @@ namespace JCalc.Resources {
         internal static string Paste {
             get {
                 return ResourceManager.GetString("Paste", resourceCulture);
-            }
-        }
-        
-        internal static string Colour {
-            get {
-                return ResourceManager.GetString("Colour", resourceCulture);
             }
         }
         
@@ -780,6 +768,36 @@ namespace JCalc.Resources {
         internal static string StyleUnderlineDescription {
             get {
                 return ResourceManager.GetString("StyleUnderlineDescription", resourceCulture);
+            }
+        }
+        
+        internal static string RangeText {
+            get {
+                return ResourceManager.GetString("RangeText", resourceCulture);
+            }
+        }
+        
+        internal static string RangeTextDescription {
+            get {
+                return ResourceManager.GetString("RangeTextDescription", resourceCulture);
+            }
+        }
+        
+        internal static string StyleColours {
+            get {
+                return ResourceManager.GetString("StyleColours", resourceCulture);
+            }
+        }
+        
+        internal static string AlignGeneral {
+            get {
+                return ResourceManager.GetString("AlignGeneral", resourceCulture);
+            }
+        }
+        
+        internal static string AlignGeneralDescription {
+            get {
+                return ResourceManager.GetString("AlignGeneralDescription", resourceCulture);
             }
         }
     }

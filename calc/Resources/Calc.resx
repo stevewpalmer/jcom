@@ -324,9 +324,6 @@
     <data name="RangeSortDescription" xml:space="preserve">
         <value>Sort the selected range of cells</value>
     </data>
-    <data name="FormFieldInputRange" xml:space="preserve">
-        <value>Enter a value between {0} and {1}</value>
-    </data>
     <data name="RangeSort" xml:space="preserve">
         <value>Sort</value>
     </data>
@@ -347,9 +344,6 @@
     </data>
     <data name="Paste" xml:space="preserve">
         <value>Paste</value>
-    </data>
-    <data name="Colour" xml:space="preserve">
-        <value>Colour</value>
     </data>
     <data name="RangeColourDescription" xml:space="preserve">
         <value>Set the colour of a range of cells</value>
@@ -386,5 +380,20 @@
     </data>
     <data name="StyleUnderlineDescription" xml:space="preserve">
         <value>Mark the text in the cell as underlined</value>
+    </data>
+    <data name="RangeText" xml:space="preserve">
+        <value>Text</value>
+    </data>
+    <data name="RangeTextDescription" xml:space="preserve">
+        <value>Set the cell text style</value>
+    </data>
+    <data name="StyleColours" xml:space="preserve">
+        <value>Colours</value>
+    </data>
+    <data name="AlignGeneral" xml:space="preserve">
+        <value>General</value>
+    </data>
+    <data name="AlignGeneralDescription" xml:space="preserve">
+        <value>Apply general cell alignment</value>
     </data>
 </root>

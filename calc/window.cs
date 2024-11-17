@@ -82,11 +82,16 @@ public class Window {
     /// be used when row or column titles have changed, including scrolling
     /// and column width.
     /// </summary>
-    public void Refresh() {
-        Screen.UpdateCursorPosition();
-        Screen.Status.UpdateFilename(Sheet.Name);
-        RenderFrame();
-        Render();
+    public void Refresh(RenderHint flags) {
+        if (flags.HasFlag(RenderHint.REFRESH)) {
+            Screen.UpdateCursorPosition();
+            Screen.Status.UpdateFilename(Sheet.Name);
+            RenderFrame();
+            flags |= RenderHint.CONTENTS;
+        }
+        if (flags.HasFlag(RenderHint.CONTENTS)) {
+            Render();
+        }
     }
 
     /// <summary>
@@ -113,6 +118,7 @@ public class Window {
             KeyCommand.KC_ALIGN_LEFT => AlignCells(CellAlignment.LEFT),
             KeyCommand.KC_ALIGN_RIGHT => AlignCells(CellAlignment.RIGHT),
             KeyCommand.KC_ALIGN_CENTRE => AlignCells(CellAlignment.CENTRE),
+            KeyCommand.KC_ALIGN_GENERAL => AlignCells(CellAlignment.GENERAL),
             KeyCommand.KC_FORMAT_FIXED => FormatCells(CellFormat.FIXED),
             KeyCommand.KC_FORMAT_PERCENT => FormatCells(CellFormat.PERCENT),
             KeyCommand.KC_FORMAT_CURRENCY => FormatCells(CellFormat.CURRENCY),
@@ -444,10 +450,11 @@ public class Window {
             foreach (Cell cellToPaste in cellsToPaste) {
                 Cell cell = Sheet.GetCell(current, true);
                 cell.Format = cellToPaste.Format;
-                cell.Alignment = cellToPaste.Alignment;
+                cell.Align = cellToPaste.Align;
                 cell.CellValue = cellToPaste.CellValue;
-                cell.DecimalPlaces = cellToPaste.DecimalPlaces;
+                cell.Decimal = cellToPaste.Decimal;
                 cell.Content = cellToPaste.Content;
+                cell.Style = cellToPaste.Style;
                 ++current.Row;
             }
             Sheet.Modified = true;

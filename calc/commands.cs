@@ -33,6 +33,7 @@ namespace JCalc;
 public enum CommandMapID {
     NONE,
     ALIGN,
+    COLOURS,
     COLUMN_WIDTH,
     DATES,
     DEFAULT_ALIGNMENT,
@@ -144,7 +145,7 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.RangeFormat, SubCommandId = CommandMapID.FORMAT, Description = Calc.RangeFormatDescription },
                 new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription },
-                new CommandMapEntry { Name = "Text", SubCommandId = CommandMapID.STYLE, Description = "Set the cell text style" },
+                new CommandMapEntry { Name = Calc.RangeText, SubCommandId = CommandMapID.STYLE, Description = Calc.RangeTextDescription },
                 new CommandMapEntry { Name = Calc.RangeExport, CommandId = KeyCommand.KC_RANGE_EXPORT, Description = Calc.RangeExportDescription },
                 new CommandMapEntry { Name = Calc.RangeSort, CommandId = KeyCommand.KC_RANGE_SORT, Description = Calc.RangeSortDescription }
             ]
@@ -167,11 +168,17 @@ public static class Commands {
         new() {
             ID = CommandMapID.STYLE,
             Commands = [
-                new CommandMapEntry { Name = Calc.StyleForeground, CommandId = KeyCommand.KC_STYLE_FG, Description = Calc.StyleForegroundDescription },
-                new CommandMapEntry { Name = Calc.StyleBackground, CommandId = KeyCommand.KC_STYLE_BG, Description = Calc.StyleBackgroundDescription },
+                new CommandMapEntry { Name = Calc.StyleColours, SubCommandId = CommandMapID.COLOURS, Description = Calc.StyleForegroundDescription },
                 new CommandMapEntry { Name = Calc.StyleBold, CommandId = KeyCommand.KC_STYLE_BOLD, Description = Calc.StyleBoldDescription },
                 new CommandMapEntry { Name = Calc.StyleItalic, CommandId = KeyCommand.KC_STYLE_ITALIC, Description = Calc.StyleItalicDescription },
                 new CommandMapEntry { Name = Calc.StyleUnderline, CommandId = KeyCommand.KC_STYLE_UNDERLINE, Description = Calc.StyleUnderlineDescription }
+            ]
+        },
+        new() {
+            ID = CommandMapID.COLOURS,
+            Commands = [
+                new CommandMapEntry { Name = Calc.StyleForeground, CommandId = KeyCommand.KC_STYLE_FG, Description = Calc.StyleForegroundDescription },
+                new CommandMapEntry { Name = Calc.StyleBackground, CommandId = KeyCommand.KC_STYLE_BG, Description = Calc.StyleBackgroundDescription }
             ]
         },
         new () {
@@ -179,7 +186,8 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.AlignLeft, CommandId = KeyCommand.KC_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
                 new CommandMapEntry { Name = Calc.AlignRight, CommandId = KeyCommand.KC_ALIGN_RIGHT, Description = Calc.AlignRightDescription },
-                new CommandMapEntry { Name = Calc.AlignCentre, CommandId = KeyCommand.KC_ALIGN_CENTRE, Description = Calc.AlignCentreDescription }
+                new CommandMapEntry { Name = Calc.AlignCentre, CommandId = KeyCommand.KC_ALIGN_CENTRE, Description = Calc.AlignCentreDescription },
+                new CommandMapEntry { Name = Calc.AlignGeneral, CommandId = KeyCommand.KC_ALIGN_GENERAL, Description = Calc.AlignGeneralDescription }
             ]
         },
         new () {
@@ -243,7 +251,8 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.AlignLeft, CommandId = KeyCommand.KC_DEFAULT_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
                 new CommandMapEntry { Name = Calc.AlignRight, CommandId = KeyCommand.KC_DEFAULT_ALIGN_RIGHT, Description = Calc.AlignRightDescription },
-                new CommandMapEntry { Name = Calc.AlignCentre, CommandId = KeyCommand.KC_DEFAULT_ALIGN_CENTRE, Description = Calc.AlignCentreDescription }
+                new CommandMapEntry { Name = Calc.AlignCentre, CommandId = KeyCommand.KC_DEFAULT_ALIGN_CENTRE, Description = Calc.AlignCentreDescription },
+                new CommandMapEntry { Name = Calc.AlignGeneral, CommandId = KeyCommand.KC_DEFAULT_ALIGN_GENERAL, Description = Calc.AlignGeneralDescription }
             ]
         }
     ];

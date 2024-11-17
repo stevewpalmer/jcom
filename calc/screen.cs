@@ -66,9 +66,7 @@ public static class Screen {
         Config = Config.Load();
         Colours = new Colours(Config);
 
-        CellStyle.DefaultBackgroundColour = Colours.BackgroundColour;
-        CellStyle.DefaultForegroundColour = Colours.ForegroundColour;
-
+        SetCellFactory();
         Command.Refresh();
         Status.Refresh();
         Version();
@@ -119,7 +117,7 @@ public static class Screen {
     /// <param name="index">Index of the window to be activated</param>
     public static void ActivateWindow(int index) {
         _activeWindow = _windowList[index];
-        _activeWindow.Refresh();
+        _activeWindow.Refresh(RenderHint.REFRESH);
     }
 
     /// <summary>
@@ -152,6 +150,7 @@ public static class Screen {
             KeyCommand.KC_DEFAULT_ALIGN_LEFT => SetDefaultAlignment(CellAlignment.LEFT),
             KeyCommand.KC_DEFAULT_ALIGN_RIGHT => SetDefaultAlignment(CellAlignment.RIGHT),
             KeyCommand.KC_DEFAULT_ALIGN_CENTRE => SetDefaultAlignment(CellAlignment.CENTRE),
+            KeyCommand.KC_DEFAULT_ALIGN_GENERAL => SetDefaultAlignment(CellAlignment.GENERAL),
             KeyCommand.KC_SETTINGS_DECIMAL_POINTS => SetDefaultDecimalPoints(),
             KeyCommand.KC_SETTINGS_BACKUPS => ConfigureBackups(),
             KeyCommand.KC_NEXT_WINDOW => SelectWindow(1),
@@ -162,10 +161,14 @@ public static class Screen {
             UpdateCursorPosition();
             flags &= ~RenderHint.CURSOR_STATUS;
         }
+        if (flags.HasFlag(RenderHint.CONTENTS)) {
+            _activeWindow.Refresh(flags);
+            flags &= ~RenderHint.CONTENTS;
+        }
         if (flags.HasFlag(RenderHint.REFRESH)) {
             Command.Refresh();
             Status.Refresh();
-            _activeWindow.Refresh();
+            _activeWindow.Refresh(flags);
             flags &= ~RenderHint.REFRESH;
         }
         return flags;
@@ -176,6 +179,17 @@ public static class Screen {
     /// </summary>
     private static void Version() {
         Status.Message($"{AssemblySupport.AssemblyDescription} v{AssemblySupport.AssemblyVersion} - {AssemblySupport.AssemblyCopyright}");
+    }
+
+    /// <summary>
+    /// Set or update the cell factory with the current cell defaults
+    /// from the configuration.
+    /// </summary>
+    private static void SetCellFactory() {
+        CellFactory.BackgroundColour = Colours.BackgroundColour;
+        CellFactory.ForegroundColour = Colours.ForegroundColour;
+        CellFactory.DecimalPlaces = Config.DefaultDecimals;
+        CellFactory.Alignment = Config.DefaultCellAlignment;
     }
 
     /// <summary>
@@ -250,7 +264,7 @@ public static class Screen {
                 AddWindow(newWindow);
             }
             _activeWindow = newWindow;
-            _activeWindow.Refresh();
+            _activeWindow.Refresh(RenderHint.REFRESH);
             flags = RenderHint.NONE;
         }
         return flags;
@@ -310,7 +324,7 @@ public static class Screen {
             Window newWindow = new Window(sheet);
             AddWindow(newWindow);
             _activeWindow = newWindow;
-            _activeWindow.Refresh();
+            _activeWindow.Refresh(RenderHint.REFRESH);
             flags = RenderHint.NONE;
         }
         return flags;
@@ -335,7 +349,8 @@ public static class Screen {
     private static RenderHint SetDefaultAlignment(CellAlignment alignment) {
         Config.DefaultCellAlignment = alignment;
         Config.Save();
-        return RenderHint.NONE;
+        SetCellFactory();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>
@@ -359,7 +374,8 @@ public static class Screen {
         int decimalPlaces = formFields[0].Value.IntValue;
         Debug.Assert(decimalPlaces >= formFields[0].MinimumValue && decimalPlaces <= formFields[0].MaximumValue);
         Config.DefaultDecimals = decimalPlaces;
-        return RenderHint.NONE;
+        SetCellFactory();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>
@@ -406,8 +422,7 @@ public static class Screen {
         Config.NormalMessageColour = normalMessageColour;
         Config.SelectionColour = selectionMessageColour;
         Config.Save();
-        CellStyle.DefaultBackgroundColour = Colours.BackgroundColour;
-        CellStyle.DefaultForegroundColour = Colours.ForegroundColour;
+        SetCellFactory();
         return RenderHint.REFRESH;
     }
 

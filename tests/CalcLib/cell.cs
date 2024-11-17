@@ -26,6 +26,7 @@
 using System;
 using System.Drawing;
 using JCalcLib;
+using JComLib;
 using NUnit.Framework;
 
 namespace CalcLibTests;
@@ -142,8 +143,8 @@ public class CellTests {
             },
             Location = new CellLocation { Column = 3, Row = 8 },
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 3,
-            Alignment = CellAlignment.CENTRE
+            Decimal = 3,
+            Align = CellAlignment.CENTRE
         };
         Cell cell2 = new Cell {
             CellValue = new CellValue {
@@ -151,15 +152,15 @@ public class CellTests {
             },
             Location = new CellLocation { Column = 1, Row = 17 },
             Format = CellFormat.PERCENT,
-            DecimalPlaces = 1,
-            Alignment = CellAlignment.RIGHT
+            Decimal = 1,
+            Align = CellAlignment.RIGHT
         };
         cell1.Swap(cell2);
         Assert.AreEqual(cell1.CellValue.Value, "67.9");
         Assert.AreEqual(cell1.Location.Column, 3);
         Assert.AreEqual(cell1.Location.Row, 8);
         Assert.AreEqual(cell1.Format, CellFormat.PERCENT);
-        Assert.AreEqual(cell1.DecimalPlaces, 1);
+        Assert.AreEqual(cell1.Decimal, 1);
         Assert.AreEqual(cell1.Alignment, CellAlignment.RIGHT);
     }
 
@@ -183,7 +184,7 @@ public class CellTests {
                 Value = "45.8794"
             },
             Format = CellFormat.FIXED,
-            DecimalPlaces = 3
+            Decimal = 3
         }.FormatDescription);
         Assert.AreEqual("(B)", new Cell {
             CellValue = new CellValue {
@@ -196,28 +197,28 @@ public class CellTests {
                 Value = "45.8794"
             },
             Format = CellFormat.SCIENTIFIC,
-            DecimalPlaces = 1
+            Decimal = 1
         }.FormatDescription);
         Assert.AreEqual("(P2)", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
             Format = CellFormat.PERCENT,
-            DecimalPlaces = 2
+            Decimal = 2
         }.FormatDescription);
         Assert.AreEqual("(,2)", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
             Format = CellFormat.COMMAS,
-            DecimalPlaces = 2
+            Decimal = 2
         }.FormatDescription);
         Assert.AreEqual("(C4)", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
             Format = CellFormat.CURRENCY,
-            DecimalPlaces = 4
+            Decimal = 4
         }.FormatDescription);
         Assert.AreEqual("(D1)", new Cell {
             CellValue = new CellValue {
@@ -242,7 +243,7 @@ public class CellTests {
                 Value = "45.8794"
             },
             Format = (CellFormat)11,
-            DecimalPlaces = 1
+            Decimal = 1
         }.FormatDescription);
     }
 
@@ -258,33 +259,33 @@ public class CellTests {
     public void VerifyGeneralAlignment() {
         Assert.AreEqual(" 45.8794", new Cell {
             Content = "45.8794",
-            Alignment = CellAlignment.GENERAL,
+            Align = CellAlignment.GENERAL,
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.AreEqual("Text    ", new Cell {
             Content = "Text",
-            Alignment = CellAlignment.GENERAL,
+            Align = CellAlignment.GENERAL,
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.AreEqual(" 45.8794", new Cell {
             Content = "45.8794",
-            Alignment = CellAlignment.RIGHT,
+            Align = CellAlignment.RIGHT,
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.AreEqual("        ", new Cell {
             CellValue = new CellValue(),
-            Alignment = CellAlignment.GENERAL,
+            Align = CellAlignment.GENERAL,
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.Throws(typeof(ArgumentException), delegate {
             new Cell {
                 Content = "45.8794",
                 Format = (CellFormat)12,
-                DecimalPlaces = 2
+                Decimal = 2
             }.ToString(8);
         });
     }
@@ -296,15 +297,15 @@ public class CellTests {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
-            Alignment = CellAlignment.LEFT,
+            Align = CellAlignment.LEFT,
             Format = CellFormat.TEXT,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.AreEqual("HELLO WO", new Cell {
             CellValue = new CellValue {
                 Value = "HELLO WORLD!"
             },
-            Alignment = CellAlignment.LEFT,
+            Align = CellAlignment.LEFT,
             Format = CellFormat.TEXT
         }.ToString(8));
     }
@@ -316,34 +317,34 @@ public class CellTests {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
-            Alignment = CellAlignment.LEFT,
+            Align = CellAlignment.LEFT,
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.AreEqual(" 45.8794", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
-            Alignment = CellAlignment.RIGHT,
+            Align = CellAlignment.RIGHT,
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.AreEqual("45.8794 ", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
-            Alignment = CellAlignment.CENTRE,
+            Align = CellAlignment.CENTRE,
             Format = CellFormat.GENERAL,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(8));
         Assert.Throws(typeof(ArgumentException), delegate {
             new Cell {
                 CellValue = new CellValue {
                     Value = "45.8794"
                 },
-                Alignment = (CellAlignment)4,
+                Align = (CellAlignment)4,
                 Format = CellFormat.GENERAL,
-                DecimalPlaces = 2
+                Decimal = 2
             }.ToString(8);
         });
     }
@@ -354,39 +355,39 @@ public class CellTests {
         Assert.AreEqual(" 45.88", new Cell {
             Content = "45.8794",
             Format = CellFormat.FIXED,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(6));
         Assert.AreEqual("45.88   ", new Cell {
             Content = "45.8794",
             Format = CellFormat.FIXED,
-            Alignment = CellAlignment.LEFT,
-            DecimalPlaces = 2
+            Align = CellAlignment.LEFT,
+            Decimal = 2
         }.ToString(8));
         Assert.AreEqual("  45.88  ", new Cell {
             Content = "45.8794",
             Format = CellFormat.FIXED,
-            Alignment = CellAlignment.CENTRE,
-            DecimalPlaces = 2
+            Align = CellAlignment.CENTRE,
+            Decimal = 2
         }.ToString(9));
         Assert.AreEqual("45.879", new Cell {
             Content = "45.8794",
             Format = CellFormat.FIXED,
-            DecimalPlaces = 3
+            Decimal = 3
         }.ToString(6));
         Assert.AreEqual("******", new Cell {
             Content = "45.8794",
             Format = CellFormat.FIXED,
-            DecimalPlaces = 4
+            Decimal = 4
         }.ToString(6));
         Assert.AreEqual("    46", new Cell {
             Content = "45.8794",
             Format = CellFormat.FIXED,
-            DecimalPlaces = 0
+            Decimal = 0
         }.ToString(6));
         Assert.AreEqual("", new Cell {
             Content = "45.8794",
             Format = CellFormat.FIXED,
-            DecimalPlaces = 0
+            Decimal = 0
         }.ToString(0));
     }
 
@@ -396,70 +397,70 @@ public class CellTests {
         Assert.AreEqual("  4.59E+01", new Cell {
             Content = "45.8794",
             Format = CellFormat.SCIENTIFIC,
-            DecimalPlaces = 2
+            Decimal = 2
         }.ToString(10));
         Assert.AreEqual("4.59E+01    ", new Cell {
             Content = "45.8794",
             Format = CellFormat.SCIENTIFIC,
-            Alignment = CellAlignment.LEFT,
-            DecimalPlaces = 2
+            Align = CellAlignment.LEFT,
+            Decimal = 2
         }.ToString(12));
         Assert.AreEqual("  4.59E+01  ", new Cell {
             Content = "45.8794",
             Format = CellFormat.SCIENTIFIC,
-            Alignment = CellAlignment.CENTRE,
-            DecimalPlaces = 2
+            Align = CellAlignment.CENTRE,
+            Decimal = 2
         }.ToString(12));
         Assert.AreEqual("   4.588E+01", new Cell {
             Content = "45.8794",
             Format = CellFormat.SCIENTIFIC,
-            DecimalPlaces = 3
+            Decimal = 3
         }.ToString(12));
         Assert.AreEqual("******", new Cell {
             Content = "45.8794",
             Format = CellFormat.SCIENTIFIC,
-            DecimalPlaces = 4
+            Decimal = 4
         }.ToString(6));
         Assert.AreEqual(" 5E+01", new Cell {
             Content = "45.8794",
             Format = CellFormat.SCIENTIFIC,
-            DecimalPlaces = 0
+            Decimal = 0
         }.ToString(6));
         Assert.AreEqual("", new Cell {
             Content = "45.8794",
             Format = CellFormat.SCIENTIFIC,
-            DecimalPlaces = 0
+            Decimal = 0
         }.ToString(0));
     }
 
     // Verify comma format formatting
     [Test]
     public void VerifyCommaFormat() {
-        Assert.AreEqual("1,234,567", new Cell {
+        Assert.AreEqual("1,234,567.00", new Cell {
             Content = "1234567",
             Format = CellFormat.COMMAS
-        }.ToString(9));
-        Assert.AreEqual("      999", new Cell {
+        }.ToString(12));
+        Assert.AreEqual("   999.00", new Cell {
             Content = "999",
             Format = CellFormat.COMMAS
         }.ToString(9));
-        Assert.AreEqual("    (999)", new Cell {
+        Assert.AreEqual(" (999.00)", new Cell {
             Content = "-999",
             Format = CellFormat.COMMAS
         }.ToString(9));
-        Assert.AreEqual("(999)    ", new Cell {
+        Assert.AreEqual("(999.00) ", new Cell {
             Content = "-999",
-            Alignment = CellAlignment.LEFT,
+            Align = CellAlignment.LEFT,
             Format = CellFormat.COMMAS
         }.ToString(9));
-        Assert.AreEqual(" (123,456) ", new Cell {
+        Assert.AreEqual(" (123,456.00) ", new Cell {
             Content = "-123456",
-            Alignment = CellAlignment.CENTRE,
+            Align = CellAlignment.CENTRE,
             Format = CellFormat.COMMAS
-        }.ToString(11));
+        }.ToString(14));
         Assert.AreEqual("********", new Cell {
             Content = "-123456",
-            Alignment = CellAlignment.LEFT,
+            Align = CellAlignment.LEFT,
             Format = CellFormat.COMMAS
         }.ToString(8));
     }
@@ -467,14 +468,14 @@ public class CellTests {
     // Verify currency format formatting
     [Test]
     public void VerifyCurrencyFormat() {
-        Assert.AreEqual("  £1,234,567", new Cell {
+        Assert.AreEqual("  £1,234,567.00", new Cell {
             Content = "1234567",
             Format = CellFormat.CURRENCY
-        }.ToString(12));
+        }.ToString(15));
         Assert.AreEqual("(£7,655.00) ", new Cell {
             Content = "-7655",
-            DecimalPlaces = 2,
-            Alignment = CellAlignment.LEFT,
+            Decimal = 2,
+            Align = CellAlignment.LEFT,
             Format = CellFormat.CURRENCY
         }.ToString(12));
     }
@@ -507,26 +508,26 @@ public class CellTests {
     // Verify percent format formatting
     [Test]
     public void VerifyPercentFormat() {
-        Assert.AreEqual("       50%", new Cell {
+        Assert.AreEqual("       50.00%", new Cell {
             Content = "0.5",
             Format = CellFormat.PERCENT
-        }.ToString(10));
+        }.ToString(13));
         Assert.AreEqual("50.000%   ", new Cell {
             Content = "0.5",
-            Alignment = CellAlignment.LEFT,
-            DecimalPlaces = 3,
+            Align = CellAlignment.LEFT,
+            Decimal = 3,
             Format = CellFormat.PERCENT
         }.ToString(10));
         Assert.AreEqual("   20%   ", new Cell {
             Content = "0.2",
-            Alignment = CellAlignment.CENTRE,
-            DecimalPlaces = 0,
+            Align = CellAlignment.CENTRE,
+            Decimal = 0,
             Format = CellFormat.PERCENT
         }.ToString(9));
         Assert.AreEqual(" 456700.00% ", new Cell {
             Content = "4567",
-            Alignment = CellAlignment.CENTRE,
-            DecimalPlaces = 2,
+            Align = CellAlignment.CENTRE,
+            Decimal = 2,
             Format = CellFormat.PERCENT
         }.ToString(12));
         Assert.AreEqual("**", new Cell {
@@ -545,17 +546,17 @@ public class CellTests {
         Assert.AreEqual("28-Dec    ", new Cell {
             Content = "657435",
             Format = CellFormat.DATE_DM,
-            Alignment = CellAlignment.LEFT
+            Align = CellAlignment.LEFT
         }.ToString(10));
         Assert.AreEqual("28-Dec-3699 ", new Cell {
             Content = "657435",
             Format = CellFormat.DATE_DMY,
-            Alignment = CellAlignment.LEFT
+            Align = CellAlignment.LEFT
         }.ToString(12));
         Assert.AreEqual("  Dec-3699  ", new Cell {
             Content = "657435",
             Format = CellFormat.DATE_MY,
-            Alignment = CellAlignment.CENTRE
+            Align = CellAlignment.CENTRE
         }.ToString(12));
         Assert.AreEqual("   -666435.0", new Cell {
             Content = "-666435.0",
@@ -569,5 +570,84 @@ public class CellTests {
             Content = "NOT A DATE",
             Format = CellFormat.DATE_DM
         }.ToString(10));
+    }
+
+    // Style a cell and ensure correct render string
+    [Test]
+    public void TestCellStyle() {
+        Cell cell1 = new Cell {
+            Content = "HELLO WORLD",
+            Align = CellAlignment.RIGHT,
+            Style = new CellStyle {
+                Foreground = AnsiColour.Cyan,
+                Background = AnsiColour.Green,
+                Bold = true
+            }
+        };
+        Assert.AreEqual("\u001b[36;42m\u001b[1m    HELLO WORLD\u001b[0m", cell1.AnsiTextSpan(15).EscapedString());
+
+        Cell cell2 = new Cell {
+            Content = "HELLO WORLD",
+            Align = CellAlignment.LEFT,
+            Style = new CellStyle {
+                Italic = true,
+                Underline = true
+            }
+        };
+        Assert.AreEqual("\u001b[97;40m\u001b[3m\u001b[4mHELLO WORLD    \u001b[0m", cell2.AnsiTextSpan(15).EscapedString());
+    }
+
+    // Test changing the cell factory changes the default
+    // properties of a cell.
+    [Test]
+    public void TestCellFactory() {
+        Cell cell1 = new Cell();
+        Cell cell3 = new Cell {
+            Decimal = 4,
+            Align = CellAlignment.CENTRE,
+            Style = new CellStyle {
+                Foreground = AnsiColour.Blue,
+                Background = AnsiColour.BrightGreen
+            }
+        };
+        Assert.AreEqual(2, cell1.DecimalPlaces);
+        Assert.AreEqual(CellAlignment.GENERAL, cell1.Alignment);
+
+        // Save cell factory
+        int dp = CellFactory.DecimalPlaces;
+        CellAlignment align = CellFactory.Alignment;
+        int fg = CellFactory.ForegroundColour;
+        int bg = CellFactory.BackgroundColour;
+
+        // cell1 should inherit factory defaults as no explicit change
+        // to the properties were made. cell3 should retain the explicit
+        // change to the properties.
+        CellFactory.DecimalPlaces = 5;
+        CellFactory.Alignment = CellAlignment.LEFT;
+        CellFactory.ForegroundColour = AnsiColour.BrightYellow;
+        CellFactory.BackgroundColour = AnsiColour.Blue;
+        Assert.AreEqual(5, cell1.DecimalPlaces);
+        Assert.AreEqual(CellAlignment.LEFT, cell1.Alignment);
+        Assert.AreEqual(AnsiColour.BrightYellow, cell1.Style.ForegroundColour);
+        Assert.AreEqual(AnsiColour.Blue, cell1.Style.BackgroundColour);
+
+        Assert.AreEqual(4, cell3.DecimalPlaces);
+        Assert.AreEqual(CellAlignment.CENTRE, cell3.Alignment);
+        Assert.AreEqual(AnsiColour.Blue, cell3.Style.ForegroundColour);
+        Assert.AreEqual(AnsiColour.BrightGreen, cell3.Style.BackgroundColour);
+
+        // Creating a new cell after changing the factory should pick
+        // up the new factory defaults
+        Cell cell2 = new Cell();
+        Assert.AreEqual(5, cell2.DecimalPlaces);
+        Assert.AreEqual(CellAlignment.LEFT, cell2.Alignment);
+        Assert.AreEqual(AnsiColour.BrightYellow, cell2.Style.ForegroundColour);
+        Assert.AreEqual(AnsiColour.Blue, cell2.Style.BackgroundColour);
+
+        // Reset cell factory
+        CellFactory.DecimalPlaces = dp;
+        CellFactory.Alignment = align;
+        CellFactory.ForegroundColour = fg;
+        CellFactory.BackgroundColour = bg;
     }
 }

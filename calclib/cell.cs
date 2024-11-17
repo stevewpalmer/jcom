@@ -44,7 +44,13 @@ public class Cell {
     /// <summary>
     /// Cell alignment
     /// </summary>
-    public CellAlignment Alignment { get; set; }
+    public CellAlignment? Align { get; set; }
+
+    /// <summary>
+    /// Cell alignment
+    /// </summary>
+    [JsonIgnore]
+    public CellAlignment Alignment => Align.GetValueOrDefault(CellFactory.Alignment);
 
     /// <summary>
     /// Cell text style
@@ -95,7 +101,12 @@ public class Cell {
     /// <summary>
     /// Number of decimal places
     /// </summary>
-    public int DecimalPlaces { get; set; }
+    public int? Decimal { get; set; }
+
+    /// <summary>
+    /// Number of decimal places
+    /// </summary>
+    public int DecimalPlaces => Decimal.GetValueOrDefault(CellFactory.DecimalPlaces);
 
     /// <summary>
     /// Is this a blank cell?
@@ -188,7 +199,7 @@ public class Cell {
     /// R(y)C(x) where y and x are row and column offsets respectively.
     /// </summary>
     /// <param name="location">A CellLocation</param>
-    /// <returns></returns>
+    /// <returns>Cell location to a relative address</returns>
     public static string LocationToAddress(Point location) =>
         $"R({location.Y})C({location.X})";
 
@@ -370,8 +381,8 @@ public class Cell {
     public void Swap(Cell other) {
         (CellValue, other.CellValue) = (other.CellValue, CellValue);
         (Format, other.Format) = (other.Format, Format);
-        (Alignment, other.Alignment) = (other.Alignment, Alignment);
-        (DecimalPlaces, other.DecimalPlaces) = (other.DecimalPlaces, DecimalPlaces);
+        (Align, other.Align) = (other.Align, Align);
+        (Decimal, other.Decimal) = (other.Decimal, Decimal);
         (Style, other.Style) = (other.Style, Style);
     }
 

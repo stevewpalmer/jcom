@@ -1,10 +1,10 @@
-// calclib
-// Window management
+// JCalcLib
+// Cell factory
 //
 // Authors:
-//  Steve
+//  Steven Palmer
 //
-// Copyright (C) 2024 Steve
+// Copyright (C) 2024 Steven Palmer
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -23,46 +23,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Text.Json.Serialization;
+using JComLib;
 
 namespace JCalcLib;
 
-public class CellStyle {
+public static class CellFactory {
 
     /// <summary>
-    /// Foreground colour
+    /// Default number of decimal places
     /// </summary>
-    public int? Foreground { get; set; }
+    public static int DecimalPlaces { get; set; } = 2;
 
     /// <summary>
-    /// Foreground colour
+    /// Default cell background colour
     /// </summary>
-    [JsonIgnore]
-    public int ForegroundColour => Foreground.GetValueOrDefault(CellFactory.ForegroundColour);
+    public static int BackgroundColour { get; set; } = AnsiColour.Black;
 
     /// <summary>
-    /// Background colour
+    /// Default cell foreground colour
     /// </summary>
-    public int? Background { get; set; }
+    public static int ForegroundColour { get; set; } = AnsiColour.BrightWhite;
 
     /// <summary>
-    /// Background colour
+    /// Default cell alignment
     /// </summary>
-    [JsonIgnore]
-    public int BackgroundColour => Background.GetValueOrDefault(CellFactory.BackgroundColour);
-
-    /// <summary>
-    /// Specifies boldface text
-    /// </summary>
-    public bool Bold { get; set; }
-
-    /// <summary>
-    /// Specifies italic text
-    /// </summary>
-    public bool Italic { get; set; }
-
-    /// <summary>
-    /// Specifies Underlined text
-    /// </summary>
-    public bool Underline { get; set; }
+    public static CellAlignment Alignment { get; set; } = CellAlignment.GENERAL;
 }

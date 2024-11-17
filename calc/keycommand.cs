@@ -31,6 +31,7 @@ namespace JCalc;
 public enum KeyCommand {
     KC_NONE,
     KC_ALIGN_CENTRE,
+    KC_ALIGN_GENERAL,
     KC_ALIGN_LEFT,
     KC_ALIGN_RIGHT,
     KC_COMMAND_BAR,
@@ -39,6 +40,7 @@ public enum KeyCommand {
     KC_DATE_DMY,
     KC_DATE_MY,
     KC_DEFAULT_ALIGN_CENTRE,
+    KC_DEFAULT_ALIGN_GENERAL,
     KC_DEFAULT_ALIGN_LEFT,
     KC_DEFAULT_ALIGN_RIGHT,
     KC_DEFAULT_DATE_DM,

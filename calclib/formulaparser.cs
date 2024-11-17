@@ -659,9 +659,9 @@ public class FormulaParser {
     }
 
     /// <summary>
-    /// Parse the next token from the formula string
+    /// Parse the next token from the formula string.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A SimpleToken represented the parsed token</returns>
     private SimpleToken GetNextToken() {
         SimpleToken token;
         if (_pushedToken != null) {

@@ -25,7 +25,6 @@
 
 using System.Diagnostics;
 using System.Drawing;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using JCalc.Resources;
@@ -226,11 +225,7 @@ public class Sheet {
     public Cell GetCell(CellLocation location, bool createIfEmpty) {
         CellList? cellList = CellListForColumn(location.Column, createIfEmpty);
         Cell cell = new Cell {
-            Alignment = Screen.Config.DefaultCellAlignment,
-            Format = Screen.Config.DefaultCellFormat,
-            DecimalPlaces = Screen.Config.DefaultDecimals,
-            Location = location,
-            Style = new CellStyle()
+            Location = location
         };
         if (cellList != null) {
             int c = 0;
@@ -357,7 +352,7 @@ public class Sheet {
     /// <param name="decimalPlaces">Number of decimal places</param>
     public void SetCellFormat(Cell cell, CellFormat format, int decimalPlaces) {
         cell.Format = format;
-        cell.DecimalPlaces = decimalPlaces;
+        cell.Decimal = decimalPlaces;
         Modified = true;
     }
 
@@ -367,7 +362,7 @@ public class Sheet {
     /// <param name="cell">Cell to align</param>
     /// <param name="alignment">New alignment</param>
     public void SetCellAlignment(Cell cell, CellAlignment alignment) {
-        cell.Alignment = alignment;
+        cell.Align = alignment;
         Modified = true;
     }
 
