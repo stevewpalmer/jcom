@@ -51,7 +51,7 @@ public class Calculate(Sheet sheet) {
             try {
                 referenceList = new Stack<CellLocation>();
                 referenceList.Push(cell.Location);
-                cell.CellValue.Value = EvaluateNode(cell.ParseNode).StringValue;
+                cell.CellValue.Value = EvaluateNode(cell, cell.ParseNode).StringValue;
             }
             catch (Exception) {
                 cell.CellValue.Value = "!ERR";
@@ -63,9 +63,10 @@ public class Calculate(Sheet sheet) {
     /// Evaluate one node of the parse tree and return the literal result of
     /// the evaluation.
     /// </summary>
+    /// <param name="sourceCell">Source cell</param>
     /// <param name="node">Node to evaluate</param>
     /// <returns>Value of node</returns>
-    private Variant EvaluateNode(CellParseNode node) {
+    private Variant EvaluateNode(Cell sourceCell, CellParseNode node) {
         switch (node.Op) {
             case TokenID.NUMBER:
                 NumberParseNode numberNode = (NumberParseNode)node;
@@ -75,82 +76,84 @@ public class Calculate(Sheet sheet) {
                 TextParseNode textNode = (TextParseNode)node;
                 return new Variant(textNode.Value);
 
-            case TokenID.KSUM: return KSum(node);
+            case TokenID.KSUM: return KSum(sourceCell, node);
+            case TokenID.KNOW: return KNow(sourceCell);
+            case TokenID.KTODAY: return KToday(sourceCell);
 
             case TokenID.EXP: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(Math.Pow(left, right));
             }
 
             case TokenID.PLUS: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left + right);
             }
 
             case TokenID.MINUS: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left - right);
             }
 
             case TokenID.MULTIPLY: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left * right);
             }
 
             case TokenID.DIVIDE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left / right);
             }
 
             case TokenID.KEQ: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(Math.Abs(left - right) < 0.01);
             }
 
             case TokenID.KNE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(Math.Abs(left - right) > 0.01);
             }
 
             case TokenID.KGT: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left > right);
             }
 
             case TokenID.KGE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left >= right);
             }
 
             case TokenID.KLT: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left < right);
             }
 
             case TokenID.KLE: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
-                double left = EvaluateNode(binaryNode.Left).DoubleValue;
-                double right = EvaluateNode(binaryNode.Right).DoubleValue;
+                double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
+                double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left <= right);
             }
 
@@ -162,14 +165,13 @@ public class Calculate(Sheet sheet) {
                 if (addressNode.Error) {
                     throw new Exception("Error in address");
                 }
-                CellLocation sourceCell = referenceList.First();
-                CellLocation absoluteLocation = addressNode.ToAbsolute(sourceCell);
+                CellLocation absoluteLocation = addressNode.ToAbsolute(sourceCell.Location);
                 Cell cell = sheet.GetCell(absoluteLocation, false);
                 if (cell.IsEmptyCell) {
                     return new Variant(0);
                 }
                 referenceList.Push(cell.Location);
-                Variant result = EvaluateNode(cell.ParseNode);
+                Variant result = EvaluateNode(cell, cell.ParseNode);
                 referenceList.Pop();
                 return result;
             }
@@ -183,26 +185,52 @@ public class Calculate(Sheet sheet) {
     /// <summary>
     /// Calculate the result of the SUM function
     /// </summary>
+    /// <param name="sourceCell">Source cell</param>
     /// <param name="node">SUM function parse node</param>
     /// <returns>The result of the function as a Variant</returns>
-    private Variant KSum(CellParseNode node) {
-        Debug.Assert(node is RangeParseNode);
-        RangeParseNode rangeNode = (RangeParseNode)node;
-        CellLocation sourceCell = referenceList.First();
+    private Variant KSum(Cell sourceCell, CellParseNode node) {
+        Debug.Assert(node is FunctionParseNode);
         Variant sumTotal = new Variant(0);
-        foreach (CellLocation location in rangeNode.RangeIterator(sourceCell)) {
-            Variant result;
-            Cell cell = sheet.GetCell(location, false);
-            if (cell.IsEmptyCell) {
-                result = new Variant(0);
+        FunctionParseNode functionNode = (FunctionParseNode)node;
+        foreach (CellParseNode parameter in functionNode.Parameters) {
+            Debug.Assert(parameter is RangeParseNode);
+            RangeParseNode rangeNode = (RangeParseNode)parameter;
+            foreach (CellLocation location in rangeNode.RangeIterator(sourceCell.Location)) {
+                Variant result;
+                Cell cell = sheet.GetCell(location, false);
+                if (cell.IsEmptyCell) {
+                    result = new Variant(0);
+                }
+                else {
+                    referenceList.Push(cell.Location);
+                    result = EvaluateNode(sourceCell, cell.ParseNode);
+                    referenceList.Pop();
+                }
+                sumTotal += result;
             }
-            else {
-                referenceList.Push(cell.Location);
-                result = EvaluateNode(cell.ParseNode);
-                referenceList.Pop();
-            }
-            sumTotal += result;
         }
         return sumTotal;
+    }
+
+    /// <summary>
+    /// Insert the current date and time. If the cell has no existing
+    /// format, we apply a default date-time format.
+    /// </summary>
+    /// <param name="cell">Source cell</param>
+    /// <returns>Value to be applied to the cell</returns>
+    private static Variant KNow(Cell cell) {
+        cell.Format ??= CellFormat.DATE_DMY;
+        return new Variant(DateTime.Now.ToOADate());
+    }
+
+    /// <summary>
+    /// Insert the current date. If the cell has no existing
+    /// format, we apply a default date-time format.
+    /// </summary>
+    /// <param name="cell">Source cell</param>
+    /// <returns>Value to be applied to the cell</returns>
+    private static Variant KToday(Cell cell) {
+        cell.Format ??= CellFormat.DATE_DM;
+        return new Variant(DateTime.Now.ToOADate());
     }
 }

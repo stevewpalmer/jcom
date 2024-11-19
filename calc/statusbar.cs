@@ -46,7 +46,7 @@ public class StatusBar {
     /// Set the status bar position and width
     /// </summary>
     public StatusBar() {
-        _statusBarRow = Terminal.Height - 1;
+        _statusBarRow = Terminal.Height - Height;
         _statusBarWidth = Terminal.Width;
         _filename = string.Empty;
         _message = string.Empty;

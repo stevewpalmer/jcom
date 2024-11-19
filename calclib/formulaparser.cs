@@ -52,7 +52,10 @@ public enum TokenID {
     EOL,
     TEXT,
     KSUM,
-    COLON
+    KNOW,
+    KTODAY,
+    COLON,
+    RANGE
 }
 
 /// <summary>
@@ -94,6 +97,8 @@ public class CellParseNode(TokenID tokenID) {
             TokenID.KNE => "<>",
             TokenID.COLON => ":",
             TokenID.KSUM => "SUM",
+            TokenID.KNOW => "NOW",
+            TokenID.KTODAY => "TODAY",
             _ => ""
         };
 
@@ -101,7 +106,13 @@ public class CellParseNode(TokenID tokenID) {
     /// Convert this parse node to its raw string.
     /// </summary>
     /// <returns>String</returns>
-    public virtual string ToRawString() => string.Empty;
+    public virtual string ToRawString() => TokenToString(Op);
+
+    /// <summary>
+    /// Convert this parse node to its string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToString() => TokenToString(Op);
 
     /// <summary>
     /// Fix up any address references on the node.
@@ -112,6 +123,47 @@ public class CellParseNode(TokenID tokenID) {
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     public virtual bool FixupAddress(CellLocation location, int column, int row, int offset) {
         return false;
+    }
+}
+
+/// <summary>
+/// Parse node for a function call.
+/// </summary>
+/// <param name="tokenID">Node token ID</param>
+public class FunctionParseNode(TokenID tokenID, CellParseNode[] parameters) : CellParseNode(tokenID) {
+
+    /// <summary>
+    /// Function parameter list
+    /// </summary>
+    public CellParseNode[] Parameters { get; } = parameters;
+
+    /// <summary>
+    /// Convert this parse node to its raw string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToRawString() => $"{TokenToString(Op)}({string.Join(",", Parameters.Select(p => p.ToRawString()))})";
+
+    /// <summary>
+    /// Convert this parse node to its string.
+    /// </summary>
+    /// <returns>String</returns>
+    public override string ToString() => $"{TokenToString(Op)}({string.Join(",", Parameters.Select(p => p.ToString()))})";
+
+    /// <summary>
+    /// Fix up any address references on the node.
+    /// </summary>
+    /// <param name="location"></param>
+    /// <param name="column">Column to fix</param>
+    /// <param name="row">Row to fix</param>
+    /// <param name="offset">Offset to be applied to the column and/or row</param>
+    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
+        bool fixup = false;
+        foreach (CellParseNode parameter in Parameters) {
+            if (parameter.FixupAddress(location, column, row, offset)) {
+                fixup = true;
+            }
+        }
+        return fixup;
     }
 }
 
@@ -163,8 +215,8 @@ public class BinaryOpParseNode(TokenID tokenID, CellParseNode left, CellParseNod
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        string left = Left.ToString()!;
-        string right = Right.ToString()!;
+        string left = Left.ToString();
+        string right = Right.ToString();
         return FormatToString(left, right);
     }
 
@@ -321,7 +373,7 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
 /// </summary>
 /// <param name="start">Start of range</param>
 /// <param name="end">End of range</param>
-public class RangeParseNode(TokenID tokenID, LocationParseNode start, LocationParseNode end) : CellParseNode(tokenID) {
+public class RangeParseNode(LocationParseNode start, LocationParseNode end) : CellParseNode(TokenID.RANGE) {
 
     /// <summary>
     /// Start of range
@@ -352,7 +404,7 @@ public class RangeParseNode(TokenID tokenID, LocationParseNode start, LocationPa
     /// </summary>
     /// <returns>String</returns>
     public override string ToRawString() {
-        return $"{TokenToString(Op)}({RangeStart.ToRawString()}:{RangeEnd.ToRawString()})";
+        return $"{RangeStart.ToRawString()}:{RangeEnd.ToRawString()}";
     }
 
     /// <summary>
@@ -360,7 +412,7 @@ public class RangeParseNode(TokenID tokenID, LocationParseNode start, LocationPa
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        return $"{TokenToString(Op)}({RangeStart}:{RangeEnd})";
+        return $"{RangeStart}:{RangeEnd}";
     }
 
     /// <summary>
@@ -404,7 +456,9 @@ public class FormulaParser {
     /// List of built-in functions
     /// </summary>
     private readonly Dictionary<string, TokenID> _functions = new() {
-        { "SUM", TokenID.KSUM }
+        { "SUM", TokenID.KSUM },
+        { "NOW", TokenID.KNOW },
+        { "TODAY", TokenID.KTODAY }
     };
 
     /// <summary>
@@ -748,6 +802,12 @@ public class FormulaParser {
                 return node;
             }
 
+            case TokenID.KTODAY:
+            case TokenID.KNOW:
+                ExpectToken(TokenID.LPAREN);
+                ExpectToken(TokenID.RPAREN);
+                return new FunctionParseNode(token.ID, []);
+
             case TokenID.KSUM: {
                 ExpectToken(TokenID.LPAREN);
                 CellParseNode start = Operand();
@@ -759,9 +819,9 @@ public class FormulaParser {
                 if (end is not LocationParseNode endRange) {
                     throw new FormatException(InvalidFormulaError);
                 }
-                RangeParseNode rangeNode = new(TokenID.KSUM, startRange, endRange);
+                RangeParseNode rangeNode = new(startRange, endRange);
                 ExpectToken(TokenID.RPAREN);
-                return rangeNode;
+                return new FunctionParseNode(TokenID.KSUM, [rangeNode]);
             }
 
             case TokenID.PLUS:

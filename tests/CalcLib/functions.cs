@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using JCalcLib;
 using JFortranLib;
@@ -39,17 +40,21 @@ public class FunctionTests {
     [Test]
     public void VerifySum() {
         Cell cell = new Cell { Location = new CellLocation { Row = 1, Column = 1 }, UIContent = "=SUM(A2:A4)"};
-        Assert.IsTrue(cell.ParseNode.GetType() == typeof(RangeParseNode));
+        Assert.IsTrue(cell.ParseNode.GetType() == typeof(FunctionParseNode));
 
-        RangeParseNode range = (RangeParseNode)cell.ParseNode;
-        Assert.AreEqual(TokenID.KSUM, range.Op);
+        FunctionParseNode functionNode = (FunctionParseNode)cell.ParseNode;
+        Assert.AreEqual(TokenID.KSUM, functionNode.Op);
+        Assert.AreEqual("SUM(A2:A4)", functionNode.ToString());
+        Assert.AreEqual("SUM(R(1)C(0):R(3)C(0))", functionNode.ToRawString());
+
+        RangeParseNode range = (RangeParseNode)functionNode.Parameters[0];
         Assert.IsTrue(range.RangeStart != null);
         Assert.IsTrue(range.RangeEnd != null);
 
         LocationParseNode rangeStart = range.RangeStart;
         LocationParseNode rangeEnd = range.RangeEnd;
-        Assert.AreEqual("SUM(A2:A4)", range.ToString());
-        Assert.AreEqual("SUM(R(1)C(0):R(3)C(0))", range.ToRawString());
+        Assert.AreEqual("A2:A4", range.ToString());
+        Assert.AreEqual("R(1)C(0):R(3)C(0)", range.ToRawString());
         Assert.AreEqual(new CellLocation { Column = 1, Row = 2}, rangeStart.AbsoluteLocation);
         Assert.AreEqual(new CellLocation { Column = 1, Row = 4}, rangeEnd.AbsoluteLocation);
 
