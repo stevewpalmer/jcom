@@ -183,12 +183,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string FormatBar {
-            get {
-                return ResourceManager.GetString("FormatBar", resourceCulture);
-            }
-        }
-        
         internal static string FormatPercent {
             get {
                 return ResourceManager.GetString("FormatPercent", resourceCulture);
@@ -354,12 +348,6 @@ namespace JCalc.Resources {
         internal static string FormatGeneralDescription {
             get {
                 return ResourceManager.GetString("FormatGeneralDescription", resourceCulture);
-            }
-        }
-        
-        internal static string FormatBarDescription {
-            get {
-                return ResourceManager.GetString("FormatBarDescription", resourceCulture);
             }
         }
         

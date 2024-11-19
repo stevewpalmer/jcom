@@ -58,11 +58,6 @@ public enum CellFormat {
     PERCENT,
 
     /// <summary>
-    /// Horizontal bar
-    /// </summary>
-    BAR,
-
-    /// <summary>
     /// Text format
     /// </summary>
     TEXT,

@@ -186,12 +186,6 @@ public class CellTests {
             Format = CellFormat.FIXED,
             Decimal = 3
         }.FormatDescription);
-        Assert.AreEqual("(B)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
-            Format = CellFormat.BAR
-        }.FormatDescription);
         Assert.AreEqual("(S1)", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
@@ -480,31 +474,6 @@ public class CellTests {
         }.ToString(12));
     }
 
-    // Verify bar format formatting
-    [Test]
-    public void VerifyBarFormat() {
-        Assert.AreEqual("+++++     ", new Cell {
-            Content = "5",
-            Format = CellFormat.BAR
-        }.ToString(10));
-        Assert.AreEqual("++++++++++", new Cell {
-            Content = "10",
-            Format = CellFormat.BAR
-        }.ToString(10));
-        Assert.AreEqual("          ", new Cell {
-            Content = "0",
-            Format = CellFormat.BAR
-        }.ToString(10));
-        Assert.AreEqual("-----     ", new Cell {
-            Content = "-5",
-            Format = CellFormat.BAR
-        }.ToString(10));
-        Assert.AreEqual("**********", new Cell {
-            Content = "12",
-            Format = CellFormat.BAR
-        }.ToString(10));
-    }
-
     // Verify percent format formatting
     [Test]
     public void VerifyPercentFormat() {
@@ -605,7 +574,7 @@ public class CellTests {
         Cell cell3 = new Cell {
             Decimal = 4,
             Align = CellAlignment.CENTRE,
-            Format = CellFormat.BAR,
+            Format = CellFormat.COMMAS,
             Style = new CellStyle {
                 Foreground = AnsiColour.Blue,
                 Background = AnsiColour.BrightGreen
@@ -639,7 +608,7 @@ public class CellTests {
 
         Assert.AreEqual(4, cell3.DecimalPlaces);
         Assert.AreEqual(CellAlignment.CENTRE, cell3.Alignment);
-        Assert.AreEqual(CellFormat.BAR, cell3.CellFormat);
+        Assert.AreEqual(CellFormat.COMMAS, cell3.CellFormat);
         Assert.AreEqual(AnsiColour.Blue, cell3.Style.ForegroundColour);
         Assert.AreEqual(AnsiColour.BrightGreen, cell3.Style.BackgroundColour);
 

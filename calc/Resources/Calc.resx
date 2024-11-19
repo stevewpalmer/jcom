@@ -87,9 +87,6 @@
     <data name="FormatGeneral" xml:space="preserve">
         <value>General</value>
     </data>
-    <data name="FormatBar" xml:space="preserve">
-        <value>+/-</value>
-    </data>
     <data name="FormatPercent" xml:space="preserve">
         <value>Percent</value>
     </data>
@@ -173,9 +170,6 @@
     </data>
     <data name="FormatGeneralDescription" xml:space="preserve">
         <value>Standard format (x.xx or x.xxExx)</value>
-    </data>
-    <data name="FormatBarDescription" xml:space="preserve">
-        <value>Horizontal bar graph format (+++ or ---)</value>
     </data>
     <data name="FormatPercentDescription" xml:space="preserve">
         <value>Percent format (x.xx%)</value>

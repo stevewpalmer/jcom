@@ -158,7 +158,6 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.FormatCurrency, CommandId = KeyCommand.KC_FORMAT_CURRENCY, Description = Calc.FormatCurrencyDescription },
                 new CommandMapEntry { Name = Calc.FormatCommas, CommandId = KeyCommand.KC_FORMAT_COMMAS, Description = Calc.FormatCommasDescription },
                 new CommandMapEntry { Name = Calc.FormatGeneral, CommandId = KeyCommand.KC_FORMAT_GENERAL, Description = Calc.FormatGeneralDescription },
-                new CommandMapEntry { Name = Calc.FormatBar, CommandId = KeyCommand.KC_FORMAT_BAR, Description = Calc.FormatBarDescription },
                 new CommandMapEntry { Name = Calc.FormatPercent, CommandId = KeyCommand.KC_FORMAT_PERCENT, Description = Calc.FormatPercentDescription },
                 new CommandMapEntry { Name = Calc.FormatDate, SubCommandId = CommandMapID.DATES, Description = Calc.FormatDatesDescription },
                 new CommandMapEntry { Name = Calc.FormatText, CommandId = KeyCommand.KC_FORMAT_TEXT, Description = Calc.FormatTextDescription },
@@ -232,7 +231,6 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.FormatCurrency, CommandId = KeyCommand.KC_DEFAULT_FORMAT_CURRENCY, Description = Calc.FormatCurrencyDescription },
                 new CommandMapEntry { Name = Calc.FormatCommas, CommandId = KeyCommand.KC_DEFAULT_FORMAT_COMMAS, Description = Calc.FormatCommasDescription },
                 new CommandMapEntry { Name = Calc.FormatGeneral, CommandId = KeyCommand.KC_DEFAULT_FORMAT_GENERAL, Description = Calc.FormatGeneralDescription },
-                new CommandMapEntry { Name = Calc.FormatBar, CommandId = KeyCommand.KC_DEFAULT_FORMAT_BAR, Description = Calc.FormatBarDescription },
                 new CommandMapEntry { Name = Calc.FormatPercent, CommandId = KeyCommand.KC_DEFAULT_FORMAT_PERCENT, Description = Calc.FormatPercentDescription },
                 new CommandMapEntry { Name = Calc.FormatDate, SubCommandId = CommandMapID.DEFAULT_DATES, Description = Calc.FormatDatesDescription },
                 new CommandMapEntry { Name = Calc.FormatText, CommandId = KeyCommand.KC_DEFAULT_FORMAT_TEXT, Description = Calc.FormatTextDescription }

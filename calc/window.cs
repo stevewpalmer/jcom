@@ -123,7 +123,6 @@ public class Window {
             KeyCommand.KC_FORMAT_PERCENT => FormatCells(CellFormat.PERCENT),
             KeyCommand.KC_FORMAT_CURRENCY => FormatCells(CellFormat.CURRENCY),
             KeyCommand.KC_FORMAT_COMMAS => FormatCells(CellFormat.COMMAS),
-            KeyCommand.KC_FORMAT_BAR => FormatCells(CellFormat.BAR),
             KeyCommand.KC_FORMAT_SCI => FormatCells(CellFormat.SCIENTIFIC),
             KeyCommand.KC_FORMAT_GENERAL => FormatCells(CellFormat.GENERAL),
             KeyCommand.KC_FORMAT_TEXT => FormatCells(CellFormat.TEXT),

@@ -76,7 +76,6 @@ public class Cell {
     public string FormatDescription {
         get {
             string text = CellFormat switch {
-                CellFormat.BAR => "B",
                 CellFormat.FIXED => $"F{DecimalPlaces}",
                 CellFormat.SCIENTIFIC => $"S{DecimalPlaces}",
                 CellFormat.TEXT => "T",
@@ -333,7 +332,6 @@ public class Cell {
                 CellFormat.COMMAS => doubleValue < 0 ?
                         $"({(-doubleValue).ToString($"N{DecimalPlaces}")})" :
                         $"{doubleValue.ToString($"N{DecimalPlaces}")}",
-                CellFormat.BAR => new string(doubleValue < 0 ? '-' : '+', maxBar),
                 CellFormat.SCIENTIFIC => doubleValue.ToString($"0.{new string('#', DecimalPlaces)}E+00"),
                 CellFormat.DATE_DM => ToDateTime("d-MMM", doubleValue),
                 CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
@@ -349,18 +347,13 @@ public class Cell {
         else if (cellValue.Length > width) {
             cellValue = cellValue[..width];
         }
-        if (CellFormat == CellFormat.BAR) {
-            cellValue = cellValue.PadRight(width);
-        }
-        else {
-            cellValue = Alignment switch {
-                CellAlignment.LEFT => cellValue.PadRight(width),
-                CellAlignment.RIGHT => cellValue.PadLeft(width),
-                CellAlignment.CENTRE => Utilities.CentreString(cellValue, width),
-                CellAlignment.GENERAL => !isNumber ? cellValue.PadRight(width) : cellValue.PadLeft(width),
-                _ => throw new ArgumentException($"Unknown Cell Alignment: {Alignment}")
-            };
-        }
+        cellValue = Alignment switch {
+            CellAlignment.LEFT => cellValue.PadRight(width),
+            CellAlignment.RIGHT => cellValue.PadLeft(width),
+            CellAlignment.CENTRE => Utilities.CentreString(cellValue, width),
+            CellAlignment.GENERAL => !isNumber ? cellValue.PadRight(width) : cellValue.PadLeft(width),
+            _ => throw new ArgumentException($"Unknown Cell Alignment: {Alignment}")
+        };
         return cellValue;
     }
 
