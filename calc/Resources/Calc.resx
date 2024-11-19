@@ -60,7 +60,7 @@
     <data name="RangeAlign" xml:space="preserve">
         <value>Align</value>
     </data>
-    <data name="FileRetrieve" xml:space="preserve">
+    <data name="FileOpen" xml:space="preserve">
         <value>Open</value>
     </data>
     <data name="FileSave" xml:space="preserve">
@@ -126,9 +126,6 @@
     <data name="CannotOpenFile" xml:space="preserve">
         <value>Cannot open file {0}</value>
     </data>
-    <data name="CannotSaveFile" xml:space="preserve">
-        <value>Cannot save {0} - {1}</value>
-    </data>
     <data name="Column" xml:space="preserve">
         <value>Column</value>
     </data>
@@ -147,13 +144,13 @@
     <data name="InsertRowDescription" xml:space="preserve">
         <value>Insert one or more blank rows above the cell pointer</value>
     </data>
-    <data name="SheetInsertDescription" xml:space="preserve">
-        <value>Insert blank column(s) or row(s)</value>
+    <data name="WorksheetInsertDescription" xml:space="preserve">
+        <value>Insert blank column(s) or row(s), or a new worksheet</value>
     </data>
-    <data name="SheetDeleteDescription" xml:space="preserve">
-        <value>Delete entire column(s) or row(s)</value>
+    <data name="WorksheetDeleteDescription" xml:space="preserve">
+        <value>Delete entire column(s) or row(s), or the current worksheet</value>
     </data>
-    <data name="SheetColumnWidthDescription" xml:space="preserve">
+    <data name="WorksheetColumnWidthDescription" xml:space="preserve">
         <value>Set display width of the current column</value>
     </data>
     <data name="FormatFixedDescription" xml:space="preserve">
@@ -198,11 +195,11 @@
     <data name="DatesMYDescription" xml:space="preserve">
         <value>Month-Year</value>
     </data>
-    <data name="FileEditDescription" xml:space="preserve">
-        <value>Load a worksheet file into a new window</value>
+    <data name="FileOpenDescription" xml:space="preserve">
+        <value>Open a workbook file</value>
     </data>
     <data name="FileSaveDescription" xml:space="preserve">
-        <value>Save the worksheet to a file</value>
+        <value>Save the current workbook to a file</value>
     </data>
     <data name="SetColumnWidthDescription" xml:space="preserve">
         <value>Set width of current column</value>
@@ -235,7 +232,7 @@
         <value>Backups</value>
     </data>
     <data name="InvalidColourIndex" xml:space="preserve">
-        <value>Invalid colour number.</value>
+        <value>Invalid colour number</value>
     </data>
     <data name="FormatTextDescription" xml:space="preserve">
         <value>Display formula instead of value</value>
@@ -283,10 +280,7 @@
         <value>Could not save the configuration - {0}</value>
     </data>
     <data name="BadCSVImportFile" xml:space="preserve">
-        <value>Error reading from {0}. File may contain bad CSV data.</value>
-    </data>
-    <data name="ErrorReadingFile" xml:space="preserve">
-        <value>Error reading from {0}. File is not a valid worksheet.</value>
+        <value>Error reading from {0}. File may contain bad CSV data</value>
     </data>
     <data name="ErrorExportingFile" xml:space="preserve">
         <value>Error writing to {0} - {1}</value>
@@ -304,7 +298,7 @@
         <value>Enter selection colour number</value>
     </data>
     <data name="BackgroundColourError" xml:space="preserve">
-        <value>Background colour is already set to foreground colour.</value>
+        <value>Background colour is already set to foreground colour</value>
     </data>
     <data name="CreateBackupFilePrompt" xml:space="preserve">
         <value>Create backup files when saving? @@</value>
@@ -389,5 +383,14 @@
     </data>
     <data name="AlignGeneralDescription" xml:space="preserve">
         <value>Apply general cell alignment</value>
+    </data>
+    <data name="InsertWorksheetDescription" xml:space="preserve">
+        <value>Create a new worksheet in this workbook</value>
+    </data>
+    <data name="DeleteWorksheetDescription" xml:space="preserve">
+        <value>Delete the current worksheet</value>
+    </data>
+    <data name="DeleteWorksheetError" xml:space="preserve">
+        <value>A workbook must contain at least one worksheet.</value>
     </data>
 </root>

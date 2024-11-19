@@ -1,5 +1,5 @@
-﻿// JCalc
-// Sheet management
+﻿// JCalcLib
+// Worksheet management
 //
 // Authors:
 //  Steve Palmer
@@ -25,76 +25,35 @@
 
 using System.Diagnostics;
 using System.Drawing;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using JCalc.Resources;
-using JCalcLib;
 using JComLib;
 
-namespace JCalc;
-
-public class CellList {
-
-    /// <summary>
-    /// Row or column 1-based index of cells
-    /// </summary>
-    public int Index { get; set; }
-
-    /// <summary>
-    /// List of cells in the row or column
-    /// </summary>
-    [JsonInclude]
-    public List<Cell> Cells { get; set; } = [];
-
-    /// <summary>
-    /// Size of the row or column
-    /// </summary>
-    public int Size { get; set; }
-
-    /// <summary>
-    /// Return all formula cells on this column
-    /// </summary>
-    [JsonIgnore]
-    public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.CellValue.Type == CellType.FORMULA);
-}
+namespace JCalcLib;
 
 public class Sheet {
-    private FileInfo? _fileInfo;
+
+    /// <summary>
+    /// Maximum number of columns
+    /// </summary>
+    public const int MaxColumns = 255;
+
+    /// <summary>
+    /// Maximum number of rows
+    /// </summary>
+    public const int MaxRows = 4096;
+
+    /// <summary>
+    /// Default column width
+    /// </summary>
+    public const int DefaultColumnWidth = 10;
 
     public Sheet() {}
 
     /// <summary>
-    /// Create a new empty sheet not associated with any file.
+    /// Create a new empty sheet with the specified number.
     /// </summary>
     /// <param name="number">Sheet number</param>
     public Sheet(int number) {
-        SheetNumber = number;
-    }
-
-    /// <summary>
-    /// Creates a sheet with the specified file.
-    /// </summary>
-    /// <param name="number">Sheet number</param>
-    /// <param name="filename">Name of file</param>
-    public Sheet(int number, string filename) {
-
-        if (!string.IsNullOrEmpty(filename) && File.Exists(filename)) {
-            try {
-                using FileStream stream = File.OpenRead(filename);
-                Sheet? inputSheet = JsonSerializer.Deserialize<Sheet>(stream);
-                if (inputSheet != null) {
-                    Location = inputSheet.Location;
-                    ColumnList = inputSheet.ColumnList;
-                    Calculate calc = new Calculate(this);
-                    calc.Update();
-                }
-            }
-            catch (JsonException) {
-                FileInfo info = new FileInfo(filename);
-                Screen.Status.Message(string.Format(Calc.ErrorReadingFile, info.Name));
-            }
-        }
-        Filename = filename;
         SheetNumber = number;
     }
 
@@ -123,22 +82,6 @@ public class Sheet {
     public bool NeedRecalculate { get; set; }
 
     /// <summary>
-    /// Return the name of the sheet. This is the base part of the filename if
-    /// there is one, or the New File string otherwise.
-    /// </summary>
-    [JsonIgnore]
-    public string Name => _fileInfo == null ? Consts.DefaultFilename : _fileInfo.Name;
-
-    /// <summary>
-    /// Return the fully qualified file name with path.
-    /// </summary>
-    [JsonIgnore]
-    public string Filename {
-        get => _fileInfo == null ? Consts.DefaultFilename : _fileInfo.FullName;
-        set => _fileInfo = string.IsNullOrEmpty(value) ? null : new FileInfo(value);
-    }
-
-    /// <summary>
     /// Whether the sheet has been modified since it was last
     /// changed.
     /// </summary>
@@ -158,36 +101,14 @@ public class Sheet {
     public static int RowHeight => 1;
 
     /// <summary>
-    /// Write the sheet back to disk.
-    /// </summary>
-    public void Write() {
-        try {
-            if (Screen.Config.BackupFile && File.Exists(Filename)) {
-                string backupFile = Filename + Consts.BackupExtension;
-                File.Delete(backupFile);
-                File.Copy(Filename, backupFile);
-            }
-            using FileStream stream = File.Create(Filename);
-            JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-                WriteIndented = true
-            });
-        }
-        catch (Exception e) {
-            Screen.Status.Message(string.Format(Calc.CannotSaveFile, Filename, e.Message));
-        }
-        Modified = false;
-    }
-
-    /// <summary>
     /// Return the width of the specified column.
     /// </summary>
     /// <param name="column">Column number, 1-based</param>
     /// <returns>Column width</returns>
     public int ColumnWidth(int column) {
-        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        Debug.Assert(column is >= 1 and <= MaxColumns);
         CellList? cellList = CellListForColumn(column, false);
-        return cellList?.Size ?? Consts.DefaultColumnWidth;
+        return cellList?.Size ?? DefaultColumnWidth;
     }
 
     /// <summary>
@@ -196,7 +117,7 @@ public class Sheet {
     /// <param name="column">Column number, 1-based</param>
     /// <param name="width">New width</param>
     public bool SetColumnWidth(int column, int width) {
-        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        Debug.Assert(column is >= 1 and <= MaxColumns);
         Debug.Assert(width is >= 0 and <= 100);
         int c = 0;
         bool success = false;
@@ -212,6 +133,9 @@ public class Sheet {
                 break;
             }
             c++;
+        }
+        if (success) {
+            Modified = true;
         }
         return success;
     }
@@ -250,7 +174,7 @@ public class Sheet {
     /// </summary>
     /// <param name="column">Insertion column</param>
     public void InsertColumn(int column) {
-        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        Debug.Assert(column is >= 1 and <= MaxColumns);
         int c = 0;
         while (c < ColumnList.Count && ColumnList[c].Index < column) {
             c++;
@@ -273,7 +197,7 @@ public class Sheet {
     /// </summary>
     /// <param name="row">Insertion row</param>
     public void InsertRow(int row) {
-        Debug.Assert(row is >= 1 and <= Consts.MaxRows);
+        Debug.Assert(row is >= 1 and <= MaxRows);
         int c = 0;
         while (c < ColumnList.Count) {
             foreach (Cell cell in ColumnList[c].Cells) {
@@ -294,7 +218,7 @@ public class Sheet {
     /// </summary>
     /// <param name="column">Deletion column</param>
     public void DeleteColumn(int column) {
-        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        Debug.Assert(column is >= 1 and <= MaxColumns);
         int c = ColumnList.Count - 1;
         while (c >= 0) {
             if (ColumnList[c].Index == column) {
@@ -321,7 +245,7 @@ public class Sheet {
     /// </summary>
     /// <param name="row">Deletion row</param>
     public void DeleteRow(int row) {
-        Debug.Assert(row is >= 1 and <= Consts.MaxRows);
+        Debug.Assert(row is >= 1 and <= MaxRows);
         int c = ColumnList.Count - 1;
         while (c >= 0) {
             int r = ColumnList[c].Cells.Count - 1;
@@ -386,7 +310,7 @@ public class Sheet {
     /// <param name="width">Line width</param>
     /// <returns>String representation of row</returns>
     public AnsiText GetRow(int column, int row, int width) {
-        Debug.Assert(column is >= 1 and <= Consts.MaxColumns);
+        Debug.Assert(column is >= 1 and <= MaxColumns);
         List<AnsiText.AnsiTextSpan> spans = [];
         int columnIndex = column;
         Cell emptyCell = new();
@@ -396,7 +320,7 @@ public class Sheet {
         }
         while (c < ColumnList.Count) {
             while (ColumnList[c].Index > columnIndex) {
-                spans.Add(emptyCell.AnsiTextSpan(Consts.DefaultColumnWidth));
+                spans.Add(emptyCell.AnsiTextSpan(DefaultColumnWidth));
                 columnIndex++;
             }
             int size = ColumnList[c].Size;
@@ -495,7 +419,8 @@ public class Sheet {
         if (!createIfEmpty) {
             return null;
         }
-        ColumnList.Insert(c, new CellList { Index = column, Size = Consts.DefaultColumnWidth });
+        ColumnList.Insert(c, new CellList { Index = column, Size = DefaultColumnWidth });
         return ColumnList[c];
     }
+
 }

@@ -129,9 +129,9 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string FileRetrieve {
+        internal static string FileOpen {
             get {
-                return ResourceManager.GetString("FileRetrieve", resourceCulture);
+                return ResourceManager.GetString("FileOpen", resourceCulture);
             }
         }
         
@@ -261,12 +261,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string CannotSaveFile {
-            get {
-                return ResourceManager.GetString("CannotSaveFile", resourceCulture);
-            }
-        }
-        
         internal static string Column {
             get {
                 return ResourceManager.GetString("Column", resourceCulture);
@@ -303,21 +297,21 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string SheetInsertDescription {
+        internal static string WorksheetInsertDescription {
             get {
-                return ResourceManager.GetString("SheetInsertDescription", resourceCulture);
+                return ResourceManager.GetString("WorksheetInsertDescription", resourceCulture);
             }
         }
         
-        internal static string SheetDeleteDescription {
+        internal static string WorksheetDeleteDescription {
             get {
-                return ResourceManager.GetString("SheetDeleteDescription", resourceCulture);
+                return ResourceManager.GetString("WorksheetDeleteDescription", resourceCulture);
             }
         }
         
-        internal static string SheetColumnWidthDescription {
+        internal static string WorksheetColumnWidthDescription {
             get {
-                return ResourceManager.GetString("SheetColumnWidthDescription", resourceCulture);
+                return ResourceManager.GetString("WorksheetColumnWidthDescription", resourceCulture);
             }
         }
         
@@ -405,9 +399,9 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string FileEditDescription {
+        internal static string FileOpenDescription {
             get {
-                return ResourceManager.GetString("FileEditDescription", resourceCulture);
+                return ResourceManager.GetString("FileOpenDescription", resourceCulture);
             }
         }
         
@@ -576,12 +570,6 @@ namespace JCalc.Resources {
         internal static string BadCSVImportFile {
             get {
                 return ResourceManager.GetString("BadCSVImportFile", resourceCulture);
-            }
-        }
-        
-        internal static string ErrorReadingFile {
-            get {
-                return ResourceManager.GetString("ErrorReadingFile", resourceCulture);
             }
         }
         
@@ -786,6 +774,24 @@ namespace JCalc.Resources {
         internal static string AlignGeneralDescription {
             get {
                 return ResourceManager.GetString("AlignGeneralDescription", resourceCulture);
+            }
+        }
+        
+        internal static string InsertWorksheetDescription {
+            get {
+                return ResourceManager.GetString("InsertWorksheetDescription", resourceCulture);
+            }
+        }
+        
+        internal static string DeleteWorksheetDescription {
+            get {
+                return ResourceManager.GetString("DeleteWorksheetDescription", resourceCulture);
+            }
+        }
+        
+        internal static string DeleteWorksheetError {
+            get {
+                return ResourceManager.GetString("DeleteWorksheetError", resourceCulture);
             }
         }
     }

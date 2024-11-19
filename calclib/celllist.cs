@@ -1,5 +1,5 @@
-﻿// JCalc
-// Main program
+// JCalcLib
+// A sparse list of cells
 //
 // Authors:
 //  Steve Palmer
@@ -23,16 +23,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
-namespace JCalc;
+using System.Text.Json.Serialization;
 
-internal static class Program {
+namespace JCalcLib;
 
-    private static void Main(string[] args) {
+public class CellList {
 
-        Screen.Open();
-        string filename = args.Length == 1 ? args[0] : string.Empty;
-        Screen.OpenBook(filename);
-        Screen.StartKeyboardLoop();
-        Screen.Close();
-    }
+    /// <summary>
+    /// Row or column 1-based index of cells
+    /// </summary>
+    public int Index { get; set; }
+
+    /// <summary>
+    /// List of cells in the row or column
+    /// </summary>
+    [JsonInclude]
+    public List<Cell> Cells { get; set; } = [];
+
+    /// <summary>
+    /// Size of the row or column
+    /// </summary>
+    public int Size { get; set; }
+
+    /// <summary>
+    /// Return all formula cells on this column
+    /// </summary>
+    [JsonIgnore]
+    public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.CellValue.Type == CellType.FORMULA);
 }

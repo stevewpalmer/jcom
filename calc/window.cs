@@ -44,13 +44,6 @@ public class Window {
     private int _numberOfColumns;
 
     /// <summary>
-    /// Create an empty window
-    /// </summary>
-    public Window() {
-        Sheet = new Sheet(1);
-    }
-
-    /// <summary>
     /// Create a window for the specified sheet
     /// </summary>
     /// <param name="sheet">Associated sheet</param>
@@ -85,7 +78,6 @@ public class Window {
     public void Refresh(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REFRESH)) {
             Screen.UpdateCursorPosition();
-            Screen.Status.UpdateFilename(Sheet.Name);
             RenderFrame();
             flags |= RenderHint.CONTENTS;
         }
@@ -130,7 +122,6 @@ public class Window {
             KeyCommand.KC_DATE_DMY => FormatCells(CellFormat.DATE_DMY),
             KeyCommand.KC_DATE_DM => FormatCells(CellFormat.DATE_DM),
             KeyCommand.KC_DATE_MY => FormatCells(CellFormat.DATE_MY),
-            KeyCommand.KC_FILE_SAVE => SaveSheet(),
             KeyCommand.KC_INSERT_COLUMN => InsertColumn(),
             KeyCommand.KC_INSERT_ROW => InsertRow(),
             KeyCommand.KC_DELETE_COLUMN => DeleteColumn(),
@@ -206,7 +197,7 @@ public class Window {
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;
         _numberOfColumns = 0;
-        while (x < frameRect.Right && columnNumber <= Consts.MaxColumns) {
+        while (x < frameRect.Right && columnNumber <= Sheet.MaxColumns) {
             int width = Sheet.ColumnWidth(columnNumber);
             int space = Math.Min(width, frameRect.Width - x);
             if (space == width) {
@@ -220,7 +211,7 @@ public class Window {
         // Row numbers
         int rowNumber = 1 + _scrollOffset.Y;
         y = frameRect.Top + CommandBar.Height + 1;
-        while (y < _sheetBounds.Bottom && rowNumber <= Consts.MaxRows) {
+        while (y < _sheetBounds.Bottom && rowNumber <= Sheet.MaxRows) {
             Terminal.Write(frameRect.Left, y, 5, fg, bg, $" {rowNumber.ToString(),-3} ");
             y += 1;
             rowNumber++;
@@ -525,7 +516,7 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint ResetColumnWidth() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.SetColumnWidth(Sheet.Location.Column, Consts.DefaultColumnWidth)) {
+        if (Sheet.SetColumnWidth(Sheet.Location.Column, Sheet.DefaultColumnWidth)) {
             flags = RenderHint.REFRESH;
         }
         return flags;
@@ -641,34 +632,6 @@ public class Window {
             catch (Exception e) {
                 Screen.Status.Message(string.Format(Calc.ErrorExportingFile, inputValue, e.Message));
             }
-            flags = RenderHint.NONE;
-        }
-        return flags;
-    }
-
-    /// <summary>
-    /// Save the changes to this sheet.
-    /// </summary>
-    /// <returns>Render hint</returns>
-    private RenderHint SaveSheet() {
-        RenderHint flags = RenderHint.CANCEL;
-        FormField[] formFields = [
-            new() {
-                Text = Calc.EnterSaveFilename,
-                Type = FormFieldType.TEXT,
-                Width = 50,
-                AllowFilenameCompletion = true,
-                FilenameCompletionFilter = $"*{Consts.DefaultExtension}",
-                Value = new Variant(Sheet.Name)
-            }
-        ];
-        if (Screen.Command.PromptForInput(formFields)) {
-            string inputValue = formFields[0].Value.StringValue;
-            Debug.Assert(!string.IsNullOrEmpty(inputValue));
-            inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.DefaultExtension);
-            Sheet.Filename = inputValue;
-            Sheet.Write();
-            Screen.Status.UpdateFilename(Sheet.Name);
             flags = RenderHint.NONE;
         }
         return flags;
@@ -948,7 +911,7 @@ public class Window {
     private RenderHint CursorRight() {
         RenderHint flags = RenderHint.NONE;
         CellLocation sheetLocation = Sheet.Location;
-        if (sheetLocation.Column < Consts.MaxColumns) {
+        if (sheetLocation.Column < Sheet.MaxColumns) {
             flags = SaveLastMarkPoint();
             ++sheetLocation.Column;
             Sheet.Location = sheetLocation;
@@ -1012,7 +975,7 @@ public class Window {
     private RenderHint CursorDown() {
         RenderHint flags = RenderHint.NONE;
         CellLocation sheetLocation = Sheet.Location;
-        if (sheetLocation.Row < Consts.MaxRows) {
+        if (sheetLocation.Row < Sheet.MaxRows) {
             flags = SaveLastMarkPoint();
             ++sheetLocation.Row;
             Sheet.Location = sheetLocation;
@@ -1035,7 +998,7 @@ public class Window {
         RenderHint flags = SaveLastMarkPoint();
         CellLocation sheetLocation = Sheet.Location;
         int previousRow = sheetLocation.Row;
-        sheetLocation.Row = Math.Min(sheetLocation.Row + _sheetBounds.Height, Consts.MaxRows);
+        sheetLocation.Row = Math.Min(sheetLocation.Row + _sheetBounds.Height, Sheet.MaxRows);
         Sheet.Location = sheetLocation;
         if (sheetLocation.Row == previousRow) {
             PlaceCursor();
@@ -1089,7 +1052,7 @@ public class Window {
         if (Screen.Command.PromptForInput(formFields)) {
             string newAddress = formFields[0].Value.StringValue;
             CellLocation location = Cell.LocationFromAddress(newAddress);
-            if (location.Row is >= 1 and <= Consts.MaxRows && location.Column is >= 1 and <= Consts.MaxColumns) {
+            if (location.Row is >= 1 and <= Sheet.MaxRows && location.Column is >= 1 and <= Sheet.MaxColumns) {
                 ResetCursor();
                 Sheet.Location = location;
                 flags = SyncRowColumnToSheet();

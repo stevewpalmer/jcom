@@ -20,4 +20,19 @@
       <ProjectReference Include="..\comlib\comlib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\CalcLib.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>CalcLib.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\CalcLib.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>CalcLib.resx</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>

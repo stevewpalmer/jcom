@@ -1,4 +1,4 @@
-// JCalc
+// JCalcLib
 // Calculate cell formulae
 //
 // Authors:
@@ -24,10 +24,9 @@
 // under the License.
 
 using System.Diagnostics;
-using JCalcLib;
 using JComLib;
 
-namespace JCalc;
+namespace JCalcLib;
 
 public class Calculate(Sheet sheet) {
     private Stack<CellLocation> referenceList = new();

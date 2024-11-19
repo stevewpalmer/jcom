@@ -32,38 +32,10 @@ public static class Consts {
     /// </summary>
     public const string ConfigurationFilename = "calc.json";
 
-    /// <summary>
-    /// Default file extension
-    /// </summary>
-    public const string DefaultExtension = ".clc";
-
-    /// <summary>
-    /// Backup file extension
-    /// </summary>
-    public const string BackupExtension = ".bak";
-
-    /// <summary>
-    /// Default filename (for an empty sheet)
-    /// </summary>
-    public const string DefaultFilename = "temp" + DefaultExtension;
-
-    /// <summary>
-    /// Maximum number of columns
-    /// </summary>
-    public const int MaxColumns = 255;
-
-    /// <summary>
-    /// Maximum number of rows
-    /// </summary>
-    public const int MaxRows = 4096;
-
-    /// <summary>
-    /// Default column width
-    /// </summary>
-    public const int DefaultColumnWidth = 10;
 
     /// <summary>
     /// Extension for CSV files
     /// </summary>
     public const string CSVExtension = ".csv";
+
 }

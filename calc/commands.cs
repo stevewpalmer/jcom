@@ -121,23 +121,25 @@ public static class Commands {
         new() {
             ID = CommandMapID.WORKSHEET,
             Commands = [
-                new CommandMapEntry { Name = Calc.WorksheetInsert, SubCommandId = CommandMapID.INSERT, Description = Calc.SheetInsertDescription},
-                new CommandMapEntry { Name = Calc.WorksheetDelete, SubCommandId = CommandMapID.DELETE, Description = Calc.SheetDeleteDescription },
-                new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = Calc.SheetColumnWidthDescription}
+                new CommandMapEntry { Name = Calc.WorksheetInsert, SubCommandId = CommandMapID.INSERT, Description = Calc.WorksheetInsertDescription},
+                new CommandMapEntry { Name = Calc.WorksheetDelete, SubCommandId = CommandMapID.DELETE, Description = Calc.WorksheetDeleteDescription },
+                new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = Calc.WorksheetColumnWidthDescription}
             ]
         },
         new() {
             ID = CommandMapID.INSERT,
             Commands = [
                 new CommandMapEntry { Name = Calc.Column, CommandId = KeyCommand.KC_INSERT_COLUMN, Description = Calc.InsertColumnDescription },
-                new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_INSERT_ROW, Description = Calc.InsertRowDescription }
+                new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_INSERT_ROW, Description = Calc.InsertRowDescription },
+                new CommandMapEntry { Name = Calc.Worksheet, CommandId = KeyCommand.KC_NEW, Description = Calc.InsertWorksheetDescription}
             ]
         },
         new() {
             ID = CommandMapID.DELETE,
             Commands = [
                 new CommandMapEntry { Name = Calc.Column, CommandId = KeyCommand.KC_DELETE_COLUMN, Description = Calc.DeleteColumnDescription },
-                new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_DELETE_ROW, Description = Calc.DeleteRowDescription }
+                new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_DELETE_ROW, Description = Calc.DeleteRowDescription },
+                new CommandMapEntry { Name = Calc.Worksheet, CommandId = KeyCommand.KC_DELETE_WORKSHEET, Description = Calc.DeleteWorksheetDescription}
             ]
         },
         new() {
@@ -200,7 +202,7 @@ public static class Commands {
         new() {
             ID = CommandMapID.FILE,
             Commands = [
-                new CommandMapEntry { Name = Calc.FileRetrieve, CommandId = KeyCommand.KC_FILE_RETRIEVE, Description = Calc.FileEditDescription },
+                new CommandMapEntry { Name = Calc.FileOpen, CommandId = KeyCommand.KC_FILE_RETRIEVE, Description = Calc.FileOpenDescription },
                 new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_FILE_SAVE, Description = Calc.FileSaveDescription},
                 new CommandMapEntry { Name = Calc.FileImport, CommandId = KeyCommand.KC_FILE_IMPORT, Description = Calc.Calc_FileImportDescription},
                 new CommandMapEntry { Name = Calc.FileExport, CommandId = KeyCommand.KC_FILE_EXPORT, Description = Calc.FileExportDescription}

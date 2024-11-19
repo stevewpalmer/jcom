@@ -35,6 +35,7 @@ namespace JCalc;
 public static class Screen {
     private static readonly List<Window> _windowList = [];
     private static Window? _activeWindow;
+    private static Book _activeBook = new();
 
     /// <summary>
     /// Configured colours
@@ -81,6 +82,32 @@ public static class Screen {
     }
 
     /// <summary>
+    /// Initialise the workbook from the specified file.
+    /// </summary>
+    /// <param name="filename">Workbook filename</param>
+    public static void OpenBook(string filename) {
+        if (string.IsNullOrEmpty(filename)) {
+            _windowList.Clear();
+            _activeBook = new Book();
+            AddWindow(new Window(_activeBook.Sheets[0]));
+            ActivateWindow(0);
+        }
+        else {
+            try {
+                _activeBook.Open(filename);
+                _windowList.Clear();
+                foreach (Sheet sheet in _activeBook.Sheets) {
+                    AddWindow(new Window(sheet));
+                }
+                ActivateWindow(0);
+            }
+            catch (Exception e) {
+                Status.Message(e.Message);
+            }
+        }
+    }
+
+    /// <summary>
     /// Start the keyboard loop and exit when the user issues the
     /// exit command.
     /// </summary>
@@ -102,25 +129,6 @@ public static class Screen {
     }
 
     /// <summary>
-    /// Add a window to the window list. This will not make the window
-    /// active.
-    /// </summary>
-    /// <param name="theWindow">Window to be added</param>
-    public static void AddWindow(Window theWindow) {
-        _windowList.Add(theWindow);
-        theWindow.SetViewportBounds(0, 0, Terminal.Width, Terminal.Height);
-    }
-
-    /// <summary>
-    /// Activate a window by its index
-    /// </summary>
-    /// <param name="index">Index of the window to be activated</param>
-    public static void ActivateWindow(int index) {
-        _activeWindow = _windowList[index];
-        _activeWindow.Refresh(RenderHint.REFRESH);
-    }
-
-    /// <summary>
     /// Handle commands at the screen level and pass on any unhandled
     /// ones to the active window.
     /// </summary>
@@ -133,8 +141,11 @@ public static class Screen {
         Status.ClearMessage();
         RenderHint flags = command switch {
             KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
+            KeyCommand.KC_NEW => NewWorksheet(),
+            KeyCommand.KC_DELETE_WORKSHEET => DeleteWorksheet(),
             KeyCommand.KC_FILE_RETRIEVE => RetrieveFile(),
             KeyCommand.KC_FILE_IMPORT => ImportFile(),
+            KeyCommand.KC_FILE_SAVE => SaveFile(),
             KeyCommand.KC_SETTINGS_COLOURS => ConfigureColours(),
             KeyCommand.KC_DEFAULT_DATE_DM => SetDefaultFormat(CellFormat.DATE_DM),
             KeyCommand.KC_DEFAULT_DATE_DMY => SetDefaultFormat(CellFormat.DATE_DMY),
@@ -181,6 +192,25 @@ public static class Screen {
     }
 
     /// <summary>
+    /// Add a window to the window list. This will not make the window
+    /// active.
+    /// </summary>
+    /// <param name="theWindow">Window to be added</param>
+    private static void AddWindow(Window theWindow) {
+        _windowList.Add(theWindow);
+        theWindow.SetViewportBounds(0, 0, Terminal.Width, Terminal.Height);
+    }
+
+    /// <summary>
+    /// Activate a window by its index
+    /// </summary>
+    /// <param name="index">Index of the window to be activated</param>
+    private static void ActivateWindow(int index) {
+        _activeWindow = _windowList[index];
+        _activeWindow.Refresh(RenderHint.REFRESH);
+    }
+
+    /// <summary>
     /// Set or update the cell factory with the current cell defaults
     /// from the configuration.
     /// </summary>
@@ -190,18 +220,6 @@ public static class Screen {
         CellFactory.DecimalPlaces = Config.DefaultDecimals;
         CellFactory.Alignment = Config.DefaultCellAlignment;
         CellFactory.Format = Config.DefaultCellFormat;
-    }
-
-    /// <summary>
-    /// Return the next available sheet number.
-    /// </summary>
-    /// <returns>Sheet number</returns>
-    private static int NextSheetNumber() {
-        int sheetNumber = 1;
-        foreach (Window _ in _windowList.TakeWhile(window => window.Sheet.SheetNumber == sheetNumber)) {
-            ++sheetNumber;
-        }
-        return sheetNumber;
     }
 
     /// <summary>
@@ -233,7 +251,70 @@ public static class Screen {
     }
 
     /// <summary>
-    /// Retrieve a file and add it to the sheet list.
+    /// Insert a new, blank, worksheet.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint NewWorksheet() {
+        Sheet sheet = _activeBook.AddSheet();
+        Window newWindow = new Window(sheet);
+        AddWindow(newWindow);
+        _activeWindow = newWindow;
+        _activeWindow.Refresh(RenderHint.REFRESH);
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Delete the current worksheet
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint DeleteWorksheet() {
+        Debug.Assert(_activeWindow != null);
+        if (_activeBook.Sheets.Count == 1) {
+            Status.Message(Calc.DeleteWorksheetError);
+            return RenderHint.NONE;
+        }
+        Sheet sheet = _activeWindow.Sheet;
+        SelectWindow(1);
+        _activeBook.RemoveSheet(sheet);
+        _windowList.Remove(_activeWindow);
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Save the active workbook.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint SaveFile() {
+        RenderHint flags = RenderHint.CANCEL;
+        FormField[] formFields = [
+            new() {
+                Text = Calc.EnterSaveFilename,
+                Type = FormFieldType.TEXT,
+                Width = 50,
+                AllowFilenameCompletion = true,
+                FilenameCompletionFilter = $"*{Book.DefaultExtension}",
+                Value = new Variant(_activeBook.Name)
+            }
+        ];
+        if (Screen.Command.PromptForInput(formFields)) {
+            string inputValue = formFields[0].Value.StringValue;
+            Debug.Assert(!string.IsNullOrEmpty(inputValue));
+            inputValue = Utilities.AddExtensionIfMissing(inputValue, Book.DefaultExtension);
+            _activeBook.Filename = inputValue;
+            try {
+                _activeBook.Write(Config.BackupFile);
+            }
+            catch (Exception e) {
+                Status.Message(e.Message);
+            }
+            Status.UpdateFilename(_activeBook.Name);
+            flags = RenderHint.NONE;
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Open a workbook.
     /// </summary>
     /// <returns>Render hint</returns>
     private static RenderHint RetrieveFile() {
@@ -244,7 +325,7 @@ public static class Screen {
                 Type = FormFieldType.TEXT,
                 Width = 50,
                 AllowFilenameCompletion = true,
-                FilenameCompletionFilter = $"*{Consts.DefaultExtension}",
+                FilenameCompletionFilter = $"*{Book.DefaultExtension}",
                 Value = new Variant(string.Empty)
             }
         ];
@@ -252,19 +333,11 @@ public static class Screen {
             string inputValue = formFields[0].Value.StringValue;
             Debug.Assert(!string.IsNullOrEmpty(inputValue));
 
-            inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.DefaultExtension);
+            inputValue = Utilities.AddExtensionIfMissing(inputValue, Book.DefaultExtension);
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
-            Window? newWindow = _windowList.FirstOrDefault(window => window.Sheet.Filename == inputValue);
-            if (newWindow == null) {
-                int sheetNumber = NextSheetNumber();
-                Sheet sheet = new Sheet(sheetNumber, inputValue);
-                newWindow = new Window(sheet);
-                AddWindow(newWindow);
-            }
-            _activeWindow = newWindow;
-            _activeWindow.Refresh(RenderHint.REFRESH);
+            OpenBook(inputValue);
             flags = RenderHint.NONE;
         }
         return flags;
@@ -294,9 +367,7 @@ public static class Screen {
             FileInfo fileInfo = new FileInfo(inputValue);
             inputValue = fileInfo.FullName;
 
-            int sheetNumber = NextSheetNumber();
-            Sheet sheet = new Sheet(sheetNumber);
-
+            Sheet sheet = _activeBook.AddSheet();
             try {
                 using TextReader stream = new StreamReader(inputValue);
                 using CsvParser parser = new CsvParser(stream, CultureInfo.InvariantCulture);
@@ -461,15 +532,18 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint Exit() {
         RenderHint flags = RenderHint.EXIT;
-        Sheet[] modifiedSheets = _windowList.Where(w => w.Sheet.Modified).Select(b => b.Sheet).ToArray();
-        if (modifiedSheets.Length != 0) {
+        if (_activeBook.Modified) {
             char[] validInput = ['y', 'n'];
             if (!Command.Prompt(Calc.QuitPrompt, validInput, out char inputChar)) {
                 flags = RenderHint.CANCEL;
             }
             else if (inputChar == 'y') {
-                foreach (Sheet sheet in modifiedSheets) {
-                    sheet.Write();
+                try {
+                    _activeBook.Write(Config.BackupFile);
+                }
+                catch (Exception e) {
+                    Status.Message(e.Message);
+                    return RenderHint.CANCEL;
                 }
             }
         }
