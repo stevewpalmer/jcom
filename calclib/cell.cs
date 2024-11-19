@@ -100,6 +100,7 @@ public class Cell {
     /// <summary>
     /// Cell format
     /// </summary>
+    [JsonIgnore]
     public CellFormat CellFormat => Format.GetValueOrDefault(CellFactory.Format);
 
     /// <summary>
@@ -110,6 +111,7 @@ public class Cell {
     /// <summary>
     /// Number of decimal places
     /// </summary>
+    [JsonIgnore]
     public int DecimalPlaces => Decimal.GetValueOrDefault(CellFactory.DecimalPlaces);
 
     /// <summary>
@@ -322,7 +324,6 @@ public class Cell {
         string cellValue = CellValue.Value;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
         if (isNumber) {
-            int maxBar = Math.Min(width + 1, (int)Math.Abs(doubleValue));
             cellValue = CellFormat switch {
                 CellFormat.FIXED => doubleValue.ToString($"F{DecimalPlaces}"),
                 CellFormat.PERCENT => $"{(doubleValue * 100).ToString($"F{DecimalPlaces}")}%",

@@ -57,6 +57,7 @@ public static class Terminal {
         Console.BackgroundColor = _savedBackgroundColour;
         Console.ForegroundColor = _savedForegroundColour;
         Console.Clear();
+        ShowCursor(true);
         if (!_isWindows) {
             Console.Write(@"[2J[?47l8");
         }

@@ -24,7 +24,6 @@
 // under the License.
 
 using System.Diagnostics;
-using System.Drawing;
 using JCalcLib;
 using JComLib;
 

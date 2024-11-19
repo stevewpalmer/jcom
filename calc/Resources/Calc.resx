@@ -393,4 +393,10 @@
     <data name="DeleteWorksheetError" xml:space="preserve">
         <value>A workbook must contain at least one worksheet.</value>
     </data>
+    <data name="FileNotFound" xml:space="preserve">
+        <value>File {0} not found</value>
+    </data>
+    <data name="ErrorReadingFile" xml:space="preserve">
+        <value>Error reading from {0}. File is not a valid workbook</value>
+    </data>
 </root>

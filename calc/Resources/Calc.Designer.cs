@@ -794,5 +794,17 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("DeleteWorksheetError", resourceCulture);
             }
         }
+        
+        internal static string FileNotFound {
+            get {
+                return ResourceManager.GetString("FileNotFound", resourceCulture);
+            }
+        }
+        
+        internal static string ErrorReadingFile {
+            get {
+                return ResourceManager.GetString("ErrorReadingFile", resourceCulture);
+            }
+        }
     }
 }

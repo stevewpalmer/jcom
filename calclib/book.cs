@@ -24,7 +24,6 @@
 // under the License.
 
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -38,7 +37,7 @@ public class Book {
     /// <summary>
     /// Backup file extension
     /// </summary>
-    public const string BackupExtension = ".bak";
+    private const string BackupExtension = ".bak";
 
     /// <summary>
     /// Default file extension
@@ -48,7 +47,7 @@ public class Book {
     /// <summary>
     /// Default filename (for an empty sheet)
     /// </summary>
-    public const string DefaultFilename = "temp" + DefaultExtension;
+    private const string DefaultFilename = "temp" + DefaultExtension;
 
     /// <summary>
     /// List of all sheets in this book
@@ -73,15 +72,16 @@ public class Book {
     /// <summary>
     /// Opens a workbook from the specified file.
     /// </summary>
-    /// <param name="filename">Name of file</param>
-    public bool Open(string filename) {
-
-        if (!File.Exists(filename)) {
-            FileInfo info = new FileInfo(filename);
-            throw new Exception(string.Format(CalcLib.FileNotFound, info.Name));
+    /// <param name="path">The workbook file to be opened</param>
+    /// <exception cref="FileNotFoundException">The specified file cannot be found</exception>
+    /// <exception cref="FileLoadException">The specified file cannot be loaded</exception>
+    public void Open(string path) {
+        if (!File.Exists(path)) {
+            FileInfo info = new FileInfo(path);
+            throw new FileNotFoundException(null, info.FullName);
         }
         try {
-            using FileStream stream = File.OpenRead(filename);
+            using FileStream stream = File.OpenRead(path);
             Sheet[]? inputSheets = JsonSerializer.Deserialize<Sheet[]>(stream);
             if (inputSheets != null) {
                 int sheetNumber = 1;
@@ -99,34 +99,30 @@ public class Book {
             }
         }
         catch (JsonException) {
-            FileInfo info = new FileInfo(filename);
-            throw new Exception(string.Format(CalcLib.ErrorReadingFile, info.Name));
+            FileInfo info = new FileInfo(path);
+            throw new FileLoadException(null, info.FullName);
         }
-        Filename = filename;
+        Filename = path;
         Modified = false;
-        return true;
     }
 
     /// <summary>
-    /// Write the workbook back to disk.
+    /// Write the workbook back to disk, optionally saving any existing copy
+    /// to a backup file.
     /// </summary>
-    /// <param name="backup"></param>
+    /// <param name="backup">True if we generate a backup, false if no backup is generated</param>
+    /// <exception cref="IOException">An I/O error occurred while saving the file</exception>
     public void Write(bool backup) {
-        try {
-            if (backup && File.Exists(Filename)) {
-                string backupFile = Filename + BackupExtension;
-                File.Delete(backupFile);
-                File.Copy(Filename, backupFile);
-            }
-            using FileStream stream = File.Create(Filename);
-            JsonSerializer.Serialize(stream, Sheets, new JsonSerializerOptions {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-                WriteIndented = true
-            });
+        if (backup && File.Exists(Filename)) {
+            string backupFile = Filename + BackupExtension;
+            File.Delete(backupFile);
+            File.Copy(Filename, backupFile);
         }
-        catch (Exception e) {
-            throw new Exception(string.Format(CalcLib.CannotSaveFile, Filename, e.Message));
-        }
+        using FileStream stream = File.Create(Filename);
+        JsonSerializer.Serialize(stream, Sheets, new JsonSerializerOptions {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+            WriteIndented = true
+        });
         Modified = false;
     }
 
@@ -145,8 +141,11 @@ public class Book {
     /// Remove the specified worksheet from the workbook.
     /// </summary>
     /// <param name="sheet">The sheet to be removed</param>
+    /// <exception cref="ArgumentException">The specified sheet does not exist in the workbook</exception>
     public void RemoveSheet(Sheet sheet) {
-        Debug.Assert(_sheets.Contains(sheet));
+        if (!_sheets.Contains(sheet)) {
+            throw new ArgumentException("Sheet does not exist");
+        }
         _sheets.Remove(sheet);
         Modified = true;
     }

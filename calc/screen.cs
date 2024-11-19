@@ -86,25 +86,26 @@ public static class Screen {
     /// </summary>
     /// <param name="filename">Workbook filename</param>
     public static void OpenBook(string filename) {
-        if (string.IsNullOrEmpty(filename)) {
-            _windowList.Clear();
-            _activeBook = new Book();
-            AddWindow(new Window(_activeBook.Sheets[0]));
-            ActivateWindow(0);
-        }
-        else {
+        if (!string.IsNullOrEmpty(filename)) {
             try {
                 _activeBook.Open(filename);
                 _windowList.Clear();
-                foreach (Sheet sheet in _activeBook.Sheets) {
-                    AddWindow(new Window(sheet));
-                }
-                ActivateWindow(0);
+            }
+            catch (FileNotFoundException e) {
+                Status.Message(string.Format(Calc.FileNotFound, e.FileName));
+            }
+            catch (FileLoadException e) {
+                Status.Message(string.Format(Calc.ErrorReadingFile, e.FileName));
             }
             catch (Exception e) {
                 Status.Message(e.Message);
             }
         }
+        foreach (Sheet sheet in _activeBook.Sheets) {
+            AddWindow(new Window(sheet));
+        }
+        ActivateWindow(0);
+        Status.UpdateFilename(_activeBook.Name);
     }
 
     /// <summary>
@@ -296,7 +297,7 @@ public static class Screen {
                 Value = new Variant(_activeBook.Name)
             }
         ];
-        if (Screen.Command.PromptForInput(formFields)) {
+        if (Command.PromptForInput(formFields)) {
             string inputValue = formFields[0].Value.StringValue;
             Debug.Assert(!string.IsNullOrEmpty(inputValue));
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Book.DefaultExtension);
