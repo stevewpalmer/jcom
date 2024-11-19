@@ -324,11 +324,11 @@ public class Sheet {
         Debug.Assert(row is >= 1 and <= Consts.MaxRows);
         int c = ColumnList.Count - 1;
         while (c >= 0) {
-            int r = ColumnList[c].Index - 1;
+            int r = ColumnList[c].Cells.Count - 1;
             while (r >= 0) {
                 Cell cell = ColumnList[c].Cells[r];
                 if (cell.Location.Row == row) {
-                    ColumnList[c].Cells.RemoveAt(c);
+                    ColumnList[c].Cells.RemoveAt(r);
                     break;
                 }
                 if (cell.Location.Row > row) {
