@@ -36,12 +36,48 @@ public struct CellLocation : IEquatable<CellLocation> {
     public CellLocation() { }
 
     /// <summary>
+    /// Initialise a CellLocation with a given column and
+    /// row. Both column and row should be 1-based and less
+    /// than the column and row maximums.
+    /// </summary>
+    /// <param name="column">Column</param>
+    /// <param name="row">Row</param>
+    public CellLocation(int column, int row) {
+        Column = column;
+        Row = row;
+    }
+
+    /// <summary>
+    /// Initialise a CellLocation with a given address.
+    /// Both column and row should be 1-based and less
+    /// than the column and row maximums.
+    /// </summary>
+    /// <param name="address">Address string</param>
+    public CellLocation(string address) {
+        ArgumentNullException.ThrowIfNull(address);
+        int newColumn = 0;
+        int newRow = 0;
+        int index = 0;
+        while (index < address.Length && char.IsLetter(address[index])) {
+            newColumn = newColumn * 26 + char.ToUpper(address[index]) - 'A' + 1;
+            index++;
+        }
+        while (index < address.Length && char.IsDigit(address[index])) {
+            newRow = newRow * 10 + address[index] - '0';
+            index++;
+        }
+        Column = newColumn;
+        Row = newRow;
+    }
+
+    /// <summary>
     /// 1-based row
     /// </summary>
     public int Row {
         get => _row;
         set {
-            Debug.Assert(value >= 1);
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, Sheet.MaxRows);
             _row = value;
         }
     }
@@ -52,7 +88,8 @@ public struct CellLocation : IEquatable<CellLocation> {
     public int Column {
         get => _column;
         set {
-            Debug.Assert(value >= 1);
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
+            ArgumentOutOfRangeException.ThrowIfGreaterThan(value, Sheet.MaxColumns);
             _column = value;
         }
     }
@@ -62,6 +99,12 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// </summary>
     [JsonIgnore]
     public Point Point => new(Column, Row);
+
+    /// <summary>
+    /// Convert a CellLocation to its absolute address.
+    /// </summary>
+    /// <returns>String containing the absolute location</returns>
+    public string Address => $"{Cell.ColumnToAddress(Column)}{Row}";
 
     /// <summary>
     /// Check two cell locations for equality

@@ -352,7 +352,7 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        return Error ? "!ERR" : Cell.LocationToAddress(AbsoluteLocation);
+        return Error ? "!ERR" : AbsoluteLocation.Address;
     }
 
     /// <summary>
@@ -844,7 +844,7 @@ public class FormulaParser {
                     absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row};
                 }
                 else {
-                    absoluteLocation = Cell.LocationFromAddress(identToken.Address);
+                    absoluteLocation = new CellLocation(identToken.Address);
                     relativeLocation = new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
                 }
                 return new LocationParseNode(absoluteLocation, relativeLocation);

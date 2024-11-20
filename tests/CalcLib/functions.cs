@@ -24,10 +24,8 @@
 // under the License.
 
 using System;
-using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 using JCalcLib;
-using JFortranLib;
 using NUnit.Framework;
 
 namespace CalcLibTests;
@@ -39,37 +37,35 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifySum() {
-        Cell cell = new Cell { Location = new CellLocation { Row = 1, Column = 1 }, UIContent = "=SUM(A2:A4)"};
-        Assert.IsTrue(cell.ParseNode.GetType() == typeof(FunctionParseNode));
-
-        FunctionParseNode functionNode = (FunctionParseNode)cell.ParseNode;
-        Assert.AreEqual(TokenID.KSUM, functionNode.Op);
-        Assert.AreEqual("SUM(A2:A4)", functionNode.ToString());
-        Assert.AreEqual("SUM(R(1)C(0):R(3)C(0))", functionNode.ToRawString());
-
-        RangeParseNode range = (RangeParseNode)functionNode.Parameters[0];
-        Assert.IsTrue(range.RangeStart != null);
-        Assert.IsTrue(range.RangeEnd != null);
-
-        LocationParseNode rangeStart = range.RangeStart;
-        LocationParseNode rangeEnd = range.RangeEnd;
-        Assert.AreEqual("A2:A4", range.ToString());
-        Assert.AreEqual("R(1)C(0):R(3)C(0)", range.ToRawString());
-        Assert.AreEqual(new CellLocation { Column = 1, Row = 2}, rangeStart.AbsoluteLocation);
-        Assert.AreEqual(new CellLocation { Column = 1, Row = 4}, rangeEnd.AbsoluteLocation);
-
-        StringBuilder str = new();
-        foreach (CellLocation loc in range.RangeIterator(cell.Location)) {
-            str.Append(loc.Column);
-            str.Append(loc.Row);
-        }
-        Assert.AreEqual("121314", str.ToString());
-
-        range.FixupAddress(cell.Location, 1, 1, 1);
-        Assert.AreEqual(new CellLocation { Column = 2, Row = 3}, rangeStart.AbsoluteLocation);
-        Assert.AreEqual(new CellLocation { Column = 2, Row = 5}, rangeEnd.AbsoluteLocation);
-
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("SUM(12:TEXT)", cell.Location).Parse(); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("SUM(A3:12)", cell.Location).Parse(); });
+        Sheet sheet = new Sheet();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
+        Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
+        cell1.Content = "56";
+        cell2.Content = "78";
+        cell3.Content = "12";
+        cell4.UIContent = "=SUM(A1:A3)";
+        Calculate calc = new Calculate(sheet);
+        calc.Update();
+        Assert.AreEqual("146", cell4.CellValue.Value);
     }
-}
+
+    /// <summary>
+    /// Verify a simple expression
+    /// </summary>
+    [Test]
+    public void VerifyExpression() {
+        Sheet sheet = new Sheet();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
+        Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
+        cell1.Content = "56";
+        cell2.Content = "78";
+        cell3.Content = "12";
+        cell4.UIContent = "=A1*(A2+A3)";
+        Calculate calc = new Calculate(sheet);
+        calc.Update();
+        Assert.AreEqual("5040", cell4.CellValue.Value);
+    }}

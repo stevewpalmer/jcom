@@ -399,4 +399,7 @@
     <data name="ErrorReadingFile" xml:space="preserve">
         <value>Error reading from {0}. File is not a valid workbook</value>
     </data>
+    <data name="InvalidAddress" xml:space="preserve">
+        <value>Invalid address</value>
+    </data>
 </root>

@@ -123,6 +123,9 @@ public class Book {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
             WriteIndented = true
         });
+        foreach (Sheet sheet in _sheets) {
+            sheet.Modified = false;
+        }
         Modified = false;
     }
 

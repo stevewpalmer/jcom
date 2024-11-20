@@ -806,5 +806,11 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("ErrorReadingFile", resourceCulture);
             }
         }
+        
+        internal static string InvalidAddress {
+            get {
+                return ResourceManager.GetString("InvalidAddress", resourceCulture);
+            }
+        }
     }
 }
