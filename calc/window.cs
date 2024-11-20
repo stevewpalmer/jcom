@@ -622,7 +622,7 @@ public class Window {
                     for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
                         for (int column = extent.Start.X; column <= extent.End.X; column++) {
                             Cell cell = Sheet.GetCell(new CellLocation { Column = column, Row = row }, false);
-                            csvWriter.WriteField(cell.CellValue.Value);
+                            csvWriter.WriteField(cell.Value);
                         }
                         csvWriter.NextRecord();
                     }
@@ -764,7 +764,6 @@ public class Window {
         if (result != CellInputResponse.CANCEL) {
 
             cell.UIContent = cellValue;
-            Sheet.Modified = true;
 
             Calculate calc = new Calculate(Sheet);
             calc.Update();
@@ -814,7 +813,7 @@ public class Window {
                 return;
             }
         }
-        string cellText = cell.ToString(width)[..width];
+        string cellText = cell.Text(width)[..width];
         Terminal.SetCursor(x, y);
         Terminal.Write(new AnsiText.AnsiTextSpan(cellText) {
             ForegroundColour = fg,

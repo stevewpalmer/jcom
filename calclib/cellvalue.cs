@@ -80,11 +80,4 @@ public class CellValue : IComparable<CellValue> {
     public static bool operator < (CellValue operand1, CellValue operand2) {
         return operand1.CompareTo(operand2) < 0;
     }
-
-    /// <summary>
-    /// Return the cell value as a string for display.
-    /// </summary>
-    public new string ToString() {
-        return Type == CellType.TEXT ? $"\"{Value}\"" : Value;
-    }
 }

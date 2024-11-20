@@ -148,7 +148,7 @@ public class Sheet {
     /// <returns>The cell at the row</returns>
     public Cell GetCell(CellLocation location, bool createIfEmpty) {
         CellList? cellList = CellListForColumn(location.Column, createIfEmpty);
-        Cell cell = new Cell {
+        Cell cell = new Cell(this) {
             Location = location
         };
         if (cellList != null) {
@@ -313,7 +313,7 @@ public class Sheet {
         Debug.Assert(column is >= 1 and <= MaxColumns);
         List<AnsiText.AnsiTextSpan> spans = [];
         int columnIndex = column;
-        Cell emptyCell = new();
+        Cell emptyCell = new(this);
         int c = 0;
         while (c < ColumnList.Count && ColumnList[c].Index < column) {
             c++;

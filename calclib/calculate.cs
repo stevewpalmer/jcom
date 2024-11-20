@@ -53,7 +53,7 @@ public class Calculate(Sheet sheet) {
                 cell.CellValue.Value = EvaluateNode(cell, cell.ParseNode).StringValue;
             }
             catch (Exception) {
-                cell.CellValue.Value = "!ERR";
+                cell.Value = "!ERR";
             }
         }
     }

@@ -31,9 +31,15 @@ using JComLib;
 
 namespace JCalcLib;
 
-public class Cell {
+public class Cell(Sheet? sheet) {
     private CellParseNode? _cellParseNode;
     private string _content = string.Empty;
+    private Sheet? _sheet = sheet;
+
+    /// <summary>
+    /// Empty constructor
+    /// </summary>
+    public Cell() : this(null) { }
 
     /// <summary>
     /// Cell value
@@ -172,6 +178,19 @@ public class Cell {
     }
 
     /// <summary>
+    /// Retrieve or set the cell's value. Retrieving the value always returns
+    /// the calculated value. The behaviour on setting the value depends on
+    /// whether the new value is a formula or a constant. If it is a formula
+    /// then it assigns the formula to the cell and evaluates it. If it is a
+    /// constant then it becomes the new value of the cell.
+    /// </summary>
+    [JsonIgnore]
+    public string Value {
+        get => CellValue.Value;
+        set => UIContent = value;
+    }
+
+    /// <summary>
     /// The UI view of the content.
     /// </summary>
     [JsonIgnore]
@@ -188,6 +207,9 @@ public class Cell {
                 _content = TryParseDate(value);
                 CellValue.Value = _content;
                 CellValue.Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
+            }
+            if (_sheet != null) {
+                _sheet.Modified = true;
             }
         }
     }
@@ -308,18 +330,11 @@ public class Cell {
     }
 
     /// <summary>
-    /// Return the raw cell contents.
-    /// </summary>
-    public string ToText() {
-        return CellValue.Type == CellType.FORMULA ? UIContent : CellValue.ToString();
-    }
-
-    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
     /// <returns>String value of cell</returns>
-    public string ToString(int width) {
+    public string Text(int width) {
         Debug.Assert(width >= 0);
         string cellValue = CellValue.Value;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
@@ -338,7 +353,7 @@ public class Cell {
                 CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
                 CellFormat.DATE_DMY => ToDateTime("d-MMM-yyyy", doubleValue),
                 CellFormat.GENERAL => cellValue,
-                CellFormat.TEXT => ToText(),
+                CellFormat.TEXT => UIContent,
                 _ => throw new ArgumentException($"Unknown Cell Format: {CellFormat}")
             };
             if (cellValue.Length > width) {
@@ -364,7 +379,7 @@ public class Cell {
     /// <param name="width">Column width to use</param>
     /// <returns>AnsiTextSpan</returns>
     public AnsiText.AnsiTextSpan AnsiTextSpan(int width) {
-        return new AnsiText.AnsiTextSpan(ToString(width)) {
+        return new AnsiText.AnsiTextSpan(Text(width)) {
             ForegroundColour = Style.ForegroundColour,
             BackgroundColour = Style.BackgroundColour,
             Bold = Style.Bold,
