@@ -1051,14 +1051,14 @@ public class Window {
         ];
         if (Screen.Command.PromptForInput(formFields)) {
             string newAddress = formFields[0].Value.StringValue;
-            CellLocation location = Cell.LocationFromAddress(newAddress);
-            if (location.Row is >= 1 and <= Sheet.MaxRows && location.Column is >= 1 and <= Sheet.MaxColumns) {
+            try {
+                CellLocation location = new CellLocation(newAddress);
                 ResetCursor();
                 Sheet.Location = location;
                 flags = SyncRowColumnToSheet();
             }
-            else {
-                flags |= RenderHint.NONE;
+            catch (ArgumentOutOfRangeException) {
+                Screen.Status.Message(Calc.InvalidAddress);
             }
         }
         return flags;

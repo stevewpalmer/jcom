@@ -48,30 +48,30 @@ public class CellTests {
     // Verify that we correctly translate positions to cell locations
     [Test]
     public void VerifyRowAndColumnFromPositions() {
-        CellLocation a1 = Cell.LocationFromAddress("A1");
+        CellLocation a1 = new CellLocation("A1");
         Assert.AreEqual(1, a1.Row);
         Assert.AreEqual(1, a1.Column);
 
-        CellLocation z1 = Cell.LocationFromAddress("Z1");
+        CellLocation z1 = new CellLocation("Z1");
         Assert.AreEqual(1, z1.Row);
         Assert.AreEqual(26, z1.Column);
 
-        CellLocation iu1 = Cell.LocationFromAddress("IU1");
+        CellLocation iu1 = new CellLocation("IU1");
         Assert.AreEqual(1, iu1.Row);
         Assert.AreEqual(255, iu1.Column);
 
-        CellLocation a4095 = Cell.LocationFromAddress("A4095");
+        CellLocation a4095 = new CellLocation("A4095");
         Assert.AreEqual(4095, a4095.Row);
         Assert.AreEqual(1, a4095.Column);
 
-        Assert.Throws(typeof(ArgumentNullException), delegate { Cell.LocationFromAddress(null!); });
+        Assert.Throws(typeof(ArgumentNullException), delegate { new CellLocation(null!); });
     }
 
     // Verify comparing two cell locations. This exercises the equality
     // operations on CellLocation.
     [Test]
     public void VerifyCompareCellLocations() {
-        CellLocation a1 = Cell.LocationFromAddress("A1");
+        CellLocation a1 = new CellLocation("A1");
         CellLocation a2 = new CellLocation { Row = 1, Column = 1 };
         Assert.AreEqual(a1, a2);
         Assert.IsTrue(a1 == a2);

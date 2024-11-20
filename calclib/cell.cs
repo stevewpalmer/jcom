@@ -67,7 +67,7 @@ public class Cell {
     /// represents the cell address on the screen.
     /// </summary>
     [JsonIgnore]
-    public string Address => LocationToAddress(Location);
+    public string Address => Location.Address;
 
     /// <summary>
     /// Return the format description of the current cell.
@@ -193,14 +193,6 @@ public class Cell {
     }
 
     /// <summary>
-    /// Convert a CellLocation to its absolute address.
-    /// </summary>
-    /// <param name="location">A CellLocation</param>
-    /// <returns>String containing the absolute location</returns>
-    public static string LocationToAddress(CellLocation location) =>
-        $"{ColumnToAddress(location.Column)}{location.Row}";
-
-    /// <summary>
     /// Convert a CellLocation to its relative address in the format
     /// R(y)C(x) where y and x are row and column offsets respectively.
     /// </summary>
@@ -208,29 +200,6 @@ public class Cell {
     /// <returns>Cell location to a relative address</returns>
     public static string LocationToAddress(Point location) =>
         $"R({location.Y})C({location.X})";
-
-    /// <summary>
-    /// Parse a cell address and return the cell location that
-    /// corresponds to that address, or (0,0) if the address
-    /// cannot be parsed.
-    /// </summary>
-    /// <param name="address">Address string</param>
-    /// <returns>CellLocation contain the cell column and row</returns>
-    public static CellLocation LocationFromAddress(string address) {
-        ArgumentNullException.ThrowIfNull(address);
-        int newColumn = 0;
-        int newRow = 0;
-        int index = 0;
-        while (index < address.Length && char.IsLetter(address[index])) {
-            newColumn = newColumn * 26 + char.ToUpper(address[index]) - 'A' + 1;
-            index++;
-        }
-        while (index < address.Length && char.IsDigit(address[index])) {
-            newRow = newRow * 10 + address[index] - '0';
-            index++;
-        }
-        return new CellLocation { Column = newColumn, Row = newRow };
-    }
 
     /// <summary>
     /// Parse a cell relative address of the format R(y)C(x) and return
