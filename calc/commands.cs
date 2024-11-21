@@ -95,13 +95,6 @@ public class CommandMap {
 public static class Commands {
 
     /// <summary>
-    /// Retrieve the command map by its ID
-    /// </summary>
-    /// <param name="id">ID of command map required</param>
-    /// <returns>Command map for that ID</returns>
-    public static CommandMap CommandMapForID(CommandMapID id) => Maps.First(m => m.ID == id);
-
-    /// <summary>
     /// All command maps
     /// </summary>
     private static readonly CommandMap[] Maps = [
@@ -110,20 +103,20 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.Worksheet, SubCommandId = CommandMapID.WORKSHEET },
                 new CommandMapEntry { Name = Calc.Range, SubCommandId = CommandMapID.RANGE },
-                new CommandMapEntry { Name = Calc.Copy, CommandId = KeyCommand.KC_COPY, Description = Calc.CopyDescription},
-                new CommandMapEntry { Name = Calc.Move, CommandId = KeyCommand.KC_CUT, Description = Calc.CutDescription},
-                new CommandMapEntry { Name = Calc.Paste, CommandId = KeyCommand.KC_PASTE, Description = Calc.PasteDescription},
+                new CommandMapEntry { Name = Calc.Copy, CommandId = KeyCommand.KC_COPY, Description = Calc.CopyDescription },
+                new CommandMapEntry { Name = Calc.Move, CommandId = KeyCommand.KC_CUT, Description = Calc.CutDescription },
+                new CommandMapEntry { Name = Calc.Paste, CommandId = KeyCommand.KC_PASTE, Description = Calc.PasteDescription },
                 new CommandMapEntry { Name = Calc.File, SubCommandId = CommandMapID.FILE },
                 new CommandMapEntry { Name = Calc.Settings, SubCommandId = CommandMapID.SETTINGS },
-                new CommandMapEntry { Name = Calc.Quit, CommandId = KeyCommand.KC_QUIT, Description = Calc.QuitCalc}
+                new CommandMapEntry { Name = Calc.Quit, CommandId = KeyCommand.KC_QUIT, Description = Calc.QuitCalc }
             ]
         },
         new() {
             ID = CommandMapID.WORKSHEET,
             Commands = [
-                new CommandMapEntry { Name = Calc.WorksheetInsert, SubCommandId = CommandMapID.INSERT, Description = Calc.WorksheetInsertDescription},
+                new CommandMapEntry { Name = Calc.WorksheetInsert, SubCommandId = CommandMapID.INSERT, Description = Calc.WorksheetInsertDescription },
                 new CommandMapEntry { Name = Calc.WorksheetDelete, SubCommandId = CommandMapID.DELETE, Description = Calc.WorksheetDeleteDescription },
-                new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = Calc.WorksheetColumnWidthDescription}
+                new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = Calc.WorksheetColumnWidthDescription }
             ]
         },
         new() {
@@ -131,7 +124,7 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.Column, CommandId = KeyCommand.KC_INSERT_COLUMN, Description = Calc.InsertColumnDescription },
                 new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_INSERT_ROW, Description = Calc.InsertRowDescription },
-                new CommandMapEntry { Name = Calc.Worksheet, CommandId = KeyCommand.KC_NEW, Description = Calc.InsertWorksheetDescription}
+                new CommandMapEntry { Name = Calc.Worksheet, CommandId = KeyCommand.KC_NEW, Description = Calc.InsertWorksheetDescription }
             ]
         },
         new() {
@@ -139,7 +132,7 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.Column, CommandId = KeyCommand.KC_DELETE_COLUMN, Description = Calc.DeleteColumnDescription },
                 new CommandMapEntry { Name = Calc.Row, CommandId = KeyCommand.KC_DELETE_ROW, Description = Calc.DeleteRowDescription },
-                new CommandMapEntry { Name = Calc.Worksheet, CommandId = KeyCommand.KC_DELETE_WORKSHEET, Description = Calc.DeleteWorksheetDescription}
+                new CommandMapEntry { Name = Calc.Worksheet, CommandId = KeyCommand.KC_DELETE_WORKSHEET, Description = Calc.DeleteWorksheetDescription }
             ]
         },
         new() {
@@ -152,7 +145,7 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.RangeSort, CommandId = KeyCommand.KC_RANGE_SORT, Description = Calc.RangeSortDescription }
             ]
         },
-        new () {
+        new() {
             ID = CommandMapID.FORMAT,
             Commands = [
                 new CommandMapEntry { Name = Calc.FormatFixed, CommandId = KeyCommand.KC_FORMAT_FIXED, Description = Calc.FormatFixedDescription },
@@ -182,7 +175,7 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.StyleBackground, CommandId = KeyCommand.KC_STYLE_BG, Description = Calc.StyleBackgroundDescription }
             ]
         },
-        new () {
+        new() {
             ID = CommandMapID.ALIGN,
             Commands = [
                 new CommandMapEntry { Name = Calc.AlignLeft, CommandId = KeyCommand.KC_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
@@ -191,7 +184,7 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.AlignGeneral, CommandId = KeyCommand.KC_ALIGN_GENERAL, Description = Calc.AlignGeneralDescription }
             ]
         },
-        new () {
+        new() {
             ID = CommandMapID.DATES,
             Commands = [
                 new CommandMapEntry { Name = Calc.DatesDMY, CommandId = KeyCommand.KC_DATE_DMY, Description = Calc.DatesDMYDescription },
@@ -203,29 +196,29 @@ public static class Commands {
             ID = CommandMapID.FILE,
             Commands = [
                 new CommandMapEntry { Name = Calc.FileOpen, CommandId = KeyCommand.KC_FILE_RETRIEVE, Description = Calc.FileOpenDescription },
-                new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_FILE_SAVE, Description = Calc.FileSaveDescription},
-                new CommandMapEntry { Name = Calc.FileImport, CommandId = KeyCommand.KC_FILE_IMPORT, Description = Calc.Calc_FileImportDescription},
-                new CommandMapEntry { Name = Calc.FileExport, CommandId = KeyCommand.KC_FILE_EXPORT, Description = Calc.FileExportDescription}
+                new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_FILE_SAVE, Description = Calc.FileSaveDescription },
+                new CommandMapEntry { Name = Calc.FileImport, CommandId = KeyCommand.KC_FILE_IMPORT, Description = Calc.Calc_FileImportDescription },
+                new CommandMapEntry { Name = Calc.FileExport, CommandId = KeyCommand.KC_FILE_EXPORT, Description = Calc.FileExportDescription }
             ]
         },
         new() {
             ID = CommandMapID.SETTINGS,
             Commands = [
-                new CommandMapEntry { Name = Calc.SettingsColours, CommandId = KeyCommand.KC_SETTINGS_COLOURS, Description = Calc.SettingsColourDescription},
+                new CommandMapEntry { Name = Calc.SettingsColours, CommandId = KeyCommand.KC_SETTINGS_COLOURS, Description = Calc.SettingsColourDescription },
                 new CommandMapEntry { Name = Calc.SettingsFormat, SubCommandId = CommandMapID.DEFAULT_FORMAT, Description = Calc.SettingsFormatDescription },
-                new CommandMapEntry { Name = Calc.SettingsAlignment, SubCommandId = CommandMapID.DEFAULT_ALIGNMENT, Description = Calc.SettingsAlignmentDescription},
+                new CommandMapEntry { Name = Calc.SettingsAlignment, SubCommandId = CommandMapID.DEFAULT_ALIGNMENT, Description = Calc.SettingsAlignmentDescription },
                 new CommandMapEntry { Name = Calc.SettingsDecimalPoints, CommandId = KeyCommand.KC_SETTINGS_DECIMAL_POINTS, Description = Calc.SettingsDecimalPointDescription },
                 new CommandMapEntry { Name = Calc.SettingsBackups, CommandId = KeyCommand.KC_SETTINGS_BACKUPS, Description = Calc.SettingsBackupDescription }
             ]
         },
-        new () {
+        new() {
             ID = CommandMapID.COLUMN_WIDTH,
             Commands = [
                 new CommandMapEntry { Name = Calc.ColumnWidthSet, CommandId = KeyCommand.KC_SET_COLUMN_WIDTH, Description = Calc.SetColumnWidthDescription },
                 new CommandMapEntry { Name = Calc.ColumnWidthReset, CommandId = KeyCommand.KC_RESET_COLUMN_WIDTH, Description = Calc.ResetColumnWidthDescription }
             ]
         },
-        new () {
+        new() {
             ID = CommandMapID.DEFAULT_FORMAT,
             Commands = [
                 new CommandMapEntry { Name = Calc.FormatFixed, CommandId = KeyCommand.KC_DEFAULT_FORMAT_FIXED, Description = Calc.FormatFixedDescription },
@@ -238,7 +231,7 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.FormatText, CommandId = KeyCommand.KC_DEFAULT_FORMAT_TEXT, Description = Calc.FormatTextDescription }
             ]
         },
-        new () {
+        new() {
             ID = CommandMapID.DEFAULT_DATES,
             Commands = [
                 new CommandMapEntry { Name = Calc.DatesDMY, CommandId = KeyCommand.KC_DEFAULT_DATE_DMY, Description = Calc.DatesDMYDescription },
@@ -246,7 +239,7 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.DatesMY, CommandId = KeyCommand.KC_DEFAULT_DATE_MY, Description = Calc.DatesMYDescription }
             ]
         },
-        new () {
+        new() {
             ID = CommandMapID.DEFAULT_ALIGNMENT,
             Commands = [
                 new CommandMapEntry { Name = Calc.AlignLeft, CommandId = KeyCommand.KC_DEFAULT_ALIGN_LEFT, Description = Calc.AlignLeftDescription },
@@ -256,4 +249,11 @@ public static class Commands {
             ]
         }
     ];
+
+    /// <summary>
+    /// Retrieve the command map by its ID
+    /// </summary>
+    /// <param name="id">ID of command map required</param>
+    /// <returns>Command map for that ID</returns>
+    public static CommandMap CommandMapForID(CommandMapID id) => Maps.First(m => m.ID == id);
 }

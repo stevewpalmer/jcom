@@ -32,10 +32,8 @@ public static class Consts {
     /// </summary>
     public const string ConfigurationFilename = "calc.json";
 
-
     /// <summary>
     /// Extension for CSV files
     /// </summary>
     public const string CSVExtension = ".csv";
-
 }

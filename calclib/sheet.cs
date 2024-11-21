@@ -47,7 +47,7 @@ public class Sheet {
     /// </summary>
     public const int DefaultColumnWidth = 10;
 
-    public Sheet() {}
+    public Sheet() { }
 
     /// <summary>
     /// Create a new empty sheet with the specified number.
@@ -351,12 +351,12 @@ public class Sheet {
         do {
             sorted = true;
             for (int r = swapExtent.Start.Y; r < swapExtent.End.Y; r++) {
-                Cell cell1 = GetCell(new CellLocation { Row = r, Column = sortColumn}, false);
-                Cell cell2 = GetCell(new CellLocation { Row = r + 1, Column = sortColumn}, false);
+                Cell cell1 = GetCell(new CellLocation { Row = r, Column = sortColumn }, false);
+                Cell cell2 = GetCell(new CellLocation { Row = r + 1, Column = sortColumn }, false);
                 if (cell1.CellValue.CompareTo(cell2.CellValue) * ordering > 0) {
                     for (int c = swapExtent.Start.X; c <= swapExtent.End.X; c++) {
-                        cell1 = GetCell(new CellLocation { Row = r, Column = c}, false);
-                        cell2 = GetCell(new CellLocation { Row = r + 1, Column = c}, false);
+                        cell1 = GetCell(new CellLocation { Row = r, Column = c }, false);
+                        cell2 = GetCell(new CellLocation { Row = r + 1, Column = c }, false);
                         cell1.Swap(cell2);
                     }
                     sorted = false;
@@ -422,5 +422,4 @@ public class Sheet {
         ColumnList.Insert(c, new CellList { Index = column, Size = DefaultColumnWidth });
         return ColumnList[c];
     }
-
 }

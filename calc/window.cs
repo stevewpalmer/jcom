@@ -35,13 +35,13 @@ using JComLib;
 namespace JCalc;
 
 public class Window {
-    private Rectangle _viewportBounds;
-    private Rectangle _sheetBounds;
-    private Point _scrollOffset = Point.Empty;
-    private Point _markAnchor;
-    private Point _lastMarkPoint;
     private bool _isMarkMode;
+    private Point _lastMarkPoint;
+    private Point _markAnchor;
     private int _numberOfColumns;
+    private Point _scrollOffset = Point.Empty;
+    private Rectangle _sheetBounds;
+    private Rectangle _viewportBounds;
 
     /// <summary>
     /// Create a window for the specified sheet
@@ -855,7 +855,7 @@ public class Window {
     private RenderHint SaveLastMarkPoint() {
         RenderHint flags = RenderHint.NONE;
         if (_isMarkMode) {
-           _lastMarkPoint = Sheet.Location.Point;
+            _lastMarkPoint = Sheet.Location.Point;
             flags = RenderHint.BLOCK;
         }
         if (!_isMarkMode) {
@@ -957,7 +957,8 @@ public class Window {
         Sheet.Location = sheetLocation;
         if (sheetLocation.Row == previousRow) {
             PlaceCursor();
-        } else {
+        }
+        else {
             _scrollOffset.Y -= previousRow - sheetLocation.Row;
             if (_scrollOffset.Y < 0) {
                 _scrollOffset.Y = 0;
@@ -1001,7 +1002,8 @@ public class Window {
         Sheet.Location = sheetLocation;
         if (sheetLocation.Row == previousRow) {
             PlaceCursor();
-        } else {
+        }
+        else {
             _scrollOffset.Y += sheetLocation.Row - previousRow;
             flags |= RenderHint.REFRESH;
         }
@@ -1020,7 +1022,7 @@ public class Window {
             flags |= RenderHint.REFRESH;
         }
         if (Sheet.Location.Column > _numberOfColumns + _scrollOffset.X) {
-            _scrollOffset.X =  Sheet.Location.Column - _numberOfColumns;
+            _scrollOffset.X = Sheet.Location.Column - _numberOfColumns;
             flags |= RenderHint.REFRESH;
         }
         if (Sheet.Location.Row <= _scrollOffset.Y) {

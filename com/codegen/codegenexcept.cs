@@ -23,8 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Runtime.Serialization;
-
 namespace CCompiler;
 
 /// <summary>

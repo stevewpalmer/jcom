@@ -36,40 +36,6 @@ namespace JCalc;
 public class Config {
 
     /// <summary>
-    /// Load a config file if one is found, otherwise return a default
-    /// configuration.
-    /// </summary>
-    /// <returns>A Config object initialised from the file</returns>
-    public static Config Load() {
-        Config fileConfig = new Config();
-        if (File.Exists(Consts.ConfigurationFilename)) {
-            try {
-                using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
-                fileConfig = JsonSerializer.Deserialize<Config>(stream) ?? fileConfig;
-            }
-            catch (Exception) {
-            }
-        }
-        return fileConfig;
-    }
-
-    /// <summary>
-    /// Save configurations back to the config file.
-    /// </summary>
-    public void Save() {
-        try {
-            using FileStream stream = File.Create(Consts.ConfigurationFilename);
-            JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
-                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
-                WriteIndented = true
-            });
-        }
-        catch (Exception e) {
-            Screen.Status.Message(string.Format(Calc.CannotSaveConfigError, e.Message));
-        }
-    }
-
-    /// <summary>
     /// Background colour
     /// </summary>
     public int? BackgroundColour { get; set; }
@@ -109,4 +75,37 @@ public class Config {
     /// Default number of decimal places
     /// </summary>
     public int DefaultDecimals { get; set; } = 2;
+
+    /// <summary>
+    /// Load a config file if one is found, otherwise return a default
+    /// configuration.
+    /// </summary>
+    /// <returns>A Config object initialised from the file</returns>
+    public static Config Load() {
+        Config fileConfig = new Config();
+        if (File.Exists(Consts.ConfigurationFilename)) {
+            try {
+                using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
+                fileConfig = JsonSerializer.Deserialize<Config>(stream) ?? fileConfig;
+            }
+            catch (Exception) { }
+        }
+        return fileConfig;
+    }
+
+    /// <summary>
+    /// Save configurations back to the config file.
+    /// </summary>
+    public void Save() {
+        try {
+            using FileStream stream = File.Create(Consts.ConfigurationFilename);
+            JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
+                WriteIndented = true
+            });
+        }
+        catch (Exception e) {
+            Screen.Status.Message(string.Format(Calc.CannotSaveConfigError, e.Message));
+        }
+    }
 }

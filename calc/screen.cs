@@ -35,7 +35,7 @@ namespace JCalc;
 public static class Screen {
     private static readonly List<Window> _windowList = [];
     private static Window? _activeWindow;
-    private static Book _activeBook = new();
+    private static readonly Book _activeBook = new();
 
     /// <summary>
     /// Configured colours
@@ -506,7 +506,7 @@ public static class Screen {
     /// <param name="colourValue">Output value</param>
     /// <returns>True if the output value is valid, false otherwise.</returns>
     public static bool GetColourInput(string prompt, ref int colourValue) {
-        FormField [] formFields = [
+        FormField[] formFields = [
             new() {
                 Text = prompt,
                 Value = new Variant(colourValue),

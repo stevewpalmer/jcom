@@ -2,9 +2,9 @@
 // A cell location
 //
 // Authors:
-//  Steve
+//  Steve Palmer
 //
-// Copyright (C) 2024 Steve
+// Copyright (C) 2024 Steve Palmer
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
 using System.Drawing;
 using System.Text.Json.Serialization;
 

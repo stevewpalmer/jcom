@@ -162,7 +162,7 @@ public class FormField {
     /// <summary>
     /// Pick list values
     /// </summary>
-    public string [] List { get; init; } = [];
+    public string[] List { get; init; } = [];
 }
 
 internal class FormFieldInternal(FormField inner) {
@@ -330,7 +330,7 @@ public class CommandBar {
     /// </summary>
     /// <param name="userfields">List of input fields</param>
     /// <returns>True if input was provided, false if the user hit Esc to cancel</returns>
-    public bool PromptForInput(FormField [] userfields) {
+    public bool PromptForInput(FormField[] userfields) {
         int column = 0;
         int row = _promptRow;
 
@@ -377,6 +377,7 @@ public class CommandBar {
         }
 
         ClearRow(_messageRow);
+
         int fieldIndex = 0;
         int index = 0;
         bool initialiseField = true;
@@ -393,7 +394,8 @@ public class CommandBar {
                     string pickList = string.Join(" ", currentField.Inner.List);
                     Terminal.Write(0, row + 1, _displayWidth, _fgColour, _bgColour, pickList);
                     Terminal.ShowCursor(false);
-                } else {
+                }
+                else {
                     ClearRow(row + 1);
                     Terminal.ShowCursor(true);
                 }
@@ -548,12 +550,12 @@ public class CommandBar {
                     break;
 
                 case ConsoleKey.Backspace when column > 0:
-                   inputBuffer.RemoveAt(--column);
-                   break;
-           }
-           if (!char.IsControl(inputKey.KeyChar) && inputBuffer.Count < _displayWidth) {
-               inputBuffer.Insert(column++, inputKey.KeyChar);
-           }
+                    inputBuffer.RemoveAt(--column);
+                    break;
+            }
+            if (!char.IsControl(inputKey.KeyChar) && inputBuffer.Count < _displayWidth) {
+                inputBuffer.Insert(column++, inputKey.KeyChar);
+            }
         } while (true);
 
         cellValue = string.Join("", inputBuffer);
@@ -600,7 +602,8 @@ public class CommandBar {
                 RenderCommandMap(commandMapID, _promptRow, selectedCommand);
                 if (!string.IsNullOrEmpty(current.Description)) {
                     Message(current.Description);
-                } else {
+                }
+                else {
                     RenderCommandMap(current.SubCommandId, _messageRow, -1);
                 }
                 redraw = false;

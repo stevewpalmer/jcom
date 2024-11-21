@@ -34,7 +34,6 @@ namespace JCalcLib;
 public class Cell(Sheet? sheet) {
     private CellParseNode? _cellParseNode;
     private string _content = string.Empty;
-    private Sheet? _sheet = sheet;
 
     /// <summary>
     /// Empty constructor
@@ -208,8 +207,8 @@ public class Cell(Sheet? sheet) {
                 CellValue.Value = _content;
                 CellValue.Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
             }
-            if (_sheet != null) {
-                _sheet.Modified = true;
+            if (sheet != null) {
+                sheet.Modified = true;
             }
         }
     }
@@ -299,24 +298,54 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Return the text value of the cell formatted based on the cell format. Numeric
+    /// values will be limited to the cell column width and values that do not fit into
+    /// the width will be replaced by "*" characters up to the width. Labels are
+    /// returned regardless of the cell width as these may overflow into subsequent
+    /// cells.
+    /// </summary>
+    public string Text2 {
+        get {
+            int width = sheet?.ColumnWidth(Location.Column) ?? Sheet.DefaultColumnWidth;
+            string text = CellValue.Value;
+            bool isNumber = double.TryParse(text, out double doubleValue);
+            if (isNumber) {
+                text = CellFormat switch {
+                    CellFormat.FIXED => doubleValue.ToString($"F{DecimalPlaces}"),
+                    CellFormat.PERCENT => $"{(doubleValue * 100).ToString($"F{DecimalPlaces}")}%",
+                    CellFormat.CURRENCY => doubleValue < 0 ? $"(\u00a3{(-doubleValue).ToString($"N{DecimalPlaces}")})" : $"\u00a3{doubleValue.ToString($"N{DecimalPlaces}")}",
+                    CellFormat.COMMAS => doubleValue < 0 ? $"({(-doubleValue).ToString($"N{DecimalPlaces}")})" : $"{doubleValue.ToString($"N{DecimalPlaces}")}",
+                    CellFormat.SCIENTIFIC => doubleValue.ToString($"0.{new string('#', DecimalPlaces)}E+00"),
+                    CellFormat.DATE_DM => ToDateTime("d-MMM", doubleValue),
+                    CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
+                    CellFormat.DATE_DMY => ToDateTime("d-MMM-yyyy", doubleValue),
+                    CellFormat.GENERAL => text,
+                    CellFormat.TEXT => UIContent,
+                    _ => throw new ArgumentException($"Unknown Cell Format: {CellFormat}")
+                };
+                if (text.Length > width) {
+                    text = new string('*', width);
+                }
+            }
+            return text;
+        }
+    }
+
+    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
     /// <returns>String value of cell</returns>
     public string Text(int width) {
         Debug.Assert(width >= 0);
-        string cellValue = CellValue.Value;
+        string cellValue = Text2;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
         if (isNumber) {
             cellValue = CellFormat switch {
                 CellFormat.FIXED => doubleValue.ToString($"F{DecimalPlaces}"),
                 CellFormat.PERCENT => $"{(doubleValue * 100).ToString($"F{DecimalPlaces}")}%",
-                CellFormat.CURRENCY => doubleValue < 0 ?
-                        $"(\u00a3{(-doubleValue).ToString($"N{DecimalPlaces}")})" :
-                        $"\u00a3{doubleValue.ToString($"N{DecimalPlaces}")}",
-                CellFormat.COMMAS => doubleValue < 0 ?
-                        $"({(-doubleValue).ToString($"N{DecimalPlaces}")})" :
-                        $"{doubleValue.ToString($"N{DecimalPlaces}")}",
+                CellFormat.CURRENCY => doubleValue < 0 ? $"(\u00a3{(-doubleValue).ToString($"N{DecimalPlaces}")})" : $"\u00a3{doubleValue.ToString($"N{DecimalPlaces}")}",
+                CellFormat.COMMAS => doubleValue < 0 ? $"({(-doubleValue).ToString($"N{DecimalPlaces}")})" : $"{doubleValue.ToString($"N{DecimalPlaces}")}",
                 CellFormat.SCIENTIFIC => doubleValue.ToString($"0.{new string('#', DecimalPlaces)}E+00"),
                 CellFormat.DATE_DM => ToDateTime("d-MMM", doubleValue),
                 CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
@@ -419,7 +448,8 @@ public class Cell(Sheet? sheet) {
             FormulaParser parser = new FormulaParser(formula[1..], location);
             cellParseNode = parser.Parse();
             return true;
-        } catch (FormatException) {
+        }
+        catch (FormatException) {
             cellParseNode = null;
             return false;
         }
