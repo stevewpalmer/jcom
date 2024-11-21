@@ -103,6 +103,7 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// Convert a CellLocation to its absolute address.
     /// </summary>
     /// <returns>String containing the absolute location</returns>
+    [JsonIgnore]
     public string Address => $"{Cell.ColumnToAddress(Column)}{Row}";
 
     /// <summary>
