@@ -86,7 +86,7 @@ public class Sheet {
     /// changed.
     /// </summary>
     [JsonIgnore]
-    public bool Modified { get; set; }
+    internal bool Modified { get; set; }
 
     /// <summary>
     /// Returns the active cell
@@ -265,28 +265,6 @@ public class Sheet {
             c--;
         }
         FixupFormulaCells(0, row, -1);
-        Modified = true;
-    }
-
-    /// <summary>
-    /// Set the new cell format and number of decimal places.
-    /// </summary>
-    /// <param name="cell">Cell to format</param>
-    /// <param name="format">New format</param>
-    /// <param name="decimalPlaces">Number of decimal places</param>
-    public void SetCellFormat(Cell cell, CellFormat format, int decimalPlaces) {
-        cell.Format = format;
-        cell.Decimal = decimalPlaces;
-        Modified = true;
-    }
-
-    /// <summary>
-    /// Set the cell alignment.
-    /// </summary>
-    /// <param name="cell">Cell to align</param>
-    /// <param name="alignment">New alignment</param>
-    public void SetCellAlignment(Cell cell, CellAlignment alignment) {
-        cell.Align = alignment;
         Modified = true;
     }
 

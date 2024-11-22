@@ -20,4 +20,8 @@
       <ProjectReference Include="..\comlib\comlib.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="ExcelNumberFormat" Version="1.1.0" />
+    </ItemGroup>
+
 </Project>

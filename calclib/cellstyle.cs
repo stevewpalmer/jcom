@@ -1,10 +1,10 @@
-// calclib
-// Window management
+// JCalcLib
+// Cell styles
 //
 // Authors:
-//  Steve
+//  Steve Palmer
 //
-// Copyright (C) 2024 Steve
+// Copyright (C) 2024 Steve Palmer
 //
 // Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
@@ -27,42 +27,111 @@ using System.Text.Json.Serialization;
 
 namespace JCalcLib;
 
-public class CellStyle {
+public class CellStyle(Sheet? sheet) {
+
+    /// <summary>
+    /// Empty constructor
+    /// </summary>
+    public CellStyle() : this(null) { }
 
     /// <summary>
     /// Foreground colour
     /// </summary>
-    public int? Foreground { get; set; }
+    [JsonInclude]
+    public int? Foreground { get; private set; }
 
     /// <summary>
     /// Foreground colour
     /// </summary>
     [JsonIgnore]
-    public int ForegroundColour => Foreground.GetValueOrDefault(CellFactory.ForegroundColour);
+    public int ForegroundColour {
+        get => Foreground.GetValueOrDefault(CellFactory.ForegroundColour);
+        set {
+            Foreground = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
 
     /// <summary>
     /// Background colour
     /// </summary>
-    public int? Background { get; set; }
+    [JsonInclude]
+    public int? Background { get; private set; }
 
     /// <summary>
     /// Background colour
     /// </summary>
     [JsonIgnore]
-    public int BackgroundColour => Background.GetValueOrDefault(CellFactory.BackgroundColour);
+    public int BackgroundColour {
+        get => Background.GetValueOrDefault(CellFactory.BackgroundColour);
+        set {
+            Background = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
 
     /// <summary>
     /// Specifies boldface text
     /// </summary>
-    public bool Bold { get; set; }
+    [JsonInclude]
+    public bool Bold { get; private set; }
+
+    /// <summary>
+    /// Sets or gets the cell text bold style.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsBold {
+        get => Bold;
+        set {
+            Bold = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
 
     /// <summary>
     /// Specifies italic text
     /// </summary>
-    public bool Italic { get; set; }
+    [JsonInclude]
+    public bool Italic { get; private set; }
+
+    /// <summary>
+    /// Sets or gets the cell text italic style.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsItalic {
+        get => Italic;
+        set {
+            Italic = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
 
     /// <summary>
     /// Specifies Underlined text
     /// </summary>
-    public bool Underline { get; set; }
+    [JsonInclude]
+    public bool Underline { get; private set; }
+
+    /// <summary>
+    /// Sets or gets the cell text underline style.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsUnderlined {
+        get => Underline;
+        set {
+            Underline = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
+
 }

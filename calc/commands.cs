@@ -47,6 +47,7 @@ public enum CommandMapID {
     RANGE,
     SETTINGS,
     STYLE,
+    TIMES,
     WORKSHEET
 }
 
@@ -151,10 +152,10 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.FormatFixed, CommandId = KeyCommand.KC_FORMAT_FIXED, Description = Calc.FormatFixedDescription },
                 new CommandMapEntry { Name = Calc.FormatScientific, CommandId = KeyCommand.KC_FORMAT_SCI, Description = Calc.FormatScientificDescription },
                 new CommandMapEntry { Name = Calc.FormatCurrency, CommandId = KeyCommand.KC_FORMAT_CURRENCY, Description = Calc.FormatCurrencyDescription },
-                new CommandMapEntry { Name = Calc.FormatCommas, CommandId = KeyCommand.KC_FORMAT_COMMAS, Description = Calc.FormatCommasDescription },
                 new CommandMapEntry { Name = Calc.FormatGeneral, CommandId = KeyCommand.KC_FORMAT_GENERAL, Description = Calc.FormatGeneralDescription },
                 new CommandMapEntry { Name = Calc.FormatPercent, CommandId = KeyCommand.KC_FORMAT_PERCENT, Description = Calc.FormatPercentDescription },
                 new CommandMapEntry { Name = Calc.FormatDate, SubCommandId = CommandMapID.DATES, Description = Calc.FormatDatesDescription },
+                new CommandMapEntry { Name = Calc.FormatTime, SubCommandId = CommandMapID.TIMES, Description = Calc.FormatTimeDescription },
                 new CommandMapEntry { Name = Calc.FormatText, CommandId = KeyCommand.KC_FORMAT_TEXT, Description = Calc.FormatTextDescription },
                 new CommandMapEntry { Name = Calc.FormatReset, CommandId = KeyCommand.KC_FORMAT_RESET, Description = Calc.FormatResetDescription }
             ]
@@ -193,6 +194,12 @@ public static class Commands {
             ]
         },
         new() {
+            ID = CommandMapID.TIMES,
+            Commands = [
+                new CommandMapEntry { Name = Calc.TimesHMSZ, CommandId = KeyCommand.KC_TIME_HMSZ, Description = Calc.TimesHMSZDescription }
+            ]
+        },
+        new() {
             ID = CommandMapID.FILE,
             Commands = [
                 new CommandMapEntry { Name = Calc.FileOpen, CommandId = KeyCommand.KC_FILE_RETRIEVE, Description = Calc.FileOpenDescription },
@@ -224,7 +231,6 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.FormatFixed, CommandId = KeyCommand.KC_DEFAULT_FORMAT_FIXED, Description = Calc.FormatFixedDescription },
                 new CommandMapEntry { Name = Calc.FormatScientific, CommandId = KeyCommand.KC_DEFAULT_FORMAT_SCI, Description = Calc.FormatScientificDescription },
                 new CommandMapEntry { Name = Calc.FormatCurrency, CommandId = KeyCommand.KC_DEFAULT_FORMAT_CURRENCY, Description = Calc.FormatCurrencyDescription },
-                new CommandMapEntry { Name = Calc.FormatCommas, CommandId = KeyCommand.KC_DEFAULT_FORMAT_COMMAS, Description = Calc.FormatCommasDescription },
                 new CommandMapEntry { Name = Calc.FormatGeneral, CommandId = KeyCommand.KC_DEFAULT_FORMAT_GENERAL, Description = Calc.FormatGeneralDescription },
                 new CommandMapEntry { Name = Calc.FormatPercent, CommandId = KeyCommand.KC_DEFAULT_FORMAT_PERCENT, Description = Calc.FormatPercentDescription },
                 new CommandMapEntry { Name = Calc.FormatDate, SubCommandId = CommandMapID.DEFAULT_DATES, Description = Calc.FormatDatesDescription },

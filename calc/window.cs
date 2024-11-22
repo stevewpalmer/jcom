@@ -114,7 +114,6 @@ public class Window {
             KeyCommand.KC_FORMAT_FIXED => FormatCells(CellFormat.FIXED),
             KeyCommand.KC_FORMAT_PERCENT => FormatCells(CellFormat.PERCENT),
             KeyCommand.KC_FORMAT_CURRENCY => FormatCells(CellFormat.CURRENCY),
-            KeyCommand.KC_FORMAT_COMMAS => FormatCells(CellFormat.COMMAS),
             KeyCommand.KC_FORMAT_SCI => FormatCells(CellFormat.SCIENTIFIC),
             KeyCommand.KC_FORMAT_GENERAL => FormatCells(CellFormat.GENERAL),
             KeyCommand.KC_FORMAT_TEXT => FormatCells(CellFormat.TEXT),
@@ -122,6 +121,7 @@ public class Window {
             KeyCommand.KC_DATE_DMY => FormatCells(CellFormat.DATE_DMY),
             KeyCommand.KC_DATE_DM => FormatCells(CellFormat.DATE_DM),
             KeyCommand.KC_DATE_MY => FormatCells(CellFormat.DATE_MY),
+            KeyCommand.KC_TIME_HMSZ => FormatCells(CellFormat.TIME),
             KeyCommand.KC_INSERT_COLUMN => InsertColumn(),
             KeyCommand.KC_INSERT_ROW => InsertRow(),
             KeyCommand.KC_DELETE_COLUMN => DeleteColumn(),
@@ -402,7 +402,8 @@ public class Window {
     private RenderHint AlignCells(CellAlignment alignment) {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
-            Sheet.SetCellAlignment(Sheet.GetCell(location, true), alignment);
+            Cell cell = Sheet.GetCell(location, true);
+            cell.Alignment = alignment;
         }
         ClearBlock();
         return flags;
@@ -439,15 +440,9 @@ public class Window {
 
             foreach (Cell cellToPaste in cellsToPaste) {
                 Cell cell = Sheet.GetCell(current, true);
-                cell.Format = cellToPaste.Format;
-                cell.Align = cellToPaste.Align;
-                cell.CellValue = cellToPaste.CellValue;
-                cell.Decimal = cellToPaste.Decimal;
-                cell.Content = cellToPaste.Content;
-                cell.Style = cellToPaste.Style;
+                cell.CopyFrom(cellToPaste);
                 ++current.Row;
             }
-            Sheet.Modified = true;
             flags = RenderHint.RECALCULATE | RenderHint.CONTENTS;
         }
         return flags;
@@ -462,7 +457,31 @@ public class Window {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         Cell cell = Sheet.ActiveCell;
         int decimalPlaces = 0;
-        if (format is CellFormat.FIXED or CellFormat.SCIENTIFIC or CellFormat.CURRENCY or CellFormat.PERCENT) {
+        bool useThousands = false;
+        if (format is CellFormat.FIXED) {
+            FormField[] formFields = [
+                new() {
+                    Text = Calc.EnterDecimalPlaces,
+                    Type = FormFieldType.NUMBER,
+                    Width = 2,
+                    MinimumValue = 0,
+                    MaximumValue = 15,
+                    Value = new Variant(cell.DecimalPlaces)
+                },
+                new() {
+                    Text = Calc.UseThousandsSeparator,
+                    Type = FormFieldType.BOOLEAN,
+                    Value = new Variant(cell.UseThousandsSeparator)
+                }
+            ];
+            if (!Screen.Command.PromptForInput(formFields)) {
+                return RenderHint.CANCEL;
+            }
+            decimalPlaces = formFields[0].Value.IntValue;
+            useThousands = formFields[1].Value.BoolValue;
+            Debug.Assert(decimalPlaces >= formFields[0].MinimumValue && decimalPlaces <= formFields[0].MaximumValue);
+        }
+        if (format is CellFormat.SCIENTIFIC or CellFormat.CURRENCY or CellFormat.PERCENT) {
             FormField[] formFields = [
                 new() {
                     Text = Calc.EnterDecimalPlaces,
@@ -480,7 +499,10 @@ public class Window {
             Debug.Assert(decimalPlaces >= formFields[0].MinimumValue && decimalPlaces <= formFields[0].MaximumValue);
         }
         foreach (CellLocation location in RangeIterator()) {
-            Sheet.SetCellFormat(Sheet.GetCell(location, true), format, decimalPlaces);
+            Cell cell2 = Sheet.GetCell(location, true);
+            cell2.CellFormat = format;
+            cell2.DecimalPlaces = decimalPlaces;
+            cell2.UseThousandsSeparator = useThousands;
         }
         ClearBlock();
         return flags;
@@ -649,9 +671,8 @@ public class Window {
         }
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
-            cell.Style.Foreground = cellColour;
+            cell.Style.ForegroundColour = cellColour;
         }
-        Sheet.Modified = true;
         return RenderHint.CONTENTS;
     }
 
@@ -667,9 +688,8 @@ public class Window {
         }
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
-            cell.Style.Background = cellColour;
+            cell.Style.BackgroundColour = cellColour;
         }
-        Sheet.Modified = true;
         return RenderHint.CONTENTS;
     }
 
@@ -681,9 +701,8 @@ public class Window {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
-            cell.Style.Bold = !cell.Style.Bold;
+            cell.Style.IsBold = !cell.Style.IsBold;
         }
-        Sheet.Modified = true;
         ClearBlock();
         return flags;
     }
@@ -696,9 +715,8 @@ public class Window {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
-            cell.Style.Italic = !cell.Style.Italic;
+            cell.Style.IsItalic = !cell.Style.IsItalic;
         }
-        Sheet.Modified = true;
         ClearBlock();
         return flags;
     }
@@ -711,9 +729,8 @@ public class Window {
         RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
-            cell.Style.Underline = !cell.Style.Underline;
+            cell.Style.IsUnderlined = !cell.Style.IsUnderlined;
         }
-        Sheet.Modified = true;
         ClearBlock();
         return flags;
     }

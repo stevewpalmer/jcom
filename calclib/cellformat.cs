@@ -43,11 +43,6 @@ public enum CellFormat {
     FIXED,
 
     /// <summary>
-    /// Commas inserted
-    /// </summary>
-    COMMAS,
-
-    /// <summary>
     /// Currency
     /// </summary>
     CURRENCY,
@@ -75,5 +70,15 @@ public enum CellFormat {
     /// <summary>
     /// Date in Day-Month format
     /// </summary>
-    DATE_DM
+    DATE_DM,
+
+    /// <summary>
+    /// Custom format
+    /// </summary>
+    CUSTOM,
+
+    /// <summary>
+    /// Time format
+    /// </summary>
+    TIME
 }

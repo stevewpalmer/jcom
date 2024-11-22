@@ -151,7 +151,6 @@ public static class Screen {
             KeyCommand.KC_DEFAULT_DATE_DM => SetDefaultFormat(CellFormat.DATE_DM),
             KeyCommand.KC_DEFAULT_DATE_DMY => SetDefaultFormat(CellFormat.DATE_DMY),
             KeyCommand.KC_DEFAULT_DATE_MY => SetDefaultFormat(CellFormat.DATE_MY),
-            KeyCommand.KC_DEFAULT_FORMAT_COMMAS => SetDefaultFormat(CellFormat.COMMAS),
             KeyCommand.KC_DEFAULT_FORMAT_CURRENCY => SetDefaultFormat(CellFormat.CURRENCY),
             KeyCommand.KC_DEFAULT_FORMAT_FIXED => SetDefaultFormat(CellFormat.FIXED),
             KeyCommand.KC_DEFAULT_FORMAT_GENERAL => SetDefaultFormat(CellFormat.GENERAL),

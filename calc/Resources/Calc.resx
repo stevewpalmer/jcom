@@ -81,9 +81,6 @@
     <data name="FormatCurrency" xml:space="preserve">
         <value>Currency</value>
     </data>
-    <data name="FormatCommas" xml:space="preserve">
-        <value>,</value>
-    </data>
     <data name="FormatGeneral" xml:space="preserve">
         <value>General</value>
     </data>
@@ -162,9 +159,6 @@
     <data name="FormatCurrencyDescription" xml:space="preserve">
         <value>Currency format (£x,xxx.xx)</value>
     </data>
-    <data name="FormatCommasDescription" xml:space="preserve">
-        <value>Commas inserted; negative values parenthised (x,xxx.xx)</value>
-    </data>
     <data name="FormatGeneralDescription" xml:space="preserve">
         <value>Standard format (x.xx or x.xxExx)</value>
     </data>
@@ -211,7 +205,7 @@
         <value>Quit Calc</value>
     </data>
     <data name="EnterDecimalPlaces" xml:space="preserve">
-        <value>Enter number of decimal places @@</value>
+        <value>Decimal places @@</value>
     </data>
     <data name="Settings" xml:space="preserve">
         <value>Settings</value>
@@ -333,9 +327,6 @@
     <data name="Paste" xml:space="preserve">
         <value>Paste</value>
     </data>
-    <data name="RangeColourDescription" xml:space="preserve">
-        <value>Set the colour of a range of cells</value>
-    </data>
     <data name="EnterCellColour" xml:space="preserve">
         <value>Enter cell colour</value>
     </data>
@@ -401,5 +392,20 @@
     </data>
     <data name="InvalidAddress" xml:space="preserve">
         <value>Invalid address</value>
+    </data>
+    <data name="UseThousandsSeparator" xml:space="preserve">
+        <value>Use 1000 Separator</value>
+    </data>
+    <data name="FormatTime" xml:space="preserve">
+        <value>Time</value>
+    </data>
+    <data name="FormatTimeDescription" xml:space="preserve">
+        <value>Time formats</value>
+    </data>
+    <data name="TimesHMSZ" xml:space="preserve">
+        <value>HH:MM:SS AM/PM</value>
+    </data>
+    <data name="TimesHMSZDescription" xml:space="preserve">
+        <value>Hour:Minute:Second A</value>
     </data>
 </root>

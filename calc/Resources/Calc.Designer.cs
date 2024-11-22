@@ -171,12 +171,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string FormatCommas {
-            get {
-                return ResourceManager.GetString("FormatCommas", resourceCulture);
-            }
-        }
-        
         internal static string FormatGeneral {
             get {
                 return ResourceManager.GetString("FormatGeneral", resourceCulture);
@@ -330,12 +324,6 @@ namespace JCalc.Resources {
         internal static string FormatCurrencyDescription {
             get {
                 return ResourceManager.GetString("FormatCurrencyDescription", resourceCulture);
-            }
-        }
-        
-        internal static string FormatCommasDescription {
-            get {
-                return ResourceManager.GetString("FormatCommasDescription", resourceCulture);
             }
         }
         
@@ -675,12 +663,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string RangeColourDescription {
-            get {
-                return ResourceManager.GetString("RangeColourDescription", resourceCulture);
-            }
-        }
-        
         internal static string EnterCellColour {
             get {
                 return ResourceManager.GetString("EnterCellColour", resourceCulture);
@@ -810,6 +792,36 @@ namespace JCalc.Resources {
         internal static string InvalidAddress {
             get {
                 return ResourceManager.GetString("InvalidAddress", resourceCulture);
+            }
+        }
+        
+        internal static string UseThousandsSeparator {
+            get {
+                return ResourceManager.GetString("UseThousandsSeparator", resourceCulture);
+            }
+        }
+        
+        internal static string FormatTime {
+            get {
+                return ResourceManager.GetString("FormatTime", resourceCulture);
+            }
+        }
+        
+        internal static string FormatTimeDescription {
+            get {
+                return ResourceManager.GetString("FormatTimeDescription", resourceCulture);
+            }
+        }
+        
+        internal static string TimesHMSZ {
+            get {
+                return ResourceManager.GetString("TimesHMSZ", resourceCulture);
+            }
+        }
+        
+        internal static string TimesHMSZDescription {
+            get {
+                return ResourceManager.GetString("TimesHMSZDescription", resourceCulture);
             }
         }
     }

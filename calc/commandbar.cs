@@ -108,6 +108,11 @@ public enum FormFieldType {
     TEXT,
 
     /// <summary>
+    /// Boolean flag
+    /// </summary>
+    BOOLEAN,
+
+    /// <summary>
     /// Pick a range of values
     /// </summary>
     PICKER
@@ -193,6 +198,11 @@ internal class FormFieldInternal(FormField inner) {
     public int MaxWidth { get; set; }
 
     /// <summary>
+    /// True if input cannot be edited directly (e.g. boolean toggle)
+    /// </summary>
+    public bool IsReadOnly { get; set; }
+
+    /// <summary>
     /// Save the input buffer to the Value. String values have leading and trailing
     /// spaces removed. Numeric values are validated against the minimum and maximum
     /// value permitted.
@@ -208,6 +218,9 @@ internal class FormFieldInternal(FormField inner) {
                     return false;
                 }
                 Inner.Value.Set(value);
+                break;
+            case FormFieldType.BOOLEAN:
+                Inner.Value.Set(bool.TryParse(inputValue, out bool _boolresult) && _boolresult);
                 break;
             default:
                 Inner.Value.Set(inputValue.Trim());
@@ -347,6 +360,11 @@ public class CommandBar {
                     prompt = prompt.Replace("@@", $"({userfield.MinimumValue}..{userfield.MaximumValue})");
                     break;
 
+                case FormFieldType.BOOLEAN:
+                    value = $"{(userfield.Value.BoolValue ? bool.TrueString : bool.FalseString)}";
+                    width = Math.Max(bool.TrueString.Length, bool.FalseString.Length);
+                    break;
+
                 case FormFieldType.PICKER:
                     value = userfield.Value.StringValue;
                     width = userfield.List.Max(p => p.Length);
@@ -372,6 +390,7 @@ public class CommandBar {
             field.X = column;
             field.Y = row;
             field.MaxWidth = width;
+            field.IsReadOnly = userfield.Type == FormFieldType.BOOLEAN;
             Terminal.Write(column, row, width, _fgColour, _bgColour, value);
             column += width + 2;
         }
@@ -440,24 +459,24 @@ public class CommandBar {
                     break;
                 }
 
-                case ConsoleKey.RightArrow when index < inputBuffer.Count:
+                case ConsoleKey.RightArrow when index < inputBuffer.Count && !currentField.IsReadOnly:
                     ++index;
                     break;
 
-                case ConsoleKey.LeftArrow when index > 0:
+                case ConsoleKey.LeftArrow when index > 0 && !currentField.IsReadOnly:
                     --index;
                     break;
 
-                case ConsoleKey.Delete when index < inputBuffer.Count:
+                case ConsoleKey.Delete when index < inputBuffer.Count && !currentField.IsReadOnly:
                     inputBuffer.RemoveAt(index);
                     break;
 
-                case ConsoleKey.Backspace when index > 0 && selection:
+                case ConsoleKey.Backspace when index > 0 && selection && !currentField.IsReadOnly:
                     inputBuffer.Clear();
                     index = 0;
                     break;
 
-                case ConsoleKey.Backspace when index > 0 && !selection:
+                case ConsoleKey.Backspace when index > 0 && !selection && !currentField.IsReadOnly:
                     inputBuffer.RemoveAt(--index);
                     break;
 
@@ -477,6 +496,10 @@ public class CommandBar {
                     return false;
 
                 default:
+                    if (currentField.Inner.Type == FormFieldType.BOOLEAN) {
+                        inputBuffer = (char.ToUpper(input.KeyChar) == 'Y' ? bool.TrueString : bool.FalseString).ToList();
+                        continue;
+                    }
                     if (currentField.Inner.Type == FormFieldType.NUMBER && !char.IsDigit(input.KeyChar)) {
                         continue;
                     }

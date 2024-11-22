@@ -322,9 +322,7 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
                 if (AbsoluteLocation.Column >= column) {
                     AbsoluteLocation = AbsoluteLocation with { Column = AbsoluteLocation.Column + offset };
                 }
-                if (RelativeLocation.X < column) {
-                    RelativeLocation = RelativeLocation with { X = AbsoluteLocation.Column - location.Column };
-                }
+                RelativeLocation = RelativeLocation with { X = AbsoluteLocation.Column - location.Column };
             }
             needRecalculate = true;
         }
@@ -336,9 +334,7 @@ public class LocationParseNode(CellLocation absoluteLocation, Point relativeLoca
                 if (AbsoluteLocation.Row >= row) {
                     AbsoluteLocation = AbsoluteLocation with { Row = AbsoluteLocation.Row + offset };
                 }
-                if (RelativeLocation.Y < row) {
-                    RelativeLocation = RelativeLocation with { Y = AbsoluteLocation.Row - location.Row };
-                }
+                RelativeLocation = RelativeLocation with { Y = AbsoluteLocation.Row - location.Row };
             }
             needRecalculate = true;
         }

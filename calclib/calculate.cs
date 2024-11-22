@@ -218,7 +218,10 @@ public class Calculate(Sheet sheet) {
     /// <param name="cell">Source cell</param>
     /// <returns>Value to be applied to the cell</returns>
     private static Variant KNow(Cell cell) {
-        cell.Format ??= CellFormat.DATE_DMY;
+        if (cell.Format == null) {
+            cell.CellFormat = CellFormat.CUSTOM;
+            cell.CustomFormatString = "dd/mm/yyyy h:mm";
+        }
         return new Variant(DateTime.Now.ToOADate());
     }
 
@@ -229,7 +232,9 @@ public class Calculate(Sheet sheet) {
     /// <param name="cell">Source cell</param>
     /// <returns>Value to be applied to the cell</returns>
     private static Variant KToday(Cell cell) {
-        cell.Format ??= CellFormat.DATE_DM;
+        if (cell.Format == null) {
+            cell.CellFormat = CellFormat.DATE_DMY;
+        }
         return new Variant(DateTime.Now.ToOADate());
     }
 }

@@ -27,6 +27,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using ExcelNumberFormat;
 using JComLib;
 
 namespace JCalcLib;
@@ -34,11 +35,25 @@ namespace JCalcLib;
 public class Cell(Sheet? sheet) {
     private CellParseNode? _cellParseNode;
     private string _content = string.Empty;
+    private string? _customFormatString;
 
     /// <summary>
     /// Empty constructor
     /// </summary>
     public Cell() : this(null) { }
+
+    /// <summary>
+    /// Copy from another cell
+    /// </summary>
+    public void CopyFrom(Cell other) {
+        CellFormat = other.CellFormat;
+        CustomFormat = other.CustomFormat;
+        Alignment = other.Alignment;
+        CellValue = other.CellValue;
+        DecimalPlaces = other.DecimalPlaces;
+        Content = other.Content;
+        Style = other.Style;
+    }
 
     /// <summary>
     /// Cell value
@@ -49,18 +64,28 @@ public class Cell(Sheet? sheet) {
     /// <summary>
     /// Cell alignment
     /// </summary>
-    public CellAlignment? Align { get; set; }
+    [JsonInclude]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public CellAlignment? Align { get; private set; }
 
     /// <summary>
     /// Cell alignment
     /// </summary>
     [JsonIgnore]
-    public CellAlignment Alignment => Align.GetValueOrDefault(CellFactory.Alignment);
+    public CellAlignment Alignment {
+        get => Align.GetValueOrDefault(CellFactory.Alignment);
+        set {
+            Align = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
 
     /// <summary>
     /// Cell text style
     /// </summary>
-    public CellStyle Style { get; set; } = new();
+    public CellStyle Style { get; set; } = new(sheet);
 
     /// <summary>
     /// Cell location
@@ -80,17 +105,19 @@ public class Cell(Sheet? sheet) {
     [JsonIgnore]
     public string FormatDescription {
         get {
+            string thousands = UseThousandsSeparator ? "C" : "";
             string text = CellFormat switch {
-                CellFormat.FIXED => $"F{DecimalPlaces}",
+                CellFormat.FIXED => $"F{DecimalPlaces}{thousands}",
                 CellFormat.SCIENTIFIC => $"S{DecimalPlaces}",
                 CellFormat.TEXT => "T",
                 CellFormat.GENERAL => "G",
                 CellFormat.PERCENT => $"P{DecimalPlaces}",
-                CellFormat.COMMAS => $",{DecimalPlaces}",
                 CellFormat.CURRENCY => $"C{DecimalPlaces}",
                 CellFormat.DATE_DM => "D2",
                 CellFormat.DATE_MY => "D3",
                 CellFormat.DATE_DMY => "D1",
+                CellFormat.TIME => "TM",
+                CellFormat.CUSTOM => $"{CustomFormatString}",
                 _ => "?"
             };
             return $"({text})";
@@ -100,24 +127,135 @@ public class Cell(Sheet? sheet) {
     /// <summary>
     /// Cell format
     /// </summary>
-    public CellFormat? Format { get; set; }
+    [JsonInclude]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public CellFormat? Format { get; private set; }
 
     /// <summary>
     /// Cell format
     /// </summary>
     [JsonIgnore]
-    public CellFormat CellFormat => Format.GetValueOrDefault(CellFactory.Format);
+    public CellFormat CellFormat {
+        get => Format.GetValueOrDefault(CellFactory.Format);
+        set {
+            Format = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Pre-compiled custom number format
+    /// </summary>
+    [JsonIgnore]
+    private NumberFormat? CustomFormat { get; set; }
+
+    /// <summary>
+    /// Custom cell format when format is set to CUSTOM
+    /// </summary>
+    [JsonInclude]
+    public string? CustomFormatString {
+        get => _customFormatString;
+        set {
+            _customFormatString = value;
+            CustomFormat = new NumberFormat(_customFormatString);
+        }
+    }
+
+    /// <summary>
+    /// General number format
+    /// </summary>
+    [JsonIgnore]
+    private readonly NumberFormat GeneralFormat = new("General");
 
     /// <summary>
     /// Number of decimal places
     /// </summary>
-    public int? Decimal { get; set; }
+    [JsonInclude]
+    public int? Decimal { get; private set; }
 
     /// <summary>
     /// Number of decimal places
     /// </summary>
     [JsonIgnore]
-    public int DecimalPlaces => Decimal.GetValueOrDefault(CellFactory.DecimalPlaces);
+    public int DecimalPlaces {
+        get => Decimal.GetValueOrDefault(CellFactory.DecimalPlaces);
+        set {
+            Decimal = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Whether or not numbers are formatted with the thousand separator
+    /// </summary>
+    [JsonInclude]
+    public bool? UseThousands { get; private set; }
+
+    /// <summary>
+    /// Whether or not numbers are formatted with the thousand separator
+    /// </summary>
+    [JsonIgnore]
+    public bool UseThousandsSeparator {
+        get => UseThousands.GetValueOrDefault(false);
+        set {
+            UseThousands = value;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Fixed number format
+    /// </summary>
+    [JsonIgnore]
+    private NumberFormat FixedFormat => NumberFormats.GetFormat("F", UseThousandsSeparator, DecimalPlaces);
+
+    /// <summary>
+    /// Scientific number format
+    /// </summary>
+    [JsonIgnore]
+    private NumberFormat ScientificFormat => NumberFormats.GetFormat("S", false, DecimalPlaces);
+
+    /// <summary>
+    /// Scientific number format
+    /// </summary>
+    [JsonIgnore]
+    private NumberFormat CurrencyFormat => NumberFormats.GetFormat("C", true, DecimalPlaces);
+
+    /// <summary>
+    /// Scientific number format
+    /// </summary>
+    [JsonIgnore]
+    private NumberFormat PercentFormat => NumberFormats.GetFormat("P", true, DecimalPlaces);
+
+    /// <summary>
+    /// Date1 format
+    /// </summary>
+    [JsonIgnore]
+    private static NumberFormat DateDMYFormat => NumberFormats.GetFormat("D1");
+
+    /// <summary>
+    /// Date2 format
+    /// </summary>
+    [JsonIgnore]
+    private static NumberFormat DateDMFormat => NumberFormats.GetFormat("D2");
+
+    /// <summary>
+    /// Date3 format
+    /// </summary>
+    [JsonIgnore]
+    private static NumberFormat DateMYFormat => NumberFormats.GetFormat("D3");
+
+    /// <summary>
+    /// Time format
+    /// </summary>
+    [JsonIgnore]
+    private static NumberFormat TimeFormat => NumberFormats.GetFormat("TM");
 
     /// <summary>
     /// Is this a blank cell?
@@ -204,6 +342,7 @@ public class Cell(Sheet? sheet) {
             }
             else {
                 _content = TryParseDate(value);
+                _content = TryParseTime(_content);
                 CellValue.Value = _content;
                 CellValue.Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
             }
@@ -308,15 +447,16 @@ public class Cell(Sheet? sheet) {
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
         if (isNumber) {
             cellValue = CellFormat switch {
-                CellFormat.FIXED => doubleValue.ToString($"F{DecimalPlaces}"),
-                CellFormat.PERCENT => $"{(doubleValue * 100).ToString($"F{DecimalPlaces}")}%",
-                CellFormat.CURRENCY => doubleValue < 0 ? $"(\u00a3{(-doubleValue).ToString($"N{DecimalPlaces}")})" : $"\u00a3{doubleValue.ToString($"N{DecimalPlaces}")}",
-                CellFormat.COMMAS => doubleValue < 0 ? $"({(-doubleValue).ToString($"N{DecimalPlaces}")})" : $"{doubleValue.ToString($"N{DecimalPlaces}")}",
-                CellFormat.SCIENTIFIC => doubleValue.ToString($"0.{new string('#', DecimalPlaces)}E+00"),
-                CellFormat.DATE_DM => ToDateTime("d-MMM", doubleValue),
-                CellFormat.DATE_MY => ToDateTime("MMM-yyyy", doubleValue),
-                CellFormat.DATE_DMY => ToDateTime("d-MMM-yyyy", doubleValue),
-                CellFormat.GENERAL => cellValue,
+                CellFormat.FIXED => FixedFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.PERCENT => PercentFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.CURRENCY => CurrencyFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.SCIENTIFIC => ScientificFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.DATE_DM => DateDMFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.DATE_MY => DateMYFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.DATE_DMY => DateDMYFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.CUSTOM => CustomFormat != null ? CustomFormat.Format(doubleValue, CultureInfo.CurrentCulture) : doubleValue.ToString(CultureInfo.CurrentCulture),
+                CellFormat.GENERAL => GeneralFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.TIME => TimeFormat.Format(doubleValue, CultureInfo.CurrentCulture),
                 CellFormat.TEXT => UIContent,
                 _ => throw new ArgumentException($"Unknown Cell Format: {CellFormat}")
             };
@@ -357,11 +497,10 @@ public class Cell(Sheet? sheet) {
     /// </summary>
     /// <param name="other">Cell to swap</param>
     public void Swap(Cell other) {
-        (CellValue, other.CellValue) = (other.CellValue, CellValue);
-        (Format, other.Format) = (other.Format, Format);
-        (Align, other.Align) = (other.Align, Align);
-        (Decimal, other.Decimal) = (other.Decimal, Decimal);
-        (Style, other.Style) = (other.Style, Style);
+        Cell temp = new();
+        temp.CopyFrom(other);
+        other.CopyFrom(this);
+        CopyFrom(temp);
     }
 
     /// <summary>
@@ -377,24 +516,6 @@ public class Cell(Sheet? sheet) {
     public bool FixupFormula(int column, int row, int offset) {
         Debug.Assert(CellValue.Type == CellType.FORMULA);
         return ParseNode.FixupAddress(Location, column, row, offset);
-    }
-
-    /// <summary>
-    /// Try and convert a value to a date and time string.
-    /// </summary>
-    /// <param name="pattern">The date/time pattern to use</param>
-    /// <param name="value">Value</param>
-    /// <returns>The date and time as a string</returns>
-    private string ToDateTime(string pattern, double value) {
-        ArgumentNullException.ThrowIfNull(pattern);
-        if (value < -657435.0) {
-            return CellValue.Value;
-        }
-        if (value > 2958465.99999999) {
-            return CellValue.Value;
-        }
-        DateTime dateTime = DateTime.FromOADate(value);
-        return dateTime.ToString(pattern);
     }
 
     /// <summary>
@@ -437,6 +558,27 @@ public class Cell(Sheet? sheet) {
             return _date.ToOADate().ToString(culture);
         }
         if (DateTime.TryParseExact(compactValue, "d-MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        return value;
+    }
+
+    /// <summary>
+    /// Try to parse the value as a time and, if we succeed, return the OADate
+    /// value as a string. Otherwise. return the original value.
+    /// </summary>
+    /// <param name="value">Value to parse</param>
+    /// <returns>OADate value of time, or the original value</returns>
+    private static string TryParseTime(string value) {
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        string compactValue = value.Replace(" ", "");
+        if (DateTime.TryParseExact(compactValue, "t", culture, DateTimeStyles.None, out DateTime _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        if (DateTime.TryParseExact(compactValue, "T", culture, DateTimeStyles.None, out _date)) {
+            return _date.ToOADate().ToString(culture);
+        }
+        if (DateTime.TryParseExact(compactValue, "h:mm:ss tt zz", culture, DateTimeStyles.None, out _date)) {
             return _date.ToOADate().ToString(culture);
         }
         return value;
