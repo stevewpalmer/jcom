@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
 using System.Globalization;
 using ExcelNumberFormat;
 
@@ -36,43 +35,25 @@ public static class NumberFormats {
     /// Get a numeric format from the formats cache. Since number formats can be computationally
     /// expensive to construct when they are shared with multiple cells, they are cached and
     /// </summary>
-    /// <param name="format">Format code</param>
+    /// <param name="format">Cell format</param>
     /// <param name="thousands">True if comma separators are required</param>
     /// <param name="decimalPlaces">Number of decimal places required</param>
     /// <returns></returns>
-    public static NumberFormat GetFormat(string format, bool thousands = false, int decimalPlaces = 2) {
-        string key = $"{format}{(thousands ? "C" : "N")}{decimalPlaces}";
+    public static NumberFormat GetFormat(CellFormat format, bool thousands = false, int decimalPlaces = 2) {
+        string key = $"{JComLib.Utilities.GetEnumDescription(format)}{(thousands ? "C" : "N")}{decimalPlaces}";
         if (!formats.TryGetValue(key, out NumberFormat? _format)) {
-            string main;
-            switch (format) {
-                case "F":
-                    main = (thousands ? "#,##0." : "0.") + new string('0', decimalPlaces);
-                    break;
-                case "P":
-                    main = $"0.{new string('0', decimalPlaces)}%";
-                    break;
-                case "S":
-                    main = $"0.{new string('0', decimalPlaces)}E+00";
-                    break;
-                case "C":
-                    main = $"{NumberFormatInfo.CurrentInfo.CurrencySymbol}#,##0.{new string('0', decimalPlaces)}";
-                    break;
-                case "D1":
-                    main = "dd-mmm-yyyy";
-                    break;
-                case "D2":
-                    main = "dd-mmm";
-                    break;
-                case "D3":
-                    main = "mmm-yyyy";
-                    break;
-                case "TM":
-                    main = "h:mm:ss AM/PM";
-                    break;
-                default:
-                    Debug.Assert(false, $"Unhandled number format {format}");
-                    return null;
-            }
+            string main = format switch {
+                CellFormat.GENERAL => "General",
+                CellFormat.FIXED => (thousands ? "#,##0." : "0.") + new string('0', decimalPlaces),
+                CellFormat.PERCENT => $"0.{new string('0', decimalPlaces)}%",
+                CellFormat.SCIENTIFIC => $"0.{new string('0', decimalPlaces)}E+00",
+                CellFormat.CURRENCY => $"{NumberFormatInfo.CurrentInfo.CurrencySymbol}#,##0.{new string('0', decimalPlaces)}",
+                CellFormat.DATE_DMY => "dd-mmm-yyyy",
+                CellFormat.DATE_DM => "dd-mmm",
+                CellFormat.DATE_MY => "mmm-yyyy",
+                CellFormat.TIME => "h:mm:ss AM/PM",
+                _ => throw new ArgumentException($"Unhandled number format {format}")
+            };
             _format = new NumberFormat(main);
             formats.Add(key, _format);
         }

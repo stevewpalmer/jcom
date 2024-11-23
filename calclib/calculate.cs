@@ -78,6 +78,8 @@ public class Calculate(Sheet sheet) {
             case TokenID.KSUM: return KSum(sourceCell, node);
             case TokenID.KNOW: return KNow(sourceCell);
             case TokenID.KTODAY: return KToday(sourceCell);
+            case TokenID.KYEAR: return KYear(sourceCell, node);
+            case TokenID.KMONTH: return KMonth(sourceCell, node);
 
             case TokenID.EXP: {
                 BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
@@ -236,5 +238,43 @@ public class Calculate(Sheet sheet) {
             cell.CellFormat = CellFormat.DATE_DMY;
         }
         return new Variant(DateTime.Now.ToOADate());
+    }
+
+    /// <summary>
+    /// Extract and insert the year part of a date.
+    /// </summary>
+    /// <param name="cell">Source cell</param>
+    /// <param name="node">Function node</param>
+    /// <returns>Value to be applied to the cell</returns>
+    private Variant KYear(Cell cell, CellParseNode node) {
+        Debug.Assert(node is FunctionParseNode);
+        FunctionParseNode functionNode = (FunctionParseNode)node;
+        Variant result = EvaluateNode(cell, functionNode.Parameters[0]);
+        try {
+            DateTime date = DateTime.FromOADate(result.DoubleValue);
+            return new Variant(date.Year);
+        }
+        catch {
+            return new Variant(0);
+        }
+    }
+
+    /// <summary>
+    /// Extract and insert the month part of a date.
+    /// </summary>
+    /// <param name="cell">Source cell</param>
+    /// <param name="node">Function node</param>
+    /// <returns>Value to be applied to the cell</returns>
+    private Variant KMonth(Cell cell, CellParseNode node) {
+        Debug.Assert(node is FunctionParseNode);
+        FunctionParseNode functionNode = (FunctionParseNode)node;
+        Variant result = EvaluateNode(cell, functionNode.Parameters[0]);
+        try {
+            DateTime date = DateTime.FromOADate(result.DoubleValue);
+            return new Variant(date.Month);
+        }
+        catch {
+            return new Variant(0);
+        }
     }
 }

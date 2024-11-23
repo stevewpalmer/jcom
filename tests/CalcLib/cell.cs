@@ -25,6 +25,7 @@
 
 using System;
 using System.Drawing;
+using ExcelNumberFormat;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -64,7 +65,7 @@ public class CellTests {
         Assert.AreEqual(4095, a4095.Row);
         Assert.AreEqual(1, a4095.Column);
 
-        Assert.Throws(typeof(ArgumentNullException), delegate { new CellLocation(null!); });
+        Assert.Throws(typeof(FormatException), delegate { _ = new CellLocation(null!); });
     }
 
     // Verify comparing two cell locations. This exercises the equality
@@ -100,6 +101,18 @@ public class CellTests {
         Assert.AreEqual("45069", new Cell { UIContent = "23-May-2023" }.CellValue.Value);
         Assert.AreEqual("45387", new Cell { UIContent = "5 - Apr" }.CellValue.Value);
         Assert.AreEqual("12-XYZ", new Cell { UIContent = "12-XYZ" }.CellValue.Value);
+    }
+
+    // Verify that setting a cell value to a time string converts it
+    // to the correct OADate representation.
+    [Test]
+    public void VerifyTryParseTime() {
+        Assert.AreEqual("45619.520833333336", new Cell { UIContent = "12:30" }.CellValue.Value);
+        Assert.AreEqual("45619", new Cell { UIContent = "00:00:00" }.CellValue.Value);
+        Assert.AreEqual("45619.99998842592", new Cell { UIContent = "23:59:59" }.CellValue.Value);
+        Assert.AreEqual("45619.30039351852", new Cell { UIContent = "7:12:34 AM" }.CellValue.Value);
+        Assert.AreEqual("7pm", new Cell { UIContent = "7pm" }.CellValue.Value);
+        Assert.AreEqual("8.04 AM", new Cell { UIContent = "8.04 AM" }.CellValue.Value);
     }
 
     // Verify the Location property
@@ -164,6 +177,30 @@ public class CellTests {
         Assert.AreEqual(cell1.Alignment, CellAlignment.RIGHT);
     }
 
+    // Verify the CreateFrom method
+    [Test]
+    public void VerifyCellCreateFrom() {
+        Cell cell = new Cell {
+            CellValue = new CellValue {
+                Value = "67.9"
+            },
+            Location = new CellLocation { Column = 1, Row = 17 },
+            CellFormat = CellFormat.PERCENT,
+            DecimalPlaces = 1,
+            Alignment = CellAlignment.RIGHT
+        };
+
+        Sheet sheet = new Sheet();
+
+        Cell newCell = Cell.CreateFrom(sheet, cell);
+        Assert.AreEqual(17, newCell.Location.Row);
+        Assert.AreEqual(1, newCell.Location.Column);
+        Assert.AreEqual(CellAlignment.RIGHT, newCell.Alignment);
+        Assert.AreEqual(CellFormat.PERCENT, newCell.CellFormat);
+        Assert.IsFalse(newCell.IsEmptyCell);
+        Assert.AreEqual("67.9", newCell.Content);
+    }
+
     // Verify the format description for the cell
     [Test]
     public void VerifyCellFormatDescription() {
@@ -173,7 +210,7 @@ public class CellTests {
             },
             CellFormat = CellFormat.GENERAL
         }.FormatDescription);
-        Assert.AreEqual("(T)", new Cell {
+        Assert.AreEqual("(R)", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
@@ -225,7 +262,21 @@ public class CellTests {
             },
             CellFormat = CellFormat.DATE_MY
         }.FormatDescription);
-        Assert.AreEqual("(?)", new Cell {
+        Assert.AreEqual("(TM)", new Cell {
+            CellValue = new CellValue {
+                Value = "48794"
+            },
+            CellFormat = CellFormat.TIME
+        }.FormatDescription);
+        Assert.AreEqual("(#,##0)", new Cell {
+            CellValue = new CellValue {
+                Value = "45.8794"
+            },
+            CellFormat = CellFormat.CUSTOM,
+            CustomFormatString = "#,##0",
+            DecimalPlaces = 2
+        }.FormatDescription);
+        Assert.AreEqual("(11)", new Cell {
             CellValue = new CellValue {
                 Value = "45.8794"
             },
@@ -288,6 +339,9 @@ public class CellTests {
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.TEXT
         }.FormattedText(8));
+        Assert.Catch(typeof(ArgumentException), delegate {
+            NumberFormats.GetFormat(CellFormat.TEXT, false, 5);
+        });
     }
 
     // Verify alignments
@@ -327,6 +381,17 @@ public class CellTests {
                 DecimalPlaces = 2
             }.FormattedText(8);
         });
+    }
+
+    // Test custom number formats
+    [Test]
+    public void VerifyCustomFormat() {
+        Assert.AreEqual("(8,745.88)", new Cell {
+            Content = "-8745.8794",
+            CellFormat = CellFormat.CUSTOM,
+            CustomFormatString = "#,##0.00_);(#,##0.00)",
+            DecimalPlaces = 2
+        }.FormattedText(10));
     }
 
     // Verify fixed format formatting
@@ -485,6 +550,27 @@ public class CellTests {
             Content = "NOT A DATE",
             CellFormat = CellFormat.DATE_DM
         }.FormattedText(10));
+    }
+
+    // Verify the time formatting
+    [Test]
+    public void VerifyTimeFormats() {
+        Assert.AreEqual(" 12:30:00 PM", new Cell {
+            Content = "45619.520833333336",
+            CellFormat = CellFormat.TIME
+        }.FormattedText(12));
+        Assert.AreEqual(" 12:00:00 AM", new Cell {
+            Content = "45619",
+            CellFormat = CellFormat.TIME
+        }.FormattedText(12));
+        Assert.AreEqual(" 11:59:59 PM", new Cell {
+            Content = "45619.99998842592",
+            CellFormat = CellFormat.TIME
+        }.FormattedText(12));
+        Assert.AreEqual("  7:12:34 AM", new Cell {
+            Content = "45619.30039351852",
+            CellFormat = CellFormat.TIME
+        }.FormattedText(12));
     }
 
     // Style a cell and ensure correct render string

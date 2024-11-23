@@ -56,4 +56,30 @@ public class SheetTests {
         Assert.AreEqual("14", cell3.Content);
         Assert.AreEqual("15", cell4.Content);
     }
+
+    // Test changing cell properties on associated cells correctly marks
+    // a sheet as modified.
+    [Test]
+    public void TestModifiedState() {
+        Sheet sheet = new Sheet(1);
+        Cell cell1 = new Cell(sheet);
+        Assert.IsFalse(sheet.Modified);
+        cell1.Alignment = CellAlignment.RIGHT;
+        Assert.IsTrue(sheet.Modified);
+
+        sheet = new Sheet(1);
+        cell1 = new Cell(sheet);
+        cell1.CellFormat = CellFormat.FIXED;
+        Assert.IsTrue(sheet.Modified);
+
+        sheet = new Sheet(1);
+        cell1 = new Cell(sheet);
+        cell1.DecimalPlaces = 4;
+        Assert.IsTrue(sheet.Modified);
+
+        sheet = new Sheet(1);
+        cell1 = new Cell(sheet);
+        cell1.UseThousandsSeparator = true;
+        Assert.IsTrue(sheet.Modified);
+    }
 }

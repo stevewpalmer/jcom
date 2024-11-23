@@ -86,7 +86,7 @@ public class Sheet {
     /// changed.
     /// </summary>
     [JsonIgnore]
-    internal bool Modified { get; set; }
+    public bool Modified { get; internal set; }
 
     /// <summary>
     /// Returns the active cell

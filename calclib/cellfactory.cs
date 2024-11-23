@@ -27,6 +27,12 @@ using JComLib;
 
 namespace JCalcLib;
 
+/// <summary>
+/// A CellFactory encapsulates default values for the properties new cells.
+/// Changing CellFactory values only affects cells that are created after
+/// the change. Existing cells are not affected. Changes are not persisted
+/// but must be set each time the program is run.
+/// </summary>
 public static class CellFactory {
 
     /// <summary>

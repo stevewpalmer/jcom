@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.ComponentModel;
+
 namespace JCalcLib;
 
 public enum CellFormat {
@@ -30,55 +32,66 @@ public enum CellFormat {
     /// <summary>
     /// General - contents are formatted according to type
     /// </summary>
+    [Description("G")]
     GENERAL,
 
     /// <summary>
     /// Exponential number
     /// </summary>
+    [Description("S")]
     SCIENTIFIC,
 
     /// <summary>
     /// Fixed format
     /// </summary>
+    [Description("F")]
     FIXED,
 
     /// <summary>
     /// Currency
     /// </summary>
+    [Description("C")]
     CURRENCY,
 
     /// <summary>
     /// Percentage
     /// </summary>
+    [Description("P")]
     PERCENT,
 
     /// <summary>
     /// Text format
     /// </summary>
+    [Description("R")]
     TEXT,
 
     /// <summary>
     /// Date in Day-Month-Year format
     /// </summary>
+    [Description("D1")]
     DATE_DMY,
 
     /// <summary>
     /// Date in Month-Year format
     /// </summary>
+    [Description("D3")]
     DATE_MY,
 
     /// <summary>
     /// Date in Day-Month format
     /// </summary>
+    [Description("D2")]
     DATE_DM,
 
     /// <summary>
     /// Custom format
     /// </summary>
+    [Description("Z")]
     CUSTOM,
 
     /// <summary>
     /// Time format
     /// </summary>
+    [Description("TM")]
     TIME
 }

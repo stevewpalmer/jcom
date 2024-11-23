@@ -52,7 +52,7 @@ public class ParsingTests {
         Assert.AreEqual("HELLO", ((TextParseNode)cell2.ParseNode).ToRawString());
         Assert.AreEqual(TokenID.PLUS, cell3.ParseNode.Op);
 
-        Assert.AreEqual("", CellParseNode.TokenToString(TokenID.EOL));
+        Assert.AreEqual("?", CellParseNode.TokenToString(TokenID.EOL));
 
         Cell cell4 = new Cell { UIContent = "=A1+A2" };
         Assert.IsTrue(cell4.CellValue.Type == CellType.FORMULA);

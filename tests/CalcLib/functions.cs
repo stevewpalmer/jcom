@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using JCalcLib;
 using NUnit.Framework;
 
@@ -40,13 +41,22 @@ public class FunctionTests {
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
         Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
-        cell1.Content = "56";
-        cell2.Content = "78";
-        cell3.Content = "12";
-        cell4.UIContent = "=SUM(A1:A3)";
+        cell1.Value = "56";
+        cell2.Value = "78";
+        cell3.Value = "12";
+        cell4.Value = "=SUM(A1:A3)";
         Calculate calc = new Calculate(sheet);
         calc.Update();
-        Assert.AreEqual("146", cell4.CellValue.Value);
+        Assert.AreEqual("146", cell4.Value);
+    }
+
+    [Test]
+    public void VerifyBadSum() {
+        Sheet sheet = new Sheet();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Value = "=ZZZ12";
+        Calculate calc = new Calculate(sheet);
+        Assert.Throws(typeof(Exception), delegate { calc.Update(); });
     }
 
     /// <summary>

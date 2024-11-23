@@ -87,10 +87,16 @@ public class Book {
                 int sheetNumber = 1;
                 _sheets.Clear();
                 foreach (Sheet inputSheet in inputSheets) {
+
                     Sheet sheet = new Sheet(sheetNumber) {
-                        Location = inputSheet.Location,
-                        ColumnList = inputSheet.ColumnList
+                        Location = inputSheet.Location
                     };
+                    sheet.ColumnList = inputSheet.ColumnList.Select(cellList => new CellList {
+                        Index = cellList.Index,
+                        Size = cellList.Size,
+                        Cells = cellList.Cells.Select(sourceCell => Cell.CreateFrom(sheet, sourceCell)).ToList()
+                    }).ToList();
+
                     _sheets.Add(sheet);
                     Calculate calc = new Calculate(sheet);
                     calc.Update();

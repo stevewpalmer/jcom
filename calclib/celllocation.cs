@@ -28,6 +28,11 @@ using System.Text.Json.Serialization;
 
 namespace JCalcLib;
 
+/// <summary>
+/// A CellLocation represents a 1-based index of a cell on a sheet. A CellLocation
+/// has two public elements: the cell row and the cell column. It also exposes
+/// equality semantics allowing two CellLocation objects to be compared for equality.
+/// </summary>
 public struct CellLocation : IEquatable<CellLocation> {
     private int _row = 1;
     private int _column = 1;
@@ -47,31 +52,60 @@ public struct CellLocation : IEquatable<CellLocation> {
     }
 
     /// <summary>
-    /// Initialise a CellLocation with a given address.
-    /// Both column and row should be 1-based and less
-    /// than the column and row maximums.
+    /// Initialise a CellLocation with a given address or throws an exception if the address
+    /// is not a valid cell location.
     /// </summary>
-    /// <param name="address">Address string</param>
+    /// <param name="address">A string containing a cell address</param>
+    /// <exception cref="ArgumentException">The address is not a valid cell location</exception>
     public CellLocation(string address) {
-        ArgumentNullException.ThrowIfNull(address);
-        int newColumn = 0;
-        int newRow = 0;
-        int index = 0;
-        while (index < address.Length && char.IsLetter(address[index])) {
-            newColumn = newColumn * 26 + char.ToUpper(address[index]) - 'A' + 1;
-            index++;
+        if (!TryParseAddress(address, out CellLocation location)) {
+            throw new FormatException();
         }
-        while (index < address.Length && char.IsDigit(address[index])) {
-            newRow = newRow * 10 + address[index] - '0';
-            index++;
-        }
-        Column = newColumn;
-        Row = newRow;
+        Column = location.Column;
+        Row = location.Row;
     }
 
     /// <summary>
-    /// 1-based row
+    /// Converts the string representation of a cell location to its CellLocation equivalent.
+    /// A return value indicates whether the conversion succeeded.
     /// </summary>
+    /// <param name="s">A string containing an address to parse</param>
+    /// <param name="result">
+    /// When this method returns, contains CellLocation equivalent
+    /// of the address contained in s, if the conversion succeeded, or (1, 1) if the conversion failed.
+    /// The conversion fails if the s parameter is null or Empty, is not of the correct format,
+    /// or represents an address that is outside the range supported by Sheet. This parameter is
+    /// passed uninitialized; any value originally supplied in result will be overwritten.
+    /// </param>
+    /// <returns>True if the address is parsed as a cell location, false otherwise</returns>
+    public static bool TryParseAddress(string s, out CellLocation result) {
+        if (!string.IsNullOrEmpty(s)) {
+            int newColumn = 0;
+            int newRow = 0;
+            int index = 0;
+            while (index < s.Length && char.IsLetter(s[index])) {
+                newColumn = newColumn * 26 + char.ToUpper(s[index]) - 'A' + 1;
+                index++;
+            }
+            while (index < s.Length && char.IsDigit(s[index])) {
+                newRow = newRow * 10 + s[index] - '0';
+                index++;
+            }
+            if (newColumn is >= 1 and <= Sheet.MaxColumns && newRow is >= 1 and <= Sheet.MaxRows) {
+                result = new CellLocation(newColumn, newRow);
+                return true;
+            }
+        }
+        result = new CellLocation(1, 1);
+        return false;
+    }
+
+    /// <summary>
+    /// Retrieve or set the 1-based row of this cell location. If the new value
+    /// is outside the valid row range for the sheet then an argument range
+    /// exception is thrown.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Value is out of range</exception>
     public int Row {
         get => _row;
         set {
@@ -82,8 +116,11 @@ public struct CellLocation : IEquatable<CellLocation> {
     }
 
     /// <summary>
-    /// 1-based column
+    /// Retrieve or set the 1-based column of this cell location. If the new value
+    /// is outside the valid column range for the sheet then an argument range
+    /// exception is thrown.
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Value is out of range</exception>
     public int Column {
         get => _column;
         set {
@@ -94,15 +131,15 @@ public struct CellLocation : IEquatable<CellLocation> {
     }
 
     /// <summary>
-    /// Returns the location as a Point
+    /// Returns this cell location as a Point.
     /// </summary>
     [JsonIgnore]
     public Point Point => new(Column, Row);
 
     /// <summary>
-    /// Convert a CellLocation to its absolute address.
+    /// Convert this CellLocation to its absolute address.
     /// </summary>
-    /// <returns>String containing the absolute location</returns>
+    /// <returns>A string containing the absolute cell location</returns>
     [JsonIgnore]
     public string Address => $"{Cell.ColumnToAddress(Column)}{Row}";
 
@@ -113,7 +150,6 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// <returns>True if the locations are equal</returns>
     public bool Equals(CellLocation other) {
         return _row == other._row && _column == other._column;
-
     }
 
     /// <summary>

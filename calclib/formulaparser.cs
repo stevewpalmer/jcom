@@ -34,6 +34,7 @@ namespace JCalcLib;
 /// List of cell parse node tokens
 /// </summary>
 public enum TokenID {
+    NONE = 0,
     ADDRESS,
     NUMBER,
     MULTIPLY,
@@ -54,6 +55,8 @@ public enum TokenID {
     KSUM,
     KNOW,
     KTODAY,
+    KYEAR,
+    KMONTH,
     COLON,
     RANGE
 }
@@ -71,6 +74,17 @@ public enum CellAddressFormat {
 /// </summary>
 /// <param name="tokenID">Node token ID</param>
 public class CellParseNode(TokenID tokenID) {
+
+    /// <summary>
+    /// List of built-in functions
+    /// </summary>
+    public static readonly Dictionary<TokenID, string> Functions = new() {
+        { TokenID.KSUM, "SUM" },
+        { TokenID.KNOW, "NOW" },
+        { TokenID.KTODAY, "TODAY" },
+        { TokenID.KYEAR, "YEAR" },
+        { TokenID.KMONTH, "MONTH" }
+    };
 
     /// <summary>
     /// Operator
@@ -96,10 +110,7 @@ public class CellParseNode(TokenID tokenID) {
             TokenID.KEQ => "=",
             TokenID.KNE => "<>",
             TokenID.COLON => ":",
-            TokenID.KSUM => "SUM",
-            TokenID.KNOW => "NOW",
-            TokenID.KTODAY => "TODAY",
-            _ => ""
+            _ => Functions.GetValueOrDefault(tokenId, "?")
         };
 
     /// <summary>
@@ -445,24 +456,15 @@ public class RangeParseNode(LocationParseNode start, LocationParseNode end) : Ce
 public class FormulaParser {
 
     private const char EOL = '\n';
+
+    private const string InvalidFormulaError = "Invalid formula";
     private readonly string _line;
+    private readonly CellLocation _location;
     private readonly List<SimpleToken> tokens = [];
     private int _index;
     private char _pushedChar;
     private SimpleToken? _pushedToken;
     private int _tindex;
-    private readonly CellLocation _location;
-
-    private const string InvalidFormulaError = "Invalid formula";
-
-    /// <summary>
-    /// List of built-in functions
-    /// </summary>
-    private readonly Dictionary<string, TokenID> _functions = new() {
-        { "SUM", TokenID.KSUM },
-        { "NOW", TokenID.KNOW },
-        { "TODAY", TokenID.KTODAY }
-    };
 
     /// <summary>
     /// Initialise a formula parser with the specified input and create
@@ -522,7 +524,8 @@ public class FormulaParser {
                     }
                     PushChar(ch);
                     str.Append(ExpectChar(')'));
-                    if (str.Length > 15) { // R(-4096)C(-255)
+                    if (str.Length > 15) {
+                        // R(-4096)C(-255)
                         throw new FormatException(InvalidFormulaError);
                     }
                     tokens.Add(new CellAddressToken(CellAddressFormat.RELATIVE, str.ToString()));
@@ -540,15 +543,17 @@ public class FormulaParser {
                         ch = GetChar();
                     }
                     PushChar(ch);
-                    if (_functions.TryGetValue(str.ToString().ToUpper(), out TokenID tokenId)) {
-                        tokens.Add(new SimpleToken(tokenId));
+
+                    string name = str.ToString().ToUpper();
+                    KeyValuePair<TokenID, string> node = CellParseNode.Functions.FirstOrDefault(item => item.Value == name);
+                    if (node.Key != TokenID.NONE) {
+                        tokens.Add(new SimpleToken(node.Key));
+                        break;
                     }
-                    else {
-                        if (str.Length > 6) {
-                            throw new FormatException(InvalidFormulaError);
-                        }
-                        tokens.Add(new CellAddressToken(CellAddressFormat.ABSOLUTE, str.ToString()));
+                    if (!CellLocation.TryParseAddress(name, out CellLocation _)) {
+                        throw new FormatException(InvalidFormulaError);
                     }
+                    tokens.Add(new CellAddressToken(CellAddressFormat.ABSOLUTE, name));
                     break;
                 }
 
@@ -610,7 +615,7 @@ public class FormulaParser {
     /// represents the formula.
     /// </summary>
     /// <returns>A CellParseNode</returns>
-    public CellParseNode Parse() => ParseExpression(0);
+    public CellParseNode Parse() => Expression(0);
 
     /// <summary>
     /// Make sure the next character read is the specified
@@ -755,7 +760,7 @@ public class FormulaParser {
     /// </summary>
     /// <param name="level">Current precedence level</param>
     /// <returns>CellParseNode</returns>
-    private CellParseNode ParseExpression(int level) {
+    private CellParseNode Expression(int level) {
         CellParseNode op1 = Operand();
         bool done = false;
 
@@ -786,7 +791,7 @@ public class FormulaParser {
                 done = true;
             }
             else {
-                op1 = new BinaryOpParseNode(token.ID, op1, ParseExpression(preced));
+                op1 = new BinaryOpParseNode(token.ID, op1, Expression(preced));
             }
         }
         return op1;
@@ -800,7 +805,7 @@ public class FormulaParser {
         SimpleToken token = GetNextToken();
         switch (token.ID) {
             case TokenID.LPAREN: {
-                CellParseNode node = ParseExpression(0);
+                CellParseNode node = Expression(0);
                 ExpectToken(TokenID.RPAREN);
                 return node;
             }
@@ -810,6 +815,13 @@ public class FormulaParser {
                 ExpectToken(TokenID.LPAREN);
                 ExpectToken(TokenID.RPAREN);
                 return new FunctionParseNode(token.ID, []);
+
+            case TokenID.KYEAR:
+            case TokenID.KMONTH:
+                ExpectToken(TokenID.LPAREN);
+                CellParseNode op1 = Expression(0);
+                ExpectToken(TokenID.RPAREN);
+                return new FunctionParseNode(token.ID, [op1]);
 
             case TokenID.KSUM: {
                 ExpectToken(TokenID.LPAREN);
@@ -831,7 +843,7 @@ public class FormulaParser {
                 return Operand();
 
             case TokenID.MINUS:
-                return new BinaryOpParseNode(TokenID.MINUS, new NumberParseNode(0), ParseExpression(9));
+                return new BinaryOpParseNode(TokenID.MINUS, new NumberParseNode(0), Expression(9));
 
             case TokenID.NUMBER: {
                 NumberToken numberToken = (NumberToken)token;
@@ -844,7 +856,7 @@ public class FormulaParser {
                 Point relativeLocation;
                 if (identToken.Format == CellAddressFormat.RELATIVE) {
                     relativeLocation = Cell.PointFromRelativeAddress(identToken.Address);
-                    absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row};
+                    absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row };
                 }
                 else {
                     absoluteLocation = new CellLocation(identToken.Address);

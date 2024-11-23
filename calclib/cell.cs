@@ -33,6 +33,7 @@ using JComLib;
 namespace JCalcLib;
 
 public class Cell(Sheet? sheet) {
+
     private CellParseNode? _cellParseNode;
     private string _content = string.Empty;
     private string? _customFormatString;
@@ -41,19 +42,6 @@ public class Cell(Sheet? sheet) {
     /// Empty constructor
     /// </summary>
     public Cell() : this(null) { }
-
-    /// <summary>
-    /// Copy from another cell
-    /// </summary>
-    public void CopyFrom(Cell other) {
-        CellFormat = other.CellFormat;
-        CustomFormat = other.CustomFormat;
-        Alignment = other.Alignment;
-        CellValue = other.CellValue;
-        DecimalPlaces = other.DecimalPlaces;
-        Content = other.Content;
-        Style = other.Style;
-    }
 
     /// <summary>
     /// Cell value
@@ -106,19 +94,12 @@ public class Cell(Sheet? sheet) {
     public string FormatDescription {
         get {
             string thousands = UseThousandsSeparator ? "C" : "";
-            string text = CellFormat switch {
-                CellFormat.FIXED => $"F{DecimalPlaces}{thousands}",
-                CellFormat.SCIENTIFIC => $"S{DecimalPlaces}",
-                CellFormat.TEXT => "T",
-                CellFormat.GENERAL => "G",
-                CellFormat.PERCENT => $"P{DecimalPlaces}",
-                CellFormat.CURRENCY => $"C{DecimalPlaces}",
-                CellFormat.DATE_DM => "D2",
-                CellFormat.DATE_MY => "D3",
-                CellFormat.DATE_DMY => "D1",
-                CellFormat.TIME => "TM",
+            string text = Utilities.GetEnumDescription(CellFormat);
+            text = CellFormat switch {
+                CellFormat.FIXED => $"{text}{DecimalPlaces}{thousands}",
+                CellFormat.SCIENTIFIC or CellFormat.PERCENT or CellFormat.CURRENCY => $"{text}{DecimalPlaces}",
                 CellFormat.CUSTOM => $"{CustomFormatString}",
-                _ => "?"
+                _ => text
             };
             return $"({text})";
         }
@@ -164,12 +145,6 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
-    /// General number format
-    /// </summary>
-    [JsonIgnore]
-    private readonly NumberFormat GeneralFormat = new("General");
-
-    /// <summary>
     /// Number of decimal places
     /// </summary>
     [JsonInclude]
@@ -208,54 +183,6 @@ public class Cell(Sheet? sheet) {
             }
         }
     }
-
-    /// <summary>
-    /// Fixed number format
-    /// </summary>
-    [JsonIgnore]
-    private NumberFormat FixedFormat => NumberFormats.GetFormat("F", UseThousandsSeparator, DecimalPlaces);
-
-    /// <summary>
-    /// Scientific number format
-    /// </summary>
-    [JsonIgnore]
-    private NumberFormat ScientificFormat => NumberFormats.GetFormat("S", false, DecimalPlaces);
-
-    /// <summary>
-    /// Scientific number format
-    /// </summary>
-    [JsonIgnore]
-    private NumberFormat CurrencyFormat => NumberFormats.GetFormat("C", true, DecimalPlaces);
-
-    /// <summary>
-    /// Scientific number format
-    /// </summary>
-    [JsonIgnore]
-    private NumberFormat PercentFormat => NumberFormats.GetFormat("P", true, DecimalPlaces);
-
-    /// <summary>
-    /// Date1 format
-    /// </summary>
-    [JsonIgnore]
-    private static NumberFormat DateDMYFormat => NumberFormats.GetFormat("D1");
-
-    /// <summary>
-    /// Date2 format
-    /// </summary>
-    [JsonIgnore]
-    private static NumberFormat DateDMFormat => NumberFormats.GetFormat("D2");
-
-    /// <summary>
-    /// Date3 format
-    /// </summary>
-    [JsonIgnore]
-    private static NumberFormat DateMYFormat => NumberFormats.GetFormat("D3");
-
-    /// <summary>
-    /// Time format
-    /// </summary>
-    [JsonIgnore]
-    private static NumberFormat TimeFormat => NumberFormats.GetFormat("TM");
 
     /// <summary>
     /// Is this a blank cell?
@@ -353,6 +280,35 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Create a new cell as a copy of another cell.
+    /// </summary>
+    public static Cell CreateFrom(Sheet sheet, Cell other) {
+        return new Cell(sheet) {
+            Location = other.Location,
+            Format = other.Format,
+            CustomFormat = other.CustomFormat,
+            Align = other.Align,
+            CellValue = other.CellValue,
+            Decimal = other.Decimal,
+            Style = other.Style,
+            Content = other.Content
+        };
+    }
+
+    /// <summary>
+    /// Copy properties from another cell
+    /// </summary>
+    public void CopyFrom(Cell other) {
+        CellFormat = other.CellFormat;
+        CustomFormat = other.CustomFormat;
+        Alignment = other.Alignment;
+        CellValue = other.CellValue;
+        DecimalPlaces = other.DecimalPlaces;
+        Content = other.Content;
+        Style = other.Style;
+    }
+
+    /// <summary>
     /// Convert a CellLocation to its relative address in the format
     /// R(y)C(x) where y and x are row and column offsets respectively.
     /// </summary>
@@ -445,18 +401,16 @@ public class Cell(Sheet? sheet) {
         Debug.Assert(width >= 0);
         string cellValue = CellValue.Value;
         bool isNumber = double.TryParse(cellValue, out double doubleValue);
+        CultureInfo culture = CultureInfo.CurrentCulture;
         if (isNumber) {
             cellValue = CellFormat switch {
-                CellFormat.FIXED => FixedFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.PERCENT => PercentFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.CURRENCY => CurrencyFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.SCIENTIFIC => ScientificFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.DATE_DM => DateDMFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.DATE_MY => DateMYFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.DATE_DMY => DateDMYFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.CUSTOM => CustomFormat != null ? CustomFormat.Format(doubleValue, CultureInfo.CurrentCulture) : doubleValue.ToString(CultureInfo.CurrentCulture),
-                CellFormat.GENERAL => GeneralFormat.Format(doubleValue, CultureInfo.CurrentCulture),
-                CellFormat.TIME => TimeFormat.Format(doubleValue, CultureInfo.CurrentCulture),
+                CellFormat.FIXED or CellFormat.PERCENT or CellFormat.CURRENCY or CellFormat.SCIENTIFIC
+                    or CellFormat.DATE_DM or CellFormat.DATE_MY or CellFormat.DATE_DMY or CellFormat.TIME
+                    or CellFormat.GENERAL => NumberFormats.GetFormat(CellFormat, UseThousandsSeparator, DecimalPlaces)
+                        .Format(doubleValue, culture),
+                CellFormat.CUSTOM => CustomFormat != null
+                    ? CustomFormat.Format(doubleValue, CultureInfo.CurrentCulture)
+                    : doubleValue.ToString(CultureInfo.CurrentCulture),
                 CellFormat.TEXT => UIContent,
                 _ => throw new ArgumentException($"Unknown Cell Format: {CellFormat}")
             };
@@ -578,7 +532,7 @@ public class Cell(Sheet? sheet) {
         if (DateTime.TryParseExact(compactValue, "T", culture, DateTimeStyles.None, out _date)) {
             return _date.ToOADate().ToString(culture);
         }
-        if (DateTime.TryParseExact(compactValue, "h:mm:ss tt zz", culture, DateTimeStyles.None, out _date)) {
+        if (DateTime.TryParseExact(value, "h:mm:ss tt", culture, DateTimeStyles.None, out _date)) {
             return _date.ToOADate().ToString(culture);
         }
         return value;
