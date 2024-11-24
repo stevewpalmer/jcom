@@ -43,15 +43,6 @@ public struct CellLocation : IEquatable<CellLocation> {
     public CellLocation() { }
 
     /// <summary>
-    /// Creates a CellLocation that copies another CellLocation
-    /// </summary>
-    /// <param name="c">CellLocation to copy</param>
-    public CellLocation(CellLocation c) {
-        Row = c.Row;
-        Column = c.Column;
-    }
-
-    /// <summary>
     /// Initialise a CellLocation with a given column and
     /// row. Both column and row should be 1-based and less
     /// than the column and row maximums.

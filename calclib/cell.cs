@@ -46,7 +46,7 @@ public class Cell(Sheet? sheet) {
     /// Creates a Cell that copies another Cell
     /// </summary>
     public Cell(Sheet sheet, Cell other) : this(sheet) {
-        Location = new CellLocation(other.Location);
+        Location = other.Location;
         Format = other.Format;
         CustomFormat = other.CustomFormat;
         Align = other.Align;
