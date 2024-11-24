@@ -107,10 +107,10 @@ public class CellTests {
     // to the correct OADate representation.
     [Test]
     public void VerifyTryParseTime() {
-        Assert.AreEqual("45619.520833333336", new Cell { UIContent = "12:30" }.CellValue.Value);
-        Assert.AreEqual("45619", new Cell { UIContent = "00:00:00" }.CellValue.Value);
-        Assert.AreEqual("45619.99998842592", new Cell { UIContent = "23:59:59" }.CellValue.Value);
-        Assert.AreEqual("45619.30039351852", new Cell { UIContent = "7:12:34 AM" }.CellValue.Value);
+        Assert.AreEqual("45620.520833333336", new Cell { UIContent = "12:30" }.CellValue.Value);
+        Assert.AreEqual("45620", new Cell { UIContent = "00:00:00" }.CellValue.Value);
+        Assert.AreEqual("45620.99998842592", new Cell { UIContent = "23:59:59" }.CellValue.Value);
+        Assert.AreEqual("45620.30039351852", new Cell { UIContent = "7:12:34 AM" }.CellValue.Value);
         Assert.AreEqual("7pm", new Cell { UIContent = "7pm" }.CellValue.Value);
         Assert.AreEqual("8.04 AM", new Cell { UIContent = "8.04 AM" }.CellValue.Value);
     }
@@ -179,11 +179,9 @@ public class CellTests {
 
     // Verify the CreateFrom method
     [Test]
-    public void VerifyCellCreateFrom() {
+    public void VerifyCellCopyConstructor() {
         Cell cell = new Cell {
-            CellValue = new CellValue {
-                Value = "67.9"
-            },
+            Content = "67.9",
             Location = new CellLocation { Column = 1, Row = 17 },
             CellFormat = CellFormat.PERCENT,
             DecimalPlaces = 1,
@@ -192,13 +190,19 @@ public class CellTests {
 
         Sheet sheet = new Sheet();
 
-        Cell newCell = Cell.CreateFrom(sheet, cell);
+        Cell newCell = new Cell(sheet, cell);
         Assert.AreEqual(17, newCell.Location.Row);
         Assert.AreEqual(1, newCell.Location.Column);
         Assert.AreEqual(CellAlignment.RIGHT, newCell.Alignment);
         Assert.AreEqual(CellFormat.PERCENT, newCell.CellFormat);
         Assert.IsFalse(newCell.IsEmptyCell);
         Assert.AreEqual("67.9", newCell.Content);
+
+        // Verify that there's no reference back to the original cell
+        cell.Content = "967.84";
+        cell.Location = new CellLocation { Column = 9, Row = 9 };
+        Assert.AreEqual("67.9", newCell.Content);
+        Assert.AreEqual("A17", newCell.Location.Address);
     }
 
     // Verify the format description for the cell

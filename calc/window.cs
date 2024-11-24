@@ -26,7 +26,6 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.Text.Json;
 using CsvHelper;
 using JCalc.Resources;
 using JCalcLib;
@@ -416,8 +415,7 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint PerformBlockAction(BlockAction blockAction) {
         if (blockAction.HasFlag(BlockAction.COPY)) {
-            IEnumerable<Cell> cells = RangeIterator().Select(location => Sheet.GetCell(location, false)).Where(cell => !cell.IsEmptyCell);
-            Clipboard.Data = JsonSerializer.Serialize(cells);
+            Clipboard.Data = RangeIterator().Select(location => new Cell(Sheet, Sheet.GetCell(location, false))).ToArray();
         }
         if (blockAction.HasFlag(BlockAction.DELETE)) {
             foreach (CellLocation location in RangeIterator()) {
@@ -434,8 +432,8 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint Paste() {
         RenderHint flags = RenderHint.NONE;
-        List<Cell>? cellsToPaste = JsonSerializer.Deserialize<List<Cell>>(Clipboard.Data);
-        if (cellsToPaste?.Count > 0) {
+        Cell [] cellsToPaste = Clipboard.Data;
+        if (cellsToPaste.Length > 0) {
             CellLocation current = Sheet.Location;
 
             foreach (Cell cellToPaste in cellsToPaste) {

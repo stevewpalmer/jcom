@@ -35,13 +35,26 @@ namespace JCalcLib;
 public class Cell(Sheet? sheet) {
 
     private CellParseNode? _cellParseNode;
-    private string _content = string.Empty;
     private string? _customFormatString;
 
     /// <summary>
     /// Empty constructor
     /// </summary>
     public Cell() : this(null) { }
+
+    /// <summary>
+    /// Creates a Cell that copies another Cell
+    /// </summary>
+    public Cell(Sheet sheet, Cell other) : this(sheet) {
+        Location = new CellLocation(other.Location);
+        Format = other.Format;
+        CustomFormat = other.CustomFormat;
+        Align = other.Align;
+        CellValue = new CellValue(other.CellValue);
+        Decimal = other.Decimal;
+        Style = other.Style;
+        RawContent = other.RawContent;
+    }
 
     /// <summary>
     /// Cell value
@@ -204,13 +217,13 @@ public class Cell(Sheet? sheet) {
                 if (_cellParseNode == null) {
                     switch (CellValue.Type) {
                         case CellType.TEXT:
-                            _cellParseNode = new TextParseNode(_content);
+                            _cellParseNode = new TextParseNode(RawContent);
                             break;
                         case CellType.NUMBER:
-                            _cellParseNode = new NumberParseNode(double.Parse(_content));
+                            _cellParseNode = new NumberParseNode(double.Parse(RawContent));
                             break;
                         case CellType.FORMULA: {
-                            TryParseFormula(_content, Location, out _cellParseNode);
+                            TryParseFormula(RawContent, Location, out _cellParseNode);
                             break;
                         }
                     }
@@ -222,6 +235,12 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Cell content
+    /// </summary>
+    [JsonIgnore]
+    private string RawContent { get; set; } = string.Empty;
+
+    /// <summary>
     /// Contents of the cell as set from a data file.
     /// </summary>
     [JsonInclude]
@@ -229,14 +248,14 @@ public class Cell(Sheet? sheet) {
         get => CellValue.Type == CellType.FORMULA ? $"={ParseNode.ToRawString()}" : CellValue.Value;
         set {
             _cellParseNode = null;
-            _content = value;
+            RawContent = value;
             if (TryParseFormula(value, Location, out CellParseNode? _)) {
                 CellValue.Value = "0";
                 CellValue.Type = CellType.FORMULA;
             }
             else {
-                CellValue.Value = _content;
-                CellValue.Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
+                CellValue.Value = RawContent;
+                CellValue.Type = double.TryParse(RawContent, out double _) ? CellType.NUMBER : CellType.TEXT;
             }
         }
     }
@@ -263,36 +282,20 @@ public class Cell(Sheet? sheet) {
         set {
             _cellParseNode = null;
             if (TryParseFormula(value, Location, out CellParseNode? _)) {
-                _content = value;
+                RawContent = value;
                 CellValue.Value = "0";
                 CellValue.Type = CellType.FORMULA;
             }
             else {
-                _content = TryParseDate(value);
-                _content = TryParseTime(_content);
-                CellValue.Value = _content;
-                CellValue.Type = double.TryParse(_content, out double _) ? CellType.NUMBER : CellType.TEXT;
+                RawContent = TryParseDate(value);
+                RawContent = TryParseTime(RawContent);
+                CellValue.Value = RawContent;
+                CellValue.Type = double.TryParse(RawContent, out double _) ? CellType.NUMBER : CellType.TEXT;
             }
             if (sheet != null) {
                 sheet.Modified = true;
             }
         }
-    }
-
-    /// <summary>
-    /// Create a new cell as a copy of another cell.
-    /// </summary>
-    public static Cell CreateFrom(Sheet sheet, Cell other) {
-        return new Cell(sheet) {
-            Location = other.Location,
-            Format = other.Format,
-            CustomFormat = other.CustomFormat,
-            Align = other.Align,
-            CellValue = other.CellValue,
-            Decimal = other.Decimal,
-            Style = other.Style,
-            Content = other.Content
-        };
     }
 
     /// <summary>

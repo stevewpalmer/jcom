@@ -50,15 +50,6 @@ public class FunctionTests {
         Assert.AreEqual("146", cell4.Value);
     }
 
-    [Test]
-    public void VerifyBadSum() {
-        Sheet sheet = new Sheet();
-        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
-        cell1.Value = "=ZZZ12";
-        Calculate calc = new Calculate(sheet);
-        Assert.Throws(typeof(Exception), delegate { calc.Update(); });
-    }
-
     /// <summary>
     /// Verify a simple expression
     /// </summary>

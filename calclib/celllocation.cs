@@ -37,7 +37,19 @@ public struct CellLocation : IEquatable<CellLocation> {
     private int _row = 1;
     private int _column = 1;
 
+    /// <summary>
+    /// Constructs an empty CellLocation
+    /// </summary>
     public CellLocation() { }
+
+    /// <summary>
+    /// Creates a CellLocation that copies another CellLocation
+    /// </summary>
+    /// <param name="c">CellLocation to copy</param>
+    public CellLocation(CellLocation c) {
+        Row = c.Row;
+        Column = c.Column;
+    }
 
     /// <summary>
     /// Initialise a CellLocation with a given column and

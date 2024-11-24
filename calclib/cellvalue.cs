@@ -30,6 +30,20 @@ namespace JCalcLib;
 public class CellValue : IComparable<CellValue> {
 
     /// <summary>
+    /// Constructs an empty CellValue.
+    /// </summary>
+    public CellValue() { }
+
+    /// <summary>
+    /// Creates a CellValue that copies another CellValue
+    /// </summary>
+    /// <param name="c">CellValue to copy</param>
+    public CellValue(CellValue c) {
+        Value = c.Value;
+        Type = c.Type;
+    }
+
+    /// <summary>
     /// Cell type
     /// </summary>
     [JsonIgnore]

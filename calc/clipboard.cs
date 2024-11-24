@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using JCalcLib;
+
 namespace JCalc;
 
 public static class Clipboard {
@@ -30,5 +32,5 @@ public static class Clipboard {
     /// <summary>
     /// Current clipboard contents
     /// </summary>
-    public static string Data { get; set; } = string.Empty;
+    public static Cell [] Data { get; set; } = [];
 }
