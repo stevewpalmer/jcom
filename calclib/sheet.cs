@@ -331,7 +331,7 @@ public class Sheet {
             for (int r = swapExtent.Start.Y; r < swapExtent.End.Y; r++) {
                 Cell cell1 = GetCell(new CellLocation { Row = r, Column = sortColumn }, false);
                 Cell cell2 = GetCell(new CellLocation { Row = r + 1, Column = sortColumn }, false);
-                if (cell1.CellValue.CompareTo(cell2.CellValue) * ordering > 0) {
+                if (cell1.Value.CompareTo(cell2.Value) * ordering > 0) {
                     for (int c = swapExtent.Start.X; c <= swapExtent.End.X; c++) {
                         cell1 = GetCell(new CellLocation { Row = r, Column = c }, false);
                         cell2 = GetCell(new CellLocation { Row = r + 1, Column = c }, false);

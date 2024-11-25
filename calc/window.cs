@@ -774,11 +774,11 @@ public class Window {
     private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
         Cell cell = Sheet.GetCell(Sheet.Location, true);
-        string cellValue = editValue ? cell.UIContent : string.Empty;
+        string cellValue = editValue ? cell.Content : string.Empty;
         CellInputResponse result = Screen.Command.PromptForCellInput(ref cellValue);
         if (result != CellInputResponse.CANCEL) {
 
-            cell.UIContent = cellValue;
+            cell.Content = cellValue;
 
             Calculate calc = new Calculate(Sheet);
             calc.Update();

@@ -50,10 +50,11 @@ public class Calculate(Sheet sheet) {
             try {
                 referenceList = new Stack<CellLocation>();
                 referenceList.Push(cell.Location);
-                cell.CellValue.Value = EvaluateNode(cell, cell.ParseNode).StringValue;
+                Debug.Assert(cell.ParseNode != null);
+                cell.Value = EvaluateNode(cell, cell.ParseNode);
             }
             catch (Exception) {
-                cell.Value = "!ERR";
+                cell.Value = new Variant("!ERR");
             }
         }
     }
@@ -172,7 +173,7 @@ public class Calculate(Sheet sheet) {
                     return new Variant(0);
                 }
                 referenceList.Push(cell.Location);
-                Variant result = EvaluateNode(cell, cell.ParseNode);
+                Variant result = cell.ParseNode != null ? EvaluateNode(cell, cell.ParseNode) : cell.Value;
                 referenceList.Pop();
                 return result;
             }
@@ -204,7 +205,7 @@ public class Calculate(Sheet sheet) {
                 }
                 else {
                     referenceList.Push(cell.Location);
-                    result = EvaluateNode(sourceCell, cell.ParseNode);
+                    result = cell.ParseNode != null ? EvaluateNode(cell, cell.ParseNode) : cell.Value;
                     referenceList.Pop();
                 }
                 sumTotal += result;

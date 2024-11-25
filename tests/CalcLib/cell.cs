@@ -25,7 +25,6 @@
 
 using System;
 using System.Drawing;
-using ExcelNumberFormat;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -96,23 +95,24 @@ public class CellTests {
     // to the correct OADate representation.
     [Test]
     public void VerifyTryParseDate() {
-        Assert.AreEqual("45387", new Cell { UIContent = "5-Apr" }.CellValue.Value);
-        Assert.AreEqual("45017", new Cell { UIContent = "Apr-2023" }.CellValue.Value);
-        Assert.AreEqual("45069", new Cell { UIContent = "23-May-2023" }.CellValue.Value);
-        Assert.AreEqual("45387", new Cell { UIContent = "5 - Apr" }.CellValue.Value);
-        Assert.AreEqual("12-XYZ", new Cell { UIContent = "12-XYZ" }.CellValue.Value);
+        Assert.AreEqual(new Variant(45387), new Cell { Content = "5-Apr" }.Value);
+        Assert.AreEqual(new Variant(45017), new Cell { Content = "Apr-2023" }.Value);
+        Assert.AreEqual(new Variant(45069), new Cell { Content = "23-May-2023" }.Value);
+        Assert.AreEqual(new Variant(45387), new Cell { Content = "5 - Apr" }.Value);
+        Assert.AreEqual(new Variant("12-XYZ"), new Cell { Content = "12-XYZ" }.Value);
     }
 
     // Verify that setting a cell value to a time string converts it
     // to the correct OADate representation.
     [Test]
     public void VerifyTryParseTime() {
-        Assert.AreEqual("45620.520833333336", new Cell { UIContent = "12:30" }.CellValue.Value);
-        Assert.AreEqual("45620", new Cell { UIContent = "00:00:00" }.CellValue.Value);
-        Assert.AreEqual("45620.99998842592", new Cell { UIContent = "23:59:59" }.CellValue.Value);
-        Assert.AreEqual("45620.30039351852", new Cell { UIContent = "7:12:34 AM" }.CellValue.Value);
-        Assert.AreEqual("7pm", new Cell { UIContent = "7pm" }.CellValue.Value);
-        Assert.AreEqual("8.04 AM", new Cell { UIContent = "8.04 AM" }.CellValue.Value);
+        double datePart = DateTime.Today.ToOADate();
+        Assert.AreEqual(new Variant(datePart + 0.520833333336), new Cell { Content = "12:30" }.Value);
+        Assert.AreEqual(new Variant(datePart + 0), new Cell { Content = "00:00:00" }.Value);
+        Assert.AreEqual(new Variant(datePart + 0.99998842592), new Cell { Content = "23:59:59" }.Value);
+        Assert.AreEqual(new Variant(datePart + 0.30039351852), new Cell { Content = "7:12:34 AM" }.Value);
+        Assert.AreEqual(new Variant("7pm"), new Cell { Content = "7pm" }.Value);
+        Assert.AreEqual(new Variant("8.04 AM"), new Cell { Content = "8.04 AM" }.Value);
     }
 
     // Verify the Location property
@@ -127,49 +127,44 @@ public class CellTests {
     public void VerifyCellContent() {
         Cell number15 = new Cell { Content = "15" };
         Cell text = new Cell { Content = "TEXT" };
-        Assert.AreEqual(number15.CellValue.Value, "15");
+        Assert.AreEqual(number15.Value, new Variant(15));
         Assert.AreEqual(number15.Content, "15");
-        Assert.AreEqual(number15.CellValue.Type, CellType.NUMBER);
-        Assert.AreEqual(text.CellValue.Value, "TEXT");
+        Assert.IsTrue(number15.Value.IsNumber);
+        Assert.AreEqual(text.Value, new Variant("TEXT"));
         Assert.AreEqual(text.Content, "TEXT");
-        Assert.AreEqual(text.CellValue.Type, CellType.TEXT);
-        Assert.AreEqual(new Cell { Content = "=A1+B2" }.CellValue.Type, CellType.FORMULA);
+        Assert.IsTrue(new Cell { Content = "=A1+B2" }.HasFormula);
     }
 
     // Verify the comparison of two cell values
     [Test]
     public void VerifyCompareTo() {
-        Assert.IsTrue(new Cell { Content = "15" }.CellValue > new Cell { Content = "12" }.CellValue);
-        Assert.IsTrue(new Cell { Content = "8" }.CellValue < new Cell { Content = "12" }.CellValue);
-        Assert.IsTrue(new Cell { Content = "HELLO" }.CellValue > new Cell { Content = "CHAIN" }.CellValue);
-        Assert.IsTrue(new Cell { Content = "APPLE" }.CellValue < new Cell { Content = "orange" }.CellValue);
-        Assert.IsTrue(new Cell().CellValue.CompareTo(new Cell { Content = "12" }.CellValue) > 0);
-        Assert.IsTrue(new Cell { Content = "APPLE" }.CellValue.CompareTo(null) > 0);
+        Assert.IsTrue(new Cell { Content = "15" }.Value > new Cell { Content = "12" }.Value);
+        Assert.IsTrue(new Cell { Content = "8" }.Value < new Cell { Content = "12" }.Value);
+        Assert.IsTrue(new Cell { Content = "HELLO" }.Value > new Cell { Content = "CHAIN" }.Value);
+        Assert.IsTrue(new Cell { Content = "APPLE" }.Value < new Cell { Content = "orange" }.Value);
+        Assert.IsTrue(new Cell().Value.CompareTo(new Cell { Content = "12" }.Value) == 0);
+        Assert.IsTrue(new Cell { Content = "APPLE" }.Value.CompareTo(null) == 1);
     }
 
     // Verify swapping two cells.
     [Test]
     public void VerifySwapCell() {
         Cell cell1 = new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             Location = new CellLocation { Column = 3, Row = 8 },
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 3,
             Alignment = CellAlignment.CENTRE
         };
         Cell cell2 = new Cell {
-            CellValue = new CellValue {
-                Value = "67.9"
-            },
+            Content = "67.9",
             Location = new CellLocation { Column = 1, Row = 17 },
             CellFormat = CellFormat.PERCENT,
             DecimalPlaces = 1,
             Alignment = CellAlignment.RIGHT
         };
         cell1.Swap(cell2);
-        Assert.AreEqual(cell1.CellValue.Value, "67.9");
+        Assert.AreEqual(cell1.Value, new Variant("67.9"));
         Assert.AreEqual(cell1.Location.Column, 3);
         Assert.AreEqual(cell1.Location.Row, 8);
         Assert.AreEqual(cell1.CellFormat, CellFormat.PERCENT);
@@ -209,81 +204,57 @@ public class CellTests {
     [Test]
     public void VerifyCellFormatDescription() {
         Assert.AreEqual("(G)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = CellFormat.GENERAL
         }.FormatDescription);
         Assert.AreEqual("(R)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = CellFormat.TEXT
         }.FormatDescription);
         Assert.AreEqual("(F3)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             DecimalPlaces = 3
         }.FormatDescription);
         Assert.AreEqual("(S1)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             DecimalPlaces = 1
         }.FormatDescription);
         Assert.AreEqual("(P2)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = CellFormat.PERCENT,
             DecimalPlaces = 2
         }.FormatDescription);
         Assert.AreEqual("(C4)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = CellFormat.CURRENCY,
             DecimalPlaces = 4
         }.FormatDescription);
         Assert.AreEqual("(D1)", new Cell {
-            CellValue = new CellValue {
-                Value = "48794"
-            },
+            Content = "48794",
             CellFormat = CellFormat.DATE_DMY
         }.FormatDescription);
         Assert.AreEqual("(D2)", new Cell {
-            CellValue = new CellValue {
-                Value = "48794"
-            },
+            Content = "48794",
             CellFormat = CellFormat.DATE_DM
         }.FormatDescription);
         Assert.AreEqual("(D3)", new Cell {
-            CellValue = new CellValue {
-                Value = "48794"
-            },
+            Content = "48794",
             CellFormat = CellFormat.DATE_MY
         }.FormatDescription);
         Assert.AreEqual("(TM)", new Cell {
-            CellValue = new CellValue {
-                Value = "48794"
-            },
+            Content = "48794",
             CellFormat = CellFormat.TIME
         }.FormatDescription);
         Assert.AreEqual("(#,##0)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = CellFormat.CUSTOM,
             CustomFormatString = "#,##0",
             DecimalPlaces = 2
         }.FormatDescription);
         Assert.AreEqual("(11)", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             CellFormat = (CellFormat)11,
             DecimalPlaces = 1
         }.FormatDescription);
@@ -311,7 +282,7 @@ public class CellTests {
             DecimalPlaces = 2
         }.FormattedText(8));
         Assert.AreEqual("        ", new Cell {
-            CellValue = new CellValue(),
+            Content = "",
             Alignment = CellAlignment.GENERAL,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
@@ -329,17 +300,13 @@ public class CellTests {
     [Test]
     public void VerifyTextFormat() {
         Assert.AreEqual("45.8794 ", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.TEXT,
             DecimalPlaces = 2
         }.FormattedText(8));
         Assert.AreEqual("HELLO WO", new Cell {
-            CellValue = new CellValue {
-                Value = "HELLO WORLD!"
-            },
+            Content = "HELLO WORLD!",
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.TEXT
         }.FormattedText(8));
@@ -352,34 +319,26 @@ public class CellTests {
     [Test]
     public void VerifyAlignments() {
         Assert.AreEqual("45.8794 ", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
         }.FormattedText(8));
         Assert.AreEqual(" 45.8794", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             Alignment = CellAlignment.RIGHT,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
         }.FormattedText(8));
         Assert.AreEqual("45.8794 ", new Cell {
-            CellValue = new CellValue {
-                Value = "45.8794"
-            },
+            Content = "45.8794",
             Alignment = CellAlignment.CENTRE,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
         }.FormattedText(8));
         Assert.Throws(typeof(ArgumentException), delegate {
             new Cell {
-                CellValue = new CellValue {
-                    Value = "45.8794"
-                },
+                Content = "45.8794",
                 Alignment = (CellAlignment)4,
                 CellFormat = CellFormat.GENERAL,
                 DecimalPlaces = 2

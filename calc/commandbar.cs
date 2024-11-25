@@ -719,7 +719,7 @@ public class CommandBar {
             Cell activeCell = _currentSheet.ActiveCell;
             text += $"{activeCell.Address}: {activeCell.FormatDescription} ";
             if (!activeCell.IsEmptyCell) {
-                text += activeCell.UIContent;
+                text += activeCell.Content;
             }
             Terminal.Write(0, _cellStatusRow, _displayWidth, _fgColour, _bgColour, text);
         }

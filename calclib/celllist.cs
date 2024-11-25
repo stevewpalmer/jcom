@@ -49,5 +49,5 @@ public class CellList {
     /// Return all formula cells on this column
     /// </summary>
     [JsonIgnore]
-    public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.CellValue.Type == CellType.FORMULA);
+    public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.HasFormula);
 }

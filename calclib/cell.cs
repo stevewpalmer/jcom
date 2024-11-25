@@ -33,9 +33,9 @@ using JComLib;
 namespace JCalcLib;
 
 public class Cell(Sheet? sheet) {
-
-    private CellParseNode? _cellParseNode;
+    private Variant _value = new();
     private string? _customFormatString;
+    private string _content = string.Empty;
 
     /// <summary>
     /// Empty constructor
@@ -50,17 +50,70 @@ public class Cell(Sheet? sheet) {
         Format = other.Format;
         CustomFormat = other.CustomFormat;
         Align = other.Align;
-        CellValue = new CellValue(other.CellValue);
         Decimal = other.Decimal;
         Style = other.Style;
-        RawContent = other.RawContent;
+        Content = other.Content;
     }
 
     /// <summary>
-    /// Cell value
+    /// Retrieve or set the cell's value. The cell's value is always the value
+    /// used in calculation and is separate from its Content which is used
+    /// to determine the cell's value and may be a formula.
     /// </summary>
     [JsonIgnore]
-    public CellValue CellValue { get; set; } = new();
+    public Variant Value {
+        get => _value;
+        set {
+            if (TryParseDate(value.StringValue, out Variant _dateValue)) {
+                if (!Format.HasValue) {
+                    CellFormat = CellFormat.DATE_DMY;
+                }
+                _value = _dateValue;
+                return;
+            }
+            if (TryParseTime(value.StringValue, out Variant _timeValue)) {
+                if (!Format.HasValue) {
+                    CellFormat = CellFormat.TIME;
+                }
+                _value = _timeValue;
+                return;
+            }
+            if (TryParseFormula(value.StringValue, Location, out CellParseNode? _parseNode)) {
+                ParseNode = _parseNode;
+                _value = new Variant(0);
+                return;
+            }
+            if (double.TryParse(value.StringValue, out double doubleValue)) {
+                _value = new Variant(doubleValue);
+                return;
+            }
+            _value = value;
+        }
+    }
+
+    /// <summary>
+    /// Cell content. The cell content is the value assigned to the cell
+    /// by the user and may be a numeric or string constant, or a formula.
+    /// If the cell contains a formula, then Content returns the formula
+    /// with any cell references corrected for adjustments to the cell
+    /// location on the sheet and thus will not necessarily be the exact
+    /// same formula as originally entered.
+    /// </summary>
+    [JsonInclude]
+    public string Content {
+        get => ParseNode != null ? $"={ParseNode}" : _content;
+        set {
+            _content = value;
+            ParseNode = null;
+            Value = new Variant(value);
+        }
+    }
+
+    /// <summary>
+    /// The parse node root of the evaluated formula assigned to this
+    /// cell, if any. If the cell has no formula, this is null.
+    /// </summary>
+    public CellParseNode? ParseNode { get; private set; }
 
     /// <summary>
     /// Cell alignment
@@ -201,102 +254,13 @@ public class Cell(Sheet? sheet) {
     /// Is this a blank cell?
     /// </summary>
     [JsonIgnore]
-    public bool IsEmptyCell => CellValue.Type == CellType.NONE;
+    public bool IsEmptyCell => !Value.HasValue;
 
     /// <summary>
-    /// Returns the cell parse node that represents this cell value. If
-    /// the cell is a simple literal text or number, it returns a node
-    /// representing that number. If it is a formula, it parses the formula
-    /// and returns the root parse node of the expression tree generated
-    /// from the formula.
+    /// Returns whether or not this cell has a formula assigned to it.
     /// </summary>
     [JsonIgnore]
-    public CellParseNode ParseNode {
-        get {
-            if (_cellParseNode == null) {
-                if (_cellParseNode == null) {
-                    switch (CellValue.Type) {
-                        case CellType.TEXT:
-                            _cellParseNode = new TextParseNode(RawContent);
-                            break;
-                        case CellType.NUMBER:
-                            _cellParseNode = new NumberParseNode(double.Parse(RawContent));
-                            break;
-                        case CellType.FORMULA: {
-                            TryParseFormula(RawContent, Location, out _cellParseNode);
-                            break;
-                        }
-                    }
-                }
-            }
-            Debug.Assert(_cellParseNode != null);
-            return _cellParseNode;
-        }
-    }
-
-    /// <summary>
-    /// Cell content
-    /// </summary>
-    [JsonIgnore]
-    private string RawContent { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Contents of the cell as set from a data file.
-    /// </summary>
-    [JsonInclude]
-    public string Content {
-        get => CellValue.Type == CellType.FORMULA ? $"={ParseNode.ToRawString()}" : CellValue.Value;
-        set {
-            _cellParseNode = null;
-            RawContent = value;
-            if (TryParseFormula(value, Location, out CellParseNode? _)) {
-                CellValue.Value = "0";
-                CellValue.Type = CellType.FORMULA;
-            }
-            else {
-                CellValue.Value = RawContent;
-                CellValue.Type = double.TryParse(RawContent, out double _) ? CellType.NUMBER : CellType.TEXT;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Retrieve or set the cell's value. Retrieving the value always returns
-    /// the calculated value. The behaviour on setting the value depends on
-    /// whether the new value is a formula or a constant. If it is a formula
-    /// then it assigns the formula to the cell and evaluates it. If it is a
-    /// constant then it becomes the new value of the cell.
-    /// </summary>
-    [JsonIgnore]
-    public string Value {
-        get => CellValue.Value;
-        set => UIContent = value;
-    }
-
-    /// <summary>
-    /// The UI view of the content.
-    /// </summary>
-    [JsonIgnore]
-    public string UIContent {
-        get => CellValue.Type == CellType.FORMULA ? $"={ParseNode}" : CellValue.Value;
-        set {
-            _cellParseNode = null;
-            if (TryParseFormula(value, Location, out CellParseNode? _)) {
-                RawContent = value;
-                CellValue.Value = "0";
-                CellValue.Type = CellType.FORMULA;
-            }
-            else {
-                RawContent = TryParseDate(value);
-                RawContent = TryParseTime(RawContent);
-                CellValue.Value = RawContent;
-                CellValue.Type = double.TryParse(RawContent, out double _) ? CellType.NUMBER : CellType.TEXT;
-            }
-            if (sheet != null) {
-                sheet.Modified = true;
-            }
-        }
-    }
+    public bool HasFormula => ParseNode != null;
 
     /// <summary>
     /// Copy properties from another cell
@@ -305,10 +269,9 @@ public class Cell(Sheet? sheet) {
         CellFormat = other.CellFormat;
         CustomFormat = other.CustomFormat;
         Alignment = other.Alignment;
-        CellValue = other.CellValue;
         DecimalPlaces = other.DecimalPlaces;
-        Content = other.Content;
         Style = other.Style;
+        Content = other.ParseNode != null ? $"={other.ParseNode.ToRawString()}" : other.Content;
     }
 
     /// <summary>
@@ -402,19 +365,20 @@ public class Cell(Sheet? sheet) {
     /// <returns>String value of cell</returns>
     public string FormattedText(int width) {
         Debug.Assert(width >= 0);
-        string cellValue = CellValue.Value;
-        bool isNumber = double.TryParse(cellValue, out double doubleValue);
+        string cellValue;
         CultureInfo culture = CultureInfo.CurrentCulture;
-        if (isNumber) {
+        if (!Value.IsNumber) {
+            cellValue = Value.StringValue ?? string.Empty;
+        } else {
             cellValue = CellFormat switch {
                 CellFormat.FIXED or CellFormat.PERCENT or CellFormat.CURRENCY or CellFormat.SCIENTIFIC
                     or CellFormat.DATE_DM or CellFormat.DATE_MY or CellFormat.DATE_DMY or CellFormat.TIME
                     or CellFormat.GENERAL => NumberFormats.GetFormat(CellFormat, UseThousandsSeparator, DecimalPlaces)
-                        .Format(doubleValue, culture),
+                        .Format(Value.DoubleValue, culture),
                 CellFormat.CUSTOM => CustomFormat != null
-                    ? CustomFormat.Format(doubleValue, CultureInfo.CurrentCulture)
-                    : doubleValue.ToString(CultureInfo.CurrentCulture),
-                CellFormat.TEXT => UIContent,
+                    ? CustomFormat.Format(Value.DoubleValue, CultureInfo.CurrentCulture)
+                    : Value.DoubleValue.ToString(CultureInfo.CurrentCulture),
+                CellFormat.TEXT => Content,
                 _ => throw new ArgumentException($"Unknown Cell Format: {CellFormat}")
             };
             if (cellValue.Length > width) {
@@ -428,7 +392,7 @@ public class Cell(Sheet? sheet) {
             CellAlignment.LEFT => cellValue.PadRight(width),
             CellAlignment.RIGHT => cellValue.PadLeft(width),
             CellAlignment.CENTRE => Utilities.CentreString(cellValue, width),
-            CellAlignment.GENERAL => !isNumber ? cellValue.PadRight(width) : cellValue.PadLeft(width),
+            CellAlignment.GENERAL => !Value.IsNumber ? cellValue.PadRight(width) : cellValue.PadLeft(width),
             _ => throw new ArgumentException($"Unknown Cell Alignment: {Alignment}")
         };
         return cellValue;
@@ -471,8 +435,7 @@ public class Cell(Sheet? sheet) {
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     public bool FixupFormula(int column, int row, int offset) {
-        Debug.Assert(CellValue.Type == CellType.FORMULA);
-        return ParseNode.FixupAddress(Location, column, row, offset);
+        return ParseNode?.FixupAddress(Location, column, row, offset) ?? false;
     }
 
     /// <summary>
@@ -500,44 +463,56 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
-    /// Try to parse the value as a date and, if we succeed, return the OADate
-    /// value as a string. Otherwise. return the original value.
+    /// Try to parse the value as a date and, if we succeed, sets dateValue to the OADate
+    /// value and returns true. Otherwise, it returns the value unchanged and returns false.
     /// </summary>
     /// <param name="value">Value to parse</param>
-    /// <returns>OADate value of date, or the original value</returns>
-    private static string TryParseDate(string value) {
+    /// <param name="dateValue">Set to the date serial number if the value parses successfully
+    /// as a date, or is set to the input value otherwise</param>
+    /// <returns>True if the value is successfully parsed as a date, false otherwise</returns>
+    private static bool TryParseDate(string value, out Variant dateValue) {
         CultureInfo culture = CultureInfo.CurrentCulture;
         string compactValue = value.Replace(" ", "");
         if (DateTime.TryParseExact(compactValue, "d-MMM", culture, DateTimeStyles.None, out DateTime _date)) {
-            return _date.ToOADate().ToString(culture);
+            dateValue = new Variant(_date.ToOADate());
+            return true;
         }
         if (DateTime.TryParseExact(compactValue, "MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
-            return _date.ToOADate().ToString(culture);
+            dateValue = new Variant(_date.ToOADate());
+            return true;
         }
         if (DateTime.TryParseExact(compactValue, "d-MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
-            return _date.ToOADate().ToString(culture);
+            dateValue = new Variant(_date.ToOADate());
+            return true;
         }
-        return value;
+        dateValue = new Variant(value);
+        return false;
     }
 
     /// <summary>
-    /// Try to parse the value as a time and, if we succeed, return the OADate
-    /// value as a string. Otherwise. return the original value.
+    /// Try to parse the value as a time and, if we succeed, sets timeValue to the OADate
+    /// value and returns true. Otherwise, it returns the value unchanged and returns false.
     /// </summary>
     /// <param name="value">Value to parse</param>
-    /// <returns>OADate value of time, or the original value</returns>
-    private static string TryParseTime(string value) {
+    /// <param name="timeValue">Set to the time serial number if the value parses successfully
+    /// as a time, or is set to the input value otherwise</param>
+    /// <returns>True if the value is successfully parsed as a time, false otherwise</returns>
+    private static bool TryParseTime(string value, out Variant timeValue) {
         CultureInfo culture = CultureInfo.CurrentCulture;
         string compactValue = value.Replace(" ", "");
         if (DateTime.TryParseExact(compactValue, "t", culture, DateTimeStyles.None, out DateTime _date)) {
-            return _date.ToOADate().ToString(culture);
+            timeValue = new Variant(_date.ToOADate());
+            return true;
         }
         if (DateTime.TryParseExact(compactValue, "T", culture, DateTimeStyles.None, out _date)) {
-            return _date.ToOADate().ToString(culture);
+            timeValue = new Variant(_date.ToOADate());
+            return true;
         }
         if (DateTime.TryParseExact(value, "h:mm:ss tt", culture, DateTimeStyles.None, out _date)) {
-            return _date.ToOADate().ToString(culture);
+            timeValue = new Variant(_date.ToOADate());
+            return true;
         }
-        return value;
+        timeValue = new Variant(value);
+        return false;
     }
 }

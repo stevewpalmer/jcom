@@ -38,25 +38,16 @@ public class ParsingTests {
     // a value on a cell.
     [Test]
     public void VerifyCellValueParseNode() {
-        Cell cell1 = new Cell { Content = "12" };
-        Cell cell2 = new Cell { Content = "HELLO" };
-        Cell cell3 = new Cell { Content = "=A1+A2" };
+        Cell cell1 = new Cell { Content = "=A1+A2" };
 
-        Assert.IsTrue(cell1.ParseNode is NumberParseNode);
-        Assert.IsTrue(cell2.ParseNode is TextParseNode);
-        Assert.IsTrue(cell3.ParseNode is BinaryOpParseNode);
-        Assert.AreEqual(TokenID.NUMBER, cell1.ParseNode.Op);
-        Assert.AreEqual(12, ((NumberParseNode)cell1.ParseNode).Value.DoubleValue);
-        Assert.AreEqual(TokenID.TEXT, cell2.ParseNode.Op);
-        Assert.AreEqual("HELLO", ((TextParseNode)cell2.ParseNode).Value);
-        Assert.AreEqual("HELLO", ((TextParseNode)cell2.ParseNode).ToRawString());
-        Assert.AreEqual(TokenID.PLUS, cell3.ParseNode.Op);
+        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
+        Assert.AreEqual(TokenID.PLUS, cell1.ParseNode.Op);
 
         Assert.AreEqual("?", CellParseNode.TokenToString(TokenID.EOL));
 
-        Cell cell4 = new Cell { UIContent = "=A1+A2" };
-        Assert.IsTrue(cell4.CellValue.Type == CellType.FORMULA);
-        Assert.AreEqual("=A1+A2", cell4.UIContent);
+        Cell cell2 = new Cell { Content = "=A1+A2" };
+        Assert.IsTrue(cell2.HasFormula);
+        Assert.AreEqual("=A1+A2", cell2.Content);
     }
 
     // Verify the creation of a BinaryOpParseNode
@@ -152,7 +143,7 @@ public class ParsingTests {
         Assert.AreEqual(TokenID.NUMBER, right.Op);
         Assert.IsTrue(Math.Abs(0.67 - right.Value.DoubleValue) < 0.01);
 
-        Assert.AreEqual("=G190^0.5*(H190+40)>0.67", cell1.UIContent);
+        Assert.AreEqual("=G190^0.5*(H190+40)>0.67", cell1.Content);
     }
 
     // Verify the <> operator
@@ -162,7 +153,7 @@ public class ParsingTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KNE, pn.Op);
-        Assert.AreEqual("=B4<>0.67", cell1.UIContent);
+        Assert.AreEqual("=B4<>0.67", cell1.Content);
     }
 
     // Verify the < operator
@@ -172,7 +163,7 @@ public class ParsingTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KLT, pn.Op);
-        Assert.AreEqual("=B4<P87", cell1.UIContent);
+        Assert.AreEqual("=B4<P87", cell1.Content);
     }
 
     // Verify the <= operator
@@ -182,7 +173,7 @@ public class ParsingTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KLE, pn.Op);
-        Assert.AreEqual("=896675<=P87", cell1.UIContent);
+        Assert.AreEqual("=896675<=P87", cell1.Content);
     }
 
     // Verify the >= operator
@@ -192,7 +183,7 @@ public class ParsingTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KGE, pn.Op);
-        Assert.AreEqual("=896675>=P87", cell1.UIContent);
+        Assert.AreEqual("=896675>=P87", cell1.Content);
     }
 
     // Verify the = operator
@@ -202,28 +193,28 @@ public class ParsingTests {
         Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
         BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
         Assert.AreEqual(TokenID.KEQ, pn.Op);
-        Assert.AreEqual("=B4=901200", cell1.UIContent);
+        Assert.AreEqual("=B4=901200", cell1.Content);
     }
 
     // Verify applying a fixup to a node
     [Test]
     public void VerifyFixup() {
-        Cell cell1 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=E5"};
+        Cell cell1 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, Content = "=E5"};
         cell1.FixupFormula(2, 2, 1);
-        Assert.AreEqual(cell1.UIContent, "=F6");
+        Assert.AreEqual(cell1.Content, "=F6");
 
-        Cell cell2 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=E5*F7"};
+        Cell cell2 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, Content = "=E5*F7"};
         cell2.FixupFormula(2, 2, 1);
-        Assert.AreEqual(cell2.UIContent, "=F6*G8");
+        Assert.AreEqual(cell2.Content, "=F6*G8");
 
         // Test bad fixup
-        Cell cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=A1"};
+        Cell cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, Content = "=A1"};
         cell3.FixupFormula(0, 1, -1);
         Assert.IsTrue(cell3.ParseNode is LocationParseNode);
         Assert.IsTrue(((LocationParseNode)cell3.ParseNode).Error);
         Assert.AreEqual("=!ERR", cell3.Content);
 
-        cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, UIContent = "=A1"};
+        cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, Content = "=A1"};
         cell3.FixupFormula(1, 0, -1);
         Assert.IsTrue(cell3.ParseNode is LocationParseNode);
         Assert.IsTrue(((LocationParseNode)cell3.ParseNode).Error);
@@ -278,7 +269,7 @@ public class ParsingTests {
     public void VerifyBadNumber() {
         const string badNumber = "=+B4*07E ";
         Cell cell1 = new Cell { Content = badNumber };
-        Assert.AreEqual(CellType.TEXT, cell1.CellValue.Type);
+        Assert.IsFalse(cell1.HasFormula);
         Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser(badNumber[1..], cell1.Location); });
     }
 
@@ -291,7 +282,7 @@ public class ParsingTests {
         Assert.AreEqual(TokenID.MINUS, pn.Op);
         Assert.IsTrue(pn.Left is LocationParseNode);
         Assert.IsTrue(pn.Right is LocationParseNode);
-        Assert.AreEqual("=B4-I87", cell1.UIContent);
+        Assert.AreEqual("=B4-I87", cell1.Content);
     }
 
     // Verify that specifying a percentage in a number converts it
@@ -309,7 +300,7 @@ public class ParsingTests {
 
         NumberParseNode right = (NumberParseNode)pn.Right;
         Assert.IsTrue(Math.Abs(0.16 - right.Value.DoubleValue) < 0.01);
-        Assert.AreEqual("=A3/0.16", cell1.UIContent);
+        Assert.AreEqual("=A3/0.16", cell1.Content);
     }
 
     // Verify an expression with parenthesis creates the correct
@@ -331,10 +322,10 @@ public class ParsingTests {
         BinaryOpParseNode right = (BinaryOpParseNode)pn.Right;
         Assert.AreEqual(TokenID.PLUS, right.Op);
 
-        Assert.AreEqual("=A1*(A2+A3)", cell1.UIContent);
+        Assert.AreEqual("=A1*(A2+A3)", cell1.Content);
 
         Cell cell3 = new Cell { Content = "= ( A1 + A2 ) * A3"};
-        Assert.AreEqual("=(A1+A2)*A3", cell3.UIContent);
+        Assert.AreEqual("=(A1+A2)*A3", cell3.Content);
 
         // Missing closing parenthesis should throw an exception
         Cell cell2 = new Cell();
@@ -344,7 +335,7 @@ public class ParsingTests {
     // Verify parsing the SUM function
     [Test]
     public void VerifySum() {
-        Cell cell = new Cell { Location = new CellLocation { Row = 1, Column = 1 }, UIContent = "=SUM(A2:A4)"};
+        Cell cell = new Cell { Location = new CellLocation { Row = 1, Column = 1 }, Content = "=SUM(A2:A4)"};
         Assert.IsTrue(cell.ParseNode.GetType() == typeof(FunctionParseNode));
 
         FunctionParseNode functionNode = (FunctionParseNode)cell.ParseNode;
