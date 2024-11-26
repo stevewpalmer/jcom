@@ -108,6 +108,6 @@ public static class Utilities {
     public static string CentreString(string str, int length) {
         ArgumentNullException.ThrowIfNull(str);
         int padding = Math.Max(0, (length - str.Length) / 2 + str.Length);
-        return str.PadLeft(padding, ' ').PadRight(length, ' ').Substring(0, length);
+        return str.PadLeft(padding, ' ').PadRight(length, ' ')[..length];
     }
 }

@@ -64,6 +64,7 @@ public class Cell(Sheet? sheet) {
         get => ComputedValue;
         set {
             FormulaTree = null;
+            Error = false;
             if (sheet != null) {
                 sheet.Modified = true;
             }
@@ -275,6 +276,12 @@ public class Cell(Sheet? sheet) {
     public bool HasFormula => FormulaTree != null;
 
     /// <summary>
+    /// Cell has an error in the formula
+    /// </summary>
+    [JsonIgnore]
+    public bool Error { get; set; }
+
+    /// <summary>
     /// Copy properties from another cell
     /// </summary>
     public void CopyFrom(Cell other) {
@@ -379,6 +386,9 @@ public class Cell(Sheet? sheet) {
         Debug.Assert(width >= 0);
         string cellValue;
         CultureInfo culture = CultureInfo.CurrentCulture;
+        if (Error) {
+            return Utilities.CentreString("!ERR", width);
+        }
         if (!Value.IsNumber) {
             cellValue = Value.StringValue ?? string.Empty;
         } else {

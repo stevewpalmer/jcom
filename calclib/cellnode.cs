@@ -320,7 +320,7 @@ public class LocationNode(CellLocation absoluteLocation, Point relativeLocation)
     /// </summary>
     /// <returns>String</returns>
     public override string ToRawString() {
-        return Error ? "!ERR" : Cell.LocationToAddress(RelativeLocation);
+        return Cell.LocationToAddress(RelativeLocation);
     }
 
     /// <summary>
@@ -328,7 +328,7 @@ public class LocationNode(CellLocation absoluteLocation, Point relativeLocation)
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        return Error ? "!ERR" : AbsoluteLocation.Address;
+        return AbsoluteLocation.Address;
     }
 
     /// <summary>

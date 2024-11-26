@@ -54,7 +54,7 @@ public class Calculate(Sheet sheet) {
                 cell.ComputedValue = EvaluateNode(cell, cell.FormulaTree);
             }
             catch (Exception) {
-                cell.Value = new Variant("!ERR");
+                cell.Error = true;
             }
         }
     }
@@ -231,6 +231,9 @@ public class Calculate(Sheet sheet) {
         }
         else if (cell.HasFormula) {
             Debug.Assert(cell.FormulaTree != null);
+            if (referenceList.Last() == location) {
+                throw new Exception("Circular reference");
+            }
             referenceList.Push(cell.Location);
             result = EvaluateNode(cell, cell.FormulaTree);
             referenceList.Pop();
