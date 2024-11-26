@@ -50,8 +50,8 @@ public class Calculate(Sheet sheet) {
             try {
                 referenceList = new Stack<CellLocation>();
                 referenceList.Push(cell.Location);
-                Debug.Assert(cell.ParseNode != null);
-                cell.Value = EvaluateNode(cell, cell.ParseNode);
+                Debug.Assert(cell.FormulaTree != null);
+                cell.ComputedValue = EvaluateNode(cell, cell.FormulaTree);
             }
             catch (Exception) {
                 cell.Value = new Variant("!ERR");
@@ -66,14 +66,14 @@ public class Calculate(Sheet sheet) {
     /// <param name="sourceCell">Source cell</param>
     /// <param name="node">Node to evaluate</param>
     /// <returns>Value of node</returns>
-    private Variant EvaluateNode(Cell sourceCell, CellParseNode node) {
+    private Variant EvaluateNode(Cell sourceCell, CellNode node) {
         switch (node.Op) {
             case TokenID.NUMBER:
-                NumberParseNode numberNode = (NumberParseNode)node;
+                NumberNode numberNode = (NumberNode)node;
                 return numberNode.Value;
 
             case TokenID.TEXT:
-                TextParseNode textNode = (TextParseNode)node;
+                TextNode textNode = (TextNode)node;
                 return new Variant(textNode.Value);
 
             case TokenID.KSUM: return KSum(sourceCell, node);
@@ -81,86 +81,94 @@ public class Calculate(Sheet sheet) {
             case TokenID.KTODAY: return KToday(sourceCell);
             case TokenID.KYEAR: return KYear(sourceCell, node);
             case TokenID.KMONTH: return KMonth(sourceCell, node);
+            case TokenID.KCONCATENATE: return KConcatenate(sourceCell, node);
 
             case TokenID.EXP: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(Math.Pow(left, right));
             }
 
             case TokenID.PLUS: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left + right);
             }
 
             case TokenID.MINUS: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left - right);
             }
 
             case TokenID.MULTIPLY: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left * right);
             }
 
             case TokenID.DIVIDE: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left / right);
             }
 
             case TokenID.KEQ: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(Math.Abs(left - right) < 0.01);
             }
 
             case TokenID.KNE: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(Math.Abs(left - right) > 0.01);
             }
 
             case TokenID.KGT: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left > right);
             }
 
             case TokenID.KGE: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left >= right);
             }
 
             case TokenID.KLT: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left < right);
             }
 
             case TokenID.KLE: {
-                BinaryOpParseNode binaryNode = (BinaryOpParseNode)node;
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
                 double left = EvaluateNode(sourceCell, binaryNode.Left).DoubleValue;
                 double right = EvaluateNode(sourceCell, binaryNode.Right).DoubleValue;
                 return new Variant(left <= right);
             }
 
+            case TokenID.CONCAT: {
+                BinaryOpNode binaryNode = (BinaryOpNode)node;
+                string left = EvaluateNode(sourceCell, binaryNode.Left).StringValue;
+                string right = EvaluateNode(sourceCell, binaryNode.Right).StringValue;
+                return new Variant(left + right);
+            }
+
             case TokenID.ADDRESS: {
-                LocationParseNode addressNode = (LocationParseNode)node;
+                LocationNode addressNode = (LocationNode)node;
                 if (referenceList.Last() == addressNode.AbsoluteLocation) {
                     throw new Exception("Circular reference");
                 }
@@ -173,7 +181,7 @@ public class Calculate(Sheet sheet) {
                     return new Variant(0);
                 }
                 referenceList.Push(cell.Location);
-                Variant result = cell.ParseNode != null ? EvaluateNode(cell, cell.ParseNode) : cell.Value;
+                Variant result = cell.FormulaTree != null ? EvaluateNode(cell, cell.FormulaTree) : cell.Value;
                 referenceList.Pop();
                 return result;
             }
@@ -185,33 +193,65 @@ public class Calculate(Sheet sheet) {
     }
 
     /// <summary>
+    /// Iterator that returns the Variant value of all cells specified by the function
+    /// parameter list.
+    /// </summary>
+    /// <param name="sourceCell">Source cell</param>
+    /// <param name="node">A FunctionParseNode</param>
+    /// <returns>The next Variant from the referenced cells</returns>
+    private IEnumerable<Variant> Arguments(Cell sourceCell, FunctionNode node) {
+        foreach (CellNode parameter in node.Parameters) {
+            if (parameter is RangeNode rangeNode) {
+                foreach (CellLocation location in rangeNode.RangeIterator(sourceCell.Location)) {
+                    Variant result = EvaluateLocation(location);
+                    if (result.HasValue) {
+                        yield return result;
+                    }
+                }
+            }
+            else {
+                Variant result = EvaluateNode(sourceCell, parameter);
+                if (result.HasValue) {
+                    yield return result;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Evaluate the cell at the specified location.
+    /// </summary>
+    /// <param name="location">CellLocation of cell to evaluate</param>
+    /// <returns>The variant value of the cell</returns>
+    private Variant EvaluateLocation(CellLocation location) {
+        Variant result;
+        Cell cell = sheet.GetCell(location, false);
+        if (cell.IsEmptyCell) {
+            result = new Variant();
+        }
+        else if (cell.HasFormula) {
+            Debug.Assert(cell.FormulaTree != null);
+            referenceList.Push(cell.Location);
+            result = EvaluateNode(cell, cell.FormulaTree);
+            referenceList.Pop();
+        }
+        else {
+            result = cell.Value;
+        }
+        return result;
+    }
+
+    /// <summary>
     /// Calculate the result of the SUM function
     /// </summary>
     /// <param name="sourceCell">Source cell</param>
     /// <param name="node">SUM function parse node</param>
     /// <returns>The result of the function as a Variant</returns>
-    private Variant KSum(Cell sourceCell, CellParseNode node) {
-        Debug.Assert(node is FunctionParseNode);
+    private Variant KSum(Cell sourceCell, CellNode node) {
+        Debug.Assert(node is FunctionNode);
         Variant sumTotal = new Variant(0);
-        FunctionParseNode functionNode = (FunctionParseNode)node;
-        foreach (CellParseNode parameter in functionNode.Parameters) {
-            Debug.Assert(parameter is RangeParseNode);
-            RangeParseNode rangeNode = (RangeParseNode)parameter;
-            foreach (CellLocation location in rangeNode.RangeIterator(sourceCell.Location)) {
-                Variant result;
-                Cell cell = sheet.GetCell(location, false);
-                if (cell.IsEmptyCell) {
-                    result = new Variant(0);
-                }
-                else {
-                    referenceList.Push(cell.Location);
-                    result = cell.ParseNode != null ? EvaluateNode(cell, cell.ParseNode) : cell.Value;
-                    referenceList.Pop();
-                }
-                sumTotal += result;
-            }
-        }
-        return sumTotal;
+        FunctionNode functionNode = (FunctionNode)node;
+        return Arguments(sourceCell, functionNode).Aggregate(sumTotal, (current, value) => current + value);
     }
 
     /// <summary>
@@ -247,9 +287,9 @@ public class Calculate(Sheet sheet) {
     /// <param name="cell">Source cell</param>
     /// <param name="node">Function node</param>
     /// <returns>Value to be applied to the cell</returns>
-    private Variant KYear(Cell cell, CellParseNode node) {
-        Debug.Assert(node is FunctionParseNode);
-        FunctionParseNode functionNode = (FunctionParseNode)node;
+    private Variant KYear(Cell cell, CellNode node) {
+        Debug.Assert(node is FunctionNode);
+        FunctionNode functionNode = (FunctionNode)node;
         Variant result = EvaluateNode(cell, functionNode.Parameters[0]);
         try {
             DateTime date = DateTime.FromOADate(result.DoubleValue);
@@ -266,9 +306,9 @@ public class Calculate(Sheet sheet) {
     /// <param name="cell">Source cell</param>
     /// <param name="node">Function node</param>
     /// <returns>Value to be applied to the cell</returns>
-    private Variant KMonth(Cell cell, CellParseNode node) {
-        Debug.Assert(node is FunctionParseNode);
-        FunctionParseNode functionNode = (FunctionParseNode)node;
+    private Variant KMonth(Cell cell, CellNode node) {
+        Debug.Assert(node is FunctionNode);
+        FunctionNode functionNode = (FunctionNode)node;
         Variant result = EvaluateNode(cell, functionNode.Parameters[0]);
         try {
             DateTime date = DateTime.FromOADate(result.DoubleValue);
@@ -277,5 +317,16 @@ public class Calculate(Sheet sheet) {
         catch {
             return new Variant(0);
         }
+    }
+
+    /// <summary>
+    /// Concatenate the result of all arguments into a single text string.
+    /// </summary>
+    /// <param name="sourceCell">Source cell</param>
+    /// <param name="node">Function node</param>
+    /// <returns>A variant containing the result of the concatenation</returns>
+    private Variant KConcatenate(Cell sourceCell, CellNode node) {
+        FunctionNode functionNode = (FunctionNode)node;
+        return new Variant(string.Concat(Arguments(sourceCell, functionNode)));
     }
 }

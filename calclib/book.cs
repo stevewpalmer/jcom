@@ -97,6 +97,7 @@ public class Book {
                         Cells = cellList.Cells.Select(sourceCell => new Cell(sheet, sourceCell)).ToList()
                     }).ToList();
 
+                    sheet.Modified = false;
                     _sheets.Add(sheet);
                     Calculate calc = new Calculate(sheet);
                     calc.Update();

@@ -40,10 +40,10 @@ public class ParsingTests {
     public void VerifyCellValueParseNode() {
         Cell cell1 = new Cell { Content = "=A1+A2" };
 
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
-        Assert.AreEqual(TokenID.PLUS, cell1.ParseNode.Op);
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+        Assert.AreEqual(TokenID.PLUS, cell1.FormulaTree.Op);
 
-        Assert.AreEqual("?", CellParseNode.TokenToString(TokenID.EOL));
+        Assert.AreEqual("?", CellNode.TokenToString(TokenID.EOL));
 
         Cell cell2 = new Cell { Content = "=A1+A2" };
         Assert.IsTrue(cell2.HasFormula);
@@ -53,9 +53,9 @@ public class ParsingTests {
     // Verify the creation of a BinaryOpParseNode
     [Test]
     public void VerifyBinaryOpParseNode() {
-        NumberParseNode left = new NumberParseNode(16);
-        LocationParseNode right = new LocationParseNode(new CellLocation("B4"), new Point(4, 4));
-        BinaryOpParseNode pn = new BinaryOpParseNode(TokenID.KGT, left, right);
+        NumberNode left = new NumberNode(16);
+        LocationNode right = new LocationNode(new CellLocation("B4"), new Point(4, 4));
+        BinaryOpNode pn = new BinaryOpNode(TokenID.KGT, left, right);
 
         Assert.AreEqual(pn.Op, TokenID.KGT);
         Assert.AreEqual(pn.Left, left);
@@ -67,18 +67,18 @@ public class ParsingTests {
     [Test]
     public void VerifyAddition() {
         Cell cell1 = new Cell { Content = "=A1+A2" };
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.PLUS, pn.Op);
-        Assert.IsTrue(pn.Left is LocationParseNode);
-        Assert.IsTrue(pn.Right is LocationParseNode);
+        Assert.IsTrue(pn.Left is LocationNode);
+        Assert.IsTrue(pn.Right is LocationNode);
 
-        LocationParseNode left = (LocationParseNode)pn.Left;
+        LocationNode left = (LocationNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
         Assert.AreEqual(new CellLocation("A1"), left.AbsoluteLocation);
 
-        LocationParseNode right = (LocationParseNode)pn.Right;
+        LocationNode right = (LocationNode)pn.Right;
         Assert.AreEqual(TokenID.ADDRESS, right.Op);
         Assert.AreEqual(new CellLocation("A2"), right.AbsoluteLocation);
     }
@@ -87,18 +87,18 @@ public class ParsingTests {
     [Test]
     public void VerifyMultiplication() {
         Cell cell1 = new Cell { Content = "=A1*14" };
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.MULTIPLY, pn.Op);
-        Assert.IsTrue(pn.Left is LocationParseNode);
-        Assert.IsTrue(pn.Right is NumberParseNode);
+        Assert.IsTrue(pn.Left is LocationNode);
+        Assert.IsTrue(pn.Right is NumberNode);
 
-        LocationParseNode left = (LocationParseNode)pn.Left;
+        LocationNode left = (LocationNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
         Assert.AreEqual(new CellLocation("A1"), left.AbsoluteLocation);
 
-        NumberParseNode right = (NumberParseNode)pn.Right;
+        NumberNode right = (NumberNode)pn.Right;
         Assert.AreEqual(TokenID.NUMBER, right.Op);
         Assert.AreEqual(14, right.Value.DoubleValue);
     }
@@ -108,18 +108,18 @@ public class ParsingTests {
     [Test]
     public void VerifyUnaryMinus() {
         Cell cell1 = new Cell { Content = "=-B3" };
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.MINUS, pn.Op);
-        Assert.IsTrue(pn.Left is NumberParseNode);
-        Assert.IsTrue(pn.Right is LocationParseNode);
+        Assert.IsTrue(pn.Left is NumberNode);
+        Assert.IsTrue(pn.Right is LocationNode);
 
-        NumberParseNode left = (NumberParseNode)pn.Left;
+        NumberNode left = (NumberNode)pn.Left;
         Assert.AreEqual(TokenID.NUMBER, left.Op);
         Assert.AreEqual(0, left.Value.DoubleValue);
 
-        LocationParseNode right = (LocationParseNode)pn.Right;
+        LocationNode right = (LocationNode)pn.Right;
         Assert.AreEqual(TokenID.ADDRESS, right.Op);
         Assert.AreEqual(new CellLocation("B3"), right.AbsoluteLocation);
     }
@@ -129,17 +129,17 @@ public class ParsingTests {
     [Test]
     public void VerifyCompoundExpression() {
         Cell cell1 = new Cell { Content = "=(G190^.5) * (H190 + 40) > .67" };
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.KGT, pn.Op);
-        Assert.IsTrue(pn.Left is BinaryOpParseNode);
-        Assert.IsTrue(pn.Right is NumberParseNode);
+        Assert.IsTrue(pn.Left is BinaryOpNode);
+        Assert.IsTrue(pn.Right is NumberNode);
 
-        BinaryOpParseNode left = (BinaryOpParseNode)pn.Left;
+        BinaryOpNode left = (BinaryOpNode)pn.Left;
         Assert.AreEqual(TokenID.MULTIPLY, left.Op);
 
-        NumberParseNode right = (NumberParseNode)pn.Right;
+        NumberNode right = (NumberNode)pn.Right;
         Assert.AreEqual(TokenID.NUMBER, right.Op);
         Assert.IsTrue(Math.Abs(0.67 - right.Value.DoubleValue) < 0.01);
 
@@ -150,8 +150,8 @@ public class ParsingTests {
     [Test]
     public void VerifyNotEquality() {
         Cell cell1 = new Cell { Content = "=B4<>.67"};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.KNE, pn.Op);
         Assert.AreEqual("=B4<>0.67", cell1.Content);
     }
@@ -160,8 +160,8 @@ public class ParsingTests {
     [Test]
     public void VerifyLessThan() {
         Cell cell1 = new Cell { Content = "=B4<P87"};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.KLT, pn.Op);
         Assert.AreEqual("=B4<P87", cell1.Content);
     }
@@ -170,8 +170,8 @@ public class ParsingTests {
     [Test]
     public void VerifyLessThanOrEquals() {
         Cell cell1 = new Cell { Content = "=896675<=P87"};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.KLE, pn.Op);
         Assert.AreEqual("=896675<=P87", cell1.Content);
     }
@@ -180,8 +180,8 @@ public class ParsingTests {
     [Test]
     public void VerifyGreaterThanOrEquals() {
         Cell cell1 = new Cell { Content = "=+896675>=P87"};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.KGE, pn.Op);
         Assert.AreEqual("=896675>=P87", cell1.Content);
     }
@@ -190,8 +190,8 @@ public class ParsingTests {
     [Test]
     public void VerifyEquality() {
         Cell cell1 = new Cell { Content = "=B4=90.12E+4"};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.KEQ, pn.Op);
         Assert.AreEqual("=B4=901200", cell1.Content);
     }
@@ -210,14 +210,14 @@ public class ParsingTests {
         // Test bad fixup
         Cell cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, Content = "=A1"};
         cell3.FixupFormula(0, 1, -1);
-        Assert.IsTrue(cell3.ParseNode is LocationParseNode);
-        Assert.IsTrue(((LocationParseNode)cell3.ParseNode).Error);
+        Assert.IsTrue(cell3.FormulaTree is LocationNode);
+        Assert.IsTrue(((LocationNode)cell3.FormulaTree).Error);
         Assert.AreEqual("=!ERR", cell3.Content);
 
         cell3 = new Cell { Location = new CellLocation { Row = 1, Column = 8}, Content = "=A1"};
         cell3.FixupFormula(1, 0, -1);
-        Assert.IsTrue(cell3.ParseNode is LocationParseNode);
-        Assert.IsTrue(((LocationParseNode)cell3.ParseNode).Error);
+        Assert.IsTrue(cell3.FormulaTree is LocationNode);
+        Assert.IsTrue(((LocationNode)cell3.FormulaTree).Error);
         Assert.AreEqual("=!ERR", cell3.Content);
     }
 
@@ -225,9 +225,9 @@ public class ParsingTests {
     public void VerifyAddressParsing() {
         Cell cell1 = new Cell { Location = new CellLocation { Row = 1, Column = 8}};
         FormulaParser parser = new FormulaParser("R(4)C(-3)", cell1.Location);
-        CellParseNode node = parser.Parse();
+        CellNode node = parser.Parse();
         Assert.IsTrue(node.Op == TokenID.ADDRESS);
-        LocationParseNode addressNode = (LocationParseNode)node;
+        LocationNode addressNode = (LocationNode)node;
         Assert.AreEqual(new CellLocation {Row = 5, Column = 5}, addressNode.AbsoluteLocation);
         Assert.AreEqual(new Point {X = -3, Y = 4}, addressNode.RelativeLocation);
         Assert.AreEqual(new CellLocation {Row = 5, Column = 5}, addressNode.ToAbsolute(cell1.Location));
@@ -277,11 +277,11 @@ public class ParsingTests {
     [Test]
     public void VerifySpaces() {
         Cell cell1 = new Cell { Content = "=   B4 -  I87 "};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.MINUS, pn.Op);
-        Assert.IsTrue(pn.Left is LocationParseNode);
-        Assert.IsTrue(pn.Right is LocationParseNode);
+        Assert.IsTrue(pn.Left is LocationNode);
+        Assert.IsTrue(pn.Right is LocationNode);
         Assert.AreEqual("=B4-I87", cell1.Content);
     }
 
@@ -290,15 +290,15 @@ public class ParsingTests {
     [Test]
     public void VerifyPercentNumber() {
         Cell cell1 = new Cell { Content = "=A3/16%"};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.DIVIDE, pn.Op);
-        Assert.IsTrue(pn.Right is NumberParseNode);
+        Assert.IsTrue(pn.Right is NumberNode);
         Assert.AreEqual("R(2)C(0)/0.16", pn.ToRawString());
         Assert.AreEqual("0.16", pn.Right.ToRawString());
 
-        NumberParseNode right = (NumberParseNode)pn.Right;
+        NumberNode right = (NumberNode)pn.Right;
         Assert.IsTrue(Math.Abs(0.16 - right.Value.DoubleValue) < 0.01);
         Assert.AreEqual("=A3/0.16", cell1.Content);
     }
@@ -308,18 +308,18 @@ public class ParsingTests {
     [Test]
     public void VerifyParenthesis() {
         Cell cell1 = new Cell { Content = "=A1*(A2+A3)"};
-        Assert.IsTrue(cell1.ParseNode is BinaryOpParseNode);
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
-        BinaryOpParseNode pn = (BinaryOpParseNode)cell1.ParseNode;
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
         Assert.AreEqual(TokenID.MULTIPLY, pn.Op);
-        Assert.IsTrue(pn.Left is LocationParseNode);
-        Assert.IsTrue(pn.Right is BinaryOpParseNode);
+        Assert.IsTrue(pn.Left is LocationNode);
+        Assert.IsTrue(pn.Right is BinaryOpNode);
 
-        LocationParseNode left = (LocationParseNode)pn.Left;
+        LocationNode left = (LocationNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
         Assert.AreEqual(new CellLocation("A1"), left.AbsoluteLocation);
 
-        BinaryOpParseNode right = (BinaryOpParseNode)pn.Right;
+        BinaryOpNode right = (BinaryOpNode)pn.Right;
         Assert.AreEqual(TokenID.PLUS, right.Op);
 
         Assert.AreEqual("=A1*(A2+A3)", cell1.Content);
@@ -336,19 +336,19 @@ public class ParsingTests {
     [Test]
     public void VerifySum() {
         Cell cell = new Cell { Location = new CellLocation { Row = 1, Column = 1 }, Content = "=SUM(A2:A4)"};
-        Assert.IsTrue(cell.ParseNode.GetType() == typeof(FunctionParseNode));
+        Assert.IsTrue(cell.FormulaTree.GetType() == typeof(FunctionNode));
 
-        FunctionParseNode functionNode = (FunctionParseNode)cell.ParseNode;
+        FunctionNode functionNode = (FunctionNode)cell.FormulaTree;
         Assert.AreEqual(TokenID.KSUM, functionNode.Op);
         Assert.AreEqual("SUM(A2:A4)", functionNode.ToString());
         Assert.AreEqual("SUM(R(1)C(0):R(3)C(0))", functionNode.ToRawString());
 
-        RangeParseNode range = (RangeParseNode)functionNode.Parameters[0];
+        RangeNode range = (RangeNode)functionNode.Parameters[0];
         Assert.IsTrue(range.RangeStart != null);
         Assert.IsTrue(range.RangeEnd != null);
 
-        LocationParseNode rangeStart = range.RangeStart;
-        LocationParseNode rangeEnd = range.RangeEnd;
+        LocationNode rangeStart = range.RangeStart;
+        LocationNode rangeEnd = range.RangeEnd;
         Assert.AreEqual("A2:A4", range.ToString());
         Assert.AreEqual("R(1)C(0):R(3)C(0)", range.ToRawString());
         Assert.AreEqual(new CellLocation { Column = 1, Row = 2}, rangeStart.AbsoluteLocation);

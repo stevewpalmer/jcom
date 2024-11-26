@@ -1,5 +1,5 @@
 // JCalcLib
-// A cell parse tree
+// Parse a formula tree
 //
 // Authors:
 //  Steve Palmer
@@ -26,12 +26,11 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Text;
-using JComLib;
 
 namespace JCalcLib;
 
 /// <summary>
-/// List of cell parse node tokens
+/// List of cell node tokens
 /// </summary>
 public enum TokenID {
     NONE = 0,
@@ -58,6 +57,9 @@ public enum TokenID {
     KYEAR,
     KMONTH,
     COLON,
+    CONCAT,
+    KCONCATENATE,
+    COMMA,
     RANGE
 }
 
@@ -70,388 +72,8 @@ public enum CellAddressFormat {
 }
 
 /// <summary>
-/// Basic cell parse node
-/// </summary>
-/// <param name="tokenID">Node token ID</param>
-public class CellParseNode(TokenID tokenID) {
-
-    /// <summary>
-    /// List of built-in functions
-    /// </summary>
-    public static readonly Dictionary<TokenID, string> Functions = new() {
-        { TokenID.KSUM, "SUM" },
-        { TokenID.KNOW, "NOW" },
-        { TokenID.KTODAY, "TODAY" },
-        { TokenID.KYEAR, "YEAR" },
-        { TokenID.KMONTH, "MONTH" }
-    };
-
-    /// <summary>
-    /// Operator
-    /// </summary>
-    public TokenID Op { get; } = tokenID;
-
-    /// <summary>
-    /// Convert a token ID to its string representation.
-    /// </summary>
-    /// <param name="tokenId">Token ID</param>
-    /// <returns>String</returns>
-    public static string TokenToString(TokenID tokenId) =>
-        tokenId switch {
-            TokenID.PLUS => "+",
-            TokenID.EXP => "^",
-            TokenID.MINUS => "-",
-            TokenID.MULTIPLY => "*",
-            TokenID.DIVIDE => "/",
-            TokenID.KLE => "<=",
-            TokenID.KLT => "<",
-            TokenID.KGE => ">=",
-            TokenID.KGT => ">",
-            TokenID.KEQ => "=",
-            TokenID.KNE => "<>",
-            TokenID.COLON => ":",
-            _ => Functions.GetValueOrDefault(tokenId, "?")
-        };
-
-    /// <summary>
-    /// Convert this parse node to its raw string.
-    /// </summary>
-    /// <returns>String</returns>
-    public virtual string ToRawString() => TokenToString(Op);
-
-    /// <summary>
-    /// Convert this parse node to its string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToString() => TokenToString(Op);
-
-    /// <summary>
-    /// Fix up any address references on the node.
-    /// </summary>
-    /// <param name="location"></param>
-    /// <param name="column">Column to fix</param>
-    /// <param name="row">Row to fix</param>
-    /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public virtual bool FixupAddress(CellLocation location, int column, int row, int offset) {
-        return false;
-    }
-}
-
-/// <summary>
-/// Parse node for a function call.
-/// </summary>
-/// <param name="tokenID">Node token ID</param>
-public class FunctionParseNode(TokenID tokenID, CellParseNode[] parameters) : CellParseNode(tokenID) {
-
-    /// <summary>
-    /// Function parameter list
-    /// </summary>
-    public CellParseNode[] Parameters { get; } = parameters;
-
-    /// <summary>
-    /// Convert this parse node to its raw string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToRawString() => $"{TokenToString(Op)}({string.Join(",", Parameters.Select(p => p.ToRawString()))})";
-
-    /// <summary>
-    /// Convert this parse node to its string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToString() => $"{TokenToString(Op)}({string.Join(",", Parameters.Select(p => p.ToString()))})";
-
-    /// <summary>
-    /// Fix up any address references on the node.
-    /// </summary>
-    /// <param name="location"></param>
-    /// <param name="column">Column to fix</param>
-    /// <param name="row">Row to fix</param>
-    /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
-        bool fixup = false;
-        foreach (CellParseNode parameter in Parameters) {
-            if (parameter.FixupAddress(location, column, row, offset)) {
-                fixup = true;
-            }
-        }
-        return fixup;
-    }
-}
-
-/// <summary>
-/// Represents a parse node that holds a binary operation.
-/// </summary>
-/// <param name="tokenID">Node token ID</param>
-/// <param name="left">Left part of expression</param>
-/// <param name="right">Right part of expression</param>
-public class BinaryOpParseNode(TokenID tokenID, CellParseNode left, CellParseNode right) : CellParseNode(tokenID) {
-
-    /// <summary>
-    /// Left child node
-    /// </summary>
-    public CellParseNode Left { get; } = left;
-
-    /// <summary>
-    /// Right child node
-    /// </summary>
-    public CellParseNode Right { get; } = right;
-
-    /// <summary>
-    /// Fix up any address references on the node.
-    /// </summary>
-    /// <param name="location"></param>
-    /// <param name="column">Column to fix</param>
-    /// <param name="row">Row to fix</param>
-    /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
-        bool left = Left.FixupAddress(location, column, row, offset);
-        bool right = Right.FixupAddress(location, column, row, offset);
-        return left || right;
-    }
-
-    /// <summary>
-    /// Convert this parse node to its raw string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToRawString() {
-        string left = Left.ToRawString();
-        string right = Right.ToRawString();
-        return FormatToString(left, right);
-    }
-
-    /// <summary>
-    /// Convert this parse node to its string. For binary operations we
-    /// add the appropriate parenthesis if the precedence of either side
-    /// of the expression is less than this one.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToString() {
-        string left = Left.ToString();
-        string right = Right.ToString();
-        return FormatToString(left, right);
-    }
-
-    private string FormatToString(string left, string right) {
-        if (FormulaParser.Precedence(Op) > FormulaParser.Precedence(Left.Op)) {
-            left = $"({left})";
-        }
-        if (FormulaParser.Precedence(Op) > FormulaParser.Precedence(Right.Op)) {
-            right = $"({right})";
-        }
-        return left + TokenToString(Op) + right;
-    }
-}
-
-/// <summary>
-/// Represents a parse node that holds a numeric value.
-/// </summary>
-/// <param name="value">Double value</param>
-public class NumberParseNode(double value) : CellParseNode(TokenID.NUMBER) {
-
-    /// <summary>
-    /// Value of node
-    /// </summary>
-    public Variant Value { get; } = new(value);
-
-    /// <summary>
-    /// Convert this parse node to its raw string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToRawString() => ToString();
-
-    /// <summary>
-    /// Convert this parse node to its string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToString() {
-        return Value.StringValue;
-    }
-}
-
-/// <summary>
-/// Represents a parse node that holds a string value.
-/// </summary>
-/// <param name="value">String value</param>
-public class TextParseNode(string value) : CellParseNode(TokenID.TEXT) {
-
-    /// <summary>
-    /// Value of node
-    /// </summary>
-    public string Value { get; } = value;
-
-    /// <summary>
-    /// Convert this parse node to its raw string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToRawString() => ToString();
-
-    /// <summary>
-    /// Convert this parse node to its string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToString() {
-        return Value;
-    }
-}
-
-/// <summary>
-/// Represents a parse node that holds a relative cell location.
-/// </summary>
-/// <param name="absoluteLocation">Absolute location</param>
-/// <param name="relativeLocation">Relative location</param>
-public class LocationParseNode(CellLocation absoluteLocation, Point relativeLocation) : CellParseNode(TokenID.ADDRESS) {
-
-    /// <summary>
-    /// Absolute location
-    /// </summary>
-    public CellLocation AbsoluteLocation { get; private set; } = absoluteLocation;
-
-    /// <summary>
-    /// Absolute location
-    /// </summary>
-    public Point RelativeLocation { get; private set; } = relativeLocation;
-
-    /// <summary>
-    /// True if the cell location now contains an error.
-    /// </summary>
-    public bool Error { get; private set; }
-
-    /// <summary>
-    /// Fix up any address references on the node.
-    /// </summary>
-    /// <param name="location">Location of this cell</param>
-    /// <param name="column">Column to fix</param>
-    /// <param name="row">Row to fix</param>
-    /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
-        bool needRecalculate = false;
-        if (column > 0) {
-            if (AbsoluteLocation.Column + offset < 1) {
-                Error = true;
-            }
-            else {
-                if (AbsoluteLocation.Column >= column) {
-                    AbsoluteLocation = AbsoluteLocation with { Column = AbsoluteLocation.Column + offset };
-                }
-                RelativeLocation = RelativeLocation with { X = AbsoluteLocation.Column - location.Column };
-            }
-            needRecalculate = true;
-        }
-        if (row > 0) {
-            if (AbsoluteLocation.Row + offset < 1) {
-                Error = true;
-            }
-            else {
-                if (AbsoluteLocation.Row >= row) {
-                    AbsoluteLocation = AbsoluteLocation with { Row = AbsoluteLocation.Row + offset };
-                }
-                RelativeLocation = RelativeLocation with { Y = AbsoluteLocation.Row - location.Row };
-            }
-            needRecalculate = true;
-        }
-        return needRecalculate;
-    }
-
-    /// <summary>
-    /// Convert this parse node to its raw string. The raw string is the internal
-    /// representation used for copying cells in a location independent way.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToRawString() {
-        return Error ? "!ERR" : Cell.LocationToAddress(RelativeLocation);
-    }
-
-    /// <summary>
-    /// Convert this parse node to its string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToString() {
-        return Error ? "!ERR" : AbsoluteLocation.Address;
-    }
-
-    /// <summary>
-    /// Convert the relative address to an absolute cell reference
-    /// </summary>
-    /// <returns>CellLocation</returns>
-    public CellLocation ToAbsolute(CellLocation sourceCell) {
-        return new CellLocation {
-            Column = sourceCell.Column + RelativeLocation.X,
-            Row = sourceCell.Row + RelativeLocation.Y
-        };
-    }
-}
-
-/// <summary>
-/// A cell range of the format Start:End where Start and End are each
-/// a LocationParseNode.
-/// </summary>
-/// <param name="start">Start of range</param>
-/// <param name="end">End of range</param>
-public class RangeParseNode(LocationParseNode start, LocationParseNode end) : CellParseNode(TokenID.RANGE) {
-
-    /// <summary>
-    /// Start of range
-    /// </summary>
-    public LocationParseNode RangeStart { get; } = start;
-
-    /// <summary>
-    /// End of range
-    /// </summary>
-    public LocationParseNode RangeEnd { get; } = end;
-
-    /// <summary>
-    /// Fix up any address references on the node.
-    /// </summary>
-    /// <param name="location"></param>
-    /// <param name="column">Column to fix</param>
-    /// <param name="row">Row to fix</param>
-    /// <param name="offset">Offset to be applied to the column and/or row</param>
-    public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
-        bool start = RangeStart.FixupAddress(location, column, row, offset);
-        bool end = RangeEnd.FixupAddress(location, column, row, offset);
-        return start || end;
-    }
-
-    /// <summary>
-    /// Convert this parse node to its raw string. The raw string is the internal
-    /// representation used for copying cells in a location independent way.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToRawString() {
-        return $"{RangeStart.ToRawString()}:{RangeEnd.ToRawString()}";
-    }
-
-    /// <summary>
-    /// Convert this parse node to its string.
-    /// </summary>
-    /// <returns>String</returns>
-    public override string ToString() {
-        return $"{RangeStart}:{RangeEnd}";
-    }
-
-    /// <summary>
-    /// Return an iterator over the range defined by the start and end.
-    /// </summary>
-    /// <returns>The next cell location in the iterator, or null</returns>
-    public IEnumerable<CellLocation> RangeIterator(CellLocation sourceCell) {
-        CellLocation rangeStart = RangeStart.ToAbsolute(sourceCell);
-        CellLocation rangeEnd = RangeEnd.ToAbsolute(sourceCell);
-        int startColumn = Math.Min(rangeStart.Column, rangeEnd.Column);
-        int endColumn = Math.Max(rangeStart.Column, rangeEnd.Column);
-        int startRow = Math.Min(rangeStart.Row, rangeEnd.Row);
-        int endRow = Math.Max(rangeStart.Row, rangeEnd.Row);
-
-        for (int column = startColumn; column <= endColumn; column++) {
-            for (int row = startRow; row <= endRow; row++) {
-                yield return new CellLocation { Column = column, Row = row };
-            }
-        }
-    }
-}
-
-/// <summary>
 /// Implements a cell formula parser to construct the associated
-/// parse tree from the expression.
+/// formula tree from the input.
 /// </summary>
 public class FormulaParser {
 
@@ -545,7 +167,7 @@ public class FormulaParser {
                     PushChar(ch);
 
                     string name = str.ToString().ToUpper();
-                    KeyValuePair<TokenID, string> node = CellParseNode.Functions.FirstOrDefault(item => item.Value == name);
+                    KeyValuePair<TokenID, string> node = CellNode.Functions.FirstOrDefault(item => item.Value == name);
                     if (node.Key != TokenID.NONE) {
                         tokens.Add(new SimpleToken(node.Key));
                         break;
@@ -565,6 +187,22 @@ public class FormulaParser {
                     PushChar(ch);
                     break;
 
+                case '\'':
+                case '"': {
+                    char endCh = ch;
+                    StringBuilder str = new();
+                    ch = GetChar();
+                    while (ch != EOL && ch != endCh) {
+                        str.Append(ch);
+                        ch = GetChar();
+                    }
+                    if (ch != endCh) {
+                        PushChar(ch);
+                    }
+                    tokens.Add(new StringToken(str.ToString()));
+                    break;
+                }
+
                 case '(': tokens.Add(new SimpleToken(TokenID.LPAREN)); break;
                 case ')': tokens.Add(new SimpleToken(TokenID.RPAREN)); break;
                 case '=': tokens.Add(new SimpleToken(TokenID.KEQ)); break;
@@ -574,6 +212,8 @@ public class FormulaParser {
                 case '/': tokens.Add(new SimpleToken(TokenID.DIVIDE)); break;
                 case '^': tokens.Add(new SimpleToken(TokenID.EXP)); break;
                 case ':': tokens.Add(new SimpleToken(TokenID.COLON)); break;
+                case '&': tokens.Add(new SimpleToken(TokenID.CONCAT)); break;
+                case ',': tokens.Add(new SimpleToken(TokenID.COMMA)); break;
 
                 case '<':
                     ch = GetChar();
@@ -611,11 +251,11 @@ public class FormulaParser {
     }
 
     /// <summary>
-    /// Run the formula and return the root of the parse node that
+    /// Run the formula and return the root of the node that
     /// represents the formula.
     /// </summary>
     /// <returns>A CellParseNode</returns>
-    public CellParseNode Parse() => Expression(0);
+    public CellNode Parse() => Expression(0);
 
     /// <summary>
     /// Make sure the next character read is the specified
@@ -760,8 +400,8 @@ public class FormulaParser {
     /// </summary>
     /// <param name="level">Current precedence level</param>
     /// <returns>CellParseNode</returns>
-    private CellParseNode Expression(int level) {
-        CellParseNode op1 = Operand();
+    private CellNode Expression(int level) {
+        CellNode op1 = Operand();
         bool done = false;
 
         while (!done) {
@@ -778,6 +418,7 @@ public class FormulaParser {
                 case TokenID.PLUS:
                 case TokenID.MULTIPLY:
                 case TokenID.DIVIDE:
+                case TokenID.CONCAT:
                 case TokenID.EXP:
                     preced = Precedence(token.ID);
                     break;
@@ -791,7 +432,7 @@ public class FormulaParser {
                 done = true;
             }
             else {
-                op1 = new BinaryOpParseNode(token.ID, op1, Expression(preced));
+                op1 = new BinaryOpNode(token.ID, op1, Expression(preced));
             }
         }
         return op1;
@@ -801,71 +442,100 @@ public class FormulaParser {
     /// Parse a single operand
     /// </summary>
     /// <returns>A CellParseNode</returns>
-    private CellParseNode Operand() {
+    private CellNode Operand() {
         SimpleToken token = GetNextToken();
         switch (token.ID) {
             case TokenID.LPAREN: {
-                CellParseNode node = Expression(0);
+                CellNode node = Expression(0);
                 ExpectToken(TokenID.RPAREN);
                 return node;
             }
 
             case TokenID.KTODAY:
             case TokenID.KNOW:
-                ExpectToken(TokenID.LPAREN);
-                ExpectToken(TokenID.RPAREN);
-                return new FunctionParseNode(token.ID, []);
+                return ParseArguments(token.ID, 0);
 
             case TokenID.KYEAR:
             case TokenID.KMONTH:
-                ExpectToken(TokenID.LPAREN);
-                CellParseNode op1 = Expression(0);
-                ExpectToken(TokenID.RPAREN);
-                return new FunctionParseNode(token.ID, [op1]);
+                return ParseArguments(token.ID, 1);
 
-            case TokenID.KSUM: {
-                ExpectToken(TokenID.LPAREN);
-                CellParseNode start = Operand();
-                if (start is not LocationParseNode startRange) {
-                    throw new FormatException(InvalidFormulaError);
-                }
-                ExpectToken(TokenID.COLON);
-                CellParseNode end = Operand();
-                if (end is not LocationParseNode endRange) {
-                    throw new FormatException(InvalidFormulaError);
-                }
-                RangeParseNode rangeNode = new(startRange, endRange);
-                ExpectToken(TokenID.RPAREN);
-                return new FunctionParseNode(TokenID.KSUM, [rangeNode]);
-            }
+            case TokenID.KSUM:
+            case TokenID.KCONCATENATE:
+                return ParseArguments(token.ID, 255);
 
             case TokenID.PLUS:
                 return Operand();
 
             case TokenID.MINUS:
-                return new BinaryOpParseNode(TokenID.MINUS, new NumberParseNode(0), Expression(9));
+                return new BinaryOpNode(TokenID.MINUS, new NumberNode(0), Expression(9));
 
             case TokenID.NUMBER: {
                 NumberToken numberToken = (NumberToken)token;
-                return new NumberParseNode(numberToken.Value);
+                return new NumberNode(numberToken.Value);
+            }
+
+            case TokenID.TEXT: {
+                StringToken stringToken = (StringToken)token;
+                return new TextNode(stringToken.Value);
             }
 
             case TokenID.ADDRESS: {
-                CellAddressToken identToken = (CellAddressToken)token;
-                CellLocation absoluteLocation;
-                Point relativeLocation;
-                if (identToken.Format == CellAddressFormat.RELATIVE) {
-                    relativeLocation = Cell.PointFromRelativeAddress(identToken.Address);
-                    absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row };
+                LocationNode location = ParseLocation(token);
+                token = GetNextToken();
+                if (token.ID != TokenID.COLON) {
+                    PushToken(token);
                 }
                 else {
-                    absoluteLocation = new CellLocation(identToken.Address);
-                    relativeLocation = new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
+                    token = GetNextToken();
+                    if (token.ID != TokenID.ADDRESS) {
+                        throw new FormatException(InvalidFormulaError);
+                    }
+                    LocationNode endLocation = ParseLocation(token);
+                    return new RangeNode(location, endLocation);
                 }
-                return new LocationParseNode(absoluteLocation, relativeLocation);
+                return location;
             }
         }
         throw new FormatException(InvalidFormulaError);
+    }
+
+    private LocationNode ParseLocation(SimpleToken token) {
+        if (token is not CellAddressToken addressToken) {
+            throw new FormatException(InvalidFormulaError);
+        }
+        CellLocation absoluteLocation;
+        Point relativeLocation;
+        if (addressToken.Format == CellAddressFormat.RELATIVE) {
+            relativeLocation = Cell.PointFromRelativeAddress(addressToken.Address);
+            absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row };
+        }
+        else {
+            absoluteLocation = new CellLocation(addressToken.Address);
+            relativeLocation = new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
+        }
+        return new LocationNode(absoluteLocation, relativeLocation);
+    }
+
+    /// <summary>
+    /// Parse the argument list to a function based on the specified
+    /// rules.
+    /// </summary>
+    /// <param name="id">Function token ID</param>
+    /// <param name="maxCount">Maximum number of arguments</param>
+    /// <returns>A function node</returns>
+    private FunctionNode ParseArguments(TokenID id, int maxCount) {
+        List<CellNode> args = [];
+        ExpectToken(TokenID.LPAREN);
+        while (maxCount-- > 0) {
+            args.Add(Expression(0));
+            SimpleToken token = GetNextToken();
+            if (token.ID != TokenID.COMMA) {
+                PushToken(token);
+                break;
+            }
+        }
+        ExpectToken(TokenID.RPAREN);
+        return new FunctionNode(id, args.ToArray());
     }
 
     /// <summary>
@@ -878,6 +548,7 @@ public class FormulaParser {
         id switch {
             TokenID.NUMBER => 20,
             TokenID.ADDRESS => 20,
+            TokenID.TEXT => 20,
             TokenID.KGT => 5,
             TokenID.KGE => 5,
             TokenID.KLE => 5,
@@ -886,6 +557,7 @@ public class FormulaParser {
             TokenID.KLT => 5,
             TokenID.PLUS => 6,
             TokenID.MINUS => 6,
+            TokenID.CONCAT => 6,
             TokenID.MULTIPLY => 7,
             TokenID.DIVIDE => 7,
             TokenID.EXP => 10,
@@ -945,5 +617,21 @@ public class FormulaParser {
         /// Returns the value.
         /// </summary>
         public double Value { get; }
+    }
+
+    private class StringToken : SimpleToken {
+
+        /// <summary>
+        /// Creates a string token with the given value.
+        /// </summary>
+        /// <param name="value">The string</param>
+        public StringToken(string value) : base(TokenID.TEXT) {
+            Value = value;
+        }
+
+        /// <summary>
+        /// Returns the string.
+        /// </summary>
+        public string Value { get; }
     }
 }

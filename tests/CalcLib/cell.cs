@@ -561,6 +561,42 @@ public class CellTests {
         Assert.AreEqual("\u001b[97;40m\u001b[3m\u001b[4mHELLO WORLD    \u001b[0m", cell2.AnsiTextSpan(15).EscapedString());
     }
 
+    // Test the semantics of Value and Content, with constants and
+    // formula.
+    [Test]
+    public void TestValueAndContent() {
+        Sheet sheet = new Sheet();
+        Cell cellA1 = sheet.GetCell(new CellLocation(1, 1), true);
+        Cell cellA2 = sheet.GetCell(new CellLocation(1, 2), true);
+        Cell cellA3 = sheet.GetCell(new CellLocation(1, 3), true);
+
+        cellA1.Content = "HELLO WORLD";
+        Assert.AreEqual(new Variant("HELLO WORLD"), cellA1.Value);
+
+        cellA1.Content = "14.90";
+        Assert.AreEqual(new Variant(14.90), cellA1.Value);
+        cellA2.Content = "67.90";
+        Assert.AreEqual(new Variant(67.90), cellA2.Value);
+        cellA3.Content = "=SUM(A1:A2)";
+
+        // Expect 0 since we've set a formula but not yet run a calculation
+        // so there is not yet any computed value.
+        Assert.AreEqual(new Variant(0), cellA3.Value);
+        Assert.AreEqual("=SUM(A1:A2)", cellA3.Content);
+        Assert.IsTrue(cellA3.HasFormula);
+        Calculate calc = new Calculate(sheet);
+        calc.Update();
+
+        // Now we should have a real value
+        Assert.IsTrue(TestUtilities.Helper.DoubleCompare(new Variant(82.8).DoubleValue, cellA3.Value.DoubleValue));
+
+        // Changing the Value to something that isn't a formula should now return
+        // false for the HasFormula property.
+        cellA3.Value = new Variant(999.99);
+        Assert.AreEqual(new Variant(999.99), cellA3.Value);
+        Assert.IsFalse(cellA3.HasFormula);
+    }
+
     // Test changing the cell factory changes the default
     // properties of a cell.
     [Test]

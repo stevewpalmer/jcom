@@ -33,7 +33,6 @@ using JComLib;
 namespace JCalcLib;
 
 public class Cell(Sheet? sheet) {
-    private Variant _value = new();
     private string? _customFormatString;
     private string _content = string.Empty;
 
@@ -62,34 +61,46 @@ public class Cell(Sheet? sheet) {
     /// </summary>
     [JsonIgnore]
     public Variant Value {
-        get => _value;
+        get => ComputedValue;
         set {
+            FormulaTree = null;
+            if (sheet != null) {
+                sheet.Modified = true;
+            }
             if (TryParseDate(value.StringValue, out Variant _dateValue)) {
                 if (!Format.HasValue) {
                     CellFormat = CellFormat.DATE_DMY;
                 }
-                _value = _dateValue;
+                ComputedValue = _dateValue;
                 return;
             }
             if (TryParseTime(value.StringValue, out Variant _timeValue)) {
                 if (!Format.HasValue) {
                     CellFormat = CellFormat.TIME;
                 }
-                _value = _timeValue;
+                ComputedValue = _timeValue;
                 return;
             }
-            if (TryParseFormula(value.StringValue, Location, out CellParseNode? _parseNode)) {
-                ParseNode = _parseNode;
-                _value = new Variant(0);
+            if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
+                FormulaTree = formulaTree;
+                ComputedValue = new Variant(0);
                 return;
             }
             if (double.TryParse(value.StringValue, out double doubleValue)) {
-                _value = new Variant(doubleValue);
+                ComputedValue = new Variant(doubleValue);
                 return;
             }
-            _value = value;
+            ComputedValue = value;
         }
     }
+
+    /// <summary>
+    /// The computed value of the cell. This is set by the calculation as
+    /// well as by the Value property once it has translates the input
+    /// value into a discrete cell value.
+    /// </summary>
+    [JsonIgnore]
+    internal Variant ComputedValue { get; set; } = new();
 
     /// <summary>
     /// Cell content. The cell content is the value assigned to the cell
@@ -101,19 +112,20 @@ public class Cell(Sheet? sheet) {
     /// </summary>
     [JsonInclude]
     public string Content {
-        get => ParseNode != null ? $"={ParseNode}" : _content;
+        get => FormulaTree != null ? $"={FormulaTree}" : _content;
         set {
             _content = value;
-            ParseNode = null;
+            FormulaTree = null;
             Value = new Variant(value);
         }
     }
 
     /// <summary>
-    /// The parse node root of the evaluated formula assigned to this
+    /// The root of the evaluated formula tree assigned to this
     /// cell, if any. If the cell has no formula, this is null.
     /// </summary>
-    public CellParseNode? ParseNode { get; private set; }
+    [JsonIgnore]
+    public CellNode? FormulaTree { get; private set; }
 
     /// <summary>
     /// Cell alignment
@@ -260,7 +272,7 @@ public class Cell(Sheet? sheet) {
     /// Returns whether or not this cell has a formula assigned to it.
     /// </summary>
     [JsonIgnore]
-    public bool HasFormula => ParseNode != null;
+    public bool HasFormula => FormulaTree != null;
 
     /// <summary>
     /// Copy properties from another cell
@@ -271,7 +283,7 @@ public class Cell(Sheet? sheet) {
         Alignment = other.Alignment;
         DecimalPlaces = other.DecimalPlaces;
         Style = other.Style;
-        Content = other.ParseNode != null ? $"={other.ParseNode.ToRawString()}" : other.Content;
+        Content = other.FormulaTree != null ? $"={other.FormulaTree.ToRawString()}" : other.Content;
     }
 
     /// <summary>
@@ -435,7 +447,7 @@ public class Cell(Sheet? sheet) {
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     public bool FixupFormula(int column, int row, int offset) {
-        return ParseNode?.FixupAddress(Location, column, row, offset) ?? false;
+        return FormulaTree?.FixupAddress(Location, column, row, offset) ?? false;
     }
 
     /// <summary>
@@ -444,20 +456,20 @@ public class Cell(Sheet? sheet) {
     /// </summary>
     /// <param name="formula">String to verify</param>
     /// <param name="location">Location of cell containing formula</param>
-    /// <param name="cellParseNode">Set to the generated parse tree root</param>
+    /// <param name="formulaTree">Set to the generated formula tree, if any</param>
     /// <returns>True if formula is valid, false otherwise</returns>
-    private static bool TryParseFormula(string formula, CellLocation location, out CellParseNode? cellParseNode) {
-        if (formula.Length == 0 || formula[0] != '=') {
-            cellParseNode = null;
+    private bool TryParseFormula(string formula, CellLocation location, out CellNode? formulaTree) {
+        if (sheet == null || formula.Length == 0 || formula[0] != '=') {
+            formulaTree = null;
             return false;
         }
         try {
             FormulaParser parser = new FormulaParser(formula[1..], location);
-            cellParseNode = parser.Parse();
+            formulaTree = parser.Parse();
             return true;
         }
         catch (FormatException) {
-            cellParseNode = null;
+            formulaTree = null;
             return false;
         }
     }
