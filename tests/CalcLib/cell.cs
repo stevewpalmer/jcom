@@ -268,31 +268,31 @@ public class CellTests {
             Alignment = CellAlignment.GENERAL,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.AreEqual("Text    ", new Cell {
             Content = "Text",
             Alignment = CellAlignment.GENERAL,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.AreEqual(" 45.8794", new Cell {
             Content = "45.8794",
             Alignment = CellAlignment.RIGHT,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.AreEqual("        ", new Cell {
             Content = "",
             Alignment = CellAlignment.GENERAL,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.Throws(typeof(ArgumentException), delegate {
             new Cell {
                 Content = "45.8794",
                 CellFormat = (CellFormat)12,
                 DecimalPlaces = 2
-            }.FormattedText(8);
+            }.Text(8);
         });
     }
 
@@ -304,12 +304,12 @@ public class CellTests {
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.TEXT,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.AreEqual("HELLO WO", new Cell {
             Content = "HELLO WORLD!",
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.TEXT
-        }.FormattedText(8));
+        }.Text(8));
         Assert.Catch(typeof(ArgumentException), delegate {
             NumberFormats.GetFormat(CellFormat.TEXT, false, 5);
         });
@@ -323,26 +323,26 @@ public class CellTests {
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.AreEqual(" 45.8794", new Cell {
             Content = "45.8794",
             Alignment = CellAlignment.RIGHT,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.AreEqual("45.8794 ", new Cell {
             Content = "45.8794",
             Alignment = CellAlignment.CENTRE,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.Throws(typeof(ArgumentException), delegate {
             new Cell {
                 Content = "45.8794",
                 Alignment = (CellAlignment)4,
                 CellFormat = CellFormat.GENERAL,
                 DecimalPlaces = 2
-            }.FormattedText(8);
+            }.Text(8);
         });
     }
 
@@ -354,7 +354,7 @@ public class CellTests {
             CellFormat = CellFormat.CUSTOM,
             CustomFormatString = "#,##0.00_);(#,##0.00)",
             DecimalPlaces = 2
-        }.FormattedText(10));
+        }.Text(10));
     }
 
     // Verify fixed format formatting
@@ -364,39 +364,39 @@ public class CellTests {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             DecimalPlaces = 2
-        }.FormattedText(6));
+        }.Text(6));
         Assert.AreEqual("45.88   ", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             Alignment = CellAlignment.LEFT,
             DecimalPlaces = 2
-        }.FormattedText(8));
+        }.Text(8));
         Assert.AreEqual("  45.88  ", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             Alignment = CellAlignment.CENTRE,
             DecimalPlaces = 2
-        }.FormattedText(9));
+        }.Text(9));
         Assert.AreEqual("45.879", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             DecimalPlaces = 3
-        }.FormattedText(6));
+        }.Text(6));
         Assert.AreEqual("******", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             DecimalPlaces = 4
-        }.FormattedText(6));
+        }.Text(6));
         Assert.AreEqual("   46.", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             DecimalPlaces = 0
-        }.FormattedText(6));
+        }.Text(6));
         Assert.AreEqual("", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             DecimalPlaces = 0
-        }.FormattedText(0));
+        }.Text(0));
     }
 
     // Verify scientific format formatting
@@ -406,39 +406,39 @@ public class CellTests {
             Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             DecimalPlaces = 2
-        }.FormattedText(10));
+        }.Text(10));
         Assert.AreEqual("4.59E+01    ", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             Alignment = CellAlignment.LEFT,
             DecimalPlaces = 2
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual("  4.59E+01  ", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             Alignment = CellAlignment.CENTRE,
             DecimalPlaces = 2
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual("   4.588E+01", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             DecimalPlaces = 3
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual("******", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             DecimalPlaces = 4
-        }.FormattedText(6));
+        }.Text(6));
         Assert.AreEqual("5.E+01", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             DecimalPlaces = 0
-        }.FormattedText(6));
+        }.Text(6));
         Assert.AreEqual("", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.SCIENTIFIC,
             DecimalPlaces = 0
-        }.FormattedText(0));
+        }.Text(0));
     }
 
     // Verify currency format formatting
@@ -447,13 +447,13 @@ public class CellTests {
         Assert.AreEqual("  £1,234,567.00", new Cell {
             Content = "1234567",
             CellFormat = CellFormat.CURRENCY
-        }.FormattedText(15));
+        }.Text(15));
         Assert.AreEqual("-£7,655.00  ", new Cell {
             Content = "-7655",
             DecimalPlaces = 2,
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.CURRENCY
-        }.FormattedText(12));
+        }.Text(12));
     }
 
     // Verify percent format formatting
@@ -462,29 +462,29 @@ public class CellTests {
         Assert.AreEqual("       50.00%", new Cell {
             Content = "0.5",
             CellFormat = CellFormat.PERCENT
-        }.FormattedText(13));
+        }.Text(13));
         Assert.AreEqual("50.000%   ", new Cell {
             Content = "0.5",
             Alignment = CellAlignment.LEFT,
             DecimalPlaces = 3,
             CellFormat = CellFormat.PERCENT
-        }.FormattedText(10));
+        }.Text(10));
         Assert.AreEqual("  20.%   ", new Cell {
             Content = "0.2",
             Alignment = CellAlignment.CENTRE,
             DecimalPlaces = 0,
             CellFormat = CellFormat.PERCENT
-        }.FormattedText(9));
+        }.Text(9));
         Assert.AreEqual(" 456700.00% ", new Cell {
             Content = "4567",
             Alignment = CellAlignment.CENTRE,
             DecimalPlaces = 2,
             CellFormat = CellFormat.PERCENT
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual("**", new Cell {
             Content = "0.2",
             CellFormat = CellFormat.PERCENT
-        }.FormattedText(2));
+        }.Text(2));
     }
 
     // Verify the date formatting
@@ -493,26 +493,26 @@ public class CellTests {
         Assert.AreEqual("    28-Dec", new Cell {
             Content = "657435",
             CellFormat = CellFormat.DATE_DM
-        }.FormattedText(10));
+        }.Text(10));
         Assert.AreEqual("28-Dec    ", new Cell {
             Content = "657435",
             CellFormat = CellFormat.DATE_DM,
             Alignment = CellAlignment.LEFT
-        }.FormattedText(10));
+        }.Text(10));
         Assert.AreEqual("28-Dec-3699 ", new Cell {
             Content = "657435",
             CellFormat = CellFormat.DATE_DMY,
             Alignment = CellAlignment.LEFT
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual("  Dec-3699  ", new Cell {
             Content = "657435",
             CellFormat = CellFormat.DATE_MY,
             Alignment = CellAlignment.CENTRE
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual("NOT A DATE", new Cell {
             Content = "NOT A DATE",
             CellFormat = CellFormat.DATE_DM
-        }.FormattedText(10));
+        }.Text(10));
     }
 
     // Verify the time formatting
@@ -521,19 +521,19 @@ public class CellTests {
         Assert.AreEqual(" 12:30:00 PM", new Cell {
             Content = "45619.520833333336",
             CellFormat = CellFormat.TIME
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual(" 12:00:00 AM", new Cell {
             Content = "45619",
             CellFormat = CellFormat.TIME
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual(" 11:59:59 PM", new Cell {
             Content = "45619.99998842592",
             CellFormat = CellFormat.TIME
-        }.FormattedText(12));
+        }.Text(12));
         Assert.AreEqual("  7:12:34 AM", new Cell {
             Content = "45619.30039351852",
             CellFormat = CellFormat.TIME
-        }.FormattedText(12));
+        }.Text(12));
     }
 
     // Style a cell and ensure correct render string

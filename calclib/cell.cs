@@ -378,11 +378,19 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Return the string value of the cell for display using the column width
+    /// assigned to this cell, or the default column width if the cell is not
+    /// associated with a sheet.
+    /// </summary>
+    /// <returns>String value of cell</returns>
+    public string Text() => Text(sheet?.ColumnWidth(Location.Column) ?? Sheet.DefaultColumnWidth);
+
+    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
     /// <returns>String value of cell</returns>
-    public string FormattedText(int width) {
+    public string Text(int width) {
         Debug.Assert(width >= 0);
         string cellValue;
         CultureInfo culture = CultureInfo.CurrentCulture;
@@ -426,7 +434,7 @@ public class Cell(Sheet? sheet) {
     /// <param name="width">Column width to use</param>
     /// <returns>AnsiTextSpan</returns>
     public AnsiText.AnsiTextSpan AnsiTextSpan(int width) {
-        return new AnsiText.AnsiTextSpan(FormattedText(width)) {
+        return new AnsiText.AnsiTextSpan(Text(width)) {
             ForegroundColour = Style.ForegroundColour,
             BackgroundColour = Style.BackgroundColour,
             Bold = Style.Bold,

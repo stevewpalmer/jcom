@@ -252,6 +252,9 @@ public class Window {
                 if (extentStart > x) {
                     left = extentStart - x;
                 }
+                if (extentStart < _scrollOffset.X) {
+                    extentStart = _sheetBounds.Left;
+                }
                 if (extentEnd > _scrollOffset.X) {
                     int extentWidth = extentEnd - extentStart;
                     line.Style(left, extentWidth, Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
@@ -322,7 +325,11 @@ public class Window {
                 Cell cell = Sheet.GetCell(location, false);
                 int fg = inMarked ? Screen.Colours.BackgroundColour : cell.Style.ForegroundColour;
                 int bg = inMarked ? Screen.Colours.SelectionColour : cell.Style.BackgroundColour;
-                DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row), fg, bg);
+                int x = GetXPositionOfCell(location.Column);
+                int y = GetYPositionOfCell(location.Row);
+                if (_sheetBounds.Contains(x, y)) {
+                    DrawCell(cell, x, y, fg, bg);
+                }
             }
         }
     }
@@ -373,6 +380,9 @@ public class Window {
     /// <param name="column">1-based column index</param>
     /// <returns>X position of column</returns>
     private int GetXPositionOfCell(int column) {
+        if (column - 1 < _scrollOffset.X) {
+            return -1;
+        }
         int x = _sheetBounds.Left;
         for (int c = _scrollOffset.X; c < column - 1; c++) {
             x += Sheet.ColumnWidth(c + 1);
@@ -386,6 +396,9 @@ public class Window {
     /// <param name="row">1-based row index</param>
     /// <returns>Y position of row</returns>
     private int GetYPositionOfCell(int row) {
+        if (row - 1 < _scrollOffset.Y) {
+            return -1;
+        }
         int y = _sheetBounds.Top;
         for (int d = _scrollOffset.Y; d < row - 1; d++) {
             y += Sheet.RowHeight;
@@ -828,7 +841,7 @@ public class Window {
                 return;
             }
         }
-        string cellText = cell.FormattedText(width)[..width];
+        string cellText = cell.Text(width)[..width];
         Terminal.SetCursor(x, y);
         Terminal.Write(new AnsiText.AnsiTextSpan(cellText) {
             ForegroundColour = fg,
