@@ -23,7 +23,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 using JComLib;
 
 namespace JCalcLib;
@@ -97,6 +99,15 @@ public class CellNode(TokenID tokenID) {
     public virtual bool FixupAddress(CellLocation location, int column, int row, int offset) {
         return false;
     }
+
+    /// <summary>
+    /// Invoke the function through reflection.
+    /// </summary>
+    /// <param name="context">Source cell containing the original formula</param>
+    /// <returns>The variant result from the function</returns>
+    public virtual Variant Evaluate(CalculationContext context) {
+        throw new NotImplementedException();
+    }
 }
 
 /// <summary>
@@ -137,6 +148,82 @@ public class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tok
             }
         }
         return fixup;
+    }
+
+    /// <summary>
+    /// Evaluate this node by invoking the function through reflection.
+    /// </summary>
+    /// <param name="context">The calculation context</param>
+    /// <returns>The variant result from the function</returns>
+    public override Variant Evaluate(CalculationContext context) {
+        string name = TokenToString(Op);
+        Debug.Assert(name != null);
+        MethodInfo? method = typeof(Functions).GetMethod(name, BindingFlags.Static | BindingFlags.Public, [typeof(Cell), typeof(IEnumerable<Variant>)]);
+        Debug.Assert(method != null);
+        Variant? result = method.Invoke(null, [context.SourceCell, Arguments(context)]) as Variant;
+        if (result == null) {
+            throw new ApplicationException("Null result");
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Iterator that returns the Variant value of all cells specified by the function
+    /// parameter list.
+    /// </summary>
+    /// <param name="context">Calculation context</param>
+    /// <returns>The next Variant from the referenced cells</returns>
+    private IEnumerable<Variant> Arguments(CalculationContext context) {
+        foreach (CellNode parameter in Parameters) {
+            if (parameter is RangeNode rangeNode) {
+                foreach (CellLocation location in rangeNode.RangeIterator(context.SourceCell.Location)) {
+                    Variant result = EvaluateLocation(context, location);
+                    if (result.HasValue) {
+                        yield return result;
+                    }
+                }
+            }
+            else {
+                Variant result = parameter.Evaluate(context);
+                if (result.HasValue) {
+                    yield return result;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Evaluate the cell at the specified location.
+    /// </summary>
+    /// <param name="context">Calculation context</param>
+    /// <param name="location">Location of cell</param>
+    /// <returns>The variant value of the cell</returns>
+    internal static Variant EvaluateLocation(CalculationContext context, CellLocation location) {
+        Cell cell = context.Sheet.GetCell(location, false);
+        if (cell.IsEmptyCell) {
+            return new Variant();
+        }
+        if (cell.HasFormula) {
+            Debug.Assert(cell.FormulaTree != null);
+            if (context.ReferenceList.Last() == location) {
+                throw new Exception("Circular reference");
+            }
+            // We have already calculated the formula on this cell
+            // so just pick up the original result.
+            if (context.ReferenceList.Contains(location)) {
+                return cell.Value;
+            }
+            CalculationContext innerContext = new() {
+                Sheet = context.Sheet,
+                SourceCell = cell,
+                ReferenceList = context.ReferenceList
+            };
+            innerContext.ReferenceList.Push(cell.Location);
+            Variant result = cell.FormulaTree.Evaluate(innerContext);
+            context.ReferenceList.Pop();
+            return result;
+        }
+        return cell.Value;
     }
 }
 
@@ -193,6 +280,13 @@ public class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : Cell
         return FormatToString(left, right);
     }
 
+    /// <summary>
+    /// Format a binary expression to a string representing the original expression.
+    /// Parenthesis are applied to the expression to ensure precedence.
+    /// </summary>
+    /// <param name="left">Left operand of the operation</param>
+    /// <param name="right">Right operand of the operation</param>
+    /// <returns>A string representing the binary expression</returns>
     private string FormatToString(string left, string right) {
         if (FormulaParser.Precedence(Op) > FormulaParser.Precedence(Left.Op)) {
             left = $"({left})";
@@ -201,6 +295,30 @@ public class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : Cell
             right = $"({right})";
         }
         return left + TokenToString(Op) + right;
+    }
+
+    /// <summary>
+    /// Invoke the function through reflection.
+    /// </summary>
+    /// <param name="context">Source cell containing the original formula</param>
+    /// <returns>The variant result from the function</returns>
+    public override Variant Evaluate(CalculationContext context) {
+        double left = Left.Evaluate(context).DoubleValue;
+        double right = Right.Evaluate(context).DoubleValue;
+        return Op switch {
+            TokenID.PLUS => new Variant(left + right),
+            TokenID.EXP => new Variant(Math.Pow(left, right)),
+            TokenID.MINUS => new Variant(left - right),
+            TokenID.MULTIPLY => new Variant(left * right),
+            TokenID.DIVIDE => new Variant(left / right),
+            TokenID.KLE => new Variant(left <= right),
+            TokenID.KEQ => new Variant(Math.Abs(left - right) < 0.01),
+            TokenID.KNE => new Variant(Math.Abs(left - right) > 0.01),
+            TokenID.KGE => new Variant(left >= right),
+            TokenID.KLT => new Variant(left < right),
+            TokenID.KGT => new Variant(left > right),
+            _ => throw new NotImplementedException("Unknown binary operator")
+        };
     }
 }
 
@@ -228,6 +346,13 @@ public class NumberNode(double value) : CellNode(TokenID.NUMBER) {
     public override string ToString() {
         return Value.StringValue;
     }
+
+    /// <summary>
+    /// Evaluate this node and return the variant value.
+    /// </summary>
+    /// <param name="context">Source cell containing the original formula</param>
+    /// <returns>The variant value</returns>
+    public override Variant Evaluate(CalculationContext context) => Value;
 }
 
 /// <summary>
@@ -239,7 +364,7 @@ public class TextNode(string value) : CellNode(TokenID.TEXT) {
     /// <summary>
     /// Value of node
     /// </summary>
-    public string Value { get; } = value;
+    private string Value { get; } = value;
 
     /// <summary>
     /// Convert this node to its raw string.
@@ -252,8 +377,15 @@ public class TextNode(string value) : CellNode(TokenID.TEXT) {
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() {
-        return "\"" + Value + "\"";
+        return $"\"{Value}\"";
     }
+
+    /// <summary>
+    /// Evaluate this node and return the variant value.
+    /// </summary>
+    /// <param name="context">Source cell containing the original formula</param>
+    /// <returns>The variant value</returns>
+    public override Variant Evaluate(CalculationContext context) => new(Value);
 }
 
 /// <summary>
@@ -340,6 +472,19 @@ public class LocationNode(CellLocation absoluteLocation, Point relativeLocation)
             Column = sourceCell.Column + RelativeLocation.X,
             Row = sourceCell.Row + RelativeLocation.Y
         };
+    }
+
+    /// <summary>
+    /// Evaluate a cell location reference and return the value of the cell.
+    /// The cell may either be a constant value or a formula. If the former
+    /// then we return the value. Otherwise we evaluate the formula and return
+    /// the result of the evaluation.
+    /// </summary>
+    /// <param name="context">The calculation context</param>
+    /// <returns>A variant</returns>
+    public override Variant Evaluate(CalculationContext context) {
+        CellLocation absoluteLocation = ToAbsolute(context.SourceCell.Location);
+        return FunctionNode.EvaluateLocation(context, absoluteLocation);
     }
 }
 

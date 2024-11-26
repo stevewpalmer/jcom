@@ -320,14 +320,14 @@ public class Window {
         }
         for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
             for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                bool inMarked = markExtent.Contains(new Point(column, row));
                 CellLocation location = new CellLocation { Column = column, Row = row };
-                Cell cell = Sheet.GetCell(location, false);
-                int fg = inMarked ? Screen.Colours.BackgroundColour : cell.Style.ForegroundColour;
-                int bg = inMarked ? Screen.Colours.SelectionColour : cell.Style.BackgroundColour;
                 int x = GetXPositionOfCell(location.Column);
                 int y = GetYPositionOfCell(location.Row);
                 if (_sheetBounds.Contains(x, y)) {
+                    Cell cell = Sheet.GetCell(location, false);
+                    bool inMarked = markExtent.Contains(new Point(column, row));
+                    int fg = inMarked ? Screen.Colours.BackgroundColour : cell.Style.ForegroundColour;
+                    int bg = inMarked ? Screen.Colours.SelectionColour : cell.Style.BackgroundColour;
                     DrawCell(cell, x, y, fg, bg);
                 }
             }

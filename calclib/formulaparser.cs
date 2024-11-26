@@ -364,6 +364,18 @@ public class FormulaParser {
     /// Parse the next token from the formula string.
     /// </summary>
     /// <returns>A SimpleToken represented the parsed token</returns>
+    private SimpleToken PeekToken() {
+        if (_pushedToken != null) {
+            return _pushedToken;
+        }
+        Debug.Assert(_tindex < tokens.Count);
+        return tokens[_tindex];
+    }
+
+    /// <summary>
+    /// Parse the next token from the formula string.
+    /// </summary>
+    /// <returns>A SimpleToken represented the parsed token</returns>
     private SimpleToken GetNextToken() {
         SimpleToken token;
         if (_pushedToken != null) {
@@ -526,12 +538,14 @@ public class FormulaParser {
     private FunctionNode ParseArguments(TokenID id, int maxCount) {
         List<CellNode> args = [];
         ExpectToken(TokenID.LPAREN);
-        while (maxCount-- > 0) {
-            args.Add(Expression(0));
-            SimpleToken token = GetNextToken();
-            if (token.ID != TokenID.COMMA) {
-                PushToken(token);
-                break;
+        if (PeekToken().ID != TokenID.RPAREN) {
+            while (maxCount-- > 0) {
+                args.Add(Expression(0));
+                SimpleToken token = GetNextToken();
+                if (token.ID != TokenID.COMMA) {
+                    PushToken(token);
+                    break;
+                }
             }
         }
         ExpectToken(TokenID.RPAREN);

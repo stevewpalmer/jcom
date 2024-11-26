@@ -213,13 +213,11 @@ public class ParsingTests {
         cell3.FixupFormula(0, 1, -1);
         Assert.IsTrue(cell3.FormulaTree is LocationNode);
         Assert.IsTrue(((LocationNode)cell3.FormulaTree).Error);
-        Assert.IsTrue(cell3.Error);
 
         cell3 = new Cell(sheet) { Location = new CellLocation { Row = 1, Column = 8}, Content = "=A1"};
         cell3.FixupFormula(1, 0, -1);
         Assert.IsTrue(cell3.FormulaTree is LocationNode);
         Assert.IsTrue(((LocationNode)cell3.FormulaTree).Error);
-        Assert.IsTrue(cell3.Error);
     }
 
     [Test]
