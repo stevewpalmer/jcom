@@ -132,7 +132,7 @@ public class CellTests {
         Assert.IsTrue(number15.Value.IsNumber);
         Assert.AreEqual(text.Value, new Variant("TEXT"));
         Assert.AreEqual(text.Content, "TEXT");
-        Assert.IsTrue(new Cell { Content = "=A1+B2" }.HasFormula);
+        Assert.IsTrue(new Cell(new Sheet(1)) { Content = "=A1+B2" }.HasFormula);
     }
 
     // Verify the comparison of two cell values
