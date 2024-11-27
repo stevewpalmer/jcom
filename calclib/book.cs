@@ -99,8 +99,7 @@ public class Book {
 
                     sheet.Modified = false;
                     _sheets.Add(sheet);
-                    Calculate calc = new Calculate(sheet);
-                    calc.Update();
+                    sheet.Calculate();
                     sheetNumber++;
                 }
             }

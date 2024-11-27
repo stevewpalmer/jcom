@@ -144,7 +144,7 @@ public static class Screen {
             KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
             KeyCommand.KC_NEW => NewWorksheet(),
             KeyCommand.KC_DELETE_WORKSHEET => DeleteWorksheet(),
-            KeyCommand.KC_FILE_RETRIEVE => RetrieveFile(),
+            KeyCommand.KC_FILE_RETRIEVE => OpenWorkbook(),
             KeyCommand.KC_FILE_IMPORT => ImportFile(),
             KeyCommand.KC_FILE_SAVE => SaveFile(),
             KeyCommand.KC_SETTINGS_COLOURS => ConfigureColours(),
@@ -164,7 +164,7 @@ public static class Screen {
             KeyCommand.KC_SETTINGS_DECIMAL_POINTS => SetDefaultDecimalPoints(),
             KeyCommand.KC_SETTINGS_BACKUPS => ConfigureBackups(),
             KeyCommand.KC_NEXT_WINDOW => SelectWindow(1),
-            KeyCommand.KC_QUIT => Exit(),
+            KeyCommand.KC_QUIT => CloseWorkbook(),
             _ => _activeWindow.HandleCommand(command)
         };
         if (flags.HasFlag(RenderHint.CURSOR_STATUS)) {
@@ -317,28 +317,30 @@ public static class Screen {
     /// Open a workbook.
     /// </summary>
     /// <returns>Render hint</returns>
-    private static RenderHint RetrieveFile() {
+    private static RenderHint OpenWorkbook() {
         RenderHint flags = RenderHint.CANCEL;
-        FormField[] formFields = [
-            new() {
-                Text = Calc.EnterEditFilename,
-                Type = FormFieldType.TEXT,
-                Width = 50,
-                AllowFilenameCompletion = true,
-                FilenameCompletionFilter = $"*{Book.DefaultExtension}",
-                Value = new Variant(string.Empty)
+        if (CloseWorkbook() != RenderHint.CANCEL) {
+            FormField[] formFields = [
+                new() {
+                    Text = Calc.EnterEditFilename,
+                    Type = FormFieldType.TEXT,
+                    Width = 50,
+                    AllowFilenameCompletion = true,
+                    FilenameCompletionFilter = $"*{Book.DefaultExtension}",
+                    Value = new Variant(string.Empty)
+                }
+            ];
+            if (Command.PromptForInput(formFields)) {
+                string inputValue = formFields[0].Value.StringValue;
+                Debug.Assert(!string.IsNullOrEmpty(inputValue));
+
+                inputValue = Utilities.AddExtensionIfMissing(inputValue, Book.DefaultExtension);
+                FileInfo fileInfo = new FileInfo(inputValue);
+                inputValue = fileInfo.FullName;
+
+                OpenBook(inputValue);
+                flags = RenderHint.NONE;
             }
-        ];
-        if (Command.PromptForInput(formFields)) {
-            string inputValue = formFields[0].Value.StringValue;
-            Debug.Assert(!string.IsNullOrEmpty(inputValue));
-
-            inputValue = Utilities.AddExtensionIfMissing(inputValue, Book.DefaultExtension);
-            FileInfo fileInfo = new FileInfo(inputValue);
-            inputValue = fileInfo.FullName;
-
-            OpenBook(inputValue);
-            flags = RenderHint.NONE;
         }
         return flags;
     }
@@ -525,12 +527,12 @@ public static class Screen {
     }
 
     /// <summary>
-    /// Exit the editor, saving any buffers if required. If prompt is
-    /// TRUE, we prompt whether to save or exit without saving. If prompt
-    /// is FALSE, we just save all modified buffers and exit.
+    /// Close the existing workbook and offer to save any changes. Returns
+    /// RenderHint.EXIT if the workbook can be closed, or RenderHint.CANCEL
+    /// if the user choose to cancel the operation.
     /// </summary>
     /// <returns>Render hint</returns>
-    private static RenderHint Exit() {
+    private static RenderHint CloseWorkbook() {
         RenderHint flags = RenderHint.EXIT;
         if (_activeBook.Modified) {
             char[] validInput = ['y', 'n'];

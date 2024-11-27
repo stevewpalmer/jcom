@@ -158,11 +158,19 @@ public class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tok
     public override Variant Evaluate(CalculationContext context) {
         string name = TokenToString(Op);
         Debug.Assert(name != null);
-        MethodInfo? method = typeof(Functions).GetMethod(name, BindingFlags.Static | BindingFlags.Public, [typeof(Cell), typeof(IEnumerable<Variant>)]);
+        MethodInfo? method = typeof(Functions).GetMethod(name, BindingFlags.Static | BindingFlags.Public, [typeof(IEnumerable<Variant>)]);
         Debug.Assert(method != null);
-        Variant? result = method.Invoke(null, [context.SourceCell, Arguments(context)]) as Variant;
+        Variant? result = method.Invoke(null, [Arguments(context)]) as Variant;
         if (result == null) {
             throw new ApplicationException("Null result");
+        }
+        if (Op == TokenID.KNOW) {
+            CellLocation sourceLocation = context.ReferenceList.First();
+            Cell cell = context.Sheet.GetCell(sourceLocation, false);
+            if (cell.Format is null or CellFormat.GENERAL) {
+                cell.CellFormat = CellFormat.CUSTOM;
+                cell.CustomFormatString = "dd/mm/yyyy h:mm";
+            }
         }
         return result;
     }
@@ -174,9 +182,10 @@ public class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tok
     /// <param name="context">Calculation context</param>
     /// <returns>The next Variant from the referenced cells</returns>
     private IEnumerable<Variant> Arguments(CalculationContext context) {
+        CellLocation sourceLocation = context.ReferenceList.Last();
         foreach (CellNode parameter in Parameters) {
             if (parameter is RangeNode rangeNode) {
-                foreach (CellLocation location in rangeNode.RangeIterator(context.SourceCell.Location)) {
+                foreach (CellLocation location in rangeNode.RangeIterator(sourceLocation)) {
                     Variant result = EvaluateLocation(context, location);
                     if (result.HasValue) {
                         yield return result;
@@ -210,16 +219,11 @@ public class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tok
             }
             // We have already calculated the formula on this cell
             // so just pick up the original result.
-            if (context.ReferenceList.Contains(location)) {
+            if (context.UpdateList.Contains(cell)) {
                 return cell.Value;
             }
-            CalculationContext innerContext = new() {
-                Sheet = context.Sheet,
-                SourceCell = cell,
-                ReferenceList = context.ReferenceList
-            };
-            innerContext.ReferenceList.Push(cell.Location);
-            Variant result = cell.FormulaTree.Evaluate(innerContext);
+            context.ReferenceList.Push(cell.Location);
+            Variant result = cell.FormulaTree.Evaluate(context);
             context.ReferenceList.Pop();
             return result;
         }
@@ -307,16 +311,16 @@ public class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : Cell
         double right = Right.Evaluate(context).DoubleValue;
         return Op switch {
             TokenID.PLUS => new Variant(left + right),
-            TokenID.EXP => new Variant(Math.Pow(left, right)),
             TokenID.MINUS => new Variant(left - right),
             TokenID.MULTIPLY => new Variant(left * right),
             TokenID.DIVIDE => new Variant(left / right),
-            TokenID.KLE => new Variant(left <= right),
+            TokenID.EXP => new Variant(Math.Pow(left, right)),
             TokenID.KEQ => new Variant(Math.Abs(left - right) < 0.01),
             TokenID.KNE => new Variant(Math.Abs(left - right) > 0.01),
             TokenID.KGE => new Variant(left >= right),
-            TokenID.KLT => new Variant(left < right),
             TokenID.KGT => new Variant(left > right),
+            TokenID.KLE => new Variant(left <= right),
+            TokenID.KLT => new Variant(left < right),
             _ => throw new NotImplementedException("Unknown binary operator")
         };
     }
@@ -483,7 +487,8 @@ public class LocationNode(CellLocation absoluteLocation, Point relativeLocation)
     /// <param name="context">The calculation context</param>
     /// <returns>A variant</returns>
     public override Variant Evaluate(CalculationContext context) {
-        CellLocation absoluteLocation = ToAbsolute(context.SourceCell.Location);
+        CellLocation sourceLocation = context.ReferenceList.Last();
+        CellLocation absoluteLocation = ToAbsolute(sourceLocation);
         return FunctionNode.EvaluateLocation(context, absoluteLocation);
     }
 }

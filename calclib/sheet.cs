@@ -193,6 +193,35 @@ public class Sheet {
     }
 
     /// <summary>
+    /// Recalculate all formulas on the sheet and update the values
+    /// on the formula cells.
+    /// </summary>
+    public IEnumerable<Cell> Calculate() {
+        List<Cell> formulaCells = [];
+        foreach (CellList cellList in ColumnList) {
+            formulaCells.AddRange(cellList.FormulaCells);
+        }
+        List<Cell> cellsToUpdate = [];
+        foreach (Cell cell in formulaCells) {
+            try {
+                CalculationContext context = new CalculationContext {
+                    ReferenceList = new Stack<CellLocation>(),
+                    UpdateList = cellsToUpdate.ToArray(),
+                    Sheet = this
+                };
+                context.ReferenceList.Push(cell.Location);
+                Debug.Assert(cell.FormulaTree != null);
+                cell.ComputedValue = cell.FormulaTree.Evaluate(context);
+                cellsToUpdate.Add(cell);
+            }
+            catch (Exception) {
+                cell.Error = true;
+            }
+        }
+        return cellsToUpdate;
+    }
+
+    /// <summary>
     /// Insert a new row at the specified row position.
     /// </summary>
     /// <param name="row">Insertion row</param>

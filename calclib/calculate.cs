@@ -23,8 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
-
 namespace JCalcLib;
 
 /// <summary>
@@ -39,49 +37,13 @@ public class CalculationContext {
     public required Sheet Sheet { get; init; }
 
     /// <summary>
-    /// The cell containing the formula that triggered the
-    /// calculation.
+    /// List of cells updated by the calculation.
     /// </summary>
-    public required Cell SourceCell { get; init; }
+    public Cell[] UpdateList { get; init; } = [];
 
     /// <summary>
     /// A reference list of visited formula nodes. This is used to
     /// catch potential circular computations.
     /// </summary>
     public Stack<CellLocation> ReferenceList = new();
-}
-
-public class Calculate(Sheet sheet) {
-
-    /// <summary>
-    /// List of affected cells
-    /// </summary>
-    public List<Cell> CellsToUpdate { get; } = [];
-
-    /// <summary>
-    /// Recalculate all formulas on the sheet and update the values
-    /// on the formula cells.
-    /// </summary>
-    public void Update() {
-        List<Cell> formulaCells = [];
-        foreach (CellList cellList in sheet.ColumnList) {
-            formulaCells.AddRange(cellList.FormulaCells);
-        }
-        foreach (Cell cell in formulaCells) {
-            CellsToUpdate.Add(cell);
-            try {
-                CalculationContext context = new CalculationContext {
-                    ReferenceList = new Stack<CellLocation>(),
-                    SourceCell = cell,
-                    Sheet = sheet
-                };
-                context.ReferenceList.Push(cell.Location);
-                Debug.Assert(cell.FormulaTree != null);
-                cell.ComputedValue = cell.FormulaTree.Evaluate(context);
-            }
-            catch (Exception) {
-                cell.Error = true;
-            }
-        }
-    }
 }

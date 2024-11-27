@@ -32,52 +32,39 @@ namespace JCalcLib;
 public static class Functions {
 
     /// <summary>
-    /// Calculate the result of the SUM function
+    /// Calculate the sum of all cells and constants in the argument list.
     /// </summary>
-    /// <param name="_">Source cell</param>
     /// <param name="arguments">Function parameters</param>
-    /// <returns>The result of the function as a Variant</returns>
-    public static Variant SUM(Cell _, IEnumerable<Variant> arguments) {
+    /// <returns>A variant containing the sum of the arguments</returns>
+    public static Variant SUM(IEnumerable<Variant> arguments) {
         Variant sumTotal = new Variant(0);
         return arguments.Aggregate(sumTotal, (current, value) => current + value);
     }
 
     /// <summary>
-    /// Insert the current date and time. If the cell has no existing
-    /// format, we apply a default date-time format.
+    /// Returns the current date and time as a serial number.
     /// </summary>
-    /// <param name="cell">Source cell</param>
     /// <param name="_">Function parameters</param>
-    /// <returns>Value to be applied to the cell</returns>
-    public static Variant NOW(Cell cell, IEnumerable<Variant> _) {
-        if (cell.Format == null) {
-            cell.CellFormat = CellFormat.CUSTOM;
-            cell.CustomFormatString = "dd/mm/yyyy h:mm";
-        }
+    /// <returns>A variant containing the serial number of the current date and time</returns>
+    public static Variant NOW(IEnumerable<Variant> _) {
         return new Variant(DateTime.Now.ToOADate());
     }
 
     /// <summary>
-    /// Insert the current date. If the cell has no existing
-    /// format, we apply a default date-time format.
+    /// Returns the current date as a serial number.
     /// </summary>
-    /// <param name="cell">Source cell</param>
     /// <param name="_">Function parameters</param>
-    /// <returns>Value to be applied to the cell</returns>
-    public static Variant TODAY(Cell cell, IEnumerable<Variant> _) {
-        if (cell.Format == null) {
-            cell.CellFormat = CellFormat.DATE_DMY;
-        }
+    /// <returns>A variant containing the serial number of the current date</returns>
+    public static Variant TODAY(IEnumerable<Variant> _) {
         return new Variant(DateTime.Now.ToOADate());
     }
 
     /// <summary>
-    /// Extract and insert the year part of a date.
+    /// Extract and return the year part of a date.
     /// </summary>
-    /// <param name="_">Source cell</param>
-    /// <param name="arguments">Function arguments</param>
-    /// <returns>Value to be applied to the cell</returns>
-    public static Variant YEAR(Cell _, IEnumerable<Variant> arguments) {
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>A vatiant containing the year part of a date</returns>
+    public static Variant YEAR(IEnumerable<Variant> arguments) {
         Variant result = arguments.First();
         try {
             DateTime date = DateTime.FromOADate(result.DoubleValue);
@@ -89,12 +76,11 @@ public static class Functions {
     }
 
     /// <summary>
-    /// Extract and insert the month part of a date.
+    /// Extract and return the month part of a date.
     /// </summary>
-    /// <param name="_">Source cell</param>
-    /// <param name="arguments">Function arguments</param>
-    /// <returns>Value to be applied to the cell</returns>
-    public static Variant MONTH(Cell _, IEnumerable<Variant> arguments) {
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>A variant containing the month value of a date</returns>
+    public static Variant MONTH(IEnumerable<Variant> arguments) {
         Variant result = arguments.First();
         try {
             DateTime date = DateTime.FromOADate(result.DoubleValue);
@@ -108,10 +94,9 @@ public static class Functions {
     /// <summary>
     /// Concatenate the result of all arguments into a single text string.
     /// </summary>
-    /// <param name="_">Source cell</param>
-    /// <param name="arguments">Function arguments</param>
+    /// <param name="arguments">Function parameters</param>
     /// <returns>A variant containing the result of the concatenation</returns>
-    public static Variant CONCATENATE(Cell _, IEnumerable<Variant> arguments) {
+    public static Variant CONCATENATE(IEnumerable<Variant> arguments) {
         return new Variant(string.Concat(arguments));
     }
 }

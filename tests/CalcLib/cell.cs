@@ -584,8 +584,7 @@ public class CellTests {
         Assert.AreEqual(new Variant(0), cellA3.Value);
         Assert.AreEqual("=SUM(A1:A2)", cellA3.Content);
         Assert.IsTrue(cellA3.HasFormula);
-        Calculate calc = new Calculate(sheet);
-        calc.Update();
+        sheet.Calculate();
 
         // Now we should have a real value
         Assert.IsTrue(TestUtilities.Helper.DoubleCompare(new Variant(82.8).DoubleValue, cellA3.Value.DoubleValue));

@@ -148,10 +148,9 @@ public class Window {
     /// <returns>Unapplied render hint</returns>
     private RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.RECALCULATE)) {
-            Calculate calc = new Calculate(Sheet);
-            calc.Update();
+            IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
             if (!flags.HasFlag(RenderHint.CONTENTS)) {
-                UpdateCells(calc.CellsToUpdate);
+                UpdateCells(cellsToUpdate);
             }
             Sheet.NeedRecalculate = false;
             flags &= ~RenderHint.RECALCULATE;
@@ -793,10 +792,9 @@ public class Window {
 
             cell.Content = cellValue;
 
-            Calculate calc = new Calculate(Sheet);
-            calc.Update();
+            IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
             UpdateCells([cell]);
-            UpdateCells(calc.CellsToUpdate);
+            UpdateCells(cellsToUpdate);
 
             hint = result switch {
                 CellInputResponse.ACCEPT => RenderHint.CURSOR,
@@ -814,7 +812,7 @@ public class Window {
     /// Render a collection of cells
     /// </summary>
     /// <param name="cells">List of cells to update</param>
-    private void UpdateCells(List<Cell> cells) {
+    private void UpdateCells(IEnumerable<Cell> cells) {
         foreach (Cell cell in cells) {
             int x = GetXPositionOfCell(cell.Location.Column);
             int y = GetYPositionOfCell(cell.Location.Row);

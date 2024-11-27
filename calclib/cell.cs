@@ -378,14 +378,6 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
-    /// Return the string value of the cell for display using the column width
-    /// assigned to this cell, or the default column width if the cell is not
-    /// associated with a sheet.
-    /// </summary>
-    /// <returns>String value of cell</returns>
-    public string Text() => Text(sheet?.ColumnWidth(Location.Column) ?? Sheet.DefaultColumnWidth);
-
-    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
