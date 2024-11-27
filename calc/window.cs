@@ -789,21 +789,25 @@ public class Window {
         string cellValue = editValue ? cell.Content : string.Empty;
         CellInputResponse result = Screen.Command.PromptForCellInput(ref cellValue);
         if (result != CellInputResponse.CANCEL) {
+            try {
+                cell.Content = cellValue;
 
-            cell.Content = cellValue;
+                IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
+                UpdateCells([cell]);
+                UpdateCells(cellsToUpdate);
 
-            IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
-            UpdateCells([cell]);
-            UpdateCells(cellsToUpdate);
-
-            hint = result switch {
-                CellInputResponse.ACCEPT => RenderHint.CURSOR,
-                CellInputResponse.ACCEPT_UP => CursorUp(),
-                CellInputResponse.ACCEPT_DOWN => CursorDown(),
-                CellInputResponse.ACCEPT_LEFT => CursorLeft(),
-                CellInputResponse.ACCEPT_RIGHT => CursorRight(),
-                _ => hint
-            };
+                hint = result switch {
+                    CellInputResponse.ACCEPT => RenderHint.CURSOR,
+                    CellInputResponse.ACCEPT_UP => CursorUp(),
+                    CellInputResponse.ACCEPT_DOWN => CursorDown(),
+                    CellInputResponse.ACCEPT_LEFT => CursorLeft(),
+                    CellInputResponse.ACCEPT_RIGHT => CursorRight(),
+                    _ => hint
+                };
+            }
+            catch (FormatException e) {
+                Screen.Status.Message(e.Message);
+            }
         }
         return hint;
     }

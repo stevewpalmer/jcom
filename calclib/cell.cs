@@ -59,6 +59,7 @@ public class Cell(Sheet? sheet) {
     /// used in calculation and is separate from its Content which is used
     /// to determine the cell's value and may be a formula.
     /// </summary>
+    /// <exception cref="FormatException">An error was found when setting a formula</exception>
     [JsonIgnore]
     public Variant Value {
         get => ComputedValue;
@@ -111,6 +112,7 @@ public class Cell(Sheet? sheet) {
     /// location on the sheet and thus will not necessarily be the exact
     /// same formula as originally entered.
     /// </summary>
+    /// <exception cref="FormatException">An error was found when setting a formula</exception>
     [JsonInclude]
     public string Content {
         get => FormulaTree != null ? $"={FormulaTree}" : _content;
@@ -126,7 +128,7 @@ public class Cell(Sheet? sheet) {
     /// cell, if any. If the cell has no formula, this is null.
     /// </summary>
     [JsonIgnore]
-    public CellNode? FormulaTree { get; private set; }
+    internal CellNode? FormulaTree { get; private set; }
 
     /// <summary>
     /// Cell alignment
@@ -468,20 +470,15 @@ public class Cell(Sheet? sheet) {
     /// <param name="location">Location of cell containing formula</param>
     /// <param name="formulaTree">Set to the generated formula tree, if any</param>
     /// <returns>True if formula is valid, false otherwise</returns>
+    /// <exception cref="FormatException">An error was found in the formula</exception>
     private bool TryParseFormula(string formula, CellLocation location, out CellNode? formulaTree) {
-        if (sheet == null || formula.Length == 0 || formula[0] != '=') {
+        if (sheet == null || formula.Length < 2 || formula[0] != '=') {
             formulaTree = null;
             return false;
         }
-        try {
-            FormulaParser parser = new FormulaParser(formula[1..], location);
-            formulaTree = parser.Parse();
-            return true;
-        }
-        catch (FormatException) {
-            formulaTree = null;
-            return false;
-        }
+        FormulaParser parser = new FormulaParser(formula[1..], location);
+        formulaTree = parser.Parse();
+        return true;
     }
 
     /// <summary>

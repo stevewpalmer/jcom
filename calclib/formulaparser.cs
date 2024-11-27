@@ -255,7 +255,7 @@ public class FormulaParser {
     /// represents the formula.
     /// </summary>
     /// <returns>A CellParseNode</returns>
-    public CellNode Parse() => Expression(0);
+    internal CellNode Parse() => Expression(0);
 
     /// <summary>
     /// Make sure the next character read is the specified
@@ -560,6 +560,12 @@ public class FormulaParser {
     /// <returns>Precedence level</returns>
     internal static int Precedence(TokenID id) =>
         id switch {
+            TokenID.KSUM => 20,
+            TokenID.KCONCATENATE => 20,
+            TokenID.KNOW => 20,
+            TokenID.KTODAY => 20,
+            TokenID.KMONTH => 20,
+            TokenID.KYEAR => 20,
             TokenID.NUMBER => 20,
             TokenID.ADDRESS => 20,
             TokenID.TEXT => 20,

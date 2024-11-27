@@ -26,7 +26,10 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using JComLib;
+
+[assembly: InternalsVisibleTo("tests")]
 
 namespace JCalcLib;
 
@@ -34,7 +37,7 @@ namespace JCalcLib;
 /// Basic cell node
 /// </summary>
 /// <param name="tokenID">Node token ID</param>
-public class CellNode(TokenID tokenID) {
+internal class CellNode(TokenID tokenID) {
 
     /// <summary>
     /// List of built-in functions
@@ -114,7 +117,7 @@ public class CellNode(TokenID tokenID) {
 /// Node for a function call.
 /// </summary>
 /// <param name="tokenID">Node token ID</param>
-public class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tokenID) {
+internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tokenID) {
 
     /// <summary>
     /// Function parameter list
@@ -237,7 +240,7 @@ public class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tok
 /// <param name="tokenID">Node token ID</param>
 /// <param name="left">Left part of expression</param>
 /// <param name="right">Right part of expression</param>
-public class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : CellNode(tokenID) {
+internal class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : CellNode(tokenID) {
 
     /// <summary>
     /// Left child node
@@ -330,7 +333,7 @@ public class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : Cell
 /// Represents a node that holds a numeric value.
 /// </summary>
 /// <param name="value">Double value</param>
-public class NumberNode(double value) : CellNode(TokenID.NUMBER) {
+internal class NumberNode(double value) : CellNode(TokenID.NUMBER) {
 
     /// <summary>
     /// Value of node
@@ -363,7 +366,7 @@ public class NumberNode(double value) : CellNode(TokenID.NUMBER) {
 /// Represents a node that holds a string value.
 /// </summary>
 /// <param name="value">String value</param>
-public class TextNode(string value) : CellNode(TokenID.TEXT) {
+internal class TextNode(string value) : CellNode(TokenID.TEXT) {
 
     /// <summary>
     /// Value of node
@@ -397,7 +400,7 @@ public class TextNode(string value) : CellNode(TokenID.TEXT) {
 /// </summary>
 /// <param name="absoluteLocation">Absolute location</param>
 /// <param name="relativeLocation">Relative location</param>
-public class LocationNode(CellLocation absoluteLocation, Point relativeLocation) : CellNode(TokenID.ADDRESS) {
+internal class LocationNode(CellLocation absoluteLocation, Point relativeLocation) : CellNode(TokenID.ADDRESS) {
 
     /// <summary>
     /// Absolute location
@@ -499,7 +502,7 @@ public class LocationNode(CellLocation absoluteLocation, Point relativeLocation)
 /// </summary>
 /// <param name="start">Start of range</param>
 /// <param name="end">End of range</param>
-public class RangeNode(LocationNode start, LocationNode end) : CellNode(TokenID.RANGE) {
+internal class RangeNode(LocationNode start, LocationNode end) : CellNode(TokenID.RANGE) {
 
     /// <summary>
     /// Start of range
