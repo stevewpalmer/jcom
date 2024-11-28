@@ -29,6 +29,13 @@ expand it gradually while still keeping it very simple.
 This folder contains the source files for a simple text editor
 based on the DOS Brief editor from the 1990s.
 
+### Calc
+
+This is the implementation of a basic but functional spreadsheet similar
+to Lotus 1-2-3 in layout but closer to Excel in emulation. It supports
+workbooks that contain one or more worksheets, simple formulas, cell
+formats and styles, and CSV export and import.
+
 ### Accounts
 
 This is a very simple disk based personal finance account management

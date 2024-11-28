@@ -3,6 +3,10 @@
 Lots of bugs to fix. The below are the things that need to be done in
 decreasing order of priority.
 
+Note that as of 28th November 2024, these are now actively tracked on
+the GitHub Issues page for greater visibility. However for source code
+hosting portability, I will try and keep this file updated separately.
+
 ## Work Items
 
 ### Fortran
@@ -18,7 +22,6 @@ decreasing order of priority.
 
 * CHAINing
 * Non-constant string lengths in DIM...OF
-* Console error handling on Linux
 
 ### Cobol
 
@@ -29,7 +32,7 @@ decreasing order of priority.
 * Undo/Redo.
 * Split windows.
 
-## Bug Fixes
+## Bugs
 
 ### Fortran
 
