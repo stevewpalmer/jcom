@@ -57,7 +57,7 @@ public enum TDisplayFormResult {
 
 public class TForm {
     private int _scrollOffset;
-    private List<TField> _fields = new();
+    private List<TField> _fields = [];
     private int _caps;
 
     // Form editing capability
@@ -93,7 +93,7 @@ public class TForm {
     private void Init(int caps) {
         SelectedItem = 1;
         IsModified = false;
-        _fields = new List<TField>();
+        _fields = [];
         _scrollOffset = 0;
         _caps = caps;
     }

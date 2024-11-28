@@ -28,8 +28,8 @@ using System.Text.Json;
 namespace JAccounts;
 
 public class TAccount {
-    private List<TRecord> _fixed = new();
-    private readonly List<TStatement> _statements = new();
+    private List<TRecord> _fixed = [];
+    private readonly List<TStatement> _statements = [];
     private const double _startBalance = 0.0;
     private bool hasFixedRecords;
 
@@ -129,7 +129,7 @@ public class TAccount {
     /// </summary>
     public IEnumerable<TCategory> Categories(int theYear) {
 
-        List<TCategory> list = new();
+        List<TCategory> list = [];
         foreach (TStatement statement in _statements.Where(statement => statement.Year == theYear)) {
             if (statement.Records.Count == 0 && statement.IsFuture) {
                 statement.Records = ReadFixed();
@@ -194,7 +194,7 @@ public class TAccount {
     /// <returns>Array of all saved years</returns>
     public static int[] ListYears() {
         string[] dirName = Directory.GetDirectories(Utils.DataFolder, "*", SearchOption.TopDirectoryOnly);
-        List<int> years = new List<int>();
+        List<int> years = [];
         foreach (string name in dirName) {
             DirectoryInfo directory = new DirectoryInfo(name);
             if (int.TryParse(directory.Name, out int year)) {
@@ -237,10 +237,10 @@ public class TAccount {
     /// <param name="fileName">Name of file to be read</param>
     /// <returns>A list of records</returns>
     private static List<TRecord> ReadDataFile(string fileName) {
-        List<TRecord> records = new List<TRecord>();
+        List<TRecord> records = [];
         if (File.Exists(fileName)) {
             using FileStream inputFile = File.Open(fileName, FileMode.Open);
-            records = JsonSerializer.Deserialize<List<TRecord>>(inputFile) ?? new List<TRecord>();
+            records = JsonSerializer.Deserialize<List<TRecord>>(inputFile) ?? [];
         }
         return records.OrderBy(r => r.Date).ToList();
     }
@@ -253,7 +253,7 @@ public class TAccount {
     /// <returns>Array of all saved years</returns>
     private static int[] ListMonths(int theYear) {
         string[] dirName = Directory.GetDirectories($"{Utils.DataFolder}/{theYear}", "*", SearchOption.TopDirectoryOnly);
-        List<int> months = new List<int>();
+        List<int> months = [];
         foreach (string name in dirName) {
             if (int.TryParse(name, out int year)) {
                 months.Add(year);

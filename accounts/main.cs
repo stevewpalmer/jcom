@@ -30,14 +30,14 @@ namespace JAccounts;
 internal static class Program {
 
     // Main menu displayed on program startup.
-    private static readonly TMenuItem[] mainMenu = {
+    private static readonly TMenuItem[] mainMenu = [
         new('C', "Current Month", "Display statement for the current Month"),
         new('A', "Annual", "Show the annual summary"),
         new('F', "Fixed", "Edit fixed income and outgoings"),
         new('L', "Calendar", "Show the statements calendar"),
         new('S', "Search", "Search statements for payments"),
         new('E', "Exit", "Exit the Accounts program")
-    };
+    ];
 
     private static void Main() {
         TAccount account = new();

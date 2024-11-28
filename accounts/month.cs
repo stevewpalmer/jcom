@@ -195,7 +195,7 @@ public static class Month {
 
         // Save the results
         if (result == TDisplayFormResult.Save) {
-            statement.Records = new List<TRecord>();
+            statement.Records = [];
             int index = form.FindSection(sectionName);
             do {
                 int theDay = Convert.ToInt32(form.Fields(index).Value);
