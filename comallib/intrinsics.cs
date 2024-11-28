@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using JComLib;
 
 namespace JComalLib;
@@ -30,6 +31,7 @@ namespace JComalLib;
 /// <summary>
 /// Fortran external intrinsics.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static partial class Intrinsics {
 
     /// <summary>
@@ -114,9 +116,7 @@ public static partial class Intrinsics {
     /// <param name="ch">Character</param>
     /// <returns>The ASCII value of the character ch</returns>
     public static int ICHAR(string ch) {
-        if (ch == null) {
-            throw new ArgumentNullException(nameof(ch));
-        }
+        ArgumentNullException.ThrowIfNull(ch);
         return ch[0];
     }
 
@@ -126,9 +126,7 @@ public static partial class Intrinsics {
     /// <param name="ch">Character</param>
     /// <returns>The ASCII value of the character ch</returns>
     public static int ICHAR(FixedString ch) {
-        if (ch == null) {
-            throw new ArgumentNullException(nameof(ch));
-        }
+        ArgumentNullException.ThrowIfNull(ch);
         return ch[0];
     }
 
@@ -185,12 +183,8 @@ public static partial class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>The 1 based offset of string s2 within s1, or 0 if not found</returns>
     public static int INDEX(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         if (s2.Length == 0) {
             return 0;
         }
@@ -206,12 +200,8 @@ public static partial class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>The 1 based offset of string s2 within s1, or 0 if not found</returns>
     public static int INDEX(string s1, string s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         if (s2.Length == 0) {
             return 0;
         }
@@ -224,9 +214,7 @@ public static partial class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The length of string s</returns>
     public static int LEN(string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -247,12 +235,8 @@ public static partial class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically less than s2, false otherwise</returns>
     public static bool LGE(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) >= 0;
     }
 
@@ -273,12 +257,8 @@ public static partial class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically greater than s2, false otherwise</returns>
     public static bool LGT(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) > 0;
     }
 
@@ -301,12 +281,8 @@ public static partial class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically less than or equal to s2, false otherwise</returns>
     public static bool LLE(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) <= 0;
     }
 
@@ -329,12 +305,8 @@ public static partial class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically less than s2, false otherwise</returns>
     public static bool LLT(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) < 0;
     }
 
@@ -409,9 +381,7 @@ public static partial class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The size of string s</returns>
     public static int SIZE(string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -421,9 +391,7 @@ public static partial class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The size of string s</returns>
     public static int SIZE(ref string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -433,9 +401,7 @@ public static partial class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The size of string s</returns>
     public static int SIZE(ref FixedString s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 

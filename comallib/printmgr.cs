@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using JComLib;
@@ -32,6 +33,9 @@ namespace JComalLib;
 /// <summary>
 /// Implements PrintManager.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedType.Global")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class PrintManager {
 
     /// <summary>
@@ -55,7 +59,7 @@ public class PrintManager {
     /// </summary>
     /// <param name="stringArray">String array to write</param>
     public static void WRITE(FixedString[] stringArray) {
-        WRITE(0, 0, IOConstant.Stdout, "S", new object[] { stringArray });
+        WRITE(0, 0, IOConstant.Stdout, "S", [stringArray]);
     }
 
     /// <summary>
@@ -63,7 +67,7 @@ public class PrintManager {
     /// </summary>
     /// <param name="stringArray">String array to write</param>
     public static void WRITE(string[] stringArray) {
-        WRITE(0, 0, IOConstant.Stdout, "S", new object[] { stringArray });
+        WRITE(0, 0, IOConstant.Stdout, "S", [stringArray]);
     }
 
     /// <summary>

@@ -23,10 +23,13 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using JComLib;
 
 namespace JComalLib;
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static class FileManager {
 
     /// <summary>
