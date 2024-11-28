@@ -104,12 +104,8 @@ public class SymbolCollection : IEnumerable<Symbol> {
     /// <param name="refLine">Line number reference</param>
     /// <returns>A newly created symbol table entry or null.</returns>
     public virtual Symbol Add(string name, SymFullType fullType, SymClass klass, Collection<SymDimension> dimensions, int refLine) {
-        if (name == null) {
-            throw new ArgumentNullException(nameof(name));
-        }
-        if (fullType == null) {
-            throw new ArgumentNullException(nameof(fullType));
-        }
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(fullType);
         Symbol newSymbol = new(name, fullType, klass, dimensions, refLine);
         _symbols[name] = newSymbol;
         return newSymbol;
@@ -181,11 +177,12 @@ public class SymbolCollection : IEnumerable<Symbol> {
     }
 
     /// <summary>
-    /// Emit the code to generate the referenced symbols from the given symbol
+    /// Emit the code to generate the referenced symbols from this symbol
     /// collection. Where a value is specified, we also initialise the symbol
     /// with the given value.
     /// </summary>
-    /// <param name="symbols">Symbol collection</param>
+    /// <param name="emitter">Emitter</param>
+    /// <param name="cg">Parse node</param>
     public void GenerateSymbols(Emitter emitter, ProgramParseNode cg) {
 
         foreach (Symbol sym in this) {
@@ -311,7 +308,7 @@ public class SymbolCollection : IEnumerable<Symbol> {
                     if (sym.Type == SymType.FIXEDCHAR) {
                         realEmitter.LoadSymbol(sym);
                         realEmitter.LoadVariant(sym.Value);
-                        realEmitter.Emit0(OpCodes.Call, typeof(FixedString).GetMethod("Set", new[] { typeof(string) }));
+                        realEmitter.Emit0(OpCodes.Call, typeof(FixedString).GetMethod("Set", [typeof(string)]));
                     }
                     else {
                         realEmitter.LoadVariant(sym.Value);

@@ -41,9 +41,7 @@ public class InstructionLabelArray : Instruction {
     /// <param name="op">Opcode</param>
     /// <param name="labels">Array of Label objects</param>
     public InstructionLabelArray(OpCode op, Label[] labels) : base(op) {
-        if (labels == null) {
-            throw new ArgumentNullException(nameof(labels));
-        }
+        ArgumentNullException.ThrowIfNull(labels);
         _labels = labels;
     }
 
@@ -53,9 +51,7 @@ public class InstructionLabelArray : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) {
             return;
         }

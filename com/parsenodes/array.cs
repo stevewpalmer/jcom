@@ -79,12 +79,8 @@ public sealed class ArrayParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">The code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
+        ArgumentNullException.ThrowIfNull(cg);
         Symbol sym = Symbol ?? Identifier.Symbol;
         Debug.Assert(sym.IsArray);
 

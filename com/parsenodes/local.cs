@@ -60,9 +60,7 @@ public class LocalParseNode : ParseNode {
     /// <param name="returnType">The expected type of the return value</param>
     /// <returns>The computed type</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
         emitter.LoadLocal(_local);
         return Symbol.SystemTypeToSymbolType(_local.Type);
     }

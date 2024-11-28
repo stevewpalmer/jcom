@@ -54,9 +54,7 @@ public class IdentifierParseNode : ParseNode {
     /// <param name="index">An array index</param>
     public IdentifierParseNode(Symbol sym, int index) : base(ParseID.IDENT) {
         Symbol = sym;
-        Indexes = new Collection<ParseNode> {
-            new NumberParseNode(index)
-        };
+        Indexes = [new NumberParseNode(index)];
     }
 
     /// <summary>
@@ -124,12 +122,8 @@ public class IdentifierParseNode : ParseNode {
     /// <param name="returnType">The type required by the caller</param>
     /// <returns>The symbol type of the value generated</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
+        ArgumentNullException.ThrowIfNull(emitter);
         Symbol sym = Symbol;
         SymType thisType;
 
@@ -201,7 +195,7 @@ public class IdentifierParseNode : ParseNode {
             cg.GenerateExpression(emitter, SymType.INTEGER, SubstringStart);
         }
         if (SubstringEnd == null) {
-            emitter.Call(cg.GetMethodForType(charType, "Substring", new[] { typeof(int) }));
+            emitter.Call(cg.GetMethodForType(charType, "Substring", [typeof(int)]));
         }
         else {
             if (SubstringEnd.IsConstant) {
@@ -210,7 +204,7 @@ public class IdentifierParseNode : ParseNode {
             else {
                 cg.GenerateExpression(emitter, SymType.INTEGER, SubstringEnd);
             }
-            emitter.Call(cg.GetMethodForType(charType, "Substring", new[] { typeof(int), typeof(int) }));
+            emitter.Call(cg.GetMethodForType(charType, "Substring", [typeof(int), typeof(int)]));
         }
         return Type;
     }
@@ -243,7 +237,7 @@ public class IdentifierParseNode : ParseNode {
 
     // Scan the expression tree and adjust the node type to the type
     // determined by the arithmetic operation on its operators.
-    private void AdjustNodeType(ParseNode node) {
+    private static void AdjustNodeType(ParseNode node) {
         if (node == null) {
             return;
         }

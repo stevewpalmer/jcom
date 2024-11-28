@@ -37,7 +37,7 @@ public class CollectionParseNode : ParseNode {
     /// Creates a Token parse node with the specified parse ID.
     /// </summary>
     public CollectionParseNode() {
-        Nodes = new Collection<ParseNode>();
+        Nodes = [];
     }
 
     /// <summary>

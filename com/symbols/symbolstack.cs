@@ -32,7 +32,7 @@ namespace CCompiler;
 /// </summary>
 public class SymbolStack {
 
-    private readonly List<SymbolCollection> _stack = new();
+    private readonly List<SymbolCollection> _stack = [];
 
     /// <summary>
     /// Return the symbol table at the top of the stack. 

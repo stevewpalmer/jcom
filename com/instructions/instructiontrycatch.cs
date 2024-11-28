@@ -77,9 +77,7 @@ public class InstructionTryCatch : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) {
             return;
         }
@@ -97,8 +95,8 @@ public class InstructionTryCatch : Instruction {
                 il.BeginCatchBlock(runtimeException);
 
                 LocalBuilder tmp1 = il.DeclareLocal(jcomRuntimeException);
-                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandler", new[] { typeof(Exception) });
-                il.EmitCall(OpCodes.Call, methodInfo, new[] { typeof(Exception) });
+                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandler", [typeof(Exception)]);
+                il.EmitCall(OpCodes.Call, methodInfo, [typeof(Exception)]);
 
                 il.Emit(OpCodes.Stloc_S, tmp1);
 
@@ -131,8 +129,8 @@ public class InstructionTryCatch : Instruction {
                 il.BeginCatchBlock(runtimeException);
 
                 LocalBuilder tmp1 = il.DeclareLocal(jcomRuntimeException);
-                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandlerNoThrow", new[] { typeof(Exception) });
-                il.EmitCall(OpCodes.Call, methodInfo, new[] { typeof(Exception) });
+                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandlerNoThrow", [typeof(Exception)]);
+                il.EmitCall(OpCodes.Call, methodInfo, [typeof(Exception)]);
 
                 il.Emit(OpCodes.Stloc_S, tmp1);
 
@@ -145,7 +143,7 @@ public class InstructionTryCatch : Instruction {
                 il.Emit(OpCodes.Ldloc_S, tmp1);
                 il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message"), null);
 
-                MethodInfo meth = typeof(Console).GetMethod("WriteLine", new[] { typeof(string) });
+                MethodInfo meth = typeof(Console).GetMethod("WriteLine", [typeof(string)]);
                 il.EmitCall(OpCodes.Call, meth, null);
                 il.MarkLabel(skipMessage);
                 break;

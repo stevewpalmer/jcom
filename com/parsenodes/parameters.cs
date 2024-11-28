@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -37,7 +37,7 @@ public class ParametersParseNode : ParseNode {
     /// Creates a subroutine or function parameters parse node.
     /// </summary>
     public ParametersParseNode() {
-        Nodes = new Collection<ParameterParseNode>();
+        Nodes = [];
     }
 
     /// <summary>
@@ -45,9 +45,7 @@ public class ParametersParseNode : ParseNode {
     /// </summary>
     /// <param name="node">The Parsenode to add</param>
     public void Add(ParseNode node) {
-        if (node == null) {
-            throw new ArgumentNullException(nameof(node));
-        }
+        ArgumentNullException.ThrowIfNull(node);
         Add(node, false);
     }
 
@@ -58,9 +56,7 @@ public class ParametersParseNode : ParseNode {
     /// <param name="node">The Parsenode to add</param>
     /// <param name="useByRef">Whether the parameter should be passed by value or reference</param>
     public void Add(ParseNode node, bool useByRef) {
-        if (node == null) {
-            throw new ArgumentNullException(nameof(node));
-        }
+        ArgumentNullException.ThrowIfNull(node);
         ParameterParseNode paramNode = new(node) {
             Type = node.Type,
             IsByRef = useByRef
@@ -74,9 +70,7 @@ public class ParametersParseNode : ParseNode {
     /// <param name="node">The Parsenode to add</param>
     /// <param name="symbol">The symbol associated with the parameter</param>
     public void Add(ParseNode node, Symbol symbol) {
-        if (node == null) {
-            throw new ArgumentNullException(nameof(node));
-        }
+        ArgumentNullException.ThrowIfNull(node);
         ParameterParseNode paramNode = new(node, symbol) {
             Type = node.Type
         };
@@ -120,12 +114,8 @@ public class ParametersParseNode : ParseNode {
     /// <param name="cg">A CodeGenerator object</param>
     /// <returns>A list of system types corresponding to the computed parameters.</returns>
     public new Type[] Generate(Emitter emitter, ProgramParseNode cg) {
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
+        ArgumentNullException.ThrowIfNull(cg);
 
         _locals = new Temporaries(emitter);
 
@@ -144,17 +134,14 @@ public class ParametersParseNode : ParseNode {
     /// count or types), the number of parameters in the caller and callee
     /// must agree.
     /// </summary>
+    /// <param name="emitter">Emitter</param>
     /// <param name="cg">A CodeGenerator object</param>
     /// <param name="sym">Symbol entry for the called function</param>
     /// <returns>A list of system types corresponding to the computed parameters.</returns>
     public Type[] Generate(Emitter emitter, ProgramParseNode cg, Symbol sym) {
 
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
+        ArgumentNullException.ThrowIfNull(sym);
 
         int callerParameterCount = Nodes.Count;
         int calleeParameterCount = sym.Parameters != null ? sym.Parameters.Count : 0;

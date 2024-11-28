@@ -38,7 +38,7 @@ public class StaticParseNode : ParseNode {
     /// <summary>
     /// Creates a local parse node with the specified local index.
     /// </summary>
-    /// <param name="local">The local identifier index</param>
+    /// <param name="staticField">A FieldInfo to initialise from</param>
     public StaticParseNode(FieldInfo staticField) {
         _static = staticField;
     }
@@ -62,9 +62,7 @@ public class StaticParseNode : ParseNode {
     /// <param name="returnType">The expected type of the return value</param>
     /// <returns>The computed type</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
         emitter.LoadStatic(_static);
         return Symbol.SystemTypeToSymbolType(_static.FieldType);
     }

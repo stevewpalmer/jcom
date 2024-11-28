@@ -42,9 +42,7 @@ public class InstructionMethod : Instruction {
     /// <param name="op">Opcode</param>
     /// <param name="meth">MethodInfo object</param>
     public InstructionMethod(OpCode op, MethodInfo meth) : base(op) {
-        if (meth == null) {
-            throw new ArgumentNullException(nameof(meth));
-        }
+        ArgumentNullException.ThrowIfNull(meth);
         _meth = meth;
     }
 
@@ -54,9 +52,7 @@ public class InstructionMethod : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) {
             return;
         }

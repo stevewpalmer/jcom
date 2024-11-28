@@ -71,9 +71,7 @@ public sealed class UnaryOpParseNode : ParseNode {
     /// <param name="returnType">The type required by the caller</param>
     /// <returns>The symbol type of the value generated</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         switch (ID) {
             case ParseID.MINUS: return GenerateMinus(emitter, cg);
             case ParseID.NOT: return GenerateNot(emitter, cg);
@@ -89,7 +87,7 @@ public sealed class UnaryOpParseNode : ParseNode {
         // property.
         if (Operand.Type == SymType.FIXEDCHAR) {
             cg.GenerateExpression(emitter, SymType.FIXEDCHAR, Operand);
-            emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", Array.Empty<Type>()));
+            emitter.Call(typeof(FixedString).GetMethod("get_IsEmpty", []));
             return SymType.BOOLEAN;
         }
         cg.GenerateExpression(emitter, Type, Operand);

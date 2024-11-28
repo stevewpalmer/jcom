@@ -67,9 +67,7 @@ public sealed class BreakParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
 
         if (IsUnconditionalBreak) {
             emitter.Branch(ScopeParseNode.ExitLabel);

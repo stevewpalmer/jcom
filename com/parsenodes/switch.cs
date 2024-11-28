@@ -32,8 +32,8 @@ namespace CCompiler;
 /// </summary>
 public sealed class SwitchParseNode : ParseNode {
 
-    private readonly List<ParseNode> _caseList = new();
-    private readonly List<ParseNode> _labelList = new();
+    private readonly List<ParseNode> _caseList = [];
+    private readonly List<ParseNode> _labelList = [];
 
     /// <summary>
     /// Gets or sets the compare expression.
@@ -77,9 +77,7 @@ public sealed class SwitchParseNode : ParseNode {
     /// <param name="emitter">The emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         int switchCount = _caseList.Count;
 
         SymType exprType = cg.GenerateExpression(emitter, CompareExpression.Type, CompareExpression);

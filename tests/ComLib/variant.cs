@@ -191,7 +191,7 @@ public class Variants {
         Variant v2 = new();
         Assert.IsTrue(v1.HasValue);
         Assert.IsTrue(!v2.HasValue);
-        Assert.Throws(typeof(NotImplementedException), delegate { _ = Variant.VariantTypeToSystemType(v2.Type); });
+        Assert.Throws(typeof(ArgumentException), delegate { _ = Variant.VariantTypeToSystemType(v2.Type); });
         Assert.Throws(typeof(NotImplementedException), delegate { _ = new Variant((object)45m); });
     }
 

@@ -62,13 +62,13 @@ public class Message {
                 str.Append(Filename);
             }
             if (Line != -1) {
-                str.AppendFormat("({0}):", Line);
+                str.Append($"({Line}):");
             }
             if (Code != MessageCode.NONE) {
                 if (str.Length > 0) {
                     str.Append(' ');
                 }
-                str.AppendFormat("{0} C{1}: ", Level, (int)Code);
+                str.Append($"{Level} C{(int)Code}: ");
             }
             str.Append(Text);
         }

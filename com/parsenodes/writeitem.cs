@@ -81,16 +81,14 @@ public sealed class WriteItemParseNode : ParseNode {
     /// <param name="cg">A CodeGenerator object</param>
     /// <param name="node">A parse node for the WRITE identifier</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg, ParseNode node) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         if (node is LoopParseNode loopNode) {
             loopNode.Callback = this;
             loopNode.Generate(emitter, cg);
         }
         else {
             Type writeManagerType = typeof(WriteManager);
-            List<Type> writeParamTypes = new();
+            List<Type> writeParamTypes = [];
 
             emitter.LoadLocal(WriteManagerIndex);
             writeParamTypes.Add(writeManagerType);

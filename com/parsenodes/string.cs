@@ -65,9 +65,7 @@ public sealed class StringParseNode : ParseNode {
     /// <param name="returnType">The type required by the caller</param>
     /// <returns>The symbol type of the value generated</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
         emitter.LoadString(Value.StringValue);
         return SymType.CHAR;
     }

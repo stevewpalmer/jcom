@@ -45,7 +45,7 @@ public class ProgramParseNode : ParseNode {
     private int _lineno;
 
     private AssemblyBuilder _ab;
-    private ISymbolDocumentWriter _currentDoc = null;
+    private readonly ISymbolDocumentWriter _currentDoc = null;
 
     /// <summary>
     /// Constructs a language neutral code generator object.
@@ -304,12 +304,8 @@ public class ProgramParseNode : ParseNode {
     /// <param name="paramTypes">An array of parameter types</param>
     /// <returns>The method for the given base type</returns>
     public MethodInfo GetMethodForType(string baseTypeName, string methodName, Type[] paramTypes) {
-        if (baseTypeName == null) {
-            throw new ArgumentNullException(nameof(baseTypeName));
-        }
-        if (methodName == null) {
-            throw new ArgumentNullException(nameof(methodName));
-        }
+        ArgumentNullException.ThrowIfNull(baseTypeName);
+        ArgumentNullException.ThrowIfNull(methodName);
         Type baseType;
         if (!baseTypeName.Contains(',')) {
 
@@ -358,12 +354,8 @@ public class ProgramParseNode : ParseNode {
     /// <param name="paramTypes">An array of parameter types</param>
     /// <returns>The method for the given base type</returns>
     public MethodInfo GetMethodForType(Type baseType, string methodName, Type[] paramTypes) {
-        if (baseType == null) {
-            throw new ArgumentNullException(nameof(baseType));
-        }
-        if (methodName == null) {
-            throw new ArgumentNullException(nameof(methodName));
-        }
+        ArgumentNullException.ThrowIfNull(baseType);
+        ArgumentNullException.ThrowIfNull(methodName);
         MethodInfo meth;
         try {
             meth = baseType.GetMethod(methodName, paramTypes);
@@ -392,6 +384,7 @@ public class ProgramParseNode : ParseNode {
     /// <summary>
     /// Sets the number of the line in the file being compiled.
     /// </summary>
+    /// <param name="emitter">Emitter</param>
     /// <param name="line">Line number to emit to the output</param>
     public void MarkLine(Emitter emitter, int line) {
         if (GenerateDebug && emitter != null) {
@@ -411,9 +404,7 @@ public class ProgramParseNode : ParseNode {
     /// <param name="identNode">An IdentifierParseNode representing the variable
     /// or array element whose address should be emitted.</param>
     public void LoadAddress(Emitter emitter, IdentifierParseNode identNode) {
-        if (identNode == null) {
-            throw new ArgumentNullException(nameof(identNode));
-        }
+        ArgumentNullException.ThrowIfNull(identNode);
         Symbol sym = identNode.Symbol;
         if (sym.IsArray) {
             GenerateLoadFromArray(emitter, identNode, true);
@@ -431,9 +422,7 @@ public class ProgramParseNode : ParseNode {
     /// <param name="useRef">If set to <c>true</c> load the element address</param>
     /// <returns>The symbol type of the array element</returns>
     public SymType GenerateLoadFromArray(Emitter emitter, IdentifierParseNode identNode, bool useRef) {
-        if (identNode == null) {
-            throw new ArgumentNullException(nameof(identNode));
-        }
+        ArgumentNullException.ThrowIfNull(identNode);
         Symbol sym = identNode.Symbol;
 
         // Handle loading the base array as opposed to an element
@@ -460,9 +449,7 @@ public class ProgramParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="identNode">Parse node for array identifier</param>
     public void GenerateLoadArrayAddress(Emitter emitter, IdentifierParseNode identNode) {
-        if (identNode == null) {
-            throw new ArgumentNullException(nameof(identNode));
-        }
+        ArgumentNullException.ThrowIfNull(identNode);
 
         Symbol sym = identNode.Symbol;
         if (sym.IsLocal) {
@@ -531,9 +518,7 @@ public class ProgramParseNode : ParseNode {
     /// <param name="rootNode">The ParseNode of the root of the expression tree.</param>
     /// <returns>The type of the generated expression</returns>
     public SymType GenerateExpression(Emitter emitter, SymType typeNeeded, ParseNode rootNode) {
-        if (rootNode == null) {
-            throw new ArgumentNullException(nameof(rootNode));
-        }
+        ArgumentNullException.ThrowIfNull(rootNode);
         SymType thisType = rootNode.Generate(emitter, this, typeNeeded);
         return emitter.ConvertType(thisType, typeNeeded);
     }
@@ -555,11 +540,11 @@ public class ProgramParseNode : ParseNode {
     // Make this assembly fully debuggable.
     private void AddDebuggable() {
         Type type = typeof(DebuggableAttribute);
-        ConstructorInfo ctor = type.GetConstructor(new[] { typeof(DebuggableAttribute.DebuggingModes) });
-        CustomAttributeBuilder caBuilder = new(ctor, new object[] {
+        ConstructorInfo ctor = type.GetConstructor([typeof(DebuggableAttribute.DebuggingModes)]);
+        CustomAttributeBuilder caBuilder = new(ctor, [
             DebuggableAttribute.DebuggingModes.DisableOptimizations |
             DebuggableAttribute.DebuggingModes.Default
-        });
+        ]);
         Builder.SetCustomAttribute(caBuilder);
     }
 

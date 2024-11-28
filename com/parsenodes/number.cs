@@ -76,21 +76,13 @@ public sealed class NumberParseNode : ParseNode {
     /// <param name="returnType">The type required by the caller</param>
     /// <returns>The symbol type of the value generated</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
-        Variant actualValue = Value;
-        switch (returnType) {
-            case SymType.INTEGER:
-                actualValue = new Variant(Value.IntValue);
-                break;
-            case SymType.FLOAT:
-                actualValue = new Variant(Value.RealValue);
-                break;
-            case SymType.DOUBLE:
-                actualValue = new Variant(Value.DoubleValue);
-                break;
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
+        Variant actualValue = returnType switch {
+            SymType.INTEGER => new Variant(Value.IntValue),
+            SymType.FLOAT => new Variant(Value.RealValue),
+            SymType.DOUBLE => new Variant(Value.DoubleValue),
+            _ => Value
+        };
         emitter.LoadVariant(actualValue);
         return Symbol.VariantTypeToSymbolType(actualValue.Type);
     }

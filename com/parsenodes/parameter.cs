@@ -78,9 +78,7 @@ public class ParameterParseNode : ParseNode {
     /// <param name="cg">A CodeGenerator object</param>
     /// <returns>The system type corresponding to this parameter.</returns>
     public new Type Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         return Generate(emitter, cg, _symbol, new Temporaries(emitter));
     }
 
@@ -116,12 +114,8 @@ public class ParameterParseNode : ParseNode {
     /// <param name="locals">A Temporaries collection for any local temporaries</param>
     /// <returns>The system type corresponding to this parameter.</returns>
     public Type Generate(Emitter emitter, ProgramParseNode cg, Symbol symParam, Temporaries locals) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
-        if (locals == null) {
-            throw new ArgumentNullException(nameof(locals));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
+        ArgumentNullException.ThrowIfNull(locals);
 
         // Set some flags up-front
         bool isByRef = symParam != null ? symParam.IsByRef : IsByRef;
@@ -229,7 +223,7 @@ public class ParameterParseNode : ParseNode {
         emitter.StoreLocal(index);
         emitter.LoadInteger(0);
         emitter.LoadInteger(symParam.ArraySize);
-        emitter.Call(typeof(Array).GetMethod("Copy", new[] { typeof(Array), typeof(int), typeof(Array), typeof(int), typeof(int) }));
+        emitter.Call(typeof(Array).GetMethod("Copy", [typeof(Array), typeof(int), typeof(Array), typeof(int), typeof(int)]));
         emitter.LoadLocal(index);
     }
 }

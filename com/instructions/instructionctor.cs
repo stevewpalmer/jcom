@@ -42,9 +42,7 @@ public class InstructionCtor : Instruction {
     /// <param name="op">Opcode</param>
     /// <param name="ctor">ConstructorInfo object</param>
     public InstructionCtor(OpCode op, ConstructorInfo ctor) : base(op) {
-        if (ctor == null) {
-            throw new ArgumentNullException(nameof(ctor));
-        }
+        ArgumentNullException.ThrowIfNull(ctor);
         _ctor = ctor;
     }
 
@@ -54,9 +52,7 @@ public class InstructionCtor : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) {
             return;
         }

@@ -79,10 +79,10 @@ public sealed class ExtCallParseNode : ParseNode {
     /// </summary>
     /// <returns><c>true</c> if this instance can be inlined; otherwise, <c>false</c>.</returns>
     public bool CanInline() {
-        if (typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter), typeof(Type) }) != null) {
+        if (typeof(Inlined).GetMethod(Name, [typeof(Emitter), typeof(Type)]) != null) {
             return true;
         }
-        return typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter) }) != null;
+        return typeof(Inlined).GetMethod(Name, [typeof(Emitter)]) != null;
     }
 
     /// <summary>
@@ -143,17 +143,17 @@ public sealed class ExtCallParseNode : ParseNode {
 
             // First try specific methods where different inline methods are
             // provided depending on the type.
-            meth = typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter), typeof(Type) });
+            meth = typeof(Inlined).GetMethod(Name, [typeof(Emitter), typeof(Type)]);
             if (meth != null) {
-                object[] ilParams = { emitter, argType };
+                object[] ilParams = [emitter, argType];
                 meth.Invoke(null, ilParams);
                 return Type;
             }
 
             // Otherwise try the type-less variant.
-            meth = typeof(Inlined).GetMethod(Name, new[] { typeof(Emitter) });
+            meth = typeof(Inlined).GetMethod(Name, [typeof(Emitter)]);
             if (meth != null) {
-                object[] ilParams = { emitter };
+                object[] ilParams = [emitter];
                 meth.Invoke(null, ilParams);
                 return Type;
             }

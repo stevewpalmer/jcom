@@ -83,9 +83,7 @@ public sealed class ReadParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A CodeGenerator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
 
         Type readManagerType = typeof(ReadManager);
         Type[] paramTypes = ReadManagerParamsNode.Generate(emitter, cg);
@@ -97,13 +95,13 @@ public sealed class ReadParseNode : ParseNode {
         if (EndLabel != null) {
             emitter.LoadLocal(objIndex);
             emitter.LoadInteger(1);
-            emitter.Call(readManagerType.GetMethod("set_HasEnd", new[] { typeof(bool) }));
+            emitter.Call(readManagerType.GetMethod("set_HasEnd", [typeof(bool)]));
         }
 
         if (ErrLabel != null) {
             emitter.LoadLocal(objIndex);
             emitter.LoadInteger(1);
-            emitter.Call(readManagerType.GetMethod("set_HasErr", new[] { typeof(bool) }));
+            emitter.Call(readManagerType.GetMethod("set_HasErr", [typeof(bool)]));
         }
 
         LocalDescriptor index = emitter.GetTemporary(typeof(int));

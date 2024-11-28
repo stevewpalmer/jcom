@@ -41,9 +41,7 @@ public class InstructionString : Instruction {
     /// <param name="op">Opcode</param>
     /// <param name="str">A string value</param>
     public InstructionString(OpCode op, string str) : base(op) {
-        if (str == null) {
-            throw new ArgumentNullException(nameof(str));
-        }
+        ArgumentNullException.ThrowIfNull(str);
         _str = str;
     }
 
@@ -53,9 +51,7 @@ public class InstructionString : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) {
             return;
         }

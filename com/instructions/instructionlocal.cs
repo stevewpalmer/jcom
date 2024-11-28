@@ -40,9 +40,7 @@ public class InstructionLocal : Instruction {
     /// <param name="op">Opcode</param>
     /// <param name="value">An integer value</param>
     public InstructionLocal(OpCode op, LocalDescriptor value) : base(op) {
-        if (value == null) {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
         Value = value;
     }
 
@@ -58,9 +56,7 @@ public class InstructionLocal : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) {
             return;
         }

@@ -37,12 +37,10 @@ public static class MyExtensions {
     /// <param name="str">Input string</param>
     /// <returns>The string with the initial letter uppercased.</returns>
     public static string CapitaliseString(this string str) {
-        if (str == null) {
-            throw new ArgumentNullException(nameof(str));
-        }
+        ArgumentNullException.ThrowIfNull(str);
         if (str.Length > 0) {
             char initialChar = char.ToUpper(str[0]);
-            return string.Concat(initialChar.ToString(), str.Substring(1));
+            return string.Concat(initialChar.ToString(), str[1..]);
         }
         return str;
     }

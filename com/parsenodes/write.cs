@@ -86,9 +86,7 @@ public sealed class WriteParseNode : ParseNode {
     /// <param name="returnType">The expected type of the returned value</param>
     /// <returns>The type of the value on the stack or SymType.NONE</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
 
         Type writeManagerType = typeof(WriteManager);
         Type[] paramTypes = WriteManagerParamsNode.Generate(emitter, cg);
@@ -100,13 +98,13 @@ public sealed class WriteParseNode : ParseNode {
         if (ErrLabel != null) {
             emitter.LoadLocal(objIndex);
             emitter.LoadInteger(1);
-            emitter.Call(writeManagerType.GetMethod("set_HasErr", new[] { typeof(bool) }));
+            emitter.Call(writeManagerType.GetMethod("set_HasErr", [typeof(bool)]));
         }
 
         // Disable use of separators for BASIC output
         emitter.LoadLocal(objIndex);
         emitter.LoadInteger(0);
-        emitter.Call(writeManagerType.GetMethod("set_UseSeparators", new[] { typeof(bool) }));
+        emitter.Call(writeManagerType.GetMethod("set_UseSeparators", [typeof(bool)]));
 
         LocalDescriptor index = emitter.GetTemporary(typeof(int));
 

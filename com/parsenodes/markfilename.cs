@@ -51,9 +51,7 @@ public sealed class MarkFilenameParseNode : ParseNode {
     /// </summary>
     /// <param name="cg">A code generator object</param>
     public override void Generate(ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         cg.MarkFile(Filename);
     }
 

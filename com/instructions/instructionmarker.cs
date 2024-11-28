@@ -52,9 +52,7 @@ public class InstructionMarker : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) { }
 #if GENERATE_NATIVE_BINARIES
         il.MarkSequencePoint(_doc, _linenumber, 1, _linenumber, 100);

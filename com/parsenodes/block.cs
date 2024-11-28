@@ -36,7 +36,7 @@ public class BlockParseNode : ParseNode {
     /// Creates a BlockParseNode.
     /// </summary>
     public BlockParseNode() {
-        Nodes = new Collection<ParseNode>();
+        Nodes = [];
     }
 
     /// <summary>
@@ -73,6 +73,8 @@ public class BlockParseNode : ParseNode {
 
     /// <summary>
     /// Emit the code to generate a block.
+    /// </summary>
+    /// <param name="em">Emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter em, ProgramParseNode cg) {
 

@@ -33,7 +33,7 @@ namespace CCompiler;
 /// informational messages.
 /// </summary>
 public class MessageCollection : IEnumerable<Message> {
-    private readonly List<Message> _messages = new();
+    private readonly List<Message> _messages = [];
     private readonly Options _opts;
 
     /// <summary>
@@ -194,9 +194,9 @@ public class MessageCollection : IEnumerable<Message> {
     /// </summary>
     /// <returns>The enumerator.</returns>
     public IEnumerator<Message> GetEnumerator() {
-        _messages.Sort(delegate(Message t1, Message t2) { return t1.Line - t2.Line; });
-        for (int i = 0; i < _messages.Count; i++) {
-            yield return _messages[i];
+        _messages.Sort((t1, t2) => t1.Line - t2.Line);
+        foreach (Message t in _messages) {
+            yield return t;
         }
     }
 

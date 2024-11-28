@@ -42,7 +42,7 @@ public sealed class Temporaries {
     /// <param name="em">A code generator Emitter</param>
     public Temporaries(Emitter em) {
         _em = em;
-        _locals = new Collection<LocalDescriptor>();
+        _locals = [];
     }
 
     /// <summary>

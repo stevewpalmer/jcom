@@ -152,7 +152,7 @@ public class Options {
     /// <value>
     /// Return an array of all source files detected on the command line
     /// </value>
-    public Collection<string> SourceFiles { get; } = new();
+    public Collection<string> SourceFiles { get; } = [];
 
     /// <value>
     /// Gets or sets the output file name.
@@ -193,7 +193,7 @@ public class Options {
 
         bool success = true;
         foreach (string optstring in arguments) {
-            if (optstring.StartsWith("-")) {
+            if (optstring.StartsWith('-')) {
                 string[] opts = optstring[1..].ToLower().Split(':');
                 if (opts[0] == "-help" || opts[0] == "h") {
 

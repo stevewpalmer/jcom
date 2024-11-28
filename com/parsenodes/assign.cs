@@ -45,8 +45,8 @@ public sealed class AssignmentParseNode : ParseNode {
     /// <param name="identifier">Identifier to which value is assigned</param>
     /// <param name="value">ParseNode for the value to be assigned</param>
     public AssignmentParseNode(IdentifierParseNode identifier, ParseNode value) {
-        Identifiers = new[] { identifier };
-        ValueExpressions = new[] { value };
+        Identifiers = [identifier];
+        ValueExpressions = [value];
     }
 
     /// <summary>
@@ -89,9 +89,7 @@ public sealed class AssignmentParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
 
         for (int arrayIndex = 0; arrayIndex < Identifiers.Length; arrayIndex++) {
 
@@ -129,7 +127,7 @@ public sealed class AssignmentParseNode : ParseNode {
                 }
                 SymType exprType = cg.GenerateExpression(emitter, wantedType, valueExpression);
                 if (sym.Type == SymType.FIXEDCHAR) {
-                    MethodInfo meth = cg.GetMethodForType(typeof(FixedString), "Set", new[] { Symbol.SymTypeToSystemType(exprType) });
+                    MethodInfo meth = cg.GetMethodForType(typeof(FixedString), "Set", [Symbol.SymTypeToSystemType(exprType)]);
                     emitter.Call(meth);
                 }
                 continue;
@@ -172,9 +170,9 @@ public sealed class AssignmentParseNode : ParseNode {
             emitter.LoadArrayElement(sym);
             cg.GenerateExpression(emitter, SymType.NONE, valueExpression);
             emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set",
-                new[] {
-                    Symbol.SymTypeToSystemType(valueExpression.Type)
-                }));
+            [
+                Symbol.SymTypeToSystemType(valueExpression.Type)
+            ]));
             return;
         }
 
@@ -207,7 +205,7 @@ public sealed class AssignmentParseNode : ParseNode {
                 cg.GenerateExpression(emitter, SymType.INTEGER, identifier.SubstringEnd);
             }
         }
-        emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set", new[] { baseType, typeof(int), typeof(int) }));
+        emitter.Call(cg.GetMethodForType(typeof(FixedString), "Set", [baseType, typeof(int), typeof(int)]));
     }
 
     // Emit the appropriate store parameter index opcode.

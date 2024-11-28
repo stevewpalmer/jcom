@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Reflection.Emit;
 using JComLib;
@@ -43,6 +44,7 @@ namespace CCompiler;
 /// generally test both methods to verify this is always the case.
 /// 
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class Inlined {
 
     /// <summary>
@@ -51,14 +53,12 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void ABS(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", new[] { typeWanted }));
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", [typeWanted]));
         }
         else {
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new[] { typeWanted }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", [typeWanted]));
         }
     }
 
@@ -67,10 +67,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void ACOS(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", [typeof(double)]));
     }
 
     /// <summary>
@@ -79,9 +77,7 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void AINT(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_I4);
         em.ConvertSystemType(typeWanted);
     }
@@ -92,10 +88,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void ALOG(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", [typeof(double)]));
     }
 
     /// <summary>
@@ -104,10 +98,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void ALOG10(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", [typeof(double)]));
     }
 
     /// <summary>
@@ -116,9 +108,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void AMOD(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Rem);
     }
 
@@ -127,10 +117,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void ASIN(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", [typeof(double)]));
     }
 
     /// <summary>
@@ -139,13 +127,11 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void ATAN(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted != typeof(double)) {
             em.Emit0(OpCodes.Conv_R8);
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", new[] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", [typeof(double)]));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -156,10 +142,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void CABS(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", new[] { typeof(Complex) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", [typeof(Complex)]));
     }
 
     /// <summary>
@@ -167,10 +151,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void CCOS(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", new[] { typeof(Complex) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", [typeof(Complex)]));
     }
 
     /// <summary>
@@ -178,11 +160,9 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void CHAR(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_U2);
-        em.CreateObject(typeof(FixedString), new[] { typeof(char) });
+        em.CreateObject(typeof(FixedString), [typeof(char)]);
     }
 
     /// <summary>
@@ -190,10 +170,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void CLOG(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", new[] { typeof(Complex) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", [typeof(Complex)]));
     }
 
     /// <summary>
@@ -201,10 +179,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void CMPLX(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Newobj, typeof(Complex).GetConstructor(new[] { typeof(double), typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Newobj, typeof(Complex).GetConstructor([typeof(double), typeof(double)]));
     }
 
     /// <summary>
@@ -213,17 +189,15 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void COS(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", new[] { typeWanted }));
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Cos", [typeWanted]));
         }
         else {
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", new[] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", [typeof(double)]));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -235,10 +209,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void COSH(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", [typeof(double)]));
     }
 
     /// <summary>
@@ -246,10 +218,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void CSIN(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", new[] { typeof(Complex) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", [typeof(Complex)]));
     }
 
     /// <summary>
@@ -258,10 +228,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void CSQRT(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", new[] { typeof(Complex) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", [typeof(Complex)]));
     }
 
     /// <summary>
@@ -269,10 +237,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DABS(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", [typeof(double)]));
     }
 
     /// <summary>
@@ -280,10 +246,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DACOS(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Acos", [typeof(double)]));
     }
 
     /// <summary>
@@ -291,10 +255,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DASIN(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Asin", [typeof(double)]));
     }
 
     /// <summary>
@@ -302,10 +264,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DATAN(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan", [typeof(double)]));
     }
 
     /// <summary>
@@ -313,10 +273,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DATAN2(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan2", new[] { typeof(double), typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Atan2", [typeof(double), typeof(double)]));
     }
 
     /// <summary>
@@ -327,11 +285,9 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void DBLE(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("DBLE", new[] { typeof(Complex) }));
+            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("DBLE", [typeof(Complex)]));
         }
         else {
             em.Emit0(OpCodes.Conv_R8);
@@ -343,10 +299,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DCOS(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cos", [typeof(double)]));
     }
 
     /// <summary>
@@ -354,10 +308,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DCOSH(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Cosh", [typeof(double)]));
     }
 
     /// <summary>
@@ -365,9 +317,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DEG(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.LoadDouble(180 / Math.PI);
         em.Mul(SymType.DOUBLE);
     }
@@ -377,10 +327,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DEXP(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", [typeof(double)]));
     }
 
     /// <summary>
@@ -388,9 +336,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DINT(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_I4);
         em.Emit0(OpCodes.Conv_R8);
     }
@@ -400,10 +346,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DLOG(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", [typeof(double)]));
     }
 
     /// <summary>
@@ -411,10 +355,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DLOG10(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", [typeof(double)]));
     }
 
     /// <summary>
@@ -423,9 +365,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DMOD(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Rem);
     }
 
@@ -434,9 +374,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DPROD(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Mul);
     }
 
@@ -445,10 +383,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DSIN(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", [typeof(double)]));
     }
 
     /// <summary>
@@ -456,10 +392,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DSINH(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", [typeof(double)]));
     }
 
     /// <summary>
@@ -468,10 +402,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DSQRT(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", [typeof(double)]));
     }
 
     /// <summary>
@@ -479,10 +411,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DTAN(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", [typeof(double)]));
     }
 
     /// <summary>
@@ -490,10 +420,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void DTANH(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", [typeof(double)]));
     }
 
     /// <summary>
@@ -503,17 +431,15 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void EXP(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Exp", new[] { typeof(Complex) }));
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Exp", [typeof(Complex)]));
         }
         else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", new[] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Exp", [typeof(double)]));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -525,9 +451,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void FLOAT(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_R4);
     }
 
@@ -536,11 +460,9 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void IABS(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_R8);
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", new[] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", [typeof(double)]));
         em.Emit0(OpCodes.Conv_I4);
     }
 
@@ -550,14 +472,10 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void ICHAR(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        if (typeWanted == null) {
-            throw new ArgumentNullException(nameof(typeWanted));
-        }
+        ArgumentNullException.ThrowIfNull(em);
+        ArgumentNullException.ThrowIfNull(typeWanted);
         em.LoadInteger(0);
-        em.Emit0(OpCodes.Call, typeWanted.GetMethod("get_Chars", new[] { typeof(int) }));
+        em.Emit0(OpCodes.Call, typeWanted.GetMethod("get_Chars", [typeof(int)]));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -568,9 +486,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void IDINT(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_I4);
     }
 
@@ -579,9 +495,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void IFIX(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_I4);
     }
 
@@ -591,11 +505,9 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void INT(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("INT", new[] { typeof(Complex) }));
+            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("INT", [typeof(Complex)]));
         }
         else {
             em.Emit0(OpCodes.Conv_I4);
@@ -608,16 +520,12 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void FLOOR(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        if (typeWanted == null) {
-            throw new ArgumentNullException(nameof(typeWanted));
-        }
+        ArgumentNullException.ThrowIfNull(em);
+        ArgumentNullException.ThrowIfNull(typeWanted);
         if (typeWanted != typeof(double)) {
             em.Emit0(OpCodes.Conv_R8);
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Floor", new[] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Floor", [typeof(double)]));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -629,12 +537,8 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void LEN(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        if (typeWanted == null) {
-            throw new ArgumentNullException(nameof(typeWanted));
-        }
+        ArgumentNullException.ThrowIfNull(em);
+        ArgumentNullException.ThrowIfNull(typeWanted);
         if (typeWanted == typeof(FixedString)) {
             em.Emit0(OpCodes.Call, typeWanted.GetMethod("get_RealLength"));
         }
@@ -649,17 +553,15 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void LOG(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", new[] { typeWanted }));
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Log", [typeWanted]));
         }
         else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", new[] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log", [typeof(double)]));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -672,13 +574,11 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void LOG10(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted != typeof(double)) {
             em.Emit0(OpCodes.Conv_R8);
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", new[] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Log10", [typeof(double)]));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -689,9 +589,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void MOD(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Rem);
     }
 
@@ -700,9 +598,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void RAD(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.LoadDouble(Math.PI / 180.0);
         em.Mul(SymType.DOUBLE);
     }
@@ -713,11 +609,9 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void REAL(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("REAL", new[] { typeof(Complex) }));
+            em.Emit0(OpCodes.Call, typeof(Intrinsics).GetMethod("REAL", [typeof(Complex)]));
         }
         else {
             em.Emit0(OpCodes.Conv_R4);
@@ -729,10 +623,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void REPORT(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.CreateObject(typeof(JComRuntimeException), new[] { typeof(JComRuntimeErrors) });
+        ArgumentNullException.ThrowIfNull(em);
+        em.CreateObject(typeof(JComRuntimeException), [typeof(JComRuntimeErrors)]);
         em.Emit0(OpCodes.Throw);
     }
 
@@ -742,10 +634,8 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void SGN(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sign", new[] { typeWanted }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sign", [typeWanted]));
     }
 
     /// <summary>
@@ -754,17 +644,15 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void SIN(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", new[] { typeWanted }));
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sin", [typeWanted]));
         }
         else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", new[] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sin", [typeof(double)]));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -776,10 +664,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void SINH(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sinh", [typeof(double)]));
     }
 
     /// <summary>
@@ -788,12 +674,8 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void SIZE(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        if (typeWanted == null) {
-            throw new ArgumentNullException(nameof(typeWanted));
-        }
+        ArgumentNullException.ThrowIfNull(em);
+        ArgumentNullException.ThrowIfNull(typeWanted);
         em.Emit0(OpCodes.Call, typeWanted.GetMethod("get_Length"));
     }
 
@@ -802,9 +684,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void SNGL(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         em.Emit0(OpCodes.Conv_R4);
     }
 
@@ -814,10 +694,8 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void STR(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Convert).GetMethod("ToString", new[] { typeWanted }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Convert).GetMethod("ToString", [typeWanted]));
     }
 
     /// <summary>
@@ -827,17 +705,15 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void SQRT(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", new[] { typeWanted }));
+            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Sqrt", [typeWanted]));
         }
         else {
             if (typeWanted != typeof(double)) {
                 em.Emit0(OpCodes.Conv_R8);
             }
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", new[] { typeof(double) }));
+            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Sqrt", [typeof(double)]));
             if (typeWanted == typeof(float)) {
                 em.Emit0(OpCodes.Conv_R4);
             }
@@ -850,13 +726,11 @@ public static class Inlined {
     /// <param name="em">Emitter object</param>
     /// <param name="typeWanted">The type of the argument</param>
     public static void TAN(Emitter em, Type typeWanted) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
+        ArgumentNullException.ThrowIfNull(em);
         if (typeWanted != typeof(double)) {
             em.Emit0(OpCodes.Conv_R8);
         }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", new[] { typeof(double) }));
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tan", [typeof(double)]));
         if (typeWanted == typeof(float)) {
             em.Emit0(OpCodes.Conv_R4);
         }
@@ -867,10 +741,8 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void TANH(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", new[] { typeof(double) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Tanh", [typeof(double)]));
     }
 
     /// <summary>
@@ -878,9 +750,7 @@ public static class Inlined {
     /// </summary>
     /// <param name="em">Emitter object</param>
     public static void VAL(Emitter em) {
-        if (em == null) {
-            throw new ArgumentNullException(nameof(em));
-        }
-        em.Emit0(OpCodes.Call, typeof(Convert).GetMethod("ToSingle", new[] { typeof(string) }));
+        ArgumentNullException.ThrowIfNull(em);
+        em.Emit0(OpCodes.Call, typeof(Convert).GetMethod("ToSingle", [typeof(string)]));
     }
 }

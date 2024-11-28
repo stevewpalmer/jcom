@@ -33,7 +33,7 @@ namespace CCompiler;
 /// </summary>
 public sealed class ConditionalParseNode : ParseNode {
 
-    private readonly Collection<ParseNode> _exprList = new();
+    private readonly Collection<ParseNode> _exprList = [];
 
     /// <summary>
     /// Creates a conditional parse node.
@@ -44,7 +44,7 @@ public sealed class ConditionalParseNode : ParseNode {
     /// Return the list of block nodes for each conditional block.
     /// </summary>
     /// <value>The body list.</value>
-    public Collection<BlockParseNode> BodyList { get; } = new();
+    public Collection<BlockParseNode> BodyList { get; } = [];
 
     /// <summary>
     /// Adds a conditional and body.
@@ -85,9 +85,7 @@ public sealed class ConditionalParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         int index = 0;
 
         Label labFalse = emitter.CreateLabel(); // Destination of false condition

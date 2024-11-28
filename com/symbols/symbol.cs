@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -97,7 +97,7 @@ public class Symbol {
     /// <value>
     /// Returns whether the symbol is the name of a function or subroutine.
     /// </value>
-    public bool IsMethod => Class == SymClass.FUNCTION || Class == SymClass.SUBROUTINE;
+    public bool IsMethod => Class is SymClass.FUNCTION or SymClass.SUBROUTINE;
 
     /// <summary>
     /// Returns whether the symbol refers to a method imported from an external
@@ -366,10 +366,10 @@ public class Symbol {
             str.Append(" (undef)");
         }
         if (Index != null) {
-            str.AppendFormat(" [{0}]", Index.Index);
+            str.Append($" [{Index.Index}]");
         }
         if (Info != null) {
-            str.AppendFormat(" [{0}]", Info);
+            str.Append($" [{Info}]");
         }
         return str.ToString();
     }
@@ -453,9 +453,7 @@ public class Symbol {
     /// <returns>The symbol type that corresponds to the given system
     /// type or SymType.NONE if the system type is unrecognised.</returns>
     public static SymType SystemTypeToSymbolType(Type type) {
-        if (type == null) {
-            throw new ArgumentNullException(nameof(type));
-        }
+        ArgumentNullException.ThrowIfNull(type);
         string typeName = type.Name.ToLower();
         if (typeName.Contains("[]")) {
             typeName = typeName.Replace("[]", "");
@@ -485,12 +483,7 @@ public class Symbol {
     /// <param name="type">The symbol type to check</param>
     /// <returns>True if the symbol type is numeric, false otherwise</returns>
     [Pure]
-    public static bool IsNumberType(SymType type) {
-        return type == SymType.DOUBLE ||
-               type == SymType.INTEGER ||
-               type == SymType.COMPLEX ||
-               type == SymType.FLOAT;
-    }
+    public static bool IsNumberType(SymType type) => type is SymType.DOUBLE or SymType.INTEGER or SymType.COMPLEX or SymType.FLOAT;
 
     /// <summary>
     /// Returns whether the specific type is a character type.
@@ -498,9 +491,7 @@ public class Symbol {
     /// <param name="type">The symbol type to check</param>
     /// <returns>True if the symbol type is character, false otherwise</returns>
     [Pure]
-    public static bool IsCharType(SymType type) {
-        return type == SymType.CHAR || type == SymType.FIXEDCHAR;
-    }
+    public static bool IsCharType(SymType type) => type is SymType.CHAR or SymType.FIXEDCHAR;
 
     /// <summary>
     /// Returns whether the specific type is a logical (boolean) type.

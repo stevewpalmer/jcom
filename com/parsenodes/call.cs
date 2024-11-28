@@ -37,7 +37,7 @@ public sealed class CallParseNode : ParseNode {
     /// Creates an internal call parse node.
     /// </summary>
     public CallParseNode() {
-        AlternateReturnLabels = new Collection<Symbol>();
+        AlternateReturnLabels = [];
     }
 
     /// <summary>

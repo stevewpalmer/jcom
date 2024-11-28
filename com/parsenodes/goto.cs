@@ -37,16 +37,14 @@ public sealed class GotoParseNode : ParseNode {
     /// Creates a goto parse node.
     /// </summary>
     public GotoParseNode() : base(ParseID.GOTO) {
-        Nodes = new Collection<ParseNode>();
+        Nodes = [];
     }
 
     /// <summary>
     /// Creates a goto parse node with the specified label.
     /// </summary>
     public GotoParseNode(ParseNode label) : base(ParseID.GOTO) {
-        Nodes = new Collection<ParseNode> {
-            label
-        };
+        Nodes = [label];
     }
 
     /// <summary>
@@ -97,9 +95,7 @@ public sealed class GotoParseNode : ParseNode {
     /// <param name="emitter">The emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         if (ValueExpression == null) {
             Symbol sym = ProgramParseNode.GetLabel(Nodes[0]);
             emitter.Branch((Label)sym.Info);

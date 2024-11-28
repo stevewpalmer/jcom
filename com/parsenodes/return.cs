@@ -54,9 +54,7 @@ public sealed class ReturnParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A CodeGenerator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         if (cg.CurrentProcedure != null) {
             bool needStore = false;
 

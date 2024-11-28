@@ -114,14 +114,10 @@ public sealed class InputManagerParseNode : ParseNode {
     /// <param name="cg">A CodeGenerator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
 
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
+        ArgumentNullException.ThrowIfNull(cg);
 
-        List<Type> constructorTypes = new();
+        List<Type> constructorTypes = [];
 
         // Constructor arguments
         if (RowPosition != null && ColumnPosition != null) {
@@ -157,7 +153,7 @@ public sealed class InputManagerParseNode : ParseNode {
 
         foreach (IdentifierParseNode identNode in Identifiers) {
 
-            List<Type> readParamTypes = new();
+            List<Type> readParamTypes = [];
 
             emitter.LoadLocal(objIndex);
             if (identNode.IsArrayBase) {

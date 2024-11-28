@@ -52,12 +52,10 @@ public class Emitter {
     /// </summary>
     /// <param name="metb">MethodBuilder</param>
     public Emitter(MethodBuilder metb) {
-        if (metb == null) {
-            throw new ArgumentNullException(nameof(metb));
-        }
+        ArgumentNullException.ThrowIfNull(metb);
         _il = metb.GetILGenerator();
-        _temp = new Collection<LocalDescriptor>();
-        _code = new Collection<Instruction>();
+        _temp = [];
+        _code = [];
     }
 
     /// <summary>
@@ -65,12 +63,10 @@ public class Emitter {
     /// </summary>
     /// <param name="cntb">ConstructorBuilder</param>
     public Emitter(ConstructorBuilder cntb) {
-        if (cntb == null) {
-            throw new ArgumentNullException(nameof(cntb));
-        }
+        ArgumentNullException.ThrowIfNull(cntb);
         _il = cntb.GetILGenerator();
-        _temp = new Collection<LocalDescriptor>();
-        _code = new Collection<Instruction>();
+        _temp = [];
+        _code = [];
     }
 
     /// <summary>
@@ -286,9 +282,7 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">Symbol</param>
     public void CreateLocal(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         LocalBuilder lb = _il.DeclareLocal(sym.SystemType);
 #if GENERATE_NATIVE_BINARIES
         if (IsDebuggable) {
@@ -315,13 +309,11 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">Symbol</param>
     public void CreateFixedString(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         Debug.Assert(sym.Type == SymType.FIXEDCHAR);
         Type baseType = typeof(FixedString);
         LoadInteger(sym.FullType.Width);
-        CreateObject(baseType, new[] { typeof(int) });
+        CreateObject(baseType, [typeof(int)]);
     }
 
     /// <summary>
@@ -353,12 +345,8 @@ public class Emitter {
     /// <param name="baseType">Base type.</param>
     /// <param name="paramTypes">Parameter types.</param>
     public void CreateObject(Type baseType, Type[] paramTypes) {
-        if (baseType == null) {
-            throw new ArgumentNullException(nameof(baseType));
-        }
-        if (paramTypes == null) {
-            throw new ArgumentNullException(nameof(paramTypes));
-        }
+        ArgumentNullException.ThrowIfNull(baseType);
+        ArgumentNullException.ThrowIfNull(paramTypes);
         Emit0(OpCodes.Newobj, baseType.GetConstructor(paramTypes));
     }
 
@@ -395,7 +383,7 @@ public class Emitter {
     public void Add(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Addition", new[] { typeof(Complex), typeof(Complex) }));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Addition", [typeof(Complex), typeof(Complex)]));
                 break;
 
             default:
@@ -411,7 +399,7 @@ public class Emitter {
     public void Sub(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Subtraction", new[] { typeof(Complex), typeof(Complex) }));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Subtraction", [typeof(Complex), typeof(Complex)]));
                 break;
 
             default:
@@ -427,7 +415,7 @@ public class Emitter {
     public void Neg(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_UnaryNegation", new[] { typeof(Complex) }));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_UnaryNegation", [typeof(Complex)]));
                 break;
 
             default:
@@ -443,7 +431,7 @@ public class Emitter {
     public void Mul(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Multiply", new[] { typeof(Complex), typeof(Complex) }));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Multiply", [typeof(Complex), typeof(Complex)]));
                 break;
 
             default:
@@ -459,7 +447,7 @@ public class Emitter {
     public void Div(SymType type) {
         switch (type) {
             case SymType.COMPLEX:
-                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Division", new[] { typeof(Complex), typeof(Complex) }));
+                Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Division", [typeof(Complex), typeof(Complex)]));
                 break;
 
             default:
@@ -468,14 +456,14 @@ public class Emitter {
                 // Floating point divisions by zero do not throw an exception but set the Nan on the
                 // number. So we need to test for this and explicitly throw an exception. This makes the
                 // code slower and more bloated though so we may want to have a switch to turn this off.
-                if (type == SymType.FLOAT || type == SymType.DOUBLE) {
+                if (type is SymType.FLOAT or SymType.DOUBLE) {
                     Type actualType = Symbol.SymTypeToSystemType(type);
                     Label skipException = _il.DefineLabel();
                     Emit0(OpCodes.Dup);
-                    Emit0(OpCodes.Call, actualType.GetMethod("IsInfinity", new[] { actualType }));
+                    Emit0(OpCodes.Call, actualType.GetMethod("IsInfinity", [actualType]));
                     Emit0(OpCodes.Brfalse, skipException);
                     Emit0(OpCodes.Ldc_I4, (int)JComRuntimeErrors.DIVISION_BY_ZERO);
-                    Emit0(OpCodes.Newobj, typeof(JComRuntimeException).GetConstructor(new[] { typeof(JComRuntimeErrors) }));
+                    Emit0(OpCodes.Newobj, typeof(JComRuntimeException).GetConstructor([typeof(JComRuntimeErrors)]));
                     Emit0(OpCodes.Throw);
                     MarkLabel(skipException);
                 }
@@ -495,7 +483,7 @@ public class Emitter {
             default:
                 Emit0(OpCodes.Div);
                 Emit0(OpCodes.Conv_R8);
-                Emit0(OpCodes.Call, typeof(Math).GetMethod("Floor", new[] { typeof(double) }));
+                Emit0(OpCodes.Call, typeof(Math).GetMethod("Floor", [typeof(double)]));
                 Emit0(OpCodes.Conv_I4);
                 break;
         }
@@ -531,8 +519,6 @@ public class Emitter {
         if (actualType != typeNeeded) {
             switch (typeNeeded) {
                 case SymType.NONE:
-                    typeNeeded = actualType;
-                    break;
                 case SymType.LABEL:
                     typeNeeded = actualType;
                     break;
@@ -568,13 +554,13 @@ public class Emitter {
 
                 case SymType.FIXEDCHAR: {
                     Type fromType = Symbol.SymTypeToSystemType(actualType);
-                    Emit0(OpCodes.Call, typeof(FixedString).GetMethod("op_Implicit", new[] { fromType }));
+                    Emit0(OpCodes.Call, typeof(FixedString).GetMethod("op_Implicit", [fromType]));
                     break;
                 }
 
                 case SymType.COMPLEX: {
                     Type fromType = Symbol.SymTypeToSystemType(actualType);
-                    Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Implicit", new[] { fromType }));
+                    Emit0(OpCodes.Call, typeof(Complex).GetMethod("op_Implicit", [fromType]));
                     break;
                 }
             }
@@ -593,9 +579,7 @@ public class Emitter {
     /// <param name="useRef">If set to <c>true</c> use emit the address of
     /// the array</param>
     public SymType GenerateLoadArray(IdentifierParseNode identNode, bool useRef) {
-        if (identNode == null) {
-            throw new ArgumentNullException(nameof(identNode));
-        }
+        ArgumentNullException.ThrowIfNull(identNode);
         Symbol sym = identNode.Symbol;
 
         if (useRef) {
@@ -615,9 +599,7 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">Symbol from which to emit</param>
     public void GenerateLoadArgument(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         switch (sym.Linkage) {
             case SymLinkage.BYVAL:
                 LoadParameter(sym.ParameterIndex);
@@ -675,7 +657,7 @@ public class Emitter {
         LoadSymbol(sym);
         LoadLocal(count);
         LoadInteger(sym.FullType.Width);
-        CreateObject(typeof(FixedString), new[] { typeof(int) });
+        CreateObject(typeof(FixedString), [typeof(int)]);
         StoreArrayElement(sym);
         LoadLocal(count);
         LoadInteger(1);
@@ -694,9 +676,7 @@ public class Emitter {
     /// <param name="sym">A Symbol object representing the variable</param>
     /// <returns>The SymType of the variable loaded</returns>
     public SymType LoadSymbol(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         if (sym.IsInCommon) {
             Symbol symCommon = sym.Common;
             List<Symbol> commonList = (List<Symbol>)symCommon.Info;
@@ -714,12 +694,9 @@ public class Emitter {
     /// <summary>
     /// Emit the code to load the the specified variant value.
     /// </summary>
-    /// <param name="em">Emitter</param>
     /// <param name="value">The value to be loaded</param>
     public void LoadVariant(Variant value) {
-        if (value == null) {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
         switch (value.Type) {
             case VariantType.STRING:
                 LoadString(value.StringValue);
@@ -752,9 +729,7 @@ public class Emitter {
     /// <param name="sym">The symbol to which the value should be stored</param>
     /// <returns>The type of the value stored</returns>
     public void StoreSymbol(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         if (sym.IsInCommon) {
             Symbol symCommon = sym.Common;
             List<Symbol> commonList = (List<Symbol>)symCommon.Info;
@@ -775,9 +750,7 @@ public class Emitter {
     /// </summary>
     /// <param name="typeNeeded">System type needed</param>
     public void ConvertSystemType(Type typeNeeded) {
-        if (typeNeeded == null) {
-            throw new ArgumentNullException(nameof(typeNeeded));
-        }
+        ArgumentNullException.ThrowIfNull(typeNeeded);
         switch (typeNeeded.Name.ToLower()) {
             case "int":
                 Emit0(OpCodes.Conv_I4);
@@ -808,9 +781,7 @@ public class Emitter {
     /// <param name="type">The type wanted</param>
     /// <param name="value">A variant value</param>
     public void LoadValue(SymType type, Variant value) {
-        if (value == null) {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
         switch (type) {
             case SymType.INTEGER:
                 LoadInteger(value.IntValue);
@@ -867,9 +838,7 @@ public class Emitter {
     /// </summary>
     /// <param name="value">String value</param>
     public void LoadString(string value) {
-        if (value == null) {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
         Emit0(OpCodes.Ldstr, value);
     }
 
@@ -880,7 +849,7 @@ public class Emitter {
     public void LoadComplex(Complex value) {
         LoadDouble(value.Real);
         LoadDouble(value.Imaginary);
-        Emit0(OpCodes.Newobj, value.GetType().GetConstructor(new[] { typeof(double), typeof(double) }));
+        Emit0(OpCodes.Newobj, value.GetType().GetConstructor([typeof(double), typeof(double)]));
     }
 
     /// <summary>
@@ -888,9 +857,7 @@ public class Emitter {
     /// </summary>
     /// <param name="value">The local variable reference</param>
     public void LoadLocal(LocalDescriptor value) {
-        if (value == null) {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
         Emit0(OpCodes.Ldloc, value);
     }
 
@@ -907,9 +874,7 @@ public class Emitter {
     /// </summary>
     /// <param name="fi">The FieldInfo structure</param>
     public void LoadStaticAddress(FieldInfo fi) {
-        if (fi == null) {
-            throw new ArgumentNullException(nameof(fi));
-        }
+        ArgumentNullException.ThrowIfNull(fi);
         Emit0(OpCodes.Ldsflda, fi);
     }
 
@@ -918,9 +883,7 @@ public class Emitter {
     /// </summary>
     /// <param name="value">The local variable reference</param>
     public void LoadLocalAddress(LocalDescriptor value) {
-        if (value == null) {
-            throw new ArgumentNullException(nameof(value));
-        }
+        ArgumentNullException.ThrowIfNull(value);
         Emit0(OpCodes.Ldloca, value);
     }
 
@@ -943,8 +906,6 @@ public class Emitter {
                 Emit0(OpCodes.Ldind_I1);
                 break;
             case SymType.CHAR:
-                Emit0(OpCodes.Ldind_Ref);
-                break;
             case SymType.REF:
                 Emit0(OpCodes.Ldind_Ref);
                 break;
@@ -998,9 +959,7 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">A symbol</param>
     public void LoadFunction(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         if (sym.Info is JMethod method) {
             Emit0(OpCodes.Ldftn, method.Builder);
         }
@@ -1015,9 +974,7 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">Array symbol</param>
     public void LoadArrayElement(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
             Type[] paramTypes = new Type[sym.Dimensions.Count];
             for (int c = 0; c < sym.Dimensions.Count; ++c) {
@@ -1037,9 +994,7 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">Array symbol</param>
     public void LoadArrayElementReference(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
             Type[] paramTypes = new Type[sym.Dimensions.Count];
             for (int c = 0; c < sym.Dimensions.Count; ++c) {
@@ -1085,10 +1040,8 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">A Symbol object representing the variable</param>
     /// <returns>The SymType of the variable loaded</returns>
-    public SymType StoreLocal(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+    public void StoreLocal(Symbol sym) {
+        ArgumentNullException.ThrowIfNull(sym);
         if (sym.IsInCommon) {
             Symbol symCommon = sym.Common;
             List<Symbol> commonList = (List<Symbol>)symCommon.Info;
@@ -1100,7 +1053,6 @@ public class Emitter {
         else {
             StoreLocal(sym.Index);
         }
-        return sym.Type;
     }
 
     /// <summary>
@@ -1147,9 +1099,7 @@ public class Emitter {
     /// </summary>
     /// <param name="sym">Array symbol</param>
     public void StoreArrayElement(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         if (sym.Dimensions.Count > 1 && !sym.IsFlatArray) {
             Type[] paramTypes = new Type[sym.Dimensions.Count + 1];
             for (int c = 0; c < sym.Dimensions.Count; ++c) {
@@ -1258,9 +1208,7 @@ public class Emitter {
     /// </summary>
     /// <param name="temp">A local descriptor for the temporary variable</param>
     public static void ReleaseTemporary(LocalDescriptor temp) {
-        if (temp == null) {
-            throw new ArgumentNullException(nameof(temp));
-        }
+        ArgumentNullException.ThrowIfNull(temp);
         temp.InUse = false;
     }
 

@@ -47,9 +47,7 @@ public sealed class VarArgParseNode : CollectionParseNode {
     /// <param name="returnType">The type required by the caller</param>
     /// <returns>The symbol type of the value generated</returns>
     public override SymType Generate(Emitter emitter, ProgramParseNode cg, SymType returnType) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         int argCount = Nodes.Count;
         emitter.CreateSimpleArray(argCount, typeof(object));
         for (int c = 0; c < argCount; ++c) {

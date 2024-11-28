@@ -46,9 +46,7 @@ public sealed class MarkLabelParseNode : ParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (emitter == null) {
-            throw new ArgumentNullException(nameof(emitter));
-        }
+        ArgumentNullException.ThrowIfNull(emitter);
         if (Label.Type == SymType.LABEL && Label.IsReferenced) {
             emitter.MarkLabel((Label)Label.Info);
         }

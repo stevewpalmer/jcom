@@ -46,9 +46,7 @@ public class InstructionField : Instruction {
     /// <param name="op">Opcode</param>
     /// <param name="field">FieldInfo object</param>
     public InstructionField(OpCode op, FieldInfo field) : base(op) {
-        if (field == null) {
-            throw new ArgumentNullException(nameof(field));
-        }
+        ArgumentNullException.ThrowIfNull(field);
         Field = field;
     }
 
@@ -58,9 +56,7 @@ public class InstructionField : Instruction {
     /// </summary>
     /// <param name="il">ILGenerator object</param>
     public override void Generate(ILGenerator il) {
-        if (il == null) {
-            throw new ArgumentNullException(nameof(il));
-        }
+        ArgumentNullException.ThrowIfNull(il);
         if (Deleted) {
             return;
         }

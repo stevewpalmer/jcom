@@ -37,7 +37,7 @@ public sealed class ProcedureParseNode : ParseNode {
     /// Constructor
     /// </summary>
     public ProcedureParseNode() : base(ParseID.PROCEDURE) {
-        Symbols = new List<SymbolCollection>();
+        Symbols = [];
         Body = new BlockParseNode();
     }
 
@@ -119,9 +119,7 @@ public sealed class ProcedureParseNode : ParseNode {
     /// </summary>
     /// <param name="cg">A CodeGenerator object</param>
     public override void Generate(ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
 
         // Create the emitter for this method
         JMethod method = ProcedureSymbol.Info as JMethod;

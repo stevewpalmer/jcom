@@ -88,16 +88,14 @@ public sealed class ReadItemParseNode : ParseNode {
     /// <param name="cg">A CodeGenerator object</param>
     /// <param name="node">A parse node for the READ identifier</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg, ParseNode node) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         if (node is LoopParseNode loopNode) {
             loopNode.Callback = this;
             loopNode.Generate(emitter, cg);
         }
         else {
             Type readManagerType = typeof(ReadManager);
-            List<Type> readParamTypes = new();
+            List<Type> readParamTypes = [];
 
             emitter.LoadLocal(ReadManagerIndex);
             readParamTypes.Add(readManagerType);

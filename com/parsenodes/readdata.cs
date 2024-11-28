@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -83,11 +83,8 @@ public sealed class ReadDataParseNode : ParseNode {
     /// </summary>
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A CodeGenerator object</param>
-    /// <param name="node">A parse node for the READ identifier</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
 
         Label endRead = emitter.CreateLabel();
 

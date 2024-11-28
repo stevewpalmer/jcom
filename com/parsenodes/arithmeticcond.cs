@@ -47,9 +47,7 @@ public sealed class ArithmeticConditionalParseNode : CollectionParseNode {
     /// <param name="emitter">Code emitter</param>
     /// <param name="cg">A code generator object</param>
     public override void Generate(Emitter emitter, ProgramParseNode cg) {
-        if (cg == null) {
-            throw new ArgumentNullException(nameof(cg));
-        }
+        ArgumentNullException.ThrowIfNull(cg);
         SymType exprType = cg.GenerateExpression(emitter, SymType.NONE, ValueExpression);
         Symbol label1 = ProgramParseNode.GetLabel(Nodes[0]);
         Symbol label2 = ProgramParseNode.GetLabel(Nodes[1]);

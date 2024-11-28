@@ -114,7 +114,7 @@ public class JType {
             if (_defaultConstructor == null) {
                 ConstructorBuilder cntb = Builder.DefineConstructor(MethodAttributes.Static,
                     CallingConventions.Standard,
-                    Array.Empty<Type>());
+                    []);
                 _defaultConstructor = new JMethod(this, cntb);
             }
             return _defaultConstructor;
@@ -127,9 +127,7 @@ public class JType {
     /// <param name="sym">The symbol</param>
     /// <returns>The A FieldInfo representing the new field</returns>
     public void CreateField(Symbol sym) {
-        if (sym == null) {
-            throw new ArgumentNullException(nameof(sym));
-        }
+        ArgumentNullException.ThrowIfNull(sym);
         string name = $"S{_staticIndex++}_{sym.Name}";
         sym.Info = Builder.DefineField(name, sym.SystemType, FieldAttributes.Static);
     }
@@ -149,7 +147,6 @@ public class JType {
     /// </summary>
     /// <param name="sym">Symbol representing the method</param>
     /// <param name="attributes">Method attributes</param>
-    /// <param name="paramTypes">Parameter types</param>
     /// <returns></returns>
     public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
 

@@ -69,7 +69,7 @@ public class JMethod {
     /// Constructs a method that belongs to the given type
     /// </summary>
     /// <param name="owningType">Method owner</param>
-    /// <param name="metd">Constructor builder</param>
+    /// <param name="cntb">Constructor builder</param>
     public JMethod(JType owningType, ConstructorBuilder cntb) {
         OwningType = owningType;
         CBuilder = cntb;
