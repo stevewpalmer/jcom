@@ -76,7 +76,7 @@ public partial class Compiler {
                 symCommon = _globalSymbols.Get(name);
                 if (symCommon == null) {
                     symCommon = _globalSymbols.Add(name, new SymFullType(SymType.COMMON), SymClass.VAR, null, _ls.LineNumber);
-                    commonSymbols = new List<Symbol>();
+                    commonSymbols = [];
                     symCommon.Info = commonSymbols;
                     symCommon.CommonIndex = 0;
                 }
@@ -154,17 +154,13 @@ public partial class Compiler {
             IdentifierToken identToken = ExpectIdentifierToken();
             if (identToken != null) {
                 Symbol sym = GetSymbolForCurrentScope(identToken.Name);
-                if (sym != null && sym.Scope == SymScope.CONSTANT) {
+                if (sym is { Scope: SymScope.CONSTANT }) {
                     Messages.Error(MessageCode.IDENTIFIERREDEFINITION, "Identifier already defined");
                     SkipToEndOfLine();
                     return null;
                 }
-                if (sym == null) {
-                    sym = _localSymbols.Get(identToken.Name);
-                    if (sym == null) {
-                        sym = _localSymbols.Add(identToken.Name, new SymFullType(SymType.NONE), SymClass.VAR, null, _ls.LineNumber);
-                    }
-                }
+                sym ??= _localSymbols.Get(identToken.Name) ??
+                        _localSymbols.Add(identToken.Name, new SymFullType(SymType.NONE), SymClass.VAR, null, _ls.LineNumber);
                 sym.Defined = true;
                 ExpectToken(TokenID.EQUOP);
                 sym.Value = ParseConstantExpression();
@@ -183,8 +179,8 @@ public partial class Compiler {
         SimpleToken token;
 
         do {
-            List<ParseNode> idList = new();
-            List<Variant> valueList = new();
+            List<ParseNode> idList = [];
+            List<Variant> valueList = [];
             do {
                 // BUGBUG: Check for duplicate identifier in ANY data
                 // statement. Need to set a symbol flag.
@@ -338,18 +334,18 @@ public partial class Compiler {
     }
 
     // FUNCTION keyword.
-    private ParseNode KFunction() {
+    private ProcedureParseNode KFunction() {
         return KSubFunc(SymClass.FUNCTION, null, new SymFullType());
     }
 
     // SUBROUTINE keyword
-    private ParseNode KSubroutine() {
+    private ProcedureParseNode KSubroutine() {
         return KSubFunc(SymClass.SUBROUTINE, null, new SymFullType());
     }
 
     // Starts a subroutine block. For this, we create a separate symbol table
     // to supplement the main one.
-    private ParseNode KSubFunc(SymClass klass, string methodName, SymFullType returnType) {
+    private ProcedureParseNode KSubFunc(SymClass klass, string methodName, SymFullType returnType) {
         ProcedureParseNode node = new();
         EnsureNoLabel();
 
@@ -365,7 +361,7 @@ public partial class Compiler {
         }
 
         Symbol method = _globalSymbols.Get(methodName);
-        if (method != null && method.Defined && !method.IsExternal) {
+        if (method is { Defined: true, IsExternal: false }) {
             Messages.Error(MessageCode.SUBFUNCDEFINED, $"{methodName} already defined");
             SkipToEndOfLine();
             return null;
@@ -390,7 +386,7 @@ public partial class Compiler {
 
         switch (klass) {
             case SymClass.PROGRAM:
-                parameters = new Collection<Symbol>();
+                parameters = [];
                 klass = SymClass.SUBROUTINE;
                 methodName = _entryPointName;
                 break;
@@ -413,9 +409,7 @@ public partial class Compiler {
         }
 
         // Add this method to the global symbol table now.
-        if (method == null) {
-            method = _globalSymbols.Add(methodName, new SymFullType(), klass, null, _ls.LineNumber);
-        }
+        method ??= _globalSymbols.Add(methodName, new SymFullType(), klass, null, _ls.LineNumber);
 
         method.Parameters = parameters;
         method.Defined = true;
@@ -442,7 +436,7 @@ public partial class Compiler {
 
         node.ProcedureSymbol = method;
         node.Symbols.Add(_localSymbols);
-        node.LabelList = new Collection<ParseNode>();
+        node.LabelList = [];
 
         _currentProcedure = node;
         _currentProcedure.AlternateReturnCount = alternateReturnCount;
@@ -540,21 +534,13 @@ public partial class Compiler {
                         Messages.Error(MessageCode.NOTALLOWEDININTRINSIC, $"{sym.Name} not permitted in INTRINSIC");
                     }
 
-                    int paramCount = 1;
-                    switch (intrDefinition.Count) {
-                        case ArgCount.One:
-                            paramCount = 1;
-                            break;
-                        case ArgCount.OneOrTwo:
-                            paramCount = 2;
-                            break;
-                        case ArgCount.Two:
-                            paramCount = 2;
-                            break;
-                        case ArgCount.TwoOrMore:
-                            paramCount = 1;
-                            break;
-                    }
+                    int paramCount = intrDefinition.Count switch {
+                        ArgCount.One => 1,
+                        ArgCount.OneOrTwo => 2,
+                        ArgCount.Two => 2,
+                        ArgCount.TwoOrMore => 1,
+                        _ => 1
+                    };
                     Type[] paramTypes = new Type[paramCount];
                     for (int c = 0; c < paramCount; ++c) {
                         SymType argType = intrDefinition.ArgType();
@@ -602,7 +588,7 @@ public partial class Compiler {
                 Symbol sym = _localSymbols.Get(identToken.Name);
 
                 // External scope being given to a dummy argument
-                if (sym != null && sym.IsParameter) {
+                if (sym is { IsParameter: true }) {
                     sym.Class = SymClass.FUNCTION;
                 }
                 else {
@@ -645,32 +631,32 @@ public partial class Compiler {
     }
 
     /// All the type declarations, one by one.
-    private ParseNode KCharacter() {
+    private ProcedureParseNode KCharacter() {
         return KDeclaration(SymType.FIXEDCHAR);
     }
 
-    private ParseNode KInteger() {
+    private ProcedureParseNode KInteger() {
         return KDeclaration(SymType.INTEGER);
     }
 
-    private ParseNode KLogical() {
+    private ProcedureParseNode KLogical() {
         return KDeclaration(SymType.BOOLEAN);
     }
 
-    private ParseNode KDouble() {
+    private ProcedureParseNode KDouble() {
         return KDeclaration(SymType.DOUBLE);
     }
 
-    private ParseNode KReal() {
+    private ProcedureParseNode KReal() {
         return KDeclaration(SymType.FLOAT);
     }
 
-    private ParseNode KComplex() {
+    private ProcedureParseNode KComplex() {
         return KDeclaration(SymType.COMPLEX);
     }
 
     /// Handle a declaration statement of the specified type.
-    private ParseNode KDeclaration(SymType type) {
+    private ProcedureParseNode KDeclaration(SymType type) {
         SymFullType fullType = new(type);
         SimpleToken token;
 
@@ -757,7 +743,7 @@ public partial class Compiler {
                             char ch1 = identToken.Name[0];
                             char ch2 = ch1;
 
-                            if (ch1 < 'A' || ch1 > 'Z') {
+                            if (ch1 is < 'A' or > 'Z') {
                                 Messages.Error(MessageCode.IMPLICITSINGLECHAR, "IMPLICIT must have a single character");
                             }
 
@@ -766,7 +752,7 @@ public partial class Compiler {
                                 identToken = ExpectIdentifierToken();
                                 if (identToken != null) {
                                     ch2 = identToken.Name[0];
-                                    if (ch2 < 'A' || ch2 > 'Z') {
+                                    if (ch2 is < 'A' or > 'Z') {
                                         Messages.Error(MessageCode.IMPLICITSINGLECHAR, "IMPLICIT must have a single character");
                                     }
                                     if (ch2 < ch1) {

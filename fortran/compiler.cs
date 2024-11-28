@@ -85,7 +85,7 @@ public partial class Compiler : ICompiler {
     /// </summary>
     /// <param name="filename">The full path and file name to be compiled</param>
     public void Compile(string filename) {
-        List<string> lines = new();
+        List<string> lines = [];
         using (StreamReader sr = new(filename)) {
             while (sr.Peek() != -1) {
                 string line = sr.ReadLine();
@@ -134,8 +134,8 @@ public partial class Compiler : ICompiler {
     /// main function is returned as an object.
     /// </summary>
     /// <returns>An ExecutionResult object representing the result of the execution</returns>
-    public ExecutionResult Execute() {
-        return Execute(_entryPointName);
+    public void Execute() {
+        Execute(_entryPointName);
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public partial class Compiler : ICompiler {
     /// <summary>
     /// Return or set the list of compiler messages.
     /// </summary>
-    public MessageCollection Messages { get; set; }
+    public MessageCollection Messages { get; init; }
 
     // Compile an array of source lines.
     private void CompileString(string filename, string[] lines) {
@@ -228,7 +228,7 @@ public partial class Compiler : ICompiler {
     // Create a token node that marks the current file being compiled. The
     // code generator uses this to refer to the correct source file if any
     // errors are found during generation.
-    private ParseNode MarkFilename() {
+    private MarkFilenameParseNode MarkFilename() {
         return new MarkFilenameParseNode { Filename = Messages.Filename };
     }
 
@@ -236,7 +236,7 @@ public partial class Compiler : ICompiler {
     // compiled. The code generator uses this in conjunction with the
     // filename to refer to the location in the source file if any errors
     // are found during generation.
-    private ParseNode MarkLine() {
+    private MarkLineParseNode MarkLine() {
         return new MarkLineParseNode { LineNumber = _ls.LineNumber };
     }
 
@@ -291,25 +291,15 @@ public partial class Compiler : ICompiler {
         if (_stfSymbols != null) {
             sym = _stfSymbols.Get(name);
         }
-        if (sym == null) {
-            sym = _localSymbols.Get(name);
-            if (sym == null) {
-                sym = _globalSymbols.Get(name);
-            }
-        }
-        return sym;
+        return sym ?? (_localSymbols.Get(name) ?? _globalSymbols.Get(name));
     }
 
     // Look up the symbol table for the specified identifier starting with the
     // current scope and working up to and including global.
     private Symbol GetMakeSymbolForCurrentScope(string name) {
-        Symbol sym = GetSymbolForCurrentScope(name);
-        if (sym == null) {
-            sym = _localSymbols.Get(name);
-            if (sym == null) {
-                sym = _localSymbols.Add(name, new SymFullType(SymType.NONE), SymClass.VAR, null, _ls.LineNumber);
-            }
-        }
+        Symbol sym = GetSymbolForCurrentScope(name) ??
+                     (_localSymbols.Get(name) ??
+                     _localSymbols.Add(name, new SymFullType(SymType.NONE), SymClass.VAR, null, _ls.LineNumber));
         return sym;
     }
 
@@ -329,10 +319,7 @@ public partial class Compiler : ICompiler {
     // cast if so. This is just a cast wrapper around ExpectToken().
     private IdentifierToken ExpectIdentifierToken() {
         SimpleToken token = ExpectToken(TokenID.IDENT);
-        if (token != null) {
-            return (IdentifierToken)token;
-        }
-        return null;
+        return (IdentifierToken)token;
     }
 
     // Eat the input to the end of the line. Useful when we hit a syntax error and want
@@ -357,7 +344,7 @@ public partial class Compiler : ICompiler {
     // Return whether we are at the end of the current line.
     private bool IsAtEndOfLine() {
         SimpleToken token = _ls.PeekToken();
-        return token.ID == TokenID.EOL || token.ID == TokenID.ENDOFFILE;
+        return token.ID is TokenID.EOL or TokenID.ENDOFFILE;
     }
 
     // Check whether the next token is the one specified and skip it if so.
@@ -453,7 +440,7 @@ public partial class Compiler : ICompiler {
 
     // Check for a label on the current line and if found, add to the
     // symbol table and generate a parsenode for the current position.
-    private ParseNode CheckLabel() {
+    private MarkLabelParseNode CheckLabel() {
         if (_ls.HasLabel) {
             Symbol sym = GetMakeLabel(_ls.Label, true);
             return new MarkLabelParseNode { Label = sym };
@@ -541,7 +528,7 @@ public partial class Compiler : ICompiler {
     // This is a straight assignment of a label to an identifier. The
     // code generator will differentiate and construct the right code
     // to perform the assignment of the label's internal ID.
-    private ParseNode KAssign() {
+    private AssignmentParseNode KAssign() {
         AssignmentParseNode assignNode = new();
         SymbolParseNode label = ParseLabel();
 
@@ -558,8 +545,8 @@ public partial class Compiler : ICompiler {
             _currentProcedure.LabelList.Add(label);
         }
 
-        assignNode.Identifiers = new[] { ParseBasicIdentifier() };
-        assignNode.ValueExpressions = new[] { new NumberParseNode(index) };
+        assignNode.Identifiers = [ParseBasicIdentifier()];
+        assignNode.ValueExpressions = [new NumberParseNode(index)];
         return assignNode;
     }
 
@@ -580,7 +567,7 @@ public partial class Compiler : ICompiler {
         string savedFilename = Messages.Filename;
         Lexer savedLexer = _ls;
         if (filename != null) {
-            List<string> lines = new();
+            List<string> lines = [];
             try {
                 string fullPath = Path.Combine(Path.GetDirectoryName(Messages.Filename), filename);
                 using (StreamReader sr = new(fullPath)) {
@@ -603,17 +590,15 @@ public partial class Compiler : ICompiler {
 
     // CALL keyword
     // Call a subroutine/function with specified parameters
-    private ParseNode KCall() {
+    private CallParseNode KCall() {
         IdentifierToken identToken = ExpectIdentifierToken();
         if (identToken == null) {
             SkipToEndOfLine();
             return null;
         }
 
-        Symbol sym = GetSymbolForCurrentScope(identToken.Name);
-        if (sym == null) {
-            sym = _globalSymbols.Add(identToken.Name, new SymFullType(SymType.NONE), SymClass.SUBROUTINE, null, _ls.LineNumber);
-        }
+        Symbol sym = GetSymbolForCurrentScope(identToken.Name) ??
+                     _globalSymbols.Add(identToken.Name, new SymFullType(SymType.NONE), SymClass.SUBROUTINE, null, _ls.LineNumber);
 
         // If this was a parameter now being used as a function, change its
         // class and type.
@@ -695,7 +680,7 @@ public partial class Compiler : ICompiler {
     }
 
     // Block IF
-    private ParseNode KBlockIf(ParseNode expr) {
+    private ConditionalParseNode KBlockIf(ParseNode expr) {
         ConditionalParseNode node = new();
         TokenID id;
 
@@ -743,7 +728,7 @@ public partial class Compiler : ICompiler {
                 expr = null;
                 ExpectEndOfLine();
             }
-        } while (id == TokenID.KELSEIF || id == TokenID.KELSE);
+        } while (id is TokenID.KELSEIF or TokenID.KELSE);
         _ls.BackToken();
         ExpectToken(TokenID.KENDIF);
         return node;
@@ -758,7 +743,7 @@ public partial class Compiler : ICompiler {
     }
 
     // Logical IF
-    private ParseNode KLogicalIf(ParseNode expr) {
+    private ConditionalParseNode KLogicalIf(ParseNode expr) {
         ConditionalParseNode node = new();
         _parsingIf = true;
         BlockParseNode body = new();
@@ -769,7 +754,7 @@ public partial class Compiler : ICompiler {
     }
 
     // Arithmetic IF
-    private ParseNode KArithmeticIf(ParseNode expr) {
+    private ArithmeticConditionalParseNode KArithmeticIf(ParseNode expr) {
         ArithmeticConditionalParseNode node = new() {
             ValueExpression = expr
         };
@@ -790,7 +775,7 @@ public partial class Compiler : ICompiler {
 
     // DO statement:
     // Syntax: DO label, var=start,end
-    private ParseNode KDo() {
+    private LoopParseNode KDo() {
         if (_parsingIf) {
             Messages.Error(MessageCode.DONOTPERMITTED, "DO statement not permitted in IF statement");
             return null;
@@ -856,7 +841,7 @@ public partial class Compiler : ICompiler {
     }
 
     // Parse a DO WHILE loop construct
-    private ParseNode KDoWhile(SymbolParseNode endLabelNode) {
+    private LoopParseNode KDoWhile(SymbolParseNode endLabelNode) {
         LoopParseNode node = new();
 
         ExpectToken(TokenID.KWHILE);
@@ -927,10 +912,10 @@ public partial class Compiler : ICompiler {
         Symbol sym = _localSymbols.Get(identToken.Name);
         if (_ls.PeekToken().ID == TokenID.LPAREN) {
             bool stfunc = sym == null;
-            if (sym != null && sym.Type == SymType.FIXEDCHAR) {
+            if (sym is { Type: SymType.FIXEDCHAR }) {
                 stfunc = false;
             }
-            else if (sym != null && !sym.IsArray) {
+            else if (sym is { IsArray: false }) {
                 stfunc = true;
             }
             if (stfunc) {
@@ -938,7 +923,7 @@ public partial class Compiler : ICompiler {
             }
         }
 
-        IdentifierParseNode identNode = (IdentifierParseNode)ParseIdentifierFromToken(identToken);
+        IdentifierParseNode identNode = ParseIdentifierFromToken(identToken);
         if (identNode != null) {
 
             // Can never assign to a constant
@@ -948,7 +933,7 @@ public partial class Compiler : ICompiler {
                 return null;
             }
 
-            node.Identifiers = new[] { identNode };
+            node.Identifiers = [identNode];
             ExpectToken(TokenID.EQUOP);
             ParseNode exprNode = Expression();
             if (exprNode != null) {
@@ -956,7 +941,7 @@ public partial class Compiler : ICompiler {
                 if (!valid) {
                     Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in assignment");
                 }
-                node.ValueExpressions = new[] { exprNode };
+                node.ValueExpressions = [exprNode];
             }
         }
         else {
@@ -1002,7 +987,7 @@ public partial class Compiler : ICompiler {
 
         string methodName = identToken.Name;
         Symbol method = _localSymbols.Get(methodName);
-        if (method != null && method.Defined && method.IsMethod) {
+        if (method is { Defined: true, IsMethod: true }) {
             Messages.Error(MessageCode.SUBFUNCDEFINED, $"Statement function {methodName} already defined");
             SkipToEndOfLine();
             return null;
@@ -1016,9 +1001,7 @@ public partial class Compiler : ICompiler {
         if (altReturnCount > 0) {
             Messages.Error(MessageCode.ALTRETURNNOTALLOWED, "Alternate return not permitted for statement functions");
         }
-        if (method == null) {
-            method = _localSymbols.Add(methodName, new SymFullType(), SymClass.FUNCTION, null, _ls.LineNumber);
-        }
+        method ??= _localSymbols.Add(methodName, new SymFullType(), SymClass.FUNCTION, null, _ls.LineNumber);
         method.Class = SymClass.INLINE;
         method.Parameters = parameters;
         method.Linkage = SymLinkage.BYVAL;
@@ -1037,7 +1020,7 @@ public partial class Compiler : ICompiler {
     //   Integer = Statement number
     //   Ident = assigned branch [[,] (x,y,z)]
     //   Computed GOTO (x,y,z),ident
-    private ParseNode KGoto() {
+    private GotoParseNode KGoto() {
         GotoParseNode node = new();
         SimpleToken token = _ls.GetToken();
 
@@ -1089,7 +1072,7 @@ public partial class Compiler : ICompiler {
     // The check for _hasProgram is because some valid FORTRAN programs have
     // duplicate PROGRAM statements at the start of the file. We simply ignore
     // the second instance.
-    private ParseNode KProgram() {
+    private ProcedureParseNode KProgram() {
         EnsureNoLabel();
 
         // Multiple PROGRAM statements are legal but ignore
@@ -1109,7 +1092,7 @@ public partial class Compiler : ICompiler {
 
     // Create a PROGRAM node with the given keyword and insert it at
     // the beginning of the current block.
-    private ParseNode KCreateProgram(string methodName) {
+    private ProcedureParseNode KCreateProgram(string methodName) {
         return KSubFunc(SymClass.SUBROUTINE, methodName, new SymFullType());
     }
 
@@ -1140,10 +1123,7 @@ public partial class Compiler : ICompiler {
             }
             string str = ((StringToken)token).String;
 
-            Symbol sym = _localSymbols.Get(label);
-            if (sym == null) {
-                sym = _localSymbols.Add(label, new SymFullType(SymType.NONE), SymClass.VAR, null, _ls.LineNumber);
-            }
+            Symbol sym = _localSymbols.Get(label) ?? _localSymbols.Add(label, new SymFullType(SymType.NONE), SymClass.VAR, null, _ls.LineNumber);
             sym.FullType = new SymFullType(SymType.CHAR, str.Length);
             sym.Modifier = SymModifier.STATIC;
             sym.Defined = true;
@@ -1154,7 +1134,7 @@ public partial class Compiler : ICompiler {
 
     // RETURN keyword
     // Returns from a subroutine or function.
-    private ParseNode KReturn() {
+    private ReturnParseNode KReturn() {
         ReturnParseNode node = new();
         if (_currentProcedure == null) {
             Messages.Error(MessageCode.ILLEGALRETURN, "Cannot use a RETURN statement here");
@@ -1234,7 +1214,7 @@ public partial class Compiler : ICompiler {
 
     // STOP keyword
     // Stop the program.
-    private ParseNode KStop() {
+    private ExtCallParseNode KStop() {
         ExtCallParseNode node = new("JComLib.Runtime,comlib", "STOP") {
             Parameters = new ParametersParseNode()
         };
@@ -1246,7 +1226,7 @@ public partial class Compiler : ICompiler {
     // PAUSE keyword
     // Pauses the program and outputs the given string. Waits for user
     // input to continue.
-    private ParseNode KPause() {
+    private ExtCallParseNode KPause() {
         ExtCallParseNode node = new("JComLib.Runtime,comlib", "PAUSE") {
             Parameters = new ParametersParseNode()
         };

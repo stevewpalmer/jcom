@@ -43,9 +43,7 @@ public class FortranSymbolCollection : SymbolCollection {
     /// </summary>
     /// <param name="symbols">The symbol collection to inherit</param>
     public FortranSymbolCollection(FortranSymbolCollection symbols) : base(symbols.Name) {
-        if (symbols == null) {
-            throw new ArgumentNullException(nameof(symbols));
-        }
+        ArgumentNullException.ThrowIfNull(symbols);
         _typeMap = symbols._typeMap;
         _typeMapSet = symbols._typeMapSet;
     }
@@ -79,23 +77,13 @@ public class FortranSymbolCollection : SymbolCollection {
     }
 
     /// <summary>
-    /// Return whether a specific implicit character is set.
-    /// </summary>
-    /// <param name="ch">The character to check</param>
-    /// <returns>True if an implication is set for that character</returns>
-    public bool IsImplicitSet(char ch) {
-        Debug.Assert(char.IsLetter(ch));
-        return _typeMapSet[char.ToUpper(ch) - 'A'];
-    }
-
-    /// <summary>
     /// Return the default FullType for variables that start with the given character.
     /// </summary>
     /// <returns>The full type for character.</returns>
     /// <param name="ch">Character</param>
     public SymFullType ImplicitTypeForCharacter(char ch) {
         ch = char.ToUpper(ch);
-        Debug.Assert(ch >= 'A' && ch <= 'Z');
+        Debug.Assert(ch is >= 'A' and <= 'Z');
         return _typeMap[ch - 'A'];
     }
 
@@ -108,7 +96,7 @@ public class FortranSymbolCollection : SymbolCollection {
     /// <param name="chLast">The last character in the range</param>
     /// <param name="fullType">The full type associated to the range</param>
     public void Implicit(char chFirst, char chLast, SymFullType fullType) {
-        Debug.Assert(chFirst >= 'A' && chFirst <= 'Z' && chLast >= 'A' && chLast <= 'Z');
+        Debug.Assert(chFirst is >= 'A' and <= 'Z' && chLast is >= 'A' and <= 'Z');
         Debug.Assert(chFirst <= chLast);
         for (int c = chFirst - 'A'; c <= chLast - 'A'; ++c) {
             _typeMap[c] = fullType;
@@ -138,12 +126,8 @@ public class FortranSymbolCollection : SymbolCollection {
     /// <param name="refLine">Line number reference</param>
     /// <returns>A newly created symbol table entry or null.</returns>
     public override Symbol Add(string name, SymFullType fullType, SymClass klass, Collection<SymDimension> dimensions, int refLine) {
-        if (name == null) {
-            throw new ArgumentNullException(nameof(name));
-        }
-        if (fullType == null) {
-            throw new ArgumentNullException(nameof(fullType));
-        }
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(fullType);
         if (fullType.Type == SymType.NONE) {
             char chFirst = char.ToUpper(name[0]);
             if (char.IsLetter(chFirst)) {

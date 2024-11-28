@@ -129,7 +129,7 @@ public partial class Compiler {
     // READ keyword
     // Reads data into variables. Basically the run-time handles the I/O and the
     // format list, and we provide the parameters.
-    private ParseNode KRead() {
+    private ReadParseNode KRead() {
         ReadParseNode node = new();
 
         InitFunctionNodes();
@@ -149,7 +149,7 @@ public partial class Compiler {
         // uses the given character string as the input source.
         ParseNode unit = cilist["UNIT"];
 
-        if (unit != null && unit.ID == ParseID.IDENT && Symbol.IsCharType(unit.Type)) {
+        if (unit is { ID: ParseID.IDENT } && Symbol.IsCharType(unit.Type)) {
             if (cilist.Has("REC")) {
                 Messages.Error(MessageCode.CILISTNOTALLOWED, "Parameter REC not allowed here");
                 SkipToEndOfLine();
@@ -185,7 +185,7 @@ public partial class Compiler {
         // assigns the result to the character string
         ParseNode unit = cilist["UNIT"];
 
-        if (unit != null && unit.ID == ParseID.IDENT && Symbol.IsCharType(unit.Type)) {
+        if (unit is { ID: ParseID.IDENT } && Symbol.IsCharType(unit.Type)) {
             node.WriteParamsNode = _ioCoreFunctions.ParametersNode(cilist);
             node.WriteManagerParamsNode = _writeFunctionString.ParametersNode(cilist);
 
@@ -201,7 +201,7 @@ public partial class Compiler {
     }
 
     // PRINT keyword
-    private ParseNode KPrint() {
+    private WriteParseNode KPrint() {
         WriteParseNode node = new();
 
         InitFunctionNodes();

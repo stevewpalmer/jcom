@@ -201,13 +201,8 @@ public static class Tokens {
     /// <param name="str">A keyword string</param>
     /// <returns>The associated token ID, or TokenID.IDENT</returns>
     public static TokenID StringToTokenID(string str) {
-        if (str == null) {
-            throw new ArgumentNullException(nameof(str));
-        }
-        if (!_keywords.TryGetValue(str.ToLower(), out TokenID id)) {
-            id = TokenID.IDENT;
-        }
-        return id;
+        ArgumentNullException.ThrowIfNull(str);
+        return _keywords.GetValueOrDefault(str.ToLower(), TokenID.IDENT);
     }
 
     /// <summary>
@@ -267,7 +262,7 @@ public class SimpleToken {
     /// <summary>
     /// Returns the token ID.
     /// </summary>
-    public TokenID ID { get; private set; }
+    public TokenID ID { get; }
 
     /// <summary>
     /// Returns the keyword ID of the token.
@@ -385,5 +380,5 @@ public class IdentifierToken : SimpleToken {
     /// <summary>
     /// Returns the identifier name.
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; }
 }

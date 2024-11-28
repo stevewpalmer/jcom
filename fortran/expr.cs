@@ -36,7 +36,7 @@ public partial class Compiler {
     // integer type.
     private ParseNode IntegerExpression() {
         ParseNode node = Expression();
-        if (node == null || !node.IsInteger) {
+        if (node is not { IsInteger: true }) {
             Messages.Error(MessageCode.INTEGEREXPECTED, "Integer expression expected");
             node = null;
         }
@@ -244,7 +244,7 @@ public partial class Compiler {
 
     // Return whether the node is a possible complex part
     private static bool IsComplexPart(ParseNode node) {
-        return node.ID == ParseID.NUMBER && (node.Type == SymType.INTEGER || node.Type == SymType.FLOAT);
+        return node.ID == ParseID.NUMBER && node.Type is SymType.INTEGER or SymType.FLOAT;
     }
 
     // Parse and optimise an expression tree
@@ -467,7 +467,7 @@ public partial class Compiler {
 
                 // Constant types are returned as-is.
                 Symbol sym = GetSymbolForCurrentScope(identToken.Name);
-                if (sym != null && sym.IsConstant) {
+                if (sym is { IsConstant: true }) {
                     sym.IsReferenced = true;
                     if (Symbol.IsCharType(sym.Type)) {
                         return new StringParseNode(sym.Value);
@@ -476,7 +476,7 @@ public partial class Compiler {
                 }
 
                 // If we're an array we're done.
-                if (sym != null && sym.IsArray) {
+                if (sym is { IsArray: true }) {
                     match = true;
                 }
 
@@ -491,14 +491,14 @@ public partial class Compiler {
                 }
 
                 // Special handling for intrinsics
-                if (!match && (sym == null || !sym.IsParameter) && node.Indexes != null) {
+                if (!match && sym is not { IsParameter: true } && node.Indexes != null) {
                     if (Intrinsics.IsIntrinsic(identToken.Name)) {
                         return IntrinsicOperand(identToken.Name.ToUpper(), node);
                     }
                 }
 
                 // Statement functions will have been predefined
-                if (!match && sym != null && sym.Class == SymClass.INLINE) {
+                if (!match && sym is { Class: SymClass.INLINE }) {
                     match = true;
                 }
 
@@ -529,7 +529,7 @@ public partial class Compiler {
     }
 
     // Parse an intrinsic function call
-    private ParseNode IntrinsicOperand(string name, IdentifierParseNode node) {
+    private ExtCallParseNode IntrinsicOperand(string name, IdentifierParseNode node) {
         IntrDefinition intrDefinition = Intrinsics.IntrinsicDefinition(name);
         Debug.Assert(intrDefinition != null);
 
@@ -583,7 +583,7 @@ public partial class Compiler {
                 match = countOfParams == 1;
                 break;
             case ArgCount.OneOrTwo:
-                match = countOfParams == 1 || countOfParams == 2;
+                match = countOfParams is 1 or 2;
                 break;
             case ArgCount.Two:
                 match = countOfParams == 2;
@@ -607,7 +607,7 @@ public partial class Compiler {
     }
 
     // Parse a function call operand
-    private ParseNode FunctionOperand(string name, IdentifierParseNode identNode) {
+    private CallParseNode FunctionOperand(string name, IdentifierParseNode identNode) {
         Symbol sym = GetSymbolForCurrentScope(name);
         SymType type = SymType.NONE;
 
@@ -620,9 +620,7 @@ public partial class Compiler {
             sym = _globalSymbols.Get(name);
         }
 
-        if (sym == null) {
-            sym = _globalSymbols.Add(name, new SymFullType(type), SymClass.FUNCTION, null, _ls.LineNumber);
-        }
+        sym ??= _globalSymbols.Add(name, new SymFullType(type), SymClass.FUNCTION, null, _ls.LineNumber);
 
         // If this was a parameter now being used as a function, change its
         // class and type.
@@ -779,9 +777,7 @@ public partial class Compiler {
         SymType type1 = node.Left.Type;
         SymType type2 = node.Right.Type;
 
-        if (type1 == SymType.INTEGER ||
-            type1 == SymType.FLOAT ||
-            type1 == SymType.DOUBLE) {
+        if (type1 is SymType.INTEGER or SymType.FLOAT or SymType.DOUBLE) {
             switch (type2) {
                 case SymType.DOUBLE:
                 case SymType.FLOAT:

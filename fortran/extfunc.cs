@@ -46,8 +46,8 @@ public class ExternalFunction {
     /// Initializes a new instance of the <see cref="ExternalFunction"/> class.
     /// </summary>
     public ExternalFunction() {
-        _definitions = new Collection<FunctionDefinition>();
-        ParameterList = new Collection<string>();
+        _definitions = [];
+        ParameterList = [];
     }
 
     /// <summary>
@@ -64,9 +64,9 @@ public class ExternalFunction {
             Name = name,
             Symbol = new Symbol(name, new SymFullType(type), SymClass.VAR, null, 0) {
                 Linkage = linkage
-            }
+            },
+            Include = include
         };
-        definition.Include = include;
         _definitions.Add(definition);
         ParameterList.Add(name);
     }
@@ -80,9 +80,7 @@ public class ExternalFunction {
     /// <param name="cilist">A dictionary of control list values</param>
     /// <returns>A ParametersParseNode object.</returns>
     public ParametersParseNode ParametersNode(ControlList cilist) {
-        if (cilist == null) {
-            throw new ArgumentNullException(nameof(cilist));
-        }
+        ArgumentNullException.ThrowIfNull(cilist);
         ParametersParseNode paramList = new();
         foreach (FunctionDefinition def in _definitions) {
             if (def.Include) {

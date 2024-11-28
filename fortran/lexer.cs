@@ -60,7 +60,7 @@ public class Lexer {
         _tindex = 0;
         _opts = opts;
         _messages = messages;
-        _tokens = new List<SimpleToken>();
+        _tokens = [];
     }
 
     /// <summary>
@@ -519,7 +519,7 @@ public class Lexer {
     // Parse a number in the specified base.
     // The number may be enclosed in single quotes as part of a base specification
     // so we skip those if they're present.
-    private SimpleToken ParseBasedNumber(int numberBase) {
+    private IntegerToken ParseBasedNumber(int numberBase) {
         StringBuilder str = new();
         char ch = GetNextChar();
         char chDelim = '\0';
@@ -562,24 +562,12 @@ public class Lexer {
             if (ch == '.') {
                 str.Append(ch);
             }
-            switch (Tokens.StringToTokenID(str.ToString())) {
-                case TokenID.KAND:
-                case TokenID.KEQ:
-                case TokenID.KEQV:
-                case TokenID.KFALSE:
-                case TokenID.KGE:
-                case TokenID.KGT:
-                case TokenID.KLE:
-                case TokenID.KLT:
-                case TokenID.KOR:
-                case TokenID.KNE:
-                case TokenID.KNEQV:
-                case TokenID.KNOT:
-                case TokenID.KTRUE:
-                case TokenID.KXOR:
-                    match = true;
-                    break;
-            }
+            match = Tokens.StringToTokenID(str.ToString()) switch {
+                TokenID.KAND or TokenID.KEQ or TokenID.KEQV or TokenID.KFALSE or TokenID.KGE or TokenID.KGT or
+                TokenID.KLE or TokenID.KLT or TokenID.KOR or TokenID.KNE or TokenID.KNEQV or TokenID.KNOT or
+                TokenID.KTRUE or TokenID.KXOR => true,
+                _ => match
+            };
         }
         _pushedChar = savedPushedChar;
         _index = savedIndex;

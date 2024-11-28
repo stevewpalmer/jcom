@@ -51,23 +51,19 @@ internal static class Program {
             Compiler comp = new(opts) {
                 Messages = messages
             };
-
-            try {
-                foreach (string srcfile in opts.SourceFiles) {
-                    if (!File.Exists(srcfile)) {
-                        messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
-                        break;
-                    }
-                    comp.Compile(srcfile);
+            foreach (string srcfile in opts.SourceFiles) {
+                if (!File.Exists(srcfile)) {
+                    messages.Error(MessageCode.SOURCEFILENOTFOUND, $"File '{srcfile}' not found");
+                    break;
                 }
-                if (messages.ErrorCount == 0) {
-                    comp.Save();
-                    if (opts.Run && messages.ErrorCount == 0) {
-                        comp.Execute();
-                    }
+                comp.Compile(srcfile);
+            }
+            if (messages.ErrorCount == 0) {
+                comp.Save();
+                if (opts.Run && messages.ErrorCount == 0) {
+                    comp.Execute();
                 }
             }
-            catch (Exception) { }
         }
         foreach (Message msg in messages) {
             if (msg.Level == MessageLevel.Error) {

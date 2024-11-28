@@ -56,6 +56,7 @@ public sealed class IntrDefinition {
     /// <summary>
     ///  Constructs a single intrinsic definition.
     /// </summary>
+    /// <param name="functionName">Function name</param>
     /// <param name="count">Indicates how many arguments the function takes</param>
     /// <param name="types">Bitmask representing the valid argument types</param>
     /// <param name="requiredType">Type to which the argument must be cast</param>
@@ -133,7 +134,7 @@ public sealed class IntrDefinition {
     public string FunctionName { get; private set; }
 
     // Private automatic property accessors
-    private int Types { get; set; }
+    private int Types { get; }
 }
 
 /// <summary>
@@ -255,9 +256,7 @@ public static class Intrinsics {
     /// <returns>True if the name is an intrinsic function</returns>
     /// <param name="name">A name to check</param>
     public static bool IsIntrinsic(string name) {
-        if (name == null) {
-            throw new ArgumentNullException(nameof(name));
-        }
+        ArgumentNullException.ThrowIfNull(name);
         return _intrinsics.ContainsKey(name.ToUpper());
     }
 
@@ -267,12 +266,7 @@ public static class Intrinsics {
     /// <returns>An IntrDefinition object or null</returns>
     /// <param name="name">The intrinsic name</param>
     public static IntrDefinition IntrinsicDefinition(string name) {
-        if (name == null) {
-            throw new ArgumentNullException(nameof(name));
-        }
-        if (_intrinsics.TryGetValue(name.ToUpper(), out IntrDefinition intrDefinition)) {
-            return intrDefinition;
-        }
-        return null;
+        ArgumentNullException.ThrowIfNull(name);
+        return _intrinsics.GetValueOrDefault(name.ToUpper());
     }
 }

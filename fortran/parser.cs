@@ -103,7 +103,7 @@ public partial class Compiler {
     // Parse an integer, real or string constant
     private Variant ParseConstantExpression() {
         ParseNode tokenNode = Expression();
-        if (tokenNode != null && tokenNode.IsConstant) {
+        if (tokenNode is { IsConstant: true }) {
             return tokenNode.Value;
         }
         Messages.Error(MessageCode.CONSTANTEXPECTED, "Constant expression expected");
@@ -113,7 +113,7 @@ public partial class Compiler {
     // Parse an integer, real or string constant
     private Variant ParseConstant() {
         ParseNode tokenNode = SimpleExpresion();
-        if (tokenNode != null && tokenNode.IsConstant) {
+        if (tokenNode is { IsConstant: true }) {
             return tokenNode.Value;
         }
         Messages.Error(MessageCode.CONSTANTEXPECTED, "Constant expected");
@@ -121,7 +121,7 @@ public partial class Compiler {
     }
 
     // Parse a STOP/PAUSE argument
-    private ParseNode ParseStopPauseConstant() {
+    private StringParseNode ParseStopPauseConstant() {
         string str = ParseStringLiteral();
         if (string.IsNullOrWhiteSpace(str)) {
             str = string.Empty;
@@ -143,18 +143,15 @@ public partial class Compiler {
     // Parse and return a string literal
     private string ParseStringLiteral() {
         SimpleToken token = ExpectToken(TokenID.STRING);
-        if (token != null) {
-            StringToken stringToken = (StringToken)token;
-            return stringToken.String;
-        }
-        return null;
+        StringToken stringToken = (StringToken)token;
+        return stringToken?.String;
     }
 
     // Parse an expression, collapse it and return the integer value or
     // raise an error otherwise.
     private bool ParseIntegerValue(out int intval) {
         ParseNode tokenNode = Expression();
-        if (tokenNode == null || tokenNode.ID != ParseID.NUMBER) {
+        if (tokenNode is not { ID: ParseID.NUMBER }) {
             Messages.Error(MessageCode.INTEGEREXPECTED, "Integer value expected");
             intval = 0;
             return false;
@@ -164,7 +161,7 @@ public partial class Compiler {
     }
 
     // Parse a variable length argument list.
-    private CollectionParseNode ParseVarargList() {
+    private VarArgParseNode ParseVarargList() {
         VarArgParseNode varargs = null;
         if (!IsAtEndOfLine()) {
             varargs = new VarArgParseNode();
@@ -189,7 +186,7 @@ public partial class Compiler {
     }
 
     // Parse a variable length argument list of references.
-    private CollectionParseNode ParseVarargReferenceList() {
+    private VarArgParseNode ParseVarargReferenceList() {
         VarArgParseNode varargs = null;
         if (!IsAtEndOfLine()) {
             varargs = new VarArgParseNode();
@@ -255,7 +252,7 @@ public partial class Compiler {
     }
 
     // Parse an implied do.
-    private ParseNode ParseImpliedDo() {
+    private LoopParseNode ParseImpliedDo() {
         LoopParseNode node = new() {
 
             // The first element of an implied DO loop is an expression
@@ -303,17 +300,14 @@ public partial class Compiler {
     //    identifier(index [,index]*)
     // where index can be an expression that evaluates to an integer or a range
     // expression of the format low:high where each side evaluates to an integer.
-    private ParseNode ParseIdentifier() {
+    private IdentifierParseNode ParseIdentifier() {
         IdentifierToken identToken = ExpectIdentifierToken();
-        if (identToken != null) {
-            return ParseIdentifierFromToken(identToken);
-        }
-        return null;
+        return identToken != null ? ParseIdentifierFromToken(identToken) : null;
     }
 
     // Parse an identifier from the specified token and assign the corresponding
     // symbol to the identifier parse node.
-    private ParseNode ParseIdentifierFromToken(IdentifierToken identToken) {
+    private IdentifierParseNode ParseIdentifierFromToken(IdentifierToken identToken) {
         IdentifierParseNode node = ParseIdentifierParseNode();
 
         if (node != null) {
@@ -336,9 +330,7 @@ public partial class Compiler {
         bool isSubstring = false;
 
         while (token.ID == TokenID.LPAREN) {
-            if (indices == null) {
-                indices = new Collection<ParseNode>();
-            }
+            indices ??= [];
             if (_ls.PeekToken().ID != TokenID.RPAREN) {
                 do {
                     ParseNode item = null;
@@ -353,9 +345,7 @@ public partial class Compiler {
                     token = _ls.GetToken();
                     if (token.ID == TokenID.COLON) {
                         isSubstring = true;
-                        if (item == null) {
-                            item = new NumberParseNode(1);
-                        }
+                        item ??= new NumberParseNode(1);
                         node.SubstringStart = item;
                         token = new SimpleToken(TokenID.COMMA);
                         continue;
@@ -382,10 +372,8 @@ public partial class Compiler {
     // primary type as that is what gets shown in the error message.
     private ParseNode ParseExpressionOfTypes(SymType[] expectedType) {
         ParseNode expr = Expression();
-        foreach (SymType type in expectedType) {
-            if (expr.Type == type) {
-                return expr;
-            }
+        if (expectedType.Any(type => expr.Type == type)) {
+            return expr;
         }
         Messages.Error(MessageCode.TYPEMISMATCH, $"{expectedType[0]} type expected");
         return expr;
@@ -397,7 +385,7 @@ public partial class Compiler {
         SymScope scope,
         out int countOfAlternateReturn) {
         SimpleToken token = _ls.GetToken();
-        Collection<Symbol> parameters = new();
+        Collection<Symbol> parameters = [];
 
         countOfAlternateReturn = 0;
         if (token.ID == TokenID.LPAREN) {
@@ -464,7 +452,7 @@ public partial class Compiler {
             SkipToken(token.ID);
             return new StringParseNode("*");
         }
-        return ParseExpressionOfTypes(new[] { SymType.CHAR, SymType.FIXEDCHAR });
+        return ParseExpressionOfTypes([SymType.CHAR, SymType.FIXEDCHAR]);
     }
 
     // Parse a unit specifier:
@@ -481,7 +469,7 @@ public partial class Compiler {
             SkipToken(token.ID);
             return null;
         }
-        return ParseExpressionOfTypes(new[] { SymType.INTEGER });
+        return ParseExpressionOfTypes([SymType.INTEGER]);
     }
 
     // Parse a control list.
@@ -558,7 +546,7 @@ public partial class Compiler {
                     case "FORM":
                     case "STATUS":
                     case "BLANK":
-                        node = ParseExpressionOfTypes(new[] { SymType.FIXEDCHAR, SymType.CHAR });
+                        node = ParseExpressionOfTypes([SymType.FIXEDCHAR, SymType.CHAR]);
                         break;
 
                     case "END":
@@ -568,7 +556,7 @@ public partial class Compiler {
 
                     case "REC":
                     case "RECL":
-                        node = ParseExpressionOfTypes(new[] { SymType.INTEGER });
+                        node = ParseExpressionOfTypes([SymType.INTEGER]);
                         break;
 
                     case "IOSTAT":
@@ -611,7 +599,7 @@ public partial class Compiler {
 
             // Ban any conflict with PROGRAM name or the current function
             Symbol globalSym = _globalSymbols.Get(identToken.Name);
-            if (globalSym != null && globalSym.Type == SymType.PROGRAM) {
+            if (globalSym is { Type: SymType.PROGRAM }) {
                 Messages.Error(MessageCode.IDENTIFIERISGLOBAL,
                     $"Identifier {identToken.Name} already has global declaration");
                 SkipToEndOfLine();
@@ -628,12 +616,9 @@ public partial class Compiler {
             }
 
             // If this is the main program, all dimensions must be constant
-            if (_currentProcedure != null && _currentProcedure.IsMainProgram) {
-                foreach (SymDimension dim in dimensions) {
-                    if (dim.Size < 0) {
-                        Messages.Error(MessageCode.ARRAYILLEGALBOUNDS, "Array dimensions must be constant");
-                        break;
-                    }
+            if (_currentProcedure is { IsMainProgram: true }) {
+                if (dimensions.Any(dim => dim.Size < 0)) {
+                    Messages.Error(MessageCode.ARRAYILLEGALBOUNDS, "Array dimensions must be constant");
                 }
             }
 
@@ -683,7 +668,7 @@ public partial class Compiler {
 
     // Parse set of array dimensions if one is found.
     private Collection<SymDimension> ParseArrayDimensions() {
-        Collection<SymDimension> dimensions = new();
+        Collection<SymDimension> dimensions = [];
         SimpleToken token = _ls.PeekToken();
         bool hasAssumedBound = false;
 
