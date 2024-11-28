@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using JComLib;
 
@@ -31,6 +32,8 @@ namespace JFortranLib;
 /// <summary>
 /// Fortran external intrinsics.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static class Intrinsics {
 
     /// <summary>
@@ -731,9 +734,7 @@ public static class Intrinsics {
     /// <param name="ch">Character</param>
     /// <returns>The ASCII value of the character ch</returns>
     public static int ICHAR(string ch) {
-        if (ch == null) {
-            throw new ArgumentNullException(nameof(ch));
-        }
+        ArgumentNullException.ThrowIfNull(ch);
         return ch[0];
     }
 
@@ -743,9 +744,7 @@ public static class Intrinsics {
     /// <param name="ch">Character</param>
     /// <returns>The ASCII value of the character ch</returns>
     public static int ICHAR(FixedString ch) {
-        if (ch == null) {
-            throw new ArgumentNullException(nameof(ch));
-        }
+        ArgumentNullException.ThrowIfNull(ch);
         return ch[0];
     }
 
@@ -797,12 +796,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>The 1 based offset of string s2 within s1, or 0 if not found</returns>
     public static int INDEX(ref FixedString s1, ref string s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         if (s2.Length == 0) {
             return 0;
         }
@@ -818,12 +813,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>The 1 based offset of string s2 within s1, or 0 if not found</returns>
     public static int INDEX(ref string s1, ref FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         if (s2.Length == 0) {
             return 0;
         }
@@ -839,12 +830,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>The 1 based offset of string s2 within s1, or 0 if not found</returns>
     public static int INDEX(ref string s1, ref string s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         if (s2.Length == 0) {
             return 0;
         }
@@ -858,12 +845,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>The 1 based offset of string s2 within s1</returns>
     public static int INDEX(ref FixedString s1, ref FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         if (s2.Length == 0) {
             return 0;
         }
@@ -881,12 +864,8 @@ public static class Intrinsics {
     /// <param name="offset">Offset within first string to search</param>
     /// <returns>The 1 based offset of string s2 within s1</returns>
     public static int INDEX(ref string s1, ref string s2, ref int offset) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         if (s2 == "") {
             return 0;
         }
@@ -949,9 +928,7 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The length of string s</returns>
     public static int LEN(string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -961,9 +938,7 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The length of string s</returns>
     public static int LEN(ref string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -973,9 +948,7 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The length of string s</returns>
     public static int LEN(ref FixedString s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.RealLength;
     }
 
@@ -996,12 +969,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically less than s2, false otherwise</returns>
     public static bool LGE(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) >= 0;
     }
 
@@ -1022,12 +991,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically greater than s2, false otherwise</returns>
     public static bool LGT(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) > 0;
     }
 
@@ -1050,12 +1015,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically less than or equal to s2, false otherwise</returns>
     public static bool LLE(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) <= 0;
     }
 
@@ -1078,12 +1039,8 @@ public static class Intrinsics {
     /// <param name="s2">Second string</param>
     /// <returns>True if string s1 is lexically less than s2, false otherwise</returns>
     public static bool LLT(FixedString s1, FixedString s2) {
-        if (s1 == null) {
-            throw new ArgumentNullException(nameof(s1));
-        }
-        if (s2 == null) {
-            throw new ArgumentNullException(nameof(s2));
-        }
+        ArgumentNullException.ThrowIfNull(s1);
+        ArgumentNullException.ThrowIfNull(s2);
         return s1.Compare(s2) < 0;
     }
 
@@ -1174,9 +1131,7 @@ public static class Intrinsics {
     /// <param name="args">Arguments.</param>
     /// <returns>The largest value in the list args</returns>
     public static double MAX(params object[] args) {
-        if (args == null) {
-            throw new ArgumentNullException(nameof(args));
-        }
+        ArgumentNullException.ThrowIfNull(args);
         if (args.Length == 0) {
             throw new ArgumentOutOfRangeException(nameof(args));
         }
@@ -1214,9 +1169,7 @@ public static class Intrinsics {
     /// <param name="args">Arguments.</param>
     /// <returns>The smallest value in the list args</returns>
     public static double MIN(params object[] args) {
-        if (args == null) {
-            throw new ArgumentNullException(nameof(args));
-        }
+        ArgumentNullException.ThrowIfNull(args);
         if (args.Length == 0) {
             throw new ArgumentOutOfRangeException(nameof(args));
         }
@@ -1335,9 +1288,7 @@ public static class Intrinsics {
     /// <param name="length">Length to return</param>
     /// <returns>Rightmost characters of string s</returns>
     public static string RIGHT(ref string s, ref int length) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         if (length < 0 || length > s.Length) {
             length = s.Length;
         }
@@ -1428,9 +1379,7 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The size of string s</returns>
     public static int SIZE(string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -1440,9 +1389,7 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The size of string s</returns>
     public static int SIZE(ref string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -1452,9 +1399,7 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The size of string s</returns>
     public static int SIZE(ref FixedString s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
 
@@ -1505,9 +1450,7 @@ public static class Intrinsics {
     /// <param name="length">Length to return</param>
     /// <returns>Leftmost characters of string s</returns>
     public static string SUBSTRING(ref string s, ref int start, ref int length) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         if (start < 0 || start >= s.Length) {
             return string.Empty;
         }
@@ -1524,9 +1467,7 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>Leftmost characters of string s</returns>
     public static string STRING(ref int copies, ref string s) {
-        if (s == null) {
-            throw new ArgumentNullException(nameof(s));
-        }
+        ArgumentNullException.ThrowIfNull(s);
         if (copies < 0) {
             throw new ArgumentException("Invalid count", nameof(s));
         }

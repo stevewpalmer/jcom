@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Text;
 using JComLib;
@@ -46,7 +47,7 @@ public sealed class FormatParser {
     /// <param name="record">The FormatRecord to use</param>
     public FormatParser(string buffer, FormatRecord record) {
         _buffer = buffer;
-        _blankAsZero = record != null && record.BlanksAsZero;
+        _blankAsZero = record is { BlanksAsZero: true };
 
         // Skip initial whitespace in the buffer
         while (_index < _buffer.Length && char.IsWhiteSpace(_buffer[_index])) {
@@ -84,9 +85,10 @@ public sealed class FormatParser {
 /// Defines a class that parses and outputs numbers using FORTRAN number
 /// conventions and specifiers.
 /// </summary>
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static class FormatNumber {
 
-    private static readonly double[] powersOf10 = { 10, 100, 1.0e4, 1.0e8, 1.0e16, 1.0e32, 1.0e64, 1.0e128, 1.0e256 };
+    private static readonly double[] powersOf10 = [10, 100, 1.0e4, 1.0e8, 1.0e16, 1.0e32, 1.0e64, 1.0e128, 1.0e256];
 
     /// <summary>
     /// Format a value represented by the object with default width and precision. The object must
@@ -95,20 +97,20 @@ public static class FormatNumber {
     /// <param name="value">An object containing a value</param>
     /// <returns>A string containing the value converted to a string</returns>
     public static string FormatValue(object value) {
-        if (value is Complex) {
-            return FormatComplex((Complex)value, new FormatRecord('F', 0, 1), new FormatRecord('F', 0, 1));
+        if (value is Complex complex) {
+            return FormatComplex(complex, new FormatRecord('F', 0, 1), new FormatRecord('F', 0, 1));
         }
-        if (value is int) {
-            return FormatInteger((int)value, new FormatRecord('I'));
+        if (value is int i) {
+            return FormatInteger(i, new FormatRecord('I'));
         }
-        if (value is bool) {
-            return FormatBoolean((bool)value, new FormatRecord('L'));
+        if (value is bool b) {
+            return FormatBoolean(b, new FormatRecord('L'));
         }
-        if (value is float) {
-            return FormatFloat((float)value, new FormatRecord('F'));
+        if (value is float f) {
+            return FormatFloat(f, new FormatRecord('F'));
         }
-        if (value is double) {
-            return FormatDouble((double)value, new FormatRecord('D'));
+        if (value is double d) {
+            return FormatDouble(d, new FormatRecord('D'));
         }
         return value.ToString();
     }
@@ -124,9 +126,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord containing formatting settings</param>
     /// <returns>A string representation of the boolean value.</returns>
     public static string FormatBoolean(bool value, FormatRecord record) {
-        if (record == null) {
-            throw new ArgumentNullException(nameof(record));
-        }
+        ArgumentNullException.ThrowIfNull(record);
         string newString = value ? "T" : "F";
         return FormatToWidth(record.FieldWidth, newString);
     }
@@ -142,9 +142,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord specifier</param>
     /// <returns>The integer value of the string</returns>
     public static int ParseInteger(string intString, FormatRecord record) {
-        if (intString == null) {
-            throw new ArgumentNullException(nameof(intString));
-        }
+        ArgumentNullException.ThrowIfNull(intString);
 
         int intValue = 0;
         int sign = 1;
@@ -184,9 +182,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord containing formatting settings</param>
     /// <returns>A string representation of the integer number.</returns>
     public static string FormatInteger(int value, FormatRecord record) {
-        if (record == null) {
-            throw new ArgumentNullException(nameof(record));
-        }
+        ArgumentNullException.ThrowIfNull(record);
 
         StringBuilder str = new();
         int tempValue = Math.Abs(value);
@@ -235,9 +231,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord containing formatting settings</param>
     /// <returns>The floating point value of the string</returns>
     public static float ParseFloat(string floatString, FormatRecord record) {
-        if (floatString == null) {
-            throw new ArgumentNullException(nameof(floatString));
-        }
+        ArgumentNullException.ThrowIfNull(floatString);
         return (float)ParseDouble(floatString, record);
     }
 
@@ -257,9 +251,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord containing formatting settings</param>
     /// <returns>A string representation of the floating point number.</returns>
     public static string FormatFloat(float value, FormatRecord record) {
-        if (record == null) {
-            throw new ArgumentNullException(nameof(record));
-        }
+        ArgumentNullException.ThrowIfNull(record);
 
         // Do exponential formatting if so requested
         if (record.FormatChar == 'E') {
@@ -301,9 +293,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord containing formatting settings</param>
     /// <returns>The double precision value of the string</returns>
     public static double ParseDouble(string doubleString, FormatRecord record) {
-        if (doubleString == null) {
-            throw new ArgumentNullException(nameof(doubleString));
-        }
+        ArgumentNullException.ThrowIfNull(doubleString);
 
         bool inFraction = false;
         bool hasExponentPart = false;
@@ -417,9 +407,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord containing formatting settings</param>
     /// <returns>A string representation of the floating point number.</returns>
     public static string FormatDouble(double value, FormatRecord record) {
-        if (record == null) {
-            throw new ArgumentNullException(nameof(record));
-        }
+        ArgumentNullException.ThrowIfNull(record);
 
         // Do exponential formatting if so requested
         if (record.FormatChar == 'E') {
@@ -462,12 +450,8 @@ public static class FormatNumber {
     /// <param name="recordImg">A FormatRecord containing formatting settings for the Imaginary part</param>
     /// <returns>A string representation of the complex number.</returns>
     public static string FormatComplex(Complex value, FormatRecord recordReal, FormatRecord recordImg) {
-        if (recordReal == null) {
-            throw new ArgumentNullException(nameof(recordReal));
-        }
-        if (recordImg == null) {
-            throw new ArgumentNullException(nameof(recordImg));
-        }
+        ArgumentNullException.ThrowIfNull(recordReal);
+        ArgumentNullException.ThrowIfNull(recordImg);
 
         FormatRecord tempRecordReal = new(recordReal);
         FormatRecord tempRecordImg = new(recordImg);
@@ -509,9 +493,7 @@ public static class FormatNumber {
     /// <param name="record">A FormatRecord containing formatting settings</param>
     /// <returns>A string representation of the value formatted as an exponential number.</returns>
     public static string FormatExponential(double value, char exponentChar, FormatRecord record) {
-        if (record == null) {
-            throw new ArgumentNullException(nameof(record));
-        }
+        ArgumentNullException.ThrowIfNull(record);
 
         int precision = record.Precision;
         int leadingZeroes = 1;

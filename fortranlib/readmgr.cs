@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using JComLib;
 
@@ -31,7 +32,10 @@ namespace JFortranLib;
 /// <summary>
 /// Implements ReadManager.
 /// </summary>
-public class ReadManager : IDisposable {
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+public sealed class ReadManager : IDisposable {
     private readonly FormatManager _format;
     private readonly IOFile _file;
 
@@ -109,9 +113,7 @@ public class ReadManager : IDisposable {
     /// Marks the end of a record read.
     /// </summary>
     public void EndRecord() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (_file != null) {
             _file.RecordIndex += 1;
         }
@@ -123,9 +125,7 @@ public class ReadManager : IDisposable {
     /// </summary>
     /// <returns>A FormatRecord, or null if no format has been set</returns>
     public FormatRecord Record() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (_format == null || _format.IsEmpty()) {
             return null;
         }
@@ -159,9 +159,7 @@ public class ReadManager : IDisposable {
     /// </summary>
     /// <returns>The number of characters skipped</returns>
     public int SkipRecord() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
             returnValue = _file.SkipRecord();
@@ -180,17 +178,10 @@ public class ReadManager : IDisposable {
     /// <param name="intValue">A reference to the integer to be set</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int ReadInteger(ref int intValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = ReadIntegerFormatted(ref intValue);
-            }
-            else {
-                returnValue = ReadIntegerUnformatted(ref intValue);
-            }
+            returnValue = IsFormatted() ? ReadIntegerFormatted(ref intValue) : ReadIntegerUnformatted(ref intValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -206,17 +197,10 @@ public class ReadManager : IDisposable {
     /// <param name="boolValue">A reference to the boolean to be set</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int ReadBoolean(ref bool boolValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = ReadBooleanFormatted(ref boolValue);
-            }
-            else {
-                returnValue = ReadBooleanUnformatted(ref boolValue);
-            }
+            returnValue = IsFormatted() ? ReadBooleanFormatted(ref boolValue) : ReadBooleanUnformatted(ref boolValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -232,17 +216,10 @@ public class ReadManager : IDisposable {
     /// <param name="floatValue">A reference to the float to be set</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int ReadFloat(ref float floatValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = ReadFloatFormatted(ref floatValue);
-            }
-            else {
-                returnValue = ReadFloatUnformatted(ref floatValue);
-            }
+            returnValue = IsFormatted() ? ReadFloatFormatted(ref floatValue) : ReadFloatUnformatted(ref floatValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -258,17 +235,10 @@ public class ReadManager : IDisposable {
     /// <param name="doubleValue">A reference to the double to be set</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int ReadDouble(ref double doubleValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = ReadDoubleFormatted(ref doubleValue);
-            }
-            else {
-                returnValue = ReadDoubleUnformatted(ref doubleValue);
-            }
+            returnValue = IsFormatted() ? ReadDoubleFormatted(ref doubleValue) : ReadDoubleUnformatted(ref doubleValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -283,17 +253,10 @@ public class ReadManager : IDisposable {
     /// <param name="fixedString">A reference to the string to be set</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int ReadString(ref FixedString fixedString) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = ReadStringFormatted(ref fixedString);
-            }
-            else {
-                returnValue = ReadStringUnformatted(ref fixedString);
-            }
+            returnValue = IsFormatted() ? ReadStringFormatted(ref fixedString) : ReadStringUnformatted(ref fixedString);
         }
         catch (IOException) {
             returnValue = -1;
@@ -312,7 +275,7 @@ public class ReadManager : IDisposable {
     /// Releases all resource used by the <see cref="ReadManager"/> object.
     /// </summary>
     /// <param name="disposing">True if we're disposing</param>
-    protected virtual void Dispose(bool disposing) {
+    private void Dispose(bool disposing) {
         if (!_isDisposed) {
             if (disposing) {
                 _file?.Dispose();
@@ -359,9 +322,7 @@ public class ReadManager : IDisposable {
 
     // Peek at the next character in the source
     private char PeekChar() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (_readIndex == -1) {
             ReadNextLine();
             if (_line == null) {
@@ -558,7 +519,7 @@ public class ReadManager : IDisposable {
         }
         else {
             StringBuilder strBuilder = new();
-            List<char> validFloatChars = new() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'E', '-', '+', '.' };
+            List<char> validFloatChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'E', '-', '+', '.'];
 
             char ch = ReadNonSpaceChar();
             for (int m = 0; m < 2; ++m) {
@@ -615,7 +576,7 @@ public class ReadManager : IDisposable {
         }
         else {
             StringBuilder strBuilder = new();
-            List<char> validDoubleChars = new() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'D', '-', '+', '.' };
+            List<char> validDoubleChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'D', '-', '+', '.'];
 
             char ch = ReadNonSpaceChar();
             for (int m = 0; m < 2; ++m) {

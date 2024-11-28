@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using JComLib;
 
@@ -102,6 +103,9 @@ public static class IOError {
 /// <summary>
 /// Fortran I/O functions.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedType.Global")]
 public static class IO {
 
     /// <summary>
@@ -112,9 +116,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         iostat = 0;
         return writeManager.WriteEmpty();
     }
@@ -128,9 +130,7 @@ public static class IO {
     /// <param name="intArray">An array of integers to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, int[] intArray) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int totalCharsWritten = 0;
         foreach (int intVar in intArray) {
             int charsWritten = writeManager.WriteInteger(intVar);
@@ -152,9 +152,7 @@ public static class IO {
     /// <param name="intVar">An integer value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, int intVar) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int charsWritten = writeManager.WriteInteger(intVar);
         if (charsWritten == -1) {
             iostat = IOError.WriteError;
@@ -171,9 +169,7 @@ public static class IO {
     /// <param name="boolArray">An array of booleans to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, bool[] boolArray) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int totalCharsWritten = 0;
         foreach (bool boolVar in boolArray) {
             int charsWritten = writeManager.WriteBoolean(boolVar);
@@ -195,9 +191,7 @@ public static class IO {
     /// <param name="boolVar">A boolean value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, bool boolVar) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int charsWritten = writeManager.WriteBoolean(boolVar);
         if (charsWritten == -1) {
             iostat = IOError.WriteError;
@@ -214,9 +208,7 @@ public static class IO {
     /// <param name="floatArray">An array of float values</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, float[] floatArray) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int totalCharsWritten = 0;
         foreach (float floatVar in floatArray) {
             int charsWritten = writeManager.WriteFloat(floatVar);
@@ -238,9 +230,7 @@ public static class IO {
     /// <param name="floatVar">A float value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, float floatVar) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int charsWritten = writeManager.WriteFloat(floatVar);
         if (charsWritten == -1) {
             iostat = IOError.WriteError;
@@ -257,9 +247,7 @@ public static class IO {
     /// <param name="doubleArray">An array of double values</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, double[] doubleArray) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int totalCharsWritten = 0;
         foreach (double doubleVar in doubleArray) {
             int charsWritten = writeManager.WriteDouble(doubleVar);
@@ -281,9 +269,7 @@ public static class IO {
     /// <param name="doubleVar">A double value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, double doubleVar) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int charsWritten = writeManager.WriteDouble(doubleVar);
         if (charsWritten == -1) {
             iostat = IOError.WriteError;
@@ -300,9 +286,7 @@ public static class IO {
     /// <param name="complexArray">An array of complex value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, Complex[] complexArray) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int totalCharsWritten = 0;
 
         foreach (Complex complexVar in complexArray) {
@@ -325,9 +309,7 @@ public static class IO {
     /// <param name="complexVar">A complex value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, Complex complexVar) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int charsWritten = writeManager.WriteComplex(complexVar);
         if (charsWritten == -1) {
             iostat = IOError.WriteError;
@@ -345,9 +327,7 @@ public static class IO {
     /// <param name="strArray">An array of string values to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, string[] strArray) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int totalCharsWritten = 0;
         foreach (string strVar in strArray) {
             int charsWritten = writeManager.WriteString(strVar);
@@ -369,9 +349,7 @@ public static class IO {
     /// <param name="strVar">A string value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, string strVar) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int charsWritten = writeManager.WriteString(strVar);
         if (charsWritten == -1) {
             iostat = IOError.WriteError;
@@ -388,9 +366,7 @@ public static class IO {
     /// <param name="fixedstrArray">An array of fixed string values to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, FixedString[] fixedstrArray) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int totalCharsWritten = 0;
         foreach (FixedString fixedstrVar in fixedstrArray) {
             int charsWritten = writeManager.WriteString(fixedstrVar.ToString());
@@ -412,9 +388,7 @@ public static class IO {
     /// <param name="fixedstrVar">A fixed string value to write</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int WRITE(WriteManager writeManager, ref int iostat, FixedString fixedstrVar) {
-        if (writeManager == null) {
-            throw new ArgumentNullException(nameof(writeManager));
-        }
+        ArgumentNullException.ThrowIfNull(writeManager);
         int charsWritten = writeManager.WriteString(fixedstrVar.ToString());
         if (charsWritten == -1) {
             iostat = IOError.WriteError;
@@ -431,9 +405,7 @@ public static class IO {
     /// <param name="iostat">A reference variable that will be set to the I/O status</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
         int charsRead = readManager.SkipRecord();
         if (charsRead < 0) {
             iostat = IOError.ReadError;
@@ -451,9 +423,7 @@ public static class IO {
     /// <param name="intArray">An integer array to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, int arraySize, int[] intArray) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
 
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
@@ -478,9 +448,7 @@ public static class IO {
     /// <param name="intVar">The integer identifier to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, ref int intVar) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
         int charsRead = readManager.ReadInteger(ref intVar);
         if (charsRead == -1) {
             iostat = IOError.ReadError;
@@ -498,9 +466,7 @@ public static class IO {
     /// <param name="boolArray">An booleanarray to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, int arraySize, bool[] boolArray) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
 
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
@@ -525,9 +491,7 @@ public static class IO {
     /// <param name="boolVar">The boolean identifier to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, ref bool boolVar) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
         int charsRead = readManager.ReadBoolean(ref boolVar);
         if (charsRead == -1) {
             iostat = IOError.ReadError;
@@ -545,9 +509,7 @@ public static class IO {
     /// <param name="floatArray">An float array to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, int arraySize, float[] floatArray) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
 
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
@@ -572,9 +534,7 @@ public static class IO {
     /// <param name="floatVar">The float identifier to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, ref float floatVar) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
         int charsRead = readManager.ReadFloat(ref floatVar);
         if (charsRead == -1) {
             iostat = IOError.ReadError;
@@ -593,12 +553,8 @@ public static class IO {
     /// <param name="complexArray">A Complex array to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, int arraySize, Complex[] complexArray) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
-        if (complexArray == null) {
-            throw new ArgumentNullException(nameof(complexArray));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
+        ArgumentNullException.ThrowIfNull(complexArray);
 
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
@@ -630,9 +586,7 @@ public static class IO {
     /// <param name="complexVar">The Complex identifier to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, ref Complex complexVar) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
 
         double realPart = 0;
         double imaginaryPart = 0;
@@ -654,9 +608,7 @@ public static class IO {
     /// <param name="doubleArray">A double array to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, int arraySize, double[] doubleArray) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
 
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
@@ -681,9 +633,7 @@ public static class IO {
     /// <param name="doubleVar">The double identifier to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, ref double doubleVar) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
         int charsRead = readManager.ReadDouble(ref doubleVar);
         if (charsRead == -1) {
             iostat = IOError.ReadError;
@@ -701,12 +651,8 @@ public static class IO {
     /// <param name="strArray">A fixed string array to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, int arraySize, FixedString[] strArray) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
-        if (strArray == null) {
-            throw new ArgumentNullException(nameof(strArray));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
+        ArgumentNullException.ThrowIfNull(strArray);
 
         int totalCharsRead = 0;
         for (int index = 0; index < arraySize; ++index) {
@@ -728,12 +674,8 @@ public static class IO {
     /// <param name="fixedstrVar">The fixed string identifier to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, ref FixedString fixedstrVar) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
-        if (fixedstrVar == null) {
-            throw new ArgumentNullException(nameof(fixedstrVar));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
+        ArgumentNullException.ThrowIfNull(fixedstrVar);
         int charsRead = readManager.ReadString(ref fixedstrVar);
         if (charsRead == -1) {
             iostat = IOError.ReadError;
@@ -752,12 +694,8 @@ public static class IO {
     /// <param name="fixedstrVar">The fixed string identifier to read into</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int READ(ReadManager readManager, ref int iostat, int start, int end, ref FixedString fixedstrVar) {
-        if (readManager == null) {
-            throw new ArgumentNullException(nameof(readManager));
-        }
-        if (fixedstrVar == null) {
-            throw new ArgumentNullException(nameof(fixedstrVar));
-        }
+        ArgumentNullException.ThrowIfNull(readManager);
+        ArgumentNullException.ThrowIfNull(fixedstrVar);
         if (end == -1) {
             end = fixedstrVar.Length;
         }

@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace JFortranLib;
 
 /// <summary>
@@ -37,6 +39,7 @@ public enum FormatOptionalPlus {
 /// <summary>
 /// Defines a class that specifies a single FORMAT record.
 /// </summary>
+[SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
 public class FormatRecord {
 
     private string _rawString;
@@ -63,9 +66,7 @@ public class FormatRecord {
     /// </summary>
     /// <param name="record">The FormatRecord to copy</param>
     public FormatRecord(FormatRecord record) {
-        if (record == null) {
-            throw new ArgumentNullException(nameof(record));
-        }
+        ArgumentNullException.ThrowIfNull(record);
         FieldWidth = record.FieldWidth;
         FormatChar = record.FormatChar;
         Count = record.Count;

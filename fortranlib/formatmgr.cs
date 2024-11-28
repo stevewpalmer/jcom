@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using JComLib;
 
@@ -33,6 +34,7 @@ namespace JFortranLib;
 /// Defines one format group which is a collection of format specifiers
 /// enclosed in parenthesis.
 /// </summary>
+[SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
 internal sealed class FormatGroup {
 
     /// <summary>

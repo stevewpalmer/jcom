@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Text;
 using JComLib;
@@ -32,7 +33,9 @@ namespace JFortranLib;
 /// <summary>
 /// Implements WriteManager.
 /// </summary>
-public class WriteManager : IDisposable {
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+public sealed class WriteManager : IDisposable {
 
     private readonly FormatManager _format;
     private readonly IOFile _file;
@@ -111,9 +114,7 @@ public class WriteManager : IDisposable {
     /// </summary>
     /// <returns>The last string written</returns>
     public string EndRecord() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         _file?.Flush();
         if (IsFormatted()) {
             FormatRecord record = Record(false);
@@ -150,9 +151,7 @@ public class WriteManager : IDisposable {
     /// <param name="allowReset">True if I/O format rescan allowed</param>
     /// <returns>A FormatRecord, or null if the end of the format list was reached</returns>
     public FormatRecord Record(bool allowReset) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (_format == null || _format.IsEmpty()) {
             return null;
         }
@@ -189,17 +188,10 @@ public class WriteManager : IDisposable {
     /// <param name="intValue">The integer value to be written</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int WriteInteger(int intValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = WriteIntegerFormatted(intValue);
-            }
-            else {
-                returnValue = WriteIntegerUnformatted(intValue);
-            }
+            returnValue = IsFormatted() ? WriteIntegerFormatted(intValue) : WriteIntegerUnformatted(intValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -214,17 +206,10 @@ public class WriteManager : IDisposable {
     /// <param name="floatValue">The floating point value to be written</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int WriteFloat(float floatValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = WriteFloatFormatted(floatValue);
-            }
-            else {
-                returnValue = WriteFloatUnformatted(floatValue);
-            }
+            returnValue = IsFormatted() ? WriteFloatFormatted(floatValue) : WriteFloatUnformatted(floatValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -239,17 +224,10 @@ public class WriteManager : IDisposable {
     /// <param name="doubleValue">The double value to be written</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int WriteDouble(double doubleValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = WriteDoubleFormatted(doubleValue);
-            }
-            else {
-                returnValue = WriteDoubleUnformatted(doubleValue);
-            }
+            returnValue = IsFormatted() ? WriteDoubleFormatted(doubleValue) : WriteDoubleUnformatted(doubleValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -264,17 +242,10 @@ public class WriteManager : IDisposable {
     /// <param name="complexValue">The complex value to be written</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int WriteComplex(Complex complexValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = WriteComplexFormatted(complexValue);
-            }
-            else {
-                returnValue = WriteComplexUnformatted(complexValue);
-            }
+            returnValue = IsFormatted() ? WriteComplexFormatted(complexValue) : WriteComplexUnformatted(complexValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -289,17 +260,10 @@ public class WriteManager : IDisposable {
     /// <param name="boolValue">The boolean value to be written</param>
     /// <returns>The count of characters read. 0 means EOF, and -1 means an error</returns>
     public int WriteBoolean(bool boolValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = WriteBoolFormatted(boolValue);
-            }
-            else {
-                returnValue = WriteBoolUnformatted(boolValue);
-            }
+            returnValue = IsFormatted() ? WriteBoolFormatted(boolValue) : WriteBoolUnformatted(boolValue);
         }
         catch (IOException) {
             returnValue = -1;
@@ -314,17 +278,10 @@ public class WriteManager : IDisposable {
     /// <param name="str">The string to be written</param>
     /// <returns>The count of characters written. 0 means EOF, and -1 means an error</returns>
     public int WriteString(string str) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue;
         try {
-            if (IsFormatted()) {
-                returnValue = WriteStringFormatted(str);
-            }
-            else {
-                returnValue = WriteStringUnformatted(str);
-            }
+            returnValue = IsFormatted() ? WriteStringFormatted(str) : WriteStringUnformatted(str);
         }
         catch (IOException) {
             returnValue = -1;
@@ -337,9 +294,7 @@ public class WriteManager : IDisposable {
     /// </summary>
     /// <returns>The count of characters written. 0 means EOF, and -1 means an error</returns>
     public int WriteEmpty() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         int returnValue = 0;
         try {
             if (IsFormatted()) {
@@ -367,7 +322,7 @@ public class WriteManager : IDisposable {
     /// Releases all resource used by the <see cref="WriteManager"/> object.
     /// </summary>
     /// <param name="disposing">True if we're disposing</param>
-    protected virtual void Dispose(bool disposing) {
+    private void Dispose(bool disposing) {
         if (!_isDisposed) {
             if (disposing) {
                 _file?.Dispose();
