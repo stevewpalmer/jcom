@@ -40,7 +40,6 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="cp $(OutputPath)* $(SolutionDir)drop/bin" />
+        <Exec Command="mkdir -p $(SolutionDir)drop/bin &amp;&amp; cp $(OutputPath)* $(SolutionDir)drop/bin" />
     </Target>
-
 </Project>

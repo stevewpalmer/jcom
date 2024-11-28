@@ -37,4 +37,8 @@
             <DependentUpon>Edit.resx</DependentUpon>
         </Compile>
     </ItemGroup>
+
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="mkdir -p $(SolutionDir)drop/bin &amp;&amp; cp $(OutputPath)* $(SolutionDir)drop/bin" />
+    </Target>
 </Project>

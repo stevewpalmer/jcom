@@ -1,6 +1,6 @@
 JFLAGS=-w:2 --debug --run
 DROP=../../drop/bin
-JFOR=$(DROP)/for $(JFLAGS)
+JFOR=$(DROP)/fort $(JFLAGS)
 
 include tests.mak
 

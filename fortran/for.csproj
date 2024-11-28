@@ -13,10 +13,16 @@
         <RootNamespace>JFortran</RootNamespace>
         <Title>Fortran Compiler</Title>
         <Authors>Steven Palmer</Authors>
+        <AssemblyName>fort</AssemblyName>
+        <PackageId>fort</PackageId>
+        <Product>fort</Product>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\comlib\comlib.csproj"/>
         <ProjectReference Include="..\com\com.csproj"/>
         <ProjectReference Include="..\fortranlib\forlib.csproj"/>
     </ItemGroup>
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+        <Exec Command="mkdir -p $(SolutionDir)drop/bin &amp;&amp; cp $(OutputPath)* $(SolutionDir)drop/bin" />
+    </Target>
 </Project>
