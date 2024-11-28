@@ -42,10 +42,10 @@ public class ComalHelper : Helper {
     }
 
     // Compile the given code and check the specified errors occurred.
-    public static void HelperCompileAndCheckErrors(string code, ComalOptions opts, Message[] expectedErrors) {
+    public static void HelperCompileAndCheckErrors(string code, ComalOptions opts, Message[] expectedErrors, bool addLineNumber) {
         opts.Run = true;
         Compiler comp = new(opts);
-        comp.CompileString(code, true);
+        comp.CompileString(code, addLineNumber);
         Assert.AreEqual(expectedErrors.Length, comp.Messages.ErrorCount);
         for (int index = 0; index < expectedErrors.Length; index++) {
             Assert.AreEqual(expectedErrors[index].Code, comp.Messages[index].Code);

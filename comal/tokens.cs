@@ -348,13 +348,8 @@ public static class Tokens {
     /// <param name="str">A keyword string</param>
     /// <returns>The associated token ID, or TokenID.IDENT</returns>
     public static TokenID StringToTokenID(string str) {
-        if (str == null) {
-            throw new ArgumentNullException(nameof(str));
-        }
-        if (!Keywords.TryGetValue(str.ToLower(), out TokenID id)) {
-            id = TokenID.IDENT;
-        }
-        return id;
+        ArgumentNullException.ThrowIfNull(str);
+        return Keywords.GetValueOrDefault(str.ToLower(), TokenID.IDENT);
     }
 
     /// <summary>

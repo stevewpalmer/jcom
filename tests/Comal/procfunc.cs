@@ -134,7 +134,7 @@ public class ProcFunc {
             new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 110, null),
             new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 140, null)
         ];
-        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors, true);
     }
 
     // Test using duplicate IMPORT statements
@@ -151,7 +151,7 @@ public class ProcFunc {
         Message[] expectedErrors = [
             new Message(null, MessageLevel.Error, MessageCode.ALREADYIMPORTED, 110, null)
         ];
-        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors, true);
     }
 
     // Test scope.

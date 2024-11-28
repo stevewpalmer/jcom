@@ -103,4 +103,25 @@ public class OptionsTest {
         Assert.AreEqual(opts.SourceFiles[1], "testfile2.lst");
         Assert.IsTrue(opts.GenerateDebug);
     }
+
+    // Validate the -IDE option.
+    [Test]
+    public void VerifyIDEOption() {
+        string code = @"
+                10 FUNC ITEST
+                20   WIDTH:=7
+                30   HEIGHT:=9
+                40   AREA:=WIDTH*
+                50   RETURN AREA
+                60 ENDFUNC
+            ";
+        Message[] expectedErrors = [
+            new Message(null, MessageLevel.Error, MessageCode.UNRECOGNISEDOPERAND, 4, null)
+        ];
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions {IDE = true}, expectedErrors, false);
+        expectedErrors = [
+            new Message(null, MessageLevel.Error, MessageCode.UNRECOGNISEDOPERAND, 40, null)
+        ];
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions {IDE = false}, expectedErrors, false);
+    }
 }

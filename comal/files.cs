@@ -40,7 +40,7 @@ public partial class Compiler {
     // Opens a data file for reading or writing. The first integer expression
     // specifies the file handle.
     //
-    private ParseNode KOpen() {
+    private ExtCallParseNode KOpen() {
 
         // Optional FILE keyword
         TestToken(TokenID.KFILE);
@@ -79,7 +79,7 @@ public partial class Compiler {
     // Creates a random access file with the specified number of records,
     // each record of the given size.
     //
-    private ParseNode KCreate() {
+    private ExtCallParseNode KCreate() {
 
         ExtCallParseNode node = GetFileManagerExtCallNode("CREATE");
         ParametersParseNode paramsNode = new();
@@ -99,7 +99,7 @@ public partial class Compiler {
     // Close the data file specified by the given integer expression, or
     // close all opened files if no integer expression is specified.
     //
-    private ParseNode KClose() {
+    private ExtCallParseNode KClose() {
 
         // Optional FILE keyword
         TestToken(TokenID.KFILE);
@@ -119,7 +119,7 @@ public partial class Compiler {
     //
     // Deletes the specified file
     //
-    private ParseNode KDelete() {
+    private ExtCallParseNode KDelete() {
 
         ExtCallParseNode node = GetFileManagerExtCallNode("DELETE");
         ParametersParseNode paramsNode = new();
@@ -134,7 +134,7 @@ public partial class Compiler {
     //
     // Writes the specified values to the given record of the random access file.
     //
-    private ParseNode KWrite() {
+    private ExtCallParseNode KWrite() {
         VarArgParseNode varargs = new();
 
         // Optional FILE number
@@ -181,9 +181,9 @@ public partial class Compiler {
     // record. The actual record may be shorter, but the same amount of space is used. Any record can be read
     // at any time by specifying its record number.
     //
-    private ParseNode KReadFile() {
+    private InputManagerParseNode KReadFile() {
         InputManagerParseNode node = new();
-        List<IdentifierParseNode> identifiers = new();
+        List<IdentifierParseNode> identifiers = [];
 
         // Optional FILE number
         TestToken(TokenID.KFILE);
@@ -233,7 +233,7 @@ public partial class Compiler {
     // output (does not read files created by WRITE FILE statements). The prompt is optional and may be a
     // variable. Both AT and <mark> are not permitted with INPUT FILE.
     //
-    private ParseNode KInput() {
+    private InputManagerParseNode KInput() {
         InputManagerParseNode node = new();
 
         ParseNode rowPosition = null;
@@ -282,7 +282,7 @@ public partial class Compiler {
         }
 
         // Variables
-        List<IdentifierParseNode> identifiers = new();
+        List<IdentifierParseNode> identifiers = [];
         bool hasStringIdentifier = false;
         bool isStringIdentifier = false;
         TokenID lastToken = TokenID.EOL;
@@ -362,9 +362,9 @@ public partial class Compiler {
     // or ;. A comma is a null separator (no spaces between items). A semicolon ; prints spaces to the next
     // zone (one space by default if ZONE has not been specified).
     //
-    private ParseNode KPrint() {
+    private ExtCallParseNode KPrint() {
         VarArgParseNode varargs = new();
-        List<char> formats = new();
+        List<char> formats = [];
 
         ParseNode rowPosition = null;
         ParseNode columnPosition = null;

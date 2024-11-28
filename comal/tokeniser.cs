@@ -47,7 +47,7 @@ public class LineTokeniser {
         _line = line.Trim();
         _index = 0;
 
-        List<SimpleToken> tokens = new();
+        List<SimpleToken> tokens = [];
         bool endOfLine = false;
         do {
             char ch = GetChar();

@@ -82,7 +82,7 @@ public partial class Compiler {
                     SymFullType fullType = new(Symbol.SystemTypeToSymbolType(method.ReturnType));
 
                     // Convert parameter types
-                    Collection<Symbol> parameters = new();
+                    Collection<Symbol> parameters = [];
                     foreach (ParameterInfo parameter in method.GetParameters()) {
 
                         SymFullType paramType = new(Symbol.SystemTypeToSymbolType(parameter.ParameterType));
@@ -123,7 +123,7 @@ public partial class Compiler {
             _program.Name = identToken.Name;
             ExpectEndOfLine();
         }
-        CompileBlock(_program.Root, new[] { TokenID.KENDMODULE });
+        CompileBlock(_program.Root, [TokenID.KENDMODULE]);
         return null;
     }
 
@@ -175,7 +175,7 @@ public partial class Compiler {
     private ParseNode KData() {
         SimpleToken token;
 
-        List<Variant> valueList = new();
+        List<Variant> valueList = [];
 
         Symbol dataSymbol = GetMakeReadDataSymbol();
         if (dataSymbol.ArrayValues != null) {
@@ -193,12 +193,12 @@ public partial class Compiler {
         _currentLine.PushToken(token);
 
         dataSymbol.ArrayValues = valueList.ToArray();
-        dataSymbol.Dimensions = new Collection<SymDimension> {
-            new() {
+        dataSymbol.Dimensions = [
+            new SymDimension {
                 LowerBound = new NumberParseNode(0),
                 UpperBound = new NumberParseNode(valueList.Count - 1)
             }
-        };
+        ];
 
         // Ensure _EOD is initialised to 0 since we have one DATA
         // statement
@@ -220,7 +220,7 @@ public partial class Compiler {
     private ParseNode KRead() {
         ReadDataParseNode node = new();
 
-        List<IdentifierParseNode> identifiers = new();
+        List<IdentifierParseNode> identifiers = [];
 
         // Discrimate READ data and READ FILE based on the first
         // tokens. READ FILE or READ <int> will definitely be a
@@ -276,17 +276,17 @@ public partial class Compiler {
     // Resets the data index back 0. Labels are not supported but, if they are, we can
     // use them to specific a particular index at which RESTORE should reset to.
     //
-    private ParseNode KRestore() {
+    private AssignmentParseNode KRestore() {
 
         AssignmentParseNode node = new() {
-            Identifiers = new[] {
+            Identifiers = [
                 new IdentifierParseNode(GetMakeReadDataIndexSymbol()),
                 new IdentifierParseNode(GetMakeEODSymbol())
-            },
-            ValueExpressions = new ParseNode[] {
+            ],
+            ValueExpressions = [
                 new NumberParseNode(0),
                 new NumberParseNode(0)
-            }
+            ]
         };
         return node;
     }
@@ -319,7 +319,7 @@ public partial class Compiler {
     // statement. RETURN may also be used to terminate a procedure early. An expression is not allowed
     // for RETURN within a PROC, but is mandatory for RETURN within a function.
     //
-    private ParseNode KReturn() {
+    private ReturnParseNode KReturn() {
 
         ReturnParseNode node = new();
         if (!_currentLine.IsAtEndOfLine && CurrentProcedure.ProcedureSymbol.Class == SymClass.SUBROUTINE) {
@@ -416,8 +416,8 @@ public partial class Compiler {
 
         // Must be an assignment statement then.
         _currentLine.PushToken(token);
-        List<IdentifierParseNode> identifiers = new();
-        List<ParseNode> values = new();
+        List<IdentifierParseNode> identifiers = [];
+        List<ParseNode> values = [];
         while (true) {
             IdentifierParseNode identNode = ParseIdentifierFromToken(identToken);
             if (identNode == null) {
@@ -478,7 +478,7 @@ public partial class Compiler {
     // Handles dynamic arrays by creating ArrayParseNode nodes that specify
     // the allocation and initialisation of the arrays.
     //
-    private ParseNode KDim() {
+    private BlockParseNode KDim() {
         BlockParseNode nodes = null;
         SymFullType fullType = new();
         SimpleToken token;
@@ -524,7 +524,7 @@ public partial class Compiler {
     //
     // The system will insert the word OF for you if you don't type it.
     //
-    private ParseNode KCase() {
+    private ConditionalParseNode KCase() {
 
         ConditionalParseNode parseNode = new();
         ParseNode exprNode = Expression();
@@ -565,11 +565,11 @@ public partial class Compiler {
 
             // Parse the body of a WHEN or OTHERWISE statement.
             BlockParseNode block = new();
-            TokenID endTokenID = CompileBlock(block, new[] {
+            TokenID endTokenID = CompileBlock(block, [
                 TokenID.KENDCASE,
                 TokenID.KOTHERWISE,
                 TokenID.KWHEN
-            });
+            ]);
             parseNode.Add(conditionalNode, block);
 
             // End of statement?
@@ -605,7 +605,7 @@ public partial class Compiler {
     //
     // Sets the PRINT zone
     //
-    private ParseNode KZone() {
+    private ExtCallParseNode KZone() {
         ExtCallParseNode node = GetFileManagerExtCallNode("set_Zone");
         node.Parameters = new ParametersParseNode();
         node.Parameters.Add(IntegerExpression(), false);
@@ -618,7 +618,7 @@ public partial class Compiler {
     //
     // Instantiates the random number generator with a new seed.
     //
-    private ParseNode KRandomize() {
+    private ExtCallParseNode KRandomize() {
 
         ExtCallParseNode node = GetIntrinsicExtCallNode("RANDOMIZE");
         if (!_currentLine.IsAtEndOfStatement) {
@@ -635,7 +635,7 @@ public partial class Compiler {
     // Conditional statement evaluation. Both single and multi line versions are
     // handled.
     //
-    private ParseNode KIf() {
+    private ConditionalParseNode KIf() {
         ConditionalParseNode node = new();
 
         ParseNode expr = Expression();
@@ -654,7 +654,7 @@ public partial class Compiler {
             TokenID endToken;
             do {
                 statements = new BlockParseNode();
-                endToken = CompileBlock(statements, new[] { TokenID.KENDIF, TokenID.KELIF, TokenID.KELSE });
+                endToken = CompileBlock(statements, [TokenID.KENDIF, TokenID.KELIF, TokenID.KELSE]);
                 node.Add(expr, statements);
                 if (endToken == TokenID.KELIF) {
 
@@ -711,8 +711,8 @@ public partial class Compiler {
             Err = Globals.Get(Consts.ErrName),
             Message = Globals.Get(Consts.ErrText)
         };
-        CompileBlock(parseNode.Body, new[] { TokenID.KENDTRAP, TokenID.KHANDLER });
-        CompileBlock(parseNode.Handler, new[] { TokenID.KENDTRAP });
+        CompileBlock(parseNode.Body, [TokenID.KENDTRAP, TokenID.KHANDLER]);
+        CompileBlock(parseNode.Handler, [TokenID.KENDTRAP]);
         return parseNode;
     }
 
@@ -722,7 +722,7 @@ public partial class Compiler {
     //
     // Loop
     //
-    private ParseNode KFor() {
+    private LoopParseNode KFor() {
 
         // Need a new local symbol table as Comal FOR keywords are
         // local to the FOR block
@@ -783,7 +783,7 @@ public partial class Compiler {
         }
         else {
             // Long format
-            CompileBlock(node.LoopBody, new[] { TokenID.KNEXT });
+            CompileBlock(node.LoopBody, [TokenID.KNEXT]);
 
             // Check identifier matches
             token = GetNextToken();
@@ -805,7 +805,7 @@ public partial class Compiler {
     //
     // Repeats a loop until a condition is satisified at the
     // end of the loop.
-    private ParseNode KRepeat() {
+    private LoopParseNode KRepeat() {
 
         LoopParseNode node = new() {
             LoopBody = new BlockParseNode()
@@ -821,7 +821,7 @@ public partial class Compiler {
             ExpectToken(TokenID.KUNTIL);
         }
         else {
-            CompileBlock(node.LoopBody, new[] { TokenID.KUNTIL });
+            CompileBlock(node.LoopBody, [TokenID.KUNTIL]);
             node.LoopBody.Add(MarkLine());
         }
         node.EndExpression = IntegerExpression();
@@ -836,7 +836,7 @@ public partial class Compiler {
     // While a condition is satisified, repeat the loop. Both
     // multi-line and single line versions are supported.
     //
-    private ParseNode KWhile() {
+    private LoopParseNode KWhile() {
 
         LoopParseNode node = new() {
             StartExpression = IntegerExpression()
@@ -854,7 +854,7 @@ public partial class Compiler {
             }
         }
         else {
-            CompileBlock(node.LoopBody, new[] { TokenID.KENDWHILE });
+            CompileBlock(node.LoopBody, [TokenID.KENDWHILE]);
         }
         return node;
     }
@@ -866,7 +866,7 @@ public partial class Compiler {
     // Creates a loop construct that requires an EXIT statement
     // in the body to exit
     //
-    private ParseNode KLoop() {
+    private LoopParseNode KLoop() {
 
         ExpectEndOfLine();
 
@@ -874,7 +874,7 @@ public partial class Compiler {
         LoopParseNode previousLoop = _currentLoop;
         _currentLoop = node;
         node.LoopBody = new BlockParseNode();
-        CompileBlock(node.LoopBody, new[] { TokenID.KENDLOOP });
+        CompileBlock(node.LoopBody, [TokenID.KENDLOOP]);
 
         node.StartExpression = new NumberParseNode(new Variant(1));
 
@@ -889,7 +889,7 @@ public partial class Compiler {
     // Exits from a LOOP statement. If a condition is specified then
     // the EXIT occurs if the condition is satisified.
     //
-    private ParseNode KExit() {
+    private BreakParseNode KExit() {
 
         if (_currentLoop == null) {
             Messages.Error(MessageCode.BADEXIT, "Cannot EXIT without a LOOP statement");
@@ -916,7 +916,7 @@ public partial class Compiler {
     // It is non-executable and may be placed anywhere within a program
     // as a one line statement.
     //
-    private ParseNode KLabel() {
+    private MarkLabelParseNode KLabel() {
 
         IdentifierToken identToken = ParseIdentifier();
         if (identToken == null) {
@@ -935,7 +935,7 @@ public partial class Compiler {
     // Statement - Transfers program execution to the line with the
     // specified label name.
     //
-    private ParseNode KGoto() {
+    private GotoParseNode KGoto() {
         return new GotoParseNode(ParseLabel());
     }
 
@@ -945,7 +945,7 @@ public partial class Compiler {
     //
     // Change the text background and foreground colour.
     //
-    private ParseNode KColour() {
+    private ExtCallParseNode KColour() {
         ExtCallParseNode node = GetRuntimeExtCallNode("COLOUR");
         node.Parameters = new ParametersParseNode();
         node.Parameters.Add(IntegerExpression());
@@ -958,7 +958,7 @@ public partial class Compiler {
     //
     // Move the cursor on the screen to the specified row and column.
     //
-    private ParseNode KCursor() {
+    private ExtCallParseNode KCursor() {
         ExtCallParseNode node = GetRuntimeExtCallNode("CURSOR");
         node.Parameters = new ParametersParseNode();
         node.Parameters.Add(IntegerExpression());
@@ -976,17 +976,12 @@ public partial class Compiler {
     // error is caught and _ERR and _ERRTEXT will be assigned the
     // specified errnum and it's associated message.
     //
-    private ParseNode KReport() {
+    private ExtCallParseNode KReport() {
 
         ExtCallParseNode node = GetRuntimeExtCallNode("REPORT");
         node.Inline = true;
         node.Parameters = new ParametersParseNode();
-        if (!_currentLine.IsAtEndOfStatement) {
-            node.Parameters.Add(IntegerExpression());
-        }
-        else {
-            node.Parameters.Add(new NumberParseNode(0));
-        }
+        node.Parameters.Add(!_currentLine.IsAtEndOfStatement ? IntegerExpression() : new NumberParseNode(0));
         return node;
     }
 
@@ -996,16 +991,11 @@ public partial class Compiler {
     //
     // Terminates program execution with an optional message.
     //
-    private ParseNode KStop() {
+    private ExtCallParseNode KStop() {
 
         ExtCallParseNode node = GetRuntimeExtCallNode("STOP");
         node.Parameters = new ParametersParseNode();
-        if (!_currentLine.IsAtEndOfStatement) {
-            node.Parameters.Add(CastNodeToType(StringExpression(), SymType.CHAR));
-        }
-        else {
-            node.Parameters.Add(new StringParseNode(""));
-        }
+        node.Parameters.Add(!_currentLine.IsAtEndOfStatement ? CastNodeToType(StringExpression(), SymType.CHAR) : new StringParseNode(""));
         node.Parameters.Add(new NumberParseNode(new Variant(_currentLineNumber)));
         return node;
     }
@@ -1016,16 +1006,11 @@ public partial class Compiler {
     //
     // ENDs the current program with an optional message.
     //
-    private ParseNode KEnd() {
+    private ExtCallParseNode KEnd() {
 
         ExtCallParseNode node = GetRuntimeExtCallNode("END");
         node.Parameters = new ParametersParseNode();
-        if (!_currentLine.IsAtEndOfStatement) {
-            node.Parameters.Add(CastNodeToType(StringExpression(), SymType.CHAR));
-        }
-        else {
-            node.Parameters.Add(new StringParseNode(""));
-        }
+        node.Parameters.Add(!_currentLine.IsAtEndOfStatement ? CastNodeToType(StringExpression(), SymType.CHAR) : new StringParseNode(""));
         node.Parameters.Add(new NumberParseNode(new Variant(_currentLineNumber)));
         return node;
     }
@@ -1037,7 +1022,7 @@ public partial class Compiler {
     // Clears the screen and puts the cursor at the top left corner (1,1). If output is to another device,
     // a CHR$(12) is sent (form feed).
     //
-    private static ParseNode KPage() {
+    private static ExtCallParseNode KPage() {
         return GetRuntimeExtCallNode("CLS");
     }
 
@@ -1048,16 +1033,11 @@ public partial class Compiler {
     // Displays a catalog of the current directory with the optional wildcard
     // specification.
     //
-    private ParseNode KDir() {
+    private ExtCallParseNode KDir() {
 
         ExtCallParseNode node = GetRuntimeExtCallNode("CATALOG");
         node.Parameters = new ParametersParseNode();
-        if (!_currentLine.IsAtEndOfStatement) {
-            node.Parameters.Add(CastNodeToType(StringExpression(), SymType.CHAR));
-        }
-        else {
-            node.Parameters.Add(new StringParseNode("*"));
-        }
+        node.Parameters.Add(!_currentLine.IsAtEndOfStatement ? CastNodeToType(StringExpression(), SymType.CHAR) : new StringParseNode("*"));
         return node;
     }
 }

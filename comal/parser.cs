@@ -48,17 +48,14 @@ public partial class Compiler {
     // Parse and return a string literal
     private string ParseStringLiteral() {
         SimpleToken token = ExpectToken(TokenID.STRING);
-        if (token != null) {
-            StringToken stringToken = (StringToken)token;
-            return stringToken.String;
-        }
-        return null;
+        StringToken stringToken = (StringToken)token;
+        return stringToken?.String;
     }
 
     // Parse an identifier
     private IdentifierToken ParseIdentifier() {
         SimpleToken token = ExpectToken(TokenID.IDENT);
-        return token == null ? null : token as IdentifierToken;
+        return token as IdentifierToken;
     }
 
     // Parse a label
@@ -97,6 +94,7 @@ public partial class Compiler {
         // a non-standard substring reference. Fix this up unless strict is
         // specified in which case this is an error
         else if (sym is { Type: SymType.FIXEDCHAR, IsArray: false } && node.HasIndexes) {
+            Debug.Assert(node.Indexes != null);
             if (_opts.Strict || node.Indexes.Count > 1) {
                 Messages.Error(MessageCode.BADSUBSTRINGSPEC, "Substring must have start and end specification");
             }
@@ -118,7 +116,7 @@ public partial class Compiler {
         SimpleToken token = GetNextToken();
 
         while (token.ID == TokenID.LPAREN) {
-            indices ??= new Collection<ParseNode>();
+            indices ??= [];
             if (_currentLine.PeekToken().ID != TokenID.RPAREN) {
                 do {
                     ParseNode item = null;
@@ -242,7 +240,7 @@ public partial class Compiler {
 
         node.ProcedureSymbol = method;
         node.Symbols.Add(localSymbols);
-        node.LabelList = new Collection<ParseNode>();
+        node.LabelList = [];
 
         ProcedureParseNode savedCurrentProcedure = CurrentProcedure;
         CurrentProcedure = node;
@@ -251,7 +249,7 @@ public partial class Compiler {
 
         // Compile the body of the procedure
         ++_blockDepth;
-        CompileBlock(node.Body, new[] { endToken });
+        CompileBlock(node.Body, [endToken]);
         --_blockDepth;
 
         // Make sure we have a RETURN statement.
@@ -304,7 +302,7 @@ public partial class Compiler {
     // array of symbols for all parameters
     private Collection<Symbol> ParseParameterDecl(SymbolCollection symbolTable, SymScope scope) {
         SimpleToken token = GetNextToken();
-        Collection<Symbol> parameters = new();
+        Collection<Symbol> parameters = [];
 
         if (token.ID == TokenID.LPAREN) {
             if (_currentLine.PeekToken().ID != TokenID.RPAREN) {
@@ -353,7 +351,7 @@ public partial class Compiler {
         // Array parameters must be specified with (). Multiple
         // dimensions are indicated with commas within the
         // parenthesis.
-        Collection<SymDimension> dimensions = new();
+        Collection<SymDimension> dimensions = [];
         if (TestToken(TokenID.LPAREN)) {
             do {
                 dimensions.Add(new SymDimension {
@@ -426,7 +424,7 @@ public partial class Compiler {
 
     // Parse set of array dimensions if one is found.
     private Collection<SymDimension> ParseArrayDimensions() {
-        Collection<SymDimension> dimensions = new();
+        Collection<SymDimension> dimensions = [];
 
         while (TestToken(TokenID.LPAREN)) {
             do {

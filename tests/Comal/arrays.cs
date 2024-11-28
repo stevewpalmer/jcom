@@ -277,7 +277,7 @@ public class Arrays {
             new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 140, null),
             new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 190, null)
         ];
-        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors);
+        ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors, true);
     }
 
     // Test Simple bounded array

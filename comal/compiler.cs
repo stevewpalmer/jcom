@@ -149,7 +149,7 @@ public partial class Compiler : ICompiler {
                         if (!lineNumberPatching) {
                             lineNumberPatching = true;
                             Messages.Warning(MessageCode.LINENUMBERPATCHING, 2,
-                                $"Source file is missing line numbers. Line numbers will be assumed starting from 10.");
+                                "Source file is missing line numbers. Line numbers will be assumed starting from 10.");
                         }
                     }
                     else if (lineNumberPatching) {
@@ -242,7 +242,7 @@ public partial class Compiler : ICompiler {
         _currentLineNumber = 0;
         _ls = lines;
 
-        CompileBlock(activeMethod.Body, new[] { TokenID.ENDOFFILE });
+        CompileBlock(activeMethod.Body, [TokenID.ENDOFFILE]);
     }
 
     /// <summary>
@@ -305,7 +305,7 @@ public partial class Compiler : ICompiler {
             Pass0();
 
             // Compile everything to the end of the file.
-            CompileBlock(_program.Root, new[] { TokenID.ENDOFFILE });
+            CompileBlock(_program.Root, [TokenID.ENDOFFILE]);
 
             // Warn about exported methods that are not defined
             foreach (Symbol sym in Globals) {
@@ -351,7 +351,7 @@ public partial class Compiler : ICompiler {
     // to the correct type, particularly for functions.
     private void Pass0() {
 
-        Stack<Symbol> parents = new(new Symbol[] { null });
+        Stack<Symbol> parents = new([null]);
 
         // Add implicit entrypoint subroutine name.
         Globals.Add(new Symbol(_entryPointName, new SymFullType(), SymClass.SUBROUTINE, null, 0) {
@@ -478,7 +478,7 @@ public partial class Compiler : ICompiler {
     // Create a token node that marks the current file being compiled. The
     // code generator uses this to refer to the correct source file if any
     // errors are found during generation.
-    private ParseNode MarkFilename() {
+    private MarkFilenameParseNode MarkFilename() {
         return new MarkFilenameParseNode { Filename = Messages.Filename };
     }
 
@@ -486,7 +486,7 @@ public partial class Compiler : ICompiler {
     // compiled. The code generator uses this in conjunction with the
     // filename to refer to the location in the source file if any errors
     // are found during generation.
-    private ParseNode MarkLine() {
+    private MarkLineParseNode MarkLine() {
         return new MarkLineParseNode {
             LineNumber = _ls.Index,
             DisplayableLineNumber = _currentLineNumber
@@ -604,11 +604,7 @@ public partial class Compiler : ICompiler {
     // Look up the symbol table for the specified identifier starting with the
     // current scope and working up to and including global.
     private Symbol GetMakeSymbolForCurrentScope(string name) {
-        Symbol sym = GetSymbolForCurrentScope(name);
-        if (sym == null) {
-            sym = MakeSymbolForCurrentScope(name);
-        }
-        return sym;
+        return GetSymbolForCurrentScope(name) ?? MakeSymbolForCurrentScope(name);
     }
 
     // Make a symbol for the current scope and initialise it. If we're in the main
@@ -657,10 +653,9 @@ public partial class Compiler : ICompiler {
         if (name.EndsWith(Consts.IntegerChar.ToString())) {
             return new SymFullType(SymType.INTEGER);
         }
-        if (name.EndsWith(Consts.StringChar.ToString())) {
-            return new SymFullType(SymType.FIXEDCHAR, 0);
-        }
-        return new SymFullType(SymType.FLOAT);
+        return name.EndsWith(Consts.StringChar.ToString()) ?
+            new SymFullType(SymType.FIXEDCHAR, 0) :
+            new SymFullType(SymType.FLOAT);
     }
 
     // Create an ExtCallParseNode for the specified function in the Intrinsics
@@ -714,10 +709,10 @@ public partial class Compiler : ICompiler {
                 Messages.Error(MessageCode.EXPECTEDTOKEN,
                     $"Expected '{Tokens.TokenIDToString(expectedID)}' not '{Tokens.TokenIDToString(token.ID)}'");
             }
-            _currentLine.InsertTokens(new[] {
+            _currentLine.InsertTokens([
                 new SimpleToken(TokenID.SPACE),
                 new SimpleToken(expectedID)
-            });
+            ]);
             GetNextToken();
         }
         GetNextToken();
@@ -764,7 +759,7 @@ public partial class Compiler : ICompiler {
 
         // End of statement? Add missing identifier
         if (token.ID == TokenID.EOL && identToken != null) {
-            _currentLine.InsertTokens(new[] { new SimpleToken(TokenID.SPACE), identToken });
+            _currentLine.InsertTokens([new SimpleToken(TokenID.SPACE), identToken]);
             GetNextToken();
         }
     }
@@ -1056,19 +1051,11 @@ public partial class Compiler : ICompiler {
     // Verify that the type on the right hand side of an assignment can be
     // assigned to the left hand side.
     private static bool ValidateAssignmentTypes(SymType toType, SymType fromType) {
-        bool valid = false;
-
-        switch (toType) {
-            case SymType.CHAR:
-            case SymType.FIXEDCHAR:
-                valid = Symbol.IsCharType(fromType);
-                break;
-
-            case SymType.INTEGER:
-            case SymType.FLOAT:
-                valid = Symbol.IsNumberType(fromType);
-                break;
-        }
+        bool valid = toType switch {
+            SymType.CHAR or SymType.FIXEDCHAR => Symbol.IsCharType(fromType),
+            SymType.INTEGER or SymType.FLOAT => Symbol.IsNumberType(fromType),
+            _ => false
+        };
         return valid;
     }
 

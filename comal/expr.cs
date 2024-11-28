@@ -72,13 +72,13 @@ public partial class Compiler {
             Messages.Error(MessageCode.INTEGEREXPECTED, "Number expected");
         }
         if (node.Type == SymType.FLOAT) {
-            if (node.IsNumber && node.Value.IntValue == node.Value.RealValue) {
+            if (node.IsNumber && Math.Abs(node.Value.IntValue - node.Value.RealValue) < 0.01) {
                 node.Value = new Variant(node.Value.IntValue);
                 return CastNodeToType(node, SymType.INTEGER);
             }
         }
         if (node.Type == SymType.DOUBLE) {
-            if (node.IsNumber && node.Value.IntValue == node.Value.DoubleValue) {
+            if (node.IsNumber && Math.Abs(node.Value.IntValue - node.Value.DoubleValue) < 0.01) {
                 node.Value = new Variant(node.Value.IntValue);
                 return CastNodeToType(node, SymType.INTEGER);
             }
@@ -191,12 +191,9 @@ public partial class Compiler {
                     if (double.IsInfinity((op1.Value / op2.Value).DoubleValue)) {
                         throw new DivideByZeroException();
                     }
-                    if (node.ID == ParseID.IDIVIDE) {
-                        node = new NumberParseNode((int)Math.Floor(op1.Value.DoubleValue / op2.Value.DoubleValue));
-                    }
-                    else {
-                        node = new NumberParseNode(op1.Value / op2.Value);
-                    }
+                    node = node.ID == ParseID.IDIVIDE ?
+                        new NumberParseNode((int)Math.Floor(op1.Value.DoubleValue / op2.Value.DoubleValue)) :
+                        new NumberParseNode(op1.Value / op2.Value);
                 }
                 catch (DivideByZeroException) {
                     Messages.Error(MessageCode.DIVISIONBYZERO, "Division by zero");
@@ -330,8 +327,9 @@ public partial class Compiler {
                 case ParseID.MINUS: return OptimiseMinus(node);
                 case ParseID.ADD: return OptimiseAddition(node);
                 case ParseID.MULT: return OptimiseMultiplication(node);
-                case ParseID.DIVIDE: return OptimiseDivision(node);
-                case ParseID.IDIVIDE: return OptimiseDivision(node);
+                case ParseID.DIVIDE:
+                case ParseID.IDIVIDE:
+                    return OptimiseDivision(node);
                 case ParseID.MOD: return OptimiseModulus(node);
                 case ParseID.SUB: return OptimiseSubtraction(node);
                 case ParseID.EXP: return OptimiseExponentation(node);
@@ -383,27 +381,18 @@ public partial class Compiler {
             int preced;
             switch (token.ID) {
                 case TokenID.KXOR:
-                    parseID = ParseID.XOR;
-                    preced = 1;
-                    break;
                 case TokenID.KBITXOR:
                     parseID = ParseID.XOR;
                     preced = 1;
                     break;
 
                 case TokenID.KOR:
-                    parseID = ParseID.OR;
-                    preced = 2;
-                    break;
                 case TokenID.KBITOR:
                     parseID = ParseID.OR;
                     preced = 2;
                     break;
 
                 case TokenID.KAND:
-                    parseID = ParseID.AND;
-                    preced = 3;
-                    break;
                 case TokenID.KBITAND:
                     parseID = ParseID.AND;
                     preced = 3;
@@ -525,12 +514,12 @@ public partial class Compiler {
     }
 
     // Parse a binary operator node
-    private ParseNode ParseBinaryOpNode(ParseID parseID, int preced, ParseNode opLeft) {
+    private BinaryOpParseNode ParseBinaryOpNode(ParseID parseID, int preced, ParseNode opLeft) {
         return CreateBinaryOpNode(parseID, opLeft, ParseExpression(preced));
     }
 
     // Create a binary operator node
-    private ParseNode CreateBinaryOpNode(ParseID parseID, ParseNode opLeft, ParseNode opRight) {
+    private BinaryOpParseNode CreateBinaryOpNode(ParseID parseID, ParseNode opLeft, ParseNode opRight) {
         if (parseID == ParseID.ADD && opLeft.IsString && opRight.IsString) {
             parseID = ParseID.CONCAT;
         }
@@ -693,10 +682,7 @@ public partial class Compiler {
 
                 // Function?
                 Symbol sym = Globals.Get(identToken.Name);
-                if (sym is { Class: SymClass.FUNCTION }) {
-                    return ExecWithIdentifier(identToken);
-                }
-                return ParseIdentifierFromToken(identToken);
+                return sym is { Class: SymClass.FUNCTION } ? ExecWithIdentifier(identToken) : ParseIdentifierFromToken(identToken);
             }
         }
         Messages.Error(MessageCode.UNRECOGNISEDOPERAND, "Unrecognised operand");
@@ -766,7 +752,7 @@ public partial class Compiler {
     }
 
     // Parse the GET$ function.
-    private ParseNode KGet() {
+    private ExtCallParseNode KGet() {
 
         ExpectToken(TokenID.LPAREN);
         ParseNode fileParseNode = IntegerExpression();

@@ -256,7 +256,7 @@ public class Line {
     /// <returns></returns>
     public static Line Deserialize(ByteReader byteReader) {
 
-        List<SimpleToken> tokens = new();
+        List<SimpleToken> tokens = [];
         SimpleToken token;
         do {
             token = SimpleToken.Deserialize(byteReader);
@@ -273,13 +273,12 @@ public class Line {
 public class Lines {
 
     private readonly List<Line> _lines;
-    private int _currentLine;
 
     /// <summary>
     /// Copy constructor
     /// </summary>
     public Lines() {
-        _lines = new List<Line>();
+        _lines = [];
     }
 
     /// <summary>
@@ -287,8 +286,8 @@ public class Lines {
     /// </summary>
     /// <param name="source">Original lines</param>
     public Lines(Lines source) {
-        _lines = new List<Line>(source._lines);
-        _currentLine = 0;
+        _lines = [..source._lines];
+        Index = 0;
     }
 
     /// <summary>
@@ -296,25 +295,25 @@ public class Lines {
     /// </summary>
     /// <param name="line">Line object</param>
     public Lines(Line line) {
-        _lines = new List<Line> { line };
-        _currentLine = 0;
+        _lines = [line];
+        Index = 0;
     }
 
     /// <summary>
     /// Return whether we've iterated to the end of the list of lines.
     /// </summary>
-    public bool EndOfFile => _currentLine == _lines.Count;
+    public bool EndOfFile => Index == _lines.Count;
 
     /// <summary>
     /// Return the index of the current line
     /// </summary>
-    public int Index => _currentLine;
+    public int Index { get; private set; }
 
     /// <summary>
     /// Reset to start of lines.
     /// </summary>
     public void Reset() {
-        _currentLine = 0;
+        Index = 0;
         foreach (Line line in _lines) {
             line.Reset();
         }
@@ -324,8 +323,8 @@ public class Lines {
     /// Move back to the previous line.
     /// </summary>
     public void BackLine() {
-        if (_currentLine > 0) {
-            Line nextLine = _lines[--_currentLine];
+        if (Index > 0) {
+            Line nextLine = _lines[--Index];
             nextLine.Reset();
         }
     }
@@ -335,8 +334,8 @@ public class Lines {
     /// </summary>
     public Line NextLine {
         get {
-            if (_currentLine < _lines.Count) {
-                Line nextLine = _lines[_currentLine++];
+            if (Index < _lines.Count) {
+                Line nextLine = _lines[Index++];
                 nextLine.Reset();
                 return nextLine;
             }
@@ -450,7 +449,7 @@ public class Lines {
     /// </summary>
     public void Clear() {
         _lines.Clear();
-        _currentLine = 0;
+        Index = 0;
     }
 
     /// <summary>
