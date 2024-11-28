@@ -54,7 +54,7 @@ public static partial class Commands {
     /// <param name="cmdLine">Command line</param>
     /// <returns>The result of the process</returns>
     public static bool CmdFortran(Parser cmdLine) {
-        return RunProgram("for", cmdLine);
+        return RunProgram("fort", cmdLine);
     }
 
     /// <summary>
