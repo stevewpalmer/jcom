@@ -132,7 +132,7 @@ public class KeyMap {
     /// <summary>
     /// Table of commands and their default keystrokes
     /// </summary>
-    private static readonly KeyCommands[] CommandTable = {
+    private static readonly KeyCommands[] CommandTable = [
         new() { CommandName = "assign_to_key", CommandId = KeyCommand.KC_ASSIGNTOKEY },
         new() { CommandName = "back_tab", CommandId = KeyCommand.KC_BACKTAB },
         new() { CommandName = "backspace", CommandId = KeyCommand.KC_BACKSPACE },
@@ -213,7 +213,7 @@ public class KeyMap {
         new() { CommandName = "version", CommandId = KeyCommand.KC_VERSION },
         new() { CommandName = "write_and_exit", CommandId = KeyCommand.KC_WRITEANDEXIT },
         new() { CommandName = "write_buffer", CommandId = KeyCommand.KC_WRITEBUFFER }
-    };
+    ];
 
     /// <summary>
     /// Key command
@@ -295,7 +295,7 @@ public class KeyMap {
     /// <summary>
     /// Keyboard map
     /// </summary>
-    private static readonly KeyMap[] KeyMaps = {
+    private static readonly KeyMap[] KeyMaps = [
         new() { KeyCommand = KeyCommand.KC_BACKSPACE, Key = ConsoleKey.Backspace },
         new() { KeyCommand = KeyCommand.KC_BACKTAB, Modifiers = ConsoleModifiers.Shift, Key = ConsoleKey.Tab },
         new() { KeyCommand = KeyCommand.KC_BACKUPFILE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.W },
@@ -396,7 +396,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_WRITEANDEXIT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.X },
         new() { KeyCommand = KeyCommand.KC_WRITEBUFFER, KeyChar = 8721 },
         new() { KeyCommand = KeyCommand.KC_WRITEBUFFER, Modifiers = ConsoleModifiers.Alt, Key = ConsoleKey.W }
-    };
+    ];
 
     /// <summary>
     /// Map a command name to its corresponding command.

@@ -33,7 +33,7 @@ namespace JEdit;
 
 public class Buffer {
     private readonly LineTerminator _terminatorType;
-    private List<string> _lines = new();
+    private List<string> _lines = [];
     private FileInfo? _fileInfo;
 
     /// <summary>
@@ -345,7 +345,7 @@ public class Buffer {
         int start = 0;
         int index;
 
-        while ((index = text.IndexOfAny(new[] { '\r', '\n' }, start)) != -1) {
+        while ((index = text.IndexOfAny(['\r', '\n'], start)) != -1) {
             if (index - start >= 0) {
                 int eolIndex = index;
                 if (text[index] == '\r' && index < text.Length - 2 && text[index + 1] == '\n') {

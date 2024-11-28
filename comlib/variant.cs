@@ -700,7 +700,7 @@ public class Variant {
             VariantType.INTEGER => typeof(int),
             VariantType.BOOLEAN => typeof(bool),
             VariantType.COMPLEX => typeof(Complex),
-            _ => throw new NotImplementedException($"No system type for {type}")
+            _ => throw new ArgumentException($"No system type for {type}")
         };
     }
 

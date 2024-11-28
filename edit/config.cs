@@ -141,7 +141,7 @@ public class Config {
     /// <summary>
     /// Tab stop settings
     /// </summary>
-    public int[] TabStops { get; set; } = { 4, 7 };
+    public int[] TabStops { get; set; } = [4, 7];
 
     /// <summary>
     /// Whether Tab inserts a hard tab or spaces

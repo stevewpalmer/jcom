@@ -213,7 +213,7 @@ public partial class Window {
         while (!finish && searchData.Next()) {
             MarkSearch(searchData);
             if (prompt) {
-                char[] validChars = { 'y', 'n', 'g', 'o' };
+                char[] validChars = ['y', 'n', 'g', 'o'];
                 if (!Screen.StatusBar.Prompt(Edit.TranslatePrompt, validChars, 'n', out char inputChar)) {
                     break;
                 }
@@ -955,7 +955,7 @@ public partial class Window {
         // a cursor position and a count. For LINE and COLUMN blocks, these are
         // simply the start of the mark range and the entire extent. For COLUMN,
         // these are a collection for each line in the column.
-        List<(Point, int)> blockRanges = new();
+        List<(Point, int)> blockRanges = [];
         (Point, int Count) currentRange = new(markStart, 0);
 
         bool indenting = action is BlockAction.INDENT or BlockAction.OUTDENT;

@@ -29,7 +29,7 @@ using JEdit.Resources;
 namespace JEdit;
 
 public static class Screen {
-    private static readonly List<Window> _windowList = new();
+    private static readonly List<Window> _windowList = [];
     private static readonly Recorder _recorder = new();
     private static Window? _activeWindow;
     private static Search? _search;
@@ -256,7 +256,7 @@ public static class Screen {
             return RenderHint.NONE;
         }
         if (_activeWindow.Buffer.Modified) {
-            char[] validInput = { 'y', 'n', 'w' };
+            char[] validInput = ['y', 'n', 'w'];
             if (StatusBar.Prompt(Edit.ThisBufferHasNotBeenSaved, validInput, 'n', out char inputChar)) {
                 switch (inputChar) {
                     case 'n':
@@ -394,7 +394,7 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint SetTabStops(Command command) {
         string tabInput = command.Args.NextWord() ?? string.Empty;
-        List<int> tabStops = new();
+        List<int> tabStops = [];
         bool hasArg = tabInput != string.Empty;
         while (hasArg || command.GetInput(Edit.EnterTabStops, ref tabInput)) {
             if (string.IsNullOrWhiteSpace(tabInput)) {
@@ -423,7 +423,7 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint StartStopRecording() {
         if (StatusBar.KeystrokesMode == KeystrokesMode.NONE && _recorder.HasKeystrokeMacro) {
-            char[] validInput = { 'y', 'n' };
+            char[] validInput = ['y', 'n'];
             if (!StatusBar.Prompt(Edit.OverwriteExistingKeystrokeMacro, validInput, 'n', out char inputChar)) {
                 return RenderHint.NONE;
             }
@@ -477,7 +477,7 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint LoadRecording() {
         if (_recorder.HasKeystrokeMacro) {
-            char[] validInput = { 'y', 'n' };
+            char[] validInput = ['y', 'n'];
             if (!StatusBar.Prompt(Edit.OverwriteExistingKeystrokeMacro, validInput, 'n', out char inputChar)) {
                 return RenderHint.NONE;
             }
@@ -786,8 +786,8 @@ public static class Screen {
         bool writeBuffers = !prompt;
         Buffer[] modifiedBuffers = _windowList.Where(w => w.Buffer.Modified).Select(b => b.Buffer).ToArray();
         if (prompt) {
-            if (modifiedBuffers.Any()) {
-                char[] validInput = { 'y', 'n', 'w' };
+            if (modifiedBuffers.Length != 0) {
+                char[] validInput = ['y', 'n', 'w'];
                 string exitPrompt = modifiedBuffers.Length == 1 ? Edit.ModifiedBuffer : string.Format(Edit.ModifiedBuffers, modifiedBuffers.Length);
                 if (StatusBar.Prompt(exitPrompt, validInput, 'n', out char inputChar)) {
                     switch (inputChar) {

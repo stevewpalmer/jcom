@@ -179,7 +179,7 @@ public class StatusBar {
         command = new Command { Id = KeyCommand.KC_NONE };
 
         Point cursorPosition = Terminal.GetCursor();
-        List<char> inputBuffer = new();
+        List<char> inputBuffer = [];
 
         while (true) {
             string prompt = string.Format(Edit.RepeatCount, repeatCount);
@@ -221,7 +221,7 @@ public class StatusBar {
         Terminal.SetCursor(prompt.Length, _statusRow);
 
         History history = History.Get(prompt);
-        List<char> inputBuffer = new();
+        List<char> inputBuffer = [];
 
         ConsoleKeyInfo input = Console.ReadKey(true);
         while (input.Key != ConsoleKey.Enter) {
@@ -243,7 +243,7 @@ public class StatusBar {
                 Terminal.Write(_bgColour, _fgColour, input.KeyChar);
             }
             if (readyText != string.Empty) {
-                inputBuffer = new List<char>(readyText.ToCharArray());
+                inputBuffer = [..readyText.ToCharArray()];
                 Message(prompt + readyText);
                 Terminal.SetCursor(prompt.Length + readyText.Length, _statusRow);
             }
@@ -287,7 +287,7 @@ public class StatusBar {
         Message(prompt);
         Terminal.SetCursor(prompt.Length, _statusRow);
 
-        List<char> inputBuffer = new();
+        List<char> inputBuffer = [];
         History history = History.Get(prompt);
         string[]? allfiles = null;
         int allfilesIndex = 0;
@@ -300,7 +300,7 @@ public class StatusBar {
         do {
             if (readyText != string.Empty) {
                 int totalWidth = prompt.Length + readyText.Length;
-                inputBuffer = new List<char>(readyText.ToCharArray());
+                inputBuffer = [..readyText.ToCharArray()];
                 Selected(prompt.Length, _statusRow, _displayWidth - totalWidth, readyText);
                 Terminal.SetCursor(totalWidth, _statusRow);
                 index = readyText.Length;

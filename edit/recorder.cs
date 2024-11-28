@@ -47,7 +47,7 @@ public enum KeystrokesMode {
 }
 
 public class Recorder {
-    private List<string> _keystrokeBuffer = new();
+    private List<string> _keystrokeBuffer = [];
 
     /// <summary>
     /// Add the specified command and arguments to the keystroke buffer

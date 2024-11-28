@@ -29,7 +29,7 @@ public class Colours {
 
     private readonly Config? _config;
 
-    private readonly ConsoleColor[] _colours = {
+    private readonly ConsoleColor[] _colours = [
         ConsoleColor.Black,
         ConsoleColor.Blue,
         ConsoleColor.Green,
@@ -46,7 +46,7 @@ public class Colours {
         ConsoleColor.DarkMagenta,
         ConsoleColor.Yellow,
         ConsoleColor.DarkYellow
-    };
+    ];
 
     /// <summary>
     /// Initialise a Colors object
