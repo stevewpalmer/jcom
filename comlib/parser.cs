@@ -58,7 +58,7 @@ public class Parser {
     /// </summary>
     /// <returns>String array of arguments</returns>
     public string[] RestOfLine() {
-        List<string> args = new();
+        List<string> args = [];
         string argument = NextWord();
         while (argument != null) {
             args.Add(argument);
@@ -73,8 +73,8 @@ public class Parser {
     /// <returns>String array of arguments</returns>
     public IEnumerable<string> ReadAndExpandWildcards() {
         string[] matchfiles = RestOfLine();
-        if (!matchfiles.Any()) {
-            matchfiles = new[] { "*" };
+        if (matchfiles.Length == 0) {
+            matchfiles = ["*"];
         }
         string[] allfiles = matchfiles.SelectMany(f => Directory.GetFiles(".", f, SearchOption.TopDirectoryOnly)).ToArray();
         allfiles = Array.ConvertAll(allfiles, f => f.ToLower());

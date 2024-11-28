@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace JComLib;
@@ -30,6 +31,8 @@ namespace JComLib;
 /// <summary>
 /// Fixed string management class
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public class FixedString : IEquatable<FixedString> {
     private readonly char[] _fixedString;
 
@@ -66,9 +69,7 @@ public class FixedString : IEquatable<FixedString> {
     /// </summary>
     /// <param name="existingString">An existing string to initialise from</param>
     public FixedString(string existingString) {
-        if (existingString == null) {
-            throw new ArgumentNullException(nameof(existingString));
-        }
+        ArgumentNullException.ThrowIfNull(existingString);
         int length = existingString.Length;
         _fixedString = new char[length];
         Length = length;
@@ -82,9 +83,7 @@ public class FixedString : IEquatable<FixedString> {
     /// </summary>
     /// <param name="existingString">An existing string to initialise from</param>
     public FixedString(FixedString existingString) {
-        if (existingString == null) {
-            throw new ArgumentNullException(nameof(existingString));
-        }
+        ArgumentNullException.ThrowIfNull(existingString);
         int length = existingString.Length;
         _fixedString = new char[length];
         Length = length;
@@ -202,9 +201,7 @@ public class FixedString : IEquatable<FixedString> {
     /// </summary>
     /// <param name="newString">The new native string to assign to this one</param>
     public void Set(string newString) {
-        if (newString == null) {
-            throw new ArgumentNullException(nameof(newString));
-        }
+        ArgumentNullException.ThrowIfNull(newString);
         InternalSet(newString.ToCharArray());
     }
 
@@ -213,9 +210,7 @@ public class FixedString : IEquatable<FixedString> {
     /// </summary>
     /// <param name="newString">The new fixed string to assign to this one</param>
     public void Set(FixedString newString) {
-        if (newString == null) {
-            throw new ArgumentNullException(nameof(newString));
-        }
+        ArgumentNullException.ThrowIfNull(newString);
         InternalSet(newString.ToCharArray());
     }
 
@@ -229,9 +224,7 @@ public class FixedString : IEquatable<FixedString> {
     /// <param name="start">The 1 based index of the start of the range</param>
     /// <param name="end">The 1 based index of the end of the range</param>
     public void Set(FixedString newString, int start, int end) {
-        if (newString == null) {
-            throw new ArgumentNullException(nameof(newString));
-        }
+        ArgumentNullException.ThrowIfNull(newString);
         if (start < 1 || end < start) {
             throw new IndexOutOfRangeException(nameof(start));
         }
@@ -248,9 +241,7 @@ public class FixedString : IEquatable<FixedString> {
     /// <param name="start">The 1 based index of the start of the range</param>
     /// <param name="end">The 1 based index of the end of the range</param>
     public void Set(string newString, int start, int end) {
-        if (newString == null) {
-            throw new ArgumentNullException(nameof(newString));
-        }
+        ArgumentNullException.ThrowIfNull(newString);
         if (start < 1 || end < start) {
             throw new IndexOutOfRangeException(nameof(start));
         }

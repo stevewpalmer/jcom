@@ -38,10 +38,9 @@ public static class Utilities {
     /// <param name="extension">Extension to supply</param>
     /// <returns>Filename with an extension</returns>
     public static string AddExtensionIfMissing(string filename, string extension) {
-        if (string.IsNullOrEmpty(Path.GetExtension(filename))) {
-            return Path.ChangeExtension(filename, extension);
-        }
-        return filename;
+        return string.IsNullOrEmpty(Path.GetExtension(filename)) ?
+            Path.ChangeExtension(filename, extension) :
+            filename;
     }
 
     /// <summary>
@@ -55,7 +54,7 @@ public static class Utilities {
         string valueName = value.ToString();
         FieldInfo field = value.GetType().GetField(valueName);
         if (field != null && field.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attributes) {
-            if (attributes.Any()) {
+            if (attributes.Length != 0) {
                 valueName = attributes.First().Description;
             }
         }

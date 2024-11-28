@@ -27,7 +27,7 @@ namespace JComLib;
 
 public class CircularList {
 
-    private List<string> _items { get; } = new();
+    private List<string> _items { get; } = [];
     private readonly int _maxCount;
     private int _listIndex;
 

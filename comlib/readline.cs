@@ -29,7 +29,7 @@ namespace JComLib;
 
 public class ReadLine {
 
-    private static readonly List<string> history = new();
+    private static readonly List<string> history = [];
 
     private int cursorPosition = Console.CursorLeft;
     private StringBuilder buffer;

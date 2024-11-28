@@ -23,11 +23,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace JComLib;
 
 /// <summary>
 /// System functions.
 /// </summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class Runtime {
 
     private static bool _escValue;
@@ -166,63 +169,31 @@ public static class Runtime {
     public static void COLOUR(int colorIndex) {
 
         if (colorIndex >= 128) {
-            ConsoleColor bgColour = ConsoleColor.Black;
-            switch (colorIndex) {
-                case 128:
-                    bgColour = ConsoleColor.Black;
-                    break;
-                case 129:
-                    bgColour = ConsoleColor.Red;
-                    break;
-                case 130:
-                    bgColour = ConsoleColor.Green;
-                    break;
-                case 131:
-                    bgColour = ConsoleColor.Yellow;
-                    break;
-                case 132:
-                    bgColour = ConsoleColor.Blue;
-                    break;
-                case 133:
-                    bgColour = ConsoleColor.Magenta;
-                    break;
-                case 134:
-                    bgColour = ConsoleColor.Cyan;
-                    break;
-                case 135:
-                    bgColour = ConsoleColor.White;
-                    break;
-            }
+            ConsoleColor bgColour = colorIndex switch {
+                128 => ConsoleColor.Black,
+                129 => ConsoleColor.Red,
+                130 => ConsoleColor.Green,
+                131 => ConsoleColor.Yellow,
+                132 => ConsoleColor.Blue,
+                133 => ConsoleColor.Magenta,
+                134 => ConsoleColor.Cyan,
+                135 => ConsoleColor.White,
+                _ => ConsoleColor.Black
+            };
             Console.BackgroundColor = bgColour;
         }
         if (colorIndex < 128) {
-            ConsoleColor fgColour = ConsoleColor.White;
-            switch (colorIndex) {
-                case 0:
-                    fgColour = ConsoleColor.Black;
-                    break;
-                case 1:
-                    fgColour = ConsoleColor.Red;
-                    break;
-                case 2:
-                    fgColour = ConsoleColor.Green;
-                    break;
-                case 3:
-                    fgColour = ConsoleColor.Yellow;
-                    break;
-                case 4:
-                    fgColour = ConsoleColor.Blue;
-                    break;
-                case 5:
-                    fgColour = ConsoleColor.Magenta;
-                    break;
-                case 6:
-                    fgColour = ConsoleColor.Cyan;
-                    break;
-                case 7:
-                    fgColour = ConsoleColor.White;
-                    break;
-            }
+            ConsoleColor fgColour = colorIndex switch {
+                0 => ConsoleColor.Black,
+                1 => ConsoleColor.Red,
+                2 => ConsoleColor.Green,
+                3 => ConsoleColor.Yellow,
+                4 => ConsoleColor.Blue,
+                5 => ConsoleColor.Magenta,
+                6 => ConsoleColor.Cyan,
+                7 => ConsoleColor.White,
+                _ => ConsoleColor.White
+            };
             Console.ForegroundColor = fgColour;
         }
     }

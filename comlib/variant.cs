@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
 
@@ -694,15 +693,15 @@ public class Variant {
     /// <param name="type">Variant type</param>
     /// <returns>The corresponding system type</returns>
     public static Type VariantTypeToSystemType(VariantType type) {
-        switch (type) {
-            case VariantType.STRING: return typeof(string);
-            case VariantType.FLOAT: return typeof(float);
-            case VariantType.DOUBLE: return typeof(double);
-            case VariantType.INTEGER: return typeof(int);
-            case VariantType.BOOLEAN: return typeof(bool);
-            case VariantType.COMPLEX: return typeof(Complex);
-        }
-        throw new NotImplementedException($"No system type for {type}");
+        return type switch {
+            VariantType.STRING => typeof(string),
+            VariantType.FLOAT => typeof(float),
+            VariantType.DOUBLE => typeof(double),
+            VariantType.INTEGER => typeof(int),
+            VariantType.BOOLEAN => typeof(bool),
+            VariantType.COMPLEX => typeof(Complex),
+            _ => throw new NotImplementedException($"No system type for {type}")
+        };
     }
 
     // Return the variant type that can contain the largest of the two given. The types

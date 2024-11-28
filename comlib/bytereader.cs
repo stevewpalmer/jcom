@@ -42,10 +42,9 @@ public class ByteReader {
         using BinaryReader writer = new(stream);
         long size = stream.Length;
         _buffer = new byte[size];
-        int offset = 0;
         do {
             int bytesToRead = size > int.MaxValue ? int.MaxValue : (int)size;
-            writer.Read(_buffer, offset, bytesToRead);
+            writer.Read(_buffer, 0, bytesToRead);
             size -= bytesToRead;
         } while (size > 0);
         _index = 0;

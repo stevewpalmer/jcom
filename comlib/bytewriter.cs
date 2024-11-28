@@ -27,7 +27,7 @@ namespace JComLib;
 
 public class ByteWriter {
 
-    private readonly List<byte> _buffer = new();
+    private readonly List<byte> _buffer = [];
 
     /// <summary>
     /// Write an integer to the byte buffer

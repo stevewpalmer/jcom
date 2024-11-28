@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace JComLib;
@@ -87,8 +88,6 @@ public sealed class StdoutIOFile : IOFile {
     /// <param name="carriageAtEnd">Whether to write a newline at the end</param>
     /// <returns>The number of characters written to the device</returns>
     public override int WriteLine(string str, bool carriageAtEnd) {
-        int charsWritten = 0;
-
         if (str.Length == 0) {
             Console.WriteLine();
         }
@@ -98,7 +97,7 @@ public sealed class StdoutIOFile : IOFile {
         else {
             Console.Write(str);
         }
-        return charsWritten;
+        return 0;
     }
 }
 
@@ -173,11 +172,11 @@ public sealed class StdinIOFile : IOFile {
 ///
 /// A file can also be either Formatted or Unformatted.
 /// </summary>
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public class IOFile : IDisposable {
 
-    private static Dictionary<int, IOFile> _filemap = new();
-    private static IOFile stdinFile = new StdinIOFile();
-    private static IOFile stdoutFile = new StdoutIOFile();
+    private static readonly Dictionary<int, IOFile> _filemap = new();
 
     /// <summary>
     /// The value of an End Of File character
@@ -257,7 +256,7 @@ public class IOFile : IDisposable {
     /// <param name="iodevice">Unit number</param>
     /// <returns>The IOFile instance for the unit, or null if the unit is not opened</returns>
     public static IOFile Get(int iodevice) {
-        return _filemap.TryGetValue(iodevice, out IOFile value) ? value : null;
+        return _filemap.GetValueOrDefault(iodevice);
     }
 
     /// <summary>
@@ -296,19 +295,13 @@ public class IOFile : IDisposable {
     /// A predefined IOFile object that represents the standard
     /// input device.
     /// </summary>
-    public static IOFile StdinFile {
-        get => stdinFile;
-        set => stdinFile = value;
-    }
+    public static IOFile StdinFile { get; set; } = new StdinIOFile();
 
     /// <summary>
     /// A predefined IOFile object that represents the standard
     /// output device.
     /// </summary>
-    public static IOFile StdoutFile {
-        get => stdoutFile;
-        set => stdoutFile = value;
-    }
+    public static IOFile StdoutFile { get; set; } = new StdoutIOFile();
 
     /// <summary>
     /// Physically open the file.
@@ -316,16 +309,14 @@ public class IOFile : IDisposable {
     /// <returns>True if file opened, false otherwise</returns>
     public bool Open() {
         FileMode mode;
-        FileAccess accessMode;
 
         if (IsScratch || IsNew) {
             mode = FileMode.Create;
-            accessMode = FileAccess.ReadWrite;
         }
         else {
             mode = FileMode.Open;
-            accessMode = FileAccess.ReadWrite;
         }
+        FileAccess accessMode = FileAccess.ReadWrite;
 
         // If no filename supplied then we make one using the standard
         // FORTRAN unit specific filename convention.
@@ -365,16 +356,12 @@ public class IOFile : IDisposable {
     /// <param name="deleteFile">True if the file is to be deleted after closing</param>
     public void Close(bool deleteFile) {
         Flush();
-        if (Handle != null) {
-            Handle.Close();
-        }
+        Handle?.Close();
         if (deleteFile && Path != null) {
             File.Delete(Path);
         }
         if (Unit != IOConstant.Stdin && Unit != IOConstant.Stdout) {
-            if (_filemap.ContainsKey(Unit)) {
-                _filemap.Remove(Unit);
-            }
+            _filemap.Remove(Unit);
         }
     }
 
@@ -391,9 +378,7 @@ public class IOFile : IDisposable {
     /// </summary>
     /// <returns>True if we succeeded, false if there was an error</returns>
     public bool EndFile() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null) {
             Open();
             if (Handle == null) {
@@ -414,9 +399,7 @@ public class IOFile : IDisposable {
     /// connected but does not exist is permitted but has no effect.
     /// </summary>
     public void Rewind() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle != null) {
             if (IsSequential) {
                 Handle.Seek(0, SeekOrigin.Begin);
@@ -430,9 +413,7 @@ public class IOFile : IDisposable {
     /// </summary>
     /// <returns>True if the backspace succeeded, false otherwise.</returns>
     public bool Backspace() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
 
         bool returnValue = false;
         if (Handle != null && IsSequential) {
@@ -448,9 +429,7 @@ public class IOFile : IDisposable {
     /// </summary>
     /// <returns>The number of bytes skipped</returns>
     public int SkipRecord() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null) {
             return -1;
         }
@@ -471,9 +450,7 @@ public class IOFile : IDisposable {
     /// Flush any unwritten data from the write buffer to disk.
     /// </summary>
     public void Flush() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (_writeBufferIndex > 0) {
             WriteRecord();
         }
@@ -487,9 +464,7 @@ public class IOFile : IDisposable {
     public virtual string ReadLine() {
         string stringRead;
 
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null || !IsFormatted) {
             return null;
         }
@@ -515,9 +490,7 @@ public class IOFile : IDisposable {
     public virtual int WriteLine(string str, bool carriageAtEnd) {
         int charsWritten;
 
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null || !IsFormatted) {
             return -1;
         }
@@ -541,9 +514,7 @@ public class IOFile : IDisposable {
     /// <param name="count">The number of characters to read</param>
     /// <returns>The string read</returns>
     public virtual string ReadChars(int count) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         string value = string.Empty;
         ReadCharacters(ref value, count);
         return value;
@@ -555,9 +526,7 @@ public class IOFile : IDisposable {
     /// <param name="intValue">A reference to the integer to be set</param>
     /// <returns>The number of bytes read</returns>
     public int ReadInteger(ref int intValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
             StringBuilder strBuilder = new();
 
@@ -593,9 +562,7 @@ public class IOFile : IDisposable {
     /// <param name="value">The integer value to write</param>
     /// <returns>The number of bytes written</returns>
     public int WriteInteger(int value) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null) {
             return -1;
         }
@@ -611,9 +578,7 @@ public class IOFile : IDisposable {
     /// <param name="floatValue">A reference to the float to be set</param>
     /// <returns>The number of bytes read</returns>
     public int ReadFloat(ref float floatValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
             StringBuilder strBuilder = new();
 
@@ -622,7 +587,7 @@ public class IOFile : IDisposable {
                 return 0;
             }
             int charsRead = 0;
-            List<char> validFloatChars = new() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'E', '-', '+', '.' };
+            List<char> validFloatChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'E', '-', '+', '.'];
             while (validFloatChars.Contains(ch)) {
                 strBuilder.Append(ch);
                 ch = ReadChar();
@@ -650,9 +615,7 @@ public class IOFile : IDisposable {
     /// <param name="value">The float value to write</param>
     /// <returns>The number of bytes written</returns>
     public int WriteFloat(float value) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null) {
             return -1;
         }
@@ -668,9 +631,7 @@ public class IOFile : IDisposable {
     /// <param name="doubleValue">A reference to the double to be set</param>
     /// <returns>The number of bytes read</returns>
     public int ReadDouble(ref double doubleValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
             StringBuilder strBuilder = new();
 
@@ -679,7 +640,7 @@ public class IOFile : IDisposable {
                 return 0;
             }
             int charsRead = 0;
-            List<char> validDoubleChars = new() { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'D', '-', '+', '.' };
+            List<char> validDoubleChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'D', '-', '+', '.'];
             while (validDoubleChars.Contains(ch)) {
                 strBuilder.Append(ch);
                 ch = ReadChar();
@@ -692,7 +653,7 @@ public class IOFile : IDisposable {
             return charsRead;
         }
 
-        int intSize = sizeof(double);
+        const int intSize = sizeof(double);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
             return 0;
@@ -707,13 +668,11 @@ public class IOFile : IDisposable {
     /// <param name="value">The double value to write</param>
     /// <returns>The number of bytes written</returns>
     public int WriteDouble(double value) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null) {
             return -1;
         }
-        int intSize = sizeof(double);
+        const int intSize = sizeof(double);
         byte[] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
@@ -725,10 +684,8 @@ public class IOFile : IDisposable {
     /// <param name="boolValue">A reference to the boolean to be set</param>
     /// <returns>The number of bytes read</returns>
     public int ReadBoolean(ref bool boolValue) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
-        int intSize = sizeof(bool);
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        const int intSize = sizeof(bool);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
             return 0;
@@ -743,13 +700,11 @@ public class IOFile : IDisposable {
     /// <param name="value">The boolean value to write</param>
     /// <returns>The number of bytes written</returns>
     public int WriteBoolean(bool value) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null) {
             return -1;
         }
-        int intSize = sizeof(bool);
+        const int intSize = sizeof(bool);
         byte[] intBuffer = BitConverter.GetBytes(value);
         WriteBytes(intBuffer, intSize);
         return intSize;
@@ -762,9 +717,7 @@ public class IOFile : IDisposable {
     /// <param name="count">Maximum number of characters to read</param>
     /// <returns>The number of bytes read</returns>
     public int ReadCharacters(ref string strValue, int count) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
             StringBuilder strBuilder = new();
 
@@ -782,7 +735,7 @@ public class IOFile : IDisposable {
             return strValue.Length;
         }
 
-        int intSize = sizeof(int);
+        const int intSize = sizeof(int);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
             return 0;
@@ -817,9 +770,7 @@ public class IOFile : IDisposable {
     /// <param name="count">Maximum number of characters to read</param>
     /// <returns>The number of bytes read</returns>
     public int ReadString(ref string strValue, int count) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
             StringBuilder strBuilder = new();
 
@@ -841,7 +792,7 @@ public class IOFile : IDisposable {
             return strValue.Length;
         }
 
-        int intSize = sizeof(int);
+        const int intSize = sizeof(int);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
             return 0;
@@ -860,13 +811,11 @@ public class IOFile : IDisposable {
     /// <param name="value">The string to write</param>
     /// <returns>The number of bytes written</returns>
     public int WriteString(string value) {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null) {
             return -1;
         }
-        int intSize = sizeof(int);
+        const int intSize = sizeof(int);
         byte[] intBuffer = BitConverter.GetBytes(value.Length);
         WriteBytes(intBuffer, intSize);
         WriteEncodedString(value, value.Length);
@@ -879,9 +828,7 @@ public class IOFile : IDisposable {
     public virtual bool IsFormatted {
         get => _isFormatted;
         set {
-            if (_isDisposed) {
-                throw new ObjectDisposedException(GetType().Name);
-            }
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
             _isFormatted = value;
         }
     }
@@ -904,9 +851,7 @@ public class IOFile : IDisposable {
     public int RecordLength {
         get => _recordLength;
         set {
-            if (_isDisposed) {
-                throw new ObjectDisposedException(GetType().Name);
-            }
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
             _recordLength = value;
             if (_recordLength > 0) {
                 _writeBuffer = new byte[_recordLength];
@@ -921,12 +866,8 @@ public class IOFile : IDisposable {
     public int RecordIndex {
         get => _recordIndex;
         set {
-            if (_isDisposed) {
-                throw new ObjectDisposedException(GetType().Name);
-            }
-            if (value < 1) {
-                throw new ArgumentOutOfRangeException(nameof(value));
-            }
+            ObjectDisposedException.ThrowIf(_isDisposed, this);
+            ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
             if (_recordIndex != value) {
                 _recordIndex = value;
                 if (RecordLength > 0 && Handle != null) {
@@ -958,12 +899,10 @@ public class IOFile : IDisposable {
     /// Releases all resource used by the <see cref="IOFile"/> object.
     /// </summary>
     /// <param name="disposing">True if we're disposing</param>
-    protected virtual void Dispose(bool disposing) {
+    protected void Dispose(bool disposing) {
         if (!_isDisposed) {
             if (disposing) {
-                if (Handle != null) {
-                    Handle.Dispose();
-                }
+                Handle?.Dispose();
             }
             _isDisposed = true;
         }
@@ -1081,7 +1020,7 @@ public class IOFile : IDisposable {
         if (currentPos == Handle.Length || currentPos == 0) {
             return true;
         }
-        int bufferSize = sizeof(int);
+        const int bufferSize = sizeof(int);
         byte[] data = new byte[bufferSize];
 
         int bytesToRead = bufferSize;
@@ -1116,16 +1055,15 @@ public class IOFile : IDisposable {
         // Do it the hard way. Work backward reading 4K chunks and look for
         // the last newline record in the block. The new position is just
         // after that.
-        int bufferSize = 4096;
+        const int bufferSize = 4096;
         byte[] data = new byte[bufferSize];
-        int startOffset = 0;
 
         currentPos -= 1;
         while (currentPos > 0) {
             bool foundRecord = false;
 
             int bytesToRead = (int)Math.Min(currentPos, bufferSize);
-            currentPos = Math.Max(startOffset, currentPos - bufferSize);
+            currentPos = Math.Max(0, currentPos - bufferSize);
             Handle.Seek(currentPos, SeekOrigin.Begin);
             int bytesRead = Handle.Read(data, 0, bytesToRead);
             while (bytesRead-- > 0) {
@@ -1149,13 +1087,11 @@ public class IOFile : IDisposable {
     // record itself.
     private int ReadRecord() {
         if (IsFormatted) {
-            if (_readBuffer == null) {
-                _readBuffer = new byte[4096];
-            }
+            _readBuffer ??= new byte[4096];
             _readBufferSize = Handle.Read(_readBuffer, 0, 4096);
         }
         else {
-            int intSize = sizeof(int);
+            const int intSize = sizeof(int);
             byte[] intBuffer = new byte[intSize];
             Handle.Read(intBuffer, 0, intSize);
 
@@ -1184,7 +1120,7 @@ public class IOFile : IDisposable {
             }
         }
         else {
-            int intSize = sizeof(int);
+            const int intSize = sizeof(int);
             byte[] intBuffer = BitConverter.GetBytes(bytesToWrite);
 
             // The record format for an unformatted file is:
@@ -1239,9 +1175,7 @@ public class IOFile : IDisposable {
 
     // Peek at the next character in the source
     private char PeekChar() {
-        if (_isDisposed) {
-            throw new ObjectDisposedException(GetType().Name);
-        }
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (_readIndex == -1) {
             ReadNextLine();
             if (_line == null) {
