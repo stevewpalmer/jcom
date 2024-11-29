@@ -82,7 +82,7 @@ public class Symbol {
     /// <value>
     /// Returns whether the symbol is an array.
     /// </value>
-    public bool IsArray => Dimensions != null && Dimensions.Count > 0;
+    public bool IsArray => Dimensions is { Count: > 0 };
 
     /// <value>
     /// Returns whether the symbol is a statement label.
@@ -296,18 +296,7 @@ public class Symbol {
     /// Is this a dynamic array where one of the bounds is
     /// computed at run-time?
     /// </summary>
-    public bool IsDynamicArray {
-        get {
-            if (IsArray) {
-                for (int c = 0; c < Dimensions.Count; ++c) {
-                    if (Dimensions[c].Size < 0) {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-    }
+    public bool IsDynamicArray => IsArray && Dimensions.Any(t => t.Size < 0);
 
     /// <summary>
     /// Return the total number of elements in this array, which is the
@@ -318,10 +307,7 @@ public class Symbol {
         get {
             int arraySize = 0;
             if (IsArray) {
-                arraySize = 1;
-                for (int c = 0; c < Dimensions.Count; ++c) {
-                    arraySize *= Dimensions[c].Size;
-                }
+                arraySize = Dimensions.Aggregate(1, (current, t) => current * t.Size);
             }
             return arraySize;
         }
@@ -430,7 +416,7 @@ public class Symbol {
     /// </summary>
     public bool CanInitialise {
         get {
-            if (ArrayValues != null && ArrayValues.Length > 0) {
+            if (ArrayValues is { Length: > 0 }) {
                 return true;
             }
             if (IsArray) {
@@ -556,9 +542,7 @@ public class Symbol {
         if (Modifier != 0) {
             blockNode.Write("Modifiers", Modifier.ToString());
         }
-        if (Parent != null) {
-            Parent.Dump(blockNode);
-        }
+        Parent?.Dump(blockNode);
         if (!string.IsNullOrEmpty(ExternalLibrary)) {
             blockNode.Write("ExternalLibrary", ExternalLibrary);
         }

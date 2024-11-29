@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -36,7 +36,7 @@ public class Arithmetic {
     // Test general constant usage.
     [Test]
     public void ArithTestConstantUsage() {
-        string code = @"
+        const string code = @"
                 FUNC ITEST
                   WIDTH:=7
                   HEIGHT:=9
@@ -51,7 +51,7 @@ public class Arithmetic {
     // Verify basic addition expression generation
     [Test]
     public void ArithBasicAddition() {
-        string code = @"
+        const string code = @"
                 FUNC TEST#
                   LET A# := 20
                   B# := A#
@@ -65,7 +65,7 @@ public class Arithmetic {
     // Verify basic subtraction expression generation
     [Test]
     public void ArithBasicSubtraction() {
-        string code = @"
+        const string code = @"
                 FUNC TEST#
                   LET A# := 4543
                   B# := 784
@@ -79,7 +79,7 @@ public class Arithmetic {
     // Verify basic multiplication expression generation
     [Test]
     public void ArithBasicMultiplication() {
-        string code = @"
+        const string code = @"
                 FUNC TEST#
                   LET A# := 90
                   LET B# := 45
@@ -93,7 +93,7 @@ public class Arithmetic {
     // Verify basic division expression generation
     [Test]
     public void ArithBasicDivision() {
-        string code = @"
+        const string code = @"
                 FUNC TEST
                   LET A := 35.60
                   LET B := 1.78
@@ -107,7 +107,7 @@ public class Arithmetic {
     // Verify implicit precedence
     [Test]
     public void ArithImplicitPrecedence1() {
-        string code = @"
+        const string code = @"
                 FUNC TEST
                   RETURN 10 + 4 * 6
                 ENDFUNC
@@ -120,7 +120,7 @@ public class Arithmetic {
     // Exponential is higher than multiplication so this is (10^3) * 2
     [Test]
     public void ArithImplicitPrecedence2() {
-        string code = @"
+        const string code = @"
                 FUNC TEST
                   RETURN 10 ^ 3 * 2
                 ENDFUNC
@@ -134,7 +134,7 @@ public class Arithmetic {
     // error and handled separately.
     [Test]
     public void ArithDivisionByZero() {
-        string code = @"
+        const string code = @"
                 FUNC ITEST
                   I# := 10
                   J# := 0
@@ -153,7 +153,7 @@ public class Arithmetic {
     // exponential simplification we explicitly handle.
     [Test]
     public void ArithSimplificationExp() {
-        string code = @"
+        const string code = @"
                 FUNC SIMPLIFY1
                   LH:=16
                   RETURN LH^(-1) + LH^0 + LH^1
@@ -166,7 +166,7 @@ public class Arithmetic {
     // Verify concatenation operator
     [Test]
     public void ArithConcatenation() {
-        string code = @"
+        const string code = @"
                 FUNC CONCATTEST$
                   RETURN ""90"" + ""45"" + ""34""
                 ENDFUNC
@@ -179,7 +179,7 @@ public class Arithmetic {
     // INT(x/y) where INT is implemented as FLOOR().
     [Test]
     public void ArithDiv() {
-        string code = @"
+        const string code = @"
                 FUNC DivTest#
                   IF 7 DIV (-3) <> -3 THEN RETURN FALSE
                   A# := -7
@@ -198,7 +198,7 @@ public class Arithmetic {
     // Verify MOD operator
     [Test]
     public void ArithMod() {
-        string code = @"
+        const string code = @"
                 FUNC ModTest#
                   IF 7 MOD -3 <> -2 THEN RETURN FALSE
                   A# := -7
@@ -217,7 +217,7 @@ public class Arithmetic {
     // Verify incremental add operator
     [Test]
     public void IncrAdd() {
-        string code = @"
+        const string code = @"
                 FUNC IncrAdd#
                   A# := -7
                   A# :+ 3
@@ -235,7 +235,7 @@ public class Arithmetic {
     // Verify incremental subtraction operator
     [Test]
     public void IncrSub() {
-        string code = @"
+        const string code = @"
                 FUNC IncrSub#
                   A# := 40
                   A# :- 12

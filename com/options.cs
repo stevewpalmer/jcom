@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -34,18 +34,12 @@ namespace CCompiler;
 /// Used to mark Option attributes
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class OptionField : Attribute {
-
-    // ReSharper disable UnusedMember.Global
-    public OptionField(string name) {
-        Name = name;
-    }
-    // ReSharper restore UnusedMember.Global
+public sealed class OptionField(string name) : Attribute {
 
     /// <summary>
     /// Option input name
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; } = name;
 
     /// <summary>
     /// Option input short name
@@ -163,10 +157,7 @@ public class Options {
             if (_outputFile != null) {
                 return _outputFile;
             }
-            if (SourceFiles.Count > 0) {
-                return Path.ChangeExtension(SourceFiles[0], null);
-            }
-            return string.Empty;
+            return SourceFiles.Count > 0 ? Path.ChangeExtension(SourceFiles[0], null) : string.Empty;
         }
         set => _outputFile = value;
     }
@@ -199,7 +190,7 @@ public class Options {
 
                     StringBuilder help = new();
                     help.AppendLine(AssemblySupport.AssemblyDescription + " " + AssemblySupport.AssemblyVersion + " " + AssemblySupport.AssemblyCopyright);
-                    help.AppendLine(AssemblySupport.ExecutableFilename() + " [options] [source-files]");
+                    help.AppendLine(AssemblySupport.ExecutableFilename + " [options] [source-files]");
 
                     help.AppendLine("   --help              Lists all compiler options (short: -h)");
                     help.AppendLine("   --version           Display compiler version (short: -v)");

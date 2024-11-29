@@ -64,9 +64,7 @@ public sealed class ReadDataParseNode : ParseNode {
     /// <param name="root">The parent XML node</param>
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("ReadData");
-        if (DataIndex != null) {
-            DataIndex.Dump(blockNode.Node("DataIndex"));
-        }
+        DataIndex?.Dump(blockNode.Node("DataIndex"));
         if (DataArray != null) {
             DataIndex.Dump(blockNode.Node("DataArray"));
         }

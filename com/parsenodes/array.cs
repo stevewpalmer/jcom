@@ -167,7 +167,7 @@ public sealed class ArrayParseNode : ParseNode {
         // Simple array initialisation - just initialise the
         // specified element. More complex initialisation requires
         // a loop across the elements.
-        if (Identifier != null && Identifier.Indexes != null && Identifier.Indexes.Count > 0) {
+        if (Identifier is { Indexes.Count: > 0 }) {
             if (Identifier.Indexes.Count == 1) {
                 NumberParseNode number = (NumberParseNode)Identifier.Indexes[0];
                 Debug.Assert(sym.Dimensions[0].LowerBound.IsConstant);

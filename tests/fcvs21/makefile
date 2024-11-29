@@ -25,7 +25,7 @@ runall: $(ALLTESTS) $(ALLDATATESTS) $(INTTESTS) $(INTDATATESTS)
 	-for f in $(INTDATATESTS); do $(JFOR) $$f < ./$${f%.FOR}.DAT; done
 	-grep "\sFAIL\s" run.out
 
-$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS): $(DROP)/com.dll $(DROP)/for
+$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS): $(DROP)/com.dll $(DROP)/fort
 
 clean:
 	-rm *.out FORT.*

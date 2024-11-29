@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -35,7 +35,7 @@ public class Loops {
     // Test LOOP and conditional EXIT THEN
     [Test]
     public void TestLoop1() {
-        string code = @"
+        const string code = @"
                 FUNC test1loop CLOSED
                   count:=0
                   LOOP
@@ -53,7 +53,7 @@ public class Loops {
     // Test unconditional EXIT
     [Test]
     public void TestLoop2() {
-        string code = @"
+        const string code = @"
                 FUNC test2loop CLOSED
                   LOOP
                     EXIT
@@ -69,7 +69,7 @@ public class Loops {
     // Test unconditional EXIT with GOTO
     [Test]
     public void TestLoop3() {
-        string code = @"
+        const string code = @"
                 FUNC test3loop CLOSED
                   LOOP
                     GOTO SkipExit
@@ -87,7 +87,7 @@ public class Loops {
     // Test WHILE loop with false condition at start
     [Test]
     public void TestLoop4() {
-        string code = @"
+        const string code = @"
                 FUNC test4loop CLOSED
                   WHILE FALSE DO
                     RETURN FALSE
@@ -102,7 +102,7 @@ public class Loops {
     // Test WHILE loop
     [Test]
     public void TestLoop5() {
-        string code = @"
+        const string code = @"
                 FUNC test5loop# CLOSED
                   c#:=1
                   WHILE c#<10 DO
@@ -118,7 +118,7 @@ public class Loops {
     // Test single line REPEAT loop
     [Test]
     public void TestLoop6() {
-        string code = @"
+        const string code = @"
                 FUNC test6loop# CLOSED
                   c#:=1
                   REPEAT c#:=c#+1 UNTIL c#=10
@@ -132,7 +132,7 @@ public class Loops {
     // Test single line WHILE loop
     [Test]
     public void TestLoop7() {
-        string code = @"
+        const string code = @"
                 FUNC test7loop# CLOSED
                   c#:=1
                   WHILE c#<10 DO c#:=c#+1
@@ -146,7 +146,7 @@ public class Loops {
     // Test simple FOR loop
     [Test]
     public void TestForLoop1() {
-        string code = @"
+        const string code = @"
                 FUNC for'test'1 CLOSED
                     total:=0
                     FOR x:=1 TO 10
@@ -163,7 +163,7 @@ public class Loops {
     // to the loop body.
     [Test]
     public void TestForLoopVariable() {
-        string code = @"
+        const string code = @"
                 FUNC for'var'test CLOSED
                     total:=0
                     x:=99
@@ -180,7 +180,7 @@ public class Loops {
     // Test FOR loop with STEP
     [Test]
     public void TestForLoop2() {
-        string code = @"
+        const string code = @"
                 FUNC for'test'2 CLOSED
                     total:=0
                     FOR x=1 TO 100 STEP 2
@@ -196,7 +196,7 @@ public class Loops {
     // Test FOR loop with negative step
     [Test]
     public void TestForLoop3() {
-        string code = @"
+        const string code = @"
                 FUNC for'test'3 CLOSED
                     total:=0
                     FOR x=10 TO 1 STEP -2 DO
@@ -212,7 +212,7 @@ public class Loops {
     // Test nested FOR loops
     [Test]
     public void TestForLoop4() {
-        string code = @"
+        const string code = @"
                 FUNC for'test'4 CLOSED
                     total:=0
                     FOR x=1 TO 10 DO
@@ -230,7 +230,7 @@ public class Loops {
     // Test single line FOR loop
     [Test]
     public void TestForLoop5() {
-        string code = @"
+        const string code = @"
                 FUNC for'test'5 CLOSED
                     total:=0
                     FOR x=100 TO 200 DO total :+ x

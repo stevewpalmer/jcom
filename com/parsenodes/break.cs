@@ -52,9 +52,7 @@ public sealed class BreakParseNode : ParseNode {
     /// <param name="root">The parent XML node</param>
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("Break");
-        if (BreakExpression != null) {
-            BreakExpression.Dump(blockNode);
-        }
+        BreakExpression?.Dump(blockNode);
     }
 
     /// <summary>

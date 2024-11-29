@@ -65,13 +65,9 @@ public sealed class ConditionalParseNode : ParseNode {
         ParseNodeXml blockNode = root.Node("Conditional");
         for (int c = 0; c < _exprList.Count; ++c) {
             ParseNode expr = _exprList[c];
-            if (expr != null) {
-                expr.Dump(blockNode);
-            }
+            expr?.Dump(blockNode);
             BlockParseNode body = BodyList[c];
-            if (body != null) {
-                body.Dump(blockNode);
-            }
+            body?.Dump(blockNode);
         }
     }
 

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -59,7 +59,7 @@ public partial class Compiler : ICompiler {
     private FortranSymbolCollection _stfSymbols;
     private ProcedureParseNode _currentProcedure;
     private CollectionParseNode _initList;
-    private string _entryPointName;
+    private readonly string _entryPointName;
     private bool _hasReturn;
     private bool _hasProgram;
     private bool _parsingIf;
@@ -117,15 +117,6 @@ public partial class Compiler : ICompiler {
         catch (CodeGeneratorException e) {
             Messages.Error(e.Filename, MessageCode.CODEGEN, e.Linenumber, e.Message);
         }
-    }
-
-    /// <summary>
-    /// Sets the name of the entry point function. This defaults to "Main" but
-    /// can be overridden by the caller.
-    /// </summary>
-    /// <param name="newEntryPointName">New entry point name.</param>
-    public void SetEntryPointName(string newEntryPointName) {
-        _entryPointName = newEntryPointName;
     }
 
     /// <summary>

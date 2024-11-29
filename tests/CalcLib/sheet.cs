@@ -68,19 +68,19 @@ public class SheetTests {
         Assert.IsTrue(sheet.Modified);
 
         sheet = new Sheet(1);
-        cell1 = new Cell(sheet) {
+        _ = new Cell(sheet) {
             CellFormat = CellFormat.FIXED
         };
         Assert.IsTrue(sheet.Modified);
 
         sheet = new Sheet(1);
-        cell1 = new Cell(sheet) {
+        _ = new Cell(sheet) {
             DecimalPlaces = 4
         };
         Assert.IsTrue(sheet.Modified);
 
         sheet = new Sheet(1);
-        cell1 = new Cell(sheet) {
+        _ = new Cell(sheet) {
             UseThousandsSeparator = true
         };
         Assert.IsTrue(sheet.Modified);

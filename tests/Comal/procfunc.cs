@@ -37,7 +37,7 @@ public class ProcFunc {
     // Test calling a procedure.
     [Test]
     public void TestProc1() {
-        string code = @"
+        const string code = @"
                 FUNC test1
                   PROC1
                   RETURN TRUE
@@ -53,7 +53,7 @@ public class ProcFunc {
     // Test calling an open function.
     [Test]
     public void TestFunc1() {
-        string code = @"
+        const string code = @"
                 FUNC test1
                   RETURN FUNC1
                 ENDFUNC test1
@@ -68,7 +68,7 @@ public class ProcFunc {
     // Test calling a procedure with a reference parameter
     [Test]
     public void TestProc2() {
-        string code = @"
+        const string code = @"
                 FUNC test1
                   A#:=0
                   PROC1(A#)
@@ -89,7 +89,7 @@ public class ProcFunc {
     // Test calling a function
     [Test]
     public void TestFunc2() {
-        string code = @"
+        const string code = @"
                 FUNC test'lower
                     DIM foo$ OF 7
                     foo$:=""HELLO""
@@ -114,7 +114,7 @@ public class ProcFunc {
     // Test using IMPORT in an open procedure is an error
     [Test]
     public void TestBadImport1() {
-        string code = @"
+        const string code = @"
                 PROC test'proc'1
                    IMPORT foo
                 ENDPROC
@@ -140,7 +140,7 @@ public class ProcFunc {
     // Test using duplicate IMPORT statements
     [Test]
     public void TestBadImport2() {
-        string code = @"
+        const string code = @"
                 PROC test'proc'1 CLOSED
                    IMPORT foo,foo
                 ENDPROC
@@ -157,7 +157,7 @@ public class ProcFunc {
     // Test scope.
     [Test]
     public void TestProcFuncScope() {
-        string code = @"
+        const string code = @"
                 FUNC scopetest$
                   DIM text$ OF 10
                   text$:=""happy""
@@ -177,7 +177,7 @@ public class ProcFunc {
     // main scope.
     [Test]
     public void TestProc3() {
-        string code = @"
+        const string code = @"
                 Foo# := 1234
                 PROC1
                 RETURN

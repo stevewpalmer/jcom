@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -36,7 +36,7 @@ public class Strings {
     // an empty string then the result is 0.
     [Test]
     public void EmptyStringIn() {
-        string code = @"
+        const string code = @"
                 FUNC INTEST
                 OFF1:="""" IN ""INDEX""
                 RETURN OFF1
@@ -49,7 +49,7 @@ public class Strings {
     // Test substring manipulation.
     [Test]
     public void Substrings1() {
-        string code = @"
+        const string code = @"
                 FUNC sub'test#
                 DIM t$ OF 4,s$ OF 3
                 t$:=""abcd""
@@ -67,7 +67,7 @@ public class Strings {
     // Test substring manipulation with no end range
     [Test]
     public void Substrings2() {
-        string code = @"
+        const string code = @"
                 FUNC sub'test#
                 DIM t$ OF 4,s$ OF 2
                 t$:=""abcd""
@@ -84,7 +84,7 @@ public class Strings {
     // Test string concatenation and truncation
     [Test]
     public void StringConcat() {
-        string code = @"
+        const string code = @"
                 FUNC concat
                 DIM t$ OF 10
                 t$:=""abcde""
@@ -102,7 +102,7 @@ public class Strings {
     // allocated size.
     [Test]
     public void StringConcat2() {
-        string code = @"
+        const string code = @"
                 FUNC concat
                 DIM t$ OF 10
                 t$:=""ABC""
@@ -119,7 +119,7 @@ public class Strings {
     // Test substring where string is shorter than the index
     [Test]
     public void Substring3() {
-        string code = @"
+        const string code = @"
                 FUNC sub'test#
                     DIM t$ OF 8
                     t$:=""abcdefgh""
@@ -137,7 +137,7 @@ public class Strings {
     // Test array indexes and substrings together
     [Test]
     public void Substring4() {
-        string code = @"
+        const string code = @"
                 FUNC array'and'substring$
                     DIM A$(10) OF 10,B$ OF 10
                     FOR X:=1 TO 10
@@ -157,7 +157,7 @@ public class Strings {
     // Test boolean value of an empty string
     [Test]
     public void EmptyStringBoolean() {
-        string code = @"
+        const string code = @"
                 FUNC emptyString
                     DIM A$ OF 1
                     A$ := """"

@@ -82,24 +82,12 @@ public sealed class InputManagerParseNode : ParseNode {
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("InputManager");
         blockNode.Attribute("Terminator", Terminator.ToString());
-        if (ColumnPosition != null) {
-            ColumnPosition.Dump(blockNode);
-        }
-        if (RowPosition != null) {
-            RowPosition.Dump(blockNode);
-        }
-        if (MaximumWidth != null) {
-            MaximumWidth.Dump(blockNode);
-        }
-        if (FileHandle != null) {
-            FileHandle.Dump(blockNode);
-        }
-        if (RecordNumber != null) {
-            RecordNumber.Dump(blockNode);
-        }
-        if (Prompt != null) {
-            Prompt.Dump(blockNode);
-        }
+        ColumnPosition?.Dump(blockNode);
+        RowPosition?.Dump(blockNode);
+        MaximumWidth?.Dump(blockNode);
+        FileHandle?.Dump(blockNode);
+        RecordNumber?.Dump(blockNode);
+        Prompt?.Dump(blockNode);
         foreach (IdentifierParseNode identNode in Identifiers) {
             identNode.Dump(blockNode);
         }

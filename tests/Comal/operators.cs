@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -35,7 +35,7 @@ public class Operators {
     // Test assignments.
     [Test]
     public void TestAssignment() {
-        string code = @"
+        const string code = @"
                 FUNC test'assign CLOSED
                   LET A# := 14
                   IF A# <> 14 THEN RETURN FALSE
@@ -54,7 +54,7 @@ public class Operators {
     // Test the bitwise AND operator.
     [Test]
     public void TestAnd() {
-        string code = @"
+        const string code = @"
                 FUNC test'and CLOSED
                   IF (TRUE AND TRUE)<> TRUE THEN RETURN FALSE
                   IF (TRUE AND FALSE)<> FALSE THEN RETURN FALSE
@@ -70,7 +70,7 @@ public class Operators {
     // Verify BITOR operator
     [Test]
     public void TestBitOR() {
-        string code = @"
+        const string code = @"
                 FUNC test'bitor CLOSED
                     IF (3 BITOR 3)<>3 THEN RETURN FALSE
                     IF (3 BITOR 0)<>3 THEN RETURN FALSE
@@ -86,7 +86,7 @@ public class Operators {
     // Verify BITAND operator
     [Test]
     public void TestBitAND() {
-        string code = @"
+        const string code = @"
                 FUNC test'bitand CLOSED
                     IF (3 BITAND 3)<>3 THEN RETURN FALSE
                     IF (3 BITAND 0)<>0 THEN RETURN FALSE
@@ -102,7 +102,7 @@ public class Operators {
     // Verify BITXOR operator
     [Test]
     public void TestBitXOR() {
-        string code = @"
+        const string code = @"
                 FUNC test'bitxor CLOSED
                     IF (3 BITXOR 3)<>0 THEN RETURN FALSE
                     IF (3 BITXOR 0)<>3 THEN RETURN FALSE
@@ -118,7 +118,7 @@ public class Operators {
     // Verify logical AND operator
     [Test]
     public void TestLogicalAND() {
-        string code = @"
+        const string code = @"
                 FUNC test'logical'and
                     counter := 0
                     p := 12 AND THEN inc'counter()
@@ -139,7 +139,7 @@ public class Operators {
     // Verify logical OR operator
     [Test]
     public void TestLogicalOR() {
-        string code = @"
+        const string code = @"
                 FUNC test'logical'or
                     counter := 0
                     p := 12 OR THEN inc'counter()

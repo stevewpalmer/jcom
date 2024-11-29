@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -104,10 +104,42 @@ public class OptionsTest {
         Assert.IsTrue(opts.GenerateDebug);
     }
 
+    // Verify the -out option.
+    [Test]
+    public void ValidateOutputFile() {
+        ComalOptions opts = new();
+        string[] args = [
+            "testfile2.for"
+        ];
+
+        Assert.AreEqual(opts.OutputFile, string.Empty);
+        Assert.IsTrue(opts.Parse(args));
+        Assert.IsTrue(opts.SourceFiles.Count == 1);
+        Assert.AreEqual(opts.SourceFiles[0], "testfile2.for");
+        Assert.AreEqual(opts.OutputFile, "testfile2");
+
+        opts.OutputFile = "myoutfile";
+        Assert.AreEqual(opts.OutputFile, "myoutfile");
+
+        string[] args2 = [
+            "testfile2.for",
+            "--out:another_out_file"
+        ];
+        Assert.IsTrue(opts.Parse(args2));
+        Assert.AreEqual(opts.OutputFile, "another_out_file");
+
+        string[] args3 = [
+            "testfile2.for",
+            "-o:out_filename.exe"
+        ];
+        Assert.IsTrue(opts.Parse(args3));
+        Assert.AreEqual(opts.OutputFile, "out_filename.exe");
+    }
+
     // Validate the -IDE option.
     [Test]
     public void VerifyIDEOption() {
-        string code = @"
+        const string code = @"
                 10 FUNC ITEST
                 20   WIDTH:=7
                 30   HEIGHT:=9

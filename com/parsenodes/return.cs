@@ -43,9 +43,7 @@ public sealed class ReturnParseNode : ParseNode {
     /// <param name="root">The parent XML node</param>
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("Return");
-        if (ReturnExpression != null) {
-            ReturnExpression.Dump(blockNode);
-        }
+        ReturnExpression?.Dump(blockNode);
     }
 
     /// <summary>
@@ -99,17 +97,15 @@ public sealed class ReturnParseNode : ParseNode {
 
             // Store the value in the return index if one exists.
             if (needStore) {
-                if (cg.CurrentProcedure.ReturnIndex == null) {
-                    cg.CurrentProcedure.ReturnIndex = emitter.GetTemporary(Symbol.SymTypeToSystemType(cg.CurrentProcedure.ProcedureSymbol.Type));
-                }
+                cg.CurrentProcedure.ReturnIndex ??= emitter.GetTemporary(Symbol.SymTypeToSystemType(cg.CurrentProcedure.ProcedureSymbol.Type));
                 emitter.StoreLocal(cg.CurrentProcedure.ReturnIndex);
             }
-        }
-        if (cg.HandlerLevel > 0) {
-            emitter.Leave(cg.CurrentProcedure.ReturnLabel);
-        }
-        else {
-            emitter.Branch(cg.CurrentProcedure.ReturnLabel);
+            if (cg.HandlerLevel > 0) {
+                emitter.Leave(cg.CurrentProcedure.ReturnLabel);
+            }
+            else {
+                emitter.Branch(cg.CurrentProcedure.ReturnLabel);
+            }
         }
     }
 }

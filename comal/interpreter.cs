@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using CCompiler;
 using JComalLib;
 using JComLib;
@@ -370,7 +371,7 @@ public class Interpreter {
             }
             else {
                 // Possible enter of a source file with no line
-                // numbers? 
+                // numbers?
                 if (line.LineNumber == 0) {
                     line.LineNumber = lineNumber;
                     lineNumber += 10;
@@ -650,6 +651,7 @@ public class Interpreter {
     }
 
     // Throw a syntax error exception from command mode.
+    [DoesNotReturn]
     private static void SyntaxError() {
         throw new Exception("Syntax Error");
     }

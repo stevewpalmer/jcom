@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.SymbolStore;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -242,6 +243,7 @@ public class ProgramParseNode : ParseNode {
     /// Save the generated assembly to disk. This requires a filename
     /// to have been previously set or this does nothing.
     /// </summary>
+    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
     public void Save() {
 #if GENERATE_NATIVE_BINARIES
         string filename = OutputFilename(OutputFile);
@@ -289,6 +291,7 @@ public class ProgramParseNode : ParseNode {
     /// Sets the specified method as the program start method.
     /// </summary>
     /// <param name="method">Method object</param>
+    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
     public void SetEntryPoint(JMethod method) {
 #if GENERATE_NATIVE_BINARIES
         _ab.SetEntryPoint(method.Builder);
@@ -541,6 +544,7 @@ public class ProgramParseNode : ParseNode {
     private void AddDebuggable() {
         Type type = typeof(DebuggableAttribute);
         ConstructorInfo ctor = type.GetConstructor([typeof(DebuggableAttribute.DebuggingModes)]);
+        Debug.Assert(ctor != null);
         CustomAttributeBuilder caBuilder = new(ctor, [
             DebuggableAttribute.DebuggingModes.DisableOptimizations |
             DebuggableAttribute.DebuggingModes.Default
@@ -569,6 +573,7 @@ public class ProgramParseNode : ParseNode {
 #endif
 
     // Sets the filename in the debug info.
+    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
     private void SetCurrentDocument(string filename) {
 #if GENERATE_NATIVE_BINARIES
         _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);

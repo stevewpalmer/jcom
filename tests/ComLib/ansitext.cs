@@ -31,6 +31,27 @@ namespace ComLibTests;
 
 public class TestANSIText {
 
+    // Verify the AnsiColour enum values
+    [Test]
+    public void VerifyValues() {
+        Assert.AreEqual(AnsiColour.Black, 30);
+        Assert.AreEqual(AnsiColour.Red, 31);
+        Assert.AreEqual(AnsiColour.Green, 32);
+        Assert.AreEqual(AnsiColour.Yellow, 33);
+        Assert.AreEqual(AnsiColour.Blue, 34);
+        Assert.AreEqual(AnsiColour.Magenta, 35);
+        Assert.AreEqual(AnsiColour.Cyan, 36);
+        Assert.AreEqual(AnsiColour.White, 37);
+        Assert.AreEqual(AnsiColour.Gray, 90);
+        Assert.AreEqual(AnsiColour.BrightRed, 91);
+        Assert.AreEqual(AnsiColour.BrightGreen, 92);
+        Assert.AreEqual(AnsiColour.BrightYellow, 93);
+        Assert.AreEqual(AnsiColour.BrightBlue, 94);
+        Assert.AreEqual(AnsiColour.BrightMagenta, 95);
+        Assert.AreEqual(AnsiColour.BrightCyan, 96);
+        Assert.AreEqual(AnsiColour.BrightWhite, 97);
+    }
+
     // Test a plain ANSI text string with no formatting.
     [Test]
     public void TestPlainString() {
@@ -68,7 +89,7 @@ public class TestANSIText {
             new AnsiText.AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Red,
                 BackgroundColour = AnsiColour.Green
-            },
+            }
         ]);
 
         Assert.IsTrue(ansi.Spans.Count == 2);

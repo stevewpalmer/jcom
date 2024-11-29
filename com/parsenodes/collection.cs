@@ -51,7 +51,7 @@ public class CollectionParseNode : ParseNode {
     /// <summary>
     /// Returns a list of all child nodes.
     /// </summary>
-    public Collection<ParseNode> Nodes { get; private set; }
+    public Collection<ParseNode> Nodes { get; }
 
     /// <summary>
     /// Dumps the contents of this parse node to the ParseNode XML

@@ -151,8 +151,6 @@ public sealed class WriteParseNode : ParseNode {
         ParseNodeXml blockNode = root.Node("Write");
         WriteManagerParamsNode.Dump(blockNode.Node("WriteManagerParams"));
         WriteParamsNode.Dump(blockNode.Node("WriteParams"));
-        if (ArgList != null) {
-            ArgList.Dump(blockNode);
-        }
+        ArgList?.Dump(blockNode);
     }
 }

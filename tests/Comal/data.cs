@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -35,7 +35,7 @@ public class Data {
     // Test simple DATA read
     [Test]
     public void TestRead1Data() {
-        string code = @"
+        const string code = @"
                 FUNC read'simple'data
                   READ A
                   RETURN A
@@ -49,7 +49,7 @@ public class Data {
     // Test multiple DATA reads
     [Test]
     public void TestReadXData() {
-        string code = @"
+        const string code = @"
                 FUNC read'multiple'data
                   READ A,B#,C,D#
                   RETURN (A+B#)*(C-D#)
@@ -63,7 +63,7 @@ public class Data {
     // Test EOD
     [Test]
     public void TestEOD() {
-        string code = @"
+        const string code = @"
                 FUNC test'eod
                   IF EOD THEN RETURN 0
                   READ A,B#,C,D#
@@ -79,7 +79,7 @@ public class Data {
     // in the program.
     [Test]
     public void TestDefaultEOD() {
-        string code = @"
+        const string code = @"
                 FUNC test'default'eod
                   IF EOD THEN RETURN 1
                   RETURN FALSE
@@ -92,7 +92,7 @@ public class Data {
     // Test RESTORE
     [Test]
     public void TestRestore() {
-        string code = @"
+        const string code = @"
                 FUNC test'restore
                   READ A,B#
                   RESTORE
@@ -108,7 +108,7 @@ public class Data {
     // Test RESTORE resets EOD
     [Test]
     public void TestRestoreResetEOD() {
-        string code = @"
+        const string code = @"
                 FUNC test'restore'reset
                   READ A,B#,C,D#
                   IF NOT EOD THEN RETURN FALSE

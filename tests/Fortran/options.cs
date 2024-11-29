@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -35,9 +35,9 @@ public class OptionsTest {
     // Validate the MessageCode table hasn't been borked
     [Test]
     public void ValidateMessageCodeTable() {
-        Assert.AreEqual((int)MessageCode.NONE, 0);
-        Assert.AreEqual((int)MessageCode.EXPECTEDTOKEN, 0x1000);
-        Assert.AreEqual((int)MessageCode.BADOPTION, 4149);
+        Assert.AreEqual(0, (int)MessageCode.NONE);
+        Assert.AreEqual(0x1000, (int)MessageCode.EXPECTEDTOKEN);
+        Assert.AreEqual(4147, (int)MessageCode.BADOPTION);
     }
 
     // Verify that the default options are what we expect.

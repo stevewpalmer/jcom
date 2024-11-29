@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -61,13 +61,9 @@ public sealed class SwitchParseNode : ParseNode {
         CompareExpression.Dump(blockNode);
         for (int c = 0; c < _caseList.Count; ++c) {
             ParseNode node = _caseList[c];
-            if (node != null) {
-                node.Dump(blockNode);
-            }
+            node?.Dump(blockNode);
             node = _labelList[c];
-            if (node != null) {
-                node.Dump(blockNode);
-            }
+            node?.Dump(blockNode);
         }
     }
 

@@ -71,7 +71,7 @@ public sealed class GotoParseNode : ParseNode {
     /// <summary>
     /// Returns a list of all child nodes.
     /// </summary>
-    public Collection<ParseNode> Nodes { get; private set; }
+    public Collection<ParseNode> Nodes { get; }
 
     /// <summary>
     /// Dumps the contents of this parse node to the ParseNode XML
@@ -81,9 +81,7 @@ public sealed class GotoParseNode : ParseNode {
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("Goto");
         blockNode.Attribute("IsZeroBased", IsZeroBased.ToString());
-        if (ValueExpression != null) {
-            ValueExpression.Dump(blockNode);
-        }
+        ValueExpression?.Dump(blockNode);
         foreach (ParseNode node in Nodes) {
             node.Dump(blockNode);
         }

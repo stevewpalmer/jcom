@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -87,7 +87,7 @@ public class IdentifierParseNode : ParseNode {
         get => _symbol;
         set {
             _symbol = value;
-            Type = _symbol != null ? _symbol.Type : SymType.NONE;
+            Type = _symbol?.Type ?? SymType.NONE;
         }
     }
 
@@ -102,7 +102,7 @@ public class IdentifierParseNode : ParseNode {
     /// Gets a value indicating whether this identifier has array indexes.
     /// </summary>
     /// <value><c>true</c> if this instance has array indexes; otherwise, <c>false</c>.</value>
-    public bool HasIndexes => Indexes != null && Indexes.Count > 0;
+    public bool HasIndexes => Indexes is { Count: > 0 };
 
     /// <summary>
     /// Implements the base code generator for the node to invoke a
@@ -177,9 +177,7 @@ public class IdentifierParseNode : ParseNode {
         if (HasSubstring) {
             ParseNodeXml subNode = blockNode.Node("Substring");
             SubstringStart.Dump(subNode);
-            if (SubstringEnd != null) {
-                SubstringEnd.Dump(subNode);
-            }
+            SubstringEnd?.Dump(subNode);
         }
     }
 

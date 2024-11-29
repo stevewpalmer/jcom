@@ -48,7 +48,7 @@ public class InstructionLocal : Instruction {
     /// Gets the local variable reference.
     /// </summary>
     /// <value>The integer parameter assigned to this opcode</value>
-    public LocalDescriptor Value { get; private set; }
+    public LocalDescriptor Value { get; }
 
     /// <summary>
     /// Generate MSIL code to emit a opcode that takes an integer

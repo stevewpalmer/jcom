@@ -80,15 +80,13 @@ public class ParametersParseNode : ParseNode {
     /// <summary>
     /// A collection of ParameterParseNode elements for this list.
     /// </summary>
-    public Collection<ParameterParseNode> Nodes { get; private set; }
+    public Collection<ParameterParseNode> Nodes { get; }
 
     /// <summary>
     /// Frees the local descriptors allocated during code generation.
     /// </summary>
     public void FreeLocalDescriptors() {
-        if (_locals != null) {
-            _locals.Free();
-        }
+        _locals?.Free();
     }
 
     /// <summary>
@@ -144,7 +142,7 @@ public class ParametersParseNode : ParseNode {
         ArgumentNullException.ThrowIfNull(sym);
 
         int callerParameterCount = Nodes.Count;
-        int calleeParameterCount = sym.Parameters != null ? sym.Parameters.Count : 0;
+        int calleeParameterCount = sym.Parameters?.Count ?? 0;
 
         if (!sym.IsParameter && callerParameterCount != calleeParameterCount) {
             cg.Error($"Parameter count mismatch for {sym.Name}");

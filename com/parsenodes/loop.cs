@@ -125,24 +125,12 @@ public sealed class LoopParseNode : ParseNode {
     /// <param name="root">The parent XML node</param>
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("Loop");
-        if (LoopVariable != null) {
-            LoopVariable.Dump(blockNode.Node("LoopVariable"));
-        }
-        if (LoopValue != null) {
-            LoopValue.Dump(blockNode.Node("LoopValue"));
-        }
-        if (StartExpression != null) {
-            StartExpression.Dump(blockNode.Node("StartExpression"));
-        }
-        if (EndExpression != null) {
-            EndExpression.Dump(blockNode.Node("EndExpression"));
-        }
-        if (StepExpression != null) {
-            StepExpression.Dump(blockNode.Node("StepExpression"));
-        }
-        if (LoopBody != null) {
-            LoopBody.Dump(blockNode.Node("LoopBody"));
-        }
+        LoopVariable?.Dump(blockNode.Node("LoopVariable"));
+        LoopValue?.Dump(blockNode.Node("LoopValue"));
+        StartExpression?.Dump(blockNode.Node("StartExpression"));
+        EndExpression?.Dump(blockNode.Node("EndExpression"));
+        StepExpression?.Dump(blockNode.Node("StepExpression"));
+        LoopBody?.Dump(blockNode.Node("LoopBody"));
     }
 
     /// <summary>
@@ -268,9 +256,7 @@ public sealed class LoopParseNode : ParseNode {
             Callback.Generate(emitter, cg, LoopValue);
         }
 
-        if (LoopBody != null) {
-            LoopBody.Generate(emitter, cg);
-        }
+        LoopBody?.Generate(emitter, cg);
 
         emitter.LoadSymbol(sym);
         if (StepExpression.IsConstant) {

@@ -65,9 +65,7 @@ public class ParameterParseNode : ParseNode {
     public override void Dump(ParseNodeXml root) {
         ParseNodeXml blockNode = root.Node("Parameter");
         _paramNode.Dump(blockNode);
-        if (_symbol != null) {
-            _symbol.Dump(blockNode);
-        }
+        _symbol?.Dump(blockNode);
     }
 
     /// <summary>
@@ -118,8 +116,8 @@ public class ParameterParseNode : ParseNode {
         ArgumentNullException.ThrowIfNull(locals);
 
         // Set some flags up-front
-        bool isByRef = symParam != null ? symParam.IsByRef : IsByRef;
-        bool isArray = symParam != null && symParam.IsArray;
+        bool isByRef = symParam?.IsByRef ?? IsByRef;
+        bool isArray = symParam is { IsArray: true };
 
         // The argument is an array, so the source must either be an array or
         // an array reference.
@@ -196,7 +194,7 @@ public class ParameterParseNode : ParseNode {
         }
 
         // Byval argument passing
-        SymType neededType = symParam != null ? symParam.Type : Type;
+        SymType neededType = symParam?.Type ?? Type;
         SymType thisType = cg.GenerateExpression(emitter, neededType, _paramNode);
         if (symParam != null) {
             thisType = symParam.Type;

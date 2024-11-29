@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -85,15 +85,15 @@ public class SymbolCollection : IEnumerable<Symbol> {
     /// Add the specified identifier to the symbol table with the given type.
     /// If type is TYP_NONE then consult the implicit array to determine what it
     /// should be.
-    /// 
+    ///
     /// For character types, width may be specified to indicate the width of the
     /// character array. For other types this has no purpose.
-    /// 
+    ///
     /// For arrays, explicit constant dimensions may be specified. By setting
     /// dimensions, the identifier is automatically marked as an array. A non-array
     /// identifier can be promoted to an array later by setting the dimensions
     /// separately.
-    /// 
+    ///
     /// The reference line is a line number in the source code where the identifier
     /// was first referenced. This is used later in error and warning messages.
     /// </summary>
@@ -121,7 +121,7 @@ public class SymbolCollection : IEnumerable<Symbol> {
         if (!CaseSensitive) {
             name = name.ToUpper();
         }
-        _symbols[name] = sym ?? throw new ArgumentNullException(nameof(sym));
+        _symbols[name] = sym;
     }
 
     /// <summary>

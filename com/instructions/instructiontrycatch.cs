@@ -101,12 +101,12 @@ public class InstructionTryCatch : Instruction {
                 il.Emit(OpCodes.Stloc_S, tmp1);
 
                 if (Err != null || ErrText != null) {
-                    if (Err != null && Err.IsReferenced) {
+                    if (Err is { IsReferenced: true }) {
                         il.Emit(OpCodes.Ldloc_S, tmp1);
                         il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_ErrorCode"), null);
                         il.Emit(OpCodes.Stsfld, (FieldInfo)Err.Info);
                     }
-                    if (ErrText != null && ErrText.IsReferenced) {
+                    if (ErrText is { IsReferenced: true }) {
                         il.Emit(OpCodes.Ldloc_S, tmp1);
                         il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message"), null);
                         il.Emit(OpCodes.Stsfld, (FieldInfo)ErrText.Info);

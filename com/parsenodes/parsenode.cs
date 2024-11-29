@@ -64,7 +64,6 @@ public enum ParseID {
     NUMBER,
     OR,
     ORTHEN,
-    PLUS,
     PROCEDURE,
     PROGRAM,
     STRING,

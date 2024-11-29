@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -42,16 +42,15 @@ public class SymFullType : IEquatable<SymFullType> {
     /// <summary>
     /// Returns whether this object is identical to the given object.
     /// </summary>
-    /// <param name="obj">The <see cref="object"/> to compare with the 
+    /// <param name="obj">The <see cref="object"/> to compare with the
     /// current <see cref="SymFullType"/>.</param>
-    /// <returns><c>true</c> if the specified <see cref="object"/> is 
+    /// <returns><c>true</c> if the specified <see cref="object"/> is
     /// equal to the current
     /// <see cref="SymFullType"/>; otherwise, <c>false</c>.</returns>
     public override bool Equals(object obj) {
-        if (!(obj is SymFullType)) {
+        if (obj is not SymFullType symOther) {
             return false;
         }
-        SymFullType symOther = (SymFullType)obj;
         return symOther.Type == Type && symOther.Width == Width;
     }
 
@@ -118,9 +117,6 @@ public class SymFullType : IEquatable<SymFullType> {
     /// </summary>
     /// <returns>A string that describes this full symbol type</returns>
     public override string ToString() {
-        if (Width == 1) {
-            return Type.ToString();
-        }
-        return $"{Type} *{Width}";
+        return Width == 1 ? Type.ToString() : $"{Type} *{Width}";
     }
 }

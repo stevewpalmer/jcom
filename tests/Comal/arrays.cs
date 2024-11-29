@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -37,7 +37,7 @@ public class Arrays {
     // Test Simple 1D array
     [Test]
     public void TestSimple1DArray() {
-        string code = @"
+        const string code = @"
                 func test closed
                   dim a(10)
                   for x:=1 to 10 do
@@ -56,7 +56,7 @@ public class Arrays {
     // Test Simple 2D array
     [Test]
     public void TestSimple2DArray() {
-        string code = @"
+        const string code = @"
                 func array'2d closed
                   dim a(10,10)
                   for x:=1 to 10 do
@@ -79,7 +79,7 @@ public class Arrays {
     // Test 1D string array
     [Test]
     public void TestString1DArray() {
-        string code = @"
+        const string code = @"
                 func test closed
                   dim a$(10) of 5
                   for x:=1 to 10 do
@@ -98,7 +98,7 @@ public class Arrays {
     // Test 2D string array
     [Test]
     public void TestString2DArray() {
-        string code = @"
+        const string code = @"
                 func array'string'2d closed
                   dim a$(5,10) of 4
                   for x:=1 to 5 do
@@ -121,7 +121,7 @@ public class Arrays {
     // Test 1D dynamic array
     [Test]
     public void Test1DDynamicArray() {
-        string code = @"
+        const string code = @"
                 func array'dynamic'1d closed
                   arysize := 13
                   dim a(arysize)
@@ -141,7 +141,7 @@ public class Arrays {
     // Test 1D dynamic array with a range
     [Test]
     public void Test1DDynamicArrayWithRange() {
-        string code = @"
+        const string code = @"
                 func array'dynamic'1d'range closed
                   lowr := -5
                   highr := 5
@@ -162,7 +162,7 @@ public class Arrays {
     // Test 1D dynamic string array
     [Test]
     public void Test1DDynamicStringArray() {
-        string code = @"
+        const string code = @"
                 func array'dynamic'string'1d closed
                   arysize := 13
                   dim a$(arysize) of 5
@@ -183,7 +183,7 @@ public class Arrays {
     // all array elements will have been reset to 0.
     [Test]
     public void Test1DRedimDynamicArray() {
-        string code = @"
+        const string code = @"
                 func array'redim'dynamic'1d closed
                   arysize := 13
                   dim a(arysize)
@@ -205,7 +205,7 @@ public class Arrays {
     // Test 2D dynamic array
     [Test]
     public void Test2DDynamicStringArray() {
-        string code = @"
+        const string code = @"
                 func array'dynamic'2d closed
                   max'x := 5
                   max'y := 7
@@ -230,7 +230,7 @@ public class Arrays {
     // Test 1D dynamic array with a range
     [Test]
     public void Test2DDynamicArrayWithRange() {
-        string code = @"
+        const string code = @"
                 func array'dynamic'2d'range closed
                   max'x'low := 0
                   max'x'high := 20
@@ -257,7 +257,7 @@ public class Arrays {
     // Test catching inconsistent array dimensions
     [Test]
     public void TestInconsistentDimensions() {
-        string code = @"
+        const string code = @"
                 func array'badd closed
                   dim a(10,10)
                   for x:=1 to 10 do
@@ -283,7 +283,7 @@ public class Arrays {
     // Test Simple bounded array
     [Test]
     public void TestSimpleBoundedArray() {
-        string code = @"
+        const string code = @"
                 func test closed
                   dim a(30:40)
                   for x:=30 to 40 do
@@ -302,7 +302,7 @@ public class Arrays {
     // Test catching out of bounds error
     [Test]
     public void TestArrayOutOfBounds() {
-        string code = @"
+        const string code = @"
                 func array'oob closed
                   dim a(30:40)
                   for x:=20 to 40 do
@@ -318,7 +318,7 @@ public class Arrays {
     // Test calling a function with an array by value.
     [Test]
     public void TestPassArrayByVal() {
-        string code = @"
+        const string code = @"
                 func array'byval
                   dim a(10)
                   for x=1 to 10 do
@@ -340,7 +340,7 @@ public class Arrays {
     // Test calling a function with an array by reference.
     [Test]
     public void TestPassArrayByRef() {
-        string code = @"
+        const string code = @"
                 func array'byref
                   dim a(10)
                   init'by'ref(a)

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -35,7 +35,7 @@ public class Functions {
     // Test Abs() function.
     [Test]
     public void TestAbs() {
-        string code = @"
+        const string code = @"
                 func test'abs closed
                   if abs(1)<>1 then return false
                   if abs(-1)<>1 then return false
@@ -55,7 +55,7 @@ public class Functions {
     // Test Atn() function.
     [Test]
     public void TestAtn() {
-        string code = @"
+        const string code = @"
                 FUNC test'atn CLOSED
                   B := 0.5
                   B# := 4
@@ -78,7 +78,7 @@ public class Functions {
     // Test Sqr() function.
     [Test]
     public void TestSqr() {
-        string code = @"
+        const string code = @"
                 FUNC test'sqr CLOSED
                   BVS := SQR(1.6)
                   AVS := SQR(0.625) * BVS
@@ -99,7 +99,7 @@ public class Functions {
     // Test Cos() function.
     [Test]
     public void TestCos() {
-        string code = @"
+        const string code = @"
                 FUNC test'cos CLOSED
                   B := 0.5
                   B# := 4
@@ -121,7 +121,7 @@ public class Functions {
     // Test Sin() function.
     [Test]
     public void TestSin() {
-        string code = @"
+        const string code = @"
                 FUNC test'sin CLOSED
                   B := 0.5
                   B# := 4
@@ -143,7 +143,7 @@ public class Functions {
     // Test Ord() function.
     [Test]
     public void TestOrd() {
-        string code = @"
+        const string code = @"
                 FUNC test'ord CLOSED
                   IF CHR$(53)<>""5"" THEN RETURN FALSE
                   IF ORD(CHR$(53))<>53 THEN RETURN FALSE
@@ -161,7 +161,7 @@ public class Functions {
     // Test Log() function.
     [Test]
     public void TestLog() {
-        string code = @"
+        const string code = @"
                 FUNC test'log CLOSED
                   IF LOG(1)<>0 THEN RETURN FALSE
                   A := ABS(LOG(2.71828)-1)
@@ -183,7 +183,7 @@ public class Functions {
     // Calls to RND in between must return the same value
     [Test]
     public void TestRandomize() {
-        string code = @"
+        const string code = @"
                 FUNC test'randomize CLOSED
                   RANDOMIZE 9
                   a:=RND
@@ -207,7 +207,7 @@ public class Functions {
     // Test RND and RND(range)
     [Test]
     public void TestRndRange() {
-        string code = @"
+        const string code = @"
                 FUNC test'rnd'range CLOSED
                   FOR x:=1 TO 50 DO
                     r:=RND(1,20)
@@ -229,7 +229,7 @@ public class Functions {
     // Test SPC$
     [Test]
     public void TestSpc() {
-        string code = @"
+        const string code = @"
                 FUNC test'spc CLOSED
                   DIM A$ OF 11
                   A$ := ""HELLO"" + SPC$(1) + ""WORLD""

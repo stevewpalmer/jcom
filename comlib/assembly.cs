@@ -35,8 +35,8 @@ public static class AssemblySupport {
     /// </summary>
     public static string AssemblyCopyright {
         get {
-            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
-            Debug.Assert(attributes.Length > 0);
+            object[] attributes = Assembly.GetEntryAssembly()?.GetCustomAttributes(typeof(AssemblyCopyrightAttribute), false);
+            Debug.Assert(attributes?.Length > 0);
             return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
         }
     }
@@ -46,8 +46,8 @@ public static class AssemblySupport {
     /// </summary>
     public static string AssemblyDescription {
         get {
-            object[] attributes = Assembly.GetEntryAssembly().GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
-            Debug.Assert(attributes.Length > 0);
+            object[] attributes = Assembly.GetEntryAssembly()?.GetCustomAttributes(typeof(AssemblyDescriptionAttribute), false);
+            Debug.Assert(attributes?.Length > 0);
             return ((AssemblyDescriptionAttribute)attributes[0]).Description;
         }
     }
@@ -57,7 +57,8 @@ public static class AssemblySupport {
     /// </summary>
     public static string AssemblyVersion {
         get {
-            Version ver = Assembly.GetEntryAssembly().GetName().Version;
+            Version ver = Assembly.GetEntryAssembly()?.GetName().Version;
+            Debug.Assert(ver != null);
             return $"{ver.Major}.{ver.Minor}.{ver.Build}";
         }
     }
@@ -66,5 +67,11 @@ public static class AssemblySupport {
     /// Return this executable filename.
     /// </summary>
     /// <returns>Executable filename string</returns>
-    public static string ExecutableFilename() => Path.GetFileNameWithoutExtension(Assembly.GetEntryAssembly().Location);
+    public static string ExecutableFilename {
+        get {
+            string path = Assembly.GetEntryAssembly()?.Location;
+            Debug.Assert(!string.IsNullOrEmpty(path));
+            return Path.GetFileNameWithoutExtension(path);
+        }
+    }
 }

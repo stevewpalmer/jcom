@@ -87,7 +87,7 @@ public sealed class StdoutIOFile : IOFile {
     /// <param name="str">The string to write</param>
     /// <param name="carriageAtEnd">Whether to write a newline at the end</param>
     /// <returns>The number of characters written to the device</returns>
-    public override int WriteLine(string str, bool carriageAtEnd) {
+    public override void WriteLine(string str, bool carriageAtEnd) {
         if (str.Length == 0) {
             Console.WriteLine();
         }
@@ -97,7 +97,6 @@ public sealed class StdoutIOFile : IOFile {
         else {
             Console.Write(str);
         }
-        return 0;
     }
 }
 
@@ -487,25 +486,22 @@ public class IOFile : IDisposable {
     /// <param name="str">The string to write</param>
     /// <param name="carriageAtEnd">Whether a carriage return is appended</param>
     /// <returns>The number of characters written to the device</returns>
-    public virtual int WriteLine(string str, bool carriageAtEnd) {
-        int charsWritten;
-
+    public virtual void WriteLine(string str, bool carriageAtEnd) {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (Handle == null || !IsFormatted) {
-            return -1;
+            return;
         }
         if (RecordLength == 0) {
             string strToWrite = str;
             if (carriageAtEnd) {
                 strToWrite += "\r\n";
             }
-            charsWritten = WriteEncodedString(strToWrite, strToWrite.Length);
+            WriteEncodedString(strToWrite, strToWrite.Length);
         }
         else {
-            charsWritten = WriteEncodedString(str, RecordLength);
+            WriteEncodedString(str, RecordLength);
         }
         Flush();
-        return charsWritten;
     }
 
     /// <summary>
@@ -716,7 +712,7 @@ public class IOFile : IDisposable {
     /// <param name="strValue">A reference to the string to be set</param>
     /// <param name="count">Maximum number of characters to read</param>
     /// <returns>The number of bytes read</returns>
-    public int ReadCharacters(ref string strValue, int count) {
+    public void ReadCharacters(ref string strValue, int count) {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
             StringBuilder strBuilder = new();
@@ -732,19 +728,18 @@ public class IOFile : IDisposable {
                 SkipSeparators(ch);
             }
             strValue = strBuilder.ToString();
-            return strValue.Length;
+            return;
         }
 
         const int intSize = sizeof(int);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
-            return 0;
+            return;
         }
         int stringLength = BitConverter.ToInt32(intBuffer, 0);
         byte[] data = new byte[stringLength];
         int bytesRead = ReadBytes(data, stringLength);
         strValue = Encoding.ASCII.GetString(data, 0, bytesRead);
-        return bytesRead + sizeof(int);
     }
 
     /// <summary>
@@ -769,7 +764,7 @@ public class IOFile : IDisposable {
     /// <param name="strValue">A reference to the string to be set</param>
     /// <param name="count">Maximum number of characters to read</param>
     /// <returns>The number of bytes read</returns>
-    public int ReadString(ref string strValue, int count) {
+    public void ReadString(ref string strValue, int count) {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
             StringBuilder strBuilder = new();
@@ -789,19 +784,18 @@ public class IOFile : IDisposable {
                 SkipSeparators(ch);
             }
             strValue = strBuilder.ToString();
-            return strValue.Length;
+            return;
         }
 
         const int intSize = sizeof(int);
         byte[] intBuffer = new byte[intSize];
         if (ReadBytes(intBuffer, intSize) != intSize) {
-            return 0;
+            return;
         }
         int stringLength = BitConverter.ToInt32(intBuffer, 0);
         byte[] data = new byte[stringLength];
         int bytesRead = ReadBytes(data, stringLength);
         strValue = Encoding.ASCII.GetString(data, 0, bytesRead);
-        return bytesRead + sizeof(int);
     }
 
     /// <summary>
@@ -993,7 +987,7 @@ public class IOFile : IDisposable {
     // Write a string encoded into the supported output format for the data file. If the string
     // is less than charsToWrite, it is left padded with spaces. Otherwise if it is longer then
     // it is truncated.
-    private int WriteEncodedString(string strToWrite, int charsToWrite) {
+    private void WriteEncodedString(string strToWrite, int charsToWrite) {
         int count = Math.Min(Encoding.ASCII.GetByteCount(strToWrite), charsToWrite);
         byte[] data = new byte[charsToWrite];
 
@@ -1005,7 +999,6 @@ public class IOFile : IDisposable {
 
         Encoding.ASCII.GetBytes(strToWrite, 0, count, data, 0);
         WriteBytes(data, charsToWrite);
-        return charsToWrite;
     }
 
     // Backspace one record in an unformatted file
@@ -1023,10 +1016,9 @@ public class IOFile : IDisposable {
         const int bufferSize = sizeof(int);
         byte[] data = new byte[bufferSize];
 
-        int bytesToRead = bufferSize;
-        currentPos -= bytesToRead;
+        currentPos -= bufferSize;
         Handle.Seek(currentPos, SeekOrigin.Begin);
-        int bytesRead = Handle.Read(data, 0, bytesToRead);
+        int bytesRead = Handle.Read(data, 0, bufferSize);
 
         // If less than 2 size records left then something went
         // wrong so bail out now.
@@ -1093,14 +1085,18 @@ public class IOFile : IDisposable {
         else {
             const int intSize = sizeof(int);
             byte[] intBuffer = new byte[intSize];
-            Handle.Read(intBuffer, 0, intSize);
+            if (Handle.Read(intBuffer, 0, intSize) != intSize) {
+                return 0;
+            }
 
             _readBufferSize = BitConverter.ToInt32(intBuffer, 0);
             _readBuffer = new byte[_readBufferSize];
             _readBufferSize = Handle.Read(_readBuffer, 0, _readBufferSize);
 
             // Skip past the record size at the end.
-            Handle.Read(intBuffer, 0, intSize);
+            if (Handle.Read(intBuffer, 0, intSize) != intSize) {
+                return 0;
+            }
         }
         _readBufferIndex = 0;
         return _readBufferSize;

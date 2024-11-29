@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -32,10 +32,10 @@ namespace ComalTests;
 [TestFixture]
 public class Conditions {
 
-  // Test IF true THEN
-  [Test]
-  public void TestTrueConstant() {
-    string code = @"
+    // Test IF true THEN
+    [Test]
+    public void TestTrueConstant() {
+        const string code = @"
                 FUNC test CLOSED
                   count:=0
                   IF TRUE THEN
@@ -47,14 +47,14 @@ public class Conditions {
                   RETURN TRUE
                 ENDFUNC test
             ";
-    Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-    Helper.HelperRunFloat(comp, "test", 1);
-  }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-  // Test IF and ELSE
-  [Test]
-  public void TestIf1() {
-    string code = @"
+    // Test IF and ELSE
+    [Test]
+    public void TestIf1() {
+        const string code = @"
                 FUNC test CLOSED
                   count:=0
                   flip:=0
@@ -70,14 +70,14 @@ public class Conditions {
                   RETURN count
                 ENDFUNC test
             ";
-    Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-    Helper.HelperRunFloat(comp, "test", 11);
-  }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 11);
+    }
 
-  // Test IF, ELSE and ELIF
-  [Test]
-  public void TestIf3() {
-    string code = @"
+    // Test IF, ELSE and ELIF
+    [Test]
+    public void TestIf3() {
+        const string code = @"
                 FUNC test CLOSED
                   count:=0
                   flip:=0
@@ -96,14 +96,14 @@ public class Conditions {
                   RETURN count
                 ENDFUNC test
             ";
-    Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-    Helper.HelperRunFloat(comp, "test", 20);
-  }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 20);
+    }
 
-  // Test CASE
-  [Test]
-  public void TestCase() {
-    string code = @"
+    // Test CASE
+    [Test]
+    public void TestCase() {
+        const string code = @"
                 FUNC test CLOSED
                   FOR X:=1 to 4 do
                     case x OF
@@ -118,14 +118,14 @@ public class Conditions {
                   RETURN TRUE
                 ENDFUNC test
             ";
-    Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-    Helper.HelperRunFloat(comp, "test", 1);
-  }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 
-  // Test CASE with strings
-  [Test]
-  public void TestCaseStrings() {
-    string code = @"
+    // Test CASE with strings
+    [Test]
+    public void TestCaseStrings() {
+        const string code = @"
                 FUNC test CLOSED
                   DIM A$ OF 3
                   A$:=""FOO""
@@ -138,7 +138,7 @@ public class Conditions {
                   return false
                 ENDFUNC test
             ";
-    Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-    Helper.HelperRunFloat(comp, "test", 1);
-  }
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "test", 1);
+    }
 }

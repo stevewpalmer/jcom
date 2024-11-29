@@ -36,7 +36,7 @@ public class Blocks {
     // Test NULL statement
     [Test]
     public void TestNull() {
-        string code = @"
+        const string code = @"
                 func test closed
                   null
                   return true
@@ -49,7 +49,7 @@ public class Blocks {
     // Test ERR in trap handler
     [Test]
     public void TestErrInTrap() {
-        string code = @"
+        const string code = @"
                 func test closed
                   trap
                     if err<>0 then return false
@@ -67,7 +67,7 @@ public class Blocks {
     // Test ERRTEXT$ in trap handler
     [Test]
     public void TestErrTextInTrap() {
-        string code = @"
+        const string code = @"
                 func test closed
                   trap
                     if len(errtext$)<>0 then return false
@@ -86,7 +86,7 @@ public class Blocks {
     // floating point.
     [Test]
     public void TestDivisionByZeroTrap() {
-        string code = @"
+        const string code = @"
                 func test closed
                   trap
                     a# := 10
@@ -113,7 +113,7 @@ public class Blocks {
     // exception.
     [Test]
     public void TestEndInTrap() {
-        string code = @"
+        const string code = @"
                 func test closed
                   trap
                     end

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection.Emit;
 
 namespace CCompiler;
@@ -58,6 +59,8 @@ public static class Peephole {
             if (code[c].Code == OpCodes.Br && code[c + 1] is InstructionLabelMarker) {
                 InstructionLabel brLabel = code[c] as InstructionLabel;
                 InstructionLabelMarker label = code[c + 1] as InstructionLabelMarker;
+                Debug.Assert(brLabel != null);
+                Debug.Assert(label != null);
                 if (brLabel.Target == label.Target) {
                     code[c].Deleted = true;
                 }
@@ -216,8 +219,7 @@ public static class Peephole {
                 }
             }
             if (code[c] is InstructionTryCatch instructionTryCatch && indexLast1 > 0) {
-                InstructionTryCatch tryCatch = instructionTryCatch;
-                if (tryCatch.TryCatchType == EmitExceptionHandlerType.Catch && code[indexLast1].Code == OpCodes.Ret) {
+                if (instructionTryCatch.TryCatchType == EmitExceptionHandlerType.Catch && code[indexLast1].Code == OpCodes.Ret) {
                     code[indexLast1].Deleted = true;
                 }
             }

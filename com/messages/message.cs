@@ -78,25 +78,25 @@ public class Message {
     /// <value>
     /// Returns the name of the file associated with this message. May be null.
     /// </value>
-    public string Filename { get; private set; }
+    public string Filename { get; }
 
     /// <value>
     /// Returns the level of this message as a <c>MessageLevel</c> type.
     /// </value>
-    public MessageLevel Level { get; private set; }
+    public MessageLevel Level { get; }
 
     /// <value>
     /// Returns the code of this message, or MessageCode.NONE if no code is associated.
     /// </value>
-    public MessageCode Code { get; private set; }
+    public MessageCode Code { get; }
 
     /// <value>
     /// Returns the source code line number of this message.
     /// </value>
-    public int Line { get; private set; }
+    public int Line { get; }
 
     /// <value>
     /// Returns the text of the message.
     /// </value>
-    public string Text { get; private set; }
+    public string Text { get; }
 }

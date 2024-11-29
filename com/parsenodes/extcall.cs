@@ -95,9 +95,7 @@ public sealed class ExtCallParseNode : ParseNode {
         blockNode.Attribute("LibraryName", LibraryName);
         blockNode.Attribute("Name", Name);
         blockNode.Attribute("Inline", Inline.ToString());
-        if (Parameters != null) {
-            Parameters.Dump(blockNode);
-        }
+        Parameters?.Dump(blockNode);
     }
 
     /// <summary>
@@ -168,9 +166,7 @@ public sealed class ExtCallParseNode : ParseNode {
             emitter.Pop();
         }
         returnType = Symbol.SystemTypeToSymbolType(meth.ReturnType);
-        if (Parameters != null) {
-            Parameters.FreeLocalDescriptors();
-        }
+        Parameters?.FreeLocalDescriptors();
         return returnType;
     }
 }

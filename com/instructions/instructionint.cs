@@ -47,7 +47,7 @@ public class InstructionInt : Instruction {
     /// Gets the integer parameter.
     /// </summary>
     /// <value>The integer parameter assigned to this opcode</value>
-    public int Value { get; private set; }
+    public int Value { get; }
 
     /// <summary>
     /// Generate MSIL code to emit a opcode that takes an integer
@@ -93,7 +93,7 @@ public class InstructionInt : Instruction {
                         il.Emit(OpCodes.Ldc_I4_8);
                         return;
                 }
-                if (Value >= -128 && Value <= 127) {
+                if (Value is >= -128 and <= 127) {
                     il.Emit(OpCodes.Ldc_I4_S, (byte)Value);
                     return;
                 }

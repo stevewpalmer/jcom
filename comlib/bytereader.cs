@@ -44,7 +44,10 @@ public class ByteReader {
         _buffer = new byte[size];
         do {
             int bytesToRead = size > int.MaxValue ? int.MaxValue : (int)size;
-            writer.Read(_buffer, 0, bytesToRead);
+            int bytesRead = writer.Read(_buffer, 0, bytesToRead);
+            if (bytesRead <= 0) {
+                break;
+            }
             size -= bytesToRead;
         } while (size > 0);
         _index = 0;

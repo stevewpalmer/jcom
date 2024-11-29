@@ -99,10 +99,7 @@ public class JType {
                 _defaultConstructor.Emitter.Emit0(OpCodes.Ret);
                 _defaultConstructor.Emitter.Save();
             }
-            if (_createdType == null) {
-                _createdType = Builder.CreateTypeInfo();
-            }
-            return _createdType;
+            return _createdType ??= Builder.CreateTypeInfo();
         }
     }
 
@@ -151,16 +148,10 @@ public class JType {
     public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
 
         bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
-        Type returnType;
 
-        if (isFunction) {
-            returnType = Symbol.SymTypeToSystemType(sym.Type);
-        }
-        else {
-            returnType = typeof(void);
-        }
+        Type returnType = isFunction ? Symbol.SymTypeToSystemType(sym.Type) : typeof(void);
 
-        int paramCount = sym.Parameters != null ? sym.Parameters.Count : 0;
+        int paramCount = sym.Parameters?.Count ?? 0;
 
         Type[] paramTypes = new Type[paramCount];
 
@@ -178,8 +169,7 @@ public class JType {
             param.ParameterIndex = c;
         }
 
-        MethodBuilder metb;
-        metb = Builder.DefineMethod(sym.Name, attributes, returnType, paramTypes);
+        MethodBuilder metb = Builder.DefineMethod(sym.Name, attributes, returnType, paramTypes);
 
         int paramIndex = 0;
         if (isFunction) {

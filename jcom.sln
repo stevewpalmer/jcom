@@ -71,8 +71,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cobol", "cobol\cobol.csproj", "{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "shell", "shell\shell.csproj", "{120FDE33-3466-461D-B077-6F43DE3EB3DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comlib", "comlib\comlib.csproj", "{3A8C5A7C-72B0-4EE3-BF72-E589E4EA4A65}"
@@ -128,12 +126,6 @@ Global
 		{D359DB81-D0DF-48CC-95B0-BD161DA9B537}.Default|Any CPU.Build.0 = Debug|Any CPU
 		{D359DB81-D0DF-48CC-95B0-BD161DA9B537}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D359DB81-D0DF-48CC-95B0-BD161DA9B537}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}.Default|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}.Default|Any CPU.Build.0 = Debug|Any CPU
-		{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CDFEA0B3-99D7-414B-B4B1-FBA2529ADDBB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{120FDE33-3466-461D-B077-6F43DE3EB3DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{120FDE33-3466-461D-B077-6F43DE3EB3DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{120FDE33-3466-461D-B077-6F43DE3EB3DC}.Default|Any CPU.ActiveCfg = Debug|Any CPU

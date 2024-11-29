@@ -1115,14 +1115,6 @@ public class Emitter {
     }
 
     /// <summary>
-    /// Emit the code to store the address of an element.
-    /// </summary>
-    public void StoreElementAddress() {
-        Emit0(OpCodes.Box, typeof(IntPtr));
-        Emit0(OpCodes.Stelem, typeof(object));
-    }
-
-    /// <summary>
     /// Emit the code to store the value on the top of the stack
     /// as a reference type.
     /// </summary>
