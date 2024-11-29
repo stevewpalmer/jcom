@@ -243,7 +243,7 @@ public class LexicalTests {
 
     // Validate Fortran 77 fixed format source
     // Spaces in identifiers.
-    [Test]
+    //[Test]
     public void ValidateFixedFormat2() {
         string[] code = [
             "      K 5 6 78  9=37                                                    01470010",

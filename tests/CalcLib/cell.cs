@@ -28,6 +28,7 @@ using System.Drawing;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
+using TestUtilities;
 
 namespace CalcLibTests;
 
@@ -587,7 +588,7 @@ public class CellTests {
         sheet.Calculate();
 
         // Now we should have a real value
-        Assert.IsTrue(TestUtilities.Helper.DoubleCompare(new Variant(82.8).DoubleValue, cellA3.Value.DoubleValue));
+        Assert.IsTrue(Helper.DoubleCompare(new Variant(82.8).DoubleValue, cellA3.Value.DoubleValue));
 
         // Changing the Value to something that isn't a formula should now return
         // false for the HasFormula property.

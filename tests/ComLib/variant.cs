@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -192,7 +192,7 @@ public class Variants {
         Assert.IsTrue(v1.HasValue);
         Assert.IsTrue(!v2.HasValue);
         Assert.Throws(typeof(ArgumentException), delegate { _ = Variant.VariantTypeToSystemType(v2.Type); });
-        Assert.Throws(typeof(NotImplementedException), delegate { _ = new Variant((object)45m); });
+        Assert.Throws(typeof(NotImplementedException), delegate { _ = new Variant(45m); });
     }
 
     // Test simple variant addition.

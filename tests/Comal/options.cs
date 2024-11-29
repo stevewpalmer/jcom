@@ -116,7 +116,7 @@ public class OptionsTest {
                 60 ENDFUNC
             ";
         Message[] expectedErrors = [
-            new Message(null, MessageLevel.Error, MessageCode.UNRECOGNISEDOPERAND, 4, null)
+            new(null, MessageLevel.Error, MessageCode.UNRECOGNISEDOPERAND, 4, null)
         ];
         ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions {IDE = true}, expectedErrors, false);
         expectedErrors = [

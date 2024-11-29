@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -131,8 +131,8 @@ public class ProcFunc {
                 ENDFUNC
             ";
         Message[] expectedErrors = [
-            new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 110, null),
-            new Message(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 140, null)
+            new(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 110, null),
+            new(null, MessageLevel.Error, MessageCode.NOTINCLOSED, 140, null)
         ];
         ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors, true);
     }
@@ -149,7 +149,7 @@ public class ProcFunc {
                 ENDFUNC
             ";
         Message[] expectedErrors = [
-            new Message(null, MessageLevel.Error, MessageCode.ALREADYIMPORTED, 110, null)
+            new(null, MessageLevel.Error, MessageCode.ALREADYIMPORTED, 110, null)
         ];
         ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors, true);
     }

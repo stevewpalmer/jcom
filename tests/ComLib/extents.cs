@@ -24,8 +24,8 @@
 // under the License
 
 using System.Drawing;
-using NUnit.Framework;
 using JComLib;
+using NUnit.Framework;
 
 namespace ComLibTests;
 

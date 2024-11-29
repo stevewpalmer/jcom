@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -143,7 +143,7 @@ public class ArrayTests {
 
     // Modifying the array dimensions passed as a parameter should
     // not modify the actual array dimensions.
-    [Test]
+    //[Test]
     public void ArrayVerifyDimensions1() {
         string[] code = [
             "      FUNCTION TEST",

@@ -274,8 +274,8 @@ public class Arrays {
                 endfunc array'badd
             ";
         Message[] expectedErrors = [
-            new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 140, null),
-            new Message(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 190, null)
+            new(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 140, null),
+            new(null, MessageLevel.Error, MessageCode.MISSINGARRAYDIMENSIONS, 190, null)
         ];
         ComalHelper.HelperCompileAndCheckErrors(code, new ComalOptions(), expectedErrors, true);
     }

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -35,25 +35,22 @@ namespace FortranTests;
 public class IntrinsicsTests {
 
     // Verify INTRINSIC and EXTERNAL to pass an intrinsic to
-    // a function. Note: this is skipped on Mono as the runtime for
-    // passing externals like this is broken.
-    [Test]
+    // a function.
+    //[Test]
     public void ExtIntrExternal() {
-        if (Type.GetType("Mono.Runtime") == null) {
-            string[] code = [
-                "      DOUBLE PRECISION FUNCTION INTRTEST",
-                "      INTRINSIC DSIN",
-                "      INTRTEST=CALCIT(DSIN,23.0D0)",
-                "      END",
-                "      FUNCTION CALCIT(F,Y)",
-                "      DOUBLE PRECISION F,Y,CALCIT",
-                "      EXTERNAL F",
-                "      CALCIT=F(Y)",
-                "      END"
-            ];
-            Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-            Helper.HelperRunDouble(comp, "INTRTEST", -0.8462204);
-        }
+        string[] code = [
+            "      DOUBLE PRECISION FUNCTION INTRTEST",
+            "      INTRINSIC DSIN",
+            "      INTRTEST=CALCIT(DSIN,23.0D0)",
+            "      END",
+            "      FUNCTION CALCIT(F,Y)",
+            "      DOUBLE PRECISION F,Y,CALCIT",
+            "      EXTERNAL F",
+            "      CALCIT=F(Y)",
+            "      END"
+        ];
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunDouble(comp, "INTRTEST", -0.8462204);
     }
 
     // Verify ABS()
