@@ -47,6 +47,7 @@ public class OptionsTest {
 
         Assert.IsFalse(opts.Backslash);
         Assert.IsFalse(opts.GenerateDebug);
+        Assert.IsFalse(opts.F90);
     }
 
     // Verify that options are correctly parsed.
@@ -82,5 +83,20 @@ public class OptionsTest {
         Assert.AreEqual(opts.SourceFiles[1], "testfile2.f");
         Assert.IsTrue(opts.Backslash);
         Assert.IsTrue(opts.GenerateDebug);
+    }
+
+    // Verify that F90 is set if the input file has a .f90
+    // file extension
+    [Test]
+    public void ValidateF90() {
+        FortranOptions opts = new();
+        string[] args = [
+            "testfile1.f90"
+        ];
+
+        Assert.IsTrue(opts.Parse(args));
+        Assert.IsTrue(opts.SourceFiles.Count == 1);
+        Assert.AreEqual(opts.SourceFiles[0], "testfile1.f90");
+        Assert.IsTrue(opts.F90);
     }
 }

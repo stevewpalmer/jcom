@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using CCompiler;
 using JFortran;
 using NUnit.Framework;
@@ -244,6 +245,8 @@ public class LexicalTests {
     // Validate Fortran 77 fixed format source
     // Spaces in identifiers.
     //[Test]
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public void ValidateFixedFormat2() {
         string[] code = [
             "      K 5 6 78  9=37                                                    01470010",

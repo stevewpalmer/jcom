@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License
 
+using System.Diagnostics.CodeAnalysis;
 using CCompiler;
 using JFortran;
 using NUnit.Framework;
@@ -144,6 +145,8 @@ public class ArrayTests {
     // Modifying the array dimensions passed as a parameter should
     // not modify the actual array dimensions.
     //[Test]
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public void ArrayVerifyDimensions1() {
         string[] code = [
             "      FUNCTION TEST",
