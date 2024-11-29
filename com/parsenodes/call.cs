@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -59,7 +59,7 @@ public sealed class CallParseNode : ParseNode {
     /// with this procedure.
     /// </summary>
     /// <value>A ParametersParseNode</value>
-    public Collection<Symbol> AlternateReturnLabels { get; set; }
+    public Collection<Symbol> AlternateReturnLabels { get; }
 
     /// <summary>
     /// Dumps the contents of this parse node to the ParseNode XML

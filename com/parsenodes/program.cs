@@ -79,7 +79,7 @@ public class ProgramParseNode : ParseNode {
     /// <summary>
     /// Return the assembly's module builder.
     /// </summary>
-    public ModuleBuilder Builder { get; set; }
+    private ModuleBuilder Builder { get; set; }
 
     /// <summary>
     /// Gets or sets the parse node of the current procedure being
@@ -92,7 +92,7 @@ public class ProgramParseNode : ParseNode {
     /// Gets or sets the current type being compiled.
     /// </summary>
     /// <value>The current method symbol entry</value>
-    public JType CurrentType { get; set; }
+    public JType CurrentType { get; private set; }
 
     /// <summary>
     /// Gets or sets the global symbol table.
@@ -133,14 +133,7 @@ public class ProgramParseNode : ParseNode {
     /// <summary>
     /// Return the .NET version of the program name
     /// </summary>
-    public string DotNetName {
-        get {
-            if (!string.IsNullOrEmpty(Name)) {
-                return Name.CapitaliseString();
-            }
-            return string.Empty;
-        }
-    }
+    private string DotNetName => !string.IsNullOrEmpty(Name) ? Name.CapitaliseString() : string.Empty;
 
     /// <summary>
     /// Gets or sets the root of the parse tree.
@@ -244,6 +237,7 @@ public class ProgramParseNode : ParseNode {
     /// to have been previously set or this does nothing.
     /// </summary>
     [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     public void Save() {
 #if GENERATE_NATIVE_BINARIES
         string filename = OutputFilename(OutputFile);
@@ -292,6 +286,8 @@ public class ProgramParseNode : ParseNode {
     /// </summary>
     /// <param name="method">Method object</param>
     [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
+    [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     public void SetEntryPoint(JMethod method) {
 #if GENERATE_NATIVE_BINARIES
         _ab.SetEntryPoint(method.Builder);
@@ -404,8 +400,10 @@ public class ProgramParseNode : ParseNode {
     /// the address of a local object or the address of an array element.
     /// </summary>
     /// <param name="emitter">Code emitter</param>
-    /// <param name="identNode">An IdentifierParseNode representing the variable
-    /// or array element whose address should be emitted.</param>
+    /// <param name="identNode">
+    /// An IdentifierParseNode representing the variable
+    /// or array element whose address should be emitted.
+    /// </param>
     public void LoadAddress(Emitter emitter, IdentifierParseNode identNode) {
         ArgumentNullException.ThrowIfNull(identNode);
         Symbol sym = identNode.Symbol;
@@ -516,8 +514,10 @@ public class ProgramParseNode : ParseNode {
     /// Generate code for an expression tree.
     /// </summary>
     /// <param name="emitter">Emitter to use</param>
-    /// <param name="typeNeeded">The type to which the expression should be converted if it
-    /// does not evaluate to that type natively.</param>
+    /// <param name="typeNeeded">
+    /// The type to which the expression should be converted if it
+    /// does not evaluate to that type natively.
+    /// </param>
     /// <param name="rootNode">The ParseNode of the root of the expression tree.</param>
     /// <returns>The type of the generated expression</returns>
     public SymType GenerateExpression(Emitter emitter, SymType typeNeeded, ParseNode rootNode) {
@@ -574,6 +574,8 @@ public class ProgramParseNode : ParseNode {
 
     // Sets the filename in the debug info.
     [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     private void SetCurrentDocument(string filename) {
 #if GENERATE_NATIVE_BINARIES
         _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);

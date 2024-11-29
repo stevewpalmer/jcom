@@ -24,7 +24,6 @@
 // under the License.
 
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace CCompiler;
 
@@ -151,8 +150,7 @@ public class IdentifierParseNode : ParseNode {
             thisType = sym.Type;
         }
         else {
-            Debug.Assert(false, "Unknown identifier type (not local OR parameter)");
-            thisType = SymType.NONE;
+            throw new Exception("Unknown identifier type (not local OR parameter)");
         }
         if (HasSubstring) {
             thisType = GenerateLoadSubstring(emitter, cg);

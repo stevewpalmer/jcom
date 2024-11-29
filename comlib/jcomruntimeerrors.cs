@@ -265,10 +265,7 @@ public class JComRuntimeException : Exception {
         if (e is ArithmeticException) {
             return new JComRuntimeException(JComRuntimeErrors.DIVISION_BY_ZERO);
         }
-        if (e is not JComRuntimeException jce) {
-            return new JComRuntimeException(JComRuntimeErrors.SYSTEM_ERROR, e.Message);
-        }
-        return jce;
+        return e as JComRuntimeException ?? new JComRuntimeException(JComRuntimeErrors.SYSTEM_ERROR, e.Message);
     }
 
     /// <summary>

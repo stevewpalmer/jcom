@@ -40,7 +40,7 @@ public class JMethod {
     /// <summary>
     /// Method builder
     /// </summary>
-    public MethodBuilder Builder { get; set; }
+    public MethodBuilder Builder { get; }
 
     /// <summary>
     /// Constructor builder
@@ -50,7 +50,7 @@ public class JMethod {
     /// <summary>
     /// Code emitter for this method
     /// </summary>
-    public Emitter Emitter { get; set; }
+    public Emitter Emitter { get; }
 
     /// <summary>
     /// Constructs a method that belongs to the given type

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -42,7 +42,7 @@ namespace CCompiler;
 /// all functions here must have an instrinsic equivalent in JComLib that
 /// will be used if inlining is disabled. Unit tests for functions will
 /// generally test both methods to verify this is always the case.
-/// 
+///
 /// </summary>
 [SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class Inlined {
@@ -54,12 +54,9 @@ public static class Inlined {
     /// <param name="typeWanted">The type of the argument</param>
     public static void ABS(Emitter em, Type typeWanted) {
         ArgumentNullException.ThrowIfNull(em);
-        if (typeWanted == typeof(Complex)) {
-            em.Emit0(OpCodes.Call, typeof(Complex).GetMethod("Abs", [typeWanted]));
-        }
-        else {
-            em.Emit0(OpCodes.Call, typeof(Math).GetMethod("Abs", [typeWanted]));
-        }
+        em.Emit0(OpCodes.Call, typeWanted == typeof(Complex) ?
+            typeof(Complex).GetMethod("Abs", [typeWanted]) :
+            typeof(Math).GetMethod("Abs", [typeWanted]));
     }
 
     /// <summary>

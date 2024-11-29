@@ -63,12 +63,12 @@ public class JType {
     /// <summary>
     /// Type builder
     /// </summary>
-    public TypeBuilder Builder { get; set; }
+    private TypeBuilder Builder { get; }
 
     /// <summary>
     /// True if type is debuggable
     /// </summary>
-    public bool Debuggable { get; set; }
+    public bool Debuggable { get; }
 
     /// <summary>
     /// Creates the specified type in the module.

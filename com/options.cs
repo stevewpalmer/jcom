@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using JComLib;
@@ -71,6 +72,7 @@ public sealed class OptionField(string name) : Attribute {
 /// Class that encapsulates options used by all compilers. This class should
 /// always be inherited with additional options specific to that compiler.
 /// </summary>
+[SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
 public class Options {
     private string _outputFile;
 

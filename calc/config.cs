@@ -88,7 +88,9 @@ public class Config {
                 using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
                 fileConfig = JsonSerializer.Deserialize<Config>(stream) ?? fileConfig;
             }
-            catch (Exception) { }
+            catch (Exception) {
+                fileConfig = new Config();
+            }
         }
         return fileConfig;
     }

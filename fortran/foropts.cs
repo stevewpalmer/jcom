@@ -50,9 +50,10 @@ public class FortranOptions : Options {
 
     /// <value>
     /// Sets and returns whether the source code should be compiled using
-    /// the Fortran 90 compiler.
+    /// the Fortran 90 compiler. This is not a settable option but is
+    /// determined by the file extension.
     /// </value>
-    public bool F90 { get; set; }
+    public bool F90 { get; private set; }
 
     /// <summary>
     /// Parse the specified command line array passed to the application.

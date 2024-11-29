@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -48,37 +48,10 @@ public class Message {
         Text = text;
     }
 
-    /// <summary>
-    /// Returns the message formatted for output.
-    /// </summary>
-    /// <returns></returns>
-    public override string ToString() {
-        StringBuilder str = new();
-        if (Level == MessageLevel.Info) {
-            str.Append(Text);
-        }
-        else {
-            if (Filename != null) {
-                str.Append(Filename);
-            }
-            if (Line != -1) {
-                str.Append($"({Line}):");
-            }
-            if (Code != MessageCode.NONE) {
-                if (str.Length > 0) {
-                    str.Append(' ');
-                }
-                str.Append($"{Level} C{(int)Code}: ");
-            }
-            str.Append(Text);
-        }
-        return str.ToString();
-    }
-
     /// <value>
     /// Returns the name of the file associated with this message. May be null.
     /// </value>
-    public string Filename { get; }
+    private string Filename { get; }
 
     /// <value>
     /// Returns the level of this message as a <c>MessageLevel</c> type.
@@ -98,5 +71,29 @@ public class Message {
     /// <value>
     /// Returns the text of the message.
     /// </value>
-    public string Text { get; }
+    private string Text { get; }
+
+    /// <summary>
+    /// Returns the message formatted for output.
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() {
+        StringBuilder str = new();
+        if (Level != MessageLevel.Info) {
+            if (Filename != null) {
+                str.Append(Filename);
+            }
+            if (Line != -1) {
+                str.Append($"({Line}):");
+            }
+            if (Code != MessageCode.NONE) {
+                if (str.Length > 0) {
+                    str.Append(' ');
+                }
+                str.Append($"{Level} C{(int)Code}: ");
+            }
+        }
+        str.Append(Text);
+        return str.ToString();
+    }
 }

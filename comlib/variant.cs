@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
 
@@ -448,11 +449,15 @@ public class Variant {
     }
 
     /// <summary>
-    /// Serves as a hash function for a <see><cref>Variant</cref>
+    /// Serves as a hash function for a <see><cref>Variant</cref>. Note that we use
+    /// two mutable values to identify this Variant. This is safe because two
+    /// distinct Variant objects with the same value should hash to the same
+    /// result in order to match in a collection.
     /// </see>object.
     /// </summary>
     /// <returns>A hash code for this instance that is suitable for use in hashing
     /// algorithms and data structures such as a hash table.</returns>
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode() {
         unchecked {
             return 17 * 23 + (StringValue + Type).GetHashCode();

@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -87,7 +87,7 @@ public sealed class LoopParseNode : ParseNode {
     /// <summary>
     /// Loop exit label for EXIT statement
     /// </summary>
-    public Label ExitLabel { get; set; }
+    public Label ExitLabel { get; private set; }
 
     /// <summary>
     /// Returns the iteration count as a positive integer, or -1 if
@@ -169,7 +169,7 @@ public sealed class LoopParseNode : ParseNode {
 
         emitter.MarkLabel(loopStart);
 
-        // If this is a WHILE(true) loop, skip the initial test. 
+        // If this is a WHILE(true) loop, skip the initial test.
         if (!(StartExpression.IsConstant && StartExpression.Value.BoolValue)) {
             cg.GenerateExpression(emitter, SymType.BOOLEAN, StartExpression);
             emitter.BranchIfFalse(ExitLabel);
@@ -199,7 +199,7 @@ public sealed class LoopParseNode : ParseNode {
 
     /// <summary>
     /// Emit the code to generate for...next style loop.
-    /// 
+    ///
     /// The number of iterations is always fixed as per this formula:
     ///
     ///  iterations = MAX(0,INT((final-value - initial-value + step-size)/step-size)

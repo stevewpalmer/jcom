@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -62,6 +62,38 @@ public class MessageCollection : IEnumerable<Message> {
     /// Sets or retrieves the current line number reported in messages.
     /// </value>
     public int Linenumber { get; set; }
+
+    /// <value>
+    /// Returns the count of errors found so far.
+    /// </value>
+    public int ErrorCount { get; private set; }
+
+    /// <value>
+    /// Return the count of messages.
+    /// </value>
+    public int Count => _messages.Count;
+
+    /// <value>
+    /// Returns the message at the specified index.
+    /// </value>
+    /// <param name="index">A zero based index</param>
+    public Message this[int index] => _messages[index];
+
+    /// <summary>
+    /// Enumerator for all messages.
+    /// </summary>
+    /// <returns>The enumerator.</returns>
+    public IEnumerator<Message> GetEnumerator() {
+        _messages.Sort((t1, t2) => t1.Line - t2.Line);
+        foreach (Message t in _messages) {
+            yield return t;
+        }
+    }
+
+    // Private enumerator required for class compliance.
+    IEnumerator IEnumerable.GetEnumerator() {
+        return GetEnumerator();
+    }
 
     /// <summary>
     /// Clear the messages list.
@@ -161,7 +193,7 @@ public class MessageCollection : IEnumerable<Message> {
     /// <param name="level">The warning level</param>
     /// <param name="line">The line number at which the error was detected</param>
     /// <param name="str">The error string to write</param>
-    public void Warning(string filename, MessageCode code, int level, int line, string str) {
+    private void Warning(string filename, MessageCode code, int level, int line, string str) {
         if (_opts.WarnAsError) {
             Error(filename, code, line, str);
         }
@@ -171,37 +203,5 @@ public class MessageCollection : IEnumerable<Message> {
                 _messages.Add(new Message(filename, MessageLevel.Warning, code, line, str));
             }
         }
-    }
-
-    /// <value>
-    /// Returns the count of errors found so far.
-    /// </value>
-    public int ErrorCount { get; private set; }
-
-    /// <value>
-    /// Return the count of messages.
-    /// </value>
-    public int Count => _messages.Count;
-
-    /// <value>
-    /// Returns the message at the specified index.
-    /// </value>
-    /// <param name="index">A zero based index</param>
-    public Message this[int index] => _messages[index];
-
-    /// <summary>
-    /// Enumerator for all messages.
-    /// </summary>
-    /// <returns>The enumerator.</returns>
-    public IEnumerator<Message> GetEnumerator() {
-        _messages.Sort((t1, t2) => t1.Line - t2.Line);
-        foreach (Message t in _messages) {
-            yield return t;
-        }
-    }
-
-    // Private enumerator required for class compliance.
-    IEnumerator IEnumerable.GetEnumerator() {
-        return GetEnumerator();
     }
 }

@@ -625,15 +625,12 @@ public partial class Compiler {
             // Check for width specifier. This always follows array bounds and if one is
             // specified, it only applies to this identifier so the original width, if any,
             // must be preserved.
-            SymFullType thisFullType = new();
             int width = fullType.Width;
-
             if (width == 0) {
                 SymFullType impliedFullType = _localSymbols.ImplicitTypeForCharacter(identToken.Name[0]);
                 width = impliedFullType.Width;
             }
-            thisFullType.Type = fullType.Type;
-            thisFullType.Width = ParseTypeWidth(width);
+            SymFullType thisFullType = new(fullType.Type, ParseTypeWidth(width));
 
             // Indicate this symbol is explicitly declared
             if (sym == null) {

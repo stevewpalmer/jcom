@@ -23,6 +23,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace CCompiler;
 
 /// <summary>
@@ -72,6 +74,7 @@ public class SymFullType : IEquatable<SymFullType> {
     /// </summary>
     /// <returns>A hash code for this instance that is suitable for use in hashing
     /// algorithms and data structures such as a hash table.</returns>
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
     public override int GetHashCode() {
         unchecked {
             int hash = 17;
@@ -105,7 +108,7 @@ public class SymFullType : IEquatable<SymFullType> {
     /// <summary>
     /// Retrieves the base type of this full stype.
     /// </summary>
-    public SymType Type { get; set; }
+    public SymType Type { get; }
 
     /// <summary>
     /// Retrieves the width of this full type.

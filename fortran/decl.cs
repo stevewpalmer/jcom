@@ -657,12 +657,10 @@ public partial class Compiler {
 
     /// Handle a declaration statement of the specified type.
     private ProcedureParseNode KDeclaration(SymType type) {
-        SymFullType fullType = new(type);
         SimpleToken token;
 
-        if (Symbol.IsCharType(type)) {
-            fullType.Width = ParseTypeWidth(1);
-        }
+        int width = Symbol.IsCharType(type) ? ParseTypeWidth(1) : 1;
+        SymFullType fullType = new(type, width);
 
         // Could be a function declaration preceded by type?
         if (_ls.PeekKeyword() == TokenID.KFUNCTION) {
@@ -732,9 +730,7 @@ public partial class Compiler {
                 case TokenID.KLOGICAL:
                 case TokenID.KCOMPLEX:
                 case TokenID.KREAL: {
-                    SymFullType fullType = new(TokenToType(token.ID)) {
-                        Width = ParseTypeWidth(1)
-                    };
+                    SymFullType fullType = new(TokenToType(token.ID), ParseTypeWidth(1));
 
                     ExpectToken(TokenID.LPAREN);
                     do {

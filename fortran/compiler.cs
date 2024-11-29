@@ -25,6 +25,7 @@
 
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using CCompiler;
 using JComLib;
@@ -176,7 +177,7 @@ public partial class Compiler : ICompiler {
             // Dump file?
             if (_opts.Dump) {
                 XmlDocument xmlTree = ParseTreeXml.Tree(_cg);
-                string outputFilename = Path.GetFileName(_opts.OutputFile);
+                string outputFilename = Path.GetFileName(_opts.OutputFile) ?? "dump";
                 outputFilename = Path.ChangeExtension(outputFilename, ".xml");
                 xmlTree.Save(outputFilename);
             }
@@ -442,6 +443,7 @@ public partial class Compiler : ICompiler {
     // Returns the block state to which the specified token belongs. For example,
     // IMPLICIT must precede any declaration which must precede any executable
     // statement in the same program group.
+    [SuppressMessage("ReSharper", "ConvertSwitchStatementToSwitchExpression")]
     private static BlockState TokenToState(SimpleToken token) {
         BlockState state = BlockState.NONE;
         switch (token.ID) {
@@ -560,7 +562,7 @@ public partial class Compiler : ICompiler {
         if (filename != null) {
             List<string> lines = [];
             try {
-                string fullPath = Path.Combine(Path.GetDirectoryName(Messages.Filename), filename);
+                string fullPath = Path.Combine(Path.GetDirectoryName(Messages.Filename) ?? string.Empty, filename);
                 using (StreamReader sr = new(fullPath)) {
                     while (sr.Peek() != -1) {
                         string line = sr.ReadLine();
@@ -902,13 +904,7 @@ public partial class Compiler : ICompiler {
         // predefined.
         Symbol sym = _localSymbols.Get(identToken.Name);
         if (_ls.PeekToken().ID == TokenID.LPAREN) {
-            bool stfunc = sym == null;
-            if (sym is { Type: SymType.FIXEDCHAR }) {
-                stfunc = false;
-            }
-            else if (sym is { IsArray: false }) {
-                stfunc = true;
-            }
+            bool stfunc = sym is null or { IsArray: false };
             if (stfunc) {
                 return KStatementFunction(identToken);
             }

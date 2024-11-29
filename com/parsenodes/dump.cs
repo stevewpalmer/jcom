@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -36,17 +36,17 @@ public class ParseNodeXml {
     private readonly XmlNode _thisNode;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ParseNodeXml"/> class.
+    /// Initializes a new instance of the <see cref="ParseNodeXml" /> class.
     /// </summary>
     /// <param name="doc">The Xml root document</param>
     /// <param name="node">The XmlNode associated with this node</param>
-    public ParseNodeXml(XmlDocument doc, XmlNode node) {
+    private ParseNodeXml(XmlDocument doc, XmlNode node) {
         _doc = doc;
         _thisNode = node;
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ParseNodeXml"/> class.
+    /// Initializes a new instance of the <see cref="ParseNodeXml" /> class.
     /// </summary>
     /// <param name="doc">The Xml root document</param>
     /// <param name="nodeName">The name of this node</param>

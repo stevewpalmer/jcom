@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection.Emit;
 
 namespace CCompiler;
@@ -52,20 +53,13 @@ public sealed class ProcedureParseNode : ParseNode {
     /// There may be multiple symbol tables for each nested scope.
     /// </summary>
     /// <value>The local symbol table</value>
-    public List<SymbolCollection> Symbols { get; set; }
+    public List<SymbolCollection> Symbols { get; }
 
     /// <summary>
     /// Gets a value indicating whether this procedure is the main program.
     /// </summary>
     /// <value><c>true</c> if this instance is main program; otherwise, <c>false</c>.</value>
-    public bool IsMainProgram {
-        get {
-            if (ProcedureSymbol != null) {
-                return ProcedureSymbol.Modifier.HasFlag(SymModifier.ENTRYPOINT);
-            }
-            return false;
-        }
-    }
+    public bool IsMainProgram => ProcedureSymbol != null && ProcedureSymbol.Modifier.HasFlag(SymModifier.ENTRYPOINT);
 
     /// <summary>
     /// The root parse node for all initialisation statements.
@@ -89,7 +83,7 @@ public sealed class ProcedureParseNode : ParseNode {
     /// Gets or sets the parse block for the procedure body.
     /// </summary>
     /// <value>The parse node for the loop body.</value>
-    public BlockParseNode Body { get; set; }
+    public BlockParseNode Body { get; }
 
     /// <summary>
     /// Whether or not we handle exceptions
@@ -106,7 +100,7 @@ public sealed class ProcedureParseNode : ParseNode {
     /// Predefined label for the return statement for any
     /// inner parse nodes that issue a RETURN statement.
     /// </summary>
-    public Label ReturnLabel { get; set; }
+    public Label ReturnLabel { get; private set; }
 
     /// <summary>
     /// Predefined label for the return statement for any
@@ -123,6 +117,7 @@ public sealed class ProcedureParseNode : ParseNode {
 
         // Create the emitter for this method
         JMethod method = ProcedureSymbol.Info as JMethod;
+        Debug.Assert(method != null);
         Emitter emitter = method.Emitter;
         cg.CurrentProcedure = this;
 

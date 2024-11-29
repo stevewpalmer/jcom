@@ -160,12 +160,12 @@ public class Symbol {
     /// <value>
     /// Gets or sets the referencing source file line number for this symbol.
     /// </value>
-    public int RefLine { get; set; }
+    public int RefLine { get; }
 
     /// <value>
     /// Gets or sets the symbol name.
     /// </value>
-    public string Name { get; set; }
+    public string Name { get; }
 
     /// <summary>
     /// Gets or sets the parse tree that defines the computed
@@ -425,10 +425,7 @@ public class Symbol {
             if (!Value.HasValue) {
                 return false;
             }
-            if (Type == SymType.FIXEDCHAR && Value.StringValue.Length == 0) {
-                return false;
-            }
-            return true;
+            return Type != SymType.FIXEDCHAR || Value.StringValue.Length != 0;
         }
     }
 

@@ -70,9 +70,7 @@ public enum LineTerminator {
 /// <summary>
 /// A class that encapsulates the standard output file.
 /// </summary>
-public sealed class StdoutIOFile : IOFile {
-
-    public StdoutIOFile() : base(IOConstant.Stdout) { }
+public sealed class StdoutIOFile() : IOFile(IOConstant.Stdout) {
 
     /// <summary>
     /// Stdout always produces formatted output.
@@ -103,12 +101,7 @@ public sealed class StdoutIOFile : IOFile {
 /// <summary>
 /// A class that encapsulates the standard input file.
 /// </summary>
-public sealed class StdinIOFile : IOFile {
-
-    public StdinIOFile() : base(IOConstant.Stdin) {
-        Width = -1;
-        Terminator = LineTerminator.NEWLINE;
-    }
+public sealed class StdinIOFile() : IOFile(IOConstant.Stdin) {
 
     /// <summary>
     /// Stdin always takes formatted input.
@@ -118,7 +111,7 @@ public sealed class StdinIOFile : IOFile {
     /// <summary>
     /// Behaviour of the cursor at the end of input.
     /// </summary>
-    public LineTerminator Terminator { get; set; }
+    public LineTerminator Terminator { get; set; } = LineTerminator.NEWLINE;
 
     /// <summary>
     /// Zone width for next zone terminator.
@@ -128,7 +121,7 @@ public sealed class StdinIOFile : IOFile {
     /// <summary>
     /// Maximum width of input.
     /// </summary>
-    public int Width { get; set; }
+    public int Width { get; set; } = -1;
 
     /// <summary>
     /// Read the specified number of characters from the console.
@@ -887,6 +880,7 @@ public class IOFile : IDisposable {
     /// </summary>
     public void Dispose() {
         Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>

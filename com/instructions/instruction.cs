@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -44,7 +44,7 @@ public class Instruction {
     /// <summary>
     /// Create an Instruction object that takes no opcode.
     /// </summary>
-    public Instruction() { }
+    protected Instruction() { }
 
     /// <summary>
     /// Generate MSIL code to emit a opcode that takes no parameters.

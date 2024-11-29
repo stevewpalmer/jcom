@@ -36,7 +36,7 @@ namespace CCompiler;
 /// Defines an enumerable collection of symbols.
 /// </summary>
 public class SymbolCollection : IEnumerable<Symbol> {
-
+    private readonly bool _caseSensitive;
     private readonly Dictionary<string, Symbol> _symbols = new();
 
     /// <summary>
@@ -45,20 +45,16 @@ public class SymbolCollection : IEnumerable<Symbol> {
     /// output to identify this collection.
     /// </summary>
     /// <param name="name">The name of this symbol collection</param>
-    public SymbolCollection(string name) {
+    /// <param name="caseSensitive">Is the collection case sensitive?</param>
+    public SymbolCollection(string name, bool caseSensitive = false) {
         Name = name;
-        CaseSensitive = false;
+        _caseSensitive = caseSensitive;
     }
-
-    /// <summary>
-    /// Are symbols case sensitive? Default is no.
-    /// </summary>
-    public bool CaseSensitive { get; set; }
 
     /// <value>
     /// The name of this symbol collection.
     /// </value>
-    public string Name { get; set; }
+    public string Name { get; }
 
     /// <summary>
     /// Return the symbol table entry for the given identifier.
@@ -68,7 +64,7 @@ public class SymbolCollection : IEnumerable<Symbol> {
     /// identifier does not exist.</returns>
     public Symbol Get(string name) {
 
-        if (!CaseSensitive) {
+        if (!_caseSensitive) {
             name = name.ToUpper();
             foreach (Symbol symbol in _symbols.Values) {
                 if (symbol.Name.ToUpper() == name) {
@@ -118,7 +114,7 @@ public class SymbolCollection : IEnumerable<Symbol> {
     public void Add(Symbol sym) {
 
         string name = sym.Name;
-        if (!CaseSensitive) {
+        if (!_caseSensitive) {
             name = name.ToUpper();
         }
         _symbols[name] = sym;
@@ -142,7 +138,7 @@ public class SymbolCollection : IEnumerable<Symbol> {
     public void Remove(Symbol sym) {
         if (_symbols.ContainsValue(sym)) {
             string name = sym.Name;
-            if (!CaseSensitive) {
+            if (!_caseSensitive) {
                 name = name.ToUpper();
             }
             _symbols.Remove(name);
@@ -155,9 +151,9 @@ public class SymbolCollection : IEnumerable<Symbol> {
     /// </summary>
     /// <param name="root">The parent XML node</param>
     public void Dump(ParseNodeXml root) {
-        ParseNodeXml blockNode = root.Node("SymbolTable");
+        ParseNodeXml blockNode = root.Node("SymbolCollection");
         blockNode.Attribute("Name", Name);
-        blockNode.Attribute("CaseSensitive", CaseSensitive.ToString());
+        blockNode.Attribute("CaseSensitive", _caseSensitive.ToString());
         foreach (Symbol sym in _symbols.Values) {
             sym.Dump(blockNode);
         }

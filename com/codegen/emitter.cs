@@ -298,7 +298,7 @@ public class Emitter {
     /// </summary>
     /// <param name="type">Type of the local</param>
     /// <returns>The integer index of the new local</returns>
-    public LocalDescriptor CreateLocal(Type type) {
+    private LocalDescriptor CreateLocal(Type type) {
         LocalBuilder lb = _il.DeclareLocal(type);
         return AssignLocal(type, lb.LocalIndex);
     }
@@ -828,7 +828,7 @@ public class Emitter {
     /// Emit the code to load a boolean value.
     /// </summary>
     /// <param name="value">Boolean value</param>
-    public void LoadBoolean(bool value) {
+    private void LoadBoolean(bool value) {
         LoadInteger(value ? -1 : 0);
     }
 
@@ -846,7 +846,7 @@ public class Emitter {
     /// Emit the code to create a complex value.
     /// </summary>
     /// <param name="value">Complex value</param>
-    public void LoadComplex(Complex value) {
+    private void LoadComplex(Complex value) {
         LoadDouble(value.Real);
         LoadDouble(value.Imaginary);
         Emit0(OpCodes.Newobj, value.GetType().GetConstructor([typeof(double), typeof(double)]));
@@ -873,7 +873,7 @@ public class Emitter {
     /// Emit the code to load the address of a static variable.
     /// </summary>
     /// <param name="fi">The FieldInfo structure</param>
-    public void LoadStaticAddress(FieldInfo fi) {
+    private void LoadStaticAddress(FieldInfo fi) {
         ArgumentNullException.ThrowIfNull(fi);
         Emit0(OpCodes.Ldsflda, fi);
     }
@@ -945,7 +945,7 @@ public class Emitter {
     /// the given index.
     /// </summary>
     /// <param name="index">Index of the parameter</param>
-    public void LoadParameterAddress(int index) {
+    private void LoadParameterAddress(int index) {
         if (index < 256) {
             Emit0(OpCodes.Ldarga_S, (byte)index);
         }

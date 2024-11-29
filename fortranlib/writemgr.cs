@@ -53,6 +53,7 @@ public sealed class WriteManager : IDisposable {
     /// <param name="iodevice">The device to read from</param>
     /// <param name="record">The index of the record to write (for direct access)</param>
     /// <param name="formatString">Format string</param>
+    [SuppressMessage("ReSharper", "IntroduceOptionalParameters.Global")]
     public WriteManager(int iodevice, int record, string formatString) : this(iodevice, record, formatString, 1) { }
 
     /// <summary>
@@ -62,7 +63,8 @@ public sealed class WriteManager : IDisposable {
     /// <param name="iodevice">The device to read from</param>
     /// <param name="record">The index of the record to write (for direct access)</param>
     /// <param name="formatString">Format string</param>
-    /// <param name="advance">Whether we advance after a record</param>
+    /// <param name="advance">Whether we advance after a record. A value of 1 means we advance, 0 means we stay
+    /// on the current record.</param>
     public WriteManager(int iodevice, int record, string formatString, int advance) {
         _file = IOFile.Get(iodevice);
         if (_file == null) {
@@ -142,6 +144,7 @@ public sealed class WriteManager : IDisposable {
     /// <summary>
     /// Sets whether or not successive output is separated by single spaces.
     /// </summary>
+    [SuppressMessage("ReSharper", "AutoPropertyCanBeMadeGetOnly.Global")]
     public bool UseSeparators { get; set; }
 
     /// <summary>
