@@ -146,18 +146,28 @@ public class Sheet {
     /// <param name="location">Location of cell</param>
     /// <param name="createIfEmpty">Create the cell if it is empty</param>
     /// <returns>The cell at the row</returns>
-    public Cell GetCell(CellLocation location, bool createIfEmpty) {
-        CellList? cellList = CellListForColumn(location.Column, createIfEmpty);
+    public Cell GetCell(CellLocation location, bool createIfEmpty) =>
+        GetCell(location.Column, location.Row, createIfEmpty);
+
+    /// <summary>
+    /// Return the cell at the given column and row.
+    /// </summary>
+    /// <param name="column">Column location of cell</param>
+    /// <param name="row">Row location of cell</param>
+    /// <param name="createIfEmpty">Create the cell if it is empty</param>
+    /// <returns>The cell at the row</returns>
+    private Cell GetCell(int column, int row, bool createIfEmpty) {
+        CellList? cellList = CellListForColumn(column, createIfEmpty);
         Cell cell = new Cell(this) {
-            Location = location
+            Location = new CellLocation(column, row)
         };
         if (cellList != null) {
             int c = 0;
             while (c < cellList.Cells.Count) {
-                if (cellList.Cells[c].Location.Row == location.Row) {
+                if (cellList.Cells[c].Location.Row == row) {
                     return cellList.Cells[c];
                 }
-                if (cellList.Cells[c].Location.Row > location.Row) {
+                if (cellList.Cells[c].Location.Row > row) {
                     break;
                 }
                 c++;
@@ -319,26 +329,47 @@ public class Sheet {
     public AnsiText GetRow(int column, int row, int width) {
         Debug.Assert(column is >= 1 and <= MaxColumns);
         List<AnsiText.AnsiTextSpan> spans = [];
-        int columnIndex = column;
-        Cell emptyCell = new(this);
-        int c = 0;
-        while (c < ColumnList.Count && ColumnList[c].Index < column) {
-            c++;
-        }
-        while (c < ColumnList.Count) {
-            while (ColumnList[c].Index > columnIndex) {
-                spans.Add(emptyCell.AnsiTextSpan(DefaultColumnWidth));
+        int columnIndex = 1;
+        int totalWidth = 0;
+        while (totalWidth < width) {
+            int size = ColumnWidth(columnIndex);
+            Cell cell = GetCell(columnIndex, row, false);
+            if (cell is { Value.IsNumber: false } && cell.Value.StringValue?.Length > size) {
+                int labelLength = cell.Value.StringValue.Length;
+                int fwdColumnIndex = columnIndex;
+                List<int> widths = [size];
+                do {
+                    Cell nextCell = GetCell(fwdColumnIndex + 1, row, false);
+                    if (nextCell is not { IsEmptyCell: true }) {
+                        break;
+                    }
+                    int columnWidth = ColumnWidth(++fwdColumnIndex);
+                    widths.Add(columnWidth);
+                    size += columnWidth;
+                } while (size < labelLength);
+                string labelCellText = cell.Text(size);
+                int index = 0;
+                foreach (int columnWidth in widths) {
+                    if (columnIndex >= column) {
+                        spans.Add(new AnsiText.AnsiTextSpan(Utilities.SpanBound(labelCellText, index, columnWidth)) {
+                            ForegroundColour = cell.Style.ForegroundColour,
+                            BackgroundColour = cell.Style.BackgroundColour,
+                            Bold = cell.Style.Bold,
+                            Italic = cell.Style.Italic,
+                            Underline = cell.Style.Underline
+                        });
+                    }
+                    index += columnWidth;
+                    columnIndex++;
+                }
+            }
+            else {
+                if (columnIndex >= column) {
+                    spans.Add(cell.AnsiTextSpan(size));
+                }
                 columnIndex++;
             }
-            int size = ColumnList[c].Size;
-            Cell? cell = ColumnList[c].Cells.Find(l => l.Location.Row == row);
-            spans.Add(cell == null ? emptyCell.AnsiTextSpan(size) : cell.AnsiTextSpan(size));
-            columnIndex++;
-            c++;
-        }
-        width -= spans.Sum(sp => sp.Text.Length);
-        if (width > 0) {
-            spans.Add(emptyCell.AnsiTextSpan(width));
+            totalWidth += size;
         }
         return new AnsiText(spans);
     }
@@ -358,12 +389,12 @@ public class Sheet {
         do {
             sorted = true;
             for (int r = swapExtent.Start.Y; r < swapExtent.End.Y; r++) {
-                Cell cell1 = GetCell(new CellLocation { Row = r, Column = sortColumn }, false);
-                Cell cell2 = GetCell(new CellLocation { Row = r + 1, Column = sortColumn }, false);
+                Cell cell1 = GetCell(sortColumn, r , false);
+                Cell cell2 = GetCell(sortColumn, r + 1, false);
                 if (cell1.Value.CompareTo(cell2.Value) * ordering > 0) {
                     for (int c = swapExtent.Start.X; c <= swapExtent.End.X; c++) {
-                        cell1 = GetCell(new CellLocation { Row = r, Column = c }, false);
-                        cell2 = GetCell(new CellLocation { Row = r + 1, Column = c }, false);
+                        cell1 = GetCell(c, r, false);
+                        cell2 = GetCell(c, r + 1, false);
                         cell1.Swap(cell2);
                     }
                     sorted = false;

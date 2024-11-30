@@ -159,6 +159,16 @@ public class TestANSIText {
         Assert.AreEqual("", simple.Substring(12, 20).Text);
         Assert.AreEqual("", simple.Substring(0, 0).Text);
 
+        AnsiText longer = new AnsiText([
+            new AnsiText.AnsiTextSpan("HELLO WORLD!") {
+                ForegroundColour = AnsiColour.Blue,
+                BackgroundColour = AnsiColour.Magenta
+            }
+        ]).Substring(3, 5);
+        Assert.AreEqual("LO WO", longer.Spans[0].Text);
+        Assert.AreEqual(AnsiColour.Blue, longer.Spans[0].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Magenta, longer.Spans[0].BackgroundColour);
+
         AnsiText ansi = new AnsiText([
             new AnsiText.AnsiTextSpan("HELLO "),
             new AnsiText.AnsiTextSpan("WORLD") {
@@ -177,6 +187,15 @@ public class TestANSIText {
         Assert.AreEqual(2, ansi.Substring(6, 6).Spans.Count);
         Assert.AreEqual("VEGAS", ansi.Substring(27, 10).Text);
         Assert.AreEqual(1, ansi.Substring(27, 10).Spans.Count);
+
+        AnsiText ansi2 = ansi.Substring(9, 10);
+        Assert.AreEqual(2, ansi2.Spans.Count);
+        Assert.AreEqual("LD", ansi2.Spans[0].Text);
+        Assert.AreEqual(AnsiColour.Yellow, ansi2.Spans[0].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Cyan, ansi2.Spans[0].BackgroundColour);
+        Assert.AreEqual(" WELCOME", ansi2.Spans[1].Text);
+        Assert.AreEqual(AnsiColour.BrightWhite, ansi2.Spans[1].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Black, ansi2.Spans[1].BackgroundColour);
     }
 
     // Test changing the style of a portion of an AnsiText
