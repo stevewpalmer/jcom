@@ -3,7 +3,6 @@
 <root>
     <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
         <xsd:element name="root" msdata:IsDataSet="true">
-            
         </xsd:element>
     </xsd:schema>
     <resheader name="resmimetype">
@@ -91,7 +90,7 @@
         <value>Date</value>
     </data>
     <data name="FormatText" xml:space="preserve">
-        <value>Text</value>
+        <value>XText</value>
     </data>
     <data name="FormatReset" xml:space="preserve">
         <value>Reset</value>
@@ -403,9 +402,27 @@
         <value>Time formats</value>
     </data>
     <data name="TimesHMSZ" xml:space="preserve">
-        <value>HH:MM:SS AM/PM</value>
+        <value>1 (HH:MM:SS AM/PM)</value>
     </data>
     <data name="TimesHMSZDescription" xml:space="preserve">
-        <value>Hour:Minute:Second A</value>
+        <value>Hour:Minute:Second AM/PM 12-Hour Format</value>
+    </data>
+    <data name="TimesHMDescription" xml:space="preserve">
+        <value>Hour:Minutes 24-Hour Format</value>
+    </data>
+    <data name="TimesHM" xml:space="preserve">
+        <value>4 (HH:MM)</value>
+    </data>
+    <data name="TimeHMZ" xml:space="preserve">
+        <value>2 (HH:MM AM/ PM)</value>
+    </data>
+    <data name="TimeHMS" xml:space="preserve">
+        <value>3 (HH:MM:SS)</value>
+    </data>
+    <data name="TimeHMZDescription" xml:space="preserve">
+        <value>Hour:Minute AM/PM 12-Hour Format</value>
+    </data>
+    <data name="TimeHMSDescription" xml:space="preserve">
+        <value>Hour:Minute:Second 24-Hour Format</value>
     </data>
 </root>

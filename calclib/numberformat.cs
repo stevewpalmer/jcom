@@ -51,7 +51,10 @@ public static class NumberFormats {
                 CellFormat.DATE_DMY => "dd-mmm-yyyy",
                 CellFormat.DATE_DM => "dd-mmm",
                 CellFormat.DATE_MY => "mmm-yyyy",
-                CellFormat.TIME => "h:mm:ss AM/PM",
+                CellFormat.TIME_HMSZ => "h:mm:ss AM/PM",
+                CellFormat.TIME_HMZ => "h:mm AM/PM",
+                CellFormat.TIME_HMS => "h:mm:ss",
+                CellFormat.TIME_HM => "h:mm",
                 _ => throw new ArgumentException($"Unhandled number format {format}")
             };
             _format = new NumberFormat(main);

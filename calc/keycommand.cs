@@ -95,6 +95,9 @@ public enum KeyCommand {
     KC_STYLE_FG,
     KC_STYLE_ITALIC,
     KC_STYLE_UNDERLINE,
+    KC_TIME_HM,
+    KC_TIME_HMZ,
+    KC_TIME_HMS,
     KC_TIME_HMSZ,
     KC_UP,
     KC_VALUE

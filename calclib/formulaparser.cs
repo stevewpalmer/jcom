@@ -56,6 +56,7 @@ public enum TokenID {
     KTODAY,
     KYEAR,
     KMONTH,
+    KTIME,
     COLON,
     CONCAT,
     KCONCATENATE,
@@ -197,7 +198,7 @@ public class FormulaParser {
                         ch = GetChar();
                     }
                     if (ch != endCh) {
-                        PushChar(ch);
+                        throw new FormatException(InvalidFormulaError);
                     }
                     tokens.Add(new StringToken(str.ToString()));
                     break;
@@ -471,6 +472,9 @@ public class FormulaParser {
             case TokenID.KMONTH:
                 return ParseArguments(token.ID, 1);
 
+            case TokenID.KTIME:
+                return ParseArguments(token.ID, 3);
+
             case TokenID.KSUM:
             case TokenID.KCONCATENATE:
                 return ParseArguments(token.ID, 255);
@@ -566,6 +570,7 @@ public class FormulaParser {
             TokenID.KTODAY => 20,
             TokenID.KMONTH => 20,
             TokenID.KYEAR => 20,
+            TokenID.KTIME => 20,
             TokenID.NUMBER => 20,
             TokenID.ADDRESS => 20,
             TokenID.TEXT => 20,

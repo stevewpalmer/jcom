@@ -90,8 +90,26 @@ public enum CellFormat {
     CUSTOM,
 
     /// <summary>
-    /// Time format
+    /// Time in Hours-Minutes-Seconds 12-hour format
     /// </summary>
-    [Description("TM")]
-    TIME
+    [Description("T1")]
+    TIME_HMSZ,
+
+    /// <summary>
+    /// Time in Hours-Minutes 24-hour format
+    /// </summary>
+    [Description("T2")]
+    TIME_HM,
+
+    /// <summary>
+    /// Time in Hours-Minutes-Seconds 24-hour format
+    /// </summary>
+    [Description("T3")]
+    TIME_HMS,
+
+    /// <summary>
+    /// Time in Hours-Minutes 12-hour format
+    /// </summary>
+    [Description("T4")]
+    TIME_HMZ
 }

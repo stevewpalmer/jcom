@@ -196,6 +196,22 @@ public class ParsingTests {
         Assert.AreEqual("=B4=901200", cell1.Content);
     }
 
+
+    // Verify the & operator
+    [Test]
+    public void VerifyConcatOperator() {
+        Sheet sheet = new Sheet();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
+
+        cell1.Content = " HELLO ";
+        cell2.Content = " WORLD!";
+        cell3.Content = "=A1&A2";
+        sheet.Calculate();
+        Assert.AreEqual(" HELLO  WORLD!", cell3.Value.StringValue);
+    }
+
     // Verify applying a fixup to a node
     [Test]
     public void VerifyFixup() {
@@ -220,6 +236,7 @@ public class ParsingTests {
         Assert.IsTrue(((LocationNode)cell3.FormulaTree).Error);
     }
 
+    // Verify the different address parsing formats
     [Test]
     public void VerifyAddressParsing() {
         Cell cell1 = new Cell { Location = new CellLocation { Row = 1, Column = 8}};
@@ -260,6 +277,7 @@ public class ParsingTests {
         Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("R(-12902)C(4000)", cell1.Location); });
         Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("+B4_H7", cell1.Location); });
         Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("*89", cell1.Location).Parse(); });
+        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("'HELLO", cell1.Location).Parse(); });
     }
 
     // Verify an exception is thrown when a bad number is
@@ -335,7 +353,7 @@ public class ParsingTests {
     [Test]
     public void VerifySum() {
         Cell cell = new Cell(new Sheet(1)) { Location = new CellLocation { Row = 1, Column = 1 }, Content = "=SUM(A2:A4)"};
-        Assert.IsTrue(cell.FormulaTree.GetType() == typeof(FunctionNode));
+        Assert.IsTrue(cell.FormulaTree?.GetType() == typeof(FunctionNode));
 
         FunctionNode functionNode = (FunctionNode)cell.FormulaTree;
         Assert.AreEqual(TokenID.KSUM, functionNode.Op);

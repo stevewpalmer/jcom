@@ -244,9 +244,21 @@ public class CellTests {
             Content = "48794",
             CellFormat = CellFormat.DATE_MY
         }.FormatDescription);
-        Assert.AreEqual("(TM)", new Cell {
+        Assert.AreEqual("(T1)", new Cell {
             Content = "48794",
-            CellFormat = CellFormat.TIME
+            CellFormat = CellFormat.TIME_HMSZ
+        }.FormatDescription);
+        Assert.AreEqual("(T2)", new Cell {
+            Content = "48794",
+            CellFormat = CellFormat.TIME_HM
+        }.FormatDescription);
+        Assert.AreEqual("(T3)", new Cell {
+            Content = "48794",
+            CellFormat = CellFormat.TIME_HMS
+        }.FormatDescription);
+        Assert.AreEqual("(T4)", new Cell {
+            Content = "48794",
+            CellFormat = CellFormat.TIME_HMZ
         }.FormatDescription);
         Assert.AreEqual("(#,##0)", new Cell {
             Content = "45.8794",
@@ -254,9 +266,9 @@ public class CellTests {
             CustomFormatString = "#,##0",
             DecimalPlaces = 2
         }.FormatDescription);
-        Assert.AreEqual("(11)", new Cell {
+        Assert.AreEqual("(14)", new Cell {
             Content = "45.8794",
-            CellFormat = (CellFormat)11,
+            CellFormat = (CellFormat)14,
             DecimalPlaces = 1
         }.FormatDescription);
     }
@@ -291,7 +303,7 @@ public class CellTests {
         Assert.Throws(typeof(ArgumentException), delegate {
             new Cell {
                 Content = "45.8794",
-                CellFormat = (CellFormat)12,
+                CellFormat = (CellFormat)14,
                 DecimalPlaces = 2
             }.Text(8);
         });
@@ -521,20 +533,32 @@ public class CellTests {
     public void VerifyTimeFormats() {
         Assert.AreEqual(" 12:30:00 PM", new Cell {
             Content = "45619.520833333336",
-            CellFormat = CellFormat.TIME
+            CellFormat = CellFormat.TIME_HMSZ
         }.Text(12));
         Assert.AreEqual(" 12:00:00 AM", new Cell {
             Content = "45619",
-            CellFormat = CellFormat.TIME
+            CellFormat = CellFormat.TIME_HMSZ
         }.Text(12));
+        Assert.AreEqual("     2:30 PM", new Cell {
+            Content = "0.604305556",
+            CellFormat = CellFormat.TIME_HMZ
+        }.Text(12));
+        Assert.AreEqual("     14:30", new Cell {
+            Content = "0.604305556",
+            CellFormat = CellFormat.TIME_HM
+        }.Text(10));
         Assert.AreEqual(" 11:59:59 PM", new Cell {
             Content = "45619.99998842592",
-            CellFormat = CellFormat.TIME
+            CellFormat = CellFormat.TIME_HMSZ
         }.Text(12));
         Assert.AreEqual("  7:12:34 AM", new Cell {
             Content = "45619.30039351852",
-            CellFormat = CellFormat.TIME
+            CellFormat = CellFormat.TIME_HMSZ
         }.Text(12));
+        Assert.AreEqual("   7:12:34", new Cell {
+            Content = "45619.30039351852",
+            CellFormat = CellFormat.TIME_HMS
+        }.Text(10));
     }
 
     // Style a cell and ensure correct render string

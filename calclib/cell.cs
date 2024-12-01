@@ -78,7 +78,7 @@ public class Cell(Sheet? sheet) {
             }
             if (TryParseTime(value.StringValue, out Variant _timeValue)) {
                 if (!Format.HasValue) {
-                    CellFormat = CellFormat.TIME;
+                    CellFormat = CellFormat.TIME_HMSZ;
                 }
                 ComputedValue = _timeValue;
                 return;
@@ -394,17 +394,30 @@ public class Cell(Sheet? sheet) {
         if (!Value.IsNumber) {
             cellValue = Value.StringValue ?? string.Empty;
         } else {
-            cellValue = CellFormat switch {
-                CellFormat.FIXED or CellFormat.PERCENT or CellFormat.CURRENCY or CellFormat.SCIENTIFIC
-                    or CellFormat.DATE_DM or CellFormat.DATE_MY or CellFormat.DATE_DMY or CellFormat.TIME
-                    or CellFormat.GENERAL => NumberFormats.GetFormat(CellFormat, UseThousandsSeparator, DecimalPlaces)
-                        .Format(Value.DoubleValue, culture),
-                CellFormat.CUSTOM => CustomFormat != null
-                    ? CustomFormat.Format(Value.DoubleValue, CultureInfo.CurrentCulture)
-                    : Value.DoubleValue.ToString(CultureInfo.CurrentCulture),
-                CellFormat.TEXT => Content,
-                _ => throw new ArgumentException($"Unknown Cell Format: {CellFormat}")
-            };
+            switch (CellFormat) {
+                case CellFormat.FIXED or
+                     CellFormat.PERCENT or
+                     CellFormat.CURRENCY or
+                     CellFormat.SCIENTIFIC or
+                     CellFormat.DATE_DM or
+                     CellFormat.DATE_MY or
+                     CellFormat.DATE_DMY or
+                     CellFormat.TIME_HMSZ or
+                     CellFormat.TIME_HMS or
+                     CellFormat.TIME_HMZ or
+                     CellFormat.TIME_HM or
+                     CellFormat.GENERAL:
+                    cellValue = NumberFormats.GetFormat(CellFormat, UseThousandsSeparator, DecimalPlaces).Format(Value.DoubleValue, culture);
+                    break;
+                case CellFormat.CUSTOM:
+                    cellValue = CustomFormat != null ? CustomFormat.Format(Value.DoubleValue, CultureInfo.CurrentCulture) : Value.DoubleValue.ToString(CultureInfo.CurrentCulture);
+                    break;
+                case CellFormat.TEXT:
+                    cellValue = Content;
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown Cell Format: {CellFormat}");
+            }
             if (cellValue.Length > width) {
                 cellValue = new string('*', width);
             }

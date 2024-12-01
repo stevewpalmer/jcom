@@ -824,5 +824,41 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("TimesHMSZDescription", resourceCulture);
             }
         }
+        
+        internal static string TimesHMDescription {
+            get {
+                return ResourceManager.GetString("TimesHMDescription", resourceCulture);
+            }
+        }
+        
+        internal static string TimesHM {
+            get {
+                return ResourceManager.GetString("TimesHM", resourceCulture);
+            }
+        }
+        
+        internal static string TimeHMZ {
+            get {
+                return ResourceManager.GetString("TimeHMZ", resourceCulture);
+            }
+        }
+        
+        internal static string TimeHMS {
+            get {
+                return ResourceManager.GetString("TimeHMS", resourceCulture);
+            }
+        }
+        
+        internal static string TimeHMZDescription {
+            get {
+                return ResourceManager.GetString("TimeHMZDescription", resourceCulture);
+            }
+        }
+        
+        internal static string TimeHMSDescription {
+            get {
+                return ResourceManager.GetString("TimeHMSDescription", resourceCulture);
+            }
+        }
     }
 }
