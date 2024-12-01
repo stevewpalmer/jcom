@@ -37,7 +37,7 @@ public class SheetTests {
         for (int column = 1; column < Sheet.MaxColumns; column++) {
             Assert.AreEqual(Sheet.DefaultColumnWidth, sheet.ColumnWidth(column));
         }
-        sheet.GetCell(new CellLocation(1, 1), true);
+        sheet.GetCell(1, 1, true);
         Assert.AreEqual(Sheet.DefaultColumnWidth, sheet.ColumnWidth(1));
         sheet.InsertColumn(1);
         Assert.AreEqual(Sheet.DefaultColumnWidth, sheet.ColumnWidth(1));

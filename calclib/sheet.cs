@@ -156,7 +156,7 @@ public class Sheet {
     /// <param name="row">Row location of cell</param>
     /// <param name="createIfEmpty">Create the cell if it is empty</param>
     /// <returns>The cell at the row</returns>
-    private Cell GetCell(int column, int row, bool createIfEmpty) {
+    public Cell GetCell(int column, int row, bool createIfEmpty) {
         CellList? cellList = CellListForColumn(column, createIfEmpty);
         Cell cell = new Cell(this) {
             Location = new CellLocation(column, row)

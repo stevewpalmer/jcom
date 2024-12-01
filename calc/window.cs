@@ -319,16 +319,11 @@ public class Window {
         }
         for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
             for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                CellLocation location = new CellLocation { Column = column, Row = row };
-                int x = GetXPositionOfCell(location.Column);
-                int y = GetYPositionOfCell(location.Row);
-                if (_sheetBounds.Contains(x, y)) {
-                    Cell cell = Sheet.GetCell(location, false);
-                    bool inMarked = markExtent.Contains(new Point(column, row));
-                    int fg = inMarked ? Screen.Colours.BackgroundColour : cell.Style.ForegroundColour;
-                    int bg = inMarked ? Screen.Colours.SelectionColour : cell.Style.BackgroundColour;
-                    DrawCell(cell, x, y, fg, bg);
-                }
+                Cell cell = Sheet.GetCell(column, row, false);
+                bool inMarked = markExtent.Contains(new Point(column, row));
+                int fg = inMarked ? Screen.Colours.BackgroundColour : cell.Style.ForegroundColour;
+                int bg = inMarked ? Screen.Colours.SelectionColour : cell.Style.BackgroundColour;
+                DrawCell(cell, fg, bg);
             }
         }
     }
@@ -337,14 +332,14 @@ public class Window {
     /// Draw the cursor
     /// </summary>
     private void PlaceCursor() {
-        ShowCell(Sheet.Location, Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
+        ShowCell(Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
     }
 
     /// <summary>
     /// Clear the cursor.
     /// </summary>
     private void ResetCursor() {
-        ShowCell(Sheet.Location, Sheet.ActiveCell.Style.ForegroundColour, Sheet.ActiveCell.Style.BackgroundColour);
+        ShowCell(Sheet.ActiveCell.Style.ForegroundColour, Sheet.ActiveCell.Style.BackgroundColour);
     }
 
     /// <summary>
@@ -362,15 +357,13 @@ public class Window {
     }
 
     /// <summary>
-    /// Draw the cell at the specified column and row in the given foreground and
-    /// background colours
+    /// Draw the active cell in the given foreground and background colours.
     /// </summary>
-    /// <param name="location">Cell location</param>
     /// <param name="fg">Foreground colour</param>
     /// <param name="bg">Background colour</param>
-    private void ShowCell(CellLocation location, int fg, int bg) {
-        Cell cell = Sheet.GetCell(location, false);
-        DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row), fg, bg);
+    private void ShowCell(int fg, int bg) {
+        Cell cell = Sheet.GetCell(Sheet.Location, false);
+        DrawCell(cell, fg, bg);
     }
 
     /// <summary>
@@ -653,7 +646,7 @@ public class Window {
                 if (extent.Valid) {
                     for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
                         for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                            Cell cell = Sheet.GetCell(new CellLocation { Column = column, Row = row }, false);
+                            Cell cell = Sheet.GetCell(column, row, false);
                             csvWriter.WriteField(cell.Value);
                         }
                         csvWriter.NextRecord();
@@ -818,11 +811,7 @@ public class Window {
     /// <param name="cells">List of cells to update</param>
     private void UpdateCells(IEnumerable<Cell> cells) {
         foreach (Cell cell in cells) {
-            int x = GetXPositionOfCell(cell.Location.Column);
-            int y = GetYPositionOfCell(cell.Location.Row);
-            if (_sheetBounds.Contains(new Point(x, y))) {
-                DrawCell(cell, x, y, cell.Style.ForegroundColour, cell.Style.BackgroundColour);
-            }
+            DrawCell(cell, cell.Style.ForegroundColour, cell.Style.BackgroundColour);
         }
     }
 
@@ -831,27 +820,30 @@ public class Window {
     /// the given physical screen offset where (0,0) is the top left corner.
     /// </summary>
     /// <param name="cell">Cell to draw</param>
-    /// <param name="x">X position of cell</param>
-    /// <param name="y">Y position of cell</param>
     /// <param name="fg">Foreground colour</param>
     /// <param name="bg">Background colour</param>
-    private void DrawCell(Cell cell, int x, int y, int fg, int bg) {
-        int width = Sheet.ColumnWidth(cell.Location.Column);
-        if (x + width > _sheetBounds.Right) {
-            width = _sheetBounds.Right - x;
-            if (width <= 0) {
-                return;
+    private void DrawCell(Cell cell, int fg, int bg) {
+        int x = GetXPositionOfCell(cell.Location.Column);
+        int y = GetYPositionOfCell(cell.Location.Row);
+        if (_sheetBounds.Contains(x, y)) {
+
+            int width = Sheet.ColumnWidth(cell.Location.Column);
+            if (x + width > _sheetBounds.Right) {
+                width = _sheetBounds.Right - x;
+                if (width <= 0) {
+                    return;
+                }
             }
+            string cellText = cell.Text(width)[..width];
+            Terminal.SetCursor(x, y);
+            Terminal.Write(new AnsiText.AnsiTextSpan(cellText) {
+                ForegroundColour = fg,
+                BackgroundColour = bg,
+                Bold = cell.Style.Bold,
+                Italic = cell.Style.Italic,
+                Underline = cell.Style.Underline
+            }.EscapedString());
         }
-        string cellText = cell.Text(width)[..width];
-        Terminal.SetCursor(x, y);
-        Terminal.Write(new AnsiText.AnsiTextSpan(cellText) {
-            ForegroundColour = fg,
-            BackgroundColour = bg,
-            Bold = cell.Style.Bold,
-            Italic = cell.Style.Italic,
-            Underline = cell.Style.Underline
-        }.EscapedString());
     }
 
     /// <summary>

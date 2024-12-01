@@ -76,13 +76,6 @@ public class AnsiText {
     }
 
     /// <summary>
-    /// AnsiText string with a single span
-    /// </summary>
-    public AnsiText(AnsiTextSpan span) {
-        Spans = [span];
-    }
-
-    /// <summary>
     /// List of spans
     /// </summary>
     public List<AnsiTextSpan> Spans { get; private set; }
