@@ -380,10 +380,44 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Return the unformatted contents of the cell for display. If includeSpilled
+    /// is True and this cell is empty then the contents include any spilled cells
+    /// to the left.
+    /// </summary>
+    /// <param name="width">Column width to use</param>
+    /// <param name="includeSpilled">True if we include spilled cells</param>
+    /// <returns>String contents of cell</returns>
+    public string Text(int width, bool includeSpilled) {
+        if (includeSpilled && IsEmptyCell && sheet != null) {
+            int column = Location.Column;
+            Cell? leftCell = null;
+            while (column >= 1) {
+                leftCell = sheet.GetCell(column, Location.Row, false);
+                if (!leftCell.IsEmptyCell) {
+                    break;
+                }
+                column--;
+            }
+            if (column > 0) {
+                int leftCellWidth = sheet.ColumnWidth(column);
+                if (leftCell is { Value.IsNumber: false } && leftCell.Value.StringValue.Length > leftCellWidth) {
+                    string leftCellText = leftCell.Text(leftCell.Value.StringValue.Length);
+                    int index = leftCellWidth;
+                    while (++column < Location.Column) {
+                        index += sheet.ColumnWidth(column);
+                    }
+                    return Utilities.SpanBound(leftCellText, index, sheet.ColumnWidth(column)).PadRight(width);
+                }
+            }
+        }
+        return Text(width);
+    }
+
+    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
-    /// <returns>String value of cell</returns>
+    /// <returns>String contents of cell</returns>
     public string Text(int width) {
         Debug.Assert(width >= 0);
         string cellValue;

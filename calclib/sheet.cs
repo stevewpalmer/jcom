@@ -47,6 +47,9 @@ public class Sheet {
     /// </summary>
     public const int DefaultColumnWidth = 10;
 
+    /// <summary>
+    /// Empty constructor with no sheet number
+    /// </summary>
     public Sheet() { }
 
     /// <summary>
@@ -180,29 +183,6 @@ public class Sheet {
     }
 
     /// <summary>
-    /// Insert a new column at the specified column position.
-    /// </summary>
-    /// <param name="column">Insertion column</param>
-    public void InsertColumn(int column) {
-        Debug.Assert(column is >= 1 and <= MaxColumns);
-        int c = 0;
-        while (c < ColumnList.Count && ColumnList[c].Index < column) {
-            c++;
-        }
-        while (c < ColumnList.Count) {
-            ++ColumnList[c].Index;
-            foreach (Cell cell in ColumnList[c].Cells) {
-                CellLocation cellLocation = cell.Location;
-                ++cellLocation.Column;
-                cell.Location = cellLocation;
-            }
-            c++;
-        }
-        FixupFormulaCells(column, 0, 1);
-        Modified = true;
-    }
-
-    /// <summary>
     /// Recalculate all formulas on the sheet and update the values
     /// on the formula cells.
     /// </summary>
@@ -229,6 +209,29 @@ public class Sheet {
             }
         }
         return cellsToUpdate;
+    }
+
+    /// <summary>
+    /// Insert a new column at the specified column position.
+    /// </summary>
+    /// <param name="column">Insertion column</param>
+    public void InsertColumn(int column) {
+        Debug.Assert(column is >= 1 and <= MaxColumns);
+        int c = 0;
+        while (c < ColumnList.Count && ColumnList[c].Index < column) {
+            c++;
+        }
+        while (c < ColumnList.Count) {
+            ++ColumnList[c].Index;
+            foreach (Cell cell in ColumnList[c].Cells) {
+                CellLocation cellLocation = cell.Location;
+                ++cellLocation.Column;
+                cell.Location = cellLocation;
+            }
+            c++;
+        }
+        FixupFormulaCells(column, 0, 1);
+        Modified = true;
     }
 
     /// <summary>
