@@ -25,45 +25,6 @@
 
 namespace JComLib;
 
-/// <summary>
-/// Ansi colour codes. Add 10 for the background code.
-/// </summary>
-public static class AnsiColour {
-    public const int Black = 30;
-    public const int Red = 31;
-    public const int Green = 32;
-    public const int Yellow = 33;
-    public const int Blue = 34;
-    public const int Magenta = 35;
-    public const int Cyan = 36;
-    public const int White = 37;
-    public const int Gray = 90;
-    public const int BrightRed = 91;
-    public const int BrightGreen = 92;
-    public const int BrightYellow = 93;
-    public const int BrightBlue = 94;
-    public const int BrightMagenta = 95;
-    public const int BrightCyan = 96;
-    public const int BrightWhite = 97;
-}
-
-public static class AnsiExtensions {
-
-    /// <summary>
-    /// Return a string to be rendered to an Ansi console with the specified
-    /// colours.
-    /// </summary>
-    /// <param name="str">Input string</param>
-    /// <param name="fg">Ansi foreground colour</param>
-    /// <param name="bg">Ansi background colour</param>
-    /// <returns>String with Ansi escape sequences</returns>
-    public static string AnsiColour(this string str, int fg, int bg) =>
-        new AnsiTextSpan(str) {
-            ForegroundColour = fg,
-            BackgroundColour = bg
-        }.EscapedString();
-}
-
 public class AnsiText {
 
     /// <summary>
@@ -108,7 +69,8 @@ public class AnsiText {
             int textLength = Spans[spanIndex].Text.Length;
             int spanWidth = Math.Min(Math.Min(textLength, length), textLength - start);
             AnsiTextSpan co = new(Spans[spanIndex]) {
-                Text = Spans[spanIndex].Text.Substring(start, spanWidth)
+                Text = Spans[spanIndex].Text.Substring(start, spanWidth),
+                Width = spanWidth
             };
             spans.Add(co);
             length -= spanWidth;

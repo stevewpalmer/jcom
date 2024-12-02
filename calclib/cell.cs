@@ -152,6 +152,18 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Return the AnsiAlignment that maps to the cell alignment.
+    /// </summary>
+    private AnsiAlignment AnsiAlignment =>
+        Alignment switch {
+            CellAlignment.LEFT => AnsiAlignment.LEFT,
+            CellAlignment.RIGHT => AnsiAlignment.RIGHT,
+            CellAlignment.CENTRE => AnsiAlignment.CENTRE,
+            CellAlignment.GENERAL => Value.IsNumber ? AnsiAlignment.RIGHT : AnsiAlignment.LEFT,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+    /// <summary>
     /// Cell text style
     /// </summary>
     public CellStyle Style { get; set; } = new(sheet);
@@ -390,6 +402,7 @@ public class Cell(Sheet? sheet) {
     public AnsiTextSpan Text(int width, bool includeSpilled) {
         string cellText = Text(width);
         Cell thisCell = this;
+        AnsiAlignment alignment = AnsiAlignment;
         if (includeSpilled && IsEmptyCell && sheet != null) {
             int column = Location.Column;
             Cell? leftCell = null;
@@ -411,6 +424,7 @@ public class Cell(Sheet? sheet) {
                     }
                     if (index < leftCellLength) {
                         cellText = Utilities.SpanBound(leftCellText, index, sheet.ColumnWidth(column));
+                        alignment = AnsiAlignment.NONE;
                         thisCell = leftCell;
                     }
                 }
@@ -419,6 +433,8 @@ public class Cell(Sheet? sheet) {
         return new AnsiTextSpan(cellText) {
             ForegroundColour = thisCell.Style.ForegroundColour,
             BackgroundColour = thisCell.Style.BackgroundColour,
+            Alignment = alignment,
+            Width = width,
             Bold = thisCell.Style.Bold,
             Italic = thisCell.Style.Italic,
             Underline = thisCell.Style.Underline
@@ -479,7 +495,9 @@ public class Cell(Sheet? sheet) {
             BackgroundColour = Style.BackgroundColour,
             Bold = Style.Bold,
             Italic = Style.Italic,
-            Underline = Style.Underline
+            Underline = Style.Underline,
+            Alignment = AnsiAlignment,
+            Width = width
         };
     }
 

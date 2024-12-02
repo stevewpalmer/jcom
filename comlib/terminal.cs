@@ -132,7 +132,7 @@ public static class Terminal {
             Console.SetCursorPosition(x, y);
             foreach (AnsiTextSpan span in str.Spans) {
                 Console.Write(span.EscapedString());
-                width -= span.Text.Length;
+                width -= span.Width;
             }
             if (width > 0) {
                 Console.Write(string.Empty.PadRight(width));
@@ -153,8 +153,12 @@ public static class Terminal {
     /// <param name="str">String to output</param>
     public static void Write(int x, int y, int width, int fg, int bg, string str) {
         lock (LockObj) {
+            string ansiString = new AnsiTextSpan(str.PadRight(width)) {
+                ForegroundColour = fg,
+                BackgroundColour = bg
+            }.EscapedString();
             Console.SetCursorPosition(x, y);
-            Console.Write(str.PadRight(width).AnsiColour(fg, bg));
+            Console.Write(ansiString);
         }
     }
 

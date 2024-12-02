@@ -550,7 +550,7 @@ public class CellTests {
                 IsBold = true
             }
         };
-        Assert.AreEqual("\u001b[36;42m\u001b[1m    HELLO WORLD\u001b[0m", cell1.AnsiTextSpan(15).EscapedString());
+        Assert.AreEqual(@"[36;42m    [0m[36;42m[1mHELLO WORLD[0m", cell1.AnsiTextSpan(15).EscapedString());
 
         Cell cell2 = new Cell(sheet1) {
             Content = "HELLO WORLD",
@@ -560,7 +560,7 @@ public class CellTests {
                 IsUnderlined = true
             }
         };
-        Assert.AreEqual("\u001b[97;40m\u001b[3m\u001b[4mHELLO WORLD    \u001b[0m", cell2.AnsiTextSpan(15).EscapedString());
+        Assert.AreEqual(@"[97;40m[3m[4mHELLO WORLD[0m[97;40m    [0m", cell2.AnsiTextSpan(15).EscapedString());
 
         // Verify CellStyles are copied from another cell
         Sheet sheet2 = new Sheet(2);

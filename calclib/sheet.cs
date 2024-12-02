@@ -350,7 +350,7 @@ public class Sheet {
                     widths.Add(columnWidth);
                     size += columnWidth;
                 } while (size < labelLength);
-                string labelCellText = cell.Text(size);
+                string labelCellText = cell.Text(labelLength);
                 int index = 0;
                 foreach (int columnWidth in widths) {
                     if (columnIndex >= column) {
@@ -359,7 +359,8 @@ public class Sheet {
                             BackgroundColour = cell.Style.BackgroundColour,
                             Bold = cell.Style.Bold,
                             Italic = cell.Style.Italic,
-                            Underline = cell.Style.Underline
+                            Underline = cell.Style.Underline,
+                            Alignment = AnsiAlignment.NONE
                         });
                     }
                     index += columnWidth;
@@ -368,7 +369,7 @@ public class Sheet {
             }
             else {
                 if (columnIndex >= column) {
-                    spans.Add(cell.AnsiTextSpan(size));
+                    spans.Add(cell.Text(size, false));
                 }
                 columnIndex++;
             }

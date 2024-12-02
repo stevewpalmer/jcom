@@ -835,19 +835,11 @@ public class Window {
                 }
             }
             AnsiTextSpan cellText = cell.Text(width, true);
-            AnsiText ansiText = new([
-                new AnsiTextSpan(cellText) {
-                    ForegroundColour = fg,
-                    BackgroundColour = bg,
-                    Text = cellText.Text
-                },
-                new AnsiTextSpan(cellText) {
-                    ForegroundColour = fg,
-                    BackgroundColour = bg,
-                    Text = new string(' ', width - cellText.Text.Length)
-                }
-            ]);
-            Terminal.Write(x, y, width, ansiText);
+            Terminal.SetCursor(x, y);
+            Terminal.Write(new AnsiTextSpan(cellText) {
+                ForegroundColour = fg,
+                BackgroundColour = bg
+            }.EscapedString());
         }
     }
 
