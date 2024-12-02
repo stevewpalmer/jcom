@@ -380,14 +380,16 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
-    /// Return the unformatted contents of the cell for display. If includeSpilled
+    /// Return the formatted contents of the cell for display. If includeSpilled
     /// is True and this cell is empty then the contents include any spilled cells
     /// to the left.
     /// </summary>
     /// <param name="width">Column width to use</param>
     /// <param name="includeSpilled">True if we include spilled cells</param>
-    /// <returns>String contents of cell</returns>
-    public string Text(int width, bool includeSpilled) {
+    /// <returns>AnsiTextSpan for cell</returns>
+    public AnsiTextSpan Text(int width, bool includeSpilled) {
+        string cellText = Text(width);
+        Cell thisCell = this;
         if (includeSpilled && IsEmptyCell && sheet != null) {
             int column = Location.Column;
             Cell? leftCell = null;
@@ -401,16 +403,26 @@ public class Cell(Sheet? sheet) {
             if (column > 0) {
                 int leftCellWidth = sheet.ColumnWidth(column);
                 if (leftCell is { Value.IsNumber: false } && leftCell.Value.StringValue.Length > leftCellWidth) {
-                    string leftCellText = leftCell.Text(leftCell.Value.StringValue.Length);
+                    int leftCellLength = leftCell.Value.StringValue.Length;
+                    string leftCellText = leftCell.Text(leftCellLength);
                     int index = leftCellWidth;
                     while (++column < Location.Column) {
                         index += sheet.ColumnWidth(column);
                     }
-                    return Utilities.SpanBound(leftCellText, index, sheet.ColumnWidth(column)).PadRight(width);
+                    if (index < leftCellLength) {
+                        cellText = Utilities.SpanBound(leftCellText, index, sheet.ColumnWidth(column));
+                        thisCell = leftCell;
+                    }
                 }
             }
         }
-        return Text(width);
+        return new AnsiTextSpan(cellText) {
+            ForegroundColour = thisCell.Style.ForegroundColour,
+            BackgroundColour = thisCell.Style.BackgroundColour,
+            Bold = thisCell.Style.Bold,
+            Italic = thisCell.Style.Italic,
+            Underline = thisCell.Style.Underline
+        };
     }
 
     /// <summary>
@@ -461,8 +473,8 @@ public class Cell(Sheet? sheet) {
     /// </summary>
     /// <param name="width">Column width to use</param>
     /// <returns>AnsiTextSpan</returns>
-    public AnsiText.AnsiTextSpan AnsiTextSpan(int width) {
-        return new AnsiText.AnsiTextSpan(Text(width)) {
+    public AnsiTextSpan AnsiTextSpan(int width) {
+        return new AnsiTextSpan(Text(width)) {
             ForegroundColour = Style.ForegroundColour,
             BackgroundColour = Style.BackgroundColour,
             Bold = Style.Bold,

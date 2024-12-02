@@ -331,7 +331,7 @@ public class Sheet {
     /// <returns>String representation of row</returns>
     public AnsiText GetRow(int column, int row, int width) {
         Debug.Assert(column is >= 1 and <= MaxColumns);
-        List<AnsiText.AnsiTextSpan> spans = [];
+        List<AnsiTextSpan> spans = [];
         int columnIndex = 1;
         int totalWidth = 0;
         while (totalWidth < width) {
@@ -354,7 +354,7 @@ public class Sheet {
                 int index = 0;
                 foreach (int columnWidth in widths) {
                     if (columnIndex >= column) {
-                        spans.Add(new AnsiText.AnsiTextSpan(Utilities.SpanBound(labelCellText, index, columnWidth)) {
+                        spans.Add(new AnsiTextSpan(Utilities.SpanBound(labelCellText, index, columnWidth)) {
                             ForegroundColour = cell.Style.ForegroundColour,
                             BackgroundColour = cell.Style.BackgroundColour,
                             Bold = cell.Style.Bold,

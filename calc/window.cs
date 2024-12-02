@@ -834,15 +834,20 @@ public class Window {
                     return;
                 }
             }
-            string cellText = cell.Text(width, true)[..width];
-            Terminal.SetCursor(x, y);
-            Terminal.Write(new AnsiText.AnsiTextSpan(cellText) {
-                ForegroundColour = fg,
-                BackgroundColour = bg,
-                Bold = cell.Style.Bold,
-                Italic = cell.Style.Italic,
-                Underline = cell.Style.Underline
-            }.EscapedString());
+            AnsiTextSpan cellText = cell.Text(width, true);
+            AnsiText ansiText = new([
+                new AnsiTextSpan(cellText) {
+                    ForegroundColour = fg,
+                    BackgroundColour = bg,
+                    Text = cellText.Text
+                },
+                new AnsiTextSpan(cellText) {
+                    ForegroundColour = fg,
+                    BackgroundColour = bg,
+                    Text = new string(' ', width - cellText.Text.Length)
+                }
+            ]);
+            Terminal.Write(x, y, width, ansiText);
         }
     }
 

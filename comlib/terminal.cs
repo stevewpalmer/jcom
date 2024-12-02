@@ -130,7 +130,7 @@ public static class Terminal {
     public static void Write(int x, int y, int width, AnsiText str) {
         lock (LockObj) {
             Console.SetCursorPosition(x, y);
-            foreach (AnsiText.AnsiTextSpan span in str.Spans) {
+            foreach (AnsiTextSpan span in str.Spans) {
                 Console.Write(span.EscapedString());
                 width -= span.Text.Length;
             }

@@ -56,7 +56,7 @@ public class TestANSIText {
     [Test]
     public void TestPlainString() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD")
+            new AnsiTextSpan("HELLO WORLD")
         ]);
         Assert.IsTrue(ansi.Spans.Count == 1);
         Assert.AreEqual("HELLO WORLD", ansi.Spans[0].Text);
@@ -69,7 +69,7 @@ public class TestANSIText {
     [Test]
     public void TestInitialString() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD") {
+            new AnsiTextSpan("HELLO WORLD") {
                 ForegroundColour = AnsiColour.Red,
                 BackgroundColour = AnsiColour.Cyan
             }
@@ -85,8 +85,8 @@ public class TestANSIText {
     [Test]
     public void TestEmbeddedSequence() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Red,
                 BackgroundColour = AnsiColour.Green
             }
@@ -105,13 +105,13 @@ public class TestANSIText {
     [Test]
     public void TestMultipleSequences() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
@@ -133,26 +133,26 @@ public class TestANSIText {
     [Test]
     public void TestLength() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
         ]);
         Assert.AreEqual(32, ansi.Length);
-        Assert.AreEqual(0, new AnsiText(Array.Empty<AnsiText.AnsiTextSpan>()).Length);
+        Assert.AreEqual(0, new AnsiText(Array.Empty<AnsiTextSpan>()).Length);
     }
 
     // Test substring extraction
     [Test]
     public void TestSubstring() {
         AnsiText simple = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD!")
+            new AnsiTextSpan("HELLO WORLD!")
         ]);
         Assert.AreEqual("LO WO", simple.Substring(3, 5).Text);
         Assert.AreEqual("WORLD!", simple.Substring(6, 20).Text);
@@ -160,7 +160,7 @@ public class TestANSIText {
         Assert.AreEqual("", simple.Substring(0, 0).Text);
 
         AnsiText longer = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD!") {
+            new AnsiTextSpan("HELLO WORLD!") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
@@ -170,13 +170,13 @@ public class TestANSIText {
         Assert.AreEqual(AnsiColour.Magenta, longer.Spans[0].BackgroundColour);
 
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
@@ -202,7 +202,7 @@ public class TestANSIText {
     [Test]
     public void TestStyle() {
         AnsiText simple = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD!")
+            new AnsiTextSpan("HELLO WORLD!")
         ]);
         simple.Style(0, 5, AnsiColour.Cyan, AnsiColour.Green);
         Assert.AreEqual(2, simple.Spans.Count);
@@ -211,13 +211,13 @@ public class TestANSIText {
         Assert.AreEqual("\u001b[97;40m", simple.Spans[1].CS);
 
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
