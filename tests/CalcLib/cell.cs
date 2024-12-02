@@ -540,10 +540,11 @@ public class CellTests {
     // Style a cell and ensure correct render string
     [Test]
     public void TestCellStyle() {
-        Cell cell1 = new Cell {
+        Sheet sheet1 = new Sheet(1);
+        Cell cell1 = new Cell(sheet1) {
             Content = "HELLO WORLD",
             Alignment = CellAlignment.RIGHT,
-            Style = new CellStyle {
+            Style = new CellStyle(sheet1) {
                 ForegroundColour = AnsiColour.Cyan,
                 BackgroundColour = AnsiColour.Green,
                 IsBold = true
@@ -551,15 +552,29 @@ public class CellTests {
         };
         Assert.AreEqual("\u001b[36;42m\u001b[1m    HELLO WORLD\u001b[0m", cell1.AnsiTextSpan(15).EscapedString());
 
-        Cell cell2 = new Cell {
+        Cell cell2 = new Cell(sheet1) {
             Content = "HELLO WORLD",
             Alignment = CellAlignment.LEFT,
-            Style = new CellStyle {
+            Style = new CellStyle(sheet1) {
                 IsItalic = true,
                 IsUnderlined = true
             }
         };
         Assert.AreEqual("\u001b[97;40m\u001b[3m\u001b[4mHELLO WORLD    \u001b[0m", cell2.AnsiTextSpan(15).EscapedString());
+
+        // Verify CellStyles are copied from another cell
+        Sheet sheet2 = new Sheet(2);
+        Cell cell3 = new Cell(sheet2, cell2);
+        Assert.AreEqual(cell3.Style.ForegroundColour, cell2.Style.ForegroundColour);
+        Assert.AreEqual(cell3.Style.BackgroundColour, cell2.Style.BackgroundColour);
+        Assert.AreEqual(cell3.Style.IsBold, cell2.Style.IsBold);
+        Assert.AreEqual(cell3.Style.IsItalic, cell2.Style.IsItalic);
+        Assert.AreEqual(cell3.Style.IsUnderlined, cell2.Style.IsUnderlined);
+
+        // Make sure modifying the style on an associated cell marks the sheet
+        // as modified
+        cell3.Style.ForegroundColour = AnsiColour.Cyan;
+        Assert.IsTrue(sheet2.Modified);
     }
 
     // Test the semantics of Value and Content, with constants and
