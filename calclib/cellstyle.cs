@@ -35,6 +35,19 @@ public class CellStyle(Sheet? sheet) {
     public CellStyle() : this(null) { }
 
     /// <summary>
+    /// Construct a CellStyle from another CellStyle
+    /// </summary>
+    /// <param name="sheet1">Worksheet associated with cell style</param>
+    /// <param name="other">CellStyle to initialise from</param>
+    public CellStyle(Sheet sheet1, CellStyle other) : this(sheet1) {
+        Foreground = other.Foreground;
+        Background = other.Background;
+        Bold = other.Bold;
+        Italic = other.Italic;
+        Underline = other.Underline;
+    }
+
+    /// <summary>
     /// Foreground colour
     /// </summary>
     [JsonInclude]

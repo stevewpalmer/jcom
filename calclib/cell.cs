@@ -50,7 +50,7 @@ public class Cell(Sheet? sheet) {
         CustomFormat = other.CustomFormat;
         Align = other.Align;
         Decimal = other.Decimal;
-        Style = other.Style;
+        Style = new CellStyle(sheet, other.Style);
         Content = other.Content;
     }
 
