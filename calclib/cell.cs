@@ -48,6 +48,7 @@ public class Cell(Sheet? sheet) {
         Location = other.Location;
         Format = other.Format;
         CustomFormat = other.CustomFormat;
+        CustomFormatString = other.CustomFormatString;
         Align = other.Align;
         Decimal = other.Decimal;
         Style = new CellStyle(sheet, other.Style);
@@ -158,7 +159,7 @@ public class Cell(Sheet? sheet) {
     /// <summary>
     /// Return the AnsiAlignment that maps to the cell alignment.
     /// </summary>
-    private AnsiAlignment AnsiAlignment =>
+    internal AnsiAlignment AnsiAlignment =>
         Alignment switch {
             CellAlignment.LEFT => AnsiAlignment.LEFT,
             CellAlignment.RIGHT => AnsiAlignment.RIGHT,
@@ -305,6 +306,7 @@ public class Cell(Sheet? sheet) {
     public void CopyFrom(Cell other) {
         CellFormat = other.CellFormat;
         CustomFormat = other.CustomFormat;
+        CustomFormatString = other.CustomFormatString;
         Alignment = other.Alignment;
         DecimalPlaces = other.DecimalPlaces;
         Style = other.Style;
