@@ -35,10 +35,16 @@ public class CellList {
     public int Index { get; set; }
 
     /// <summary>
-    /// List of cells in the row or column
+    /// List of cells in column
     /// </summary>
     [JsonInclude]
     public List<Cell> Cells { get; set; } = [];
+
+    /// <summary>
+    /// List of non-empty cells in column
+    /// </summary>
+    [JsonIgnore]
+    public List<Cell> NonEmptyCells => Cells.Where(c => !c.IsEmptyCell).ToList();
 
     /// <summary>
     /// Size of the row or column

@@ -50,7 +50,7 @@ public class AnsiTextSpan(string text) {
     /// Return the control sequence for any explicit colours set on
     /// the span, or an empty string.
     /// </summary>
-    public string CSColours {
+    private string CSColours {
         get {
             if (ForegroundColour.HasValue && BackgroundColour.HasValue) {
                 return $"{CSI}{ForegroundColour};{BackgroundColour + 10}m";
@@ -64,10 +64,7 @@ public class AnsiTextSpan(string text) {
     /// </summary>
     public string CS {
         get {
-            StringBuilder cs = new();
-            if (ForegroundColour.HasValue && BackgroundColour.HasValue) {
-                cs.Append($"{CSI}{ForegroundColour};{BackgroundColour + 10}m");
-            }
+            StringBuilder cs = new(CSColours);
             if (Bold) {
                 cs.Append($"{CSI}1m");
             }
@@ -133,7 +130,7 @@ public class AnsiTextSpan(string text) {
     /// </summary>
     /// <param name="length">Length of string to be allocated</param>
     /// <returns>A string filled with spaces up to the given length</returns>
-    private string EmptyString(int length) => new(' ', length);
+    private static string EmptyString(int length) => new(' ', length);
 
     /// <summary>
     /// Returns the text span with all escape sequences applied.

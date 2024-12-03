@@ -92,6 +92,10 @@ public class Cell(Sheet? sheet) {
                 ComputedValue = new Variant(doubleValue);
                 return;
             }
+            if (value.StringValue == "") {
+                ComputedValue = new Variant();
+                return;
+            }
             ComputedValue = value;
         }
     }
