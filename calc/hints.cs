@@ -71,5 +71,10 @@ public enum RenderHint {
     /// <summary>
     /// Sheet requires recalculation
     /// </summary>
-    RECALCULATE = 256
+    RECALCULATE = 256,
+
+    /// <summary>
+    /// Update the entire cursor row
+    /// </summary>
+    UPDATEROW = 512
 }

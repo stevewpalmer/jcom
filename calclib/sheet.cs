@@ -323,14 +323,32 @@ public class Sheet {
     }
 
     /// <summary>
-    /// Render a row of cells using the specified data
+    /// Return whether the specified row contains spilled cells. A spilled cell
+    /// is a label that exceeds the cell width and is followed by an empty cell.
+    /// </summary>
+    /// <param name="row">Row to check</param>
+    /// <returns>True if row contains at least one spilled cell</returns>
+    public bool HasSpilledCells(int row) {
+        foreach (CellList cellList in ColumnList) {
+            Cell? cell = cellList.Cells.FirstOrDefault(cell => cell.Location.Row == row);
+            if (cell is { Value.IsNumber: false, IsEmptyCell: false } && cell.Value.StringValue.Length > cellList.Size) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Returns an AnsiText representing the cells at the given row starting from
+    /// the column offset and for the given width.
     /// </summary>
     /// <param name="column">Start column, 1-based</param>
     /// <param name="row">Row index to return</param>
     /// <param name="width">Line width</param>
-    /// <returns>String representation of row</returns>
+    /// <returns>AnsiText string representation of the requested row</returns>
     public AnsiText GetRow(int column, int row, int width) {
         Debug.Assert(column is >= 1 and <= MaxColumns);
+        Debug.Assert(row is >= 1 and <= MaxRows);
         List<AnsiTextSpan> spans = [];
         int columnIndex = 1;
         int totalWidth = 0;
@@ -357,6 +375,7 @@ public class Sheet {
                         spans.Add(new AnsiTextSpan(Utilities.SpanBound(labelCellText, index, columnWidth)) {
                             ForegroundColour = cell.Style.ForegroundColour,
                             BackgroundColour = cell.Style.BackgroundColour,
+                            Width = columnWidth,
                             Bold = cell.Style.Bold,
                             Italic = cell.Style.Italic,
                             Underline = cell.Style.Underline,
@@ -369,7 +388,15 @@ public class Sheet {
             }
             else {
                 if (columnIndex >= column) {
-                    spans.Add(cell.Text(size, false));
+                    spans.Add(new AnsiTextSpan(cell.Text(size)) {
+                        ForegroundColour = cell.Style.ForegroundColour,
+                        BackgroundColour = cell.Style.BackgroundColour,
+                        Width = size,
+                        Bold = cell.Style.Bold,
+                        Italic = cell.Style.Italic,
+                        Underline = cell.Style.Underline,
+                        Alignment = cell.AnsiAlignment
+                    });
                 }
                 columnIndex++;
             }

@@ -157,7 +157,12 @@ public class Window {
         }
         if (flags.HasFlag(RenderHint.CONTENTS)) {
             Render();
-            flags &= ~RenderHint.CONTENTS | RenderHint.BLOCK;
+            flags &= ~RenderHint.CONTENTS | RenderHint.BLOCK | RenderHint.UPDATEROW;
+            flags |= RenderHint.CURSOR_STATUS;
+        }
+        if (flags.HasFlag(RenderHint.UPDATEROW)) {
+            DrawRow(Sheet.Location.Row);
+            flags &= ~RenderHint.UPDATEROW;
             flags |= RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
@@ -268,6 +273,46 @@ public class Window {
     }
 
     /// <summary>
+    /// Render a single row.
+    /// </summary>
+    /// <param name="row">Row to render</param>
+    private void DrawRow(int row) {
+        RExtent markExtent = new RExtent();
+        if (_isMarkMode) {
+            markExtent
+                .Add(_markAnchor)
+                .Add(Sheet.Location.Point);
+        }
+
+        int y = _sheetBounds.Top + (row - _scrollOffset.Y - 1);
+        if (y < _sheetBounds.Top || y > _sheetBounds.Bottom) {
+            return;
+        }
+
+        AnsiText line = Sheet.GetRow(_scrollOffset.X + 1, row, _sheetBounds.Width);
+        int x = _sheetBounds.Left;
+        int w = _sheetBounds.Width;
+        int length = Math.Min(w, line.Length);
+
+        if (row >= markExtent.Start.Y && row <= markExtent.End.Y) {
+            int extentStart = GetXPositionOfCell(markExtent.Start.X);
+            int extentEnd = GetXPositionOfCell(markExtent.End.X + 1);
+            int left = 0;
+            if (extentStart > x) {
+                left = extentStart - x;
+            }
+            if (extentStart < _scrollOffset.X) {
+                extentStart = _sheetBounds.Left;
+            }
+            if (extentEnd > _scrollOffset.X) {
+                int extentWidth = extentEnd - extentStart;
+                line.Style(left, extentWidth, Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
+            }
+        }
+        Terminal.Write(x, y, _sheetBounds.Width, line.Substring(0, length));
+    }
+
+    /// <summary>
     /// Return the mark extent.
     /// </summary>
     /// <returns>An RExtent with the mark extent</returns>
@@ -285,11 +330,9 @@ public class Window {
     /// original marked block area.
     /// </summary>
     private void ClearBlock() {
-        if (_isMarkMode) {
-            RExtent extent = GetMarkExtent();
-            _isMarkMode = false;
-            RenderExtent(extent);
-        }
+        RExtent extent = GetMarkExtent();
+        _isMarkMode = false;
+        RenderExtent(extent);
     }
 
     /// <summary>
@@ -318,6 +361,10 @@ public class Window {
                 .Add(Sheet.Location.Point);
         }
         for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
+            if (Sheet.HasSpilledCells(row)) {
+                DrawRow(row);
+                continue;
+            }
             for (int column = extent.Start.X; column <= extent.End.X; column++) {
                 Cell cell = Sheet.GetCell(column, row, false);
                 bool inMarked = markExtent.Contains(new Point(column, row));
@@ -783,13 +830,15 @@ public class Window {
         CellInputResponse result = Screen.Command.PromptForCellInput(ref cellValue);
         if (result != CellInputResponse.CANCEL) {
             try {
+                if (Sheet.HasSpilledCells(Sheet.Location.Row)) {
+                    hint = RenderHint.UPDATEROW;
+                }
                 cell.Content = cellValue;
-
-                IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
-                UpdateCells([cell]);
+                HashSet<Cell> cellsToUpdate = [cell];
+                cellsToUpdate.UnionWith(Sheet.Calculate());
                 UpdateCells(cellsToUpdate);
 
-                hint = result switch {
+                hint |= result switch {
                     CellInputResponse.ACCEPT => RenderHint.CURSOR,
                     CellInputResponse.ACCEPT_UP => CursorUp(),
                     CellInputResponse.ACCEPT_DOWN => CursorDown(),
@@ -810,7 +859,17 @@ public class Window {
     /// </summary>
     /// <param name="cells">List of cells to update</param>
     private void UpdateCells(IEnumerable<Cell> cells) {
+        List<int> spilledRows = [];
         foreach (Cell cell in cells) {
+            int row = cell.Location.Row;
+            if (spilledRows.Contains(row)) {
+                continue;
+            }
+            if (Sheet.HasSpilledCells(row)) {
+                spilledRows.Add(row);
+                DrawRow(row);
+                continue;
+            }
             DrawCell(cell, cell.Style.ForegroundColour, cell.Style.BackgroundColour);
         }
     }
@@ -839,7 +898,7 @@ public class Window {
             Terminal.Write(new AnsiTextSpan(cellText) {
                 ForegroundColour = fg,
                 BackgroundColour = bg
-            }.EscapedString());
+            }.EscapedText());
         }
     }
 

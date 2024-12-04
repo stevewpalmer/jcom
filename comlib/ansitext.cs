@@ -42,12 +42,17 @@ public class AnsiText {
     /// <summary>
     /// Length of the rendered text
     /// </summary>
-    public int Length => Spans.Sum(span => span.Text.Length);
+    public int Length => Spans.Sum(span => span.Length);
 
     /// <summary>
-    /// Return the raw Ansi text
+    /// Return the raw text
     /// </summary>
     public string Text => string.Join("", Spans.Select(span => span.Text));
+
+    /// <summary>
+    /// Return the Ansi text
+    /// </summary>
+    public string EscapedText => string.Join("", Spans.Select(span => span.EscapedText()));
 
     /// <summary>
     /// Return a substring of an AnsiText string starting from start
@@ -70,10 +75,10 @@ public class AnsiText {
             int spanWidth = Math.Min(Math.Min(textLength, length), textLength - start);
             AnsiTextSpan co = new(Spans[spanIndex]) {
                 Text = Spans[spanIndex].Text.Substring(start, spanWidth),
-                Width = spanWidth
+                Width = Math.Min(Spans[spanIndex].Width, length)
             };
             spans.Add(co);
-            length -= spanWidth;
+            length -= co.Length;
             start = 0;
             spanIndex++;
         }
@@ -100,10 +105,10 @@ public class AnsiText {
             newSpans.AddRange(preStyle.Spans);
         }
         if (newStyle.Length > 0) {
-            newSpans.Add(new AnsiTextSpan(newStyle.Text) {
+            newSpans.AddRange(newStyle.Spans.Select(n => new AnsiTextSpan(n) {
                 ForegroundColour = fg,
                 BackgroundColour = bg
-            });
+            }));
         }
         if (postStyle.Length > 0) {
             newSpans.AddRange(postStyle.Spans);
