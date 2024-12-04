@@ -289,6 +289,17 @@ public class Cell(Sheet? sheet) {
     public bool IsEmptyCell => !Value.HasValue;
 
     /// <summary>
+    /// Is this a spilled cell?
+    /// </summary>
+    [JsonIgnore]
+    public bool IsSpilled {
+        get {
+            int columnWidth = sheet?.ColumnWidth(Location.Column) ?? Sheet.DefaultColumnWidth;
+            return Value is { HasValue: true, IsNumber: false } && Value.StringValue.Length > columnWidth;
+        }
+    }
+
+    /// <summary>
     /// Returns whether or not this cell has a formula assigned to it.
     /// </summary>
     [JsonIgnore]

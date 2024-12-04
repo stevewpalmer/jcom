@@ -466,16 +466,23 @@ public class Window {
     /// <param name="blockAction">Block action to perform</param>
     /// <returns>Render hint</returns>
     private RenderHint PerformBlockAction(BlockAction blockAction) {
+        RenderHint hint = RenderHint.CURSOR;
         if (blockAction.HasFlag(BlockAction.COPY)) {
             Clipboard.Data = RangeIterator().Select(location => new Cell(Sheet, Sheet.GetCell(location, false))).ToArray();
         }
         if (blockAction.HasFlag(BlockAction.DELETE)) {
             foreach (CellLocation location in RangeIterator()) {
-                Sheet.DeleteCell(Sheet.GetCell(location, false));
+                Cell cell = Sheet.GetCell(location, false);
+                if (cell.IsSpilled) {
+                    hint = RenderHint.CONTENTS;
+                }
+                Sheet.DeleteCell(cell);
             }
         }
-        ClearBlock();
-        return RenderHint.CURSOR;
+        if (hint == RenderHint.CURSOR) {
+            ClearBlock();
+        }
+        return hint;
     }
 
     /// <summary>
