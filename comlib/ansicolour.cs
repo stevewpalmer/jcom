@@ -1,5 +1,5 @@
-// JCalcLib
-// A sparse list of cells
+// JComLib
+// ANSI text colours
 //
 // Authors:
 //  Steve Palmer
@@ -23,37 +23,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Text.Json.Serialization;
+namespace JComLib;
 
-namespace JCalcLib;
-
-public class CellList {
-
-    /// <summary>
-    /// Row or column 1-based index of cells
-    /// </summary>
-    public int Index { get; set; }
-
-    /// <summary>
-    /// List of cells in column
-    /// </summary>
-    [JsonInclude]
-    public List<Cell> Cells { get; set; } = [];
-
-    /// <summary>
-    /// List of non-empty cells in column
-    /// </summary>
-    [JsonIgnore]
-    public List<Cell> NonEmptyCells => Cells.Where(c => !c.IsEmptyCell).ToList();
-
-    /// <summary>
-    /// Size of the row or column
-    /// </summary>
-    public int Size { get; set; }
-
-    /// <summary>
-    /// Return all formula cells on this column
-    /// </summary>
-    [JsonIgnore]
-    public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.HasFormula);
+/// <summary>
+/// Ansi colour codes. Add 10 for the background code.
+/// </summary>
+public static class AnsiColour {
+    public const int Black = 30;
+    public const int Red = 31;
+    public const int Green = 32;
+    public const int Yellow = 33;
+    public const int Blue = 34;
+    public const int Magenta = 35;
+    public const int Cyan = 36;
+    public const int White = 37;
+    public const int Gray = 90;
+    public const int BrightRed = 91;
+    public const int BrightGreen = 92;
+    public const int BrightYellow = 93;
+    public const int BrightBlue = 94;
+    public const int BrightMagenta = 95;
+    public const int BrightCyan = 96;
+    public const int BrightWhite = 97;
 }

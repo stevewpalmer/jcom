@@ -33,8 +33,8 @@ using JComLib;
 namespace JCalcLib;
 
 public class Cell(Sheet? sheet) {
-    private string? _customFormatString;
     private string _content = string.Empty;
+    private string? _customFormatString;
 
     /// <summary>
     /// Empty constructor
@@ -48,6 +48,7 @@ public class Cell(Sheet? sheet) {
         Location = other.Location;
         Format = other.Format;
         CustomFormat = other.CustomFormat;
+        CustomFormatString = other.CustomFormatString;
         Align = other.Align;
         Decimal = other.Decimal;
         Style = new CellStyle(sheet, other.Style);
@@ -90,6 +91,10 @@ public class Cell(Sheet? sheet) {
             }
             if (double.TryParse(value.StringValue, out double doubleValue)) {
                 ComputedValue = new Variant(doubleValue);
+                return;
+            }
+            if (value.StringValue == "") {
+                ComputedValue = new Variant();
                 return;
             }
             ComputedValue = value;
@@ -150,6 +155,18 @@ public class Cell(Sheet? sheet) {
             }
         }
     }
+
+    /// <summary>
+    /// Return the AnsiAlignment that maps to the cell alignment.
+    /// </summary>
+    internal AnsiAlignment AnsiAlignment =>
+        Alignment switch {
+            CellAlignment.LEFT => AnsiAlignment.LEFT,
+            CellAlignment.RIGHT => AnsiAlignment.RIGHT,
+            CellAlignment.CENTRE => AnsiAlignment.CENTRE,
+            CellAlignment.GENERAL => Value.IsNumber ? AnsiAlignment.RIGHT : AnsiAlignment.LEFT,
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
     /// <summary>
     /// Cell text style
@@ -289,6 +306,7 @@ public class Cell(Sheet? sheet) {
     public void CopyFrom(Cell other) {
         CellFormat = other.CellFormat;
         CustomFormat = other.CustomFormat;
+        CustomFormatString = other.CustomFormatString;
         Alignment = other.Alignment;
         DecimalPlaces = other.DecimalPlaces;
         Style = other.Style;
@@ -380,10 +398,60 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Return the formatted contents of the cell for display. If includeSpilled
+    /// is True and this cell is empty then the contents include any spilled cells
+    /// to the left.
+    /// </summary>
+    /// <param name="width">Column width to use</param>
+    /// <param name="includeSpilled">True if we include spilled cells</param>
+    /// <returns>AnsiTextSpan for cell</returns>
+    public AnsiTextSpan Text(int width, bool includeSpilled) {
+        string cellText = Text(width);
+        Cell thisCell = this;
+        AnsiAlignment alignment = AnsiAlignment;
+        if (includeSpilled && IsEmptyCell && sheet != null) {
+            int column = Location.Column;
+            Cell? leftCell = null;
+            while (column >= 1) {
+                leftCell = sheet.GetCell(column, Location.Row, false);
+                if (!leftCell.IsEmptyCell) {
+                    break;
+                }
+                column--;
+            }
+            if (column > 0) {
+                int leftCellWidth = sheet.ColumnWidth(column);
+                if (leftCell is { Value.IsNumber: false } && leftCell.Value.StringValue.Length > leftCellWidth) {
+                    int leftCellLength = leftCell.Value.StringValue.Length;
+                    string leftCellText = leftCell.Text(leftCellLength);
+                    int index = leftCellWidth;
+                    while (++column < Location.Column) {
+                        index += sheet.ColumnWidth(column);
+                    }
+                    if (index < leftCellLength) {
+                        cellText = Utilities.SpanBound(leftCellText, index, sheet.ColumnWidth(column));
+                        alignment = AnsiAlignment.NONE;
+                        thisCell = leftCell;
+                    }
+                }
+            }
+        }
+        return new AnsiTextSpan(cellText) {
+            ForegroundColour = thisCell.Style.ForegroundColour,
+            BackgroundColour = thisCell.Style.BackgroundColour,
+            Alignment = alignment,
+            Width = width,
+            Bold = thisCell.Style.Bold,
+            Italic = thisCell.Style.Italic,
+            Underline = thisCell.Style.Underline
+        };
+    }
+
+    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>
-    /// <returns>String value of cell</returns>
+    /// <returns>String contents of cell</returns>
     public string Text(int width) {
         Debug.Assert(width >= 0);
         string cellValue;
@@ -440,13 +508,15 @@ public class Cell(Sheet? sheet) {
     /// </summary>
     /// <param name="width">Column width to use</param>
     /// <returns>AnsiTextSpan</returns>
-    public AnsiText.AnsiTextSpan AnsiTextSpan(int width) {
-        return new AnsiText.AnsiTextSpan(Text(width)) {
+    public AnsiTextSpan AnsiTextSpan(int width) {
+        return new AnsiTextSpan(Text(width)) {
             ForegroundColour = Style.ForegroundColour,
             BackgroundColour = Style.BackgroundColour,
             Bold = Style.Bold,
             Italic = Style.Italic,
-            Underline = Style.Underline
+            Underline = Style.Underline,
+            Alignment = AnsiAlignment,
+            Width = width
         };
     }
 
@@ -489,7 +559,7 @@ public class Cell(Sheet? sheet) {
             formulaTree = null;
             return false;
         }
-        FormulaParser parser = new FormulaParser(formula[1..], location);
+        FormulaParser parser = new(formula[1..], location);
         formulaTree = parser.Parse();
         return true;
     }
@@ -499,8 +569,10 @@ public class Cell(Sheet? sheet) {
     /// value and returns true. Otherwise, it returns the value unchanged and returns false.
     /// </summary>
     /// <param name="value">Value to parse</param>
-    /// <param name="dateValue">Set to the date serial number if the value parses successfully
-    /// as a date, or is set to the input value otherwise</param>
+    /// <param name="dateValue">
+    /// Set to the date serial number if the value parses successfully
+    /// as a date, or is set to the input value otherwise
+    /// </param>
     /// <returns>True if the value is successfully parsed as a date, false otherwise</returns>
     private static bool TryParseDate(string value, out Variant dateValue) {
         CultureInfo culture = CultureInfo.CurrentCulture;
@@ -526,8 +598,10 @@ public class Cell(Sheet? sheet) {
     /// value and returns true. Otherwise, it returns the value unchanged and returns false.
     /// </summary>
     /// <param name="value">Value to parse</param>
-    /// <param name="timeValue">Set to the time serial number if the value parses successfully
-    /// as a time, or is set to the input value otherwise</param>
+    /// <param name="timeValue">
+    /// Set to the time serial number if the value parses successfully
+    /// as a time, or is set to the input value otherwise
+    /// </param>
     /// <returns>True if the value is successfully parsed as a time, false otherwise</returns>
     private static bool TryParseTime(string value, out Variant timeValue) {
         CultureInfo culture = CultureInfo.CurrentCulture;

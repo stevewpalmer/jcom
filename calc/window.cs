@@ -56,6 +56,11 @@ public class Window {
     public Sheet Sheet { get; }
 
     /// <summary>
+    /// Extent of area invalidated.
+    /// </summary>
+    private RExtent InvalidateExtent { get; set; } = new();
+
+    /// <summary>
     /// Set the viewport and sheet bounds for the window.
     /// </summary>
     /// <param name="x">Left edge, 0 based</param>
@@ -81,6 +86,7 @@ public class Window {
             flags |= RenderHint.CONTENTS;
         }
         if (flags.HasFlag(RenderHint.CONTENTS)) {
+            InvalidateExtent.Clear();
             Render();
         }
     }
@@ -152,20 +158,24 @@ public class Window {
     private RenderHint ApplyRenderHint(RenderHint flags) {
         if (flags.HasFlag(RenderHint.RECALCULATE)) {
             IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
-            if (!flags.HasFlag(RenderHint.CONTENTS)) {
-                UpdateCells(cellsToUpdate);
-            }
+            UpdateCells(cellsToUpdate);
             Sheet.NeedRecalculate = false;
+            flags |= RenderHint.CONTENTS;
             flags &= ~RenderHint.RECALCULATE;
+        }
+        if (flags.HasFlag(RenderHint.BLOCK)) {
+            if (_isMarkMode) {
+                InvalidateExtent = new RExtent()
+                    .Add(_markAnchor)
+                    .Add(Sheet.Location.Point)
+                    .Add(_lastMarkPoint);
+                flags |= RenderHint.CONTENTS;
+            }
+            flags &= ~RenderHint.BLOCK;
         }
         if (flags.HasFlag(RenderHint.CONTENTS)) {
             Render();
-            flags &= ~RenderHint.CONTENTS | RenderHint.BLOCK;
-            flags |= RenderHint.CURSOR_STATUS;
-        }
-        if (flags.HasFlag(RenderHint.BLOCK)) {
-            RenderBlock();
-            flags &= ~RenderHint.BLOCK;
+            flags &= ~RenderHint.CONTENTS;
             flags |= RenderHint.CURSOR_STATUS;
         }
         if (flags.HasFlag(RenderHint.CURSOR)) {
@@ -229,10 +239,16 @@ public class Window {
     private void Render() {
         Point cursorPosition = Terminal.GetCursor();
 
-        RExtent renderExtent = new RExtent()
-            .Add(new Point(1, _scrollOffset.Y + 1))
-            .Add(new Point(_sheetBounds.Width, _scrollOffset.Y + _sheetBounds.Height));
-        RExtent markExtent = new RExtent();
+        RExtent renderExtent;
+        if (InvalidateExtent.Valid) {
+            renderExtent = InvalidateExtent;
+        }
+        else {
+            renderExtent = new RExtent()
+                .Add(new Point(1, _scrollOffset.Y + 1))
+                .Add(new Point(_sheetBounds.Width, _scrollOffset.Y + _sheetBounds.Height));
+        }
+        RExtent markExtent = new();
         if (_isMarkMode) {
             markExtent
                 .Add(_markAnchor)
@@ -240,7 +256,7 @@ public class Window {
         }
 
         int i = renderExtent.Start.Y;
-        int y = _sheetBounds.Top;
+        int y = GetYPositionOfCell(i);
         while (i <= renderExtent.End.Y) {
             AnsiText line = Sheet.GetRow(_scrollOffset.X + 1, i, _sheetBounds.Width);
             int x = _sheetBounds.Left;
@@ -266,6 +282,7 @@ public class Window {
             ++i;
             ++y;
         }
+        InvalidateExtent.Clear();
         PlaceCursor();
         Terminal.SetCursor(cursorPosition.X, cursorPosition.Y);
     }
@@ -288,66 +305,22 @@ public class Window {
     /// original marked block area.
     /// </summary>
     private void ClearBlock() {
-        if (_isMarkMode) {
-            RExtent extent = GetMarkExtent();
-            _isMarkMode = false;
-            RenderExtent(extent);
-        }
-    }
-
-    /// <summary>
-    /// Render the area covered by the mark including any area
-    /// uncovered as indicated by the _lastMarkPoint anchor.
-    /// </summary>
-    private void RenderBlock() {
-        RExtent extent = new RExtent()
-            .Add(_markAnchor)
-            .Add(Sheet.Location.Point)
-            .Add(_lastMarkPoint);
-        RenderExtent(extent);
-    }
-
-    /// <summary>
-    /// Render the area of the window specified by the extent
-    /// which indicates the top left and bottom right portion
-    /// of the sheet to be rendered.
-    /// </summary>
-    /// <param name="extent">Extent to be rendered</param>
-    private void RenderExtent(RExtent extent) {
-        RExtent markExtent = new RExtent();
-        if (_isMarkMode) {
-            markExtent
-                .Add(_markAnchor)
-                .Add(Sheet.Location.Point);
-        }
-        for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
-            for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                CellLocation location = new CellLocation { Column = column, Row = row };
-                int x = GetXPositionOfCell(location.Column);
-                int y = GetYPositionOfCell(location.Row);
-                if (_sheetBounds.Contains(x, y)) {
-                    Cell cell = Sheet.GetCell(location, false);
-                    bool inMarked = markExtent.Contains(new Point(column, row));
-                    int fg = inMarked ? Screen.Colours.BackgroundColour : cell.Style.ForegroundColour;
-                    int bg = inMarked ? Screen.Colours.SelectionColour : cell.Style.BackgroundColour;
-                    DrawCell(cell, x, y, fg, bg);
-                }
-            }
-        }
+        InvalidateExtent = GetMarkExtent();
+        _isMarkMode = false;
     }
 
     /// <summary>
     /// Draw the cursor
     /// </summary>
     private void PlaceCursor() {
-        ShowCell(Sheet.Location, Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
+        UpdateActiveCell(Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
     }
 
     /// <summary>
     /// Clear the cursor.
     /// </summary>
     private void ResetCursor() {
-        ShowCell(Sheet.Location, Sheet.ActiveCell.Style.ForegroundColour, Sheet.ActiveCell.Style.BackgroundColour);
+        UpdateActiveCell(Sheet.ActiveCell.Style.ForegroundColour, Sheet.ActiveCell.Style.BackgroundColour);
     }
 
     /// <summary>
@@ -362,18 +335,6 @@ public class Window {
                 yield return new CellLocation { Column = column, Row = row };
             }
         }
-    }
-
-    /// <summary>
-    /// Draw the cell at the specified column and row in the given foreground and
-    /// background colours
-    /// </summary>
-    /// <param name="location">Cell location</param>
-    /// <param name="fg">Foreground colour</param>
-    /// <param name="bg">Background colour</param>
-    private void ShowCell(CellLocation location, int fg, int bg) {
-        Cell cell = Sheet.GetCell(location, false);
-        DrawCell(cell, GetXPositionOfCell(location.Column), GetYPositionOfCell(location.Row), fg, bg);
     }
 
     /// <summary>
@@ -438,7 +399,7 @@ public class Window {
             }
         }
         ClearBlock();
-        return RenderHint.CURSOR;
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>
@@ -447,7 +408,7 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint Paste() {
         RenderHint flags = RenderHint.NONE;
-        Cell [] cellsToPaste = Clipboard.Data;
+        Cell[] cellsToPaste = Clipboard.Data;
         if (cellsToPaste.Length > 0) {
             CellLocation current = Sheet.Location;
 
@@ -456,7 +417,7 @@ public class Window {
                 cell.CopyFrom(cellToPaste);
                 ++current.Row;
             }
-            flags = RenderHint.RECALCULATE | RenderHint.CONTENTS;
+            flags = RenderHint.RECALCULATE;
         }
         return flags;
     }
@@ -651,12 +612,12 @@ public class Window {
             try {
                 using FileStream stream = File.Create(inputValue);
                 using StreamWriter textStream = new(stream);
-                using CsvWriter csvWriter = new CsvWriter(textStream, CultureInfo.InvariantCulture);
+                using CsvWriter csvWriter = new(textStream, CultureInfo.InvariantCulture);
 
                 if (extent.Valid) {
                     for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
                         for (int column = extent.Start.X; column <= extent.End.X; column++) {
-                            Cell cell = Sheet.GetCell(new CellLocation { Column = column, Row = row }, false);
+                            Cell cell = Sheet.GetCell(column, row, false);
                             csvWriter.WriteField(cell.Value);
                         }
                         csvWriter.NextRecord();
@@ -794,12 +755,9 @@ public class Window {
         if (result != CellInputResponse.CANCEL) {
             try {
                 cell.Content = cellValue;
-
-                IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
                 UpdateCells([cell]);
-                UpdateCells(cellsToUpdate);
 
-                hint = result switch {
+                hint = RenderHint.RECALCULATE | result switch {
                     CellInputResponse.ACCEPT => RenderHint.CURSOR,
                     CellInputResponse.ACCEPT_UP => CursorUp(),
                     CellInputResponse.ACCEPT_DOWN => CursorDown(),
@@ -821,40 +779,34 @@ public class Window {
     /// <param name="cells">List of cells to update</param>
     private void UpdateCells(IEnumerable<Cell> cells) {
         foreach (Cell cell in cells) {
-            int x = GetXPositionOfCell(cell.Location.Column);
-            int y = GetYPositionOfCell(cell.Location.Row);
-            if (_sheetBounds.Contains(new Point(x, y))) {
-                DrawCell(cell, x, y, cell.Style.ForegroundColour, cell.Style.BackgroundColour);
-            }
+            InvalidateExtent.Add(cell.Location.Point);
         }
     }
 
     /// <summary>
-    /// Draw this cell at the given cell position (1-based row and column) at
-    /// the given physical screen offset where (0,0) is the top left corner.
+    /// Update the current cell.
     /// </summary>
-    /// <param name="cell">Cell to draw</param>
-    /// <param name="x">X position of cell</param>
-    /// <param name="y">Y position of cell</param>
     /// <param name="fg">Foreground colour</param>
     /// <param name="bg">Background colour</param>
-    private void DrawCell(Cell cell, int x, int y, int fg, int bg) {
-        int width = Sheet.ColumnWidth(cell.Location.Column);
-        if (x + width > _sheetBounds.Right) {
-            width = _sheetBounds.Right - x;
-            if (width <= 0) {
-                return;
+    private void UpdateActiveCell(int fg, int bg) {
+        Cell cell = Sheet.ActiveCell;
+        int x = GetXPositionOfCell(cell.Location.Column);
+        int y = GetYPositionOfCell(cell.Location.Row);
+        if (_sheetBounds.Contains(x, y)) {
+            int width = Sheet.ColumnWidth(cell.Location.Column);
+            if (x + width > _sheetBounds.Right) {
+                width = _sheetBounds.Right - x;
+                if (width <= 0) {
+                    return;
+                }
             }
+            AnsiTextSpan cellText = cell.Text(width, true);
+            Terminal.SetCursor(x, y);
+            Terminal.Write(new AnsiTextSpan(cellText) {
+                ForegroundColour = fg,
+                BackgroundColour = bg
+            }.EscapedText());
         }
-        string cellText = cell.Text(width)[..width];
-        Terminal.SetCursor(x, y);
-        Terminal.Write(new AnsiText.AnsiTextSpan(cellText) {
-            ForegroundColour = fg,
-            BackgroundColour = bg,
-            Bold = cell.Style.Bold,
-            Italic = cell.Style.Italic,
-            Underline = cell.Style.Underline
-        }.EscapedString());
     }
 
     /// <summary>
@@ -866,7 +818,7 @@ public class Window {
         RenderHint flags;
         if (_isMarkMode) {
             ClearBlock();
-            flags = RenderHint.CURSOR;
+            flags = RenderHint.CONTENTS;
         }
         else {
             _markAnchor = Sheet.Location.Point;
@@ -1086,7 +1038,7 @@ public class Window {
         if (Screen.Command.PromptForInput(formFields)) {
             string newAddress = formFields[0].Value.StringValue;
             try {
-                CellLocation location = new CellLocation(newAddress);
+                CellLocation location = new(newAddress);
                 ResetCursor();
                 Sheet.Location = location;
                 flags = SyncRowColumnToSheet();

@@ -379,7 +379,7 @@ public static class Screen {
                     string[]? fields = parser.Record;
                     if (fields != null) {
                         for (int column = 1; column <= fields.Length; column++) {
-                            Cell cell = sheet.GetCell(new CellLocation { Column = column, Row = row }, true);
+                            Cell cell = sheet.GetCell(column, row, true);
                             cell.Content = fields[column - 1];
                         }
                     }

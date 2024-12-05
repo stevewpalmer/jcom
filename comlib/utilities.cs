@@ -62,6 +62,13 @@ public static class Utilities {
     }
 
     /// <summary>
+    /// Allocate an empty string of the given length.
+    /// </summary>
+    /// <param name="length">Length of string to be allocated</param>
+    /// <returns>A string filled with spaces up to the given length</returns>
+    public static string EmptyString(int length) => new(' ', length);
+
+    /// <summary>
     /// Return a section of the specified string starting from the given index
     /// and for the specified length. If the index and length are outside the
     /// string range, we return an empty string.

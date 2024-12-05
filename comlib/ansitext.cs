@@ -23,48 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Text;
-
 namespace JComLib;
-
-/// <summary>
-/// Ansi colour codes. Add 10 for the background code.
-/// </summary>
-public static class AnsiColour {
-    public const int Black = 30;
-    public const int Red = 31;
-    public const int Green = 32;
-    public const int Yellow = 33;
-    public const int Blue = 34;
-    public const int Magenta = 35;
-    public const int Cyan = 36;
-    public const int White = 37;
-    public const int Gray = 90;
-    public const int BrightRed = 91;
-    public const int BrightGreen = 92;
-    public const int BrightYellow = 93;
-    public const int BrightBlue = 94;
-    public const int BrightMagenta = 95;
-    public const int BrightCyan = 96;
-    public const int BrightWhite = 97;
-}
-
-public static class AnsiExtensions {
-
-    /// <summary>
-    /// Return a string to be rendered to an Ansi console with the specified
-    /// colours.
-    /// </summary>
-    /// <param name="str">Input string</param>
-    /// <param name="fg">Ansi foreground colour</param>
-    /// <param name="bg">Ansi background colour</param>
-    /// <returns>String with Ansi escape sequences</returns>
-    public static string AnsiColour(this string str, int fg, int bg) =>
-        new AnsiText.AnsiTextSpan(str) {
-            ForegroundColour = fg,
-            BackgroundColour = bg
-        }.EscapedString();
-}
 
 public class AnsiText {
 
@@ -83,12 +42,17 @@ public class AnsiText {
     /// <summary>
     /// Length of the rendered text
     /// </summary>
-    public int Length => Spans.Sum(span => span.Text.Length);
+    public int Length => Spans.Sum(span => span.Length);
 
     /// <summary>
-    /// Return the raw Ansi text
+    /// Return the raw text
     /// </summary>
     public string Text => string.Join("", Spans.Select(span => span.Text));
+
+    /// <summary>
+    /// Return the Ansi text
+    /// </summary>
+    public string EscapedText => string.Join("", Spans.Select(span => span.EscapedText()));
 
     /// <summary>
     /// Return a substring of an AnsiText string starting from start
@@ -104,16 +68,17 @@ public class AnsiText {
         int spanIndex = 0;
         List<AnsiTextSpan> spans = [];
         while (spanIndex < Spans.Count && Spans[spanIndex].Text.Length <= start) {
-            start -= Spans[spanIndex++].Text.Length;
+            start -= Spans[spanIndex++].Length;
         }
         while (spanIndex < Spans.Count && length > 0) {
             int textLength = Spans[spanIndex].Text.Length;
             int spanWidth = Math.Min(Math.Min(textLength, length), textLength - start);
             AnsiTextSpan co = new(Spans[spanIndex]) {
-                Text = Spans[spanIndex].Text.Substring(start, spanWidth)
+                Text = Spans[spanIndex].Text.Substring(start, spanWidth),
+                Width = Math.Min(Spans[spanIndex].Width, length)
             };
             spans.Add(co);
-            length -= spanWidth;
+            length -= co.Length;
             start = 0;
             spanIndex++;
         }
@@ -140,10 +105,10 @@ public class AnsiText {
             newSpans.AddRange(preStyle.Spans);
         }
         if (newStyle.Length > 0) {
-            newSpans.Add(new AnsiTextSpan(newStyle.Text) {
+            newSpans.AddRange(newStyle.Spans.Select(n => new AnsiTextSpan(n) {
                 ForegroundColour = fg,
                 BackgroundColour = bg
-            });
+            }));
         }
         if (postStyle.Length > 0) {
             newSpans.AddRange(postStyle.Spans);
@@ -151,81 +116,4 @@ public class AnsiText {
         Spans = newSpans;
     }
 
-    public class AnsiTextSpan(string text) {
-
-        // Control Sequence Introducer
-        private const string CSI = @"[";
-
-        /// <summary>
-        /// Copy constructor
-        /// </summary>
-        /// <param name="other">AnsiTextSpan to copy</param>
-        public AnsiTextSpan(AnsiTextSpan other) : this(other.Text) {
-            ForegroundColour = other.ForegroundColour;
-            BackgroundColour = other.BackgroundColour;
-            Bold = other.Bold;
-            Italic = other.Italic;
-            Underline = other.Underline;
-        }
-
-        /// <summary>
-        /// Control sequence
-        /// </summary>
-        public string CS {
-            get {
-                StringBuilder cs = new();
-                if (ForegroundColour.HasValue && BackgroundColour.HasValue) {
-                    cs.Append($"{CSI}{ForegroundColour};{BackgroundColour+10}m");
-                }
-                if (Bold) {
-                    cs.Append($"{CSI}1m");
-                }
-                if (Italic) {
-                    cs.Append($"{CSI}3m");
-                }
-                if (Underline) {
-                    cs.Append($"{CSI}4m");
-                }
-                return cs.ToString();
-            }
-        }
-
-        /// <summary>
-        /// Foreground colour
-        /// </summary>
-        public int? ForegroundColour { get; init; } = AnsiColour.BrightWhite;
-
-        /// <summary>
-        /// Background colour
-        /// </summary>
-        public int? BackgroundColour { get; init; } = AnsiColour.Black;
-
-        /// <summary>
-        /// Specifies boldface text
-        /// </summary>
-        public bool Bold { get; init; }
-
-        /// <summary>
-        /// Specifies italic text
-        /// </summary>
-        public bool Italic { get; init; }
-
-        /// <summary>
-        /// Specifies Underlined text
-        /// </summary>
-        public bool Underline { get; init; }
-
-        /// <summary>
-        /// Raw text string
-        /// </summary>
-        public string Text { get; init; } = text;
-
-        /// <summary>
-        /// Returns the text span with all escape sequences applied.
-        /// </summary>
-        /// <returns>Escaped string</returns>
-        public string EscapedString() {
-            return $"{CS}{Text}{CSI}0m";
-        }
-    }
 }

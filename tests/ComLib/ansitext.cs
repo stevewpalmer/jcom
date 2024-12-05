@@ -24,12 +24,14 @@
 // under the License.
 
 using System;
+using JCalcLib;
 using JComLib;
 using NUnit.Framework;
 
 namespace ComLibTests;
 
 public class TestANSIText {
+    private const string CSI = @"[";
 
     // Verify the AnsiColour enum values
     [Test]
@@ -56,12 +58,12 @@ public class TestANSIText {
     [Test]
     public void TestPlainString() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD")
+            new AnsiTextSpan("HELLO WORLD")
         ]);
         Assert.IsTrue(ansi.Spans.Count == 1);
         Assert.AreEqual("HELLO WORLD", ansi.Spans[0].Text);
         Assert.AreEqual("HELLO WORLD", ansi.Text);
-        Assert.AreEqual("\u001b[97;40m", ansi.Spans[0].CS);
+        Assert.AreEqual($"{CSI}97;40m", ansi.Spans[0].CS);
     }
 
     // Test creating an ANSI text string with the foreground colour
@@ -69,7 +71,7 @@ public class TestANSIText {
     [Test]
     public void TestInitialString() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD") {
+            new AnsiTextSpan("HELLO WORLD") {
                 ForegroundColour = AnsiColour.Red,
                 BackgroundColour = AnsiColour.Cyan
             }
@@ -77,7 +79,7 @@ public class TestANSIText {
         Assert.IsTrue(ansi.Spans.Count == 1);
         Assert.AreEqual("HELLO WORLD", ansi.Spans[0].Text);
         Assert.AreEqual("HELLO WORLD", ansi.Text);
-        Assert.AreEqual("\u001b[31;46m", ansi.Spans[0].CS);
+        Assert.AreEqual($"{CSI}31;46m", ansi.Spans[0].CS);
     }
 
     // Test parsing a text string with the ANSI colour escape sequence that
@@ -85,8 +87,8 @@ public class TestANSIText {
     [Test]
     public void TestEmbeddedSequence() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Red,
                 BackgroundColour = AnsiColour.Green
             }
@@ -94,9 +96,9 @@ public class TestANSIText {
 
         Assert.IsTrue(ansi.Spans.Count == 2);
         Assert.AreEqual("HELLO ", ansi.Spans[0].Text);
-        Assert.AreEqual("\u001b[97;40m", ansi.Spans[0].CS);
+        Assert.AreEqual($"{CSI}97;40m", ansi.Spans[0].CS);
         Assert.AreEqual("WORLD", ansi.Spans[1].Text);
-        Assert.AreEqual("\u001b[31;42m", ansi.Spans[1].CS);
+        Assert.AreEqual($"{CSI}31;42m", ansi.Spans[1].CS);
         Assert.AreEqual("HELLO WORLD", ansi.Text);
     }
 
@@ -105,13 +107,13 @@ public class TestANSIText {
     [Test]
     public void TestMultipleSequences() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
@@ -119,13 +121,13 @@ public class TestANSIText {
 
         Assert.IsTrue(ansi.Spans.Count == 4);
         Assert.AreEqual("HELLO ", ansi.Spans[0].Text);
-        Assert.AreEqual("\u001b[97;40m", ansi.Spans[0].CS);
+        Assert.AreEqual($"{CSI}97;40m", ansi.Spans[0].CS);
         Assert.AreEqual("WORLD", ansi.Spans[1].Text);
-        Assert.AreEqual("\u001b[33;46m", ansi.Spans[1].CS);
+        Assert.AreEqual($"{CSI}33;46m", ansi.Spans[1].CS);
         Assert.AreEqual(" WELCOME TO LAS ", ansi.Spans[2].Text);
-        Assert.AreEqual("\u001b[97;40m", ansi.Spans[2].CS);
+        Assert.AreEqual($"{CSI}97;40m", ansi.Spans[2].CS);
         Assert.AreEqual("VEGAS", ansi.Spans[3].Text);
-        Assert.AreEqual("\u001b[34;45m", ansi.Spans[3].CS);
+        Assert.AreEqual($"{CSI}34;45m", ansi.Spans[3].CS);
         Assert.AreEqual("HELLO WORLD WELCOME TO LAS VEGAS", ansi.Text);
     }
 
@@ -133,40 +135,97 @@ public class TestANSIText {
     [Test]
     public void TestLength() {
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
         ]);
         Assert.AreEqual(32, ansi.Length);
-        Assert.AreEqual(0, new AnsiText(Array.Empty<AnsiText.AnsiTextSpan>()).Length);
+        Assert.AreEqual(0, new AnsiText(Array.Empty<AnsiTextSpan>()).Length);
+    }
+
+    // Test alignments
+    [Test]
+    public void TestAlignments() {
+        Cell leftCell = new Cell { Alignment = CellAlignment.LEFT };
+        Cell rightCell = new Cell { Alignment = CellAlignment.RIGHT };
+        Cell centreCell = new Cell { Alignment = CellAlignment.CENTRE };
+        Cell generalCell = new Cell { Value = new Variant(12), Alignment = CellAlignment.GENERAL };
+        Cell generalTextCell = new Cell { Value = new Variant("MOUSE"), Alignment = CellAlignment.GENERAL };
+
+        Assert.Throws(typeof(ArgumentOutOfRangeException), delegate { _ = new Cell { Alignment = (CellAlignment)10 }.AnsiAlignment; });
+
+        Assert.AreEqual(AnsiAlignment.LEFT, leftCell.AnsiAlignment);
+        Assert.AreEqual(AnsiAlignment.RIGHT, rightCell.AnsiAlignment);
+        Assert.AreEqual(AnsiAlignment.CENTRE, centreCell.AnsiAlignment);
+        Assert.AreEqual(AnsiAlignment.RIGHT, generalCell.AnsiAlignment);
+        Assert.AreEqual(AnsiAlignment.LEFT, generalTextCell.AnsiAlignment);
+
+        AnsiText none = new AnsiText([
+            new AnsiTextSpan("  PRETTY EASY  ") {
+                Width = 30,
+                Alignment = AnsiAlignment.NONE
+            }
+        ]);
+        Assert.AreEqual(30, none.Length);
+        Assert.AreEqual($"{CSI}97;40m  PRETTY EASY  {CSI}0m{CSI}97;40m               {CSI}0m", none.EscapedText);
+
+        AnsiText simple = new AnsiText([
+            new AnsiTextSpan("HELLO") {
+                Width = 10,
+                Alignment = AnsiAlignment.LEFT
+            },
+            new AnsiTextSpan("WORLD!") {
+                Width = 10,
+                Alignment = AnsiAlignment.RIGHT
+            }
+        ]);
+        Assert.AreEqual($"{CSI}97;40mHELLO{CSI}0m{CSI}97;40m     {CSI}0m{CSI}97;40m    {CSI}0m{CSI}97;40mWORLD!{CSI}0m", simple.EscapedText);
+
+        AnsiText centered = new AnsiText([
+            new AnsiTextSpan("Centre") {
+                Width = 11,
+                Alignment = AnsiAlignment.CENTRE
+            }
+        ]);
+        Assert.AreEqual($"{CSI}97;40m   {CSI}0m{CSI}97;40mCentre{CSI}0m{CSI}97;40m  {CSI}0m", centered.EscapedText);
     }
 
     // Test substring extraction
     [Test]
     public void TestSubstring() {
         AnsiText simple = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD!")
+            new AnsiTextSpan("HELLO WORLD!")
         ]);
         Assert.AreEqual("LO WO", simple.Substring(3, 5).Text);
         Assert.AreEqual("WORLD!", simple.Substring(6, 20).Text);
         Assert.AreEqual("", simple.Substring(12, 20).Text);
         Assert.AreEqual("", simple.Substring(0, 0).Text);
 
+        AnsiText longer = new AnsiText([
+            new AnsiTextSpan("HELLO WORLD!") {
+                ForegroundColour = AnsiColour.Blue,
+                BackgroundColour = AnsiColour.Magenta
+            }
+        ]).Substring(3, 5);
+        Assert.AreEqual("LO WO", longer.Spans[0].Text);
+        Assert.AreEqual(AnsiColour.Blue, longer.Spans[0].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Magenta, longer.Spans[0].BackgroundColour);
+
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
@@ -177,40 +236,52 @@ public class TestANSIText {
         Assert.AreEqual(2, ansi.Substring(6, 6).Spans.Count);
         Assert.AreEqual("VEGAS", ansi.Substring(27, 10).Text);
         Assert.AreEqual(1, ansi.Substring(27, 10).Spans.Count);
+
+        AnsiText ansi2 = ansi.Substring(9, 10);
+        Assert.AreEqual(2, ansi2.Spans.Count);
+        Assert.AreEqual("LD", ansi2.Spans[0].Text);
+        Assert.AreEqual(AnsiColour.Yellow, ansi2.Spans[0].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Cyan, ansi2.Spans[0].BackgroundColour);
+        Assert.AreEqual(" WELCOME", ansi2.Spans[1].Text);
+        Assert.AreEqual(AnsiColour.BrightWhite, ansi2.Spans[1].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Black, ansi2.Spans[1].BackgroundColour);
     }
 
     // Test changing the style of a portion of an AnsiText
     [Test]
     public void TestStyle() {
         AnsiText simple = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO WORLD!")
+            new AnsiTextSpan("HELLO WORLD!")
         ]);
         simple.Style(0, 5, AnsiColour.Cyan, AnsiColour.Green);
         Assert.AreEqual(2, simple.Spans.Count);
-        Assert.AreEqual("\u001b[36;42m", simple.Spans[0].CS);
+        Assert.AreEqual($"{CSI}36;42m", simple.Spans[0].CS);
         Assert.AreEqual(" WORLD!", simple.Spans[1].Text);
-        Assert.AreEqual("\u001b[97;40m", simple.Spans[1].CS);
+        Assert.AreEqual($"{CSI}97;40m", simple.Spans[1].CS);
 
         AnsiText ansi = new AnsiText([
-            new AnsiText.AnsiTextSpan("HELLO "),
-            new AnsiText.AnsiTextSpan("WORLD") {
+            new AnsiTextSpan("HELLO "),
+            new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
                 BackgroundColour = AnsiColour.Cyan
             },
-            new AnsiText.AnsiTextSpan(" WELCOME TO LAS "),
-            new AnsiText.AnsiTextSpan("VEGAS") {
+            new AnsiTextSpan(" WELCOME TO LAS "),
+            new AnsiTextSpan("VEGAS") {
                 ForegroundColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.Magenta
             }
         ]);
         ansi.Style(8, 10, AnsiColour.Cyan, AnsiColour.Green);
-        Assert.AreEqual(5, ansi.Spans.Count);
+        Assert.AreEqual(6, ansi.Spans.Count);
         Assert.AreEqual("HELLO ", ansi.Spans[0].Text);
         Assert.AreEqual("WO", ansi.Spans[1].Text);
-        Assert.AreEqual("RLD WELCOM", ansi.Spans[2].Text);
+        Assert.AreEqual("RLD", ansi.Spans[2].Text);
         Assert.AreEqual(AnsiColour.Cyan, ansi.Spans[2].ForegroundColour);
         Assert.AreEqual(AnsiColour.Green, ansi.Spans[2].BackgroundColour);
-        Assert.AreEqual("E TO LAS ", ansi.Spans[3].Text);
-        Assert.AreEqual("VEGAS", ansi.Spans[4].Text);
+        Assert.AreEqual(" WELCOM", ansi.Spans[3].Text);
+        Assert.AreEqual(AnsiColour.Cyan, ansi.Spans[3].ForegroundColour);
+        Assert.AreEqual(AnsiColour.Green, ansi.Spans[3].BackgroundColour);
+        Assert.AreEqual("E TO LAS ", ansi.Spans[4].Text);
+        Assert.AreEqual("VEGAS", ansi.Spans[5].Text);
     }
 }

@@ -1,5 +1,5 @@
-// JCalcLib
-// A sparse list of cells
+// JComLib
+// ANSI text alignment
 //
 // Authors:
 //  Steve Palmer
@@ -23,37 +23,27 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Text.Json.Serialization;
-
 namespace JCalcLib;
 
-public class CellList {
+public enum AnsiAlignment {
 
     /// <summary>
-    /// Row or column 1-based index of cells
+    /// No alignment
     /// </summary>
-    public int Index { get; set; }
+    NONE,
 
     /// <summary>
-    /// List of cells in column
+    /// Left alignment
     /// </summary>
-    [JsonInclude]
-    public List<Cell> Cells { get; set; } = [];
+    LEFT,
 
     /// <summary>
-    /// List of non-empty cells in column
+    /// Right alignment
     /// </summary>
-    [JsonIgnore]
-    public List<Cell> NonEmptyCells => Cells.Where(c => !c.IsEmptyCell).ToList();
+    RIGHT,
 
     /// <summary>
-    /// Size of the row or column
+    /// Centered
     /// </summary>
-    public int Size { get; set; }
-
-    /// <summary>
-    /// Return all formula cells on this column
-    /// </summary>
-    [JsonIgnore]
-    public IEnumerable<Cell> FormulaCells => Cells.Where(c => c.HasFormula);
+    CENTRE
 }
