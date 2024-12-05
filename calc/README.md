@@ -1,9 +1,8 @@
 # Calc
 
 This folder contains the source files for a simple spreadsheet.
-This is currently a work in progress.
 
-<img width="750" alt="calc" src="https://github.com/user-attachments/assets/2fa1812d-99d5-41f6-a02f-2840a03d37f9">
+<img width="741" alt="Screenshot 2024-12-05 at 2 04 10 am" src="https://github.com/user-attachments/assets/29d884da-ceaf-4fa8-9fff-675d06731432">
 
 Run calc from the shell with the `calc` command. By default,
 this opens calc with an empty worksheet and a default filename.
