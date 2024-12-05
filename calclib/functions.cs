@@ -60,6 +60,21 @@ public static class Functions {
     }
 
     /// <summary>
+    /// Returns a serial number representing the specified time.
+    /// </summary>
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>A variant containing the serial number of the current date</returns>
+    public static Variant TIME(IEnumerable<Variant> arguments) {
+        Variant [] parts = arguments.ToArray();
+        if (parts.Length != 3) {
+            throw new ArgumentException("Arguments must have three parts");
+        }
+        DateTime oaBaseDate = DateTime.FromOADate(0);
+        TimeSpan ts = new TimeSpan(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
+        return new Variant(oaBaseDate.Add(ts).ToOADate());
+    }
+
+    /// <summary>
     /// Extract and return the year part of a date.
     /// </summary>
     /// <param name="arguments">Function parameters</param>

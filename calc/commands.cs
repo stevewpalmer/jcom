@@ -196,7 +196,10 @@ public static class Commands {
         new() {
             ID = CommandMapID.TIMES,
             Commands = [
-                new CommandMapEntry { Name = Calc.TimesHMSZ, CommandId = KeyCommand.KC_TIME_HMSZ, Description = Calc.TimesHMSZDescription }
+                new CommandMapEntry { Name = Calc.TimesHMSZ, CommandId = KeyCommand.KC_TIME_HMSZ, Description = Calc.TimesHMSZDescription },
+                new CommandMapEntry { Name = Calc.TimeHMZ, CommandId = KeyCommand.KC_TIME_HMZ, Description = Calc.TimeHMZDescription },
+                new CommandMapEntry { Name = Calc.TimeHMS, CommandId = KeyCommand.KC_TIME_HMS, Description = Calc.TimeHMSDescription },
+                new CommandMapEntry { Name = Calc.TimesHM, CommandId = KeyCommand.KC_TIME_HM, Description = Calc.TimesHMDescription }
             ]
         },
         new() {

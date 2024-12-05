@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -47,6 +48,34 @@ public class FunctionTests {
         cell4.Content = "=A1*(A2+A3)";
         sheet.Calculate();
         Assert.AreEqual(new Variant(5040), cell4.Value);
+    }
+
+    /// <summary>
+    /// Verify the TIME function
+    /// </summary>
+    [Test]
+    public void VerifyTime() {
+        Sheet sheet = new Sheet();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Content = "=TIME(12,40,30)";
+        cell1.CellFormat = CellFormat.TIME_HMS;
+        sheet.Calculate();
+        TimeOnly time = TimeOnly.Parse(cell1.Text(12));
+        Assert.AreEqual(new TimeOnly(12, 40, 30), time);
+    }
+
+    /// <summary>
+    /// Verify the NOW function
+    /// </summary>
+    [Test]
+    public void VerifyNow() {
+        Sheet sheet = new Sheet();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Content = "=NOW()";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        DateOnly time = DateOnly.Parse(cell1.Text(12));
+        Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), time);
     }
 
     /// <summary>

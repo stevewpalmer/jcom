@@ -48,6 +48,7 @@ internal class CellNode(TokenID tokenID) {
         { TokenID.KTODAY, "TODAY" },
         { TokenID.KYEAR, "YEAR" },
         { TokenID.KMONTH, "MONTH" },
+        { TokenID.KTIME, "TIME" },
         { TokenID.KCONCATENATE, "CONCATENATE" }
     };
 
@@ -310,20 +311,21 @@ internal class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : Ce
     /// <param name="context">Source cell containing the original formula</param>
     /// <returns>The variant result from the function</returns>
     public override Variant Evaluate(CalculationContext context) {
-        double left = Left.Evaluate(context).DoubleValue;
-        double right = Right.Evaluate(context).DoubleValue;
+        Variant left = Left.Evaluate(context);
+        Variant right = Right.Evaluate(context);
         return Op switch {
             TokenID.PLUS => new Variant(left + right),
             TokenID.MINUS => new Variant(left - right),
             TokenID.MULTIPLY => new Variant(left * right),
             TokenID.DIVIDE => new Variant(left / right),
-            TokenID.EXP => new Variant(Math.Pow(left, right)),
-            TokenID.KEQ => new Variant(Math.Abs(left - right) < 0.01),
-            TokenID.KNE => new Variant(Math.Abs(left - right) > 0.01),
-            TokenID.KGE => new Variant(left >= right),
-            TokenID.KGT => new Variant(left > right),
-            TokenID.KLE => new Variant(left <= right),
-            TokenID.KLT => new Variant(left < right),
+            TokenID.EXP => new Variant(Math.Pow(left.DoubleValue, right.DoubleValue)),
+            TokenID.KEQ => new Variant(Math.Abs(left.DoubleValue - right.DoubleValue) < 0.01),
+            TokenID.KNE => new Variant(Math.Abs(left.DoubleValue - right.DoubleValue) > 0.01),
+            TokenID.KGE => new Variant(left.DoubleValue >= right.DoubleValue),
+            TokenID.KGT => new Variant(left.DoubleValue > right.DoubleValue),
+            TokenID.KLE => new Variant(left.DoubleValue <= right.DoubleValue),
+            TokenID.KLT => new Variant(left.DoubleValue < right.DoubleValue),
+            TokenID.CONCAT => new Variant(left.StringValue + right.StringValue),
             _ => throw new NotImplementedException("Unknown binary operator")
         };
     }
