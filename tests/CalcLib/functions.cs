@@ -37,7 +37,7 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyExpression() {
-        Sheet sheet = new Sheet();
+        Sheet sheet = new();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -55,7 +55,7 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyTime() {
-        Sheet sheet = new Sheet();
+        Sheet sheet = new();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=TIME(12,40,30)";
         cell1.CellFormat = CellFormat.TIME_HMS;
@@ -69,13 +69,44 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyNow() {
-        Sheet sheet = new Sheet();
+        Sheet sheet = new();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=NOW()";
         cell1.CellFormat = CellFormat.DATE_DMY;
         sheet.Calculate();
-        DateOnly time = DateOnly.Parse(cell1.Text(12));
-        Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), time);
+        DateOnly date = DateOnly.Parse(cell1.Text(12));
+        Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), date);
+    }
+
+    /// <summary>
+    /// Verify the TODAY function
+    /// </summary>
+    [Test]
+    public void VerifyToday() {
+        Sheet sheet = new();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Content = "=TODAY()";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        DateOnly date = DateOnly.Parse(cell1.Text(12));
+        Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), date);
+
+        cell1.Content = "=YEAR(TODAY())";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(DateTime.Now.Year), cell1.Value);
+
+        cell1.Content = "=MONTH(TODAY())";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(DateTime.Now.Month), cell1.Value);
+        Assert.AreEqual("=MONTH(TODAY())", cell1.Content);
+
+        cell1.Content = "=MONTH(TODAY())&YEAR(TODAY())";
+        cell1.CellFormat = CellFormat.GENERAL;
+        sheet.Calculate();
+        Assert.AreEqual($"{DateTime.Now.Month}{DateTime.Now.Year}", cell1.Value.StringValue);
+        Assert.AreEqual("=MONTH(TODAY())&YEAR(TODAY())", cell1.Content);
     }
 
     /// <summary>
@@ -83,7 +114,7 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifySum() {
-        Sheet sheet = new Sheet();
+        Sheet sheet = new();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -130,7 +161,7 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyConcatenate() {
-        Sheet sheet = new Sheet();
+        Sheet sheet = new();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -150,6 +181,16 @@ public class FunctionTests {
         cell5.Content = "=CONCATENATE(A1:A2,A3:A4)";
         sheet.Calculate();
         Assert.AreEqual(new Variant("Happy New Year Everyone!"), cell5.Value);
+
+        // Concatenate operator
+        cell5.Content = "=A1&A2&A3";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant("Happy New Year"), cell5.Value);
+
+        // Concatenate operator
+        cell5.Content = "='Foo'&'Bar'";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant("FooBar"), cell5.Value);
 
         // Empty cells are skipped
         sheet.DeleteCell(cell2);
@@ -172,5 +213,21 @@ public class FunctionTests {
         cell5.Content = "=CONCATENATE()";
         sheet.Calculate();
         Assert.AreEqual(new Variant(""), cell5.Value);
+    }
+
+    /// <summary>
+    /// Verify we catch circular references
+    /// </summary>
+    [Test]
+    public void VerifyCircularReferences() {
+        Sheet sheet = new();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+
+        // Simple range sum
+        cell1.Content = "=A2";
+        cell2.Content = "=A1";
+        sheet.Calculate();
+        Assert.AreEqual(" !ERR ", cell2.Text(6));
     }
 }

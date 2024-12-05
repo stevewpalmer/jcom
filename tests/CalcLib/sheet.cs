@@ -33,7 +33,7 @@ public class SheetTests {
     // Test that a new sheet has default columns
     [Test]
     public void TestDefaultColumns() {
-        Sheet sheet = new Sheet(1);
+        Sheet sheet = new(1);
         for (int column = 1; column < Sheet.MaxColumns; column++) {
             Assert.AreEqual(Sheet.DefaultColumnWidth, sheet.ColumnWidth(column));
         }
@@ -46,7 +46,7 @@ public class SheetTests {
     // Add a few cells to the sheet and read them back
     [Test]
     public void TestAddingCells() {
-        Sheet sheet = new Sheet(1);
+        Sheet sheet = new(1);
         Cell cell1 = sheet.GetCell(new CellLocation(1, 1), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         cell1.Content = "14";
@@ -61,8 +61,8 @@ public class SheetTests {
     // a sheet as modified.
     [Test]
     public void TestModifiedState() {
-        Sheet sheet = new Sheet(1);
-        Cell cell1 = new Cell(sheet);
+        Sheet sheet = new(1);
+        Cell cell1 = new(sheet);
         Assert.IsFalse(sheet.Modified);
         cell1.Alignment = CellAlignment.RIGHT;
         Assert.IsTrue(sheet.Modified);

@@ -54,16 +54,16 @@ public class RExtentTest {
 
         // Adding a single point - both Start and End should have
         // the same value.
-        Point point = new Point(5, 5);
+        Point point = new(5, 5);
         _rextent.Add(point);
         Assert.AreEqual(point, _rextent.Start);
         Assert.AreEqual(point, _rextent.End);
 
         // Adding multiple points - the Start will be the top left
         // point and the End will be the bottom right.
-        Point point1 = new Point(5, 5);
-        Point point2 = new Point(6, 6);
-        Point point3 = new Point(4, 4);
+        Point point1 = new(5, 5);
+        Point point2 = new(6, 6);
+        Point point3 = new(4, 4);
         _rextent.Add(point1);
         _rextent.Add(point2);
         _rextent.Add(point3);
@@ -74,8 +74,8 @@ public class RExtentTest {
     // Verify the Contains method.
     [Test]
     public void VerifyContains() {
-        Point point1 = new Point(2, 2);
-        Point point2 = new Point(5, 5);
+        Point point1 = new(2, 2);
+        Point point2 = new(5, 5);
         _rextent.Add(point1);
         _rextent.Add(point2);
         Assert.IsTrue(_rextent.Contains(point1));
@@ -91,8 +91,8 @@ public class RExtentTest {
     // Verify the Clear method
     [Test]
     public void VerifyClear() {
-        Point point1 = new Point(2, 2);
-        Point point2 = new Point(5, 5);
+        Point point1 = new(2, 2);
+        Point point2 = new(5, 5);
         _rextent.Add(point1);
         _rextent.Add(point2);
         _rextent.Clear();

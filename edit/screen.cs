@@ -231,7 +231,7 @@ public static class Screen {
     private static RenderHint EditFile(Command command) {
         string inputValue = string.Empty;
         if (command.GetFilename(Edit.File, ref inputValue)) {
-            FileInfo fileInfo = new FileInfo(inputValue);
+            FileInfo fileInfo = new(inputValue);
             inputValue = fileInfo.FullName;
 
             Window? newWindow = _windowList.FirstOrDefault(window => window.Buffer.Filename == inputValue);
@@ -363,7 +363,7 @@ public static class Screen {
         RenderHint flags = RenderHint.NONE;
         string inputValue = string.Empty;
         if (StatusBar.PromptForInput(Edit.CommandPrompt, ref inputValue, false)) {
-            Parser parser = new Parser(inputValue);
+            Parser parser = new(inputValue);
             KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
             if (commandId == KeyCommand.KC_NONE) {
                 StatusBar.Message(Edit.UnknownCommand);
@@ -457,7 +457,7 @@ public static class Screen {
         else {
             StatusBar.KeystrokesMode = KeystrokesMode.PLAYBACK;
             foreach (string commandString in _recorder.Keystrokes) {
-                Parser parser = new Parser(commandString);
+                Parser parser = new(commandString);
                 KeyCommand commandId = KeyMap.MapCommandNameToCommand(parser.NextWord());
                 if (commandId != KeyCommand.KC_NONE) {
                     flags |= HandleCommand(new Command {

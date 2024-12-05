@@ -299,29 +299,29 @@ public class FormulaParser {
     private NumberToken ParseNumber() {
         StringBuilder str = new();
 
-        char ch = GetChar();
+        char ch = GetCharSkipSpaces();
         while (char.IsDigit(ch)) {
             str.Append(ch);
-            ch = GetChar();
+            ch = GetCharSkipSpaces();
         }
         if (ch == '.') {
             str.Append(ch);
-            ch = GetChar();
+            ch = GetCharSkipSpaces();
             while (char.IsDigit(ch)) {
                 str.Append(ch);
-                ch = GetChar();
+                ch = GetCharSkipSpaces();
             }
         }
         if (char.ToUpper(ch) == 'E' && !char.IsLetter(PeekChar())) {
             str.Append('E');
-            ch = GetChar();
+            ch = GetCharSkipSpaces();
             if (ch is '+' or '-') {
                 str.Append(ch);
-                ch = GetChar();
+                ch = GetCharSkipSpaces();
             }
             while (char.IsDigit(ch)) {
                 str.Append(ch);
-                ch = GetChar();
+                ch = GetCharSkipSpaces();
             }
         }
         int factor = 1;
@@ -349,9 +349,24 @@ public class FormulaParser {
         _pushedChar = ch;
     }
 
+    /// <summary>
+    /// Get the next non-whitespace character.
+    /// </summary>
+    /// <returns>The next non-whitespace character or EOL if we reach the end of the line.</returns>
+    private char GetCharSkipSpaces() {
+        char ch;
+        do {
+            ch = GetChar();
+        } while (ch is ' ' or '\t');
+        return ch;
+    }
+
+    /// <summary>
     /// Read the next character from the stream. If we reach the end of the line check
     /// the next one for a continuation character. If one is found, consume
     /// the new line and return the next character. Otherwise, return EOL.
+    /// </summary>
+    /// <returns>The next non-whitespace character or EOL if we reach the end of the line.</returns>
     private char GetChar() {
         if (_pushedChar != '\0') {
             char ch = _pushedChar;
@@ -516,11 +531,11 @@ public class FormulaParser {
     }
 
     private LocationNode ParseLocation(SimpleToken token) {
-        if (token is not CellAddressToken addressToken) {
-            throw new FormatException(InvalidFormulaError);
-        }
+        Debug.Assert(token is CellAddressToken);
+
         CellLocation absoluteLocation;
         Point relativeLocation;
+        CellAddressToken addressToken = (CellAddressToken)token;
         if (addressToken.Format == CellAddressFormat.RELATIVE) {
             relativeLocation = Cell.PointFromRelativeAddress(addressToken.Address);
             absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row };

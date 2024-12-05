@@ -38,7 +38,7 @@ public class CellTests {
     // Create a cell and verify properties.
     [Test]
     public void VerifyDefaultProperties() {
-        Cell cell = new Cell();
+        Cell cell = new();
         Assert.AreEqual(1, cell.Location.Row);
         Assert.AreEqual(1, cell.Location.Column);
         Assert.AreEqual(CellAlignment.GENERAL, cell.Alignment);
@@ -49,19 +49,19 @@ public class CellTests {
     // Verify that we correctly translate positions to cell locations
     [Test]
     public void VerifyRowAndColumnFromPositions() {
-        CellLocation a1 = new CellLocation("A1");
+        CellLocation a1 = new("A1");
         Assert.AreEqual(1, a1.Row);
         Assert.AreEqual(1, a1.Column);
 
-        CellLocation z1 = new CellLocation("Z1");
+        CellLocation z1 = new("Z1");
         Assert.AreEqual(1, z1.Row);
         Assert.AreEqual(26, z1.Column);
 
-        CellLocation iu1 = new CellLocation("IU1");
+        CellLocation iu1 = new("IU1");
         Assert.AreEqual(1, iu1.Row);
         Assert.AreEqual(255, iu1.Column);
 
-        CellLocation a4095 = new CellLocation("A4095");
+        CellLocation a4095 = new("A4095");
         Assert.AreEqual(4095, a4095.Row);
         Assert.AreEqual(1, a4095.Column);
 
@@ -72,8 +72,8 @@ public class CellTests {
     // operations on CellLocation.
     [Test]
     public void VerifyCompareCellLocations() {
-        CellLocation a1 = new CellLocation("A1");
-        CellLocation a2 = new CellLocation { Row = 1, Column = 1 };
+        CellLocation a1 = new("A1");
+        CellLocation a2 = new() { Row = 1, Column = 1 };
         Assert.AreEqual(a1, a2);
         Assert.IsTrue(a1 == a2);
         Assert.IsFalse(a1 != a2);
@@ -112,8 +112,7 @@ public class CellTests {
         Assert.AreEqual(new Variant(datePart + 0), new Cell { Content = "00:00:00" }.Value);
         Assert.AreEqual(new Variant(datePart + 0.99998842592), new Cell { Content = "23:59:59" }.Value);
         Assert.AreEqual(new Variant(datePart + 0.30039351852), new Cell { Content = "7:12:34 AM" }.Value);
-        Assert.AreEqual(new Variant("7pm"), new Cell { Content = "7pm" }.Value);
-        Assert.AreEqual(new Variant("8.04 AM"), new Cell { Content = "8.04 AM" }.Value);
+        Assert.AreEqual(new Variant("Seven o'clock"), new Cell { Content = "Seven o'clock" }.Value);
     }
 
     // Verify the Location property
@@ -126,8 +125,8 @@ public class CellTests {
     // Verify that cell content and value match
     [Test]
     public void VerifyCellContent() {
-        Cell number15 = new Cell { Content = "15" };
-        Cell text = new Cell { Content = "TEXT" };
+        Cell number15 = new() { Content = "15" };
+        Cell text = new() { Content = "TEXT" };
         Assert.AreEqual(number15.Value, new Variant(15));
         Assert.AreEqual(number15.Content, "15");
         Assert.IsTrue(number15.Value.IsNumber);
@@ -150,14 +149,14 @@ public class CellTests {
     // Verify swapping two cells.
     [Test]
     public void VerifySwapCell() {
-        Cell cell1 = new Cell {
+        Cell cell1 = new() {
             Content = "45.8794",
             Location = new CellLocation { Column = 3, Row = 8 },
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 3,
             Alignment = CellAlignment.CENTRE
         };
-        Cell cell2 = new Cell {
+        Cell cell2 = new() {
             Content = "67.9",
             Location = new CellLocation { Column = 1, Row = 17 },
             CellFormat = CellFormat.PERCENT,
@@ -176,7 +175,7 @@ public class CellTests {
     // Verify the CreateFrom method
     [Test]
     public void VerifyCellCopyConstructor() {
-        Cell cell = new Cell {
+        Cell cell = new() {
             Content = "67.9",
             Location = new CellLocation { Column = 1, Row = 17 },
             CellFormat = CellFormat.PERCENT,
@@ -184,9 +183,9 @@ public class CellTests {
             Alignment = CellAlignment.RIGHT
         };
 
-        Sheet sheet = new Sheet();
+        Sheet sheet = new();
 
-        Cell newCell = new Cell(sheet, cell);
+        Cell newCell = new(sheet, cell);
         Assert.AreEqual(17, newCell.Location.Row);
         Assert.AreEqual(1, newCell.Location.Column);
         Assert.AreEqual(CellAlignment.RIGHT, newCell.Alignment);
@@ -564,8 +563,8 @@ public class CellTests {
     // Style a cell and ensure correct render string
     [Test]
     public void TestCellStyle() {
-        Sheet sheet1 = new Sheet(1);
-        Cell cell1 = new Cell(sheet1) {
+        Sheet sheet1 = new(1);
+        Cell cell1 = new(sheet1) {
             Content = "HELLO WORLD",
             Alignment = CellAlignment.RIGHT,
             Style = new CellStyle(sheet1) {
@@ -576,7 +575,7 @@ public class CellTests {
         };
         Assert.AreEqual(@"[36;42m    [0m[36;42m[1mHELLO WORLD[0m", cell1.AnsiTextSpan(15).EscapedText());
 
-        Cell cell2 = new Cell(sheet1) {
+        Cell cell2 = new(sheet1) {
             Content = "HELLO WORLD",
             Alignment = CellAlignment.LEFT,
             Style = new CellStyle(sheet1) {
@@ -587,8 +586,8 @@ public class CellTests {
         Assert.AreEqual(@"[97;40m[3m[4mHELLO WORLD[0m[97;40m    [0m", cell2.AnsiTextSpan(15).EscapedText());
 
         // Verify CellStyles are copied from another cell
-        Sheet sheet2 = new Sheet(2);
-        Cell cell3 = new Cell(sheet2, cell2);
+        Sheet sheet2 = new(2);
+        Cell cell3 = new(sheet2, cell2);
         Assert.AreEqual(cell3.Style.ForegroundColour, cell2.Style.ForegroundColour);
         Assert.AreEqual(cell3.Style.BackgroundColour, cell2.Style.BackgroundColour);
         Assert.AreEqual(cell3.Style.IsBold, cell2.Style.IsBold);
@@ -605,7 +604,7 @@ public class CellTests {
     // formula.
     [Test]
     public void TestValueAndContent() {
-        Sheet sheet = new Sheet();
+        Sheet sheet = new();
         Cell cellA1 = sheet.GetCell(new CellLocation(1, 1), true);
         Cell cellA2 = sheet.GetCell(new CellLocation(1, 2), true);
         Cell cellA3 = sheet.GetCell(new CellLocation(1, 3), true);
@@ -640,8 +639,8 @@ public class CellTests {
     // properties of a cell.
     [Test]
     public void TestCellFactory() {
-        Cell cell1 = new Cell();
-        Cell cell3 = new Cell {
+        Cell cell1 = new();
+        Cell cell3 = new() {
             DecimalPlaces = 4,
             Alignment = CellAlignment.CENTRE,
             UseThousandsSeparator = true,
@@ -684,7 +683,7 @@ public class CellTests {
 
         // Creating a new cell after changing the factory should pick
         // up the new factory defaults
-        Cell cell2 = new Cell();
+        Cell cell2 = new();
         Assert.AreEqual(5, cell2.DecimalPlaces);
         Assert.AreEqual(CellAlignment.LEFT, cell2.Alignment);
         Assert.AreEqual(CellFormat.SCIENTIFIC, cell2.CellFormat);
@@ -697,5 +696,21 @@ public class CellTests {
         CellFactory.ForegroundColour = fg;
         CellFactory.BackgroundColour = bg;
         CellFactory.Format = fmt;
+    }
+
+    // Verify retrieving the AnsiText content of a cell.
+    [Test]
+    public void VerifySpilledTextCell() {
+        Sheet sheet = new(1);
+        Cell cell1 = sheet.GetCell(1, 1, true);
+        cell1.Value = new Variant("This is a very long text string");
+        AnsiTextSpan ansiText = sheet.GetCell(1, 1, false).Text(10, true);
+        Assert.AreEqual("This is a ", ansiText.Text);
+
+        ansiText = sheet.GetCell(2, 1, false).Text(10, true);
+        Assert.AreEqual("very long ", ansiText.Text);
+
+        ansiText = sheet.GetCell(4, 1, false).Text(10, true);
+        Assert.AreEqual("g", ansiText.Text);
     }
 }

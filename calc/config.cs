@@ -82,7 +82,7 @@ public class Config {
     /// </summary>
     /// <returns>A Config object initialised from the file</returns>
     public static Config Load() {
-        Config fileConfig = new Config();
+        Config fileConfig = new();
         if (File.Exists(Consts.ConfigurationFilename)) {
             try {
                 using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);

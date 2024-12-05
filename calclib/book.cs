@@ -77,7 +77,7 @@ public class Book {
     /// <exception cref="FileLoadException">The specified file cannot be loaded</exception>
     public void Open(string path) {
         if (!File.Exists(path)) {
-            FileInfo info = new FileInfo(path);
+            FileInfo info = new(path);
             throw new FileNotFoundException(null, info.FullName);
         }
         try {
@@ -88,7 +88,7 @@ public class Book {
                 _sheets.Clear();
                 foreach (Sheet inputSheet in inputSheets) {
 
-                    Sheet sheet = new Sheet(sheetNumber) {
+                    Sheet sheet = new(sheetNumber) {
                         Location = inputSheet.Location
                     };
                     sheet.ColumnList = inputSheet.ColumnList.Select(cellList => new CellList {
@@ -105,7 +105,7 @@ public class Book {
             }
         }
         catch (JsonException) {
-            FileInfo info = new FileInfo(path);
+            FileInfo info = new(path);
             throw new FileLoadException(null, info.FullName);
         }
         Filename = path;
@@ -140,7 +140,7 @@ public class Book {
     /// </summary>
     /// <returns>The new worksheet</returns>
     public Sheet AddSheet() {
-        Sheet newSheet = new Sheet(NextSheetNumber());
+        Sheet newSheet = new(NextSheetNumber());
         _sheets.Add(newSheet);
         Modified = true;
         return newSheet;

@@ -57,7 +57,7 @@ public class TestANSIText {
     // Test a plain ANSI text string with no formatting.
     [Test]
     public void TestPlainString() {
-        AnsiText ansi = new AnsiText([
+        AnsiText ansi = new([
             new AnsiTextSpan("HELLO WORLD")
         ]);
         Assert.IsTrue(ansi.Spans.Count == 1);
@@ -70,7 +70,7 @@ public class TestANSIText {
     // set to red and the background colour to cyan.
     [Test]
     public void TestInitialString() {
-        AnsiText ansi = new AnsiText([
+        AnsiText ansi = new([
             new AnsiTextSpan("HELLO WORLD") {
                 ForegroundColour = AnsiColour.Red,
                 BackgroundColour = AnsiColour.Cyan
@@ -86,7 +86,7 @@ public class TestANSIText {
     // sets the foreground colour to red and the background colour to cyan.
     [Test]
     public void TestEmbeddedSequence() {
-        AnsiText ansi = new AnsiText([
+        AnsiText ansi = new([
             new AnsiTextSpan("HELLO "),
             new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Red,
@@ -106,7 +106,7 @@ public class TestANSIText {
     // sets the foreground colour to red and the background colour to cyan.
     [Test]
     public void TestMultipleSequences() {
-        AnsiText ansi = new AnsiText([
+        AnsiText ansi = new([
             new AnsiTextSpan("HELLO "),
             new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
@@ -134,7 +134,7 @@ public class TestANSIText {
     // Test that the Length property returns the raw string length
     [Test]
     public void TestLength() {
-        AnsiText ansi = new AnsiText([
+        AnsiText ansi = new([
             new AnsiTextSpan("HELLO "),
             new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
@@ -153,11 +153,11 @@ public class TestANSIText {
     // Test alignments
     [Test]
     public void TestAlignments() {
-        Cell leftCell = new Cell { Alignment = CellAlignment.LEFT };
-        Cell rightCell = new Cell { Alignment = CellAlignment.RIGHT };
-        Cell centreCell = new Cell { Alignment = CellAlignment.CENTRE };
-        Cell generalCell = new Cell { Value = new Variant(12), Alignment = CellAlignment.GENERAL };
-        Cell generalTextCell = new Cell { Value = new Variant("MOUSE"), Alignment = CellAlignment.GENERAL };
+        Cell leftCell = new() { Alignment = CellAlignment.LEFT };
+        Cell rightCell = new() { Alignment = CellAlignment.RIGHT };
+        Cell centreCell = new() { Alignment = CellAlignment.CENTRE };
+        Cell generalCell = new() { Value = new Variant(12), Alignment = CellAlignment.GENERAL };
+        Cell generalTextCell = new() { Value = new Variant("MOUSE"), Alignment = CellAlignment.GENERAL };
 
         Assert.Throws(typeof(ArgumentOutOfRangeException), delegate { _ = new Cell { Alignment = (CellAlignment)10 }.AnsiAlignment; });
 
@@ -167,7 +167,7 @@ public class TestANSIText {
         Assert.AreEqual(AnsiAlignment.RIGHT, generalCell.AnsiAlignment);
         Assert.AreEqual(AnsiAlignment.LEFT, generalTextCell.AnsiAlignment);
 
-        AnsiText none = new AnsiText([
+        AnsiText none = new([
             new AnsiTextSpan("  PRETTY EASY  ") {
                 Width = 30,
                 Alignment = AnsiAlignment.NONE
@@ -176,7 +176,7 @@ public class TestANSIText {
         Assert.AreEqual(30, none.Length);
         Assert.AreEqual($"{CSI}97;40m  PRETTY EASY  {CSI}0m{CSI}97;40m               {CSI}0m", none.EscapedText);
 
-        AnsiText simple = new AnsiText([
+        AnsiText simple = new([
             new AnsiTextSpan("HELLO") {
                 Width = 10,
                 Alignment = AnsiAlignment.LEFT
@@ -188,7 +188,7 @@ public class TestANSIText {
         ]);
         Assert.AreEqual($"{CSI}97;40mHELLO{CSI}0m{CSI}97;40m     {CSI}0m{CSI}97;40m    {CSI}0m{CSI}97;40mWORLD!{CSI}0m", simple.EscapedText);
 
-        AnsiText centered = new AnsiText([
+        AnsiText centered = new([
             new AnsiTextSpan("Centre") {
                 Width = 11,
                 Alignment = AnsiAlignment.CENTRE
@@ -200,7 +200,7 @@ public class TestANSIText {
     // Test substring extraction
     [Test]
     public void TestSubstring() {
-        AnsiText simple = new AnsiText([
+        AnsiText simple = new([
             new AnsiTextSpan("HELLO WORLD!")
         ]);
         Assert.AreEqual("LO WO", simple.Substring(3, 5).Text);
@@ -218,7 +218,7 @@ public class TestANSIText {
         Assert.AreEqual(AnsiColour.Blue, longer.Spans[0].ForegroundColour);
         Assert.AreEqual(AnsiColour.Magenta, longer.Spans[0].BackgroundColour);
 
-        AnsiText ansi = new AnsiText([
+        AnsiText ansi = new([
             new AnsiTextSpan("HELLO "),
             new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,
@@ -250,7 +250,7 @@ public class TestANSIText {
     // Test changing the style of a portion of an AnsiText
     [Test]
     public void TestStyle() {
-        AnsiText simple = new AnsiText([
+        AnsiText simple = new([
             new AnsiTextSpan("HELLO WORLD!")
         ]);
         simple.Style(0, 5, AnsiColour.Cyan, AnsiColour.Green);
@@ -259,7 +259,7 @@ public class TestANSIText {
         Assert.AreEqual(" WORLD!", simple.Spans[1].Text);
         Assert.AreEqual($"{CSI}97;40m", simple.Spans[1].CS);
 
-        AnsiText ansi = new AnsiText([
+        AnsiText ansi = new([
             new AnsiTextSpan("HELLO "),
             new AnsiTextSpan("WORLD") {
                 ForegroundColour = AnsiColour.Yellow,

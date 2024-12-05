@@ -77,13 +77,6 @@ public class Cell(Sheet? sheet) {
                 ComputedValue = _dateValue;
                 return;
             }
-            if (TryParseTime(value.StringValue, out Variant _timeValue)) {
-                if (!Format.HasValue) {
-                    CellFormat = CellFormat.TIME_HMSZ;
-                }
-                ComputedValue = _timeValue;
-                return;
-            }
             if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
                 FormulaTree = formulaTree;
                 ComputedValue = new Variant(0);
@@ -582,35 +575,6 @@ public class Cell(Sheet? sheet) {
             return true;
         }
         dateValue = new Variant(value);
-        return false;
-    }
-
-    /// <summary>
-    /// Try to parse the value as a time and, if we succeed, sets timeValue to the OADate
-    /// value and returns true. Otherwise, it returns the value unchanged and returns false.
-    /// </summary>
-    /// <param name="value">Value to parse</param>
-    /// <param name="timeValue">
-    /// Set to the time serial number if the value parses successfully
-    /// as a time, or is set to the input value otherwise
-    /// </param>
-    /// <returns>True if the value is successfully parsed as a time, false otherwise</returns>
-    private static bool TryParseTime(string value, out Variant timeValue) {
-        CultureInfo culture = CultureInfo.CurrentCulture;
-        string compactValue = value.Replace(" ", "");
-        if (DateTime.TryParseExact(compactValue, "t", culture, DateTimeStyles.None, out DateTime _date)) {
-            timeValue = new Variant(_date.ToOADate());
-            return true;
-        }
-        if (DateTime.TryParseExact(compactValue, "T", culture, DateTimeStyles.None, out _date)) {
-            timeValue = new Variant(_date.ToOADate());
-            return true;
-        }
-        if (DateTime.TryParseExact(value, "h:mm:ss tt", culture, DateTimeStyles.None, out _date)) {
-            timeValue = new Variant(_date.ToOADate());
-            return true;
-        }
-        timeValue = new Variant(value);
         return false;
     }
 }

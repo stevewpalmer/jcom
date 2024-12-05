@@ -256,7 +256,7 @@ public static class Screen {
     /// <returns>Render hint</returns>
     private static RenderHint NewWorksheet() {
         Sheet sheet = _activeBook.AddSheet();
-        Window newWindow = new Window(sheet);
+        Window newWindow = new(sheet);
         AddWindow(newWindow);
         _activeWindow = newWindow;
         _activeWindow.Refresh(RenderHint.REFRESH);
@@ -335,7 +335,7 @@ public static class Screen {
                 Debug.Assert(!string.IsNullOrEmpty(inputValue));
 
                 inputValue = Utilities.AddExtensionIfMissing(inputValue, Book.DefaultExtension);
-                FileInfo fileInfo = new FileInfo(inputValue);
+                FileInfo fileInfo = new(inputValue);
                 inputValue = fileInfo.FullName;
 
                 OpenBook(inputValue);
@@ -366,13 +366,13 @@ public static class Screen {
             Debug.Assert(!string.IsNullOrEmpty(inputValue));
 
             inputValue = Utilities.AddExtensionIfMissing(inputValue, Consts.CSVExtension);
-            FileInfo fileInfo = new FileInfo(inputValue);
+            FileInfo fileInfo = new(inputValue);
             inputValue = fileInfo.FullName;
 
             Sheet sheet = _activeBook.AddSheet();
             try {
                 using TextReader stream = new StreamReader(inputValue);
-                using CsvParser parser = new CsvParser(stream, CultureInfo.InvariantCulture);
+                using CsvParser parser = new(stream, CultureInfo.InvariantCulture);
 
                 int row = 1;
                 while (parser.Read()) {
@@ -394,7 +394,7 @@ public static class Screen {
                 Status.Message(string.Format(Calc.CannotOpenFile, fileInfo.Name));
                 return RenderHint.NONE;
             }
-            Window newWindow = new Window(sheet);
+            Window newWindow = new(sheet);
             AddWindow(newWindow);
             _activeWindow = newWindow;
             _activeWindow.Refresh(RenderHint.REFRESH);
@@ -528,7 +528,7 @@ public static class Screen {
 
     /// <summary>
     /// Close the existing workbook and offer to save any changes. Returns
-    /// RenderHint.EXIT if the workbook can be closed, or RenderHint.CANCEL
+    /// RenderHint EXIT if the workbook can be closed, or RenderHint CANCEL
     /// if the user choose to cancel the operation.
     /// </summary>
     /// <returns>Render hint</returns>

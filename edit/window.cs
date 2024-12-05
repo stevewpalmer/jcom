@@ -373,7 +373,7 @@ public partial class Window {
             .Add(new Point(0, _viewportOffset.Y))
             .Add(new Point(0, _viewportOffset.Y + _viewportBounds.Height - 1));
 
-        Extent markExtent = new Extent();
+        Extent markExtent = new();
         if (_markMode == MarkMode.SEARCH) {
             markExtent = new Extent()
                 .Add(_searchExtent.Start)
@@ -392,7 +392,7 @@ public partial class Window {
         // modified by the most recent edit action. The resulting extent to be updated
         // is the superset of the two, limited to the area of the visible window.
         if (flags.HasFlag(RenderHint.BLOCK)) {
-            Extent blockExtent = new Extent();
+            Extent blockExtent = new();
             blockExtent
                 .Add(markExtent.Start)
                 .Add(markExtent.End)
@@ -517,7 +517,7 @@ public partial class Window {
     /// <param name="lineIndex">Index of line to retrieve</param>
     /// <returns>Pre-rendered line</returns>
     private string GetPreRenderLine(int lineIndex) {
-        StringBuilder line = new StringBuilder(Buffer.GetLine(lineIndex));
+        StringBuilder line = new(Buffer.GetLine(lineIndex));
         int index = 0;
         while (index < line.Length) {
             if (line[index] == Consts.EndOfLine) {

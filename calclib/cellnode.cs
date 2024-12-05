@@ -486,13 +486,13 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     /// <summary>
     /// Evaluate a cell location reference and return the value of the cell.
     /// The cell may either be a constant value or a formula. If the former
-    /// then we return the value. Otherwise we evaluate the formula and return
+    /// then we return the value. Otherwise, we evaluate the formula and return
     /// the result of the evaluation.
     /// </summary>
     /// <param name="context">The calculation context</param>
     /// <returns>A variant</returns>
     public override Variant Evaluate(CalculationContext context) {
-        CellLocation sourceLocation = context.ReferenceList.Last();
+        CellLocation sourceLocation = context.ReferenceList.Peek();
         CellLocation absoluteLocation = ToAbsolute(sourceLocation);
         return FunctionNode.EvaluateLocation(context, absoluteLocation);
     }

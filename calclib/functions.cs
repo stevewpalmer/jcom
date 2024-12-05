@@ -37,7 +37,7 @@ public static class Functions {
     /// <param name="arguments">Function parameters</param>
     /// <returns>A variant containing the sum of the arguments</returns>
     public static Variant SUM(IEnumerable<Variant> arguments) {
-        Variant sumTotal = new Variant(0);
+        Variant sumTotal = new(0);
         return arguments.Aggregate(sumTotal, (current, value) => current + value);
     }
 
@@ -70,7 +70,7 @@ public static class Functions {
             throw new ArgumentException("Arguments must have three parts");
         }
         DateTime oaBaseDate = DateTime.FromOADate(0);
-        TimeSpan ts = new TimeSpan(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
+        TimeSpan ts = new(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
         return new Variant(oaBaseDate.Add(ts).ToOADate());
     }
 

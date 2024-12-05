@@ -349,7 +349,7 @@ public class CommandBar {
 
         List<FormFieldInternal> fields = [];
         foreach (FormField userfield in userfields) {
-            FormFieldInternal field = new FormFieldInternal(userfield);
+            FormFieldInternal field = new(userfield);
             fields.Add(field);
             string value = string.Empty;
             int width = userfield.Width;
@@ -614,7 +614,7 @@ public class CommandBar {
     /// Render the list of commands
     /// </summary>
     public RenderHint PromptForCommand(CommandMapID commandMapID) {
-        Stack<(CommandMapID, int)> commandMapStack = new Stack<(CommandMapID, int)>();
+        Stack<(CommandMapID, int)> commandMapStack = new();
         int selectedCommand = 0;
         bool redraw = true;
         RenderHint flags = RenderHint.NONE;
