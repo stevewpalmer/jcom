@@ -577,15 +577,7 @@ public class Cell(Sheet? sheet) {
     private static bool TryParseDate(string value, out Variant dateValue) {
         CultureInfo culture = CultureInfo.CurrentCulture;
         string compactValue = value.Replace(" ", "");
-        if (DateTime.TryParseExact(compactValue, "d-MMM", culture, DateTimeStyles.None, out DateTime _date)) {
-            dateValue = new Variant(_date.ToOADate());
-            return true;
-        }
-        if (DateTime.TryParseExact(compactValue, "MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
-            dateValue = new Variant(_date.ToOADate());
-            return true;
-        }
-        if (DateTime.TryParseExact(compactValue, "d-MMM-yyyy", culture, DateTimeStyles.None, out _date)) {
+        if (DateTime.TryParse(compactValue, culture, DateTimeStyles.None, out DateTime _date)) {
             dateValue = new Variant(_date.ToOADate());
             return true;
         }
