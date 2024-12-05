@@ -335,6 +335,7 @@ public class ParsingTests {
     [Test]
     public void VerifySum() {
         Cell cell = new Cell(new Sheet(1)) { Location = new CellLocation { Row = 1, Column = 1 }, Content = "=SUM(A2:A4)"};
+        Assert.IsNotNull(cell.FormulaTree);
         Assert.IsTrue(cell.FormulaTree.GetType() == typeof(FunctionNode));
 
         FunctionNode functionNode = (FunctionNode)cell.FormulaTree;

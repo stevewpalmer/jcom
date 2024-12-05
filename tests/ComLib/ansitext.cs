@@ -171,7 +171,7 @@ public class TestANSIText {
             new AnsiTextSpan("  PRETTY EASY  ") {
                 Width = 30,
                 Alignment = AnsiAlignment.NONE
-            },
+            }
         ]);
         Assert.AreEqual(30, none.Length);
         Assert.AreEqual($"{CSI}97;40m  PRETTY EASY  {CSI}0m{CSI}97;40m               {CSI}0m", none.EscapedText);

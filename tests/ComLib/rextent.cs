@@ -87,4 +87,15 @@ public class RExtentTest {
         Assert.IsFalse(_rextent.Contains(new Point(5, 6)));
         Assert.IsFalse(_rextent.Contains(new Point(6, 5)));
     }
+
+    // Verify the Clear method
+    [Test]
+    public void VerifyClear() {
+        Point point1 = new Point(2, 2);
+        Point point2 = new Point(5, 5);
+        _rextent.Add(point1);
+        _rextent.Add(point2);
+        _rextent.Clear();
+        Assert.IsFalse(_rextent.Valid);
+    }
 }

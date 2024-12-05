@@ -161,7 +161,7 @@ public class Sheet {
     /// <returns>The cell at the row</returns>
     public Cell GetCell(int column, int row, bool createIfEmpty) {
         CellList? cellList = CellListForColumn(column, createIfEmpty);
-        Cell cell = new Cell(this) {
+        Cell cell = new(this) {
             Location = new CellLocation(column, row)
         };
         if (cellList != null) {
@@ -194,7 +194,7 @@ public class Sheet {
         List<Cell> cellsToUpdate = [];
         foreach (Cell cell in formulaCells) {
             try {
-                CalculationContext context = new CalculationContext {
+                CalculationContext context = new() {
                     ReferenceList = new Stack<CellLocation>(),
                     UpdateList = cellsToUpdate.ToArray(),
                     Sheet = this
@@ -323,22 +323,6 @@ public class Sheet {
     }
 
     /// <summary>
-    /// Return whether the specified row contains spilled cells. A spilled cell
-    /// is a label that exceeds the cell width and is followed by an empty cell.
-    /// </summary>
-    /// <param name="row">Row to check</param>
-    /// <returns>True if row contains at least one spilled cell</returns>
-    public bool HasSpilledCells(int row) {
-        foreach (CellList cellList in ColumnList) {
-            Cell? cell = cellList.Cells.FirstOrDefault(cell => cell.Location.Row == row);
-            if (cell is { Value.IsNumber: false, IsEmptyCell: false } && cell.Value.StringValue.Length > cellList.Size) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /// <summary>
     /// Returns an AnsiText representing the cells at the given row starting from
     /// the column offset and for the given width.
     /// </summary>
@@ -420,7 +404,7 @@ public class Sheet {
         do {
             sorted = true;
             for (int r = swapExtent.Start.Y; r < swapExtent.End.Y; r++) {
-                Cell cell1 = GetCell(sortColumn, r , false);
+                Cell cell1 = GetCell(sortColumn, r, false);
                 Cell cell2 = GetCell(sortColumn, r + 1, false);
                 if (cell1.Value.CompareTo(cell2.Value) * ordering > 0) {
                     for (int c = swapExtent.Start.X; c <= swapExtent.End.X; c++) {
@@ -440,7 +424,7 @@ public class Sheet {
     /// </summary>
     /// <returns>Extent that covers all cells on the sheet</returns>
     public RExtent GetCellExtent() {
-        RExtent extent = new RExtent();
+        RExtent extent = new();
         Point? topLeft = ColumnList.FirstOrDefault()?.Cells.FirstOrDefault()?.Location.Point;
         Point? bottomRight = ColumnList.LastOrDefault()?.Cells.LastOrDefault()?.Location.Point;
         if (topLeft != null) {

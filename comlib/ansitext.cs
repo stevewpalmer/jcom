@@ -68,7 +68,7 @@ public class AnsiText {
         int spanIndex = 0;
         List<AnsiTextSpan> spans = [];
         while (spanIndex < Spans.Count && Spans[spanIndex].Text.Length <= start) {
-            start -= Spans[spanIndex++].Text.Length;
+            start -= Spans[spanIndex++].Length;
         }
         while (spanIndex < Spans.Count && length > 0) {
             int textLength = Spans[spanIndex].Text.Length;

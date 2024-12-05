@@ -33,8 +33,8 @@ using JComLib;
 namespace JCalcLib;
 
 public class Cell(Sheet? sheet) {
-    private string? _customFormatString;
     private string _content = string.Empty;
+    private string? _customFormatString;
 
     /// <summary>
     /// Empty constructor
@@ -289,17 +289,6 @@ public class Cell(Sheet? sheet) {
     public bool IsEmptyCell => !Value.HasValue;
 
     /// <summary>
-    /// Is this a spilled cell?
-    /// </summary>
-    [JsonIgnore]
-    public bool IsSpilled {
-        get {
-            int columnWidth = sheet?.ColumnWidth(Location.Column) ?? Sheet.DefaultColumnWidth;
-            return Value is { HasValue: true, IsNumber: false } && Value.StringValue.Length > columnWidth;
-        }
-    }
-
-    /// <summary>
     /// Returns whether or not this cell has a formula assigned to it.
     /// </summary>
     [JsonIgnore]
@@ -472,7 +461,8 @@ public class Cell(Sheet? sheet) {
         }
         if (!Value.IsNumber) {
             cellValue = Value.StringValue ?? string.Empty;
-        } else {
+        }
+        else {
             cellValue = CellFormat switch {
                 CellFormat.FIXED or CellFormat.PERCENT or CellFormat.CURRENCY or CellFormat.SCIENTIFIC
                     or CellFormat.DATE_DM or CellFormat.DATE_MY or CellFormat.DATE_DMY or CellFormat.TIME
@@ -557,7 +547,7 @@ public class Cell(Sheet? sheet) {
             formulaTree = null;
             return false;
         }
-        FormulaParser parser = new FormulaParser(formula[1..], location);
+        FormulaParser parser = new(formula[1..], location);
         formulaTree = parser.Parse();
         return true;
     }
@@ -567,8 +557,10 @@ public class Cell(Sheet? sheet) {
     /// value and returns true. Otherwise, it returns the value unchanged and returns false.
     /// </summary>
     /// <param name="value">Value to parse</param>
-    /// <param name="dateValue">Set to the date serial number if the value parses successfully
-    /// as a date, or is set to the input value otherwise</param>
+    /// <param name="dateValue">
+    /// Set to the date serial number if the value parses successfully
+    /// as a date, or is set to the input value otherwise
+    /// </param>
     /// <returns>True if the value is successfully parsed as a date, false otherwise</returns>
     private static bool TryParseDate(string value, out Variant dateValue) {
         CultureInfo culture = CultureInfo.CurrentCulture;
@@ -594,8 +586,10 @@ public class Cell(Sheet? sheet) {
     /// value and returns true. Otherwise, it returns the value unchanged and returns false.
     /// </summary>
     /// <param name="value">Value to parse</param>
-    /// <param name="timeValue">Set to the time serial number if the value parses successfully
-    /// as a time, or is set to the input value otherwise</param>
+    /// <param name="timeValue">
+    /// Set to the time serial number if the value parses successfully
+    /// as a time, or is set to the input value otherwise
+    /// </param>
     /// <returns>True if the value is successfully parsed as a time, false otherwise</returns>
     private static bool TryParseTime(string value, out Variant timeValue) {
         CultureInfo culture = CultureInfo.CurrentCulture;

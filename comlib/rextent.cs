@@ -76,4 +76,12 @@ public class RExtent {
     /// <returns>True if the point is within the extent, false otherwise</returns>
     public bool Contains(Point point) =>
         Valid && Rectangle.FromLTRB(Start.X, Start.Y, End.X + 1, End.Y + 1).Contains(point);
+
+    /// <summary>
+    /// Clear the extent
+    /// </summary>
+    public void Clear() {
+        Start = Uninitalised;
+        End = Uninitalised;
+    }
 }
