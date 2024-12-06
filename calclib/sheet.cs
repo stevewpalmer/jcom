@@ -206,6 +206,7 @@ public class Sheet {
             }
             catch (Exception) {
                 cell.Error = true;
+                cellsToUpdate.Add(cell);
             }
         }
         return cellsToUpdate;
