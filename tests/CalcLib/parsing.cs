@@ -342,6 +342,59 @@ public class ParsingTests {
         Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("A1*(A2+A3", cell2.Location).Parse(); });
     }
 
+    /// <summary>
+    /// Make sure operator precedence is correct.
+    /// </summary>
+    [Test]
+    public void VerifyPrecedence() {
+        Sheet sheet = new();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Content = "=SUM(1,2)+NOW()*4";
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+
+        // SUM has higher precedence than that * operator.
+        BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
+        Assert.IsTrue(FormulaParser.Precedence(pn.Left.Op) > FormulaParser.Precedence(pn.Right.Op));
+
+        // NOW() and a number have equal precedence
+        pn = (BinaryOpNode)pn.Right;
+        Assert.IsTrue(FormulaParser.Precedence(pn.Left.Op) == FormulaParser.Precedence(pn.Right.Op));
+
+        cell1.Content = "=TODAY()&CONCATENATE(TIME(12,40,3),TIME(9,12,45))";
+        Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
+
+        // Functions have equal precedence
+        pn = (BinaryOpNode)cell1.FormulaTree;
+        Assert.IsTrue(FormulaParser.Precedence(pn.Left.Op) == FormulaParser.Precedence(pn.Right.Op));
+
+        // Verify precedences
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KSUM) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KCONCATENATE) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KNOW) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KTODAY) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KMONTH) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KYEAR) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KTIME) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.NUMBER) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.ADDRESS) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.TEXT) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KGT) == 5);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KGE) == 5);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KLE) == 5);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KNE) == 5);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KEQ) == 5);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.KLT) == 5);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.PLUS) == 6);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.MINUS) == 6);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.CONCAT) == 6);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.MULTIPLY) == 7);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.DIVIDE) == 7);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.EXP) == 10);
+
+        // Impossible precedences return 0
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.EOL) == 0);
+    }
+
     // Verify parsing the SUM function
     [Test]
     public void VerifySum() {

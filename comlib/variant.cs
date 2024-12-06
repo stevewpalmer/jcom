@@ -602,6 +602,19 @@ public class Variant {
     }
 
     /// <summary>
+    /// Implements the greater than or equals operator between two variants.
+    /// </summary>
+    /// <param name="s1">First variant</param>
+    /// <param name="s2">Second variant</param>
+    /// <returns>True if the two variants are equal, false otherwise</returns>
+    public static bool operator >=(Variant s1, Variant s2) {
+        if (s1 is null) {
+            return false;
+        }
+        return s1.CompareTo(s2) >= 0;
+    }
+
+    /// <summary>
     /// Implements the less than operator between two variants.
     /// </summary>
     /// <param name="s1">First variant</param>
@@ -612,6 +625,19 @@ public class Variant {
             return false;
         }
         return s1.CompareTo(s2) < 0;
+    }
+
+    /// <summary>
+    /// Implements the less than or equls operator between two variants.
+    /// </summary>
+    /// <param name="s1">First variant</param>
+    /// <param name="s2">Second variant</param>
+    /// <returns>True if the two variants are equal, false otherwise</returns>
+    public static bool operator <=(Variant s1, Variant s2) {
+        if (s1 is null) {
+            return false;
+        }
+        return s1.CompareTo(s2) <= 0;
     }
 
     /// <summary>

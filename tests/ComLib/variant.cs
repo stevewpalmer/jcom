@@ -416,7 +416,7 @@ public class Variants {
     // Test the use of a variant in a dictionary
     [Test]
     public void Variants18() {
-        Dictionary<Variant, string> testDict = new Dictionary<Variant, string> {
+        Dictionary<Variant, string> testDict = new() {
             { new Variant("TEST"), "Found TEST!" },
             { new Variant("TEST2"), "Found TEST2!" },
             { new Variant(14.56d), "Found 14.56d!" },

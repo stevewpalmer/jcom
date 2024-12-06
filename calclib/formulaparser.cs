@@ -381,9 +381,7 @@ public class FormulaParser {
     /// </summary>
     /// <returns>A SimpleToken represented the parsed token</returns>
     private SimpleToken PeekToken() {
-        if (_pushedToken != null) {
-            return _pushedToken;
-        }
+        Debug.Assert(_pushedToken == null);
         Debug.Assert(_tindex < tokens.Count);
         return tokens[_tindex];
     }

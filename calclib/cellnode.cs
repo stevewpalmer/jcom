@@ -319,12 +319,12 @@ internal class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : Ce
             TokenID.MULTIPLY => new Variant(left * right),
             TokenID.DIVIDE => new Variant(left / right),
             TokenID.EXP => new Variant(Math.Pow(left.DoubleValue, right.DoubleValue)),
-            TokenID.KEQ => new Variant(Math.Abs(left.DoubleValue - right.DoubleValue) < 0.01),
-            TokenID.KNE => new Variant(Math.Abs(left.DoubleValue - right.DoubleValue) > 0.01),
-            TokenID.KGE => new Variant(left.DoubleValue >= right.DoubleValue),
-            TokenID.KGT => new Variant(left.DoubleValue > right.DoubleValue),
-            TokenID.KLE => new Variant(left.DoubleValue <= right.DoubleValue),
-            TokenID.KLT => new Variant(left.DoubleValue < right.DoubleValue),
+            TokenID.KEQ => new Variant(left == right),
+            TokenID.KNE => new Variant(left != right),
+            TokenID.KGE => new Variant(left >= right),
+            TokenID.KGT => new Variant(left > right),
+            TokenID.KLE => new Variant(left <= right),
+            TokenID.KLT => new Variant(left < right),
             TokenID.CONCAT => new Variant(left.StringValue + right.StringValue),
             _ => throw new NotImplementedException("Unknown binary operator")
         };
