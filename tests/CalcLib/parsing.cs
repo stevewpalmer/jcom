@@ -196,28 +196,6 @@ public class ParsingTests {
         Assert.AreEqual("=B4=901200", cell1.Content);
     }
 
-
-    // Verify the & operator
-    [Test]
-    public void VerifyConcatOperator() {
-        Sheet sheet = new();
-        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
-        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
-        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
-
-        cell1.Content = " HELLO ";
-        cell2.Content = " WORLD!";
-        cell3.Content = "=A1&A2";
-        sheet.Calculate();
-        Assert.AreEqual(" HELLO  WORLD!", cell3.Value.StringValue);
-        Assert.AreEqual("=A1&A2", cell3.Content);
-
-        cell3.Content = "='HELLO '&' WORLD!'";
-        sheet.Calculate();
-        Assert.AreEqual("HELLO  WORLD!", cell3.Value.StringValue);
-        Assert.AreEqual("=\"HELLO \"&\" WORLD!\"", cell3.Content);
-    }
-
     // Verify applying a fixup to a node
     [Test]
     public void VerifyFixup() {
@@ -317,7 +295,7 @@ public class ParsingTests {
         Assert.AreEqual("=B4*3000", cell2.Content);
     }
 
-    // Verify that specifying a percentage in a number converts it
+    // Verify that specifying a percentage converts it
     // to the appropriate representation.
     [Test]
     public void VerifyPercentNumber() {

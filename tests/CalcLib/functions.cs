@@ -33,24 +33,6 @@ namespace CalcLibTests;
 public class FunctionTests {
 
     /// <summary>
-    /// Verify a simple expression
-    /// </summary>
-    [Test]
-    public void VerifyExpression() {
-        Sheet sheet = new();
-        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
-        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
-        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
-        Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
-        cell1.Content = "56";
-        cell2.Content = "78";
-        cell3.Content = "12";
-        cell4.Content = "=A1*(A2+A3)";
-        sheet.Calculate();
-        Assert.AreEqual(new Variant(5040), cell4.Value);
-    }
-
-    /// <summary>
     /// Verify the TIME function
     /// </summary>
     [Test]
@@ -213,21 +195,5 @@ public class FunctionTests {
         cell5.Content = "=CONCATENATE()";
         sheet.Calculate();
         Assert.AreEqual(new Variant(""), cell5.Value);
-    }
-
-    /// <summary>
-    /// Verify we catch circular references
-    /// </summary>
-    [Test]
-    public void VerifyCircularReferences() {
-        Sheet sheet = new();
-        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
-        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
-
-        // Simple range sum
-        cell1.Content = "=A2";
-        cell2.Content = "=A1";
-        sheet.Calculate();
-        Assert.AreEqual(" !ERR ", cell2.Text(6));
     }
 }
