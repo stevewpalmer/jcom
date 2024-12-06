@@ -89,7 +89,6 @@ public static class Screen {
         if (!string.IsNullOrEmpty(filename)) {
             try {
                 _activeBook.Open(filename);
-                _windowList.Clear();
             }
             catch (FileNotFoundException e) {
                 Status.Message(string.Format(Calc.FileNotFound, e.FileName));
@@ -101,6 +100,7 @@ public static class Screen {
                 Status.Message(e.Message);
             }
         }
+        _windowList.Clear();
         foreach (Sheet sheet in _activeBook.Sheets) {
             AddWindow(new Window(sheet));
         }
@@ -144,6 +144,7 @@ public static class Screen {
             KeyCommand.KC_COMMAND_BAR => HandleCommandBar(),
             KeyCommand.KC_NEW => NewWorksheet(),
             KeyCommand.KC_DELETE_WORKSHEET => DeleteWorksheet(),
+            KeyCommand.KC_FILE_NEW => NewWorkbook(),
             KeyCommand.KC_FILE_RETRIEVE => OpenWorkbook(),
             KeyCommand.KC_FILE_IMPORT => ImportFile(),
             KeyCommand.KC_FILE_SAVE => SaveFile(),
@@ -311,6 +312,18 @@ public static class Screen {
             flags = RenderHint.NONE;
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Create a new blank workbook.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint NewWorkbook() {
+        if (CloseWorkbook() != RenderHint.CANCEL) {
+            _activeBook.New();
+            OpenBook(string.Empty);
+        }
+        return RenderHint.NONE;
     }
 
     /// <summary>

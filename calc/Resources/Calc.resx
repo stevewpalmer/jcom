@@ -425,4 +425,10 @@
     <data name="TimeHMSDescription" xml:space="preserve">
         <value>Hour:Minute:Second 24-Hour Format</value>
     </data>
+    <data name="FileNew" xml:space="preserve">
+        <value>New</value>
+    </data>
+    <data name="FileNewDescription" xml:space="preserve">
+        <value>Create a new workbook file</value>
+    </data>
 </root>

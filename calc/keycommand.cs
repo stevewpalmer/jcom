@@ -61,6 +61,7 @@ public enum KeyCommand {
     KC_EDIT,
     KC_FILE_EXPORT,
     KC_FILE_IMPORT,
+    KC_FILE_NEW,
     KC_FILE_RETRIEVE,
     KC_FILE_SAVE,
     KC_FORMAT_CURRENCY,

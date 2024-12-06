@@ -70,6 +70,16 @@ public class Book {
     }
 
     /// <summary>
+    /// Reset this book back to new. Any existing worksheets will
+    /// be lost unless they are saved.
+    /// </summary>
+    public void New() {
+        _fileInfo = null;
+        _sheets.Clear();
+        _sheets.Add(new Sheet(1));
+    }
+
+    /// <summary>
     /// Opens a workbook from the specified file.
     /// </summary>
     /// <param name="path">The workbook file to be opened</param>

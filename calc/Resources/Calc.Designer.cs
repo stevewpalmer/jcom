@@ -860,5 +860,17 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("TimeHMSDescription", resourceCulture);
             }
         }
+        
+        internal static string FileNew {
+            get {
+                return ResourceManager.GetString("FileNew", resourceCulture);
+            }
+        }
+        
+        internal static string FileNewDescription {
+            get {
+                return ResourceManager.GetString("FileNewDescription", resourceCulture);
+            }
+        }
     }
 }

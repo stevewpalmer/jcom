@@ -205,6 +205,7 @@ public static class Commands {
         new() {
             ID = CommandMapID.FILE,
             Commands = [
+                new CommandMapEntry { Name = Calc.FileNew, CommandId = KeyCommand.KC_FILE_NEW, Description = Calc.FileNewDescription },
                 new CommandMapEntry { Name = Calc.FileOpen, CommandId = KeyCommand.KC_FILE_RETRIEVE, Description = Calc.FileOpenDescription },
                 new CommandMapEntry { Name = Calc.FileSave, CommandId = KeyCommand.KC_FILE_SAVE, Description = Calc.FileSaveDescription },
                 new CommandMapEntry { Name = Calc.FileImport, CommandId = KeyCommand.KC_FILE_IMPORT, Description = Calc.Calc_FileImportDescription },
