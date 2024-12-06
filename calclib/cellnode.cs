@@ -223,7 +223,7 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
             }
             // We have already calculated the formula on this cell
             // so just pick up the original result.
-            if (context.UpdateList.Contains(cell)) {
+            if (context.UpdateList.Contains(cell) && !cell.Error) {
                 return cell.Value;
             }
             context.ReferenceList.Push(cell.Location);
