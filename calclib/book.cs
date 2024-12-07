@@ -104,7 +104,7 @@ public class Book {
                     sheet.ColumnList = inputSheet.ColumnList.Select(cellList => new CellList {
                         Index = cellList.Index,
                         Size = cellList.Size,
-                        Cells = cellList.NonEmptyCells.Select(sourceCell => new Cell(sheet, sourceCell)).ToList()
+                        Cells = cellList.Cells.Select(sourceCell => new Cell(sheet, sourceCell)).ToList()
                     }).ToList();
 
                     sheet.Modified = false;

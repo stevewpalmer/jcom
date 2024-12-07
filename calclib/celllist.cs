@@ -41,12 +41,6 @@ public class CellList {
     public List<Cell> Cells { get; set; } = [];
 
     /// <summary>
-    /// List of non-empty cells in column
-    /// </summary>
-    [JsonIgnore]
-    public List<Cell> NonEmptyCells => Cells.Where(c => !c.IsEmptyCell).ToList();
-
-    /// <summary>
     /// Size of the row or column
     /// </summary>
     public int Size { get; set; }
