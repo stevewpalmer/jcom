@@ -133,6 +133,12 @@ public class CellTests {
         Assert.AreEqual(text.Value, new Variant("TEXT"));
         Assert.AreEqual(text.Content, "TEXT");
         Assert.IsTrue(new Cell(new Sheet(1)) { Content = "=A1+B2" }.HasFormula);
+
+        Cell date = new() { Content = "4 June 1980" };
+        Assert.AreEqual("04/06/1980", date.Content);
+
+        Cell time = new() { Content = "7.30pm" };
+        Assert.AreEqual("19:30", time.Content);
     }
 
     // Verify the comparison of two cell values

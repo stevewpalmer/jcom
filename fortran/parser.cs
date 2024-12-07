@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CCompiler;
 using JComLib;
 
@@ -219,6 +220,7 @@ public partial class Compiler {
         SimpleToken token = ExpectToken(TokenID.STRING);
         if (token != null) {
             StringToken stringToken = token as StringToken;
+            Debug.Assert(stringToken != null);
             NumberParseNode node = new(stringToken.String.ToLower() == "yes" ? 1 : 0);
             return node;
         }

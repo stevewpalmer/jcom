@@ -33,7 +33,6 @@ using JComLib;
 namespace JCalcLib;
 
 public class Cell(Sheet? sheet) {
-    private string _content = string.Empty;
     private string? _customFormatString;
 
     /// <summary>
@@ -52,8 +51,17 @@ public class Cell(Sheet? sheet) {
         Align = other.Align;
         Decimal = other.Decimal;
         Style = new CellStyle(sheet, other.Style);
-        Content = other.Content;
+        ContentString = other.ContentString;
+        Error = other.Error;
+        FormulaTree = other.FormulaTree;
+        Value = new Variant(other.ContentString);
     }
+
+    /// <summary>
+    /// Raw content string.
+    /// </summary>
+    [JsonIgnore]
+    private string ContentString { get; set; } = string.Empty;
 
     /// <summary>
     /// Retrieve or set the cell's value. The cell's value is always the value
@@ -75,6 +83,13 @@ public class Cell(Sheet? sheet) {
                     CellFormat = CellFormat.DATE_DMY;
                 }
                 ComputedValue = _dateValue;
+                return;
+            }
+            if (TryParseTime(value.StringValue, out Variant _timeValue)) {
+                if (!Format.HasValue) {
+                    CellFormat = CellFormat.TIME_HMZ;
+                }
+                ComputedValue = _timeValue;
                 return;
             }
             if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
@@ -113,9 +128,23 @@ public class Cell(Sheet? sheet) {
     /// <exception cref="FormatException">An error was found when setting a formula</exception>
     [JsonInclude]
     public string Content {
-        get => FormulaTree != null ? $"={FormulaTree}" : _content;
+        get {
+            if (FormulaTree != null) {
+                return $"={FormulaTree}";
+            }
+            if (IsEmptyCell) {
+                return string.Empty;
+            }
+            if (Format is CellFormat.DATE_DM or CellFormat.DATE_DMY or CellFormat.DATE_MY) {
+                return DateTime.FromOADate(ComputedValue.DoubleValue).ToShortDateString();
+            }
+            if (Format is CellFormat.TIME_HM or CellFormat.TIME_HMZ or CellFormat.TIME_HMS or CellFormat.TIME_HMSZ) {
+                return DateTime.FromOADate(ComputedValue.DoubleValue).ToShortTimeString();
+            }
+            return ContentString;
+        }
         set {
-            _content = value;
+            ContentString = value;
             FormulaTree = null;
             Value = new Variant(value);
         }
@@ -454,20 +483,21 @@ public class Cell(Sheet? sheet) {
         }
         if (!Value.IsNumber) {
             cellValue = Value.StringValue ?? string.Empty;
-        } else {
+        }
+        else {
             switch (CellFormat) {
                 case CellFormat.FIXED or
-                     CellFormat.PERCENT or
-                     CellFormat.CURRENCY or
-                     CellFormat.SCIENTIFIC or
-                     CellFormat.DATE_DM or
-                     CellFormat.DATE_MY or
-                     CellFormat.DATE_DMY or
-                     CellFormat.TIME_HMSZ or
-                     CellFormat.TIME_HMS or
-                     CellFormat.TIME_HMZ or
-                     CellFormat.TIME_HM or
-                     CellFormat.GENERAL:
+                    CellFormat.PERCENT or
+                    CellFormat.CURRENCY or
+                    CellFormat.SCIENTIFIC or
+                    CellFormat.DATE_DM or
+                    CellFormat.DATE_MY or
+                    CellFormat.DATE_DMY or
+                    CellFormat.TIME_HMSZ or
+                    CellFormat.TIME_HMS or
+                    CellFormat.TIME_HMZ or
+                    CellFormat.TIME_HM or
+                    CellFormat.GENERAL:
                     cellValue = NumberFormats.GetFormat(CellFormat, UseThousandsSeparator, DecimalPlaces).Format(Value.DoubleValue, culture);
                     break;
                 case CellFormat.CUSTOM:
@@ -568,13 +598,30 @@ public class Cell(Sheet? sheet) {
     /// </param>
     /// <returns>True if the value is successfully parsed as a date, false otherwise</returns>
     private static bool TryParseDate(string value, out Variant dateValue) {
-        CultureInfo culture = CultureInfo.CurrentCulture;
-        string compactValue = value.Replace(" ", "");
-        if (DateTime.TryParse(compactValue, culture, DateTimeStyles.None, out DateTime _date)) {
-            dateValue = new Variant(_date.ToOADate());
+        if (DateOnly.TryParse(value, out DateOnly _date)) {
+            dateValue = new Variant(_date.ToDateTime(TimeOnly.MinValue).ToOADate());
             return true;
         }
         dateValue = new Variant(value);
+        return false;
+    }
+
+    /// <summary>
+    /// Try to parse the value as a time and, if we succeed, sets timeValue to the OADate
+    /// value and returns true. Otherwise, it returns the value unchanged and returns false.
+    /// </summary>
+    /// <param name="value">Value to parse</param>
+    /// <param name="timeValue">
+    /// Set to the datetime serial number if the value parses successfully
+    /// as a time, or is set to the input value otherwise
+    /// </param>
+    /// <returns>True if the value is successfully parsed as a time, false otherwise</returns>
+    private static bool TryParseTime(string value, out Variant timeValue) {
+        if (TimeOnly.TryParse(value, out TimeOnly _time)) {
+            timeValue = new Variant(DateTime.Now.Date.Add(_time.ToTimeSpan()).ToOADate());
+            return true;
+        }
+        timeValue = new Variant(value);
         return false;
     }
 }
