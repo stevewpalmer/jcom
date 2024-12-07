@@ -403,7 +403,8 @@ public class Window {
     }
 
     /// <summary>
-    /// Paste cells from the clipboard to the current location.
+    /// Paste cells from the clipboard to the current location while
+    /// respecting the geometry of the original cells.
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint Paste() {
@@ -412,10 +413,14 @@ public class Window {
         if (cellsToPaste.Length > 0) {
             CellLocation current = Sheet.Location;
 
+            Point startPoint = cellsToPaste[0].Location.Point;
             foreach (Cell cellToPaste in cellsToPaste) {
-                Cell cell = Sheet.GetCell(current, true);
+                Point cellPoint = cellToPaste.Location.Point;
+                Cell cell = Sheet.GetCell(new CellLocation {
+                    Column = current.Column + (cellPoint.X - startPoint.X),
+                    Row = current.Row + (cellPoint.Y - startPoint.Y)
+                }, true);
                 cell.CopyFrom(cellToPaste);
-                ++current.Row;
             }
             flags = RenderHint.RECALCULATE;
         }
