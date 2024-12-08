@@ -148,7 +148,10 @@ public static class Screen {
             KeyCommand.KC_FILE_RETRIEVE => OpenWorkbook(),
             KeyCommand.KC_FILE_IMPORT => ImportFile(),
             KeyCommand.KC_FILE_SAVE => SaveFile(),
-            KeyCommand.KC_SETTINGS_COLOURS => ConfigureColours(),
+            KeyCommand.KC_SETTINGS_FGCOLOUR => SetForegroundColour(),
+            KeyCommand.KC_SETTINGS_BGCOLOUR => SetBackgroundColour(),
+            KeyCommand.KC_SETTINGS_MESSAGES => SetMessageColour(),
+            KeyCommand.KC_SETTINGS_SELECTION => SetSelectionColour(),
             KeyCommand.KC_DEFAULT_DATE_DM => SetDefaultFormat(CellFormat.DATE_DM),
             KeyCommand.KC_DEFAULT_DATE_DMY => SetDefaultFormat(CellFormat.DATE_DMY),
             KeyCommand.KC_DEFAULT_DATE_MY => SetDefaultFormat(CellFormat.DATE_MY),
@@ -217,7 +220,7 @@ public static class Screen {
     /// </summary>
     private static void SetCellFactory() {
         CellFactory.BackgroundColour = Colours.BackgroundColour;
-        CellFactory.ForegroundColour = Colours.ForegroundColour;
+        CellFactory.TextColour = Colours.ForegroundColour;
         CellFactory.DecimalPlaces = Config.DefaultDecimals;
         CellFactory.Alignment = Config.DefaultCellAlignment;
         CellFactory.Format = Config.DefaultCellFormat;
@@ -417,6 +420,66 @@ public static class Screen {
     }
 
     /// <summary>
+    /// Display the colour picker for the screen foreground colour.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint SetForegroundColour() {
+        int cellColour = Colours.ForegroundColour;
+        if (!GetColourInput(Calc.ScreenTextColour, ref cellColour)) {
+            return RenderHint.NONE;
+        }
+        Config.ForegroundColour = cellColour;
+        Config.Save();
+        SetCellFactory();
+        return RenderHint.REFRESH;
+    }
+
+    /// <summary>
+    /// Display the colour picker for the screen background colour.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint SetBackgroundColour() {
+        int cellColour = Colours.BackgroundColour;
+        if (!GetColourInput(Calc.ScreenBackgroundColour, ref cellColour)) {
+            return RenderHint.NONE;
+        }
+        Config.BackgroundColour = cellColour;
+        Config.Save();
+        SetCellFactory();
+        return RenderHint.REFRESH;
+    }
+
+    /// <summary>
+    /// Display the colour picker for the messages colour.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint SetMessageColour() {
+        int cellColour = Colours.NormalMessageColour;
+        if (!GetColourInput(Calc.MessageColour, ref cellColour)) {
+            return RenderHint.NONE;
+        }
+        Config.NormalMessageColour = cellColour;
+        Config.Save();
+        SetCellFactory();
+        return RenderHint.REFRESH;
+    }
+
+    /// <summary>
+    /// Display the colour picker for the selection colour.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint SetSelectionColour() {
+        int cellColour = Colours.SelectionColour;
+        if (!GetColourInput(Calc.SelectionColour, ref cellColour)) {
+            return RenderHint.NONE;
+        }
+        Config.SelectionColour = cellColour;
+        Config.Save();
+        SetCellFactory();
+        return RenderHint.REFRESH;
+    }
+
+    /// <summary>
     /// Set the default cell format.
     /// </summary>
     /// <param name="format">Format to be set as default</param>
@@ -480,40 +543,6 @@ public static class Screen {
     }
 
     /// <summary>
-    /// Allow configuring the calc screen colours
-    /// </summary>
-    /// <returns>Render hint</returns>
-    private static RenderHint ConfigureColours() {
-        int backgroundColour = Colours.BackgroundColour;
-        int foregroundColour = Colours.ForegroundColour;
-        int normalMessageColour = Colours.NormalMessageColour;
-        int selectionMessageColour = Colours.SelectionColour;
-        if (!GetColourInput(Calc.EnterBackgroundColour, ref backgroundColour)) {
-            return RenderHint.NONE;
-        }
-        if (!GetColourInput(Calc.EnterForegroundColour, ref foregroundColour)) {
-            return RenderHint.NONE;
-        }
-        if (foregroundColour == backgroundColour) {
-            Status.Message(Calc.BackgroundColourError);
-            return RenderHint.NONE;
-        }
-        if (!GetColourInput(Calc.EnterMessageColour, ref normalMessageColour)) {
-            return RenderHint.NONE;
-        }
-        if (!GetColourInput(Calc.EnterSelectionColour, ref selectionMessageColour)) {
-            return RenderHint.NONE;
-        }
-        Config.BackgroundColour = backgroundColour;
-        Config.ForegroundColour = foregroundColour;
-        Config.NormalMessageColour = normalMessageColour;
-        Config.SelectionColour = selectionMessageColour;
-        Config.Save();
-        SetCellFactory();
-        return RenderHint.REFRESH;
-    }
-
-    /// <summary>
     /// Input a colour index as part of the colour command.
     /// </summary>
     /// <param name="prompt">Prompt to display</param>
@@ -523,8 +552,8 @@ public static class Screen {
         FormField[] formFields = [
             new() {
                 Text = prompt,
-                Value = new Variant(colourValue),
-                Width = 2
+                Type = FormFieldType.COLOURPICKER,
+                Value = new Variant(colourValue)
             }
         ];
         if (!Command.PromptForInput(formFields)) {
@@ -532,10 +561,7 @@ public static class Screen {
             return false;
         }
         colourValue = formFields[0].Value.IntValue;
-        if (colourValue is (< 30 or > 37) and (< 90 or > 97)) {
-            Status.Message(string.Format(Calc.InvalidColourIndex));
-            return false;
-        }
+        Debug.Assert(colourValue >= 0);
         return true;
     }
 

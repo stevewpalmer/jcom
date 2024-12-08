@@ -122,41 +122,43 @@ public class AnsiTextSpan(string text) {
     /// <summary>
     /// Returns the text span with all escape sequences applied.
     /// </summary>
-    /// <returns>Escaped string</returns>
-    public string EscapedText() {
-        string leftPadding = string.Empty;
-        string rightPadding = string.Empty;
-        string text = Text;
-        if (Width > 0) {
-            int spacing;
-            switch (Alignment) {
-                case AnsiAlignment.NONE:
-                    spacing = Width - text.Length;
-                    rightPadding = $"{CSColours}{Utilities.EmptyString(spacing)}{CSI}0m";
-                    break;
+    /// <value>Escaped string</value>
+    public string EscapedText {
+        get {
+            string leftPadding = string.Empty;
+            string rightPadding = string.Empty;
+            string text = Text;
+            if (Width > 0) {
+                int spacing;
+                switch (Alignment) {
+                    case AnsiAlignment.NONE:
+                        spacing = Width - text.Length;
+                        rightPadding = $"{CSColours}{Utilities.EmptyString(spacing)}{CSI}0m";
+                        break;
 
-                case AnsiAlignment.LEFT:
-                    text = text.Trim();
-                    spacing = Width - text.Length;
-                    rightPadding = $"{CSColours}{Utilities.EmptyString(spacing)}{CSI}0m";
-                    break;
+                    case AnsiAlignment.LEFT:
+                        text = text.Trim();
+                        spacing = Width - text.Length;
+                        rightPadding = $"{CSColours}{Utilities.EmptyString(spacing)}{CSI}0m";
+                        break;
 
-                case AnsiAlignment.CENTRE:
-                    text = text.Trim();
-                    spacing = Width - text.Length;
-                    int leftSize = spacing / 2;
-                    int rightSize = spacing - leftSize;
-                    rightPadding = $"{CSColours}{Utilities.EmptyString(leftSize)}{CSI}0m";
-                    leftPadding = $"{CSColours}{Utilities.EmptyString(rightSize)}{CSI}0m";
-                    break;
+                    case AnsiAlignment.CENTRE:
+                        text = text.Trim();
+                        spacing = Width - text.Length;
+                        int leftSize = spacing / 2;
+                        int rightSize = spacing - leftSize;
+                        rightPadding = $"{CSColours}{Utilities.EmptyString(leftSize)}{CSI}0m";
+                        leftPadding = $"{CSColours}{Utilities.EmptyString(rightSize)}{CSI}0m";
+                        break;
 
-                case AnsiAlignment.RIGHT:
-                    text = text.Trim();
-                    spacing = Width - text.Length;
-                    leftPadding = $"{CSColours}{Utilities.EmptyString(spacing)}{CSI}0m";
-                    break;
+                    case AnsiAlignment.RIGHT:
+                        text = text.Trim();
+                        spacing = Width - text.Length;
+                        leftPadding = $"{CSColours}{Utilities.EmptyString(spacing)}{CSI}0m";
+                        break;
+                }
             }
+            return $"{leftPadding}{CS}{text}{CSI}0m{rightPadding}";
         }
-        return $"{leftPadding}{CS}{text}{CSI}0m{rightPadding}";
     }
 }

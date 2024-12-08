@@ -574,12 +574,12 @@ public class CellTests {
             Content = "HELLO WORLD",
             Alignment = CellAlignment.RIGHT,
             Style = new CellStyle(sheet1) {
-                ForegroundColour = AnsiColour.Cyan,
+                TextColour = AnsiColour.Cyan,
                 BackgroundColour = AnsiColour.Green,
                 IsBold = true
             }
         };
-        Assert.AreEqual(@"[36;42m    [0m[36;42m[1mHELLO WORLD[0m", cell1.AnsiTextSpan(15).EscapedText());
+        Assert.AreEqual(@"[36;42m    [0m[36;42m[1mHELLO WORLD[0m", cell1.AnsiTextSpan(15).EscapedText);
 
         Cell cell2 = new(sheet1) {
             Content = "HELLO WORLD",
@@ -589,12 +589,12 @@ public class CellTests {
                 IsUnderlined = true
             }
         };
-        Assert.AreEqual(@"[97;40m[3m[4mHELLO WORLD[0m[97;40m    [0m", cell2.AnsiTextSpan(15).EscapedText());
+        Assert.AreEqual(@"[97;40m[3m[4mHELLO WORLD[0m[97;40m    [0m", cell2.AnsiTextSpan(15).EscapedText);
 
         // Verify CellStyles are copied from another cell
         Sheet sheet2 = new(2);
         Cell cell3 = new(sheet2, cell2);
-        Assert.AreEqual(cell3.Style.ForegroundColour, cell2.Style.ForegroundColour);
+        Assert.AreEqual(cell3.Style.TextColour, cell2.Style.TextColour);
         Assert.AreEqual(cell3.Style.BackgroundColour, cell2.Style.BackgroundColour);
         Assert.AreEqual(cell3.Style.IsBold, cell2.Style.IsBold);
         Assert.AreEqual(cell3.Style.IsItalic, cell2.Style.IsItalic);
@@ -602,7 +602,7 @@ public class CellTests {
 
         // Make sure modifying the style on an associated cell marks the sheet
         // as modified
-        cell3.Style.ForegroundColour = AnsiColour.Cyan;
+        cell3.Style.TextColour = AnsiColour.Cyan;
         Assert.IsTrue(sheet2.Modified);
     }
 
@@ -651,7 +651,7 @@ public class CellTests {
             Alignment = CellAlignment.CENTRE,
             UseThousandsSeparator = true,
             Style = new CellStyle {
-                ForegroundColour = AnsiColour.Blue,
+                TextColour = AnsiColour.Blue,
                 BackgroundColour = AnsiColour.BrightGreen
             }
         };
@@ -662,7 +662,7 @@ public class CellTests {
         // Save cell factory
         int dp = CellFactory.DecimalPlaces;
         CellAlignment align = CellFactory.Alignment;
-        int fg = CellFactory.ForegroundColour;
+        int fg = CellFactory.TextColour;
         int bg = CellFactory.BackgroundColour;
         CellFormat fmt = CellFactory.Format;
 
@@ -671,20 +671,20 @@ public class CellTests {
         // change to the properties.
         CellFactory.DecimalPlaces = 5;
         CellFactory.Alignment = CellAlignment.LEFT;
-        CellFactory.ForegroundColour = AnsiColour.BrightYellow;
+        CellFactory.TextColour = AnsiColour.BrightYellow;
         CellFactory.BackgroundColour = AnsiColour.Blue;
         CellFactory.Format = CellFormat.SCIENTIFIC;
 
         Assert.AreEqual(5, cell1.DecimalPlaces);
         Assert.AreEqual(CellAlignment.LEFT, cell1.Alignment);
         Assert.AreEqual(CellFormat.SCIENTIFIC, cell1.CellFormat);
-        Assert.AreEqual(AnsiColour.BrightYellow, cell1.Style.ForegroundColour);
+        Assert.AreEqual(AnsiColour.BrightYellow, cell1.Style.TextColour);
         Assert.AreEqual(AnsiColour.Blue, cell1.Style.BackgroundColour);
 
         Assert.AreEqual(4, cell3.DecimalPlaces);
         Assert.AreEqual(CellAlignment.CENTRE, cell3.Alignment);
         Assert.IsTrue(cell3.UseThousandsSeparator);
-        Assert.AreEqual(AnsiColour.Blue, cell3.Style.ForegroundColour);
+        Assert.AreEqual(AnsiColour.Blue, cell3.Style.TextColour);
         Assert.AreEqual(AnsiColour.BrightGreen, cell3.Style.BackgroundColour);
 
         // Creating a new cell after changing the factory should pick
@@ -693,13 +693,13 @@ public class CellTests {
         Assert.AreEqual(5, cell2.DecimalPlaces);
         Assert.AreEqual(CellAlignment.LEFT, cell2.Alignment);
         Assert.AreEqual(CellFormat.SCIENTIFIC, cell2.CellFormat);
-        Assert.AreEqual(AnsiColour.BrightYellow, cell2.Style.ForegroundColour);
+        Assert.AreEqual(AnsiColour.BrightYellow, cell2.Style.TextColour);
         Assert.AreEqual(AnsiColour.Blue, cell2.Style.BackgroundColour);
 
         // Reset cell factory
         CellFactory.DecimalPlaces = dp;
         CellFactory.Alignment = align;
-        CellFactory.ForegroundColour = fg;
+        CellFactory.TextColour = fg;
         CellFactory.BackgroundColour = bg;
         CellFactory.Format = fmt;
     }

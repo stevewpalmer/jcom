@@ -459,12 +459,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string InvalidColourIndex {
-            get {
-                return ResourceManager.GetString("InvalidColourIndex", resourceCulture);
-            }
-        }
-        
         internal static string FormatTextDescription {
             get {
                 return ResourceManager.GetString("FormatTextDescription", resourceCulture);
@@ -567,36 +561,6 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string EnterBackgroundColour {
-            get {
-                return ResourceManager.GetString("EnterBackgroundColour", resourceCulture);
-            }
-        }
-        
-        internal static string EnterForegroundColour {
-            get {
-                return ResourceManager.GetString("EnterForegroundColour", resourceCulture);
-            }
-        }
-        
-        internal static string EnterMessageColour {
-            get {
-                return ResourceManager.GetString("EnterMessageColour", resourceCulture);
-            }
-        }
-        
-        internal static string EnterSelectionColour {
-            get {
-                return ResourceManager.GetString("EnterSelectionColour", resourceCulture);
-            }
-        }
-        
-        internal static string BackgroundColourError {
-            get {
-                return ResourceManager.GetString("BackgroundColourError", resourceCulture);
-            }
-        }
-        
         internal static string CreateBackupFilePrompt {
             get {
                 return ResourceManager.GetString("CreateBackupFilePrompt", resourceCulture);
@@ -663,15 +627,15 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string EnterCellColour {
+        internal static string SelectCellTextColour {
             get {
-                return ResourceManager.GetString("EnterCellColour", resourceCulture);
+                return ResourceManager.GetString("SelectCellTextColour", resourceCulture);
             }
         }
         
-        internal static string StyleForeground {
+        internal static string StyleTextColour {
             get {
-                return ResourceManager.GetString("StyleForeground", resourceCulture);
+                return ResourceManager.GetString("StyleTextColour", resourceCulture);
             }
         }
         
@@ -699,9 +663,9 @@ namespace JCalc.Resources {
             }
         }
         
-        internal static string StyleForegroundDescription {
+        internal static string StyleTextColourDescription {
             get {
-                return ResourceManager.GetString("StyleForegroundDescription", resourceCulture);
+                return ResourceManager.GetString("StyleTextColourDescription", resourceCulture);
             }
         }
         
@@ -870,6 +834,90 @@ namespace JCalc.Resources {
         internal static string FileNewDescription {
             get {
                 return ResourceManager.GetString("FileNewDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsTextColour {
+            get {
+                return ResourceManager.GetString("SettingsTextColour", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsBackgroundColour {
+            get {
+                return ResourceManager.GetString("SettingsBackgroundColour", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsMessageColour {
+            get {
+                return ResourceManager.GetString("SettingsMessageColour", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsSelectionColour {
+            get {
+                return ResourceManager.GetString("SettingsSelectionColour", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsTextColourDescription {
+            get {
+                return ResourceManager.GetString("SettingsTextColourDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsBackgroundColourDescription {
+            get {
+                return ResourceManager.GetString("SettingsBackgroundColourDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsMessageColourDescription {
+            get {
+                return ResourceManager.GetString("SettingsMessageColourDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SettingsSelectionColourDescription {
+            get {
+                return ResourceManager.GetString("SettingsSelectionColourDescription", resourceCulture);
+            }
+        }
+        
+        internal static string ScreenTextColour {
+            get {
+                return ResourceManager.GetString("ScreenTextColour", resourceCulture);
+            }
+        }
+        
+        internal static string ScreenBackgroundColour {
+            get {
+                return ResourceManager.GetString("ScreenBackgroundColour", resourceCulture);
+            }
+        }
+        
+        internal static string MessageColour {
+            get {
+                return ResourceManager.GetString("MessageColour", resourceCulture);
+            }
+        }
+        
+        internal static string SelectionColour {
+            get {
+                return ResourceManager.GetString("SelectionColour", resourceCulture);
+            }
+        }
+        
+        internal static string StyleColoursDescription {
+            get {
+                return ResourceManager.GetString("StyleColoursDescription", resourceCulture);
+            }
+        }
+        
+        internal static string SelectCellBackgroundColour {
+            get {
+                return ResourceManager.GetString("SelectCellBackgroundColour", resourceCulture);
             }
         }
     }

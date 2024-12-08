@@ -137,7 +137,7 @@ public class Window {
             KeyCommand.KC_DELETE => PerformBlockAction(BlockAction.DELETE),
             KeyCommand.KC_RANGE_EXPORT => ExportRange(),
             KeyCommand.KC_RANGE_SORT => SortRange(),
-            KeyCommand.KC_STYLE_FG => SetCellForegroundColour(),
+            KeyCommand.KC_STYLE_FG => SetCellTextColour(),
             KeyCommand.KC_STYLE_BG => SetCellBackgroundColour(),
             KeyCommand.KC_STYLE_BOLD => SetCellBold(),
             KeyCommand.KC_STYLE_ITALIC => SetCellItalic(),
@@ -320,7 +320,7 @@ public class Window {
     /// Clear the cursor.
     /// </summary>
     private void ResetCursor() {
-        UpdateActiveCell(Sheet.ActiveCell.Style.ForegroundColour, Sheet.ActiveCell.Style.BackgroundColour);
+        UpdateActiveCell(Sheet.ActiveCell.Style.TextColour, Sheet.ActiveCell.Style.BackgroundColour);
     }
 
     /// <summary>
@@ -640,17 +640,17 @@ public class Window {
 
     /// <summary>
     /// Prompt for a colour value for a range of cells and set
-    /// those cell foreground colour.
+    /// those cell text colour.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint SetCellForegroundColour() {
-        int cellColour = Sheet.ActiveCell.Style.ForegroundColour;
-        if (!Screen.GetColourInput(Calc.EnterCellColour, ref cellColour)) {
+    private RenderHint SetCellTextColour() {
+        int cellColour = Sheet.ActiveCell.Style.TextColour;
+        if (!Screen.GetColourInput(Calc.SelectCellTextColour, ref cellColour)) {
             return RenderHint.NONE;
         }
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
-            cell.Style.ForegroundColour = cellColour;
+            cell.Style.TextColour = cellColour;
         }
         return RenderHint.CONTENTS;
     }
@@ -662,7 +662,7 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint SetCellBackgroundColour() {
         int cellColour = Sheet.ActiveCell.Style.BackgroundColour;
-        if (!Screen.GetColourInput(Calc.EnterCellColour, ref cellColour)) {
+        if (!Screen.GetColourInput(Calc.SelectCellBackgroundColour, ref cellColour)) {
             return RenderHint.NONE;
         }
         foreach (CellLocation location in RangeIterator()) {
@@ -810,7 +810,7 @@ public class Window {
             Terminal.Write(new AnsiTextSpan(cellText) {
                 ForegroundColour = fg,
                 BackgroundColour = bg
-            }.EscapedText());
+            }.EscapedText);
         }
     }
 

@@ -40,7 +40,7 @@ public class CellStyle(Sheet? sheet) {
     /// <param name="sheet1">Worksheet associated with cell style</param>
     /// <param name="other">CellStyle to initialise from</param>
     public CellStyle(Sheet sheet1, CellStyle other) : this(sheet1) {
-        Foreground = other.Foreground;
+        Colour = other.Colour;
         Background = other.Background;
         Bold = other.Bold;
         Italic = other.Italic;
@@ -48,19 +48,19 @@ public class CellStyle(Sheet? sheet) {
     }
 
     /// <summary>
-    /// Foreground colour
+    /// Text colour
     /// </summary>
     [JsonInclude]
-    public int? Foreground { get; private set; }
+    public int? Colour { get; private set; }
 
     /// <summary>
-    /// Foreground colour
+    /// Text colour
     /// </summary>
     [JsonIgnore]
-    public int ForegroundColour {
-        get => Foreground.GetValueOrDefault(CellFactory.ForegroundColour);
+    public int TextColour {
+        get => Colour.GetValueOrDefault(CellFactory.TextColour);
         set {
-            Foreground = value;
+            Colour = value;
             if (sheet != null) {
                 sheet.Modified = true;
             }

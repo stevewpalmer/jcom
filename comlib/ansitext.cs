@@ -52,7 +52,7 @@ public class AnsiText {
     /// <summary>
     /// Return the Ansi text
     /// </summary>
-    public string EscapedText => string.Join("", Spans.Select(span => span.EscapedText()));
+    public string EscapedText => string.Join("", Spans.Select(span => span.EscapedText));
 
     /// <summary>
     /// Return a substring of an AnsiText string starting from start

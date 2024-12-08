@@ -23,6 +23,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
+using JCalcLib;
+
 namespace JComLib;
 
 /// <summary>
@@ -37,7 +40,7 @@ public static class AnsiColour {
     public const int Magenta = 35;
     public const int Cyan = 36;
     public const int White = 37;
-    public const int Gray = 90;
+    public const int Grey = 90;
     public const int BrightRed = 91;
     public const int BrightGreen = 92;
     public const int BrightYellow = 93;
@@ -45,4 +48,72 @@ public static class AnsiColour {
     public const int BrightMagenta = 95;
     public const int BrightCyan = 96;
     public const int BrightWhite = 97;
+
+    private static readonly Dictionary<int, string> colors = new() {
+        { Black, "Black" },
+        { Red, "Red" },
+        { Green, "Green" },
+        { Yellow, "Yellow" },
+        { Blue, "Blue" },
+        { Magenta, "Magenta" },
+        { Cyan, "Cyan" },
+        { White, "White" },
+        { Grey, "Grey" },
+        { BrightRed, "Bright Red" },
+        { BrightGreen, "Bright Green" },
+        { BrightYellow, "Bright Yellow" },
+        { BrightBlue, "Bright Blue" },
+        { BrightMagenta, "Bright Magenta" },
+        { BrightCyan, "Bright Cyan" },
+        { BrightWhite, "Bright White" }
+    };
+
+    /// <summary>
+    /// Return a label for use by the command bar colour picker for the
+    /// specified colour index.
+    /// </summary>
+    /// <param name="colour">Index of colour</param>
+    /// <returns>String label</returns>
+    public static string LabelForColour(int colour) {
+        Debug.Assert(colour >= 0 && colour < colors.Count);
+        int fgColour = colour switch {
+            0 or 1 or 4 or 5 or 8 or 12 => White,
+            _ => Black,
+        };
+        return new AnsiTextSpan(colour.ToString("X")) {
+            Width = 3,
+            Alignment = AnsiAlignment.CENTRE,
+            ForegroundColour = fgColour,
+            BackgroundColour = ColourValues[colour]
+        }.EscapedText;
+    }
+
+    /// <summary>
+    /// The names of all supported colours
+    /// </summary>
+    public static string[] ColourNames => colors.Values.ToArray();
+
+    /// <summary>
+    /// The names of all supported colours
+    /// </summary>
+    public static int[] ColourValues => colors.Keys.ToArray();
+
+    /// <summary>
+    /// Retrieve the colour value for the specified display name.
+    /// </summary>
+    /// <param name="name">Colour name</param>
+    /// <returns>Colour value, or -1</returns>
+    public static int ColourFromName(string name) {
+        foreach (KeyValuePair<int, string> color in colors.Where(color => color.Value == name)) {
+            return color.Key;
+        }
+        return -1;
+    }
+
+    /// <summary>
+    /// Retrieve the display name for the specified colour value.
+    /// </summary>
+    /// <param name="colourValue">Colour value</param>
+    /// <returns>Display name for colour value, or null</returns>
+    public static string NameFromColour(int colourValue) => colors.GetValueOrDefault(colourValue);
 }

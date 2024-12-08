@@ -46,9 +46,9 @@ public static class CellFactory {
     public static int BackgroundColour { get; set; } = AnsiColour.Black;
 
     /// <summary>
-    /// Default cell foreground colour
+    /// Default cell text colour
     /// </summary>
-    public static int ForegroundColour { get; set; } = AnsiColour.BrightWhite;
+    public static int TextColour { get; set; } = AnsiColour.BrightWhite;
 
     /// <summary>
     /// Default cell alignment

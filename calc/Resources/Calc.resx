@@ -224,9 +224,6 @@
     <data name="SettingsBackups" xml:space="preserve">
         <value>Backups</value>
     </data>
-    <data name="InvalidColourIndex" xml:space="preserve">
-        <value>Invalid colour number</value>
-    </data>
     <data name="FormatTextDescription" xml:space="preserve">
         <value>Display formula instead of value</value>
     </data>
@@ -278,21 +275,6 @@
     <data name="ErrorExportingFile" xml:space="preserve">
         <value>Error writing to {0} - {1}</value>
     </data>
-    <data name="EnterBackgroundColour" xml:space="preserve">
-        <value>Enter background colour number</value>
-    </data>
-    <data name="EnterForegroundColour" xml:space="preserve">
-        <value>Enter foreground colour number</value>
-    </data>
-    <data name="EnterMessageColour" xml:space="preserve">
-        <value>Enter message colour number</value>
-    </data>
-    <data name="EnterSelectionColour" xml:space="preserve">
-        <value>Enter selection colour number</value>
-    </data>
-    <data name="BackgroundColourError" xml:space="preserve">
-        <value>Background colour is already set to foreground colour</value>
-    </data>
     <data name="CreateBackupFilePrompt" xml:space="preserve">
         <value>Create backup files when saving? @@</value>
     </data>
@@ -326,11 +308,11 @@
     <data name="Paste" xml:space="preserve">
         <value>Paste</value>
     </data>
-    <data name="EnterCellColour" xml:space="preserve">
-        <value>Enter cell colour</value>
+    <data name="SelectCellTextColour" xml:space="preserve">
+        <value>Select cell text colour</value>
     </data>
-    <data name="StyleForeground" xml:space="preserve">
-        <value>Colour</value>
+    <data name="StyleTextColour" xml:space="preserve">
+        <value>Text</value>
     </data>
     <data name="StyleBackground" xml:space="preserve">
         <value>Background</value>
@@ -344,11 +326,11 @@
     <data name="StyleUnderline" xml:space="preserve">
         <value>Underline</value>
     </data>
-    <data name="StyleForegroundDescription" xml:space="preserve">
-        <value>Set the text foreground colour</value>
+    <data name="StyleTextColourDescription" xml:space="preserve">
+        <value>Set the cell text colour</value>
     </data>
     <data name="StyleBackgroundDescription" xml:space="preserve">
-        <value>Set the text background color</value>
+        <value>Set the cell background colour</value>
     </data>
     <data name="StyleBoldDescription" xml:space="preserve">
         <value>Mark the text in the cell as bold</value>
@@ -430,5 +412,47 @@
     </data>
     <data name="FileNewDescription" xml:space="preserve">
         <value>Create a new workbook file</value>
+    </data>
+    <data name="SettingsTextColour" xml:space="preserve">
+        <value>Text</value>
+    </data>
+    <data name="SettingsBackgroundColour" xml:space="preserve">
+        <value>Background</value>
+    </data>
+    <data name="SettingsMessageColour" xml:space="preserve">
+        <value>Messages</value>
+    </data>
+    <data name="SettingsSelectionColour" xml:space="preserve">
+        <value>Selection</value>
+    </data>
+    <data name="SettingsTextColourDescription" xml:space="preserve">
+        <value>Set the screen text colour</value>
+    </data>
+    <data name="SettingsBackgroundColourDescription" xml:space="preserve">
+        <value>Set the screen background colour</value>
+    </data>
+    <data name="SettingsMessageColourDescription" xml:space="preserve">
+        <value>Set the colour of text on the command and status bar</value>
+    </data>
+    <data name="SettingsSelectionColourDescription" xml:space="preserve">
+        <value>Set the selection colour</value>
+    </data>
+    <data name="ScreenTextColour" xml:space="preserve">
+        <value>Screen text colour</value>
+    </data>
+    <data name="ScreenBackgroundColour" xml:space="preserve">
+        <value>Screen background colour</value>
+    </data>
+    <data name="MessageColour" xml:space="preserve">
+        <value>Command and Status text colour</value>
+    </data>
+    <data name="SelectionColour" xml:space="preserve">
+        <value>Selection colour</value>
+    </data>
+    <data name="StyleColoursDescription" xml:space="preserve">
+        <value>Change the cell colours</value>
+    </data>
+    <data name="SelectCellBackgroundColour" xml:space="preserve">
+        <value>Select cell background colour</value>
     </data>
 </root>

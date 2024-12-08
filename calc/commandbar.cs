@@ -115,7 +115,12 @@ public enum FormFieldType {
     /// <summary>
     /// Pick a range of values
     /// </summary>
-    PICKER
+    PICKER,
+
+    /// <summary>
+    /// Pick a colour
+    /// </summary>
+    COLOURPICKER
 }
 
 /// <summary>
@@ -370,6 +375,12 @@ public class CommandBar {
                     width = userfield.List.Max(p => p.Length);
                     break;
 
+                case FormFieldType.COLOURPICKER:
+                    int indexOfColour = Array.IndexOf(AnsiColour.ColourValues, userfield.Value.IntValue);
+                    value = AnsiColour.LabelForColour(indexOfColour);
+                    width = 3;
+                    break;
+
                 case FormFieldType.TEXT:
                     value = userfield.Value.StringValue;
                     break;
@@ -410,8 +421,17 @@ public class CommandBar {
             if (initialiseField) {
                 inputBuffer = currentField.Inner.Value.StringValue.ToList();
                 if (currentField.Inner.Type == FormFieldType.PICKER) {
+
                     string pickList = string.Join(" ", currentField.Inner.List);
                     Terminal.Write(0, row + 1, _displayWidth, _fgColour, _bgColour, pickList);
+                    Terminal.ShowCursor(false);
+                } else if (currentField.Inner.Type == FormFieldType.COLOURPICKER) {
+
+                    List<string> labels = [];
+                    for (int c = 0; c < AnsiColour.ColourNames.Length; c++) {
+                        labels.Add(AnsiColour.LabelForColour(c));
+                    }
+                    Terminal.Write(0, row + 1, _displayWidth, _fgColour, _bgColour, string.Join(" ", labels));
                     Terminal.ShowCursor(false);
                 }
                 else {
@@ -424,9 +444,17 @@ public class CommandBar {
             }
 
             string text = string.Join("", inputBuffer);
-            int fg = selection ? _bgColour : _fgColour;
-            int bg = selection ? _selColour : _bgColour;
-            Terminal.Write(currentField.X, currentField.Y, currentField.MaxWidth, fg, bg, text);
+            if (currentField.Inner.Type == FormFieldType.COLOURPICKER) {
+                int colourValue = int.Parse(text);
+                int indexOfColour = Array.IndexOf(AnsiColour.ColourValues, colourValue);
+                Terminal.SetCursor(currentField.X, currentField.Y);
+                Terminal.Write(AnsiColour.LabelForColour(indexOfColour));
+            }
+            else {
+                int fg = selection ? _bgColour : _fgColour;
+                int bg = selection ? _selColour : _bgColour;
+                Terminal.Write(currentField.X, currentField.Y, currentField.MaxWidth, fg, bg, text);
+            }
             Terminal.SetCursor(currentField.X + index, currentField.Y);
 
             ConsoleKeyInfo input = Console.ReadKey(true);
@@ -501,6 +529,11 @@ public class CommandBar {
                         continue;
                     }
                     if (currentField.Inner.Type == FormFieldType.NUMBER && !char.IsDigit(input.KeyChar)) {
+                        continue;
+                    }
+                    if (currentField.Inner.Type == FormFieldType.COLOURPICKER && char.IsAsciiHexDigit(input.KeyChar)) {
+                        int colourIndex = Convert.ToInt32(input.KeyChar.ToString(), 16);
+                        inputBuffer = AnsiColour.ColourValues[colourIndex].ToString().ToList();
                         continue;
                     }
                     if (currentField.Inner.Type == FormFieldType.PICKER) {

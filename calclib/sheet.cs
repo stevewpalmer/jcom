@@ -358,7 +358,7 @@ public class Sheet {
                 foreach (int columnWidth in widths) {
                     if (columnIndex >= column) {
                         spans.Add(new AnsiTextSpan(Utilities.SpanBound(labelCellText, index, columnWidth)) {
-                            ForegroundColour = cell.Style.ForegroundColour,
+                            ForegroundColour = cell.Style.TextColour,
                             BackgroundColour = cell.Style.BackgroundColour,
                             Width = columnWidth,
                             Bold = cell.Style.Bold,
@@ -374,7 +374,7 @@ public class Sheet {
             else {
                 if (columnIndex >= column) {
                     spans.Add(new AnsiTextSpan(cell.Text(size)) {
-                        ForegroundColour = cell.Style.ForegroundColour,
+                        ForegroundColour = cell.Style.TextColour,
                         BackgroundColour = cell.Style.BackgroundColour,
                         Width = size,
                         Bold = cell.Style.Bold,

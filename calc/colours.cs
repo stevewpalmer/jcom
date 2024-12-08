@@ -32,12 +32,12 @@ public class Colours {
     private readonly Config? _config;
 
     /// <summary>
-    /// Initialise a Colors object
+    /// Initialise a Colours object
     /// </summary>
     public Colours() : this(null) { }
 
     /// <summary>
-    /// Initialise a Colors object with the specified configuration
+    /// Initialise a Colours object with the specified configuration
     /// </summary>
     /// <param name="config">Configuration file</param>
     public Colours(Config? config) {

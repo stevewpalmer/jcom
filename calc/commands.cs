@@ -33,6 +33,7 @@ namespace JCalc;
 public enum CommandMapID {
     NONE,
     ALIGN,
+    CELLCOLOURS,
     COLOURS,
     COLUMN_WIDTH,
     DATES,
@@ -163,16 +164,16 @@ public static class Commands {
         new() {
             ID = CommandMapID.STYLE,
             Commands = [
-                new CommandMapEntry { Name = Calc.StyleColours, SubCommandId = CommandMapID.COLOURS, Description = Calc.StyleForegroundDescription },
+                new CommandMapEntry { Name = Calc.StyleColours, SubCommandId = CommandMapID.CELLCOLOURS, Description = Calc.StyleColoursDescription },
                 new CommandMapEntry { Name = Calc.StyleBold, CommandId = KeyCommand.KC_STYLE_BOLD, Description = Calc.StyleBoldDescription },
                 new CommandMapEntry { Name = Calc.StyleItalic, CommandId = KeyCommand.KC_STYLE_ITALIC, Description = Calc.StyleItalicDescription },
                 new CommandMapEntry { Name = Calc.StyleUnderline, CommandId = KeyCommand.KC_STYLE_UNDERLINE, Description = Calc.StyleUnderlineDescription }
             ]
         },
         new() {
-            ID = CommandMapID.COLOURS,
+            ID = CommandMapID.CELLCOLOURS,
             Commands = [
-                new CommandMapEntry { Name = Calc.StyleForeground, CommandId = KeyCommand.KC_STYLE_FG, Description = Calc.StyleForegroundDescription },
+                new CommandMapEntry { Name = Calc.StyleTextColour, CommandId = KeyCommand.KC_STYLE_FG, Description = Calc.StyleTextColourDescription },
                 new CommandMapEntry { Name = Calc.StyleBackground, CommandId = KeyCommand.KC_STYLE_BG, Description = Calc.StyleBackgroundDescription }
             ]
         },
@@ -215,11 +216,20 @@ public static class Commands {
         new() {
             ID = CommandMapID.SETTINGS,
             Commands = [
-                new CommandMapEntry { Name = Calc.SettingsColours, CommandId = KeyCommand.KC_SETTINGS_COLOURS, Description = Calc.SettingsColourDescription },
+                new CommandMapEntry { Name = Calc.SettingsColours, SubCommandId = CommandMapID.COLOURS, Description = Calc.SettingsColourDescription },
                 new CommandMapEntry { Name = Calc.SettingsFormat, SubCommandId = CommandMapID.DEFAULT_FORMAT, Description = Calc.SettingsFormatDescription },
                 new CommandMapEntry { Name = Calc.SettingsAlignment, SubCommandId = CommandMapID.DEFAULT_ALIGNMENT, Description = Calc.SettingsAlignmentDescription },
                 new CommandMapEntry { Name = Calc.SettingsDecimalPoints, CommandId = KeyCommand.KC_SETTINGS_DECIMAL_POINTS, Description = Calc.SettingsDecimalPointDescription },
                 new CommandMapEntry { Name = Calc.SettingsBackups, CommandId = KeyCommand.KC_SETTINGS_BACKUPS, Description = Calc.SettingsBackupDescription }
+            ]
+        },
+        new() {
+            ID = CommandMapID.COLOURS,
+            Commands = [
+                new CommandMapEntry { Name = Calc.SettingsTextColour, CommandId = KeyCommand.KC_SETTINGS_FGCOLOUR, Description = Calc.SettingsTextColourDescription },
+                new CommandMapEntry { Name = Calc.SettingsBackgroundColour, CommandId = KeyCommand.KC_SETTINGS_BGCOLOUR, Description = Calc.SettingsBackgroundColourDescription },
+                new CommandMapEntry { Name = Calc.SettingsMessageColour, CommandId = KeyCommand.KC_SETTINGS_MESSAGES, Description = Calc.SettingsMessageColourDescription },
+                new CommandMapEntry { Name = Calc.SettingsSelectionColour, CommandId = KeyCommand.KC_SETTINGS_SELECTION, Description = Calc.SettingsSelectionColourDescription }
             ]
         },
         new() {

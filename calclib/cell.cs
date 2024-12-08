@@ -459,7 +459,7 @@ public class Cell(Sheet? sheet) {
             }
         }
         return new AnsiTextSpan(cellText) {
-            ForegroundColour = thisCell.Style.ForegroundColour,
+            ForegroundColour = thisCell.Style.TextColour,
             BackgroundColour = thisCell.Style.BackgroundColour,
             Alignment = alignment,
             Width = width,
@@ -533,7 +533,7 @@ public class Cell(Sheet? sheet) {
     /// <returns>AnsiTextSpan</returns>
     public AnsiTextSpan AnsiTextSpan(int width) {
         return new AnsiTextSpan(Text(width)) {
-            ForegroundColour = Style.ForegroundColour,
+            ForegroundColour = Style.TextColour,
             BackgroundColour = Style.BackgroundColour,
             Bold = Style.Bold,
             Italic = Style.Italic,

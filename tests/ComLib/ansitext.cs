@@ -44,7 +44,7 @@ public class TestANSIText {
         Assert.AreEqual(AnsiColour.Magenta, 35);
         Assert.AreEqual(AnsiColour.Cyan, 36);
         Assert.AreEqual(AnsiColour.White, 37);
-        Assert.AreEqual(AnsiColour.Gray, 90);
+        Assert.AreEqual(AnsiColour.Grey, 90);
         Assert.AreEqual(AnsiColour.BrightRed, 91);
         Assert.AreEqual(AnsiColour.BrightGreen, 92);
         Assert.AreEqual(AnsiColour.BrightYellow, 93);
