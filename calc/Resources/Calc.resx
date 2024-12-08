@@ -455,4 +455,10 @@
     <data name="SelectCellBackgroundColour" xml:space="preserve">
         <value>Select cell background colour</value>
     </data>
+    <data name="ColumnWidthAuto" xml:space="preserve">
+        <value>Auto-Size</value>
+    </data>
+    <data name="AutoColumnWidthDescription" xml:space="preserve">
+        <value>Automatically size column width</value>
+    </data>
 </root>

@@ -112,6 +112,7 @@ public class Window {
             KeyCommand.KC_FILE_EXPORT => ExportFile(),
             KeyCommand.KC_SET_COLUMN_WIDTH => SetColumnWidth(),
             KeyCommand.KC_RESET_COLUMN_WIDTH => ResetColumnWidth(),
+            KeyCommand.KC_AUTOSIZE_COLUMN_WIDTH => AutoSizeColumnWidth(),
             KeyCommand.KC_ALIGN_LEFT => AlignCells(CellAlignment.LEFT),
             KeyCommand.KC_ALIGN_RIGHT => AlignCells(CellAlignment.RIGHT),
             KeyCommand.KC_ALIGN_CENTRE => AlignCells(CellAlignment.CENTRE),
@@ -506,7 +507,13 @@ public class Window {
         if (Screen.Command.PromptForInput(formFields)) {
             int newWidth = formFields[0].Value.IntValue;
             Debug.Assert(newWidth >= formFields[0].MinimumValue && newWidth <= formFields[0].MaximumValue);
-            flags = Sheet.SetColumnWidth(Sheet.Location.Column, newWidth) ? RenderHint.REFRESH : RenderHint.NONE;
+            flags = RenderHint.NONE;
+
+            foreach (CellLocation location in RangeIterator()) {
+                if (Sheet.SetColumnWidth(location.Column, newWidth)) {
+                    flags = RenderHint.REFRESH;
+                }
+            }
         }
         return flags;
     }
@@ -517,8 +524,24 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint ResetColumnWidth() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet.SetColumnWidth(Sheet.Location.Column, Sheet.DefaultColumnWidth)) {
-            flags = RenderHint.REFRESH;
+        foreach (CellLocation location in RangeIterator()) {
+            if (Sheet.SetColumnWidth(location.Column, Sheet.DefaultColumnWidth)) {
+                flags = RenderHint.REFRESH;
+            }
+        }
+        return flags;
+    }
+
+    /// <summary>
+    /// Automatically size the selected column widths.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint AutoSizeColumnWidth() {
+        RenderHint flags = RenderHint.NONE;
+        foreach (CellLocation location in RangeIterator()) {
+            if (Sheet.SetColumnWidth(location.Column, 0)) {
+                flags = RenderHint.REFRESH;
+            }
         }
         return flags;
     }

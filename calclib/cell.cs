@@ -470,6 +470,12 @@ public class Cell(Sheet? sheet) {
     }
 
     /// <summary>
+    /// Return the nominal width of this cell.
+    /// </summary>
+    [JsonIgnore]
+    public int Width => ComputedValue.HasValue ? ComputedValue.StringValue.Length : 0;
+
+    /// <summary>
     /// Return the string value of the cell for display.
     /// </summary>
     /// <param name="width">Column width to use</param>

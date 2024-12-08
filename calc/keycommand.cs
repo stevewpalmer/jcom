@@ -34,6 +34,7 @@ public enum KeyCommand {
     KC_ALIGN_GENERAL,
     KC_ALIGN_LEFT,
     KC_ALIGN_RIGHT,
+    KC_AUTOSIZE_COLUMN_WIDTH,
     KC_COMMAND_BAR,
     KC_COPY,
     KC_CUT,

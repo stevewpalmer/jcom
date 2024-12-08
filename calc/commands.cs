@@ -236,7 +236,8 @@ public static class Commands {
             ID = CommandMapID.COLUMN_WIDTH,
             Commands = [
                 new CommandMapEntry { Name = Calc.ColumnWidthSet, CommandId = KeyCommand.KC_SET_COLUMN_WIDTH, Description = Calc.SetColumnWidthDescription },
-                new CommandMapEntry { Name = Calc.ColumnWidthReset, CommandId = KeyCommand.KC_RESET_COLUMN_WIDTH, Description = Calc.ResetColumnWidthDescription }
+                new CommandMapEntry { Name = Calc.ColumnWidthReset, CommandId = KeyCommand.KC_RESET_COLUMN_WIDTH, Description = Calc.ResetColumnWidthDescription },
+                new CommandMapEntry { Name = Calc.ColumnWidthAuto, CommandId = KeyCommand.KC_AUTOSIZE_COLUMN_WIDTH, Description = Calc.AutoColumnWidthDescription }
             ]
         },
         new() {

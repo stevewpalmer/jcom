@@ -124,6 +124,14 @@ public class Sheet {
         Debug.Assert(width is >= 0 and <= 100);
         int c = 0;
         bool success = false;
+        if (width == 0) {
+            CellList? cellList = CellListForColumn(column, false);
+            if (cellList != null) {
+                foreach (Cell cell in cellList.Cells) {
+                    width = Math.Max(width, cell.Width);
+                }
+            }
+        }
         while (c < ColumnList.Count) {
             if (ColumnList[c].Index == column) {
                 success = ColumnList[c].Size != width;

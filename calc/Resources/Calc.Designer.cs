@@ -920,5 +920,17 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("SelectCellBackgroundColour", resourceCulture);
             }
         }
+        
+        internal static string ColumnWidthAuto {
+            get {
+                return ResourceManager.GetString("ColumnWidthAuto", resourceCulture);
+            }
+        }
+        
+        internal static string AutoColumnWidthDescription {
+            get {
+                return ResourceManager.GetString("AutoColumnWidthDescription", resourceCulture);
+            }
+        }
     }
 }
