@@ -38,6 +38,7 @@ public enum KeyCommand {
     KC_COMMAND_BAR,
     KC_COPY,
     KC_CUT,
+    KC_DATAFILL,
     KC_DATE_DM,
     KC_DATE_DMY,
     KC_DATE_MY,

@@ -932,5 +932,17 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("AutoColumnWidthDescription", resourceCulture);
             }
         }
+        
+        internal static string RangeFill {
+            get {
+                return ResourceManager.GetString("RangeFill", resourceCulture);
+            }
+        }
+        
+        internal static string RangeFillDescription {
+            get {
+                return ResourceManager.GetString("RangeFillDescription", resourceCulture);
+            }
+        }
     }
 }

@@ -138,6 +138,7 @@ public class Window {
             KeyCommand.KC_DELETE => PerformBlockAction(BlockAction.DELETE),
             KeyCommand.KC_RANGE_EXPORT => ExportRange(),
             KeyCommand.KC_RANGE_SORT => SortRange(),
+            KeyCommand.KC_DATAFILL => FillRange(),
             KeyCommand.KC_STYLE_FG => SetCellTextColour(),
             KeyCommand.KC_STYLE_BG => SetCellBackgroundColour(),
             KeyCommand.KC_STYLE_BOLD => SetCellBold(),
@@ -499,8 +500,8 @@ public class Window {
                 Text = Calc.EnterColumnWidth,
                 Type = FormFieldType.NUMBER,
                 Width = 2,
-                MinimumValue = 1,
-                MaximumValue = 72,
+                MinimumValue = Sheet.MinColumnWidth,
+                MaximumValue = Sheet.MaxColumnWidth,
                 Value = new Variant(Sheet.ColumnWidth(Sheet.Location.Column))
             }
         ];
@@ -735,6 +736,22 @@ public class Window {
         }
         ClearBlock();
         return flags;
+    }
+
+    /// <summary>
+    /// Fill the selected cells. The algorithm applied depends on the number of
+    /// cells at the start of the range that contain values. If only one cell
+    /// has a value, that value is replicated in the range. If two cells have
+    /// values then the difference is applied to subsequent cells. However if
+    /// the two cells are dates then it uses the formatting on the cells to
+    /// determine the date distribution.
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private RenderHint FillRange() {
+        CellFiller filler = new(Sheet, RangeIterator());
+        filler.Process();
+        ClearBlock();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>

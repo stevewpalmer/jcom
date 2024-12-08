@@ -461,4 +461,10 @@
     <data name="AutoColumnWidthDescription" xml:space="preserve">
         <value>Automatically size column width</value>
     </data>
+    <data name="RangeFill" xml:space="preserve">
+        <value>Data-Fill</value>
+    </data>
+    <data name="RangeFillDescription" xml:space="preserve">
+        <value>Fill the selected cells</value>
+    </data>
 </root>

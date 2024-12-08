@@ -48,6 +48,16 @@ public class Sheet {
     public const int DefaultColumnWidth = 10;
 
     /// <summary>
+    /// Minimum column width
+    /// </summary>
+    public const int MinColumnWidth = 1;
+
+    /// <summary>
+    /// Maximum column width
+    /// </summary>
+    public const int MaxColumnWidth = 72;
+
+    /// <summary>
     /// Empty constructor with no sheet number
     /// </summary>
     public Sheet() { }
@@ -115,13 +125,15 @@ public class Sheet {
     }
 
     /// <summary>
-    /// Set the new width of the specified column.
+    /// Set the new width of the specified column. If a width of 0 is
+    /// specified then the new width is the maximum width of all items in
+    /// the column up to MaxColumnWidth.
     /// </summary>
     /// <param name="column">Column number, 1-based</param>
     /// <param name="width">New width</param>
     public bool SetColumnWidth(int column, int width) {
         Debug.Assert(column is >= 1 and <= MaxColumns);
-        Debug.Assert(width is >= 0 and <= 100);
+        Debug.Assert(width is 0 or >= MinColumnWidth and <= MaxColumnWidth);
         int c = 0;
         bool success = false;
         if (width == 0) {
@@ -130,6 +142,7 @@ public class Sheet {
                 foreach (Cell cell in cellList.Cells) {
                     width = Math.Max(width, cell.Width);
                 }
+                width = Math.Max(Math.Min(width, MaxColumnWidth), MinColumnWidth);
             }
         }
         while (c < ColumnList.Count) {

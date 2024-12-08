@@ -144,6 +144,7 @@ public static class Commands {
                 new CommandMapEntry { Name = Calc.RangeAlign, SubCommandId = CommandMapID.ALIGN, Description = Calc.RangeAlignDescription },
                 new CommandMapEntry { Name = Calc.RangeText, SubCommandId = CommandMapID.STYLE, Description = Calc.RangeTextDescription },
                 new CommandMapEntry { Name = Calc.RangeExport, CommandId = KeyCommand.KC_RANGE_EXPORT, Description = Calc.RangeExportDescription },
+                new CommandMapEntry { Name = Calc.RangeFill, CommandId = KeyCommand.KC_DATAFILL, Description = Calc.RangeFillDescription },
                 new CommandMapEntry { Name = Calc.RangeSort, CommandId = KeyCommand.KC_RANGE_SORT, Description = Calc.RangeSortDescription }
             ]
         },
