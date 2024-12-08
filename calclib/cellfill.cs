@@ -76,8 +76,10 @@ public class CellVariantFiller : ICellTypeFiller {
             cellValue = cell.Value;
             return;
         }
-        cell.Value = cellValue + deltaValue;
-        cellValue += deltaValue;
+        if (cellValue.HasValue) {
+            cell.Value = cellValue + deltaValue;
+            cellValue += deltaValue;
+        }
     }
 }
 

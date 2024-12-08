@@ -845,7 +845,7 @@ public class Window {
                     return;
                 }
             }
-            AnsiTextSpan cellText = cell.Text(width, true);
+            AnsiTextSpan cellText = cell.AnsiTextForWidth(width, true);
             Terminal.SetCursor(x, y);
             Terminal.Write(new AnsiTextSpan(cellText) {
                 ForegroundColour = fg,

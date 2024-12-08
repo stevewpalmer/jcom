@@ -42,7 +42,7 @@ public class FunctionTests {
         cell1.Content = "=TIME(12,40,30)";
         cell1.CellFormat = CellFormat.TIME_HMS;
         sheet.Calculate();
-        TimeOnly time = TimeOnly.Parse(cell1.Text(12));
+        TimeOnly time = TimeOnly.Parse(cell1.TextForWidth(12));
         Assert.AreEqual(new TimeOnly(12, 40, 30), time);
     }
 
@@ -56,7 +56,7 @@ public class FunctionTests {
         cell1.Content = "=NOW()";
         cell1.CellFormat = CellFormat.DATE_DMY;
         sheet.Calculate();
-        DateOnly date = DateOnly.Parse(cell1.Text(12));
+        DateOnly date = DateOnly.Parse(cell1.TextForWidth(12));
         Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), date);
     }
 
@@ -70,7 +70,7 @@ public class FunctionTests {
         cell1.Content = "=TODAY()";
         cell1.CellFormat = CellFormat.DATE_DMY;
         sheet.Calculate();
-        DateOnly date = DateOnly.Parse(cell1.Text(12));
+        DateOnly date = DateOnly.Parse(cell1.TextForWidth(12));
         Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), date);
 
         cell1.Content = "=YEAR(TODAY())";

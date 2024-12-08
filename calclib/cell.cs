@@ -427,8 +427,8 @@ public class Cell(Sheet? sheet) {
     /// <param name="width">Column width to use</param>
     /// <param name="includeSpilled">True if we include spilled cells</param>
     /// <returns>AnsiTextSpan for cell</returns>
-    public AnsiTextSpan Text(int width, bool includeSpilled) {
-        string cellText = Text(width);
+    public AnsiTextSpan AnsiTextForWidth(int width, bool includeSpilled) {
+        string cellText = TextForWidth(width);
         Cell thisCell = this;
         AnsiAlignment alignment = AnsiAlignment;
         if (includeSpilled && IsEmptyCell && sheet != null) {
@@ -445,7 +445,7 @@ public class Cell(Sheet? sheet) {
                 int leftCellWidth = sheet.ColumnWidth(column);
                 if (leftCell is { Value.IsNumber: false } && leftCell.Value.StringValue.Length > leftCellWidth) {
                     int leftCellLength = leftCell.Value.StringValue.Length;
-                    string leftCellText = leftCell.Text(leftCellLength);
+                    string leftCellText = leftCell.TextForWidth(leftCellLength);
                     int index = leftCellWidth;
                     while (++column < Location.Column) {
                         index += sheet.ColumnWidth(column);
@@ -473,54 +473,69 @@ public class Cell(Sheet? sheet) {
     /// Return the nominal width of this cell.
     /// </summary>
     [JsonIgnore]
-    public int Width => ComputedValue.HasValue ? ComputedValue.StringValue.Length : 0;
+    public int Width => Text.Length;
 
     /// <summary>
-    /// Return the string value of the cell for display.
+    /// Return the string value of the cell with formatting
+    /// applied.
+    /// </summary>
+    /// <returns>String contents of cell</returns>
+    private string Text {
+        get {
+            string cellValue;
+            if (Error) {
+                return "!ERR";
+            }
+            if (!Value.IsNumber) {
+                cellValue = Value.StringValue ?? string.Empty;
+            }
+            else {
+                CultureInfo culture = CultureInfo.CurrentCulture;
+                switch (CellFormat) {
+                    case CellFormat.FIXED or
+                        CellFormat.PERCENT or
+                        CellFormat.CURRENCY or
+                        CellFormat.SCIENTIFIC or
+                        CellFormat.DATE_DM or
+                        CellFormat.DATE_MY or
+                        CellFormat.DATE_DMY or
+                        CellFormat.TIME_HMSZ or
+                        CellFormat.TIME_HMS or
+                        CellFormat.TIME_HMZ or
+                        CellFormat.TIME_HM or
+                        CellFormat.GENERAL:
+                        cellValue = NumberFormats.GetFormat(CellFormat, UseThousandsSeparator, DecimalPlaces).Format(Value.DoubleValue, culture);
+                        break;
+                    case CellFormat.CUSTOM:
+                        cellValue = CustomFormat != null ? CustomFormat.Format(Value.DoubleValue, culture) : Value.DoubleValue.ToString(CultureInfo.CurrentCulture);
+                        break;
+                    case CellFormat.TEXT:
+                        cellValue = Content;
+                        break;
+                    default:
+                        throw new ArgumentException($"Unknown Cell Format: {CellFormat}");
+                }
+            }
+            return cellValue;
+        }
+    }
+
+    /// <summary>
+    /// Return the string value of the cell for display, formatted for
+    /// the specified column width. Numeric values that exceed the width
+    /// are replaced by a string of asterisks of the given width. Text
+    /// values are truncated to the width. The final output is aligned.
     /// </summary>
     /// <param name="width">Column width to use</param>
     /// <returns>String contents of cell</returns>
-    public string Text(int width) {
+    public string TextForWidth(int width) {
         Debug.Assert(width >= 0);
-        string cellValue;
-        CultureInfo culture = CultureInfo.CurrentCulture;
+        string cellValue = Text;
         if (Error) {
-            return Utilities.CentreString("!ERR", width);
-        }
-        if (!Value.IsNumber) {
-            cellValue = Value.StringValue ?? string.Empty;
-        }
-        else {
-            switch (CellFormat) {
-                case CellFormat.FIXED or
-                    CellFormat.PERCENT or
-                    CellFormat.CURRENCY or
-                    CellFormat.SCIENTIFIC or
-                    CellFormat.DATE_DM or
-                    CellFormat.DATE_MY or
-                    CellFormat.DATE_DMY or
-                    CellFormat.TIME_HMSZ or
-                    CellFormat.TIME_HMS or
-                    CellFormat.TIME_HMZ or
-                    CellFormat.TIME_HM or
-                    CellFormat.GENERAL:
-                    cellValue = NumberFormats.GetFormat(CellFormat, UseThousandsSeparator, DecimalPlaces).Format(Value.DoubleValue, culture);
-                    break;
-                case CellFormat.CUSTOM:
-                    cellValue = CustomFormat != null ? CustomFormat.Format(Value.DoubleValue, CultureInfo.CurrentCulture) : Value.DoubleValue.ToString(CultureInfo.CurrentCulture);
-                    break;
-                case CellFormat.TEXT:
-                    cellValue = Content;
-                    break;
-                default:
-                    throw new ArgumentException($"Unknown Cell Format: {CellFormat}");
-            }
-            if (cellValue.Length > width) {
-                cellValue = new string('*', width);
-            }
+            return Utilities.CentreString(cellValue, width);
         }
         if (cellValue.Length > width) {
-            cellValue = cellValue[..width];
+            cellValue = Value.IsNumber ? new string('*', width) :  cellValue[..width];
         }
         cellValue = Alignment switch {
             CellAlignment.LEFT => cellValue.PadRight(width),
@@ -538,7 +553,7 @@ public class Cell(Sheet? sheet) {
     /// <param name="width">Column width to use</param>
     /// <returns>AnsiTextSpan</returns>
     public AnsiTextSpan AnsiTextSpan(int width) {
-        return new AnsiTextSpan(Text(width)) {
+        return new AnsiTextSpan(TextForWidth(width)) {
             ForegroundColour = Style.TextColour,
             BackgroundColour = Style.BackgroundColour,
             Bold = Style.Bold,

@@ -257,7 +257,7 @@ public class FormulaTests {
         cell1.Content = "=A2";
         cell2.Content = "=A1";
         sheet.Calculate();
-        Assert.AreEqual(" !ERR ", cell1.Text(6));
-        Assert.AreEqual(" !ERR ", cell2.Text(6));
+        Assert.AreEqual(" !ERR ", cell1.TextForWidth(6));
+        Assert.AreEqual(" !ERR ", cell2.TextForWidth(6));
     }
 }

@@ -374,7 +374,7 @@ public class Sheet {
                     widths.Add(columnWidth);
                     size += columnWidth;
                 } while (size < labelLength);
-                string labelCellText = cell.Text(labelLength);
+                string labelCellText = cell.TextForWidth(labelLength);
                 int index = 0;
                 foreach (int columnWidth in widths) {
                     if (columnIndex >= column) {
@@ -394,7 +394,7 @@ public class Sheet {
             }
             else {
                 if (columnIndex >= column) {
-                    spans.Add(new AnsiTextSpan(cell.Text(size)) {
+                    spans.Add(new AnsiTextSpan(cell.TextForWidth(size)) {
                         ForegroundColour = cell.Style.TextColour,
                         BackgroundColour = cell.Style.BackgroundColour,
                         Width = size,
