@@ -86,7 +86,7 @@ public static class Functions {
             return new Variant(date.Year);
         }
         catch {
-            return new Variant(0);
+            throw new Exception("Number out of range");
         }
     }
 
@@ -102,7 +102,7 @@ public static class Functions {
             return new Variant(date.Month);
         }
         catch {
-            return new Variant(0);
+            throw new Exception("Number out of range");
         }
     }
 

@@ -487,7 +487,7 @@ public class Cell(Sheet? sheet) {
     /// applied.
     /// </summary>
     /// <returns>String contents of cell</returns>
-    private string Text {
+    public string Text {
         get {
             string cellValue;
             if (Error) {

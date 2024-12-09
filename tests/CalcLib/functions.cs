@@ -44,6 +44,11 @@ public class FunctionTests {
         sheet.Calculate();
         TimeOnly time = TimeOnly.Parse(cell1.TextForWidth(12));
         Assert.AreEqual(new TimeOnly(12, 40, 30), time);
+
+        cell1.Content = "=TIME(12)";
+        cell1.CellFormat = CellFormat.TIME_HMS;
+        sheet.Calculate();
+        Assert.IsTrue(cell1.Error);
     }
 
     /// <summary>
@@ -78,11 +83,21 @@ public class FunctionTests {
         sheet.Calculate();
         Assert.AreEqual(new Variant(DateTime.Now.Year), cell1.Value);
 
+        cell1.Content = "=YEAR(99999999)";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        Assert.IsTrue(cell1.Error);
+
         cell1.Content = "=MONTH(TODAY())";
         cell1.CellFormat = CellFormat.DATE_DMY;
         sheet.Calculate();
         Assert.AreEqual(new Variant(DateTime.Now.Month), cell1.Value);
         Assert.AreEqual("=MONTH(TODAY())", cell1.Content);
+
+        cell1.Content = "=MONTH(99999999)";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        Assert.IsTrue(cell1.Error);
 
         cell1.Content = "=MONTH(TODAY())&YEAR(TODAY())";
         cell1.CellFormat = CellFormat.GENERAL;

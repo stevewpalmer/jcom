@@ -139,6 +139,9 @@ public class CellTests {
 
         Cell time = new() { Content = "7.30pm" };
         Assert.AreEqual("19:30", time.Content);
+
+        Cell empty = new();
+        Assert.AreEqual("", empty.Content);
     }
 
     // Verify the comparison of two cell values
@@ -342,12 +345,12 @@ public class CellTests {
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
         }.TextForWidth(8));
-        Assert.AreEqual(" 45.8794", new Cell {
+        Assert.AreEqual("45.8794", new Cell {
             Content = "45.8794",
             Alignment = CellAlignment.RIGHT,
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
-        }.TextForWidth(8));
+        }.Text);
         Assert.AreEqual("45.8794 ", new Cell {
             Content = "45.8794",
             Alignment = CellAlignment.CENTRE,
@@ -383,12 +386,12 @@ public class CellTests {
             CellFormat = CellFormat.FIXED,
             DecimalPlaces = 2
         }.TextForWidth(6));
-        Assert.AreEqual("45.88   ", new Cell {
+        Assert.AreEqual("45.88", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
             Alignment = CellAlignment.LEFT,
             DecimalPlaces = 2
-        }.TextForWidth(8));
+        }.Text);
         Assert.AreEqual("  45.88  ", new Cell {
             Content = "45.8794",
             CellFormat = CellFormat.FIXED,
@@ -493,6 +496,12 @@ public class CellTests {
             DecimalPlaces = 0,
             CellFormat = CellFormat.PERCENT
         }.TextForWidth(9));
+        Assert.AreEqual(4, new Cell {
+            Content = "0.2",
+            Alignment = CellAlignment.CENTRE,
+            DecimalPlaces = 0,
+            CellFormat = CellFormat.PERCENT
+        }.Width);
         Assert.AreEqual(" 456700.00% ", new Cell {
             Content = "4567",
             Alignment = CellAlignment.CENTRE,
@@ -617,6 +626,7 @@ public class CellTests {
 
         cellA1.Content = "HELLO WORLD";
         Assert.AreEqual(new Variant("HELLO WORLD"), cellA1.Value);
+        Assert.AreEqual(11, cellA1.Width);
 
         cellA1.Content = "14.90";
         Assert.AreEqual(new Variant(14.90), cellA1.Value);
