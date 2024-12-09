@@ -37,7 +37,6 @@ public class Window {
     private bool _isMarkMode;
     private Point _lastMarkPoint;
     private Point _markAnchor;
-    private int _numberOfColumns;
     private Point _scrollOffset = Point.Empty;
     private Rectangle _sheetBounds;
     private Rectangle _viewportBounds;
@@ -82,6 +81,7 @@ public class Window {
     public void Refresh(RenderHint flags) {
         if (flags.HasFlag(RenderHint.REFRESH)) {
             Screen.UpdateCursorPosition();
+            SyncRowColumnToSheet();
             RenderFrame();
             flags |= RenderHint.CONTENTS;
         }
@@ -209,13 +209,9 @@ public class Window {
 
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;
-        _numberOfColumns = 0;
         while (x < frameRect.Right && columnNumber <= Sheet.MaxColumns) {
             int width = Sheet.ColumnWidth(columnNumber);
             int space = Math.Min(width, frameRect.Width - x);
-            if (space == width) {
-                ++_numberOfColumns;
-            }
             Terminal.Write(x, y, width, fg, bg, Utilities.CentreString(Cell.ColumnToAddress(columnNumber), width)[..space]);
             x += width;
             columnNumber++;
@@ -615,7 +611,12 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint ExportRange() {
-        return ExportExtent(GetMarkExtent());
+        RenderHint flags = ExportExtent(GetMarkExtent());
+        if (flags != RenderHint.CANCEL) {
+            ClearBlock();
+            flags = RenderHint.REFRESH;
+        }
+        return flags;
     }
 
     /// <summary>
@@ -1044,18 +1045,40 @@ public class Window {
     }
 
     /// <summary>
+    /// Compute the number of full columns visible in this sheet.
+    /// </summary>
+    /// <returns>Number of fully visible columns</returns>
+    private int TotalColumnsOnSheet() {
+        int x = _sheetBounds.X;
+        int columnNumber = 1 + _scrollOffset.X;
+        int numberOfColumns = 0;
+        while (x < _viewportBounds.Right && columnNumber <= Sheet.MaxColumns) {
+            int width = Sheet.ColumnWidth(columnNumber);
+            int space = Math.Min(width, _viewportBounds.Width - x);
+            if (space == width) {
+                ++numberOfColumns;
+            }
+            x += width;
+            columnNumber++;
+        }
+        return numberOfColumns;
+    }
+
+    /// <summary>
     /// Sync the Sheet.Row and Sheet.Column to ensure they are visible on the window by
     /// adjusting the scroll offsets as appropriate.
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint SyncRowColumnToSheet() {
         RenderHint flags = RenderHint.CURSOR;
+        int numberOfColumns = TotalColumnsOnSheet();
+
         if (Sheet.Location.Column <= _scrollOffset.X) {
             _scrollOffset.X = Sheet.Location.Column - 1;
             flags |= RenderHint.REFRESH;
         }
-        if (Sheet.Location.Column > _numberOfColumns + _scrollOffset.X) {
-            _scrollOffset.X = Sheet.Location.Column - _numberOfColumns;
+        if (Sheet.Location.Column > numberOfColumns + _scrollOffset.X) {
+            _scrollOffset.X = Sheet.Location.Column - numberOfColumns;
             flags |= RenderHint.REFRESH;
         }
         if (Sheet.Location.Row <= _scrollOffset.Y) {
