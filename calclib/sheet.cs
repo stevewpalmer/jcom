@@ -135,7 +135,6 @@ public class Sheet {
         Debug.Assert(column is >= 1 and <= MaxColumns);
         Debug.Assert(width is 0 or >= MinColumnWidth and <= MaxColumnWidth);
 
-        bool success = false;
         if (width == 0) {
             CellList? cellList = CellListForColumn(column, false);
             if (cellList != null) {
@@ -148,7 +147,7 @@ public class Sheet {
 
         CellList? columnList = CellListForColumn(column, true);
         Debug.Assert(columnList != null);
-        success = columnList.Size != width;
+        bool success = columnList.Size != width;
         columnList.Size = width;
         if (success) {
             Modified = true;
@@ -379,6 +378,7 @@ public class Sheet {
                             Underline = cell.Style.Underline,
                             Alignment = AnsiAlignment.NONE
                         });
+                        totalWidth += size;
                     }
                     index += columnWidth;
                     columnIndex++;
@@ -395,10 +395,10 @@ public class Sheet {
                         Underline = cell.Style.Underline,
                         Alignment = cell.AnsiAlignment
                     });
+                    totalWidth += size;
                 }
                 columnIndex++;
             }
-            totalWidth += size;
         }
         return new AnsiText(spans);
     }
