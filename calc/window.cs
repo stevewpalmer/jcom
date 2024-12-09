@@ -516,6 +516,7 @@ public class Window {
                 }
             }
         }
+        ClearBlock();
         return flags;
     }
 
@@ -530,6 +531,7 @@ public class Window {
                 flags = RenderHint.REFRESH;
             }
         }
+        ClearBlock();
         return flags;
     }
 
@@ -544,6 +546,7 @@ public class Window {
                 flags = RenderHint.REFRESH;
             }
         }
+        ClearBlock();
         return flags;
     }
 

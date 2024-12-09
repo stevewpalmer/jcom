@@ -326,13 +326,20 @@ public class Cell(Sheet? sheet) {
     /// Copy properties from another cell
     /// </summary>
     public void CopyFrom(Cell other) {
+        StyleFrom(other);
+        Content = other.FormulaTree != null ? $"={other.FormulaTree.ToRawString()}" : other.Content;
+    }
+
+    /// <summary>
+    /// Copy style from another cell
+    /// </summary>
+    public void StyleFrom(Cell other) {
         CellFormat = other.CellFormat;
         CustomFormat = other.CustomFormat;
         CustomFormatString = other.CustomFormatString;
         Alignment = other.Alignment;
         DecimalPlaces = other.DecimalPlaces;
         Style = other.Style;
-        Content = other.FormulaTree != null ? $"={other.FormulaTree.ToRawString()}" : other.Content;
     }
 
     /// <summary>

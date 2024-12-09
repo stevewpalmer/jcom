@@ -134,7 +134,7 @@ public class Sheet {
     public bool SetColumnWidth(int column, int width) {
         Debug.Assert(column is >= 1 and <= MaxColumns);
         Debug.Assert(width is 0 or >= MinColumnWidth and <= MaxColumnWidth);
-        int c = 0;
+
         bool success = false;
         if (width == 0) {
             CellList? cellList = CellListForColumn(column, false);
@@ -145,19 +145,11 @@ public class Sheet {
                 width = Math.Max(Math.Min(width, MaxColumnWidth), MinColumnWidth);
             }
         }
-        while (c < ColumnList.Count) {
-            if (ColumnList[c].Index == column) {
-                success = ColumnList[c].Size != width;
-                ColumnList[c].Size = width;
-                break;
-            }
-            if (ColumnList[c].Index > column) {
-                ColumnList.Insert(c, new CellList { Index = column, Size = width });
-                success = true;
-                break;
-            }
-            c++;
-        }
+
+        CellList? columnList = CellListForColumn(column, true);
+        Debug.Assert(columnList != null);
+        success = columnList.Size != width;
+        columnList.Size = width;
         if (success) {
             Modified = true;
         }

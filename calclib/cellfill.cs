@@ -24,6 +24,7 @@
 // under the License.
 
 using System.Diagnostics;
+using System.Globalization;
 using JComLib;
 
 namespace JCalcLib;
@@ -56,6 +57,7 @@ public abstract class ICellTypeFiller {
 public class CellVariantFiller : ICellTypeFiller {
     private Variant cellValue = new(0);
     private Variant deltaValue = new(0);
+    private Cell? firstCell;
 
     /// <summary>
     /// Update the variant cell at the index. If index is 1, use the
@@ -68,16 +70,21 @@ public class CellVariantFiller : ICellTypeFiller {
     /// <param name="cell">Cell to fill</param>
     public override void Update(int index, Cell cell) {
         if (index == 1) {
+            firstCell = cell;
             cellValue = cell.Value;
             return;
         }
         if (index == 2 && cell is { IsEmptyCell: false, Value.HasValue: true }) {
             deltaValue = cell.Value - cellValue;
             cellValue = cell.Value;
+            Debug.Assert(firstCell != null);
+            cell.StyleFrom(firstCell);
             return;
         }
         if (cellValue.HasValue) {
-            cell.Value = cellValue + deltaValue;
+            Debug.Assert(firstCell != null);
+            cell.StyleFrom(firstCell);
+            cell.Content = (cellValue + deltaValue).ToString();
             cellValue += deltaValue;
         }
     }
@@ -90,6 +97,7 @@ public class CellDateVariantFiller : ICellTypeFiller {
     private DateTime cellDateTime;
     private int dayDelta;
     private int monthDelta;
+    private Cell? firstCell;
 
     /// <summary>
     /// Update the date in the cell at the index. If index is 1, use the
@@ -107,11 +115,12 @@ public class CellDateVariantFiller : ICellTypeFiller {
     public override void Update(int index, Cell cell) {
         if (index == 1) {
             cellDateTime = DateTime.FromOADate(cell.Value.DoubleValue);
+            firstCell = cell;
             return;
         }
         if (index == 2 && cell is { IsEmptyCell: false, Value.HasValue: true }) {
             DateTime deltaDateTime = DateTime.FromOADate(cell.Value.DoubleValue);
-            switch (cell.Format) {
+            switch (cell.CellFormat) {
                 case CellFormat.DATE_DMY:
                 case CellFormat.DATE_DM:
                     dayDelta = (deltaDateTime - cellDateTime).Days;
@@ -120,11 +129,15 @@ public class CellDateVariantFiller : ICellTypeFiller {
                     monthDelta = (deltaDateTime.Year - cellDateTime.Year) * 12 + deltaDateTime.Month - cellDateTime.Month;
                     break;
             }
+            Debug.Assert(firstCell != null);
+            cell.StyleFrom(firstCell);
             cellDateTime = deltaDateTime;
             return;
         }
         cellDateTime = cellDateTime.AddDays(dayDelta).AddMonths(monthDelta);
-        cell.Value = new Variant(cellDateTime.ToOADate());
+        Debug.Assert(firstCell != null);
+        cell.StyleFrom(firstCell);
+        cell.Content = cellDateTime.ToOADate().ToString(CultureInfo.CurrentCulture);
     }
 }
 
