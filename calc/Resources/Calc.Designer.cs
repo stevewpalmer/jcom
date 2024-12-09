@@ -944,5 +944,11 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("RangeFillDescription", resourceCulture);
             }
         }
+        
+        internal static string TruncatedCSVImport {
+            get {
+                return ResourceManager.GetString("TruncatedCSVImport", resourceCulture);
+            }
+        }
     }
 }

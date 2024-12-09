@@ -467,4 +467,7 @@
     <data name="RangeFillDescription" xml:space="preserve">
         <value>Fill the selected cells</value>
     </data>
+    <data name="TruncatedCSVImport" xml:space="preserve">
+        <value>Input file too large. Data has been truncated.</value>
+    </data>
 </root>

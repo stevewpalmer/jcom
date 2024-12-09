@@ -386,15 +386,24 @@ public static class Screen {
             inputValue = fileInfo.FullName;
 
             Sheet sheet = _activeBook.AddSheet();
+            bool truncated = false;
             try {
                 using TextReader stream = new StreamReader(inputValue);
                 using CsvParser parser = new(stream, CultureInfo.InvariantCulture);
 
                 int row = 1;
                 while (parser.Read()) {
+                    if (row > Sheet.MaxRows) {
+                        truncated = true;
+                        break;
+                    }
                     string[]? fields = parser.Record;
                     if (fields != null) {
-                        for (int column = 1; column <= fields.Length; column++) {
+                        if (fields.Length > Sheet.MaxColumns) {
+                            truncated = true;
+                        }
+                        int maxColumn = Math.Min(Sheet.MaxColumns, fields.Length);
+                        for (int column = 1; column <= maxColumn; column++) {
                             Cell cell = sheet.GetCell(column, row, true);
                             cell.Content = fields[column - 1];
                         }
@@ -409,6 +418,9 @@ public static class Screen {
             catch (FileNotFoundException) {
                 Status.Message(string.Format(Calc.CannotOpenFile, fileInfo.Name));
                 return RenderHint.NONE;
+            }
+            if (truncated) {
+                Status.Message(Calc.TruncatedCSVImport);
             }
             Window newWindow = new(sheet);
             AddWindow(newWindow);
