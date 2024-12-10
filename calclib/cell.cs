@@ -78,18 +78,12 @@ public class Cell(Sheet? sheet) {
             if (sheet != null) {
                 sheet.Modified = true;
             }
-            if (TryParseDate(value.StringValue, out Variant _dateValue)) {
+            if (TryParseDate(value.StringValue, out Variant _dateValue, out string _format)) {
                 if (!Format.HasValue) {
-                    CellFormat = CellFormat.DATE_DMY;
+                    CellFormat = CellFormat.CUSTOM;
+                    CustomFormatString = _format;
                 }
                 ComputedValue = _dateValue;
-                return;
-            }
-            if (TryParseTime(value.StringValue, out Variant _timeValue)) {
-                if (!Format.HasValue) {
-                    CellFormat = CellFormat.TIME_HMZ;
-                }
-                ComputedValue = _timeValue;
                 return;
             }
             if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
@@ -624,32 +618,44 @@ public class Cell(Sheet? sheet) {
     /// Set to the date serial number if the value parses successfully
     /// as a date, or is set to the input value otherwise
     /// </param>
+    /// <param name="customFormat">Custom format to be applied to the cell if successful</param>
     /// <returns>True if the value is successfully parsed as a date, false otherwise</returns>
-    private static bool TryParseDate(string value, out Variant dateValue) {
-        if (DateOnly.TryParse(value, out DateOnly _date)) {
-            dateValue = new Variant(_date.ToDateTime(TimeOnly.MinValue).ToOADate());
-            return true;
+    private static bool TryParseDate(string value, out Variant dateValue, out string customFormat) {
+        (string, string)[] formats = [
+            ("yyyy-MM-ddTHH:mm:ssZ", "d/m/yyyy h:mm:ss"),
+            ("d/M", "d-m"),
+            ("d/MMM", "d-mmm"),
+            ("d/MMMM", "d-mmmm"),
+            ("d MMM", "d-mmm"),
+            ("d MMMM", "d-mmmm"),
+            ("d MMMM y", "d-mmmm-y"),
+            ("d MMMM yyyy", "d-mmmm-yyy"),
+            ("d/M/y", "d-m-y"),
+            ("d/M/yyyy", "d-m-yyy"),
+            ("MMM/y", "mmm-y"),
+            ("MMMM/y", "mmmm-y"),
+            ("MMM/yyyy", "mmm-yyy"),
+            ("MMMM/yyyy", "mmmm-yyy"),
+            ("MMM y", "mmm-y"),
+            ("MMMM y", "mmmm-y"),
+            ("MMM yyyy", "mmm-yyy"),
+            ("MMMM yyyy", "mmmm-yyy"),
+            ("h:m tt", "h:mm am/pm"),
+            ("H:m", "h:mm"),
+            ("h tt", "h am/pm"),
+            ("H:m", "h:mm"),
+            ("h:m:s tt", "h:mm:ss am/pm"),
+            ("H:m:s", "h:mm:ss")
+        ];
+        foreach ((string, string) format in formats) {
+            if (DateTime.TryParseExact(value, format.Item1, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out DateTime dateTime)) {
+                dateValue = new Variant(dateTime.ToOADate());
+                customFormat = format.Item2;
+                return true;
+            }
         }
         dateValue = new Variant(value);
-        return false;
-    }
-
-    /// <summary>
-    /// Try to parse the value as a time and, if we succeed, sets timeValue to the OADate
-    /// value and returns true. Otherwise, it returns the value unchanged and returns false.
-    /// </summary>
-    /// <param name="value">Value to parse</param>
-    /// <param name="timeValue">
-    /// Set to the datetime serial number if the value parses successfully
-    /// as a time, or is set to the input value otherwise
-    /// </param>
-    /// <returns>True if the value is successfully parsed as a time, false otherwise</returns>
-    private static bool TryParseTime(string value, out Variant timeValue) {
-        if (TimeOnly.TryParse(value, out TimeOnly _time)) {
-            timeValue = new Variant(DateTime.Now.Date.Add(_time.ToTimeSpan()).ToOADate());
-            return true;
-        }
-        timeValue = new Variant(value);
+        customFormat = "";
         return false;
     }
 }

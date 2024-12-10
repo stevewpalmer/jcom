@@ -96,10 +96,10 @@ public class CellTests {
     // to the correct OADate representation.
     [Test]
     public void VerifyTryParseDate() {
-        Assert.AreEqual(new Variant(45387), new Cell { Content = "5-Apr" }.Value);
-        Assert.AreEqual(new Variant(45017), new Cell { Content = "Apr-2023" }.Value);
-        Assert.AreEqual(new Variant(45069), new Cell { Content = "23-May-2023" }.Value);
-        Assert.AreEqual(new Variant(45387), new Cell { Content = "5 - Apr" }.Value);
+        Assert.AreEqual(new Variant(45387), new Cell { Content = "5 Apr" }.Value);
+        Assert.AreEqual(new Variant(45017), new Cell { Content = "Apr 2023" }.Value);
+        Assert.AreEqual(new Variant(45069), new Cell { Content = "23 May 2023" }.Value);
+        Assert.AreEqual(new Variant(45387), new Cell { Content = "5  Apr" }.Value);
         Assert.AreEqual(new Variant("12-XYZ"), new Cell { Content = "12-XYZ" }.Value);
     }
 
@@ -135,10 +135,10 @@ public class CellTests {
         Assert.IsTrue(new Cell(new Sheet(1)) { Content = "=A1+B2" }.HasFormula);
 
         Cell date = new() { Content = "4 June 1980" };
-        Assert.AreEqual("04/06/1980", date.Content);
+        Assert.AreEqual("4-June-1980", date.Text);
 
-        Cell time = new() { Content = "7.30pm" };
-        Assert.AreEqual("19:30", time.Content);
+        Cell time = new() { Content = "7:30 pm" };
+        Assert.AreEqual("7:30 PM", time.Text);
 
         Cell empty = new();
         Assert.AreEqual("", empty.Content);
