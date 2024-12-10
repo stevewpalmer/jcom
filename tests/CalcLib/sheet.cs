@@ -58,10 +58,10 @@ public class SheetTests {
     }
 
     /// <summary>
-    /// Verify insertion and deletion of random columns
+    /// Verify deletion of random columns
     /// </summary>
     [Test]
-    public void TestInsertAndDeleteColumns() {
+    public void TestDeleteColumns() {
         Sheet sheet = new(1);
         Random random = new();
         List<(CellLocation, Variant)> cells = [];
@@ -74,6 +74,30 @@ public class SheetTests {
         }
         foreach ((CellLocation cellLocation, Variant _) in cells) {
             sheet.DeleteColumn(cellLocation.Column);
+        }
+        foreach ((CellLocation cellLocation, Variant value) in cells) {
+            Cell cell = sheet.GetCell(cellLocation, false);
+            Assert.IsTrue(cell.IsEmptyCell);
+        }
+    }
+
+    /// <summary>
+    /// Verify deletion of random rows
+    /// </summary>
+    [Test]
+    public void TestDeleteRows() {
+        Sheet sheet = new(1);
+        Random random = new();
+        List<(CellLocation, Variant)> cells = [];
+        for (int i = 0; i < 10; i++) {
+            int column = random.Next(1, Sheet.MaxColumns);
+            int row = random.Next(1, Sheet.MaxRows);
+            Cell cell = sheet.GetCell(column, row, true);
+            cell.Value = new Variant(random.Next(0, 3000));
+            cells.Add((cell.Location, cell.Value));
+        }
+        foreach ((CellLocation cellLocation, Variant _) in cells) {
+            sheet.DeleteRow(cellLocation.Row);
         }
         foreach ((CellLocation cellLocation, Variant value) in cells) {
             Cell cell = sheet.GetCell(cellLocation, false);
