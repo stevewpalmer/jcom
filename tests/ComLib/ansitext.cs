@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Collections.Generic;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -52,6 +53,26 @@ public class TestANSIText {
         Assert.AreEqual(AnsiColour.BrightMagenta, 95);
         Assert.AreEqual(AnsiColour.BrightCyan, 96);
         Assert.AreEqual(AnsiColour.BrightWhite, 97);
+    }
+
+    /// <summary>
+    /// Verify the AnsiColour names and values
+    /// </summary>
+    [Test]
+    public void TestColourNames() {
+        IList<string> names = AnsiColour.ColourNames;
+        int[] colours = AnsiColour.ColourValues;
+
+        foreach (int colour in colours) {
+            string name = AnsiColour.NameFromColour(colour);
+            string label = AnsiColour.LabelForColour(colour);
+            Assert.AreEqual(colour, AnsiColour.ColourFromName(name));
+            Assert.IsTrue(label.Contains(Array.FindIndex(colours, c => c == colour).ToString("X")));
+            Assert.IsTrue(names.Contains(name));
+        }
+
+        // Invalid colour name test
+        Assert.AreEqual(-1, AnsiColour.ColourFromName("Brighton"));
     }
 
     // Test a plain ANSI text string with no formatting.

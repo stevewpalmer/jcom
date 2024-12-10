@@ -69,34 +69,35 @@ public static class AnsiColour {
     };
 
     /// <summary>
-    /// Return a label for use by the command bar colour picker for the
-    /// specified colour index.
-    /// </summary>
-    /// <param name="colour">Index of colour</param>
-    /// <returns>String label</returns>
-    public static string LabelForColour(int colour) {
-        Debug.Assert(colour >= 0 && colour < colors.Count);
-        int fgColour = colour switch {
-            0 or 1 or 4 or 5 or 8 or 12 => White,
-            _ => Black,
-        };
-        return new AnsiTextSpan(colour.ToString("X")) {
-            Width = 3,
-            Alignment = AnsiAlignment.CENTRE,
-            ForegroundColour = fgColour,
-            BackgroundColour = ColourValues[colour]
-        }.EscapedText;
-    }
-
-    /// <summary>
     /// The names of all supported colours
     /// </summary>
     public static string[] ColourNames => colors.Values.ToArray();
 
     /// <summary>
-    /// The names of all supported colours
+    /// The all supported colour values
     /// </summary>
     public static int[] ColourValues => colors.Keys.ToArray();
+
+    /// <summary>
+    /// Return a label for use by the command bar colour picker for the
+    /// specified colour.
+    /// </summary>
+    /// <param name="colourValue">Colour value</param>
+    /// <returns>String label</returns>
+    public static string LabelForColour(int colourValue) {
+        int colourIndex = Array.FindIndex(ColourValues, c => c == colourValue);
+        Debug.Assert(colourIndex >= 0 && colourIndex < colors.Count);
+        int fgColour = colourIndex switch {
+            0 or 1 or 4 or 5 or 8 or 12 => White,
+            _ => Black
+        };
+        return new AnsiTextSpan(colourIndex.ToString("X")) {
+            Width = 3,
+            Alignment = AnsiAlignment.CENTRE,
+            ForegroundColour = fgColour,
+            BackgroundColour = ColourValues[colourIndex]
+        }.EscapedText;
+    }
 
     /// <summary>
     /// Retrieve the colour value for the specified display name.
