@@ -388,10 +388,12 @@ public static class Screen {
             Sheet sheet = _activeBook.AddSheet();
             bool truncated = false;
             try {
-                using TextReader stream = new StreamReader(inputValue);
+                using StreamReader stream = new(inputValue);
                 using CsvParser parser = new(stream, CultureInfo.InvariantCulture);
 
                 int row = 1;
+                long fileSize = stream.BaseStream.Length;
+                int lastPercent = -1;
                 while (parser.Read()) {
                     if (row > Sheet.MaxRows) {
                         truncated = true;
@@ -408,6 +410,13 @@ public static class Screen {
                             cell.Content = fields[column - 1];
                         }
                     }
+                    int percent = Convert.ToInt32(parser.CharCount / (double)fileSize * 100.0d);
+                    if (percent != lastPercent) {
+                        if (percent % 5 == 0) {
+                            Status.Message($"Importing file ... {percent}% complete.");
+                        }
+                        lastPercent = percent;
+                    }
                     row++;
                 }
             }
@@ -419,6 +428,7 @@ public static class Screen {
                 Status.Message(string.Format(Calc.CannotOpenFile, fileInfo.Name));
                 return RenderHint.NONE;
             }
+            Status.ClearMessage();
             if (truncated) {
                 Status.Message(Calc.TruncatedCSVImport);
             }
