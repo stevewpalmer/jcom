@@ -2,9 +2,9 @@
 
 This repository contains the source code for a simple console
 based operating system similar to those from the 1970s and 80s. It
-includes a basic shell interface, a text editor, a Comal compiler
-and interpreter and a Fortran compiler. Other features are being
-added over time.
+includes a basic shell interface, a simple spreadsheet, a text
+editor, a Comal compiler and interpreter and a Fortran compiler.
+Other features are being added over time.
 
 This is very much a personal project by one who grew up during
 the 1980s and for who my first experience with computers was via
@@ -15,7 +15,7 @@ started with learning to write simple programs. In addition, by
 eliminating network access, it avoids almost all the security
 issues inherent in today's systems.
 
-The solution currently includes four projects:
+The solution currently includes these projects:
 
 ### Shell
 
