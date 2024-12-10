@@ -158,12 +158,10 @@ public class Window {
     /// </summary>
     /// <returns>Unapplied render hint</returns>
     private RenderHint ApplyRenderHint(RenderHint flags) {
-        if (flags.HasFlag(RenderHint.RECALCULATE)) {
+        if (Sheet.NeedRecalculate) {
             IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
             UpdateCells(cellsToUpdate);
-            Sheet.NeedRecalculate = false;
             flags |= RenderHint.CONTENTS;
-            flags &= ~RenderHint.RECALCULATE;
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
             if (_isMarkMode) {
@@ -418,7 +416,7 @@ public class Window {
                 }, true);
                 cell.CopyFrom(cellToPaste);
             }
-            flags = RenderHint.RECALCULATE;
+            Sheet.NeedRecalculate = true;
         }
         return flags;
     }
@@ -549,12 +547,8 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertColumn() {
-        RenderHint flags = RenderHint.REFRESH;
         Sheet.InsertColumn(Sheet.Location.Column);
-        if (Sheet.NeedRecalculate) {
-            flags |= RenderHint.RECALCULATE;
-        }
-        return flags;
+        return RenderHint.REFRESH;
     }
 
     /// <summary>
@@ -562,12 +556,8 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint InsertRow() {
-        RenderHint flags = RenderHint.REFRESH;
         Sheet.InsertRow(Sheet.Location.Row);
-        if (Sheet.NeedRecalculate) {
-            flags |= RenderHint.RECALCULATE;
-        }
-        return flags;
+        return RenderHint.REFRESH;
     }
 
     /// <summary>
@@ -575,12 +565,8 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteColumn() {
-        RenderHint flags = RenderHint.REFRESH;
         Sheet.DeleteColumn(Sheet.Location.Column);
-        if (Sheet.NeedRecalculate) {
-            flags |= RenderHint.RECALCULATE;
-        }
-        return flags;
+        return RenderHint.REFRESH;
     }
 
     /// <summary>
@@ -588,12 +574,8 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint DeleteRow() {
-        RenderHint flags = RenderHint.REFRESH;
         Sheet.DeleteRow(Sheet.Location.Row);
-        if (Sheet.NeedRecalculate) {
-            flags |= RenderHint.RECALCULATE;
-        }
-        return flags;
+        return RenderHint.REFRESH;
     }
 
     /// <summary>
@@ -803,8 +785,9 @@ public class Window {
             try {
                 cell.Content = cellValue;
                 UpdateCells([cell]);
+                Sheet.NeedRecalculate = true;
 
-                hint = RenderHint.RECALCULATE | result switch {
+                hint = result switch {
                     CellInputResponse.ACCEPT => RenderHint.CURSOR,
                     CellInputResponse.ACCEPT_UP => CursorUp(),
                     CellInputResponse.ACCEPT_DOWN => CursorDown(),

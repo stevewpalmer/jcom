@@ -23,12 +23,26 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System;
+using System.Collections.Generic;
 using JCalcLib;
+using JComLib;
 using NUnit.Framework;
 
 namespace CalcLibTests;
 
 public class SheetTests {
+
+    /// <summary>
+    /// Test properties on a new sheet.
+    /// </summary>
+    [Test]
+    public void TestNewSheet() {
+        Sheet sheet = new Sheet(1);
+        Assert.AreEqual(1, sheet.SheetNumber);
+        Assert.AreEqual("A1", sheet.ActiveCell.Address);
+        Assert.AreEqual(1, Sheet.RowHeight);
+    }
 
     // Test that a new sheet has default columns
     [Test]
@@ -41,6 +55,30 @@ public class SheetTests {
         Assert.AreEqual(Sheet.DefaultColumnWidth, sheet.ColumnWidth(1));
         sheet.InsertColumn(1);
         Assert.AreEqual(Sheet.DefaultColumnWidth, sheet.ColumnWidth(1));
+    }
+
+    /// <summary>
+    /// Verify insertion and deletion of random columns
+    /// </summary>
+    [Test]
+    public void TestInsertAndDeleteColumns() {
+        Sheet sheet = new(1);
+        Random random = new();
+        List<(CellLocation, Variant)> cells = [];
+        for (int i = 0; i < 10; i++) {
+            int column = random.Next(1, Sheet.MaxColumns);
+            int row = random.Next(1, Sheet.MaxRows);
+            Cell cell = sheet.GetCell(column, row, true);
+            cell.Value = new Variant(random.Next(0, 3000));
+            cells.Add((cell.Location, cell.Value));
+        }
+        foreach ((CellLocation cellLocation, Variant _) in cells) {
+            sheet.DeleteColumn(cellLocation.Column);
+        }
+        foreach ((CellLocation cellLocation, Variant value) in cells) {
+            Cell cell = sheet.GetCell(cellLocation, false);
+            Assert.IsTrue(cell.IsEmptyCell);
+        }
     }
 
     // Add a few cells to the sheet and read them back
@@ -84,5 +122,16 @@ public class SheetTests {
             UseThousandsSeparator = true
         };
         Assert.IsTrue(sheet.Modified);
+    }
+
+    /// <summary>
+    /// Verify changing the location of the active cell.
+    /// </summary>
+    [Test]
+    public void TestLocation() {
+        Sheet sheet = new(1);
+        Assert.AreEqual("A1", sheet.ActiveCell.Address);
+        sheet.Location = new CellLocation("B4");
+        Assert.AreEqual("B4", sheet.ActiveCell.Address);
     }
 }

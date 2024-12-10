@@ -260,4 +260,28 @@ public class FormulaTests {
         Assert.AreEqual(" !ERR ", cell1.TextForWidth(6));
         Assert.AreEqual(" !ERR ", cell2.TextForWidth(6));
     }
+
+    /// <summary>
+    /// Make sure the NeedRecalculate property is set if we
+    /// update columns or rows.
+    /// </summary>
+    [Test]
+    public void VerifyNeedRecalculate() {
+        Sheet sheet = new();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("B2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("C3"), true);
+        cell1.Content = "4.5";
+        cell2.Content = "167.03";
+        cell3.Content = "=A1*B2";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(751.635), cell3.Value);
+
+        sheet.InsertColumn(1);
+        Assert.IsTrue(sheet.NeedRecalculate);
+        sheet.Calculate();
+        Assert.IsFalse(sheet.NeedRecalculate);
+        Assert.AreEqual(new Variant(751.635), cell3.Value);
+        Assert.AreEqual("=B1*C2", cell3.Content);
+    }
 }

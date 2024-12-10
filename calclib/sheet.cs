@@ -221,6 +221,7 @@ public class Sheet {
                 cellsToUpdate.Add(cell);
             }
         }
+        NeedRecalculate = false;
         return cellsToUpdate;
     }
 
