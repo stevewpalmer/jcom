@@ -379,13 +379,22 @@ public class Variants {
 
         Variant v3 = new(17.4f);
         Variant v4 = new(97.2f);
+        Variant v5 = new(97.2f);
         Assert.IsTrue(v4 > v3);
+        Assert.IsTrue(v4 >= v3);
+        Assert.IsTrue(v4 >= v5);
         Assert.IsTrue(v3 < v4);
+        Assert.IsTrue(v3 <= v4);
+        Assert.IsTrue(v5 <= v4);
 
         Assert.IsFalse(null < v4);
+        Assert.IsFalse(null <= v4);
         Assert.IsFalse(null > v4);
-        Assert.IsFalse(null < v4);
+        Assert.IsFalse(null >= v4);
         Assert.IsTrue(v3 > null);
+        Assert.IsFalse(v3 < null);
+        Assert.IsTrue(v3 >= null);
+        Assert.IsFalse(v3 <= null);
     }
 
     // Test negation

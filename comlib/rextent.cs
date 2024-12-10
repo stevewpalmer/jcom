@@ -43,15 +43,25 @@ public class RExtent {
     /// extent if the point falls outside its existing range.
     /// </summary>
     public RExtent Add(Point point) {
-        if (Valid) {
-            Start = new Point(Math.Min(Start.X, point.X), Math.Min(Start.Y, point.Y));
-            End = new Point(Math.Max(End.X, point.X), Math.Max(End.Y, point.Y));
-        }
-        else {
+        if (Before(point, Start)) {
             Start = point;
+        }
+        if (After(point, End)) {
             End = point;
         }
         return this;
+    }
+
+    /// <summary>
+    /// Reduce the extent to the specified points.
+    /// </summary>
+    public void Subtract(Point p1, Point p2) {
+        if (After(p1, Start)) {
+            Start = p1;
+        }
+        if (Before(p2, End)) {
+            End = p2;
+        }
     }
 
     /// <summary>
@@ -76,6 +86,26 @@ public class RExtent {
     /// <returns>True if the point is within the extent, false otherwise</returns>
     public bool Contains(Point point) =>
         Valid && Rectangle.FromLTRB(Start.X, Start.Y, End.X + 1, End.Y + 1).Contains(point);
+
+    /// <summary>
+    /// Return whether point p1 is before point p2 in the extent.
+    /// </summary>
+    /// <param name="p1">First point to test</param>
+    /// <param name="p2">Second point to test</param>
+    /// <returns>True if point p1 is before point p2, false otherwise.</returns>
+    private static bool Before(Point p1, Point p2) =>
+        p1 == Uninitalised || p2 == Uninitalised ||
+        p1.Y < p2.Y || p1.Y == p2.Y && p1.X < p2.X;
+
+    /// <summary>
+    /// Return whether point p1 is after point p2 in the extent.
+    /// </summary>
+    /// <param name="p1">First point to test</param>
+    /// <param name="p2">Second point to test</param>
+    /// <returns>True if point p1 is after point p2, false otherwise.</returns>
+    private static bool After(Point p1, Point p2) =>
+        p1 == Uninitalised || p2 == Uninitalised ||
+        p1.Y > p2.Y || p1.Y == p2.Y && p1.X > p2.X;
 
     /// <summary>
     /// Clear the extent

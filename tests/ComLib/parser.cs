@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License
 
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JComLib;
@@ -40,7 +39,7 @@ public class ParserTest {
     [TestCase("'test' input", ExpectedResult = new[] { "test", "input" })]
     [TestCase("\"test\" input", ExpectedResult = new[] { "test", "input" })]
     public string[] TestRestOfLine(string input) {
-        Parser parser = new Parser(input);
+        Parser parser = new(input);
         return parser.RestOfLine();
     }
 
@@ -50,9 +49,13 @@ public class ParserTest {
         File.WriteAllLines("test.txt", content);
         File.WriteAllLines("test.cs", content);
 
-        Parser parser = new Parser(File.ReadAllText("test.txt"));
-        IEnumerable<string> result = parser.ReadAndExpandWildcards();
-        Assert.AreEqual(result.Count(), 2);
+        Parser parser = new(File.ReadAllText("test.txt"));
+        string[] result = parser.ReadAndExpandWildcards().ToArray();
+        Assert.AreEqual(result.Length, 2);
+
+        // Results are sorted.
+        Assert.IsTrue(result[0] == "./test.cs");
+        Assert.IsTrue(result[1] == "./test.txt");
     }
 
     // Test the behaviour of the NextWord method to return the next word from the
@@ -63,14 +66,33 @@ public class ParserTest {
     [TestCase("\'test string\'", ExpectedResult = "test string")]
     [TestCase("\'test string", ExpectedResult = "test string")]
     public string TestNextWord(string input) {
-        Parser parser = new Parser(input);
+        Parser parser = new(input);
         return parser.NextWord();
+    }
+
+    /// <summary>
+    /// Test making a copy of an existing parser and verify that
+    /// the two function independently.
+    /// </summary>
+    [Test]
+    public void TestParserCopy() {
+        Parser parser = new("England expects that every man will do his duty");
+        Assert.AreEqual("England", parser.NextWord());
+        Assert.AreEqual("expects", parser.NextWord());
+        Assert.AreEqual("that", parser.NextWord());
+
+        Parser newParser = new(parser);
+        Assert.AreEqual("every", newParser.NextWord());
+        Assert.AreEqual("man", newParser.NextWord());
+
+        Assert.AreEqual("every", parser.NextWord());
+        Assert.AreEqual("man", parser.NextWord());
     }
 
     // Test the behaviour of GetChar and PushChar.
     [Test]
     public void TestPushChar_GetChar() {
-        Parser parser = new Parser("abcdef");
+        Parser parser = new("abcdef");
         Assert.AreEqual('a', parser.GetChar());
 
         // Push character back

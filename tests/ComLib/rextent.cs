@@ -71,6 +71,23 @@ public class RExtentTest {
         Assert.AreEqual(point2, _rextent.End);
     }
 
+    // Verify the Subtract method that reduces an extent to
+    // exclude the specified point
+    [Test]
+    public void VerifySubtract() {
+        Point start = new Point(1, 1);
+        Point end = new Point(2, 2);
+        _rextent.Add(start);
+        _rextent.Add(end);
+
+        Point newStart = new Point(1, 2);
+        Point newEnd = new Point(2, 1);
+        _rextent.Subtract(newStart, newEnd);
+
+        Assert.AreEqual(newStart, _rextent.Start);
+        Assert.AreEqual(newEnd, _rextent.End);
+    }
+
     // Verify the Contains method.
     [Test]
     public void VerifyContains() {

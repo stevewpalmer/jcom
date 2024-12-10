@@ -237,15 +237,13 @@ public class Window {
     private void Render() {
         Point cursorPosition = Terminal.GetCursor();
 
-        RExtent renderExtent;
+        RExtent renderExtent = new RExtent()
+            .Add(new Point(1, _scrollOffset.Y + 1))
+            .Add(new Point(_sheetBounds.Width, _scrollOffset.Y + _sheetBounds.Height));
         if (InvalidateExtent.Valid) {
-            renderExtent = InvalidateExtent;
+            renderExtent.Subtract(InvalidateExtent.Start, InvalidateExtent.End);
         }
-        else {
-            renderExtent = new RExtent()
-                .Add(new Point(1, _scrollOffset.Y + 1))
-                .Add(new Point(_sheetBounds.Width, _scrollOffset.Y + _sheetBounds.Height));
-        }
+
         RExtent markExtent = new();
         if (_isMarkMode) {
             markExtent
@@ -785,7 +783,7 @@ public class Window {
             if (sortColumn >= markExtent.Start.X && sortColumn <= markExtent.End.X) {
                 Sheet.SortCells(sortColumn, descending, markExtent);
             }
-            flags = RenderHint.CURSOR;
+            flags = RenderHint.REFRESH;
         }
         ClearBlock();
         return flags;
