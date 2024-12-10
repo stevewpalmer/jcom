@@ -278,10 +278,12 @@ public class FormulaTests {
         Assert.AreEqual(new Variant(751.635), cell3.Value);
 
         sheet.InsertColumn(1);
+        sheet.InsertRow(2);
         Assert.IsTrue(sheet.NeedRecalculate);
         sheet.Calculate();
         Assert.IsFalse(sheet.NeedRecalculate);
         Assert.AreEqual(new Variant(751.635), cell3.Value);
-        Assert.AreEqual("=B1*C2", cell3.Content);
+        Assert.AreEqual("=B1*C3", cell3.Content);
+        Assert.AreEqual("D4", cell3.Location.Address);
     }
 }

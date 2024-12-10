@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -38,7 +39,7 @@ public class SheetTests {
     /// </summary>
     [Test]
     public void TestNewSheet() {
-        Sheet sheet = new Sheet(1);
+        Sheet sheet = new(1);
         Assert.AreEqual(1, sheet.SheetNumber);
         Assert.AreEqual("A1", sheet.ActiveCell.Address);
         Assert.AreEqual(1, Sheet.RowHeight);
@@ -75,7 +76,7 @@ public class SheetTests {
         foreach ((CellLocation cellLocation, Variant _) in cells) {
             sheet.DeleteColumn(cellLocation.Column);
         }
-        foreach ((CellLocation cellLocation, Variant value) in cells) {
+        foreach ((CellLocation cellLocation, Variant _) in cells) {
             Cell cell = sheet.GetCell(cellLocation, false);
             Assert.IsTrue(cell.IsEmptyCell);
         }
@@ -99,7 +100,7 @@ public class SheetTests {
         foreach ((CellLocation cellLocation, Variant _) in cells) {
             sheet.DeleteRow(cellLocation.Row);
         }
-        foreach ((CellLocation cellLocation, Variant value) in cells) {
+        foreach ((CellLocation cellLocation, Variant _) in cells) {
             Cell cell = sheet.GetCell(cellLocation, false);
             Assert.IsTrue(cell.IsEmptyCell);
         }
@@ -157,5 +158,32 @@ public class SheetTests {
         Assert.AreEqual("A1", sheet.ActiveCell.Address);
         sheet.Location = new CellLocation("B4");
         Assert.AreEqual("B4", sheet.ActiveCell.Address);
+    }
+
+    /// <summary>
+    /// Test some simple sorting
+    /// </summary>
+    [Test]
+    public void TestSorting() {
+        Sheet sheet = new(1);
+        double[][] data = {
+            [72, 86, 99],
+            [12, 25, 33],
+            [43, 51, 64]
+        };
+        for (int row = 1; row < data.Length; row++) {
+            for (int column = 1; column < data[row].Length; column++) {
+                Cell cell = sheet.GetCell(new CellLocation(column, row), true);
+                cell.Value = new Variant(data[row][column]);
+            }
+        }
+        sheet.SortCells(2, false, sheet.GetCellExtent());
+        for (int row = 2; row < data.Length; row++) {
+            for (int column = 1; column < data[row].Length; column++) {
+                Cell cell1 = sheet.GetCell(new CellLocation(column, row), true);
+                Cell cell2 = sheet.GetCell(new CellLocation(column, row - 1), true);
+                Assert.IsTrue(cell1.Value >= cell2.Value);
+            }
+        }
     }
 }
