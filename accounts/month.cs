@@ -42,7 +42,7 @@ public static class Month {
     /// <param name="thisYear">Year to show</param>
     /// <param name="thisMonth">Month to show</param>
     public static void Show(TAccount account, int thisYear, int thisMonth) {
-        TForm form = new TForm(TForm.CanPrint);
+        TForm form = new(TForm.CanPrint);
         int rowIndex = 4;
         TDisplayFormResult result;
         int selectedItem = -1;
@@ -54,7 +54,7 @@ public static class Month {
         // Get the statement for this year and month
         TStatement? statement = account.Get(thisYear, thisMonth);
         if (statement == null) {
-            TForm errorForm = new TForm(TForm.Simple);
+            TForm errorForm = new(TForm.Simple);
             errorForm.AddLabel(rowIndex, 4, $"Unable to find a statement for {TDate.MonthName(thisMonth)} {thisYear}.");
             errorForm.DisplayForm();
             return;
@@ -201,7 +201,7 @@ public static class Month {
                 int theDay = Convert.ToInt32(form.Fields(index).Value);
                 string theName = form.Fields(index + 1).Value;
                 double theValue = Convert.ToDouble(form.Fields(index + 2).Value);
-                TDate theDate = new TDate(thisYear, thisMonth, theDay);
+                TDate theDate = new(thisYear, thisMonth, theDay);
 
                 if (!string.IsNullOrEmpty(theName)) {
                     statement.Records.Add(new TRecord(theName, theValue, theDate));

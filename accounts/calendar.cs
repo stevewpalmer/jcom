@@ -39,7 +39,7 @@ public static class Calendar {
         do {
             Utils.ShowTitle("Calendar");
 
-            TForm form = new TForm(TForm.Simple);
+            TForm form = new(TForm.Simple);
             int rowIndex = 4;
 
             // Display instructions line.

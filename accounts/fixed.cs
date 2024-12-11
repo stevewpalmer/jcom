@@ -37,7 +37,7 @@ public static class Fixed {
 
         Utils.ShowTitle("Fixed Incomings and Outgoings");
 
-        TForm form = new TForm(TForm.CanPrint);
+        TForm form = new(TForm.CanPrint);
         int rowIndex = 4;
 
         // Display instructions line
@@ -166,7 +166,7 @@ public static class Fixed {
             do {
                 string theName = form.Fields(index).Value;
                 double theValue = Convert.ToDouble(form.Fields(index + 1).Value);
-                TDate theDate = new TDate(2019, 1, Convert.ToInt32(form.Fields(index + 2).Value));
+                TDate theDate = new(2019, 1, Convert.ToInt32(form.Fields(index + 2).Value));
 
                 if (!string.IsNullOrEmpty(theName)) {
                     fixedRecords.Add(new TRecord(theName, theValue, theDate));

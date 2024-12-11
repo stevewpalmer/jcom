@@ -35,7 +35,7 @@ public static class Search {
     /// </summary>
     /// <param name="account">Account to search</param>
     public static void SearchStatements(TAccount account) {
-        TForm form = new TForm(TForm.Simple);
+        TForm form = new(TForm.Simple);
         TDisplayFormResult result;
         int maxRowIndex = 8;
 

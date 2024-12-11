@@ -111,7 +111,7 @@ public class TAccount {
             }
             for (int theMonth = startMonth; theMonth <= 12; theMonth++) {
                 List<TRecord> records = ReadMonth(theYear, theMonth);
-                TStatement oneMonth = new TStatement(theYear, theMonth, records) {
+                TStatement oneMonth = new(theYear, theMonth, records) {
                     EntryBalance = entryBalance
                 };
                 if (oneMonth.Records.Count == 0 && oneMonth.IsFuture) {
@@ -196,7 +196,7 @@ public class TAccount {
         string[] dirName = Directory.GetDirectories(Utils.DataFolder, "*", SearchOption.TopDirectoryOnly);
         List<int> years = [];
         foreach (string name in dirName) {
-            DirectoryInfo directory = new DirectoryInfo(name);
+            DirectoryInfo directory = new(name);
             if (int.TryParse(directory.Name, out int year)) {
                 years.Add(year);
             }

@@ -223,7 +223,7 @@ public class TField {
     public void Draw(string formattedText, int offset, bool isSelected, bool showCursor) {
         ConsoleColor fgColour = Utils.ForegroundColour;
         Point savedCursor = Terminal.GetCursor();
-        Point newCursor = new Point(Column, Row + offset);
+        Point newCursor = new(Column, Row + offset);
 
         if (formattedText.StartsWith('_')) {
             formattedText = formattedText[1..];

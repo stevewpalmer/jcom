@@ -130,7 +130,7 @@ public class TForm {
     /// Add a text option field to the form
     /// </summary>
     public void AddOption(int theRow, int theColumn, string theLabel, object theData) {
-        TField newField = new TField(theRow, theColumn, theLabel.Length, theLabel, TFieldType.Option) {
+        TField newField = new(theRow, theColumn, theLabel.Length, theLabel, TFieldType.Option) {
             Data = theData
         };
         Add(newField);
@@ -140,7 +140,7 @@ public class TForm {
     /// Add a text option field to the form
     /// </summary>
     public void AddOption(int theRow, int theColumn, string theLabel, char theCh) {
-        TField newField = new TField(theRow, theColumn, theLabel.Length, theLabel, TFieldType.Option) {
+        TField newField = new(theRow, theColumn, theLabel.Length, theLabel, TFieldType.Option) {
             Ch = theCh
         };
         Add(newField);

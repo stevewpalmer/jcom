@@ -49,7 +49,7 @@ internal static class Program {
 
         Terminal.Open();
         while (!exit) {
-            TForm form = new TForm(TForm.Simple);
+            TForm form = new(TForm.Simple);
 
             Utils.ShowTitle("Main Menu");
 

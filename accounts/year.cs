@@ -45,7 +45,7 @@ public static class Year {
         Utils.ShowTitle($"Summary for {thisYear}");
         IEnumerable<TCategory> list = account.Categories(thisYear);
 
-        TForm form = new TForm(TForm.Simple + TForm.CanPrint);
+        TForm form = new(TForm.Simple + TForm.CanPrint);
         int rowIndex = 4;
 
         // Show explanation if the summary is for the current or future years
