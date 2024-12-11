@@ -450,11 +450,17 @@ public class Sheet {
     public RExtent GetCellExtent() {
         RExtent extent = new();
         Point? topLeft = ColumnList.FirstOrDefault()?.Cells.FirstOrDefault()?.Location.Point;
+        Point? topRight = ColumnList.LastOrDefault()?.Cells.FirstOrDefault()?.Location.Point;
         Point? bottomRight = ColumnList.LastOrDefault()?.Cells.LastOrDefault()?.Location.Point;
+        Point? bottomLeft = ColumnList.FirstOrDefault()?.Cells.LastOrDefault()?.Location.Point;
         if (topLeft != null) {
             extent.Add(topLeft.Value);
             Debug.Assert(bottomRight.HasValue);
             extent.Add(bottomRight.Value);
+            Debug.Assert(topRight.HasValue);
+            extent.Add(topRight.Value);
+            Debug.Assert(bottomLeft.HasValue);
+            extent.Add(bottomLeft.Value);
         }
         return extent;
     }

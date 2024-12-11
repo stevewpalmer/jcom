@@ -32,13 +32,14 @@ namespace ComLibTests;
 [TestFixture]
 [TestOf(typeof(RExtent))]
 public class RExtentTest {
-    private static readonly Point Uninitialised = new(-1, -1);
-    private RExtent _rextent;
 
     [SetUp]
     public void Setup() {
         _rextent = new RExtent();
     }
+
+    private static readonly Point Uninitialised = new(-1, -1);
+    private RExtent _rextent;
 
     // Verify that a new instance of an RExtent has both Start
     // and End set to Uninitialised.
@@ -75,17 +76,34 @@ public class RExtentTest {
     // exclude the specified point
     [Test]
     public void VerifySubtract() {
-        Point start = new Point(1, 1);
-        Point end = new Point(2, 2);
+        Point newStart = new(5, 8);
+        Point newEnd = new(14, 25);
+        _rextent.Subtract(newStart, newEnd);
+
+        // Subtracting an uninitialized extent should reduce to
+        // the subtracted rectangle
+        Assert.AreEqual(new Point(5, 8), _rextent.Start);
+        Assert.AreEqual(new Point(14, 25), _rextent.End);
+
+        Point start = new(3, 10);
+        Point end = new(12, 30);
+        _rextent = new();
         _rextent.Add(start);
         _rextent.Add(end);
 
-        Point newStart = new Point(1, 2);
-        Point newEnd = new Point(2, 1);
+        newStart = new(5, 8);
+        newEnd = new(14, 25);
         _rextent.Subtract(newStart, newEnd);
 
-        Assert.AreEqual(newStart, _rextent.Start);
-        Assert.AreEqual(newEnd, _rextent.End);
+        Assert.AreEqual(new Point(5, 10), _rextent.Start);
+        Assert.AreEqual(new Point(12, 25), _rextent.End);
+
+        newStart = new(1, 1);
+        newEnd = new(90, 90);
+        _rextent.Subtract(newStart, newEnd);
+
+        Assert.AreEqual(new Point(5, 10), _rextent.Start);
+        Assert.AreEqual(new Point(12, 25), _rextent.End);
     }
 
     // Verify the Contains method.
