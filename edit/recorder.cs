@@ -59,7 +59,7 @@ public class Recorder {
         bool success = false;
         if (_keystrokeBuffer.Count < Consts.MaxKeystrokes) {
             string line = KeyMap.MapCommandToCommandName(command.Id);
-            Parser args = new Parser(command.Args);
+            Parser args = new(command.Args);
             string[] argStrings = args.RestOfLine();
             if (argStrings.Length > 0) {
                 line += $" {string.Join(", ", argStrings)}";

@@ -260,7 +260,7 @@ public class KeyMap {
     /// for that key with the command ID left empty.
     /// </summary>
     private static KeyMap? Parse(string keydef) {
-        KeyMap newKeymap = new KeyMap();
+        KeyMap newKeymap = new();
         bool validKeymap = false;
         foreach (string part in keydef.Split('-', '+').Select(s => s.Trim().ToLower())) {
             switch (part) {
@@ -418,7 +418,7 @@ public class KeyMap {
 
         KeyMap? match = KeyMaps.FirstOrDefault(km => km.Match(keyIn));
         KeyCommand commandId = match?.KeyCommand ?? KeyCommand.KC_NONE;
-        Parser commandArgs = new Parser(string.Empty);
+        Parser commandArgs = new(string.Empty);
         if (commandId == KeyCommand.KC_NONE) {
             commandId = KeyCommand.KC_SELFINSERT;
             commandArgs = new Parser(((int)keyIn.KeyChar).ToString());

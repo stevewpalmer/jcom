@@ -120,7 +120,7 @@ public class Search {
             int matchIndex;
             if (RegExp) {
                 RegexOptions options = CaseInsensitive ? RegexOptions.IgnoreCase : RegexOptions.None;
-                Regex regex = new Regex(SearchString, options);
+                Regex regex = new(SearchString, options);
                 Match m = regex.Match(line, Column);
                 matchIndex = m.Success ? m.Index : -1;
                 MatchLength = m.Length;
@@ -160,7 +160,7 @@ public class Search {
             int matchIndex;
             if (RegExp) {
                 RegexOptions options = CaseInsensitive ? RegexOptions.IgnoreCase : RegexOptions.None;
-                Regex regex = new Regex(SearchString, options | RegexOptions.RightToLeft);
+                Regex regex = new(SearchString, options | RegexOptions.RightToLeft);
                 Match m = regex.Match(line, 0, Column);
                 matchIndex = m.Success ? m.Index : -1;
                 MatchLength = m.Length;

@@ -87,7 +87,7 @@ public class Buffer {
                 LineTerminator.CRLF => "\r\n",
                 _ => Consts.EndOfLine.ToString()
             };
-            StringBuilder lines = new StringBuilder();
+            StringBuilder lines = new();
             foreach (string line in _lines) {
                 lines.Append(line.Replace(Consts.EndOfLine.ToString(), lineTerminator));
             }
@@ -281,7 +281,7 @@ public class Buffer {
     /// </summary>
     /// <returns>A StringBuilder object initialised with the line contents</returns>
     private StringBuilder PrepareLine() {
-        StringBuilder line = new StringBuilder(_lines[LineIndex]);
+        StringBuilder line = new(_lines[LineIndex]);
         if (Offset >= line.Length) {
             int count = Math.Max(0, line.Length - 1);
             while (count < Offset) {
