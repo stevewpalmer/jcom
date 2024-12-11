@@ -403,7 +403,7 @@ public class Sheet {
         }
         if (columnIndex == MaxColumns && totalWidth < width) {
             int size = width - totalWidth;
-            Cell cell = new Cell();
+            Cell cell = new();
             spans.Add(new AnsiTextSpan(cell.TextForWidth(size)) {
                 ForegroundColour = cell.Style.TextColour,
                 BackgroundColour = cell.Style.BackgroundColour,

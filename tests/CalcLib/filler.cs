@@ -42,7 +42,7 @@ public class FillerTests {
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Value = new Variant(12);
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
             cellLocations.Add(new CellLocation(1, row));
         }
@@ -74,7 +74,7 @@ public class FillerTests {
         cell1.Value = new Variant(100);
         cell2.Value = new Variant(150);
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
             cellLocations.Add(new CellLocation(1, row));
         }
@@ -100,7 +100,7 @@ public class FillerTests {
         cell1.Content = "April 1983";
         cell1.CellFormat = CellFormat.DATE_MY;
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
             cellLocations.Add(new CellLocation(1, row));
         }
@@ -128,7 +128,7 @@ public class FillerTests {
         cell2.Content = "May 1983";
         cell2.CellFormat = CellFormat.DATE_MY;
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
             cellLocations.Add(new CellLocation(1, row));
         }
@@ -158,7 +158,7 @@ public class FillerTests {
         cell2.Content = "2 October 1983";
         cell2.CellFormat = CellFormat.DATE_DM;
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
             cellLocations.Add(new CellLocation(1, row));
         }
@@ -184,7 +184,7 @@ public class FillerTests {
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Value = new Variant(0.12);
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int column = 1; column < 10; column++) {
             cellLocations.Add(new CellLocation(column, 1));
         }
@@ -205,7 +205,7 @@ public class FillerTests {
     public void VerifyFillEmptyFill() {
         Sheet sheet = new(1);
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
             cellLocations.Add(new CellLocation(1, row));
         }
@@ -238,7 +238,7 @@ public class FillerTests {
         };
         cell1.DecimalPlaces = 4;
 
-        List<CellLocation> cellLocations = new();
+        List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
             cellLocations.Add(new CellLocation(1, row));
         }

@@ -34,7 +34,7 @@ public class ComSymbolCollection {
     // Verify a basic symbol collection
     [Test]
     public void TestBasic() {
-        SymbolCollection s = new SymbolCollection("_TEST123");
+        SymbolCollection s = new("_TEST123");
         Assert.AreEqual("_TEST123", s.Name);
         s.Add(new Symbol("Dummy123", new SymFullType(SymType.DOUBLE), SymClass.VAR, [], 45));
         Assert.IsNotNull(s.Get("DUMMY123"));
@@ -52,7 +52,7 @@ public class ComSymbolCollection {
     // Verify a collection with multiple symbols
     [Test]
     public void TestMultipleSymbols() {
-        SymbolCollection s = new SymbolCollection("_TEST123");
+        SymbolCollection s = new("_TEST123");
         Assert.AreEqual("_TEST123", s.Name);
         s.Add("A$", new SymFullType(SymType.CHAR), SymClass.VAR, [], 45);
         s.Add("B%", new SymFullType(SymType.DOUBLE), SymClass.VAR, [], 53);
@@ -66,7 +66,7 @@ public class ComSymbolCollection {
     // Verify a case sensitive symbol collection
     [Test]
     public void TestCaseSensitive() {
-        SymbolCollection s = new SymbolCollection("_TEST123_CASE", true) {
+        SymbolCollection s = new("_TEST123_CASE", true) {
             new Symbol("Dummy123", new SymFullType(SymType.DOUBLE), SymClass.VAR, [], 45)
         };
         Assert.IsNull(s.Get("DUMMY123"));

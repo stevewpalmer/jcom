@@ -87,19 +87,19 @@ public class RExtentTest {
 
         Point start = new(3, 10);
         Point end = new(12, 30);
-        _rextent = new();
+        _rextent = new RExtent();
         _rextent.Add(start);
         _rextent.Add(end);
 
-        newStart = new(5, 8);
-        newEnd = new(14, 25);
+        newStart = new Point(5, 8);
+        newEnd = new Point(14, 25);
         _rextent.Subtract(newStart, newEnd);
 
         Assert.AreEqual(new Point(5, 10), _rextent.Start);
         Assert.AreEqual(new Point(12, 25), _rextent.End);
 
-        newStart = new(1, 1);
-        newEnd = new(90, 90);
+        newStart = new Point(1, 1);
+        newEnd = new Point(90, 90);
         _rextent.Subtract(newStart, newEnd);
 
         Assert.AreEqual(new Point(5, 10), _rextent.Start);

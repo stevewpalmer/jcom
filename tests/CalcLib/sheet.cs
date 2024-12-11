@@ -25,7 +25,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -166,11 +165,11 @@ public class SheetTests {
     [Test]
     public void TestSorting() {
         Sheet sheet = new(1);
-        double[][] data = {
+        double[][] data = [
             [72, 86, 99],
             [12, 25, 33],
             [43, 51, 64]
-        };
+        ];
         for (int row = 1; row < data.Length; row++) {
             for (int column = 1; column < data[row].Length; column++) {
                 Cell cell = sheet.GetCell(new CellLocation(column, row), true);

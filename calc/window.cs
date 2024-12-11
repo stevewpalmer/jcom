@@ -412,7 +412,6 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint Paste() {
-        RenderHint flags = RenderHint.NONE;
         Cell[] cellsToPaste = Clipboard.Data;
         List<Cell> cellsToUpdate = [];
         if (cellsToPaste.Length > 0) {
@@ -431,7 +430,7 @@ public class Window {
             UpdateCells(cellsToUpdate);
             Sheet.NeedRecalculate = true;
         }
-        return flags;
+        return RenderHint.NONE;
     }
 
     /// <summary>

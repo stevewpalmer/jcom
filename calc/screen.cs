@@ -82,13 +82,27 @@ public static class Screen {
     }
 
     /// <summary>
+    /// Render the current workbook.
+    /// </summary>
+    private static void RenderBook() {
+        _windowList.Clear();
+        foreach (Sheet sheet in _activeBook.Sheets) {
+            AddWindow(new Window(sheet));
+        }
+        ActivateWindow(0);
+    }
+
+    /// <summary>
     /// Initialise the workbook from the specified file.
     /// </summary>
     /// <param name="filename">Workbook filename</param>
     public static void OpenBook(string filename) {
         if (!string.IsNullOrEmpty(filename)) {
+            RenderBook();
+            Status.Message($"Loading {filename}...");
             try {
                 _activeBook.Open(filename);
+                Status.ClearMessage();
             }
             catch (FileNotFoundException e) {
                 Status.Message(string.Format(Calc.FileNotFound, e.FileName));
@@ -100,11 +114,7 @@ public static class Screen {
                 Status.Message(e.Message);
             }
         }
-        _windowList.Clear();
-        foreach (Sheet sheet in _activeBook.Sheets) {
-            AddWindow(new Window(sheet));
-        }
-        ActivateWindow(0);
+        RenderBook();
         Status.UpdateFilename(_activeBook.Name);
     }
 

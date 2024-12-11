@@ -24,7 +24,6 @@
 // under the License.
 
 using System;
-using System.Collections.Generic;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -60,7 +59,7 @@ public class TestANSIText {
     /// </summary>
     [Test]
     public void TestColourNames() {
-        IList<string> names = AnsiColour.ColourNames;
+        string[] names = AnsiColour.ColourNames;
         int[] colours = AnsiColour.ColourValues;
 
         foreach (int colour in colours) {
@@ -68,7 +67,7 @@ public class TestANSIText {
             string label = AnsiColour.LabelForColour(colour);
             Assert.AreEqual(colour, AnsiColour.ColourFromName(name));
             Assert.IsTrue(label.Contains(Array.FindIndex(colours, c => c == colour).ToString("X")));
-            Assert.IsTrue(names.Contains(name));
+            Assert.IsTrue(Array.IndexOf(names, name) >= 0);
         }
 
         // Invalid colour name test

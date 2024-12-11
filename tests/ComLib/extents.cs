@@ -51,7 +51,7 @@ public class Extents {
     // include the specified point
     [Test]
     public void VerifyAdd() {
-        Point point = new Point(1, 1);
+        Point point = new(1, 1);
         _extent.Add(point);
 
         Assert.AreEqual(point, _extent.Start);
@@ -62,13 +62,13 @@ public class Extents {
     // exclude the specified point
     [Test]
     public void VerifySubtract() {
-        Point start = new Point(1, 1);
-        Point end = new Point(2, 2);
+        Point start = new(1, 1);
+        Point end = new(2, 2);
         _extent.Add(start);
         _extent.Add(end);
 
-        Point newStart = new Point(1, 2);
-        Point newEnd = new Point(2, 1);
+        Point newStart = new(1, 2);
+        Point newEnd = new(2, 1);
         _extent.Subtract(newStart, newEnd);
 
         Assert.AreEqual(newStart, _extent.Start);
@@ -98,7 +98,7 @@ public class Extents {
     // uninitialised.
     [Test]
     public void VerifyClear() {
-        Point point = new Point(1, 1);
+        Point point = new(1, 1);
         _extent.Add(point);
         _extent.Clear();
 
