@@ -58,6 +58,9 @@ public class FillerTests {
         // Make sure we didn't spill outside the range
         Cell afterLast = sheet.GetCell(new CellLocation("A11"), true);
         Assert.IsTrue(afterLast.IsEmptyCell);
+
+        // A fill always requires a recalculate at the moment.
+        Assert.IsTrue(sheet.NeedRecalculate);
     }
 
     /// <summary>
