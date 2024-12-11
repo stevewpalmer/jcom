@@ -165,5 +165,6 @@ public class CellFiller(Sheet sheet, IEnumerable<CellLocation> cells) {
             cellTypeFiller.Update(index, cell);
             index++;
         }
+        sheet.NeedRecalculate = true;
     }
 }
