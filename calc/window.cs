@@ -413,6 +413,7 @@ public class Window {
     private RenderHint Paste() {
         RenderHint flags = RenderHint.NONE;
         Cell[] cellsToPaste = Clipboard.Data;
+        List<Cell> cellsToUpdate = [];
         if (cellsToPaste.Length > 0) {
             CellLocation current = Sheet.Location;
 
@@ -424,7 +425,9 @@ public class Window {
                     Row = current.Row + (cellPoint.Y - startPoint.Y)
                 }, true);
                 cell.CopyFrom(cellToPaste);
+                cellsToUpdate.Add(cell);
             }
+            UpdateCells(cellsToUpdate);
             Sheet.NeedRecalculate = true;
         }
         return flags;
