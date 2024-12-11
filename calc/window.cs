@@ -57,7 +57,7 @@ public class Window {
     /// <summary>
     /// Extent of area invalidated.
     /// </summary>
-    private RExtent InvalidateExtent { get; set; } = new();
+    private RExtent InvalidateExtent { get; } = new();
 
     /// <summary>
     /// Set the viewport and sheet bounds for the window.
@@ -166,7 +166,8 @@ public class Window {
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
             if (_isMarkMode) {
-                InvalidateExtent = new RExtent()
+                InvalidateExtent.Clear();
+                InvalidateExtent
                     .Add(_markAnchor)
                     .Add(Sheet.Location.Point)
                     .Add(_lastMarkPoint);
@@ -309,7 +310,7 @@ public class Window {
     /// original marked block area.
     /// </summary>
     private void ClearBlock() {
-        InvalidateExtent = GetMarkExtent();
+        InvalidateExtent.Add(GetMarkExtent());
         _isMarkMode = false;
     }
 
@@ -697,13 +698,14 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint SetCellBold() {
-        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
             cell.Style.IsBold = !cell.Style.IsBold;
+            UpdateCells([cell]);
         }
         ClearBlock();
-        return flags;
+        InvalidateRow();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>
@@ -711,13 +713,14 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint SetCellItalic() {
-        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
             cell.Style.IsItalic = !cell.Style.IsItalic;
+            UpdateCells([cell]);
         }
         ClearBlock();
-        return flags;
+        InvalidateRow();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>
@@ -725,13 +728,14 @@ public class Window {
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint SetCellUnderline() {
-        RenderHint flags = _isMarkMode ? RenderHint.CONTENTS : RenderHint.CURSOR;
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
             cell.Style.IsUnderlined = !cell.Style.IsUnderlined;
+            UpdateCells([cell]);
         }
         ClearBlock();
-        return flags;
+        InvalidateRow();
+        return RenderHint.CONTENTS;
     }
 
     /// <summary>
@@ -816,6 +820,15 @@ public class Window {
     }
 
     /// <summary>
+    /// Invalidate the current row
+    /// </summary>
+    private void InvalidateRow() {
+        InvalidateExtent
+            .Add(new Point(1, Sheet.Location.Row))
+            .Add(new Point(Sheet.MaxColumns, Sheet.Location.Row));
+    }
+
+    /// <summary>
     /// Render a collection of cells
     /// </summary>
     /// <param name="cells">List of cells to update</param>
@@ -896,19 +909,8 @@ public class Window {
     /// </summary>
     /// <returns></returns>
     private RenderHint CursorHome() {
-        RenderHint flags = RenderHint.NONE;
-        if (Sheet.Location.Column > 1 || Sheet.Location.Row > 1) {
-            flags |= SaveLastMarkPoint();
-            if (_scrollOffset.X > 0 || _scrollOffset.Y > 0) {
-                flags |= RenderHint.REFRESH;
-                _scrollOffset = new Point(0, 0);
-            }
-            else {
-                flags |= RenderHint.CURSOR;
-            }
-            Sheet.Location = new CellLocation { Column = 1, Row = 1 };
-        }
-        return flags;
+        Sheet.Location = new CellLocation(1, 1);
+        return SyncRowColumnToSheet();
     }
 
     /// <summary>

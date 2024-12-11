@@ -379,7 +379,7 @@ public class Sheet {
                             Underline = cell.Style.Underline,
                             Alignment = AnsiAlignment.NONE
                         });
-                        totalWidth += size;
+                        totalWidth += columnWidth;
                     }
                     index += columnWidth;
                     columnIndex++;

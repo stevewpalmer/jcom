@@ -49,6 +49,15 @@ public class RExtent {
     }
 
     /// <summary>
+    /// Merge the specified extent with this one.
+    /// </summary>
+    /// <param name="extent">Extent to merge</param>
+    public void Add(RExtent extent) {
+        Add(extent.Start);
+        Add(extent.End);
+    }
+
+    /// <summary>
     /// Reduce the extent to the specified points.
     /// </summary>
     public void Subtract(Point p1, Point p2) {
