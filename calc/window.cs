@@ -207,10 +207,19 @@ public class Window {
 
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;
-        while (x < frameRect.Right && columnNumber <= Sheet.MaxColumns) {
-            int width = Sheet.ColumnWidth(columnNumber);
+        while (x < frameRect.Right) {
+            int width;
+            string label;
+            if (columnNumber <= Sheet.MaxColumns) {
+                width = Sheet.ColumnWidth(columnNumber);
+                label = Utilities.CentreString(Cell.ColumnToAddress(columnNumber), width);
+            }
+            else {
+                width = frameRect.Width - x;
+                label = Utilities.EmptyString(width);
+            }
             int space = Math.Min(width, frameRect.Width - x);
-            Terminal.Write(x, y, width, fg, bg, Utilities.CentreString(Cell.ColumnToAddress(columnNumber), width)[..space]);
+            Terminal.Write(x, y, width, fg, bg, label[..space]);
             x += width;
             columnNumber++;
         }
@@ -1020,6 +1029,9 @@ public class Window {
         }
         else {
             _scrollOffset.Y += sheetLocation.Row - previousRow;
+            if (_scrollOffset.Y + _sheetBounds.Height > Sheet.MaxRows) {
+                _scrollOffset.Y = Sheet.MaxRows - _sheetBounds.Height;
+            }
             flags |= RenderHint.REFRESH;
         }
         return flags;
@@ -1095,7 +1107,7 @@ public class Window {
                 Sheet.Location = location;
                 flags = SyncRowColumnToSheet();
             }
-            catch (ArgumentOutOfRangeException) {
+            catch (FormatException) {
                 Screen.Status.Message(Calc.InvalidAddress);
             }
         }

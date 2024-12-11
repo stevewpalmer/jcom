@@ -350,7 +350,7 @@ public class Sheet {
         List<AnsiTextSpan> spans = [];
         int columnIndex = 1;
         int totalWidth = 0;
-        while (totalWidth < width) {
+        while (totalWidth < width && columnIndex < MaxColumns) {
             int size = ColumnWidth(columnIndex);
             Cell cell = GetCell(columnIndex, row, false);
             if (cell is { Value.IsNumber: false } && cell.Value.StringValue?.Length > size) {
@@ -400,6 +400,15 @@ public class Sheet {
                 }
                 columnIndex++;
             }
+        }
+        if (columnIndex == MaxColumns && totalWidth < width) {
+            int size = width - totalWidth;
+            Cell cell = new Cell();
+            spans.Add(new AnsiTextSpan(cell.TextForWidth(size)) {
+                ForegroundColour = cell.Style.TextColour,
+                BackgroundColour = cell.Style.BackgroundColour,
+                Width = size
+            });
         }
         return new AnsiText(spans);
     }
