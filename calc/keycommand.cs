@@ -61,6 +61,7 @@ public enum KeyCommand {
     KC_DELETE_WORKSHEET,
     KC_DOWN,
     KC_EDIT,
+    KC_END,
     KC_FILE_EXPORT,
     KC_FILE_IMPORT,
     KC_FILE_NEW,

@@ -251,6 +251,7 @@ public class CommandBar {
         new() { Key = ConsoleKey.UpArrow, CommandId = KeyCommand.KC_UP },
         new() { Key = ConsoleKey.DownArrow, CommandId = KeyCommand.KC_DOWN },
         new() { Key = ConsoleKey.Home, CommandId = KeyCommand.KC_HOME },
+        new() { Key = ConsoleKey.End, CommandId = KeyCommand.KC_END },
         new() { Key = ConsoleKey.PageUp, CommandId = KeyCommand.KC_PAGEUP },
         new() { Key = ConsoleKey.PageDown, CommandId = KeyCommand.KC_PAGEDOWN },
         new() { Key = ConsoleKey.F2, CommandId = KeyCommand.KC_EDIT },

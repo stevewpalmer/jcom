@@ -103,6 +103,7 @@ public class Window {
             KeyCommand.KC_UP => CursorUp(),
             KeyCommand.KC_DOWN => CursorDown(),
             KeyCommand.KC_HOME => CursorHome(),
+            KeyCommand.KC_END => CursorEnd(),
             KeyCommand.KC_PAGEUP => CursorPageUp(),
             KeyCommand.KC_PAGEDOWN => CursorPageDown(),
             KeyCommand.KC_MARK => ToggleMarkMode(),
@@ -897,15 +898,29 @@ public class Window {
     /// <returns></returns>
     private RenderHint CursorHome() {
         RenderHint flags = RenderHint.NONE;
-        if (Sheet is { Location: { Column: > 1, Row: > 1 } }) {
-            flags = SaveLastMarkPoint();
+        if (Sheet.Location.Column > 1 || Sheet.Location.Row > 1) {
+            flags |= SaveLastMarkPoint();
             if (_scrollOffset.X > 0 || _scrollOffset.Y > 0) {
                 flags |= RenderHint.REFRESH;
                 _scrollOffset = new Point(0, 0);
             }
+            else {
+                flags |= RenderHint.CURSOR;
+            }
             Sheet.Location = new CellLocation { Column = 1, Row = 1 };
         }
         return flags;
+    }
+
+    /// <summary>
+    /// Move the cursor to the home position.
+    /// </summary>
+    /// <returns></returns>
+    private RenderHint CursorEnd() {
+        RenderHint flags = SaveLastMarkPoint();
+        RExtent sheetExtent = Sheet.GetCellExtent();
+        Sheet.Location = new CellLocation(sheetExtent.End.X, sheetExtent.End.Y);
+        return flags | SyncRowColumnToSheet();
     }
 
     /// <summary>

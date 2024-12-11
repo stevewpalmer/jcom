@@ -27,6 +27,7 @@ Press the '/' key to open the command menu.
 | Page Down         | PgDn        | PgDn        |
 | Page Up           | PgUp        | PgUp        |
 | Start Cell        | Home        | Home        |
+| Last Cell         | End         | End         |
 | Open Menu         | /           | /           |
 | Edit Current Cell | F2          | F2          |
 | Delete Cell       | Del         | Del         |
