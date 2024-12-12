@@ -146,7 +146,7 @@ public class Arithmetic {
         Compiler comp = new(opts);
         comp.CompileString(code, true);
         Assert.AreEqual(0, comp.Messages.ErrorCount);
-        Assert.Throws(typeof(DivideByZeroException), delegate { comp.Execute("ITEST"); });
+        Assert.Throws(typeof(DivideByZeroException), () => comp.Execute("ITEST"));
     }
 
     // Verify expression simplification involving the three

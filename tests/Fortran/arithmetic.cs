@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -152,7 +152,7 @@ public class ArithmeticTests {
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
         Assert.AreEqual(0, comp.Messages.ErrorCount);
-        Assert.Throws(typeof(DivideByZeroException), delegate { comp.Execute("ITEST"); });
+        Assert.Throws(typeof(DivideByZeroException), () => comp.Execute("ITEST"));
     }
 
     // Verify expression simplification involving the three

@@ -714,6 +714,23 @@ public class CellTests {
         CellFactory.Format = fmt;
     }
 
+    /// <summary>
+    /// Test that retrieving the content of a date or time formatted cell retrieves the
+    /// formatted date or time string.
+    /// </summary>
+    [Test]
+    public void TestFormattedDate() {
+        Sheet sheet = new(1);
+        Cell cell1 = sheet.GetCell(1, 1, true);
+        cell1.Content = "4 June 1966";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        Assert.AreEqual("04/06/1966", cell1.Content);
+
+        cell1.Content = "3:45 pm";
+        cell1.CellFormat = CellFormat.TIME_HMSZ;
+        Assert.AreEqual("15:45", cell1.Content);
+    }
+
     // Verify retrieving the AnsiText content of a cell.
     [Test]
     public void VerifySpilledTextCell() {

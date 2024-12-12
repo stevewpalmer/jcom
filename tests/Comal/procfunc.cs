@@ -193,6 +193,6 @@ public class ProcFunc {
             Interactive = true
         };
         Compiler comp = ComalHelper.HelperCompile(code, opts);
-        Assert.Throws(typeof(JComRuntimeException), delegate { comp.Execute("Main"); });
+        Assert.Throws(typeof(JComRuntimeException), () => comp.Execute("Main"));
     }
 }

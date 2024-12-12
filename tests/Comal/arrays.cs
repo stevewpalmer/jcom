@@ -312,7 +312,7 @@ public class Arrays {
                 endfunc
             ";
         Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-        Assert.Throws(typeof(IndexOutOfRangeException), delegate { comp.Execute("array'oob"); });
+        Assert.Throws(typeof(IndexOutOfRangeException), () => comp.Execute("array'oob"));
     }
 
     // Test calling a function with an array by value.
