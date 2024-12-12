@@ -78,12 +78,8 @@ public class Cell(Sheet? sheet) {
             if (sheet != null) {
                 sheet.Modified = true;
             }
-            if (TryParseDate(value.StringValue, out Variant _dateValue, out string _format)) {
-                if (!Format.HasValue) {
-                    CellFormat = CellFormat.CUSTOM;
-                    CustomFormatString = _format;
-                }
-                ComputedValue = _dateValue;
+            if (value.StringValue == "") {
+                ComputedValue = new Variant();
                 return;
             }
             if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
@@ -95,8 +91,12 @@ public class Cell(Sheet? sheet) {
                 ComputedValue = new Variant(doubleValue);
                 return;
             }
-            if (value.StringValue == "") {
-                ComputedValue = new Variant();
+            if (TryParseDate(value.StringValue, out Variant _dateValue, out string _format)) {
+                if (!Format.HasValue) {
+                    CellFormat = CellFormat.CUSTOM;
+                    CustomFormatString = _format;
+                }
+                ComputedValue = _dateValue;
                 return;
             }
             ComputedValue = value;
