@@ -456,7 +456,7 @@ public class Window {
                     Type = FormFieldType.NUMBER,
                     Width = 2,
                     MinimumValue = 0,
-                    MaximumValue = 15,
+                    MaximumValue = Sheet.MaxDecimalPlaces,
                     Value = new Variant(cell.DecimalPlaces)
                 },
                 new() {
@@ -479,7 +479,7 @@ public class Window {
                     Type = FormFieldType.NUMBER,
                     Width = 2,
                     MinimumValue = 0,
-                    MaximumValue = 15,
+                    MaximumValue = Sheet.MaxDecimalPlaces,
                     Value = new Variant(cell.DecimalPlaces)
                 }
             ];
@@ -890,11 +890,9 @@ public class Window {
     }
 
     /// <summary>
-    /// Save the last mark point at the start or end of marking a
-    /// range. If the Shift key is down, we either drop the mark
-    /// anchor if we are not currently in mark mode or update the
-    /// mark point to where the cursor currently is before it gets
-    /// moved by the caller.
+    /// Save the last mark point if we are currently marking a block so
+    /// we know the extent of the area to be invalidated when we update
+    /// the window.
     /// </summary>
     /// <returns>Render hint</returns>
     private RenderHint SaveLastMarkPoint() {
@@ -1116,11 +1114,12 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint GotoRowColumn() {
         RenderHint flags = RenderHint.CANCEL;
+        int inputWidth = new CellLocation(Sheet.MaxColumns, Sheet.MaxRows).Address.Length;
         FormField[] formFields = [
             new() {
                 Text = Calc.GotoRowPrompt,
                 Type = FormFieldType.TEXT,
-                Width = 7,
+                Width = inputWidth,
                 Value = new Variant(Sheet.ActiveCell.Address)
             }
         ];

@@ -58,6 +58,11 @@ public class Sheet {
     public const int MaxColumnWidth = 72;
 
     /// <summary>
+    /// Maximum number of decimal places
+    /// </summary>
+    public const int MaxDecimalPlaces = 15;
+
+    /// <summary>
     /// Empty constructor with no sheet number
     /// </summary>
     public Sheet() { }

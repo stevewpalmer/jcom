@@ -546,7 +546,7 @@ public static class Screen {
                 Type = FormFieldType.NUMBER,
                 Width = 2,
                 MinimumValue = 0,
-                MaximumValue = 15,
+                MaximumValue = Sheet.MaxColumns,
                 Value = new Variant(Config.DefaultDecimals)
             }
         ];
