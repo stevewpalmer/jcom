@@ -16,7 +16,11 @@
     <ItemGroup>
         <ProjectReference Include="..\comlib\comlib.csproj"/>
     </ItemGroup>
+
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-        <Exec Command="mkdir -p $(SolutionDir)drop/bin &amp;&amp; cp $(OutputPath)* $(SolutionDir)drop/bin" />
+        <ItemGroup>
+            <BinFiles Include="$(OutputPath)*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(BinFiles)" DestinationFolder="$(SolutionDir)drop/bin" SkipUnchangedFiles="true" />
     </Target>
 </Project>
