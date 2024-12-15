@@ -212,7 +212,7 @@ public static class Screen {
     /// <param name="theWindow">Window to be added</param>
     private static void AddWindow(Window theWindow) {
         _windowList.Add(theWindow);
-        theWindow.SetViewportBounds(0, 0, Terminal.Width, Terminal.Height);
+        theWindow.SetViewportBounds(0, CommandBar.Height, Terminal.Width, Terminal.Height - (CommandBar.Height + StatusBar.Height));
     }
 
     /// <summary>

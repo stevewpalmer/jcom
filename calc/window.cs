@@ -42,6 +42,16 @@ public class Window {
     private Rectangle _viewportBounds;
 
     /// <summary>
+    /// Width of the row label frame
+    /// </summary>
+    private const int RowLabelWidth = 5;
+
+    /// <summary>
+    /// Height of the column label frame
+    /// </summary>
+    private const int ColumnLabelHeight = 1;
+
+    /// <summary>
     /// Create a window for the specified sheet
     /// </summary>
     /// <param name="sheet">Associated sheet</param>
@@ -68,7 +78,7 @@ public class Window {
     /// <param name="height">Height of window</param>
     public void SetViewportBounds(int x, int y, int width, int height) {
         _viewportBounds = new Rectangle(x, y, width, height);
-        _sheetBounds = new Rectangle(x + 5, y + CommandBar.Height + 1, width - 5, height - (CommandBar.Height + 1 + StatusBar.Height));
+        _sheetBounds = new Rectangle(x + RowLabelWidth, y + ColumnLabelHeight, width - RowLabelWidth, height - ColumnLabelHeight);
         _markAnchor = Point.Empty;
         _isMarkMode = false;
     }
@@ -197,19 +207,17 @@ public class Window {
     /// scroll offset.
     /// </summary>
     private void RenderFrame() {
-        Rectangle frameRect = _viewportBounds;
-
         int fg = Screen.Colours.BackgroundColour;
         int bg = Screen.Colours.SelectionColour;
 
         // Sheet number
         int x = _sheetBounds.X;
-        int y = frameRect.Top + CommandBar.Height;
-        Terminal.Write(0, y, 5, fg, bg, $@"  {(char)(Sheet.SheetNumber + 'A' - 1)}  ");
+        int y = _viewportBounds.Top;
+        Terminal.Write(0, y, RowLabelWidth, fg, bg, $@"  {(char)(Sheet.SheetNumber + 'A' - 1)}  ");
 
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;
-        while (x < frameRect.Right) {
+        while (x < _viewportBounds.Right) {
             int width;
             string label;
             if (columnNumber <= Sheet.MaxColumns) {
@@ -217,10 +225,10 @@ public class Window {
                 label = Utilities.CentreString(Cell.ColumnToAddress(columnNumber), width);
             }
             else {
-                width = frameRect.Width - x;
+                width = _viewportBounds.Width - x;
                 label = Utilities.EmptyString(width);
             }
-            int space = Math.Min(width, frameRect.Width - x);
+            int space = Math.Min(width, _viewportBounds.Width - x);
             Terminal.Write(x, y, width, fg, bg, label[..space]);
             x += width;
             columnNumber++;
@@ -228,9 +236,9 @@ public class Window {
 
         // Row numbers
         int rowNumber = 1 + _scrollOffset.Y;
-        y = frameRect.Top + CommandBar.Height + 1;
-        while (y < _sheetBounds.Bottom && rowNumber <= Sheet.MaxRows) {
-            Terminal.Write(frameRect.Left, y, 5, fg, bg, $" {rowNumber.ToString(),-3} ");
+        y = _viewportBounds.Top + ColumnLabelHeight;
+        while (y < _viewportBounds.Bottom && rowNumber <= Sheet.MaxRows) {
+            Terminal.Write(_viewportBounds.Left, y, RowLabelWidth, fg, bg, $" {rowNumber.ToString(),-3} ");
             y += 1;
             rowNumber++;
         }
@@ -244,8 +252,6 @@ public class Window {
     /// method instead.
     /// </summary>
     private void Render() {
-        Point cursorPosition = Terminal.GetCursor();
-
         RExtent renderExtent = new RExtent()
             .Add(new Point(1, _scrollOffset.Y + 1))
             .Add(new Point(_sheetBounds.Width, _scrollOffset.Y + _sheetBounds.Height));
@@ -289,7 +295,6 @@ public class Window {
         }
         InvalidateExtent.Clear();
         PlaceCursor();
-        Terminal.SetCursor(cursorPosition.X, cursorPosition.Y);
     }
 
     /// <summary>
@@ -909,8 +914,9 @@ public class Window {
     /// </summary>
     /// <returns></returns>
     private RenderHint CursorHome() {
+        RenderHint flags = SaveLastMarkPoint();
         Sheet.Location = new CellLocation(1, 1);
-        return SyncRowColumnToSheet();
+        return flags | SyncRowColumnToSheet();
     }
 
     /// <summary>
