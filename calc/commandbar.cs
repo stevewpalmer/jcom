@@ -45,9 +45,24 @@ public class KeyMap {
     public KeyCommand CommandId { get; init; }
 
     /// <summary>
+    /// Associated command ID
+    /// </summary>
+    public int KeyChar { get; init; }
+
+    /// <summary>
     /// Modifier key, if applicable
     /// </summary>
-    public ConsoleModifiers Modifier { get; init; } = ConsoleModifiers.None;
+    public ConsoleModifiers Modifiers { get; init; } = ConsoleModifiers.None;
+
+    /// <summary>
+    /// Match the ConsoleKeyInfo with this KeyMap.
+    /// </summary>
+    /// <param name="keyIn">ConsoleKeyInfo input</param>
+    /// <returns>True if match, false otherwise</returns>
+    public bool Match(ConsoleKeyInfo keyIn) {
+        return Modifiers == keyIn.Modifiers &&
+               ((Key != 0 && Key == keyIn.Key) || (KeyChar != 0 && KeyChar == keyIn.KeyChar));
+    }
 }
 
 /// <summary>
@@ -246,21 +261,23 @@ public class CommandBar {
     /// Non-command (navigation) key map
     /// </summary>
     private static readonly KeyMap[] KeyTable = [
-        new() { Key = ConsoleKey.LeftArrow, CommandId = KeyCommand.KC_LEFT },
-        new() { Key = ConsoleKey.RightArrow, CommandId = KeyCommand.KC_RIGHT },
-        new() { Key = ConsoleKey.UpArrow, CommandId = KeyCommand.KC_UP },
-        new() { Key = ConsoleKey.DownArrow, CommandId = KeyCommand.KC_DOWN },
-        new() { Key = ConsoleKey.Home, CommandId = KeyCommand.KC_HOME },
-        new() { Key = ConsoleKey.End, CommandId = KeyCommand.KC_END },
-        new() { Key = ConsoleKey.PageUp, CommandId = KeyCommand.KC_PAGEUP },
-        new() { Key = ConsoleKey.PageDown, CommandId = KeyCommand.KC_PAGEDOWN },
-        new() { Key = ConsoleKey.F2, CommandId = KeyCommand.KC_EDIT },
-        new() { Key = ConsoleKey.F5, CommandId = KeyCommand.KC_GOTO },
-        new() { Key = ConsoleKey.Delete, CommandId = KeyCommand.KC_DELETE },
-        new() { Key = ConsoleKey.F6, CommandId = KeyCommand.KC_NEXT_WINDOW },
-        new() { Key = ConsoleKey.C, Modifier = ConsoleModifiers.Control, CommandId = KeyCommand.KC_COPY },
-        new() { Key = ConsoleKey.X, Modifier = ConsoleModifiers.Control, CommandId = KeyCommand.KC_CUT },
-        new() { Key = ConsoleKey.V, Modifier = ConsoleModifiers.Control, CommandId = KeyCommand.KC_PASTE }
+        new() { CommandId = KeyCommand.KC_LEFT, Key = ConsoleKey.LeftArrow },
+        new() { CommandId = KeyCommand.KC_RIGHT, Key = ConsoleKey.RightArrow },
+        new() { CommandId = KeyCommand.KC_UP, Key = ConsoleKey.UpArrow },
+        new() { CommandId = KeyCommand.KC_DOWN, Key = ConsoleKey.DownArrow },
+        new() { CommandId = KeyCommand.KC_HOME, Key = ConsoleKey.Home },
+        new() { CommandId = KeyCommand.KC_END, Key = ConsoleKey.End },
+        new() { CommandId = KeyCommand.KC_PAGEUP, Key = ConsoleKey.PageUp },
+        new() { CommandId = KeyCommand.KC_PAGEDOWN, Key = ConsoleKey.PageDown },
+        new() { CommandId = KeyCommand.KC_EDIT, Key = ConsoleKey.F2 },
+        new() { CommandId = KeyCommand.KC_GOTO, Key = ConsoleKey.F5 },
+        new() { CommandId = KeyCommand.KC_DELETE, Key = ConsoleKey.Delete },
+        new() { CommandId = KeyCommand.KC_NEXT_WINDOW, Key = ConsoleKey.F6 },
+        new() { CommandId = KeyCommand.KC_MARK, Key = ConsoleKey.M, Modifiers = ConsoleModifiers.Alt },
+        new() { CommandId = KeyCommand.KC_MARK, KeyChar = 181 },
+        new() { CommandId = KeyCommand.KC_COPY, Key = ConsoleKey.C, Modifiers = ConsoleModifiers.Control },
+        new() { CommandId = KeyCommand.KC_CUT, Key = ConsoleKey.X, Modifiers = ConsoleModifiers.Control },
+        new() { CommandId = KeyCommand.KC_PASTE, Key = ConsoleKey.V, Modifiers = ConsoleModifiers.Control }
     ];
 
     private readonly int _cellStatusRow;
@@ -327,11 +344,8 @@ public class CommandBar {
         if (keyIn.KeyChar == '/') {
             return KeyCommand.KC_COMMAND_BAR;
         }
-        if (keyIn.KeyChar == 181) {
-            return KeyCommand.KC_MARK;
-        }
         foreach (KeyMap command in KeyTable) {
-            if (command.Key == keyIn.Key && command.Modifier == keyIn.Modifiers) {
+            if (command.Match(keyIn)) {
                 return command.CommandId;
             }
         }
