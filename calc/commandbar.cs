@@ -586,13 +586,14 @@ public class CommandBar {
             inputBuffer = [..cellValue.ToCharArray()];
         }
         int column = inputBuffer.Count;
-        Terminal.ShowCursor(true);
         do {
             string text = string.Join("", inputBuffer);
             Terminal.Write(0, _promptRow, _displayWidth, _fgColour, _bgColour, text);
+            Terminal.ShowCursor(true);
             Terminal.SetCursor(column, _promptRow);
 
             ConsoleKeyInfo inputKey = ReadKey();
+            Terminal.ShowCursor(false);
             response = inputKey.Key switch {
                 ConsoleKey.Escape => CellInputResponse.CANCEL,
                 ConsoleKey.Enter => CellInputResponse.ACCEPT,
