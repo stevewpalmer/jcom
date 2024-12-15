@@ -171,7 +171,7 @@ public class Window {
     private RenderHint ApplyRenderHint(RenderHint flags) {
         if (Sheet.NeedRecalculate) {
             IEnumerable<Cell> cellsToUpdate = Sheet.Calculate();
-            UpdateCells(cellsToUpdate);
+            InvalidateCells(cellsToUpdate);
             flags |= RenderHint.CONTENTS;
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
@@ -433,7 +433,7 @@ public class Window {
                 cell.CopyFrom(cellToPaste);
                 cellsToUpdate.Add(cell);
             }
-            UpdateCells(cellsToUpdate);
+            InvalidateCells(cellsToUpdate);
             Sheet.NeedRecalculate = true;
         }
         return RenderHint.NONE;
@@ -706,7 +706,7 @@ public class Window {
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
             cell.Style.IsBold = !cell.Style.IsBold;
-            UpdateCells([cell]);
+            InvalidateCells([cell]);
         }
         ClearBlock();
         InvalidateRow();
@@ -721,7 +721,7 @@ public class Window {
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
             cell.Style.IsItalic = !cell.Style.IsItalic;
-            UpdateCells([cell]);
+            InvalidateCells([cell]);
         }
         ClearBlock();
         InvalidateRow();
@@ -736,7 +736,7 @@ public class Window {
         foreach (CellLocation location in RangeIterator()) {
             Cell cell = Sheet.GetCell(location, true);
             cell.Style.IsUnderlined = !cell.Style.IsUnderlined;
-            UpdateCells([cell]);
+            InvalidateCells([cell]);
         }
         ClearBlock();
         InvalidateRow();
@@ -805,7 +805,7 @@ public class Window {
         if (result != CellInputResponse.CANCEL) {
             try {
                 cell.Content = cellValue;
-                UpdateCells([cell]);
+                InvalidateCells([cell]);
                 Sheet.NeedRecalculate = true;
 
                 hint = result switch {
@@ -837,7 +837,7 @@ public class Window {
     /// Render a collection of cells
     /// </summary>
     /// <param name="cells">List of cells to update</param>
-    private void UpdateCells(IEnumerable<Cell> cells) {
+    private void InvalidateCells(IEnumerable<Cell> cells) {
         foreach (Cell cell in cells) {
             InvalidateExtent.Add(cell.Location.Point);
         }
@@ -873,7 +873,7 @@ public class Window {
     /// Toggle whether we are in mark mode when moving the
     /// cursor over the screen.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Render hint</returns>
     private RenderHint ToggleMarkMode() {
         RenderHint flags;
         if (_isMarkMode) {
@@ -912,7 +912,7 @@ public class Window {
     /// <summary>
     /// Move the cursor to the home position.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Render hint</returns>
     private RenderHint CursorHome() {
         RenderHint flags = SaveLastMarkPoint();
         Sheet.Location = new CellLocation(1, 1);
@@ -922,7 +922,7 @@ public class Window {
     /// <summary>
     /// Move the cursor to the home position.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Render hint</returns>
     private RenderHint CursorEnd() {
         RenderHint flags = SaveLastMarkPoint();
         RExtent sheetExtent = Sheet.GetCellExtent();

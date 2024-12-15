@@ -107,7 +107,7 @@ public class Search {
     /// Find the next occurrence of the search string when searching
     /// forward through the file.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>True if we matched the search string, false otherwise</returns>
     private bool NextForward() {
         MatchSuccess = false;
         while (Row < _buffer.Length) {

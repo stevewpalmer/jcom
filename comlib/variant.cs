@@ -713,7 +713,7 @@ public class Variant {
     /// <summary>
     /// Returns the variant value as a string.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Variant string</returns>
     public override string ToString() {
         return StringValue;
     }

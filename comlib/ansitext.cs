@@ -63,7 +63,7 @@ public class AnsiText {
     /// </summary>
     /// <param name="start">Zero based start index</param>
     /// <param name="length">Length required</param>
-    /// <returns></returns>
+    /// <returns>Substring as an AnsiText</returns>
     public AnsiText Substring(int start, int length) {
         int spanIndex = 0;
         List<AnsiTextSpan> spans = [];

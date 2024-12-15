@@ -690,7 +690,7 @@ public partial class Window {
     /// from that offset to the next tab stop.
     /// </summary>
     /// <param name="offset"></param>
-    /// <returns></returns>
+    /// <returns>Number of spaces to next tab offset</returns>
     private static int SpacesToPad(int offset) {
         int tabWidth = 7;
         int previousStop = 1;

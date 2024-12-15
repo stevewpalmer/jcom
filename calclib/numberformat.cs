@@ -38,7 +38,7 @@ public static class NumberFormats {
     /// <param name="format">Cell format</param>
     /// <param name="thousands">True if comma separators are required</param>
     /// <param name="decimalPlaces">Number of decimal places required</param>
-    /// <returns></returns>
+    /// <returns>A NumberFormat object initialised for the specfied format</returns>
     public static NumberFormat GetFormat(CellFormat format, bool thousands = false, int decimalPlaces = 2) {
         string key = $"{JComLib.Utilities.GetEnumDescription(format)}{(thousands ? "C" : "N")}{decimalPlaces}";
         if (!formats.TryGetValue(key, out NumberFormat? _format)) {
