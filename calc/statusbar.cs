@@ -109,7 +109,9 @@ public class StatusBar {
     /// </summary>
     private void RenderFilename() {
         _maxFilenameWidth = Math.Max(_maxFilenameWidth, _filename.Length);
-        int pos = _statusBarWidth - _maxFilenameWidth;
-        Terminal.Write(pos, _statusBarRow, _maxFilenameWidth, _fgColour, _bgColour, _filename.PadLeft(_maxFilenameWidth));
+        if (_maxFilenameWidth > 0) {
+            int pos = _statusBarWidth - _maxFilenameWidth;
+            Terminal.Write(pos, _statusBarRow, _maxFilenameWidth, _fgColour, _bgColour, _filename.PadLeft(_maxFilenameWidth));
+        }
     }
 }

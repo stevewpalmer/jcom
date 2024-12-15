@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -129,6 +130,8 @@ public static class Terminal {
     /// <param name="str">String to output</param>
     public static void Write(int x, int y, int width, AnsiText str) {
         lock (LockObj) {
+            Debug.Assert(x < Console.WindowWidth);
+            Debug.Assert(y < Console.WindowHeight);
             Console.SetCursorPosition(x, y);
             foreach (AnsiTextSpan span in str.Spans) {
                 Console.Write(span.EscapedText);
@@ -153,6 +156,8 @@ public static class Terminal {
     /// <param name="str">String to output</param>
     public static void Write(int x, int y, int width, int fg, int bg, string str) {
         lock (LockObj) {
+            Debug.Assert(x < Console.WindowWidth);
+            Debug.Assert(y < Console.WindowHeight);
             string ansiString = new AnsiTextSpan(str.PadRight(width)) {
                 ForegroundColour = fg,
                 BackgroundColour = bg
@@ -175,6 +180,8 @@ public static class Terminal {
     /// <param name="str">String to output</param>
     public static void Write(int x, int y, int width, ConsoleColor bg, ConsoleColor fg, string str) {
         lock (LockObj) {
+            Debug.Assert(x < Console.WindowWidth);
+            Debug.Assert(y < Console.WindowHeight);
             Console.SetCursorPosition(x, y);
             ConsoleColor fgSaved = Console.ForegroundColor;
             ConsoleColor bgSaved = Console.BackgroundColor;
@@ -219,6 +226,8 @@ public static class Terminal {
     /// <param name="x">Cursor column</param>
     /// <param name="y">Cursor row</param>
     public static void SetCursor(int x, int y) {
+        Debug.Assert(x < Console.WindowWidth);
+        Debug.Assert(y < Console.WindowHeight);
         Console.SetCursorPosition(x, y);
     }
 
