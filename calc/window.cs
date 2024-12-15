@@ -176,8 +176,8 @@ public class Window {
         }
         if (flags.HasFlag(RenderHint.BLOCK)) {
             if (_isMarkMode) {
-                InvalidateExtent.Clear();
                 InvalidateExtent
+                    .Clear()
                     .Add(_markAnchor)
                     .Add(Sheet.Location.Point)
                     .Add(_lastMarkPoint);
@@ -271,8 +271,7 @@ public class Window {
         while (i <= renderExtent.End.Y) {
             AnsiText line = Sheet.GetRow(_scrollOffset.X + 1, i, _sheetBounds.Width);
             int x = _sheetBounds.Left;
-            int w = _sheetBounds.Width;
-            int length = Math.Min(w, line.Length);
+            Debug.Assert(line.Length == _sheetBounds.Width);
 
             if (i >= markExtent.Start.Y && i <= markExtent.End.Y) {
                 int extentStart = GetXPositionOfCell(markExtent.Start.X);
@@ -289,7 +288,7 @@ public class Window {
                     line.Style(left, extentWidth, Screen.Colours.BackgroundColour, Screen.Colours.SelectionColour);
                 }
             }
-            Terminal.Write(x, y, _sheetBounds.Width, line.Substring(0, length));
+            Terminal.Write(x, y, _sheetBounds.Width, line);
             ++i;
             ++y;
         }

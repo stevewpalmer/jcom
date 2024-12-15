@@ -70,6 +70,15 @@ public class RExtentTest {
         _rextent.Add(point3);
         Assert.AreEqual(point3, _rextent.Start);
         Assert.AreEqual(point2, _rextent.End);
+
+        // Add two extents.
+        RExtent extent1 = new RExtent().Add(new Point(4, 7)).Add(new Point(56, 201));
+        extent1.Add(new RExtent().Add(new Point(9, 3)).Add(new Point(70, 101)));
+
+        Assert.AreEqual(4, extent1.Start.X);
+        Assert.AreEqual(3, extent1.Start.Y);
+        Assert.AreEqual(70, extent1.End.X);
+        Assert.AreEqual(201, extent1.End.Y);
     }
 
     // Verify the Subtract method that reduces an extent to

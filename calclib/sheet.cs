@@ -356,7 +356,7 @@ public class Sheet {
         int columnIndex = 1;
         int totalWidth = 0;
         while (totalWidth < width && columnIndex < MaxColumns) {
-            int size = ColumnWidth(columnIndex);
+            int size = Math.Min(ColumnWidth(columnIndex), width - totalWidth);
             Cell cell = GetCell(columnIndex, row, false);
             if (cell is { Value.IsNumber: false } && cell.Value.StringValue?.Length > size) {
                 int labelLength = cell.Value.StringValue.Length;
@@ -406,7 +406,7 @@ public class Sheet {
                 columnIndex++;
             }
         }
-        if (columnIndex == MaxColumns && totalWidth < width) {
+        if (totalWidth < width) {
             int size = width - totalWidth;
             Cell cell = new();
             spans.Add(new AnsiTextSpan(cell.TextForWidth(size)) {

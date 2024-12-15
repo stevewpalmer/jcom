@@ -288,9 +288,9 @@ public static class Screen {
             return RenderHint.NONE;
         }
         Sheet sheet = _activeWindow.Sheet;
-        SelectWindow(1);
-        _activeBook.RemoveSheet(sheet);
         _windowList.Remove(_activeWindow);
+        _activeBook.RemoveSheet(sheet);
+        SelectWindow(1);
         return RenderHint.NONE;
     }
 
