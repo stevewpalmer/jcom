@@ -804,11 +804,11 @@ public class Window {
     /// <returns>Render hint</returns>
     private RenderHint InputValue(bool editValue) {
         RenderHint hint = RenderHint.NONE;
-        Cell cell = Sheet.GetCell(Sheet.Location, true);
-        string cellValue = editValue ? cell.Content : string.Empty;
+        string cellValue = editValue ? Sheet.ActiveCell.Content : string.Empty;
         CellInputResponse result = Screen.Command.PromptForCellInput(ref cellValue);
         if (result != CellInputResponse.CANCEL) {
             try {
+                Cell cell = Sheet.GetCell(Sheet.Location, true);
                 cell.Content = cellValue;
                 InvalidateCells([cell]);
                 Sheet.NeedRecalculate = true;
