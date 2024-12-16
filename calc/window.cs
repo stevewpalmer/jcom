@@ -357,6 +357,9 @@ public class Window {
         }
         int x = _sheetBounds.Left;
         for (int c = _scrollOffset.X; c < column - 1; c++) {
+            if (x >= _sheetBounds.Right) {
+                return -1;
+            }
             x += Sheet.ColumnWidth(c + 1);
         }
         return x;
@@ -373,6 +376,9 @@ public class Window {
         }
         int y = _sheetBounds.Top;
         for (int d = _scrollOffset.Y; d < row - 1; d++) {
+            if (y >= _sheetBounds.Bottom) {
+                return -1;
+            }
             y += Sheet.RowHeight;
         }
         return y;
