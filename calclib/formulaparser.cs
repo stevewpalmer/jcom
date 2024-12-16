@@ -57,6 +57,9 @@ public enum TokenID {
     KYEAR,
     KMONTH,
     KTIME,
+    KDATE,
+    KEDATE,
+    KDAYS360,
     COLON,
     CONCAT,
     KCONCATENATE,
@@ -485,6 +488,11 @@ public class FormulaParser {
             case TokenID.KMONTH:
                 return ParseArguments(token.ID, 1);
 
+            case TokenID.KDAYS360:
+            case TokenID.KEDATE:
+                return ParseArguments(token.ID, 2);
+
+            case TokenID.KDATE:
             case TokenID.KTIME:
                 return ParseArguments(token.ID, 3);
 
@@ -576,14 +584,7 @@ public class FormulaParser {
     /// <param name="id">Token ID</param>
     /// <returns>Precedence level</returns>
     internal static int Precedence(TokenID id) =>
-        id switch {
-            TokenID.KSUM => 20,
-            TokenID.KCONCATENATE => 20,
-            TokenID.KNOW => 20,
-            TokenID.KTODAY => 20,
-            TokenID.KMONTH => 20,
-            TokenID.KYEAR => 20,
-            TokenID.KTIME => 20,
+        CellNode.Functions.ContainsKey(id) ? 20 : id switch {
             TokenID.NUMBER => 20,
             TokenID.ADDRESS => 20,
             TokenID.TEXT => 20,

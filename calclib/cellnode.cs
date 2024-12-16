@@ -49,6 +49,9 @@ internal class CellNode(TokenID tokenID) {
         { TokenID.KYEAR, "YEAR" },
         { TokenID.KMONTH, "MONTH" },
         { TokenID.KTIME, "TIME" },
+        { TokenID.KDATE, "DATE" },
+        { TokenID.KEDATE, "EDATE" },
+        { TokenID.KDAYS360, "DAYS360" },
         { TokenID.KCONCATENATE, "CONCATENATE" }
     };
 

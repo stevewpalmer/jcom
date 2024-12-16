@@ -28,7 +28,6 @@ using JComLib;
 namespace JCalcLib;
 
 // ReSharper disable UnusedMember.Global
-
 public static class Functions {
 
     /// <summary>
@@ -60,18 +59,89 @@ public static class Functions {
     }
 
     /// <summary>
-    /// Returns a serial number representing the specified time.
+    /// Returns a serial number representing the specified time on the current date.
     /// </summary>
     /// <param name="arguments">Function parameters</param>
-    /// <returns>A variant containing the serial number of the current date</returns>
+    /// <returns>A variant containing the serial number of the specified time</returns>
     public static Variant TIME(IEnumerable<Variant> arguments) {
-        Variant [] parts = arguments.ToArray();
+        Variant[] parts = arguments.ToArray();
         if (parts.Length != 3) {
             throw new ArgumentException("Arguments must have three parts");
         }
         DateTime oaBaseDate = DateTime.FromOADate(0);
         TimeSpan ts = new(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
         return new Variant(oaBaseDate.Add(ts).ToOADate());
+    }
+
+    /// <summary>
+    /// Returns a serial number representing the specified date.
+    /// </summary>
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>A variant containing the serial number of the specified date</returns>
+    public static Variant DATE(IEnumerable<Variant> arguments) {
+        Variant[] parts = arguments.ToArray();
+        if (parts.Length != 3) {
+            throw new ArgumentException("Arguments must have three parts");
+        }
+        DateTime ts = new(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
+        return new Variant(ts.ToOADate());
+    }
+
+    /// <summary>
+    /// Returns the serial number that represents the date that is the indicated number
+    /// of months before or after a specified date (the start_date).
+    /// </summary>
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>A variant containing the serial number of the computed date</returns>
+    public static Variant EDATE(IEnumerable<Variant> arguments) {
+        Variant[] parts = arguments.ToArray();
+        if (parts.Length != 2) {
+            throw new ArgumentException("Arguments must have two parts");
+        }
+        try {
+            DateTime date = DateTime.FromOADate(parts[0].DoubleValue);
+            date = date.AddMonths(parts[1].IntValue);
+            return new Variant(date.ToOADate());
+        }
+        catch {
+            throw new Exception("Number out of range");
+        }
+    }
+
+    /// <summary>
+    /// Returns the number of days between two dates based on a 360-day year (twelve 30-day months),
+    /// which is used in some accounting calculations. The method applied is the European method and
+    /// will require updates to support the NASD method.
+    /// </summary>
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>A variant containing the number of days between the two days according to
+    /// a 360-day year.</returns>
+    public static Variant DAYS360(IEnumerable<Variant> arguments) {
+        Variant[] parts = arguments.ToArray();
+        if (parts.Length != 2) {
+            throw new ArgumentException("Arguments must have two parts");
+        }
+        try {
+            DateTime startDate = DateTime.FromOADate(parts[0].DoubleValue);
+            DateTime endDate = DateTime.FromOADate(parts[1].DoubleValue);
+            if (endDate < startDate) {
+                (endDate, startDate) = (startDate, endDate);
+            }
+            int lastFebruary = new DateTime(startDate.Year, 3, 1).AddDays(-1).Day;
+            int startDays = startDate.Day;
+            int endDays = endDate.Day;
+            if (startDays == 31 || (startDate.Month == 2 && startDays == lastFebruary)) {
+                startDays = 30;
+            }
+            if (endDays == 31 && startDays == 30) {
+                endDays = 30;
+            }
+            int duration = (endDate.Year - startDate.Year) * 360 + (endDate.Month - startDate.Month) * 30 + (endDays - startDays);
+            return new Variant(duration);
+        }
+        catch {
+            throw new Exception("Number out of range");
+        }
     }
 
     /// <summary>

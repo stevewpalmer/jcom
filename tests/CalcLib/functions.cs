@@ -52,6 +52,82 @@ public class FunctionTests {
     }
 
     /// <summary>
+    /// Verify the DATE function
+    /// </summary>
+    [Test]
+    public void VerifyDate() {
+        Sheet sheet = new();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Content = "=DATE(2024,2,17)";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        DateTime time = DateTime.Parse(cell1.TextForWidth(12));
+        Assert.AreEqual(new DateTime(2024, 2, 17), time);
+
+        cell1.Content = "=DATE(12)";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        sheet.Calculate();
+        Assert.IsTrue(cell1.Error);
+    }
+
+    /// <summary>
+    /// Verify the EDATE function
+    /// </summary>
+    [Test]
+    public void VerifyEDate() {
+        Sheet sheet = new();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        cell1.Content = "=DATE(2024,1,15)";
+        cell1.CellFormat = CellFormat.DATE_DMY;
+        cell2.CellFormat = CellFormat.DATE_DMY;
+
+        cell2.Content = "=EDATE(A1,1)";
+        sheet.Calculate();
+        DateTime time = DateTime.Parse(cell2.Text);
+        Assert.AreEqual(new DateTime(2024, 2, 15), time);
+
+        cell2.Content = "=EDATE(A1,-1)";
+        sheet.Calculate();
+        time = DateTime.Parse(cell2.Text);
+        Assert.AreEqual(new DateTime(2023, 12, 15), time);
+
+        cell2.Content = "=EDATE(A1,2)";
+        sheet.Calculate();
+        time = DateTime.Parse(cell2.Text);
+        Assert.AreEqual(new DateTime(2024, 3, 15), time);
+    }
+
+    /// <summary>
+    /// Verify the DAYS360 function
+    /// </summary>
+    [Test]
+    public void VerifyDays360() {
+        Sheet sheet = new();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
+        Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
+        Cell cell5 = sheet.GetCell(new CellLocation("A5"), true);
+        cell1.Content = "=DATE(2011,1,1)";
+        cell2.Content = "=DATE(2011,1,30)";
+        cell3.Content = "=DATE(2011,2,1)";
+        cell4.Content = "=DATE(2011,12,31)";
+
+        cell5.Content = "=DAYS360(A2,A3)";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(1), cell5.Value);
+
+        cell5.Content = "=DAYS360(A1,A4)";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(360), cell5.Value);
+
+        cell5.Content = "=DAYS360(A1,A3)";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(30), cell5.Value);
+    }
+
+    /// <summary>
     /// Verify the NOW function
     /// </summary>
     [Test]
