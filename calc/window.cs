@@ -426,7 +426,8 @@ public class Window {
         Cell[] cellsToPaste = Clipboard.Data;
         List<Cell> cellsToUpdate = [];
         if (cellsToPaste.Length > 0) {
-            CellLocation current = Sheet.Location;
+            Point start = GetMarkExtent().Start;
+            CellLocation current = new() { Column = start.X, Row = start.Y };
 
             Point startPoint = cellsToPaste[0].Location.Point;
             foreach (Cell cellToPaste in cellsToPaste) {
@@ -441,6 +442,7 @@ public class Window {
             InvalidateCells(cellsToUpdate);
             Sheet.NeedRecalculate = true;
         }
+        ClearBlock();
         return RenderHint.NONE;
     }
 
