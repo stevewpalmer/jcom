@@ -385,11 +385,11 @@ public class ParsingTests {
         Assert.IsTrue(FormulaParser.Precedence(TokenID.KNE) == 5);
         Assert.IsTrue(FormulaParser.Precedence(TokenID.KEQ) == 5);
         Assert.IsTrue(FormulaParser.Precedence(TokenID.KLT) == 5);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.PLUS) == 6);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.MINUS) == 6);
         Assert.IsTrue(FormulaParser.Precedence(TokenID.CONCAT) == 6);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.MULTIPLY) == 7);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.DIVIDE) == 7);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.PLUS) == 7);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.MINUS) == 7);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.MULTIPLY) == 8);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.DIVIDE) == 8);
         Assert.IsTrue(FormulaParser.Precedence(TokenID.EXP) == 10);
 
         // Impossible precedences return 0

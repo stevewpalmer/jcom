@@ -593,11 +593,11 @@ public class FormulaParser {
             TokenID.KNE => 5,
             TokenID.KEQ => 5,
             TokenID.KLT => 5,
-            TokenID.PLUS => 6,
-            TokenID.MINUS => 6,
             TokenID.CONCAT => 6,
-            TokenID.MULTIPLY => 7,
-            TokenID.DIVIDE => 7,
+            TokenID.PLUS => 7,
+            TokenID.MINUS => 7,
+            TokenID.MULTIPLY => 8,
+            TokenID.DIVIDE => 8,
             TokenID.EXP => 10,
             _ => 0
         };
