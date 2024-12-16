@@ -186,7 +186,7 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
     /// <param name="context">Calculation context</param>
     /// <returns>The next Variant from the referenced cells</returns>
     private IEnumerable<Variant> Arguments(CalculationContext context) {
-        CellLocation sourceLocation = context.ReferenceList.Last();
+        CellLocation sourceLocation = context.ReferenceList.First();
         foreach (CellNode parameter in Parameters) {
             if (parameter is RangeNode rangeNode) {
                 foreach (CellLocation location in rangeNode.RangeIterator(sourceLocation)) {
