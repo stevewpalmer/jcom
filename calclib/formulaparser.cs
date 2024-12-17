@@ -637,7 +637,7 @@ public class FormulaParser {
         public CellAddressFormat Format { get; }
 
         /// <summary>
-        /// Returns the identifier name.
+        /// Returns the cell address.
         /// </summary>
         public string Address { get; }
     }
