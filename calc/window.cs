@@ -754,7 +754,7 @@ public class Window {
     /// Fill the selected cells. The algorithm applied depends on the number of
     /// cells at the start of the range that contain values. If only one cell
     /// has a value, that value is replicated in the range. If two cells have
-    /// values then the difference is applied to subsequent cells. However if
+    /// values then the difference is applied to subsequent cells. However, if
     /// the two cells are dates then it uses the formatting on the cells to
     /// determine the date distribution.
     /// </summary>
@@ -1006,20 +1006,9 @@ public class Window {
     private RenderHint CursorPageUp() {
         RenderHint flags = SaveLastMarkPoint();
         CellLocation sheetLocation = Sheet.Location;
-        int previousRow = sheetLocation.Row;
         sheetLocation.Row = Math.Max(sheetLocation.Row - _sheetBounds.Height, 1);
         Sheet.Location = sheetLocation;
-        if (sheetLocation.Row == previousRow) {
-            PlaceCursor();
-        }
-        else {
-            _scrollOffset.Y -= previousRow - sheetLocation.Row;
-            if (_scrollOffset.Y < 0) {
-                _scrollOffset.Y = 0;
-            }
-            flags |= RenderHint.REFRESH;
-        }
-        return flags;
+        return flags | SyncRowColumnToSheet(true);
     }
 
     /// <summary>
@@ -1051,20 +1040,9 @@ public class Window {
     private RenderHint CursorPageDown() {
         RenderHint flags = SaveLastMarkPoint();
         CellLocation sheetLocation = Sheet.Location;
-        int previousRow = sheetLocation.Row;
         sheetLocation.Row = Math.Min(sheetLocation.Row + _sheetBounds.Height, Sheet.MaxRows);
         Sheet.Location = sheetLocation;
-        if (sheetLocation.Row == previousRow) {
-            PlaceCursor();
-        }
-        else {
-            _scrollOffset.Y += sheetLocation.Row - previousRow;
-            if (_scrollOffset.Y + _sheetBounds.Height > Sheet.MaxRows) {
-                _scrollOffset.Y = Sheet.MaxRows - _sheetBounds.Height;
-            }
-            flags |= RenderHint.REFRESH;
-        }
-        return flags;
+        return flags | SyncRowColumnToSheet(true);
     }
 
     /// <summary>
@@ -1092,24 +1070,28 @@ public class Window {
     /// adjusting the scroll offsets as appropriate.
     /// </summary>
     /// <returns>Render hint</returns>
-    private RenderHint SyncRowColumnToSheet() {
+    private RenderHint SyncRowColumnToSheet(bool tryCenter = false) {
         RenderHint flags = RenderHint.CURSOR;
         int numberOfColumns = TotalColumnsOnSheet();
 
         if (Sheet.Location.Column <= _scrollOffset.X) {
-            _scrollOffset.X = Sheet.Location.Column - 1;
+            int centreColumn = Sheet.Location.Column - _scrollOffset.X + numberOfColumns / 2;
+            _scrollOffset.X = tryCenter ? Math.Max(0, centreColumn) : Sheet.Location.Column - 1;
             flags |= RenderHint.REFRESH;
         }
         if (Sheet.Location.Column > numberOfColumns + _scrollOffset.X) {
-            _scrollOffset.X = Sheet.Location.Column - numberOfColumns;
+            int centreColumn = Sheet.Location.Column - _scrollOffset.X + numberOfColumns / 2;
+            _scrollOffset.X = tryCenter ? centreColumn : Sheet.Location.Column - numberOfColumns;
             flags |= RenderHint.REFRESH;
         }
         if (Sheet.Location.Row <= _scrollOffset.Y) {
-            _scrollOffset.Y = Sheet.Location.Row - 1;
+            int centreRow = _sheetBounds.Height / 2 - (Sheet.Location.Row - _scrollOffset.Y);
+            _scrollOffset.Y = tryCenter ? Math.Max(0, _scrollOffset.Y - centreRow) : Sheet.Location.Row - 1;
             flags |= RenderHint.REFRESH;
         }
         if (Sheet.Location.Row > _sheetBounds.Height + _scrollOffset.Y) {
-            _scrollOffset.Y = Sheet.Location.Row - _sheetBounds.Height;
+            int centreRow = _sheetBounds.Height / 2 - (Sheet.Location.Row - _scrollOffset.Y);
+            _scrollOffset.Y = tryCenter ? Math.Max(0, _scrollOffset.Y - centreRow) :Sheet.Location.Row - _sheetBounds.Height;
             flags |= RenderHint.REFRESH;
         }
         return flags;

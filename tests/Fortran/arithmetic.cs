@@ -152,7 +152,7 @@ public class ArithmeticTests {
         Compiler comp = new(new FortranOptions());
         comp.CompileString(code);
         Assert.AreEqual(0, comp.Messages.ErrorCount);
-        Assert.Throws(typeof(DivideByZeroException), () => comp.Execute("ITEST"));
+        Assert.Throws<DivideByZeroException>(() => comp.Execute("ITEST"));
     }
 
     // Verify expression simplification involving the three

@@ -124,6 +124,6 @@ public class Blocks {
                 endfunc
             ";
         Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
-        Assert.Throws(typeof(JComRuntimeException), () => comp.Execute("test"));
+        Assert.Throws<JComRuntimeException>(() => comp.Execute("test"));
     }
 }

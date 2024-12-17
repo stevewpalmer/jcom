@@ -191,8 +191,8 @@ public class Variants {
         Variant v2 = new();
         Assert.IsTrue(v1.HasValue);
         Assert.IsTrue(!v2.HasValue);
-        Assert.Throws(typeof(ArgumentException), delegate { _ = Variant.VariantTypeToSystemType(v2.Type); });
-        Assert.Throws(typeof(NotImplementedException), delegate { _ = new Variant(45m); });
+        Assert.Throws<ArgumentException>(delegate { _ = Variant.VariantTypeToSystemType(v2.Type); });
+        Assert.Throws<NotImplementedException>(delegate { _ = new Variant(45m); });
     }
 
     // Test simple variant addition.
@@ -222,10 +222,10 @@ public class Variants {
 
         Variant v11 = new(true);
         Variant v12 = new(false);
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v11 + v12; });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v11 + v12; });
 
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = null + v2; });
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = v1 + null; });    }
+        Assert.Throws<ArgumentNullException>(delegate { _ = null + v2; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = v1 + null; });    }
 
     // Test simple variant subtraction.
     [Test]
@@ -250,14 +250,14 @@ public class Variants {
 
         Variant v9 = new("ONE");
         Variant v10 = new("TWO");
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v9 - v10; });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v9 - v10; });
 
         Variant v11 = new(true);
         Variant v12 = new(false);
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v11 - v12; });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v11 - v12; });
 
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = null - v2; });
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = v1 - null; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = null - v2; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = v1 - null; });
     }
 
     // Test simple variant multiplication.
@@ -283,10 +283,10 @@ public class Variants {
 
         Variant v9 = new("ONE");
         Variant v10 = new("TWO");
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v9 * v10; });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v9 * v10; });
 
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = null * v2; });
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = v1 * null; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = null * v2; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = v1 * null; });
     }
 
     // Test simple variant division.
@@ -313,10 +313,10 @@ public class Variants {
 
         Variant v9 = new("ONE");
         Variant v10 = new("TWO");
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v9 / v10; });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v9 / v10; });
 
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = null / v2; });
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = v1 / null; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = null / v2; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = v1 / null; });
     }
 
     // Test simple variant modulus.
@@ -336,10 +336,10 @@ public class Variants {
 
         Variant v7 = new("ONE");
         Variant v8 = new("TWO");
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v7 % v8; });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v7 % v8; });
 
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = null % v2; });
-        Assert.Throws(typeof(ArgumentNullException), delegate { _ = v1 % null; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = null % v2; });
+        Assert.Throws<ArgumentNullException>(delegate { _ = v1 % null; });
     }
 
     // Test simple variant power.
@@ -366,7 +366,7 @@ public class Variants {
 
         Variant v9 = new("TEST");
         Variant v10 = new("DATA");
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v9.Pow(v10); });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v9.Pow(v10); });
     }
 
     // Test variant greater than and less than comparisons.
@@ -415,8 +415,8 @@ public class Variants {
         Assert.IsTrue(Helper.DoubleCompare(new Variant(-0.632d).RealValue, v3.Negate().DoubleValue));
 
         Variant v4 = new("A STRING");
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = -v4; });
-        Assert.Throws(typeof(InvalidOperationException), delegate { _ = v4.Negate(); });
+        Assert.Throws<InvalidOperationException>(delegate { _ = -v4; });
+        Assert.Throws<InvalidOperationException>(delegate { _ = v4.Negate(); });
 
         Variant v5 = new(new Complex(45.12, -0.12));
         Assert.IsTrue(Helper.DoubleCompare(new Variant(-45.12).DoubleValue, (-v5).ComplexValue.Real));

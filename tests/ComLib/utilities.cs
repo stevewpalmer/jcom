@@ -77,7 +77,7 @@ public class Utilities {
         Assert.AreEqual("  abcdef  ", JComLib.Utilities.CentreString("abcdef", 10));
         Assert.AreEqual("abcdef", JComLib.Utilities.CentreString("abcdef", 6));
         Assert.AreEqual("a", JComLib.Utilities.CentreString("abcdef", 1));
-        Assert.Throws(typeof(ArgumentNullException), delegate { JComLib.Utilities.CentreString(null, 10); });
+        Assert.Throws<ArgumentNullException>(delegate { JComLib.Utilities.CentreString(null, 10); });
         Assert.AreEqual("          ", JComLib.Utilities.CentreString("", 10));
     }
 }

@@ -179,7 +179,7 @@ public class TestANSIText {
         Cell generalCell = new() { Value = new Variant(12), Alignment = CellAlignment.GENERAL };
         Cell generalTextCell = new() { Value = new Variant("MOUSE"), Alignment = CellAlignment.GENERAL };
 
-        Assert.Throws(typeof(ArgumentOutOfRangeException), delegate { _ = new Cell { Alignment = (CellAlignment)10 }.AnsiAlignment; });
+        Assert.Throws<ArgumentOutOfRangeException>(delegate { _ = new Cell { Alignment = (CellAlignment)10 }.AnsiAlignment; });
 
         Assert.AreEqual(AnsiAlignment.LEFT, leftCell.AnsiAlignment);
         Assert.AreEqual(AnsiAlignment.RIGHT, rightCell.AnsiAlignment);

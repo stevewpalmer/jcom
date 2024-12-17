@@ -145,7 +145,7 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// <summary>
     /// Retrieve or set the name of the sheet referenced by this location.
     /// </summary>
-    public string? SheetName { get; set; } = null;
+    public string? SheetName { get; } = null;
 
     /// <summary>
     /// Returns this cell location as a Point.

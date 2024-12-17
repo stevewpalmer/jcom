@@ -74,7 +74,6 @@ public class CellTests {
         Assert.AreEqual(4095, sheet1a4095.Row);
         Assert.AreEqual(1, sheet1a4095.Column);
 
-        Assert.Throws(typeof(FormatException), delegate { _ = new CellLocation(null!); });
         Assert.Throws<FormatException>(delegate { _ = new CellLocation(null!); });
     }
 
