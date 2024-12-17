@@ -65,7 +65,7 @@ public class CellTests {
         Assert.AreEqual(4095, a4095.Row);
         Assert.AreEqual(1, a4095.Column);
 
-        Assert.Throws(typeof(FormatException), delegate { _ = new CellLocation(null!); });
+        Assert.Throws<FormatException>(delegate { _ = new CellLocation(null!); });
     }
 
     // Verify comparing two cell locations. This exercises the equality
@@ -308,7 +308,7 @@ public class CellTests {
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
         }.TextForWidth(8));
-        Assert.Throws(typeof(ArgumentException), delegate {
+        Assert.Throws<ArgumentException>(delegate {
             new Cell {
                 Content = "45.8794",
                 CellFormat = (CellFormat)14,
@@ -331,7 +331,7 @@ public class CellTests {
             Alignment = CellAlignment.LEFT,
             CellFormat = CellFormat.TEXT
         }.TextForWidth(8));
-        Assert.Catch(typeof(ArgumentException), delegate {
+        Assert.Catch<ArgumentException>(delegate {
             NumberFormats.GetFormat(CellFormat.TEXT, false, 5);
         });
     }
@@ -357,7 +357,7 @@ public class CellTests {
             CellFormat = CellFormat.GENERAL,
             DecimalPlaces = 2
         }.TextForWidth(8));
-        Assert.Throws(typeof(ArgumentException), delegate {
+        Assert.Throws<ArgumentException>(delegate {
             new Cell {
                 Content = "45.8794",
                 Alignment = (CellAlignment)4,

@@ -76,7 +76,7 @@ internal static class Program {
         if (BinaryFolder == string.Empty) {
             return;
         }
-        HomeFolder = $"{Directory.GetParent(BinaryFolder)?.FullName}/home";
+        HomeFolder = $".";
         if (!Directory.Exists(HomeFolder)) {
             Directory.CreateDirectory(HomeFolder);
         }

@@ -31,7 +31,7 @@ using JEdit.Resources;
 namespace JEdit;
 
 public class StatusBar {
-    private static readonly object LockObj = new();
+    private static readonly Lock LockObj = new();
     private static int _statusRow;
     private static int _timeWidth;
     private static int _timePosition;

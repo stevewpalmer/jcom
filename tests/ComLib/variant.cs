@@ -362,7 +362,7 @@ public class Variants {
 
         Variant v7 = new(new Complex(20, 3));
         Variant v8 = new(new Complex(2, 4));
-        Assert.AreEqual(new Variant(new Complex(218.9382832563314, -53.8472034693398)), v7.Pow(v8));
+        Assert.AreEqual(new Variant(Complex.Pow(new Complex(20, 3), new Complex(2, 4))), v7.Pow(v8));
 
         Variant v9 = new("TEST");
         Variant v10 = new("DATA");

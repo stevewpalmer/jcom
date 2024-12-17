@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <NoWarn>1701;1702;8600;8601;8602;8604;8618;8625;8603</NoWarn>
-        <LangVersion>12</LangVersion>
+        <LangVersion>13</LangVersion>
         <ReleaseVersion>0.3</ReleaseVersion>
         <Description>Comal</Description>
         <Copyright>(c) Steven Palmer 2013-2024</Copyright>

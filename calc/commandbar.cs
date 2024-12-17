@@ -442,9 +442,7 @@ public class CommandBar {
                 } else if (currentField.Inner.Type == FormFieldType.COLOURPICKER) {
 
                     List<string> labels = [];
-                    foreach (int colourValue in AnsiColour.ColourValues) {
-                        labels.Add(AnsiColour.LabelForColour(colourValue));
-                    }
+                    labels.AddRange(AnsiColour.ColourValues.Select(AnsiColour.LabelForColour));
                     Terminal.Write(0, row + 1, _displayWidth, _fgColour, _bgColour, string.Join(" ", labels));
                     Terminal.ShowCursor(false);
                 }

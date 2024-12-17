@@ -244,11 +244,11 @@ public class ParsingTests {
         Assert.AreEqual("R(2)C(3)", Cell.LocationToAddress(new Point(3, 2)));
         Assert.AreEqual("R(-2)C(-3)", Cell.LocationToAddress(new Point(-3, -2)));
 
-        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("P(-20)C(-25)"); });
-        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("R-20C-25"); });
-        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("R(-20)C-25"); });
-        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("R(-20)C(-25"); });
-        Assert.Throws(typeof(ArgumentException), delegate { _ = Cell.PointFromRelativeAddress("R(-3320)C(-3325"); });
+        Assert.Throws<ArgumentException>(delegate { _ = Cell.PointFromRelativeAddress("P(-20)C(-25)"); });
+        Assert.Throws<ArgumentException>(delegate { _ = Cell.PointFromRelativeAddress("R-20C-25"); });
+        Assert.Throws<ArgumentException>(delegate { _ = Cell.PointFromRelativeAddress("R(-20)C-25"); });
+        Assert.Throws<ArgumentException>(delegate { _ = Cell.PointFromRelativeAddress("R(-20)C(-25"); });
+        Assert.Throws<ArgumentException>(delegate { _ = Cell.PointFromRelativeAddress("R(-3320)C(-3325"); });
     }
 
     // Verify an exception is thrown when a bad operand is
@@ -256,13 +256,13 @@ public class ParsingTests {
     [Test]
     public void VerifyBadOperand() {
         Cell cell1 = new();
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("{}{}", cell1.Location); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("AAB7656", cell1.Location); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("R(-12)C", cell1.Location); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("R(-12902)C(4000)", cell1.Location); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("+B4_H7", cell1.Location); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("*89", cell1.Location).Parse(); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("'HELLO", cell1.Location).Parse(); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("{}{}", cell1.Location); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("AAB7656", cell1.Location); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("R(-12)C", cell1.Location); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("R(-12902)C(4000)", cell1.Location); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("+B4_H7", cell1.Location); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("*89", cell1.Location).Parse(); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("'HELLO", cell1.Location).Parse(); });
     }
 
     // Verify an exception is thrown when a bad number is
@@ -272,7 +272,7 @@ public class ParsingTests {
         const string badNumber = "=+B4*07E ";
         Cell cell1 = new() { Content = badNumber };
         Assert.IsFalse(cell1.HasFormula);
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser(badNumber[1..], cell1.Location); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser(badNumber[1..], cell1.Location); });
     }
 
     // Verify spaces in an expression are ignored.
@@ -340,7 +340,7 @@ public class ParsingTests {
 
         // Missing closing parenthesis should throw an exception
         Cell cell2 = new(new Sheet(1));
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("A1*(A2+A3", cell2.Location).Parse(); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("A1*(A2+A3", cell2.Location).Parse(); });
     }
 
     /// <summary>
@@ -430,7 +430,7 @@ public class ParsingTests {
         Assert.AreEqual(new CellLocation { Column = 2, Row = 3}, rangeStart.AbsoluteLocation);
         Assert.AreEqual(new CellLocation { Column = 2, Row = 5}, rangeEnd.AbsoluteLocation);
 
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("SUM(12:TEXT)", cell.Location).Parse(); });
-        Assert.Throws(typeof(FormatException), delegate { _ = new FormulaParser("SUM(A3:12)", cell.Location).Parse(); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("SUM(12:TEXT)", cell.Location).Parse(); });
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("SUM(A3:12)", cell.Location).Parse(); });
     }
 }

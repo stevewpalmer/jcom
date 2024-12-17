@@ -241,7 +241,7 @@ public class FormulaTests {
         BinaryOpNode pn = new(TokenID.LPAREN, new NumberNode(90), new NumberNode(4));
         Sheet sheet = new(1);
         CalculationContext context = new() { Sheet = sheet };
-        Assert.Throws(typeof(NotImplementedException), delegate { pn.Evaluate(context); });
+        Assert.Throws<NotImplementedException>(delegate { pn.Evaluate(context); });
     }
 
     /// <summary>

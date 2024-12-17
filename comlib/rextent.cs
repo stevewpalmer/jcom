@@ -52,10 +52,9 @@ public class RExtent {
     /// Merge the specified extent with this one.
     /// </summary>
     /// <param name="extent">Extent to merge</param>
-    public RExtent Add(RExtent extent) {
+    public void Add(RExtent extent) {
         Add(extent.Start);
         Add(extent.End);
-        return this;
     }
 
     /// <summary>

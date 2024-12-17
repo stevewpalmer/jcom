@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 namespace JComLib;
 
 public static class Terminal {
-    private static readonly object LockObj = new();
+    private static readonly Lock LockObj = new();
     private static ConsoleColor _savedBackgroundColour;
     private static ConsoleColor _savedForegroundColour;
     private static bool _isWindows;
