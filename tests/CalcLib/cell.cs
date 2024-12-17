@@ -50,21 +50,31 @@ public class CellTests {
     [Test]
     public void VerifyRowAndColumnFromPositions() {
         CellLocation a1 = new("A1");
+        Assert.IsNull(a1.SheetName);
         Assert.AreEqual(1, a1.Row);
         Assert.AreEqual(1, a1.Column);
 
         CellLocation z1 = new("Z1");
+        Assert.IsNull(z1.SheetName);
         Assert.AreEqual(1, z1.Row);
         Assert.AreEqual(26, z1.Column);
 
         CellLocation iu1 = new("IU1");
+        Assert.IsNull(iu1.SheetName);
         Assert.AreEqual(1, iu1.Row);
         Assert.AreEqual(255, iu1.Column);
 
         CellLocation a4095 = new("A4095");
+        Assert.IsNull(a4095.SheetName);
         Assert.AreEqual(4095, a4095.Row);
         Assert.AreEqual(1, a4095.Column);
 
+        CellLocation sheet1a4095 = new("Sheet1:A4095");
+        Assert.AreEqual("Sheet1", sheet1a4095.SheetName);
+        Assert.AreEqual(4095, sheet1a4095.Row);
+        Assert.AreEqual(1, sheet1a4095.Column);
+
+        Assert.Throws(typeof(FormatException), delegate { _ = new CellLocation(null!); });
         Assert.Throws<FormatException>(delegate { _ = new CellLocation(null!); });
     }
 

@@ -49,9 +49,11 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// </summary>
     /// <param name="column">Column</param>
     /// <param name="row">Row</param>
-    public CellLocation(int column, int row) {
+    /// <param name="sheetName">Optional sheet name</param>
+    public CellLocation(int column, int row, string? sheetName = null) {
         Column = column;
         Row = row;
+        SheetName = sheetName;
     }
 
     /// <summary>
@@ -66,6 +68,7 @@ public struct CellLocation : IEquatable<CellLocation> {
         }
         Column = location.Column;
         Row = location.Row;
+        SheetName = location.SheetName;
     }
 
     /// <summary>
@@ -74,8 +77,8 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// </summary>
     /// <param name="s">A string containing an address to parse</param>
     /// <param name="result">
-    /// When this method returns, contains CellLocation equivalent
-    /// of the address contained in s, if the conversion succeeded, or (1, 1) if the conversion failed.
+    /// When this method returns, contains the CellLocation equivalent of the address contained
+    /// in s, if the conversion succeeded, or (1, 1) if the conversion failed.
     /// The conversion fails if the s parameter is null or Empty, is not of the correct format,
     /// or represents an address that is outside the range supported by Sheet. This parameter is
     /// passed uninitialized; any value originally supplied in result will be overwritten.
@@ -83,9 +86,15 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// <returns>True if the address is parsed as a cell location, false otherwise</returns>
     public static bool TryParseAddress(string s, out CellLocation result) {
         if (!string.IsNullOrEmpty(s)) {
+            string? sheetName = null;
             int newColumn = 0;
             int newRow = 0;
             int index = 0;
+            int delimiter = s.IndexOf(':');
+            if (delimiter != -1) {
+                sheetName = s[..delimiter];
+                index = delimiter + 1;
+            }
             while (index < s.Length && char.IsLetter(s[index])) {
                 newColumn = newColumn * 26 + char.ToUpper(s[index]) - 'A' + 1;
                 index++;
@@ -95,7 +104,7 @@ public struct CellLocation : IEquatable<CellLocation> {
                 index++;
             }
             if (newColumn is >= 1 and <= Sheet.MaxColumns && newRow is >= 1 and <= Sheet.MaxRows) {
-                result = new CellLocation(newColumn, newRow);
+                result = new CellLocation(newColumn, newRow, sheetName);
                 return true;
             }
         }
@@ -134,6 +143,11 @@ public struct CellLocation : IEquatable<CellLocation> {
     }
 
     /// <summary>
+    /// Retrieve or set the name of the sheet referenced by this location.
+    /// </summary>
+    public string? SheetName { get; set; } = null;
+
+    /// <summary>
     /// Returns this cell location as a Point.
     /// </summary>
     [JsonIgnore]
@@ -144,7 +158,9 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// </summary>
     /// <returns>A string containing the absolute cell location</returns>
     [JsonIgnore]
-    public string Address => $"{Cell.ColumnToAddress(Column)}{Row}";
+    public string Address => SheetName != null ?
+        $"{SheetName}:{Cell.ColumnToAddress(Column)}{Row}" :
+        $"{Cell.ColumnToAddress(Column)}{Row}";
 
     /// <summary>
     /// Check two cell locations for equality
@@ -152,7 +168,7 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// <param name="other">CellLocation to compare</param>
     /// <returns>True if the locations are equal</returns>
     public bool Equals(CellLocation other) {
-        return _row == other._row && _column == other._column;
+        return _row == other._row && _column == other._column && SheetName == other.SheetName;
     }
 
     /// <summary>
