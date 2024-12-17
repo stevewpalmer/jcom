@@ -950,5 +950,23 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("TruncatedCSVImport", resourceCulture);
             }
         }
+        
+        internal static string WorksheetRenameDescription {
+            get {
+                return ResourceManager.GetString("WorksheetRenameDescription", resourceCulture);
+            }
+        }
+        
+        internal static string WorksheetRename {
+            get {
+                return ResourceManager.GetString("WorksheetRename", resourceCulture);
+            }
+        }
+        
+        internal static string EnterWorksheetName {
+            get {
+                return ResourceManager.GetString("EnterWorksheetName", resourceCulture);
+            }
+        }
     }
 }

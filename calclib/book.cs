@@ -33,6 +33,7 @@ public class Book {
     private readonly List<Sheet> _sheets = [];
     private FileInfo? _fileInfo;
     private bool _modified;
+    private int _sheetNumber = 1;
 
     /// <summary>
     /// Backup file extension
@@ -94,11 +95,15 @@ public class Book {
             using FileStream stream = File.OpenRead(path);
             Sheet[]? inputSheets = JsonSerializer.Deserialize<Sheet[]>(stream);
             if (inputSheets != null) {
-                int sheetNumber = 1;
                 _sheets.Clear();
+                _sheetNumber = 1;
                 foreach (Sheet inputSheet in inputSheets) {
 
-                    Sheet sheet = new(sheetNumber) {
+                    string sheetName = inputSheet.Name;
+                    if (string.IsNullOrEmpty(sheetName)) {
+                        sheetName = $"Sheet{_sheetNumber++}";
+                    }
+                    Sheet sheet = new(sheetName) {
                         Location = inputSheet.Location
                     };
                     sheet.ColumnList = inputSheet.ColumnList.Select(cellList => new CellList {
@@ -110,7 +115,6 @@ public class Book {
                     sheet.Modified = false;
                     _sheets.Add(sheet);
                     sheet.Calculate();
-                    sheetNumber++;
                 }
             }
         }
@@ -150,7 +154,7 @@ public class Book {
     /// </summary>
     /// <returns>The new worksheet</returns>
     public Sheet AddSheet() {
-        Sheet newSheet = new(NextSheetNumber());
+        Sheet newSheet = new(_sheetNumber++);
         _sheets.Add(newSheet);
         Modified = true;
         return newSheet;
@@ -181,17 +185,5 @@ public class Book {
     public string Filename {
         get => _fileInfo == null ? DefaultFilename : _fileInfo.FullName;
         set => _fileInfo = string.IsNullOrEmpty(value) ? null : new FileInfo(value);
-    }
-
-    /// <summary>
-    /// Return the next available sheet number.
-    /// </summary>
-    /// <returns>Sheet number</returns>
-    private int NextSheetNumber() {
-        int sheetNumber = 1;
-        foreach (Sheet _ in _sheets.TakeWhile(s => s.SheetNumber == sheetNumber)) {
-            ++sheetNumber;
-        }
-        return sheetNumber;
     }
 }

@@ -31,6 +31,7 @@ using JComLib;
 namespace JCalcLib;
 
 public class Sheet {
+    private string _name = string.Empty;
 
     /// <summary>
     /// Maximum number of columns
@@ -68,11 +69,30 @@ public class Sheet {
     public Sheet() { }
 
     /// <summary>
+    /// Create a new empty sheet with the specified name.
+    /// </summary>
+    /// <param name="name">Sheet name</param>
+    public Sheet(string name) {
+        _name = name;
+    }
+
+    /// <summary>
     /// Create a new empty sheet with the specified number.
     /// </summary>
     /// <param name="number">Sheet number</param>
     public Sheet(int number) {
-        SheetNumber = number;
+        _name = $"Sheet{number}";
+    }
+
+    /// <summary>
+    /// Sheet name, as used in formula.
+    /// </summary>
+    public string Name {
+        get => _name;
+        set {
+            _name = value;
+            Modified = true;
+        }
     }
 
     /// <summary>
@@ -86,12 +106,6 @@ public class Sheet {
     /// </summary>
     [JsonInclude]
     public CellLocation Location { get; set; } = new();
-
-    /// <summary>
-    /// Sheet number
-    /// </summary>
-    [JsonIgnore]
-    public int SheetNumber { get; }
 
     /// <summary>
     /// Do changes to the sheet require a recalculation?

@@ -118,6 +118,7 @@ public static class Commands {
             Commands = [
                 new CommandMapEntry { Name = Calc.WorksheetInsert, SubCommandId = CommandMapID.INSERT, Description = Calc.WorksheetInsertDescription },
                 new CommandMapEntry { Name = Calc.WorksheetDelete, SubCommandId = CommandMapID.DELETE, Description = Calc.WorksheetDeleteDescription },
+                new CommandMapEntry { Name = Calc.WorksheetRename, CommandId = KeyCommand.KC_SHEET_RENAME, Description = Calc.WorksheetRenameDescription },
                 new CommandMapEntry { Name = Calc.WorksheetColumnWidth, SubCommandId = CommandMapID.COLUMN_WIDTH, Description = Calc.WorksheetColumnWidthDescription }
             ]
         },

@@ -105,7 +105,7 @@ public class Cell(Sheet? sheet) {
 
     /// <summary>
     /// The computed value of the cell. This is set by the calculation as
-    /// well as by the Value property once it has translates the input
+    /// well as by the Value property once it has translated the input
     /// value into a discrete cell value.
     /// </summary>
     [JsonIgnore]

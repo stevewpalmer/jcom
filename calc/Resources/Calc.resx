@@ -470,4 +470,13 @@
     <data name="TruncatedCSVImport" xml:space="preserve">
         <value>Input file too large. Data has been truncated.</value>
     </data>
+    <data name="WorksheetRenameDescription" xml:space="preserve">
+        <value>Rename this worksheet</value>
+    </data>
+    <data name="WorksheetRename" xml:space="preserve">
+        <value>Rename</value>
+    </data>
+    <data name="EnterWorksheetName" xml:space="preserve">
+        <value>Enter worksheet name</value>
+    </data>
 </root>

@@ -209,11 +209,11 @@ public class Window {
     private void RenderFrame() {
         int fg = Screen.Colours.BackgroundColour;
         int bg = Screen.Colours.SelectionColour;
-
-        // Sheet number
         int x = _sheetBounds.X;
         int y = _viewportBounds.Top;
-        Terminal.Write(0, y, RowLabelWidth, fg, bg, $@"  {(char)(Sheet.SheetNumber + 'A' - 1)}  ");
+
+        // Corner
+        Terminal.Write(_viewportBounds.Left, y, RowLabelWidth, fg, bg, Utilities.EmptyString(RowLabelWidth));
 
         // Column numbers
         int columnNumber = 1 + _scrollOffset.X;

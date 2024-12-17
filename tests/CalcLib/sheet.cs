@@ -39,7 +39,7 @@ public class SheetTests {
     [Test]
     public void TestNewSheet() {
         Sheet sheet = new(1);
-        Assert.AreEqual(1, sheet.SheetNumber);
+        Assert.AreEqual("Sheet1", sheet.Name);
         Assert.AreEqual("A1", sheet.ActiveCell.Address);
         Assert.AreEqual(1, Sheet.RowHeight);
     }

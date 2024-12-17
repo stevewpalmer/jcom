@@ -158,6 +158,7 @@ public static class Screen {
             KeyCommand.KC_FILE_RETRIEVE => OpenWorkbook(),
             KeyCommand.KC_FILE_IMPORT => ImportFile(),
             KeyCommand.KC_FILE_SAVE => SaveFile(),
+            KeyCommand.KC_SHEET_RENAME => RenameWorksheet(),
             KeyCommand.KC_SETTINGS_FGCOLOUR => SetForegroundColour(),
             KeyCommand.KC_SETTINGS_BGCOLOUR => SetBackgroundColour(),
             KeyCommand.KC_SETTINGS_MESSAGES => SetMessageColour(),
@@ -274,6 +275,27 @@ public static class Screen {
         AddWindow(newWindow);
         _activeWindow = newWindow;
         _activeWindow.Refresh(RenderHint.REFRESH);
+        return RenderHint.NONE;
+    }
+
+    /// <summary>
+    /// Rename the current worksheet
+    /// </summary>
+    /// <returns>Render hint</returns>
+    private static RenderHint RenameWorksheet() {
+        Debug.Assert(_activeWindow != null);
+        FormField[] formFields = [
+            new() {
+                Text = Calc.EnterWorksheetName,
+                Type = FormFieldType.TEXT,
+                Width = 50,
+                Value = new Variant(_activeWindow.Sheet.Name)
+            }
+        ];
+        if (Command.PromptForInput(formFields)) {
+            _activeWindow.Sheet.Name = formFields[0].Value.ToString();
+            Command.Refresh();
+        }
         return RenderHint.NONE;
     }
 
