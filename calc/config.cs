@@ -27,6 +27,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using JCalc.Resources;
 using JCalcLib;
+using JComLib;
 
 namespace JCalc;
 
@@ -83,9 +84,10 @@ public class Config {
     /// <returns>A Config object initialised from the file</returns>
     public static Config Load() {
         Config fileConfig = new();
-        if (File.Exists(Consts.ConfigurationFilename)) {
+        string configFile = Path.Combine(Utilities.ConfigPath, Consts.ConfigurationFilename);
+        if (File.Exists(configFile)) {
             try {
-                using FileStream stream = File.OpenRead(Consts.ConfigurationFilename);
+                using FileStream stream = File.OpenRead(configFile);
                 fileConfig = JsonSerializer.Deserialize<Config>(stream) ?? fileConfig;
             }
             catch (Exception) {
@@ -100,7 +102,7 @@ public class Config {
     /// </summary>
     public void Save() {
         try {
-            using FileStream stream = File.Create(Consts.ConfigurationFilename);
+            using FileStream stream = File.Create(Path.Combine(Utilities.ConfigPath, Consts.ConfigurationFilename));
             JsonSerializer.Serialize(stream, this, new JsonSerializerOptions {
                 DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
                 WriteIndented = true
