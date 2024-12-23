@@ -118,7 +118,8 @@ public class Book {
                 }
             }
         }
-        catch (JsonException) {
+        catch (Exception) {
+            _sheets.Add(new Sheet(1));
             FileInfo info = new(path);
             throw new FileLoadException(null, info.FullName);
         }
