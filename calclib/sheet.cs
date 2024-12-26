@@ -109,6 +109,7 @@ public class Sheet {
     /// <summary>
     /// Associated workbook for this sheet.
     /// </summary>
+    [JsonIgnore]
     public Book? Book { get; }
 
     /// <summary>

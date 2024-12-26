@@ -60,6 +60,7 @@ public enum TokenID {
     KDATE,
     KEDATE,
     KDAYS360,
+    KTEXT,
     COLON,
     CONCAT,
     KCONCATENATE,
@@ -486,6 +487,7 @@ public class FormulaParser {
 
             case TokenID.KDAYS360:
             case TokenID.KEDATE:
+            case TokenID.KTEXT:
                 return ParseArguments(token.ID, 2);
 
             case TokenID.KDATE:

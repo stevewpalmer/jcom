@@ -52,7 +52,8 @@ internal class CellNode(TokenID tokenID) {
         { TokenID.KDATE, "DATE" },
         { TokenID.KEDATE, "EDATE" },
         { TokenID.KDAYS360, "DAYS360" },
-        { TokenID.KCONCATENATE, "CONCATENATE" }
+        { TokenID.KCONCATENATE, "CONCATENATE" },
+        { TokenID.KTEXT, "TEXT" }
     };
 
     /// <summary>
@@ -215,18 +216,33 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
     /// <param name="location">Location of cell</param>
     /// <returns>The variant value of the cell</returns>
     internal static Variant EvaluateLocation(CalculationContext context, CellLocation location) {
-        Debug.Assert(context.Sheet.Book != null);
-        Sheet? sourceSheet = location.SheetName == null ? context.Sheet : context.Sheet.Book.Sheet(location.SheetName);
-        if (sourceSheet == null) {
-            return new Variant();
+        if (location.SheetName != null) {
+
+            // If this is a reference in another sheet then we need to switch context to that sheet for
+            // the calculation and switch back afterward. This ensures that calculations on the new sheet
+            // are relative to that sheet.
+            Debug.Assert(context.Sheet.Book != null);
+            Sheet? sourceSheet = context.Sheet.Book.Sheet(location.SheetName);
+            if (sourceSheet == null) {
+                return new Variant();
+            }
+            CalculationContext newContext = new() {
+                Sheet = sourceSheet,
+                ReferenceList = [],
+                UpdateList = context.UpdateList
+            };
+            return EvaluateLocation(newContext, new CellLocation {
+                Column = location.Column,
+                Row = location.Row
+            });
         }
-        Cell cell = sourceSheet.GetCell(location, false);
+        Cell cell = context.Sheet.GetCell(location, false);
         if (cell.IsEmptyCell) {
             return new Variant();
         }
         if (cell.HasFormula) {
             Debug.Assert(cell.FormulaTree != null);
-            if (context.ReferenceList.Last() == location) {
+            if (context.ReferenceList.Count > 0 && context.ReferenceList.Last() == location) {
                 throw new Exception("Circular reference");
             }
             // We have already calculated the formula on this cell

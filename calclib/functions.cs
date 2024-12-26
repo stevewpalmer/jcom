@@ -23,13 +23,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Globalization;
+using ExcelNumberFormat;
 using JComLib;
 
 namespace JCalcLib;
 
 // ReSharper disable UnusedMember.Global
 public static class Functions {
-
     /// <summary>
     /// Calculate the sum of all cells and constants in the argument list.
     /// </summary>
@@ -114,8 +115,10 @@ public static class Functions {
     /// will require updates to support the NASD method.
     /// </summary>
     /// <param name="arguments">Function parameters</param>
-    /// <returns>A variant containing the number of days between the two days according to
-    /// a 360-day year.</returns>
+    /// <returns>
+    /// A variant containing the number of days between the two days according to
+    /// a 360-day year.
+    /// </returns>
     public static Variant DAYS360(IEnumerable<Variant> arguments) {
         Variant[] parts = arguments.ToArray();
         if (parts.Length != 2) {
@@ -183,5 +186,29 @@ public static class Functions {
     /// <returns>A variant containing the result of the concatenation</returns>
     public static Variant CONCATENATE(IEnumerable<Variant> arguments) {
         return new Variant(string.Concat(arguments));
+    }
+
+    /// <summary>
+    /// Format a value by applying formatting to it with format codes. The
+    /// value is specified in the first parameter and the format in the second
+    /// parameter.
+    /// </summary>
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>
+    /// A variant containing the result of the value parameter formatted using the
+    /// format specified in the format parameter. If the format parameter does not specify a
+    /// valid number or string format then the text is returned unchanged.
+    /// </returns>
+    public static Variant TEXT(IEnumerable<Variant> arguments) {
+        Variant[] parts = arguments.ToArray();
+        if (parts.Length != 2) {
+            throw new ArgumentException("Arguments must have two parts");
+        }
+        NumberFormat customFormat = new(parts[1].StringValue);
+        CultureInfo culture = CultureInfo.CurrentCulture;
+        if (parts[0].IsNumber) {
+            return new Variant(customFormat.Format(parts[0].DoubleValue, culture));
+        }
+        return new Variant(customFormat.Format(parts[0].StringValue, culture));
     }
 }

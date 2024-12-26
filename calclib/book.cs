@@ -114,6 +114,8 @@ public class Book {
 
                     sheet.Modified = false;
                     _sheets.Add(sheet);
+                }
+                foreach (Sheet sheet in _sheets) {
                     sheet.Calculate();
                 }
             }
