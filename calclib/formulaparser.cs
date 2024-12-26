@@ -160,18 +160,14 @@ public class FormulaParser {
 
                 case >= 'A' and <= 'Z' or >= 'a' and <= 'z': {
                     StringBuilder str = new();
-                    while (char.IsLetter(ch)) {
-                        str.Append(ch);
-                        ch = GetChar();
-                    }
-                    while (char.IsDigit(ch)) {
+                    while (char.IsLetterOrDigit(ch) || ch == '!') {
                         str.Append(ch);
                         ch = GetChar();
                     }
                     PushChar(ch);
 
-                    string name = str.ToString().ToUpper();
-                    KeyValuePair<TokenID, string> node = CellNode.Functions.FirstOrDefault(item => item.Value == name);
+                    string name = str.ToString();
+                    KeyValuePair<TokenID, string> node = CellNode.Functions.FirstOrDefault(item => item.Value == name.ToUpper());
                     if (node.Key != TokenID.NONE) {
                         tokens.Add(new SimpleToken(node.Key));
                         break;
@@ -538,7 +534,6 @@ public class FormulaParser {
 
     private LocationNode ParseLocation(SimpleToken token) {
         Debug.Assert(token is CellAddressToken);
-
         CellLocation absoluteLocation;
         Point relativeLocation;
         CellAddressToken addressToken = (CellAddressToken)token;
@@ -547,8 +542,12 @@ public class FormulaParser {
             absoluteLocation = new CellLocation { Column = relativeLocation.X + _location.Column, Row = relativeLocation.Y + _location.Row };
         }
         else {
+
+            // If this is a reference to a cell on another sheet, there is no relative location.
             absoluteLocation = new CellLocation(addressToken.Address);
-            relativeLocation = new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
+            relativeLocation = absoluteLocation.SheetName != null ?
+                new Point(0, 0) :
+                new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
         }
         return new LocationNode(absoluteLocation, relativeLocation);
     }

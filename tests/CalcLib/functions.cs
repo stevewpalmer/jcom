@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Linq;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -37,7 +38,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyTime() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=TIME(12,40,30)";
         cell1.CellFormat = CellFormat.TIME_HMS;
@@ -56,7 +58,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyDate() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=DATE(2024,2,17)";
         cell1.CellFormat = CellFormat.DATE_DMY;
@@ -75,7 +78,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyEDate() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         cell1.Content = "=DATE(2024,1,15)";
@@ -103,7 +107,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyDays360() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -132,7 +137,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyNow() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=NOW()";
         cell1.CellFormat = CellFormat.DATE_DMY;
@@ -146,7 +152,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyToday() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=TODAY()";
         cell1.CellFormat = CellFormat.DATE_DMY;
@@ -187,7 +194,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifySum() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -234,7 +242,8 @@ public class FunctionTests {
     /// </summary>
     [Test]
     public void VerifyConcatenate() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);

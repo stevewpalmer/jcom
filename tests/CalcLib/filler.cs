@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -38,7 +39,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void SimpleFillerTest() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Value = new Variant(12);
 
@@ -68,7 +70,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void IncrementingFillerTest() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         cell1.Value = new Variant(100);
@@ -95,7 +98,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void VerifySimpleDateFill() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "April 1983";
         cell1.CellFormat = CellFormat.DATE_MY;
@@ -120,7 +124,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void VerifyIncrementingMYFill() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         cell1.Content = "April 1983";
@@ -150,7 +155,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void VerifyIncrementingDMFill() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         cell1.Content = "1 October 1983";
@@ -180,7 +186,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void VerifyHorizontalFill() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Value = new Variant(0.12);
 
@@ -203,7 +210,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void VerifyFillEmptyFill() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
 
         List<CellLocation> cellLocations = [];
         for (int row = 1; row < 10; row++) {
@@ -224,7 +232,8 @@ public class FillerTests {
     /// </summary>
     [Test]
     public void VerifyStyleReplication() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Value = new Variant(100.0 / 3.0 / 100.0);
         cell1.CellFormat = CellFormat.PERCENT;

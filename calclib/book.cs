@@ -67,7 +67,7 @@ public class Book {
     /// Create an empty workbook with just one sheet.
     /// </summary>
     public Book() {
-        _sheets.Add(new Sheet(1));
+        _sheets.Add(new Sheet(this, 1));
     }
 
     /// <summary>
@@ -77,7 +77,7 @@ public class Book {
     public void New() {
         _fileInfo = null;
         _sheets.Clear();
-        _sheets.Add(new Sheet(1));
+        _sheets.Add(new Sheet(this, 1));
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public class Book {
                     if (string.IsNullOrEmpty(sheetName)) {
                         sheetName = $"Sheet{_sheetNumber++}";
                     }
-                    Sheet sheet = new(sheetName) {
+                    Sheet sheet = new(this, sheetName) {
                         Location = inputSheet.Location
                     };
                     sheet.ColumnList = inputSheet.ColumnList.Select(cellList => new CellList {
@@ -154,7 +154,7 @@ public class Book {
     /// </summary>
     /// <returns>The new worksheet</returns>
     public Sheet AddSheet() {
-        Sheet newSheet = new(_sheetNumber++);
+        Sheet newSheet = new(this, _sheetNumber++);
         _sheets.Add(newSheet);
         Modified = true;
         return newSheet;
@@ -185,5 +185,14 @@ public class Book {
     public string Filename {
         get => _fileInfo == null ? DefaultFilename : _fileInfo.FullName;
         set => _fileInfo = string.IsNullOrEmpty(value) ? null : new FileInfo(value);
+    }
+
+    /// <summary>
+    /// Return a worksheet given its name.
+    /// </summary>
+    /// <param name="sheetName">Name of sheet to locate</param>
+    /// <returns>The sheet whose name matches the given name, or null if not found</returns>
+    public Sheet? Sheet(string sheetName) {
+        return _sheets.FirstOrDefault(s => s.Name == sheetName);
     }
 }

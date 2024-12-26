@@ -90,7 +90,7 @@ public struct CellLocation : IEquatable<CellLocation> {
             int newColumn = 0;
             int newRow = 0;
             int index = 0;
-            int delimiter = s.IndexOf(':');
+            int delimiter = s.IndexOf('!');
             if (delimiter != -1) {
                 sheetName = s[..delimiter];
                 index = delimiter + 1;
@@ -145,7 +145,7 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// <summary>
     /// Retrieve or set the name of the sheet referenced by this location.
     /// </summary>
-    public string? SheetName { get; } = null;
+    public string? SheetName { get; set; } = null;
 
     /// <summary>
     /// Returns this cell location as a Point.
@@ -159,7 +159,7 @@ public struct CellLocation : IEquatable<CellLocation> {
     /// <returns>A string containing the absolute cell location</returns>
     [JsonIgnore]
     public string Address => SheetName != null ?
-        $"{SheetName}:{Cell.ColumnToAddress(Column)}{Row}" :
+        $"{SheetName}!{Cell.ColumnToAddress(Column)}{Row}" :
         $"{Cell.ColumnToAddress(Column)}{Row}";
 
     /// <summary>

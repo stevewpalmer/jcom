@@ -215,7 +215,12 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
     /// <param name="location">Location of cell</param>
     /// <returns>The variant value of the cell</returns>
     internal static Variant EvaluateLocation(CalculationContext context, CellLocation location) {
-        Cell cell = context.Sheet.GetCell(location, false);
+        Debug.Assert(context.Sheet.Book != null);
+        Sheet? sourceSheet = location.SheetName == null ? context.Sheet : context.Sheet.Book.Sheet(location.SheetName);
+        if (sourceSheet == null) {
+            return new Variant();
+        }
+        Cell cell = sourceSheet.GetCell(location, false);
         if (cell.IsEmptyCell) {
             return new Variant();
         }
@@ -413,7 +418,7 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     public CellLocation AbsoluteLocation { get; private set; } = absoluteLocation;
 
     /// <summary>
-    /// Absolute location
+    /// Relative location
     /// </summary>
     public Point RelativeLocation { get; private set; } = relativeLocation;
 
@@ -481,6 +486,7 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     /// <returns>CellLocation</returns>
     public CellLocation ToAbsolute(CellLocation sourceCell) {
         return new CellLocation {
+            SheetName = sourceCell.SheetName,
             Column = sourceCell.Column + RelativeLocation.X,
             Row = sourceCell.Row + RelativeLocation.Y
         };
@@ -496,7 +502,9 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     /// <returns>A variant</returns>
     public override Variant Evaluate(CalculationContext context) {
         CellLocation sourceLocation = context.ReferenceList.Peek();
-        CellLocation absoluteLocation = ToAbsolute(sourceLocation);
+        CellLocation absoluteLocation = AbsoluteLocation.SheetName == null ?
+            ToAbsolute(sourceLocation) :
+            AbsoluteLocation;
         return FunctionNode.EvaluateLocation(context, absoluteLocation);
     }
 }

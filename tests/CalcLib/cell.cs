@@ -25,6 +25,7 @@
 
 using System;
 using System.Drawing;
+using System.Linq;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -69,7 +70,7 @@ public class CellTests {
         Assert.AreEqual(4095, a4095.Row);
         Assert.AreEqual(1, a4095.Column);
 
-        CellLocation sheet1a4095 = new("Sheet1:A4095");
+        CellLocation sheet1a4095 = new("Sheet1!A4095");
         Assert.AreEqual("Sheet1", sheet1a4095.SheetName);
         Assert.AreEqual(4095, sheet1a4095.Row);
         Assert.AreEqual(1, sheet1a4095.Column);
@@ -134,6 +135,7 @@ public class CellTests {
     // Verify that cell content and value match
     [Test]
     public void VerifyCellContent() {
+        Book workBook = new();
         Cell number15 = new() { Content = "15" };
         Cell text = new() { Content = "TEXT" };
         Assert.AreEqual(number15.Value, new Variant(15));
@@ -141,7 +143,7 @@ public class CellTests {
         Assert.IsTrue(number15.Value.IsNumber);
         Assert.AreEqual(text.Value, new Variant("TEXT"));
         Assert.AreEqual(text.Content, "TEXT");
-        Assert.IsTrue(new Cell(new Sheet(1)) { Content = "=A1+B2" }.HasFormula);
+        Assert.IsTrue(new Cell(workBook.Sheets.First()) { Content = "=A1+B2" }.HasFormula);
 
         Cell date = new() { Content = "4 June 1980" };
         Assert.AreEqual("4-June-1980", date.Text);
@@ -201,7 +203,8 @@ public class CellTests {
             Alignment = CellAlignment.RIGHT
         };
 
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
 
         Cell newCell = new(sheet, cell);
         Assert.AreEqual(17, newCell.Location.Row);
@@ -587,7 +590,8 @@ public class CellTests {
     // Style a cell and ensure correct render string
     [Test]
     public void TestCellStyle() {
-        Sheet sheet1 = new(1);
+        Book workBook = new();
+        Sheet sheet1 = workBook.Sheets.First();
         Cell cell1 = new(sheet1) {
             Content = "HELLO WORLD",
             Alignment = CellAlignment.RIGHT,
@@ -610,7 +614,7 @@ public class CellTests {
         Assert.AreEqual(@"[97;40m[3m[4mHELLO WORLD[0m[97;40m    [0m", cell2.AnsiTextSpan(15).EscapedText);
 
         // Verify CellStyles are copied from another cell
-        Sheet sheet2 = new(2);
+        Sheet sheet2 = workBook.AddSheet();
         Cell cell3 = new(sheet2, cell2);
         Assert.AreEqual(cell3.Style.TextColour, cell2.Style.TextColour);
         Assert.AreEqual(cell3.Style.BackgroundColour, cell2.Style.BackgroundColour);
@@ -628,7 +632,8 @@ public class CellTests {
     // formula.
     [Test]
     public void TestValueAndContent() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cellA1 = sheet.GetCell(new CellLocation(1, 1), true);
         Cell cellA2 = sheet.GetCell(new CellLocation(1, 2), true);
         Cell cellA3 = sheet.GetCell(new CellLocation(1, 3), true);
@@ -729,7 +734,8 @@ public class CellTests {
     /// </summary>
     [Test]
     public void TestFormattedDate() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(1, 1, true);
         cell1.Content = "4 June 1966";
         cell1.CellFormat = CellFormat.DATE_DMY;
@@ -743,7 +749,8 @@ public class CellTests {
     // Verify retrieving the AnsiText content of a cell.
     [Test]
     public void VerifySpilledTextCell() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(1, 1, true);
         cell1.Value = new Variant("This is a very long text string");
         AnsiTextSpan ansiText = sheet.GetCell(1, 1, false).AnsiTextForWidth(10, true);

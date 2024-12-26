@@ -25,6 +25,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -38,7 +39,8 @@ public class SheetTests {
     /// </summary>
     [Test]
     public void TestNewSheet() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Assert.AreEqual("Sheet1", sheet.Name);
         Assert.AreEqual("A1", sheet.ActiveCell.Address);
         Assert.AreEqual(1, Sheet.RowHeight);
@@ -47,7 +49,8 @@ public class SheetTests {
     // Test that a new sheet has default columns
     [Test]
     public void TestDefaultColumns() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         for (int column = 1; column < Sheet.MaxColumns; column++) {
             Assert.AreEqual(Sheet.DefaultColumnWidth, sheet.ColumnWidth(column));
         }
@@ -62,7 +65,8 @@ public class SheetTests {
     /// </summary>
     [Test]
     public void TestDeleteColumns() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Random random = new();
         List<(CellLocation, Variant)> cells = [];
         for (int i = 0; i < 10; i++) {
@@ -86,7 +90,8 @@ public class SheetTests {
     /// </summary>
     [Test]
     public void TestDeleteRows() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Random random = new();
         List<(CellLocation, Variant)> cells = [];
         for (int i = 0; i < 10; i++) {
@@ -108,7 +113,8 @@ public class SheetTests {
     // Add a few cells to the sheet and read them back
     [Test]
     public void TestAddingCells() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation(1, 1), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         cell1.Content = "14";
@@ -123,25 +129,26 @@ public class SheetTests {
     // a sheet as modified.
     [Test]
     public void TestModifiedState() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = new(sheet);
         Assert.IsFalse(sheet.Modified);
         cell1.Alignment = CellAlignment.RIGHT;
         Assert.IsTrue(sheet.Modified);
 
-        sheet = new Sheet(1);
+        sheet = workBook.AddSheet();
         _ = new Cell(sheet) {
             CellFormat = CellFormat.FIXED
         };
         Assert.IsTrue(sheet.Modified);
 
-        sheet = new Sheet(1);
+        sheet = workBook.AddSheet();
         _ = new Cell(sheet) {
             DecimalPlaces = 4
         };
         Assert.IsTrue(sheet.Modified);
 
-        sheet = new Sheet(1);
+        sheet = workBook.AddSheet();
         _ = new Cell(sheet) {
             UseThousandsSeparator = true
         };
@@ -153,7 +160,8 @@ public class SheetTests {
     /// </summary>
     [Test]
     public void TestLocation() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Assert.AreEqual("A1", sheet.ActiveCell.Address);
         sheet.Location = new CellLocation("B4");
         Assert.AreEqual("B4", sheet.ActiveCell.Address);
@@ -164,7 +172,8 @@ public class SheetTests {
     /// </summary>
     [Test]
     public void TestSorting() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         double[][] data = [
             [72, 86, 99],
             [12, 25, 33],

@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Linq;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
@@ -37,7 +38,8 @@ public class FormulaTests {
     /// </summary>
     [Test]
     public void VerifyExpression() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -53,7 +55,8 @@ public class FormulaTests {
     // Verify the = operator
     [Test]
     public void VerifyEquals() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -74,7 +77,8 @@ public class FormulaTests {
     // Verify the <> operator
     [Test]
     public void VerifyNotEquals() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -95,7 +99,8 @@ public class FormulaTests {
     // Verify the >= operator
     [Test]
     public void VerifyGreaterThanOrEquals() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -116,7 +121,8 @@ public class FormulaTests {
     // Verify the > operator
     [Test]
     public void VerifyGreaterThan() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -137,7 +143,8 @@ public class FormulaTests {
     // Verify the >= operator
     [Test]
     public void VerifyLessThanOrEquals() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -158,7 +165,8 @@ public class FormulaTests {
     // Verify the < operator
     [Test]
     public void VerifyLessThan() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -179,7 +187,8 @@ public class FormulaTests {
     // Verify the EXP operator
     [Test]
     public void VerifyEXP() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -200,7 +209,8 @@ public class FormulaTests {
     // Verify the minus operator
     [Test]
     public void VerifyMinus() {
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -215,7 +225,8 @@ public class FormulaTests {
     // Verify the & operator
     [Test]
     public void VerifyConcatOperator() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
@@ -239,7 +250,8 @@ public class FormulaTests {
     [Test]
     public void TestBadOperator() {
         BinaryOpNode pn = new(TokenID.LPAREN, new NumberNode(90), new NumberNode(4));
-        Sheet sheet = new(1);
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         CalculationContext context = new() { Sheet = sheet };
         Assert.Throws<NotImplementedException>(delegate { pn.Evaluate(context); });
     }
@@ -249,7 +261,8 @@ public class FormulaTests {
     /// </summary>
     [Test]
     public void VerifyCircularReferences() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
 
@@ -267,7 +280,8 @@ public class FormulaTests {
     /// </summary>
     [Test]
     public void VerifyNeedRecalculate() {
-        Sheet sheet = new();
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("B2"), true);
         Cell cell3 = sheet.GetCell(new CellLocation("C3"), true);

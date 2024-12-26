@@ -69,18 +69,29 @@ public class Sheet {
     public Sheet() { }
 
     /// <summary>
+    /// Empty constructor with no sheet number
+    /// </summary>
+    public Sheet(Book book) {
+        Book = book;
+    }
+
+    /// <summary>
     /// Create a new empty sheet with the specified name.
     /// </summary>
+    /// <param name="book">Parent workbook</param>
     /// <param name="name">Sheet name</param>
-    public Sheet(string name) {
+    public Sheet(Book book, string name) {
+        Book = book;
         _name = name;
     }
 
     /// <summary>
     /// Create a new empty sheet with the specified number.
     /// </summary>
+    /// <param name="book">Parent workbook</param>
     /// <param name="number">Sheet number</param>
-    public Sheet(int number) {
+    public Sheet(Book book, int number) {
+        Book = book;
         _name = $"Sheet{number}";
     }
 
@@ -94,6 +105,11 @@ public class Sheet {
             Modified = true;
         }
     }
+
+    /// <summary>
+    /// Associated workbook for this sheet.
+    /// </summary>
+    public Book? Book { get; }
 
     /// <summary>
     /// Column list
@@ -218,6 +234,7 @@ public class Sheet {
     /// on the formula cells.
     /// </summary>
     public IEnumerable<Cell> Calculate() {
+        Debug.Assert(Book != null);
         List<Cell> formulaCells = [];
         foreach (CellList cellList in ColumnList) {
             formulaCells.AddRange(cellList.FormulaCells);
