@@ -61,6 +61,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39
 		samples\Comal\time.lst = samples\Comal\time.lst
 		samples\Comal\trap2.lst = samples\Comal\trap2.lst
 		samples\Comal\using.lst = samples\Comal\using.lst
+		samples\Comal\maze.lst = samples\Comal\maze.lst
+		samples\Comal\18.DAT = samples\Comal\18.DAT
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{58BCD580-AEDE-4B79-AB0B-F1B589E6F04C}"
