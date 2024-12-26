@@ -452,29 +452,31 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     public override bool FixupAddress(CellLocation location, int column, int row, int offset) {
         bool needRecalculate = false;
-        if (column > 0) {
-            if (AbsoluteLocation.Column + offset < 1) {
-                Error = true;
-            }
-            else {
-                if (AbsoluteLocation.Column >= column) {
-                    AbsoluteLocation = AbsoluteLocation with { Column = AbsoluteLocation.Column + offset };
+        if (location.SheetName == AbsoluteLocation.SheetName) {
+            if (column > 0) {
+                if (AbsoluteLocation.Column + offset < 1) {
+                    Error = true;
                 }
-                RelativeLocation = RelativeLocation with { X = AbsoluteLocation.Column - location.Column };
-            }
-            needRecalculate = true;
-        }
-        if (row > 0) {
-            if (AbsoluteLocation.Row + offset < 1) {
-                Error = true;
-            }
-            else {
-                if (AbsoluteLocation.Row >= row) {
-                    AbsoluteLocation = AbsoluteLocation with { Row = AbsoluteLocation.Row + offset };
+                else {
+                    if (AbsoluteLocation.Column >= column) {
+                        AbsoluteLocation = AbsoluteLocation with { Column = AbsoluteLocation.Column + offset };
+                    }
+                    RelativeLocation = RelativeLocation with { X = AbsoluteLocation.Column - location.Column };
                 }
-                RelativeLocation = RelativeLocation with { Y = AbsoluteLocation.Row - location.Row };
+                needRecalculate = true;
             }
-            needRecalculate = true;
+            if (row > 0) {
+                if (AbsoluteLocation.Row + offset < 1) {
+                    Error = true;
+                }
+                else {
+                    if (AbsoluteLocation.Row >= row) {
+                        AbsoluteLocation = AbsoluteLocation with { Row = AbsoluteLocation.Row + offset };
+                    }
+                    RelativeLocation = RelativeLocation with { Y = AbsoluteLocation.Row - location.Row };
+                }
+                needRecalculate = true;
+            }
         }
         return needRecalculate;
     }
