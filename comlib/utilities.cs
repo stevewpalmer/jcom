@@ -38,9 +38,7 @@ public static class Utilities {
     /// <param name="extension">Extension to supply</param>
     /// <returns>Filename with an extension</returns>
     public static string AddExtensionIfMissing(string filename, string extension) {
-        return string.IsNullOrEmpty(Path.GetExtension(filename)) ?
-            Path.ChangeExtension(filename, extension) :
-            filename;
+        return string.IsNullOrEmpty(Path.GetExtension(filename)) ? Path.ChangeExtension(filename, extension) : filename;
     }
 
     /// <summary>
@@ -115,5 +113,18 @@ public static class Utilities {
         ArgumentNullException.ThrowIfNull(str);
         int padding = Math.Max(0, (length - str.Length) / 2 + str.Length);
         return str.PadLeft(padding, ' ').PadRight(length, ' ')[..length];
+    }
+
+    /// <summary>
+    /// Return the application data folder for this system
+    /// </summary>
+    public static string ConfigPath {
+        get {
+            string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "JCom");
+            if (!Path.Exists(configPath)) {
+                Directory.CreateDirectory(configPath);
+            }
+            return configPath;
+        }
     }
 }
