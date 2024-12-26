@@ -119,7 +119,7 @@ public class Book {
             }
         }
         catch (Exception) {
-            _sheets.Add(new Sheet(1));
+            _sheets.Add(new Sheet(this, 1));
             FileInfo info = new(path);
             throw new FileLoadException(null, info.FullName);
         }
