@@ -1,47 +1,43 @@
-   10 L:=500
-   20 DIM S(0:70,0:70),X(L),Y(L),D(L)
-   30 W:=1
-   40 OPEN FILE 7,"18.DAT",READ
-   50 REPEAT
-   60   INPUT FILE 7:COL,ROW
-   70   PRINT COL,ROW
-   80   S(COL,ROW):=1
-   90   I:=I+1
-  100 UNTIL I=1024
-  110 CLOSE 7
-  120 FOR ROW:=1 TO 70
-  130   FOR COL:=1 TO 70
-  140     IF S(COL,ROW)=1 THEN CH$:="#" ELSE CH$:="."
-  150     PRINT CH$,
-  160   ENDFOR
-  170   PRINT
-  180 ENDFOR
-  190 REPEAT
-  200   COL:=X(R)
-  210   ROW:=Y(R)
-  220   DIRECTION:=D(R)
-  230   R:=R+1 AND (R<>L)
-  240   IF COL=70 AND ROW=70 THEN
-  250     PRINT DIRECTION
-  260     END
-  270   ENDIF
-  280   COL:=COL-1
-  290   Solve
-  300   COL:=COL+2
-  310   Solve
-  320   COL:=COL-1
-  330   ROW:=ROW-1
-  340   Solve
-  350   ROW:=ROW+2
-  360   Solve
-  370 UNTIL FALSE
-  380 PROC Solve
-  390   IF X<0 OR X>70 THEN RETURN
-  400   IF Y<0 OR Y>70 THEN RETURN
-  410   IF S(X,Y) THEN RETURN
-  420   S(X,Y):=1
-  430   X(W):=X
-  440   Y(W):=Y
-  450   D(W)=DIRECTION+1
-  460   W:=W+1 AND (W<>L)
-  470 ENDPROC Solve
+l:=2030
+DIM s(0:70,0:70),x(l),y(l),d(l)
+w:=1
+r:=1
+OPEN FILE 7,"18.dat",READ
+REPEAT
+  INPUT FILE 7:col,row
+  s(col,row):=1
+  i:=i+1
+UNTIL i=1024
+CLOSE 7
+REPEAT
+  col:=x(r)
+  row:=y(r)
+  direction:=d(r)
+  r:=r+1
+  IF col=70 AND row=70 THEN
+    PRINT direction
+    END
+  ENDIF
+  col:=col-1
+  solve
+  col:=col+2
+  solve
+  col:=col-1
+  row:=row-1
+  solve
+  row:=row+2
+  solve
+UNTIL FALSE
+PROC solve
+  IF col>=0 AND col<=70 THEN
+    IF row>=0 AND row<70 THEN
+      IF NOT s(col,row) THEN
+        s(col,row):=1
+        x(w):=col
+        y(w):=row
+        d(w):=direction+1
+        w:=w+1
+      ENDIF
+    ENDIF
+  ENDIF
+ENDPROC solve
