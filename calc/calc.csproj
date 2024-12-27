@@ -10,7 +10,7 @@
         <Title>Spreadsheet</Title>
         <Authors>Steven Palmer</Authors>
         <IsPackable>false</IsPackable>
-        <LangVersion>13</LangVersion>
+        <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>

@@ -4,7 +4,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <ReleaseVersion>0.3</ReleaseVersion>
         <ImplicitUsings>enable</ImplicitUsings>
-        <LangVersion>13</LangVersion>
+        <LangVersion>default</LangVersion>
         <WarningLevel>4</WarningLevel>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <RootNamespace>JComalLib</RootNamespace>

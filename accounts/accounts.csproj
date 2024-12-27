@@ -12,7 +12,7 @@
         <Description>Simple personal accounts management program</Description>
         <Copyright>(c) Steven Palmer 2013-2024</Copyright>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <LangVersion>13</LangVersion>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

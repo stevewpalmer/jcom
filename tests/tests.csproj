@@ -11,7 +11,7 @@
         <Product>Unit Tests</Product>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-        <LangVersion>13</LangVersion>
+        <LangVersion>default</LangVersion>
         <ConsolePause>False</ConsolePause>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
