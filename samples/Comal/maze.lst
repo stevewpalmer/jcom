@@ -1,43 +1,67 @@
-l:=2030
-DIM s(0:70,0:70),x(l),y(l),d(l)
-w:=1
-r:=1
+l:=500
+DIM s(0:70,0:70),x(0:l),y(0:l),d(0:l)
 OPEN FILE 7,"18.dat",READ
+
+height:=0
+width:=0
 REPEAT
   INPUT FILE 7:col,row
   s(col,row):=1
   i:=i+1
+  IF row > height THEN height:=row
+  IF col > width THEN width:=col
 UNTIL i=1024
 CLOSE 7
+
+FOR row:=0 TO height DO
+  FOR col:=0 TO width DO
+    DIM ch$ OF 1
+    IF s(col,row)=1 THEN
+      ch$:="#"
+    ELSE
+      ch$:="."
+    ENDIF
+    PRINT ch$,
+  ENDFOR col
+  PRINT
+ENDFOR row
+
+w:=1
+r:=0
+
 REPEAT
   col:=x(r)
   row:=y(r)
-  direction:=d(r)
+  distance:=d(r)
   r:=r+1
-  IF col=70 AND row=70 THEN
-    PRINT direction
+  IF r=l THEN r:=0
+  IF col=width AND row=height THEN
+    PRINT distance
     END
   ENDIF
   col:=col-1
-  solve
+  try'visit
   col:=col+2
-  solve
+  try'visit
   col:=col-1
   row:=row-1
-  solve
+  try'visit
   row:=row+2
-  solve
+  try'visit
 UNTIL FALSE
-PROC solve
-  IF col>=0 AND col<=70 THEN
-    IF row>=0 AND row<70 THEN
-      IF NOT s(col,row) THEN
+
+PROC try'visit
+  IF col>=0 AND col<=width THEN
+    IF row>=0 AND row<=height THEN
+      IF s(col,row) <> 1 THEN
         s(col,row):=1
         x(w):=col
         y(w):=row
-        d(w):=direction+1
+        d(w):=distance+1
         w:=w+1
+        IF w=l THEN w:=0
       ENDIF
     ENDIF
   ENDIF
-ENDPROC solve
+ENDPROC try'visit
+
