@@ -286,7 +286,6 @@ public partial class Compiler : ICompiler {
     // Compile an array of source lines.
     private void CompileLines(string filename, Lines lines) {
         try {
-
             _ls = lines;
             _blockDepth = 0;
             _currentLineNumber = 0;
