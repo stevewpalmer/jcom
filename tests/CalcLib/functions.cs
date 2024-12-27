@@ -24,6 +24,7 @@
 // under the License.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using JCalcLib;
 using JComLib;
@@ -100,6 +101,10 @@ public class FunctionTests {
         sheet.Calculate();
         time = DateTime.Parse(cell2.Text);
         Assert.AreEqual(new DateTime(2024, 3, 15), time);
+
+        cell2.Content = "=EDATE(99999999,2)";
+        sheet.Calculate();
+        Assert.IsTrue(cell2.Error);
     }
 
     /// <summary>
@@ -114,22 +119,37 @@ public class FunctionTests {
         Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
         Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
         Cell cell5 = sheet.GetCell(new CellLocation("A5"), true);
+        Cell cell6 = sheet.GetCell(new CellLocation("A6"), true);
         cell1.Content = "=DATE(2011,1,1)";
         cell2.Content = "=DATE(2011,1,30)";
         cell3.Content = "=DATE(2011,2,1)";
         cell4.Content = "=DATE(2011,12,31)";
+        cell5.Content = "=DATE(2011,2,28)";
 
-        cell5.Content = "=DAYS360(A2,A3)";
+        cell6.Content = "=DAYS360(A2,A3)";
         sheet.Calculate();
-        Assert.AreEqual(new Variant(1), cell5.Value);
+        Assert.AreEqual(new Variant(1), cell6.Value);
 
-        cell5.Content = "=DAYS360(A1,A4)";
+        cell6.Content = "=DAYS360(A1,A4)";
         sheet.Calculate();
-        Assert.AreEqual(new Variant(360), cell5.Value);
+        Assert.AreEqual(new Variant(360), cell6.Value);
 
-        cell5.Content = "=DAYS360(A1,A3)";
+        cell6.Content = "=DAYS360(A1,A3)";
         sheet.Calculate();
-        Assert.AreEqual(new Variant(30), cell5.Value);
+        Assert.AreEqual(new Variant(30), cell6.Value);
+
+        cell6.Content = "=DAYS360(A4,A5)";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(300), cell6.Value);
+
+        // Make sure it works in reverse!
+        cell6.Content = "=DAYS360(A3,A1)";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(30), cell6.Value);
+
+        cell6.Content = "=DAYS360(9999999,9999999)";
+        sheet.Calculate();
+        Assert.IsTrue(cell6.Error);
     }
 
     /// <summary>
@@ -145,6 +165,17 @@ public class FunctionTests {
         sheet.Calculate();
         DateOnly date = DateOnly.Parse(cell1.TextForWidth(12));
         Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), date);
+
+        // Check the correct format is set
+        cell1.CellFormat = CellFormat.GENERAL;
+        sheet.Calculate();
+        Assert.AreEqual(DateTime.Now.ToString("dd/MM/yyyy H:mm"), cell1.TextForWidth(16));
+
+        sheet = workBook.AddSheet();
+        cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Content = "=NOW()";
+        sheet.Calculate();
+        Assert.AreEqual(DateTime.Now.ToString("dd/MM/yyyy H:mm"), cell1.TextForWidth(16));
     }
 
     /// <summary>
@@ -295,5 +326,37 @@ public class FunctionTests {
         cell5.Content = "=CONCATENATE()";
         sheet.Calculate();
         Assert.AreEqual(new Variant(""), cell5.Value);
+    }
+
+    /// <summary>
+    /// Verify the TEXT function
+    /// </summary>
+    [Test]
+    public void VerifyTextFunction() {
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
+        Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
+        Cell cell5 = sheet.GetCell(new CellLocation("A5"), true);
+
+        string currencyChar = NumberFormatInfo.CurrentInfo.CurrencySymbol;
+
+        cell1.Value = new Variant("Total comes to ");
+        cell2.Value = new Variant(45.78);
+        cell3.Value = new Variant(3.90);
+        cell4.Value = new Variant("=SUM(A2:A3)");
+        cell5.Value = new Variant($"=A1&TEXT(A4, '{currencyChar}#,##0.00')");
+        sheet.Calculate();
+
+        Assert.AreEqual($"Total comes to {currencyChar}49.68", cell5.Value.StringValue);
+
+        cell1.Value = new Variant("Tomorrow will be ");
+        cell2.Value = new Variant("10 June 2024");
+        cell3.Value = new Variant($"=A1&TEXT(A2, 'dd-mmm-yyyy')");
+        sheet.Calculate();
+
+        Assert.AreEqual("Tomorrow will be 10-Jun-2024", cell3.Value.StringValue);
     }
 }

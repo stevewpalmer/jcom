@@ -108,6 +108,25 @@ public class SheetTests {
             Cell cell = sheet.GetCell(cellLocation, false);
             Assert.IsTrue(cell.IsEmptyCell);
         }
+
+        Sheet sheet2 = workBook.AddSheet();
+        Cell cell1 = sheet2.GetCell(new CellLocation("A1"), true);
+        cell1.Value = new Variant("=SUM(A3:A4)");
+
+        Cell cell2 = sheet2.GetCell(new CellLocation("A3"), true);
+        Cell cell3 = sheet2.GetCell(new CellLocation("A4"), true);
+        cell2.Value = new Variant(300);
+        cell3.Value = new Variant(700);
+        sheet2.Calculate();
+        Assert.AreEqual(new Variant(1000), cell1.Value);
+
+        sheet2.DeleteRow(2);
+        sheet2.Calculate();
+
+        Assert.AreEqual("=SUM(A2:A3)", cell1.Content);
+        Assert.AreEqual(new Variant(1000), cell1.Value);
+        Assert.AreEqual(new Variant(300), cell2.Value);
+        Assert.AreEqual(new Variant(700), cell3.Value);
     }
 
     // Add a few cells to the sheet and read them back
@@ -193,5 +212,32 @@ public class SheetTests {
                 Assert.IsTrue(cell1.Value >= cell2.Value);
             }
         }
+    }
+
+    /// <summary>
+    /// Simple test of cross-sheet references.
+    /// </summary>
+    [Test]
+    public void TestCrossSheetReference() {
+        Book workBook = new();
+        Sheet sheet1 = workBook.Sheets.First();
+        Sheet sheet2 = workBook.AddSheet();
+
+        sheet1.Name = "Savings";
+        sheet2.Name = "Expenses";
+
+        Cell cell1 = sheet1.GetCell(new CellLocation("A1"), true);
+        cell1.Value = new Variant("45.89");
+
+        Cell cell2 = sheet2.GetCell(new CellLocation("A1"), true);
+        cell2.Value = new Variant("=Savings!A1");
+
+        sheet2.Calculate();
+        Assert.AreEqual(new Variant(45.89), cell2.Value);
+
+        cell2.Value = new Variant("=NonExistentSheet!A1");
+
+        sheet2.Calculate();
+        Assert.AreEqual(new Variant(0), cell2.Value);
     }
 }

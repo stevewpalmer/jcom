@@ -372,6 +372,23 @@ public class ParsingTests {
     }
 
     /// <summary>
+    /// Verify that returning ToString on a TextNode returns the text
+    /// content correctly wrapped in quotes.
+    /// </summary>
+    [Test]
+    public void VerifyTextNode() {
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        cell1.Content = "='Some text goes here'";
+        Assert.IsTrue(cell1.FormulaTree is TextNode);
+
+        TextNode tn = cell1.FormulaTree as TextNode;
+        Assert.AreEqual("\"Some text goes here\"", tn.ToString());
+        Assert.AreEqual("\"Some text goes here\"", tn.ToRawString());
+    }
+
+    /// <summary>
     /// Make sure operator precedence is correct.
     /// </summary>
     [Test]

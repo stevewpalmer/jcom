@@ -23,6 +23,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Globalization;
 using ExcelNumberFormat;
 using JComLib;
@@ -31,6 +32,7 @@ namespace JCalcLib;
 
 // ReSharper disable UnusedMember.Global
 public static class Functions {
+
     /// <summary>
     /// Calculate the sum of all cells and constants in the argument list.
     /// </summary>
@@ -66,9 +68,7 @@ public static class Functions {
     /// <returns>A variant containing the serial number of the specified time</returns>
     public static Variant TIME(IEnumerable<Variant> arguments) {
         Variant[] parts = arguments.ToArray();
-        if (parts.Length != 3) {
-            throw new ArgumentException("Arguments must have three parts");
-        }
+        Debug.Assert(parts.Length == 3);
         DateTime oaBaseDate = DateTime.FromOADate(0);
         TimeSpan ts = new(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
         return new Variant(oaBaseDate.Add(ts).ToOADate());
@@ -81,9 +81,7 @@ public static class Functions {
     /// <returns>A variant containing the serial number of the specified date</returns>
     public static Variant DATE(IEnumerable<Variant> arguments) {
         Variant[] parts = arguments.ToArray();
-        if (parts.Length != 3) {
-            throw new ArgumentException("Arguments must have three parts");
-        }
+        Debug.Assert(parts.Length == 3);
         DateTime ts = new(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
         return new Variant(ts.ToOADate());
     }
@@ -96,9 +94,7 @@ public static class Functions {
     /// <returns>A variant containing the serial number of the computed date</returns>
     public static Variant EDATE(IEnumerable<Variant> arguments) {
         Variant[] parts = arguments.ToArray();
-        if (parts.Length != 2) {
-            throw new ArgumentException("Arguments must have two parts");
-        }
+        Debug.Assert(parts.Length == 2);
         try {
             DateTime date = DateTime.FromOADate(parts[0].DoubleValue);
             date = date.AddMonths(parts[1].IntValue);
@@ -121,9 +117,7 @@ public static class Functions {
     /// </returns>
     public static Variant DAYS360(IEnumerable<Variant> arguments) {
         Variant[] parts = arguments.ToArray();
-        if (parts.Length != 2) {
-            throw new ArgumentException("Arguments must have two parts");
-        }
+        Debug.Assert(parts.Length == 2);
         try {
             DateTime startDate = DateTime.FromOADate(parts[0].DoubleValue);
             DateTime endDate = DateTime.FromOADate(parts[1].DoubleValue);
@@ -201,14 +195,9 @@ public static class Functions {
     /// </returns>
     public static Variant TEXT(IEnumerable<Variant> arguments) {
         Variant[] parts = arguments.ToArray();
-        if (parts.Length != 2) {
-            throw new ArgumentException("Arguments must have two parts");
-        }
+        Debug.Assert(parts.Length == 2);
         NumberFormat customFormat = new(parts[1].StringValue);
         CultureInfo culture = CultureInfo.CurrentCulture;
-        if (parts[0].IsNumber) {
-            return new Variant(customFormat.Format(parts[0].DoubleValue, culture));
-        }
-        return new Variant(customFormat.Format(parts[0].StringValue, culture));
+        return new Variant(customFormat.Format(parts[0].DoubleValue, culture));
     }
 }

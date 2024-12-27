@@ -169,9 +169,7 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
         MethodInfo? method = typeof(Functions).GetMethod(name, BindingFlags.Static | BindingFlags.Public, [typeof(IEnumerable<Variant>)]);
         Debug.Assert(method != null);
         Variant? result = method.Invoke(null, [Arguments(context)]) as Variant;
-        if (result == null) {
-            throw new ApplicationException("Null result");
-        }
+        Debug.Assert(result != null);
         if (Op == TokenID.KNOW) {
             CellLocation sourceLocation = context.ReferenceList.First();
             Cell cell = context.Sheet.GetCell(sourceLocation, false);
