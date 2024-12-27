@@ -354,9 +354,12 @@ public class Interpreter {
         ActiveCompiler = null;
 
         int lastLine = 0;
-        int lineNumber = Lines.MaxLine + 10;
+        int lineNumber;
 
-        if (!isMerge) {
+        if (isMerge) {
+            lineNumber = Lines.MaxLine + 10;
+        } else {
+            lineNumber = 10;
             Lines.Clear();
         }
 
