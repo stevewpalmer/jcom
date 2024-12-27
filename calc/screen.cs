@@ -445,7 +445,7 @@ public static class Screen {
                     int percent = Convert.ToInt32(parser.CharCount / (double)fileSize * 100.0d);
                     if (percent != lastPercent) {
                         if (percent % 5 == 0) {
-                            Status.Message($"Importing file ... {percent}% complete.");
+                            Status.Message(string.Format(Calc.ImportProgress, percent));
                         }
                         lastPercent = percent;
                     }

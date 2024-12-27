@@ -653,10 +653,19 @@ public class Window {
                 using CsvWriter csvWriter = new(textStream, CultureInfo.InvariantCulture);
 
                 if (extent.Valid) {
+                    long fileSize = extent.End.Y - extent.Start.Y;
+                    int lastPercent = -1;
                     for (int row = extent.Start.Y; row <= extent.End.Y; row++) {
                         for (int column = extent.Start.X; column <= extent.End.X; column++) {
                             Cell cell = Sheet.GetCell(column, row, false);
                             csvWriter.WriteField(cell.Value);
+                        }
+                        int percent = Convert.ToInt32((row - extent.Start.Y) / (double)fileSize * 100.0d);
+                        if (percent != lastPercent) {
+                            if (percent % 5 == 0) {
+                                Screen.Status.Message(string.Format(Calc.ExportProgress, percent));
+                            }
+                            lastPercent = percent;
                         }
                         csvWriter.NextRecord();
                     }
@@ -665,7 +674,9 @@ public class Window {
             }
             catch (Exception e) {
                 Screen.Status.Message(string.Format(Calc.ErrorExportingFile, inputValue, e.Message));
+                return RenderHint.NONE;
             }
+            Screen.Status.ClearMessage();
             flags = RenderHint.NONE;
         }
         return flags;

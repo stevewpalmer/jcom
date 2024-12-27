@@ -479,4 +479,10 @@
     <data name="EnterWorksheetName" xml:space="preserve">
         <value>Enter worksheet name</value>
     </data>
+    <data name="ImportProgress" xml:space="preserve">
+        <value>Importing file ... {0}% complete.</value>
+    </data>
+    <data name="ExportProgress" xml:space="preserve">
+        <value>Exporting file ... {0}% complete.</value>
+    </data>
 </root>

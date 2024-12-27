@@ -968,5 +968,17 @@ namespace JCalc.Resources {
                 return ResourceManager.GetString("EnterWorksheetName", resourceCulture);
             }
         }
+        
+        internal static string ImportProgress {
+            get {
+                return ResourceManager.GetString("ImportProgress", resourceCulture);
+            }
+        }
+        
+        internal static string ExportProgress {
+            get {
+                return ResourceManager.GetString("ExportProgress", resourceCulture);
+            }
+        }
     }
 }
