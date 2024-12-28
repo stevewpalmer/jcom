@@ -33,6 +33,7 @@ using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace CCompiler;
 
@@ -267,6 +268,21 @@ public class ProgramParseNode : ParseNode {
             // Create the executable:
             using FileStream fileStream = new(filename, FileMode.Create, FileAccess.Write);
             peBlob.WriteContentTo(fileStream);
+
+            // Create the runtime configuration file.
+            string configFilename = Path.ChangeExtension(OutputFile, "runtimeconfig.json");
+            Debug.Assert(configFilename != null);
+            using FileStream configFile = new(configFilename, FileMode.Create, FileAccess.Write);
+            const string config = $@"{{
+    ""runtimeOptions"": {{
+        ""tfm"": ""net9.0"",
+        ""framework"": {{
+            ""name"": ""Microsoft.NETCore.App"",
+            ""version"": ""9.0.0""
+        }}
+    }}
+}}";
+            configFile.Write(Encoding.UTF8.GetBytes(config));
         }
         catch (IOException) {
             Error($"Cannot write to output file {filename}");
