@@ -299,21 +299,10 @@ public class ProgramParseNode : ParseNode {
     /// <param name="rowCounts">The row counts of all tables that the associated type system metadata contain</param>
     /// <param name="entryPointHandle">Handle of the entrypoint method</param>
     /// <returns>A DebugDirectoryBuilder</returns>
-    private DebugDirectoryBuilder GeneratePdb(MetadataBuilder pdbBuilder, ImmutableArray<int> rowCounts, MethodDefinitionHandle entryPointHandle) {
+    private static DebugDirectoryBuilder GeneratePdb(MetadataBuilder pdbBuilder, ImmutableArray<int> rowCounts, MethodDefinitionHandle entryPointHandle) {
         BlobBuilder portablePdbBlob = new();
         PortablePdbBuilder portablePdbBuilder = new(pdbBuilder, rowCounts, entryPointHandle);
-        BlobContentId pdbContentId = portablePdbBuilder.Serialize(portablePdbBlob);
-
-        string pdbFilename = Path.GetFileName(OutputFile);
-        pdbFilename = Path.ChangeExtension(pdbFilename, "pdb");
-        Debug.Assert(pdbFilename != null);
-
-        using FileStream fileStream = new(pdbFilename, FileMode.Create, FileAccess.Write);
-        portablePdbBlob.WriteContentTo(fileStream);
-
         DebugDirectoryBuilder debugDirectoryBuilder = new();
-        debugDirectoryBuilder.AddCodeViewEntry(pdbFilename, pdbContentId, portablePdbBuilder.FormatVersion);
-
         debugDirectoryBuilder.AddEmbeddedPortablePdbEntry(portablePdbBlob, portablePdbBuilder.FormatVersion);
         return debugDirectoryBuilder;
     }
