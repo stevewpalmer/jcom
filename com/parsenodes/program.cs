@@ -270,10 +270,11 @@ public class ProgramParseNode : ParseNode {
             peBlob.WriteContentTo(fileStream);
 
             // Create the runtime configuration file.
-            string configFilename = Path.ChangeExtension(OutputFile, "runtimeconfig.json");
-            Debug.Assert(configFilename != null);
-            using FileStream configFile = new(configFilename, FileMode.Create, FileAccess.Write);
-            const string config = $@"{{
+            if (_entryPoint != null) {
+                string configFilename = Path.ChangeExtension(OutputFile, "runtimeconfig.json");
+                Debug.Assert(configFilename != null);
+                using FileStream configFile = new(configFilename, FileMode.Create, FileAccess.Write);
+                const string config = @"{{
     ""runtimeOptions"": {{
         ""tfm"": ""net9.0"",
         ""framework"": {{
@@ -282,7 +283,8 @@ public class ProgramParseNode : ParseNode {
         }}
     }}
 }}";
-            configFile.Write(Encoding.UTF8.GetBytes(config));
+                configFile.Write(Encoding.UTF8.GetBytes(config));
+            }
         }
         catch (IOException) {
             Error($"Cannot write to output file {filename}");
