@@ -274,12 +274,13 @@ public class ProgramParseNode : ParseNode {
                 string configFilename = Path.ChangeExtension(OutputFile, "runtimeconfig.json");
                 Debug.Assert(configFilename != null);
                 using FileStream configFile = new(configFilename, FileMode.Create, FileAccess.Write);
-                const string config = @"{{
+                string version = Environment.Version.ToString();
+                string config = $@"{{
     ""runtimeOptions"": {{
         ""tfm"": ""net9.0"",
         ""framework"": {{
             ""name"": ""Microsoft.NETCore.App"",
-            ""version"": ""9.0.0""
+            ""version"": ""{version}""
         }}
     }}
 }}";
