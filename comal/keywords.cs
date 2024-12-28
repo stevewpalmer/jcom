@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -43,7 +43,7 @@ public partial class Compiler {
     // Specifies an external library to be included in the compilation.
     // Exported members of the library are added to the symbol table in
     // the same way as PROC func(parms) EXTERNAL "library".
-    // 
+    //
     private ParseNode KUse() {
 
         SimpleToken token = GetNextToken();
@@ -95,7 +95,7 @@ public partial class Compiler {
 
                     Globals.Add(new Symbol(method.Name, fullType, klass, null, _currentLineNumber) {
                         Modifier = SymModifier.EXTERNAL,
-                        ExternalLibrary = thisType.AssemblyQualifiedName,
+                        ExternalLibrary = baseTypeName,
                         Parameters = parameters
                     });
                 }

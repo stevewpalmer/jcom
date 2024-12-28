@@ -236,9 +236,10 @@ public class ProgramParseNode : ParseNode {
             _ = CurrentType.CreateType;
 
             ManagedPEBuilder peBuilder;
+
             if (GenerateDebug) {
                 MetadataBuilder metadataBuilder = ab.GenerateMetadata(out BlobBuilder ilStream, out _, out MetadataBuilder pdbBuilder);
-                MethodDefinitionHandle entryPointHandle = MetadataTokens.MethodDefinitionHandle(_entryPoint.MetadataToken);
+                MethodDefinitionHandle entryPointHandle = _entryPoint != null ? MetadataTokens.MethodDefinitionHandle(_entryPoint.MetadataToken) : default;
                 DebugDirectoryBuilder debugDirectoryBuilder = GeneratePdb(pdbBuilder, metadataBuilder.GetRowCounts(), entryPointHandle);
 
                 peBuilder = new ManagedPEBuilder(
@@ -250,12 +251,14 @@ public class ProgramParseNode : ParseNode {
             }
             else {
                 MetadataBuilder metadataBuilder = ab.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder fieldData);
+                MethodDefinitionHandle entryPointHandle = _entryPoint != null ? MetadataTokens.MethodDefinitionHandle(_entryPoint.MetadataToken) : default;
+
                 peBuilder = new ManagedPEBuilder(
                     header: PEHeaderBuilder.CreateExecutableHeader(),
                     metadataRootBuilder: new MetadataRootBuilder(metadataBuilder),
                     ilStream: ilStream,
                     mappedFieldData: fieldData,
-                    entryPoint: MetadataTokens.MethodDefinitionHandle(_entryPoint.MetadataToken));
+                    entryPoint: entryPointHandle);
             }
 
             BlobBuilder peBlob = new();
