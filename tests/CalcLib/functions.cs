@@ -169,13 +169,13 @@ public class FunctionTests {
         // Check the correct format is set
         cell1.CellFormat = CellFormat.GENERAL;
         sheet.Calculate();
-        Assert.AreEqual(DateTime.Now.ToString("dd/MM/yyyy H:mm"), cell1.TextForWidth(16));
+        Assert.AreEqual(DateTime.Now.ToString("dd/MM/yyyy H:mm"), cell1.Text);
 
         sheet = workBook.AddSheet();
         cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=NOW()";
         sheet.Calculate();
-        Assert.AreEqual(DateTime.Now.ToString("dd/MM/yyyy H:mm"), cell1.TextForWidth(16));
+        Assert.AreEqual(DateTime.Now.ToString("dd/MM/yyyy H:mm"), cell1.Text);
     }
 
     /// <summary>

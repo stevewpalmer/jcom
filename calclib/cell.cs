@@ -244,7 +244,7 @@ public class Cell(Sheet? sheet) {
     /// Pre-compiled custom number format
     /// </summary>
     [JsonIgnore]
-    private NumberFormat? CustomFormat { get; set; }
+    internal NumberFormat? CustomFormat { get; private set; }
 
     /// <summary>
     /// Custom cell format when format is set to CUSTOM

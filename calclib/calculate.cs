@@ -46,4 +46,9 @@ public class CalculationContext {
     /// catch potential circular computations.
     /// </summary>
     public Stack<CellLocation> ReferenceList = new();
+
+    /// <summary>
+    /// Location of source cell for the specified sheet.
+    /// </summary>
+    public CellLocation SourceLocation;
 }

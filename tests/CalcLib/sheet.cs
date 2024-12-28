@@ -235,6 +235,7 @@ public class SheetTests {
         sheet2.Calculate();
         Assert.AreEqual(new Variant(45.89), cell2.Value);
 
+        // A non-existent sheet reference evaluates to 0.
         cell2.Value = new Variant("=NonExistentSheet!A1");
 
         sheet2.Calculate();

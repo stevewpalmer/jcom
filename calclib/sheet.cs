@@ -246,6 +246,7 @@ public class Sheet {
                 CalculationContext context = new() {
                     ReferenceList = new Stack<CellLocation>(),
                     UpdateList = cellsToUpdate.ToArray(),
+                    SourceLocation = cell.Location,
                     Sheet = this
                 };
                 context.ReferenceList.Push(cell.Location);

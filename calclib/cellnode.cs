@@ -214,7 +214,7 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
     /// <param name="location">Location of cell</param>
     /// <returns>The variant value of the cell</returns>
     internal static Variant EvaluateLocation(CalculationContext context, CellLocation location) {
-        if (location.SheetName != null) {
+        if (location.SheetName != null && location.SheetName != context.SourceLocation.SheetName) {
 
             // If this is a reference in another sheet then we need to switch context to that sheet for
             // the calculation and switch back afterward. This ensures that calculations on the new sheet
@@ -226,7 +226,8 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
             }
             CalculationContext newContext = new() {
                 Sheet = sourceSheet,
-                ReferenceList = [],
+                ReferenceList = context.ReferenceList,
+                SourceLocation = location,
                 UpdateList = context.UpdateList
             };
             return EvaluateLocation(newContext, new CellLocation {

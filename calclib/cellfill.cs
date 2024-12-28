@@ -25,6 +25,7 @@
 
 using System.Diagnostics;
 using System.Globalization;
+using ExcelNumberFormat;
 using JComLib;
 
 namespace JCalcLib;
@@ -38,6 +39,9 @@ public abstract class ICellTypeFiller {
     /// <returns>A ICellTypeFiller class</returns>
     public static ICellTypeFiller Create(Cell cell) {
         if (cell.Format is CellFormat.DATE_DM or CellFormat.DATE_DMY or CellFormat.DATE_MY) {
+            return new CellDateVariantFiller();
+        }
+        if (cell.Format is CellFormat.CUSTOM && cell.CustomFormat != null && cell.CustomFormat.IsDateTimeFormat) {
             return new CellDateVariantFiller();
         }
         return new CellVariantFiller();

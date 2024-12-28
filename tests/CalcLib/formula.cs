@@ -263,6 +263,8 @@ public class FormulaTests {
     public void VerifyCircularReferences() {
         Book workBook = new();
         Sheet sheet = workBook.Sheets.First();
+        sheet.Name = "Summary";
+
         Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
         Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
 
@@ -272,6 +274,25 @@ public class FormulaTests {
         sheet.Calculate();
         Assert.AreEqual(" !ERR ", cell1.TextForWidth(6));
         Assert.AreEqual(" !ERR ", cell2.TextForWidth(6));
+
+        // A more complex circular reference across multiple sheets
+        // Here, cell A1 on all three sheets refer to cell A1 on the
+        // previous sheet:
+        //
+        //  Expenses!A1 <= Savings!A1 <= Summary!A1
+        Sheet sheet2 = workBook.AddSheet();
+        Sheet sheet3 = workBook.AddSheet();
+        sheet2.Name = "Expenses";
+        sheet3.Name = "Savings";
+
+        Cell cell3 = sheet2.GetCell(new CellLocation("A1"), true);
+        Cell cell4 = sheet3.GetCell(new CellLocation("A1"), true);
+        cell3.Value = new Variant("=Summary!A1");
+        cell1.Value = new Variant("=Savings!A1");
+        cell4.Value = new Variant("=Expenses!A1");
+        sheet2.Calculate();
+
+        Assert.AreEqual(" !ERR ", cell3.TextForWidth(6));
     }
 
     /// <summary>
