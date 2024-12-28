@@ -284,11 +284,9 @@ public class Emitter {
     public void CreateLocal(Symbol sym) {
         ArgumentNullException.ThrowIfNull(sym);
         LocalBuilder lb = _il.DeclareLocal(sym.SystemType);
-#if GENERATE_NATIVE_BINARIES
         if (IsDebuggable) {
             lb.SetLocalSymInfo(sym.Name);
         }
-#endif
         sym.Index = AssignLocal(sym.SystemType, lb.LocalIndex);
     }
 

@@ -133,7 +133,7 @@ public class InstructionTryCatch : Instruction {
 
                 LocalBuilder tmp1 = il.DeclareLocal(jcomRuntimeException);
                 MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandlerNoThrow", [typeof(Exception)]);
-                il.EmitCall(OpCodes.Call, methodInfo, [typeof(Exception)]);
+                il.EmitCall(OpCodes.Call, methodInfo, null);
 
                 il.Emit(OpCodes.Stloc_S, tmp1);
 
