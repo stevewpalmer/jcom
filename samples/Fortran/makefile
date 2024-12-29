@@ -1,10 +1,11 @@
-JFLAGS=-w:4
-DROP=../../drop
-JFOR=mono $(DROP)/jfor.exe $(JFLAGS)
+JFLAGS=-w:4 --debug
+DROP=../../drop/bin
+JFOR=$(DROP)/fort $(JFLAGS)
 
-INCLUDE "fortran.mak"
+SOURCES=date.exe datest.exe euclid.exe f2ccalc.exe heron.exe \
+	loan.exe petrol.exe reduce.exe stats.exe triang.exe vowels.exe bottles.exe
 
-BINARIES=comlib.dll forlib.dll $(DROP)/com.dll $(DROP)/for.exe
+BINARIES=comlib.dll forlib.dll $(DROP)/com.dll $(DROP)/fort
 
 all: $(SOURCES)
 
@@ -23,4 +24,4 @@ forlib.dll: $(DROP)/forlib.dll
 	$(JFOR) $<
 
 clean:
-	-rm *.exe *.dll *.pdb *.dll.mdb *.exe.mdb *.out 
+	-rm -f *.exe *.dll *.runtimeconfig.json *.out

@@ -23,11 +23,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.SymbolStore;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace CCompiler;
 
@@ -35,18 +41,16 @@ namespace CCompiler;
 /// Specifies a parse node for a single program.
 /// </summary>
 public class ProgramParseNode : ParseNode {
-
-#if GENERATE_NATIVE_BINARIES
-    private readonly bool _isCOMVisible = true;
-    private readonly bool _isCLSCompliant = true;
-#endif
+    private const bool _isCLSCompliant = true;
+    private const bool _isCOMVisible = true;
     private readonly Options _opts;
+
+    private AssemblyBuilder _ab;
+    private ISymbolDocumentWriter _currentDoc;
+    private MethodBuilder _entryPoint;
 
     private string _filename;
     private int _lineno;
-
-    private AssemblyBuilder _ab;
-    private readonly ISymbolDocumentWriter _currentDoc = null;
 
     /// <summary>
     /// Constructs a language neutral code generator object.
@@ -55,25 +59,6 @@ public class ProgramParseNode : ParseNode {
     public ProgramParseNode(Options opts) : base(ParseID.PROGRAM) {
         _opts = opts;
         _lineno = -1;
-    }
-
-    /// <summary>
-    /// Throws an error exception that includes the line number and file name of the
-    /// location of the error.
-    /// </summary>
-    /// <param name="lineNumber">The number of the line</param>
-    /// <param name="errorString">The error string</param>
-    public void Error(int lineNumber, string errorString) {
-        throw new CodeGeneratorException(lineNumber, _filename, errorString);
-    }
-
-    /// <summary>
-    /// Throws an error exception that includes the line number and file name of the
-    /// location of the error.
-    /// </summary>
-    /// <param name="errorString">The error string</param>
-    public void Error(string errorString) {
-        throw new CodeGeneratorException(_lineno, _filename, errorString);
     }
 
     /// <summary>
@@ -147,6 +132,25 @@ public class ProgramParseNode : ParseNode {
     public int HandlerLevel { get; set; }
 
     /// <summary>
+    /// Throws an error exception that includes the line number and file name of the
+    /// location of the error.
+    /// </summary>
+    /// <param name="lineNumber">The number of the line</param>
+    /// <param name="errorString">The error string</param>
+    public void Error(int lineNumber, string errorString) {
+        throw new CodeGeneratorException(lineNumber, _filename, errorString);
+    }
+
+    /// <summary>
+    /// Throws an error exception that includes the line number and file name of the
+    /// location of the error.
+    /// </summary>
+    /// <param name="errorString">The error string</param>
+    public void Error(string errorString) {
+        throw new CodeGeneratorException(_lineno, _filename, errorString);
+    }
+
+    /// <summary>
     /// Dumps the contents of this parse node to the ParseNode XML
     /// output under the specified parent node.
     /// </summary>
@@ -165,32 +169,18 @@ public class ProgramParseNode : ParseNode {
     /// <summary>
     /// Generate the code for the entire program from the root parse tree.
     /// </summary>
-    public void Generate() {
+    /// <param name="save">Set to true to generate persistable code. Set to
+    /// false generate in-memory code for immediate execution.</param>
+    public void Generate(bool save) {
         try {
             AssemblyName an = new() {
                 Name = DotNetName,
                 Version = new Version(VersionString)
             };
 
-            bool isSaveable = !string.IsNullOrEmpty(OutputFile);
-#if GENERATE_NATIVE_BINARIES
-            AssemblyBuilderAccess access = isSaveable ? AssemblyBuilderAccess.RunAndSave : AssemblyBuilderAccess.Run;
-#else
-            AssemblyBuilderAccess access = AssemblyBuilderAccess.Run;
-#endif
-            _ab = AssemblyBuilder.DefineDynamicAssembly(an, access);
-
-            // Don't make the main class abstract if the program is being run from
-            // memory as otherwise the caller will be unable to create an instance.
-#if GENERATE_NATIVE_BINARIES
-            if (isSaveable) {
-                Builder = _ab.DefineDynamicModule(DotNetName, OutputFilename(OutputFile), GenerateDebug);
-            } else {
-                Builder = _ab.DefineDynamicModule(DotNetName, GenerateDebug);
-            }
-#else
+            _ab = save ? new PersistedAssemblyBuilder(an, typeof(object).Assembly) :
+                AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
             Builder = _ab.DefineDynamicModule(DotNetName);
-#endif
 
             // Make this assembly debuggable if the debug option was specified.
             if (GenerateDebug) {
@@ -211,7 +201,7 @@ public class ProgramParseNode : ParseNode {
 
             // Create the default type
             JTypeAttributes typeAttributes = JTypeAttributes.Public;
-            if (isSaveable) {
+            if (save) {
                 typeAttributes |= JTypeAttributes.Sealed;
             }
             if (GenerateDebug) {
@@ -236,22 +226,85 @@ public class ProgramParseNode : ParseNode {
     /// Save the generated assembly to disk. This requires a filename
     /// to have been previously set or this does nothing.
     /// </summary>
-    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     public void Save() {
-#if GENERATE_NATIVE_BINARIES
         string filename = OutputFilename(OutputFile);
         try {
+            Debug.Assert(_ab is PersistedAssemblyBuilder);
+            PersistedAssemblyBuilder ab = (PersistedAssemblyBuilder)_ab;
             AddCLSCompliant();
             AddCOMVisiblity();
 
             _ = CurrentType.CreateType;
-            _ab.Save(filename);
+
+            ManagedPEBuilder peBuilder;
+
+            if (GenerateDebug) {
+                MetadataBuilder metadataBuilder = ab.GenerateMetadata(out BlobBuilder ilStream, out _, out MetadataBuilder pdbBuilder);
+                MethodDefinitionHandle entryPointHandle = _entryPoint != null ? MetadataTokens.MethodDefinitionHandle(_entryPoint.MetadataToken) : default;
+                DebugDirectoryBuilder debugDirectoryBuilder = GeneratePdb(pdbBuilder, metadataBuilder.GetRowCounts(), entryPointHandle);
+
+                peBuilder = new ManagedPEBuilder(
+                    header: new PEHeaderBuilder(imageCharacteristics: Characteristics.ExecutableImage, subsystem: Subsystem.WindowsCui),
+                    metadataRootBuilder: new MetadataRootBuilder(metadataBuilder),
+                    ilStream: ilStream,
+                    debugDirectoryBuilder: debugDirectoryBuilder,
+                    entryPoint: entryPointHandle);
+            }
+            else {
+                MetadataBuilder metadataBuilder = ab.GenerateMetadata(out BlobBuilder ilStream, out BlobBuilder fieldData);
+                MethodDefinitionHandle entryPointHandle = _entryPoint != null ? MetadataTokens.MethodDefinitionHandle(_entryPoint.MetadataToken) : default;
+
+                peBuilder = new ManagedPEBuilder(
+                    header: PEHeaderBuilder.CreateExecutableHeader(),
+                    metadataRootBuilder: new MetadataRootBuilder(metadataBuilder),
+                    ilStream: ilStream,
+                    mappedFieldData: fieldData,
+                    entryPoint: entryPointHandle);
+            }
+
+            BlobBuilder peBlob = new();
+            peBuilder.Serialize(peBlob);
+
+            // Create the executable:
+            using FileStream fileStream = new(filename, FileMode.Create, FileAccess.Write);
+            peBlob.WriteContentTo(fileStream);
+
+            // Create the runtime configuration file.
+            if (_entryPoint != null) {
+                string configFilename = Path.ChangeExtension(OutputFile, "runtimeconfig.json");
+                Debug.Assert(configFilename != null);
+                using FileStream configFile = new(configFilename, FileMode.Create, FileAccess.Write);
+                string version = Environment.Version.ToString();
+                string config = $@"{{
+    ""runtimeOptions"": {{
+        ""tfm"": ""net9.0"",
+        ""framework"": {{
+            ""name"": ""Microsoft.NETCore.App"",
+            ""version"": ""{version}""
+        }}
+    }}
+}}";
+                configFile.Write(Encoding.UTF8.GetBytes(config));
+            }
         }
         catch (IOException) {
             Error($"Cannot write to output file {filename}");
         }
-#endif
+    }
+
+    /// <summary>
+    /// Generate a PDB for a debuggable executable.
+    /// </summary>
+    /// <param name="pdbBuilder">PDB builder class</param>
+    /// <param name="rowCounts">The row counts of all tables that the associated type system metadata contain</param>
+    /// <param name="entryPointHandle">Handle of the entrypoint method</param>
+    /// <returns>A DebugDirectoryBuilder</returns>
+    private static DebugDirectoryBuilder GeneratePdb(MetadataBuilder pdbBuilder, ImmutableArray<int> rowCounts, MethodDefinitionHandle entryPointHandle) {
+        BlobBuilder portablePdbBlob = new();
+        PortablePdbBuilder portablePdbBuilder = new(pdbBuilder, rowCounts, entryPointHandle);
+        DebugDirectoryBuilder debugDirectoryBuilder = new();
+        debugDirectoryBuilder.AddEmbeddedPortablePdbEntry(portablePdbBlob, portablePdbBuilder.FormatVersion);
+        return debugDirectoryBuilder;
     }
 
     /// <summary>
@@ -285,13 +338,9 @@ public class ProgramParseNode : ParseNode {
     /// Sets the specified method as the program start method.
     /// </summary>
     /// <param name="method">Method object</param>
-    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     public void SetEntryPoint(JMethod method) {
-#if GENERATE_NATIVE_BINARIES
-        _ab.SetEntryPoint(method.Builder);
-#endif
+        ArgumentNullException.ThrowIfNull(method);
+        _entryPoint = method.Builder;
     }
 
     /// <summary>
@@ -553,33 +602,31 @@ public class ProgramParseNode : ParseNode {
     }
 
     // Mark this assembly as CLS Compliant.
-#if GENERATE_NATIVE_BINARIES
     private void AddCLSCompliant() {
         Type type = typeof(CLSCompliantAttribute);
-        ConstructorInfo ctor = type.GetConstructor(new[] { typeof(bool) });
-        CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCLSCompliant });
-        Builder.SetCustomAttribute(caBuilder);
+        ConstructorInfo ctor = type.GetConstructor([typeof(bool)]);
+        if (ctor != null) {
+            CustomAttributeBuilder caBuilder = new(ctor, [_isCLSCompliant]);
+            Builder.SetCustomAttribute(caBuilder);
+        }
     }
-#endif
 
     // Mark this assembly as COM Visible.
-#if GENERATE_NATIVE_BINARIES
     private void AddCOMVisiblity() {
         Type type = typeof(ComVisibleAttribute);
-        ConstructorInfo ctor = type.GetConstructor(new[] { typeof(bool) });
-        CustomAttributeBuilder caBuilder = new(ctor, new object[] { _isCOMVisible });
-        Builder.SetCustomAttribute(caBuilder);
+        ConstructorInfo ctor = type.GetConstructor([typeof(bool)]);
+        if (ctor != null) {
+            CustomAttributeBuilder caBuilder = new(ctor, [_isCOMVisible]);
+            Builder.SetCustomAttribute(caBuilder);
+        }
     }
-#endif
 
     // Sets the filename in the debug info.
     [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     private void SetCurrentDocument(string filename) {
-#if GENERATE_NATIVE_BINARIES
         _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);
-#endif
     }
 
     // Retrieves the current document.
@@ -588,7 +635,6 @@ public class ProgramParseNode : ParseNode {
     }
 
     // Gets the output filename complete with extension.
-#if GENERATE_NATIVE_BINARIES
     private string OutputFilename(string outputFile) {
         string outputFilename = Path.GetFileName(outputFile);
         if (!Path.HasExtension(outputFilename)) {
@@ -596,5 +642,4 @@ public class ProgramParseNode : ParseNode {
         }
         return outputFilename;
     }
-#endif
 }

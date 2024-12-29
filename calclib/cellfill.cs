@@ -25,7 +25,6 @@
 
 using System.Diagnostics;
 using System.Globalization;
-using ExcelNumberFormat;
 using JComLib;
 
 namespace JCalcLib;
@@ -41,7 +40,7 @@ public abstract class ICellTypeFiller {
         if (cell.Format is CellFormat.DATE_DM or CellFormat.DATE_DMY or CellFormat.DATE_MY) {
             return new CellDateVariantFiller();
         }
-        if (cell.Format is CellFormat.CUSTOM && cell.CustomFormat != null && cell.CustomFormat.IsDateTimeFormat) {
+        if (cell is { Format: CellFormat.CUSTOM, CustomFormat.IsDateTimeFormat: true }) {
             return new CellDateVariantFiller();
         }
         return new CellVariantFiller();
@@ -100,8 +99,8 @@ public class CellVariantFiller : ICellTypeFiller {
 public class CellDateVariantFiller : ICellTypeFiller {
     private DateTime cellDateTime;
     private int dayDelta;
-    private int monthDelta;
     private Cell? firstCell;
+    private int monthDelta;
 
     /// <summary>
     /// Update the date in the cell at the index. If index is 1, use the

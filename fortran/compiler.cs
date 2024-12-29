@@ -112,7 +112,7 @@ public partial class Compiler : ICompiler {
     public void Save() {
         try {
             MarkExecutable();
-            _cg.Generate();
+            _cg.Generate(true);
             _cg.Save();
         }
         catch (CodeGeneratorException e) {
@@ -139,7 +139,7 @@ public partial class Compiler : ICompiler {
     /// <returns>An ExecutionResult object representing the result of the execution</returns>
     public ExecutionResult Execute(string entryPointName) {
         MarkExecutable();
-        _cg.Generate();
+        _cg.Generate(false);
         return _cg.Run(entryPointName);
     }
 

@@ -252,7 +252,7 @@ public partial class Compiler : ICompiler {
     public void Save() {
         try {
             _program.IsExecutable = _hasProgram;
-            _program.Generate();
+            _program.Generate(true);
             _program.Save();
         }
         catch (CodeGeneratorException e) {
@@ -279,7 +279,7 @@ public partial class Compiler : ICompiler {
     /// <returns>An ExecutionResult object representing the result of the execution</returns>
     public ExecutionResult Execute(string entryPointName) {
         _program.IsExecutable = _hasProgram;
-        _program.Generate();
+        _program.Generate(false);
         return _program.Run(entryPointName);
     }
 
@@ -319,6 +319,7 @@ public partial class Compiler : ICompiler {
                 XmlDocument xmlTree = ParseTreeXml.Tree(_program);
                 string outputFilename = Path.GetFileName(_opts.OutputFile);
                 outputFilename = Path.ChangeExtension(outputFilename, ".xml");
+                Debug.Assert(outputFilename != null);
                 xmlTree.Save(outputFilename);
             }
         }
@@ -363,6 +364,7 @@ public partial class Compiler : ICompiler {
             SimpleToken token = GetNextToken();
             if (token.ID == TokenID.INTEGER) {
                 IntegerToken lineNumberToken = token as IntegerToken;
+                Debug.Assert(lineNumberToken != null);
                 lineNumber = lineNumberToken.Value;
                 Messages.Linenumber = lineNumber;
                 token = GetNextToken();
@@ -441,6 +443,7 @@ public partial class Compiler : ICompiler {
             // Possible initial line number
             if (token.ID == TokenID.INTEGER) {
                 IntegerToken lineNumberToken = token as IntegerToken;
+                Debug.Assert(lineNumberToken != null);
                 _currentLineNumber = _opts.IDE ? _ls.Index : lineNumberToken.Value;
                 Messages.Linenumber = _currentLineNumber;
                 token = GetNextToken();
@@ -750,8 +753,7 @@ public partial class Compiler : ICompiler {
     private void CheckEndOfBlockName(IdentifierToken identToken, SimpleToken token) {
 
         if (token.ID == TokenID.IDENT && identToken != null) {
-            IdentifierToken endIdentToken = token as IdentifierToken;
-            if (endIdentToken.Name != identToken.Name) {
+            if (token is IdentifierToken endIdentToken && endIdentToken.Name != identToken.Name) {
                 Messages.Error(MessageCode.UNDEFINEDLABEL, $"Mismatched name {endIdentToken.Name}");
             }
         }

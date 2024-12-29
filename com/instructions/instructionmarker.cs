@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -54,8 +54,6 @@ public class InstructionMarker : Instruction {
     public override void Generate(ILGenerator il) {
         ArgumentNullException.ThrowIfNull(il);
         if (Deleted) { }
-#if GENERATE_NATIVE_BINARIES
         il.MarkSequencePoint(_doc, _linenumber, 1, _linenumber, 100);
-#endif
     }
 }

@@ -1,6 +1,7 @@
-JFLAGS=-w:2 --debug --run
+JFLAGS=-w:2 --debug
 DROP=../../drop/bin
 JFOR=$(DROP)/fort $(JFLAGS)
+JRUN=dotnet
 
 include tests.mak
 
@@ -8,25 +9,34 @@ all: $(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS)
 
 failures: $(FAILTESTS)
 	-rm run.out FORT.*
-	-for f in $(FAILTESTS); do $(JFOR) $$f; done >>run.out
+	-for f in $(FAILTESTS); do $(JRUN) $$f; done >>run.out
 	-grep "\sFAIL\s" run.out
 
 run: $(ALLTESTS)
 	-rm run.out FORT.*
-	-for f in $(ALLTESTS); do $(JFOR) $$f; done >>run.out
-	-for f in $(ALLDATATESTS); do $(JFOR) $$f < ./$${f%.FOR}.dat; done>>run.out
+	-for f in $(ALLTESTS); do $(JRUN) $$f; done >>run.out
+	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.FOR}.dat; done>>run.out
 	-grep "\sFAIL\s" run.out
 
 runall: $(ALLTESTS) $(ALLDATATESTS) $(INTTESTS) $(INTDATATESTS)
 	-rm run.out FORT.*
-	-for f in $(ALLTESTS); do $(JFOR) $$f; done >>run.out
-	-for f in $(ALLDATATESTS); do $(JFOR) $$f < ./$${f%.FOR}.DAT; done>>run.out
-	-for f in $(INTTESTS); do $(JFOR) $$f; done
-	-for f in $(INTDATATESTS); do $(JFOR) $$f < ./$${f%.FOR}.DAT; done
+	-for f in $(ALLTESTS); do $(JRUN) $$f; done >>run.out
+	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.FOR}.DAT; done>>run.out
+	-for f in $(INTTESTS); do $(JRUN) $$f; done
+	-for f in $(INTDATATESTS); do $(JRUN) $$f < ./$${f%.FOR}.DAT; done
 	-grep "\sFAIL\s" run.out
 
-$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS): $(DROP)/com.dll $(DROP)/fort
+$(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS): comlib.dll forlib.dll $(DROP)/fort
+
+comlib.dll: $(DROP)/comlib.dll
+	cp $(DROP)/comlib.dll .
+
+forlib.dll: $(DROP)/forlib.dll
+	cp $(DROP)/forlib.dll .
+
+%.exe : %.FOR
+	$(JFOR) $<
 
 clean:
-	-rm *.out FORT.*
+	-rm *.out *.exe FORT.*
 
