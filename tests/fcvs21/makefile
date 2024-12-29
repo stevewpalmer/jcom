@@ -38,5 +38,5 @@ forlib.dll: $(DROP)/forlib.dll
 	$(JFOR) $<
 
 clean:
-	-rm *.out *.exe FORT.*
+	-rm *.out *.exe *.runtimeconfig.json FORT.*
 
