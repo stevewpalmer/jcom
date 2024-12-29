@@ -23,7 +23,8 @@ ALLTESTS=FM002.exe FM003.exe FM004.exe FM005.exe FM006.exe  \
     FM810.exe FM812.exe FM814.exe FM816.exe FM818.exe FM819.exe \
     FM821.exe FM822.exe FM823.exe FM824.exe FM825.exe FM826.exe \
     FM827.exe FM832.exe FM910.exe FM912.exe FM914.exe FM915.exe \
-    FM916.exe FM917.exe FM919.exe FM920.exe FM921.exe FM922.exe
+    FM916.exe FM917.exe FM919.exe FM920.exe FM921.exe FM922.exe \
+    FM013.exe
 
 # Non-interactive tests that accept data file stdin where the data
 # file basename is the same as the test executable name.
@@ -43,7 +44,7 @@ BUGTESTS=FM317.exe FM328.exe
 # All of these fail to compile cleanly due to unfinished implementation
 # Once support is added, gradually move these to the appropriate
 # successful tests groups.
-FAILTESTS=FM010.exe FM011.exe FM013.exe FM022.exe FM023.exe \
+FAILTESTS=FM010.exe FM011.exe FM022.exe FM023.exe \
     FM024.exe FM111.exe FM200.exe FM252.exe FM300.exe FM302.exe \
     FM308.exe FM500.exe FM503.exe FM506.exe FM509.exe FM517.exe \
     FM700.exe FM710.exe FM719.exe FM722.exe FM809.exe FM811.exe \
