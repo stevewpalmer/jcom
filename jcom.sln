@@ -35,6 +35,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fortran", "Fortran", "{9FF5
 		samples\Fortran\triang.f = samples\Fortran\triang.f
 		samples\Fortran\vowels.f = samples\Fortran\vowels.f
 		samples\Fortran\bottles.f = samples\Fortran\bottles.f
+		samples\Fortran\makefile = samples\Fortran\makefile
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39-BF1A-4D40-89E0-95655031D755}"
@@ -63,6 +64,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39
 		samples\Comal\using.lst = samples\Comal\using.lst
 		samples\Comal\maze.lst = samples\Comal\maze.lst
 		samples\Comal\18.DAT = samples\Comal\18.DAT
+		samples\Comal\makefile = samples\Comal\makefile
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{58BCD580-AEDE-4B79-AB0B-F1B589E6F04C}"
