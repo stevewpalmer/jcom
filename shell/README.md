@@ -7,14 +7,13 @@ To run the shell:
 
 ```
 Shell 1.0.0
-(c) Steven Palmer 2013-2023
+(c) Steven Palmer 2013-2024
 
 $
 ```
 
-On startup, it will look for a home folder under `..\home`
-and create one if it is not found. The home folder then becomes the
-default folder for all applications.
+On startup, the home folder will be the current folder and this will also
+be the home folder for all applications run from the shell.
 
 ### Commands
 
@@ -27,5 +26,6 @@ default folder for all applications.
 | EDIT     | Run the text editor                  |
 | HELP     | Display a list of available commands |
 | ACCOUNTS | Run the Accounts program             |
+| CALC     | Run the spreadsheet                  |
 | COMAL    | Run the Comal interpreter/compiler   |
 | FOR      | Run the Fortran compiler             |
