@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -95,7 +95,7 @@ public class ParameterParseNode : ParseNode {
     /// <summary>
     /// Generate the code to push one parameter onto the caller stack. There are
     /// three different approaches here:
-    /// 
+    ///
     /// 1. Passing a defined variable. We either pass the address of the
     ///    variable (which may be local, parameter or static) if the corresponding
     ///    argument is BYREF, or we pass the value.
@@ -104,7 +104,7 @@ public class ParameterParseNode : ParseNode {
     ///    and pass the address of the storage.
     /// 3. Finally, a computed value where the argument is BYVAL is passed on
     ///    the stack.
-    /// 
+    ///
     /// </summary>
     /// <param name="emitter">The emitter</param>
     /// <param name="cg">A CodeGenerator object</param>
@@ -158,6 +158,12 @@ public class ParameterParseNode : ParseNode {
                     }
                     if (isByRef) {
                         cg.LoadAddress(emitter, identNode);
+                    }
+                    else if (symParam?.Class == SymClass.FUNCTION) {
+                        // Passing a function by name, so the parameter type is
+                        // native int.
+                        identType = SymType.INTEGER;
+                        identNode.Generate(emitter, cg, identType);
                     }
                     else {
                         identNode.Generate(emitter, cg);

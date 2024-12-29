@@ -37,7 +37,7 @@ public class IntrinsicsTests {
 
     // Verify INTRINSIC and EXTERNAL to pass an intrinsic to
     // a function.
-    //[Test]
+    [Test]
     [SuppressMessage("Performance", "CA1822:Mark members as static")]
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public void ExtIntrExternal() {

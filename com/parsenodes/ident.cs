@@ -133,17 +133,13 @@ public class IdentifierParseNode : ParseNode {
         else if (sym.IsArray) {
             thisType = cg.GenerateLoadFromArray(emitter, this, false);
         }
-        else if (sym.IsIntrinsic || sym.IsExternal) {
+        else if (sym.IsIntrinsic || sym.IsExternal || sym.Class == SymClass.FUNCTION) {
             emitter.LoadFunction(sym);
             thisType = SymType.INTEGER;
         }
         else if (sym.IsParameter) {
             emitter.GenerateLoadArgument(sym);
             thisType = sym.Type;
-        }
-        else if (sym.Class == SymClass.FUNCTION) {
-            emitter.LoadFunction(sym);
-            thisType = SymType.INTEGER;
         }
         else if (sym.IsLocal) {
             emitter.LoadSymbol(sym);
