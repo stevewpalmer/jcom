@@ -98,7 +98,7 @@ public class InstructionTryCatch : Instruction {
                 il.BeginCatchBlock(runtimeException);
 
                 LocalBuilder tmp1 = il.DeclareLocal(jcomRuntimeException);
-                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandler", [typeof(Exception)]);
+                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandler", [typeof(Exception)])!;
                 il.EmitCall(OpCodes.Call, methodInfo, null);
 
                 il.Emit(OpCodes.Stloc_S, tmp1);
@@ -106,12 +106,12 @@ public class InstructionTryCatch : Instruction {
                 if (Err != null || ErrText != null) {
                     if (Err is { IsReferenced: true }) {
                         il.Emit(OpCodes.Ldloc_S, tmp1);
-                        il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_ErrorCode"), null);
+                        il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_ErrorCode")!, null);
                         il.Emit(OpCodes.Stsfld, (FieldInfo)Err.Info);
                     }
                     if (ErrText is { IsReferenced: true }) {
                         il.Emit(OpCodes.Ldloc_S, tmp1);
-                        il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message"), null);
+                        il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message")!, null);
                         il.Emit(OpCodes.Stsfld, (FieldInfo)ErrText.Info);
                     }
                 }
@@ -132,7 +132,7 @@ public class InstructionTryCatch : Instruction {
                 il.BeginCatchBlock(runtimeException);
 
                 LocalBuilder tmp1 = il.DeclareLocal(jcomRuntimeException);
-                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandlerNoThrow", [typeof(Exception)]);
+                MethodInfo methodInfo = jcomRuntimeException.GetMethod("GeneralHandlerNoThrow", [typeof(Exception)])!;
                 il.EmitCall(OpCodes.Call, methodInfo, null);
 
                 il.Emit(OpCodes.Stloc_S, tmp1);
@@ -140,13 +140,13 @@ public class InstructionTryCatch : Instruction {
                 Label skipMessage = il.DefineLabel();
 
                 il.Emit(OpCodes.Ldloc_S, tmp1);
-                il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Type"), null);
+                il.EmitCall(OpCodes.Call, jcomRuntimeException.GetMethod("get_Type")!, null);
                 il.Emit(OpCodes.Ldc_I4, (int)JComRuntimeExceptionType.END);
 
                 il.Emit(OpCodes.Ldloc_S, tmp1);
-                il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message"), null);
+                il.EmitCall(OpCodes.Callvirt, jcomRuntimeException.GetMethod("get_Message")!, null);
 
-                MethodInfo meth = typeof(Console).GetMethod("WriteLine", [typeof(string)]);
+                MethodInfo meth = typeof(Console).GetMethod("WriteLine", [typeof(string)])!;
                 il.EmitCall(OpCodes.Call, meth, null);
                 il.MarkLabel(skipMessage);
                 break;

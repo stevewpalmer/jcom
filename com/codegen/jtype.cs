@@ -61,16 +61,6 @@ public class JType {
     private JMethod _defaultConstructor;
 
     /// <summary>
-    /// Type builder
-    /// </summary>
-    private TypeBuilder Builder { get; }
-
-    /// <summary>
-    /// True if type is debuggable
-    /// </summary>
-    public bool Debuggable { get; }
-
-    /// <summary>
     /// Creates the specified type in the module.
     /// </summary>
     /// <param name="mb">Module builder</param>
@@ -89,6 +79,16 @@ public class JType {
         }
         Builder = mb.DefineType(typeName, attr);
     }
+
+    /// <summary>
+    /// Type builder
+    /// </summary>
+    private TypeBuilder Builder { get; }
+
+    /// <summary>
+    /// True if type is debuggable
+    /// </summary>
+    public bool Debuggable { get; }
 
     /// <summary>
     /// Create an instance of this type
@@ -146,7 +146,7 @@ public class JType {
     /// <param name="attributes">Method attributes</param>
     /// <returns></returns>
     public JMethod CreateMethod(Symbol sym, MethodAttributes attributes) {
-
+        ArgumentNullException.ThrowIfNull(sym);
         bool isFunction = sym.RetVal != null || sym.Class == SymClass.FUNCTION;
 
         Type returnType = isFunction ? Symbol.SymTypeToSystemType(sym.Type) : typeof(void);
@@ -156,6 +156,7 @@ public class JType {
         Type[] paramTypes = new Type[paramCount];
 
         for (int c = 0; c < paramCount; ++c) {
+            Debug.Assert(sym.Parameters != null);
             Symbol param = sym.Parameters[c];
             if (param == null) {
                 throw new NullReferenceException("Parameters");
@@ -178,6 +179,7 @@ public class JType {
 
         // For each parameter, set the actual name and type.
         for (int c = 0; c < paramCount; ++c) {
+            Debug.Assert(sym.Parameters != null);
             Symbol param = sym.Parameters[c];
             if (param == null) {
                 throw new NullReferenceException("Parameters");

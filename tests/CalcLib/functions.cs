@@ -354,7 +354,7 @@ public class FunctionTests {
 
         cell1.Value = new Variant("Tomorrow will be ");
         cell2.Value = new Variant("10 June 2024");
-        cell3.Value = new Variant($"=A1&TEXT(A2, 'dd-mmm-yyyy')");
+        cell3.Value = new Variant("=A1&TEXT(A2, 'dd-mmm-yyyy')");
         sheet.Calculate();
 
         Assert.AreEqual("Tomorrow will be 10-Jun-2024", cell3.Value.StringValue);

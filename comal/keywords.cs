@@ -541,6 +541,7 @@ public partial class Compiler {
                 // Possible initial line number
                 if (token.ID == TokenID.INTEGER) {
                     IntegerToken lineNumberToken = token as IntegerToken;
+                    Debug.Assert(lineNumberToken != null);
                     _currentLineNumber = lineNumberToken.Value;
                     Messages.Linenumber = _currentLineNumber;
                     token = GetNextToken();
@@ -693,7 +694,6 @@ public partial class Compiler {
                     escFlag = true;
                     break;
                 case TokenID.MINUS:
-                    escFlag = false;
                     break;
                 default:
                     Messages.Error(MessageCode.UNEXPECTEDTOKEN, "+ or - expected after TRAP ESC");
