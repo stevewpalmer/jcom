@@ -329,7 +329,7 @@ public class Emitter {
 
     /// <summary>
     /// Creates a simple 1 dimensional array of the given type and using the
-    /// size on the top of the stack..
+    /// size on the top of the stack.
     /// </summary>
     /// <param name="itemsType">Type of the items in the array</param>
     public void CreateArray(Type itemsType) {
@@ -505,7 +505,7 @@ public class Emitter {
     /// <summary>
     /// Checks whether the actual type of the last operation matches the type
     /// needed and, if not, emits the appropriate conversion to the required type.
-    /// If typeNeeded is NONE then no conversion is performed..
+    /// If typeNeeded is NONE then no conversion is performed.
     /// </summary>
     /// <returns>The type that the last operation was converted to</returns>
     /// <param name="actualType">The actual type of the operation</param>
@@ -690,7 +690,7 @@ public class Emitter {
     }
 
     /// <summary>
-    /// Emit the code to load the the specified variant value.
+    /// Emit the code to load the specified variant value.
     /// </summary>
     /// <param name="value">The value to be loaded</param>
     public void LoadVariant(Variant value) {
@@ -939,7 +939,7 @@ public class Emitter {
     }
 
     /// <summary>
-    /// Emit the code to load the address of the a parameter at
+    /// Emit the code to load the address of a parameter at
     /// the given index.
     /// </summary>
     /// <param name="index">Index of the parameter</param>
@@ -963,6 +963,9 @@ public class Emitter {
         }
         if (sym.Info is MethodInfo methodInfo) {
             Emit0(OpCodes.Ldftn, methodInfo);
+        }
+        if (sym.Class is SymClass.FUNCTION && sym.IsParameter) {
+            Emit0(OpCodes.Ldarg, sym.ParameterIndex);
         }
     }
 
@@ -1239,7 +1242,7 @@ public class Emitter {
         _code.Add(new InstructionLabelArray(op, operand));
     }
 
-    // Emit an opcode with an local variable
+    // Emit an opcode with a local variable
     private void Emit0(OpCode op, LocalDescriptor value) {
         _code.Add(new InstructionLocal(op, value));
     }

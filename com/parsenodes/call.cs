@@ -109,9 +109,16 @@ public sealed class CallParseNode : ParseNode {
         Type[] paramTypes = Parameters.Generate(emitter, cg, sym);
 
         if (sym.IsParameter) {
-            ProcName.Generate(emitter, cg);
-            emitter.CallIndirect(sym.Type, paramTypes);
-            thisType = sym.Type;
+            if (sym.Class is SymClass.FUNCTION) {
+                ProcName.Generate(emitter, cg, SymType.INTEGER);
+                emitter.CallIndirect(sym.Type, paramTypes);
+                thisType = SymType.INTEGER;
+            }
+            else {
+                ProcName.Generate(emitter, cg);
+                emitter.CallIndirect(sym.Type, paramTypes);
+                thisType = sym.Type;
+            }
         }
         else {
             if (sym.Info is JMethod method) {
