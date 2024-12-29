@@ -87,6 +87,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "calc", "calc\calc.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "calclib", "calclib\calclib.csproj", "{F78C144E-7A95-41A3-8BFC-B20F359220CC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vim", "vim", "{C79CBDBA-D972-4CAC-8607-3EB7BFE41C34}"
+	ProjectSection(SolutionItems) = preProject
+		vim\README.md = vim\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ftdetect", "ftdetect", "{DB75EA68-0CF6-4580-93A6-0B4CBA1D4BC7}"
+	ProjectSection(SolutionItems) = preProject
+		vim\ftdetect\comal.vim = vim\ftdetect\comal.vim
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "syntax", "syntax", "{C790D401-FB9F-4FC4-81C1-15D008627847}"
+	ProjectSection(SolutionItems) = preProject
+		vim\syntax\comal.vim = vim\syntax\comal.vim
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +188,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9FF5FDA2-96E2-43C5-AD9C-04F134E42A1F} = {A6F58576-DD4A-423E-A27C-F564EF3102A9}
 		{BAC0DB39-BF1A-4D40-89E0-95655031D755} = {A6F58576-DD4A-423E-A27C-F564EF3102A9}
+		{DB75EA68-0CF6-4580-93A6-0B4CBA1D4BC7} = {C79CBDBA-D972-4CAC-8607-3EB7BFE41C34}
+		{C790D401-FB9F-4FC4-81C1-15D008627847} = {C79CBDBA-D972-4CAC-8607-3EB7BFE41C34}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F9E1A5DB-84B8-48A5-BEB4-DC826ABF8799}
