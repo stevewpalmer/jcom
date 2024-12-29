@@ -112,7 +112,7 @@ public class Search {
         MatchSuccess = false;
         while (Row < _buffer.Length) {
             string line = _buffer.GetLine(Row);
-            if (++Column == line.Length) {
+            if (++Column >= line.Length) {
                 Column = 0;
                 ++Row;
                 continue;
