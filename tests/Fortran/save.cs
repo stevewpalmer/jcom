@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -46,7 +46,7 @@ public class SaveTests {
             "        INTEGER B",
             "        SAVE B",
             "        B = B + 1",
-            "        RETURN B",
+            "        FOO=B",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -62,13 +62,13 @@ public class SaveTests {
             "          ITEST = ITEST + FOO()",
             " 10     CONTINUE",
             "      END",
-            "      FUNCTION FOO()",
+            "      FUNCTION FOO",
             "        INTEGER B,C,D",
             "        SAVE",
             "        B = B + 1",
             "        C = C + 2",
             "        D = D + 4",
-            "        RETURN B+C+D",
+            "        FOO=B+C+D",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());

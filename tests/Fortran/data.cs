@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -40,7 +40,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A,B,C,D",
             "        DATA A,B,C,D /12,13,14,15/",
-            "        RETURN A+B+C+D",
+            "        ITEST= A+B+C+D",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -55,7 +55,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A,B,C,D",
             "        DATA A,B,C,D /4*17/",
-            "        RETURN A+B+C+D",
+            "        ITEST=  A+B+C+D",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -70,7 +70,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A,B,C,D",
             "        DATA A,B,C,D /4*-17/",
-            "        RETURN A+B+C+D",
+            "        ITEST=  A+B+C+D",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -84,7 +84,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A /34,67,90,-12/",
-            "        RETURN A(1)+A(2)+A(3)+A(4)",
+            "        ITEST=A(1)+A(2)+A(3)+A(4)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -98,7 +98,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A /4*65/",
-            "        RETURN A(1)+A(2)+A(3)+A(4)",
+            "        ITEST=A(1)+A(2)+A(3)+A(4)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -112,7 +112,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A /2*65, 2*12/",
-            "        RETURN A(1)+A(2)+A(3)+A(4)",
+            "        ITEST=A(1)+A(2)+A(3)+A(4)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -127,7 +127,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A(1),A(2),A(4) /34,67,99/",
-            "        RETURN A(1)+A(2)+A(4)",
+            "        ITEST= A(1)+A(2)+A(4)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -143,7 +143,7 @@ public class DataTests {
             "        INTEGER A(4)",
             "        A(1)=450",
             "        DATA A(1),A(2),A(4) /19,34,99/",
-            "        RETURN A(1)+A(2)+A(3)+A(4)",
+            "        ITEST= A(1)+A(2)+A(3)+A(4)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -158,7 +158,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER A(4)",
             "        DATA A(1),A(2),A(4) /3*77/",
-            "        RETURN A(1)+A(2)+A(3)+A(4)",
+            "        ITEST= A(1)+A(2)+A(3)+A(4)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -174,7 +174,7 @@ public class DataTests {
             "        INTEGER ODD(10)",
             "        DATA (ODD(I),I=1,10,2)/ 5 * 43/",
             "        DATA (ODD(I),I=2,10,2)/ 5 * 0 /",
-            "        RETURN SUM(ODD)",
+            "        ITEST=SUM(ODD)",
             "      END",
             "      INTEGER FUNCTION SUM(JRY)",
             "        INTEGER JRY(10)",
@@ -196,7 +196,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        INTEGER NUMBER(10)",
             "        DATA (NUMBER(I),I=1,10)/1,1,2,3,5,8,13,21,34,55/",
-            "        RETURN SUM(NUMBER)",
+            "        ITEST=SUM(NUMBER)",
             "      END",
             "      INTEGER FUNCTION SUM(JRY)",
             "        INTEGER JRY(10)",
@@ -217,7 +217,7 @@ public class DataTests {
             "      FUNCTION ITEST",
             "        CHARACTER * 20 B, ITEST",
             "        DATA B /20*'A'/",
-            "        RETURN B",
+            "        ITEST=B",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());

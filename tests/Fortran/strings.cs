@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -37,10 +37,10 @@ public class Strings {
     public void SubstringSet() {
         string[] code = [
             "      FUNCTION ITEST",
-            "        CHARACTER METAL(2)*10, ITEST",
+            "        CHARACTER METAL(2)*10, ITEST*7",
             "        METAL(1) = 'CADMIUM'",
             "        METAL(1)(3:4) = 'LO'",
-            "        RETURN METAL(1)",
+            "        ITEST=METAL(1)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());

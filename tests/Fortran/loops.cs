@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -40,7 +40,7 @@ public class LoopTests {
             "        DO 20,I=1,10",
             "          J=J+I",
             "20      CONTINUE",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -56,7 +56,7 @@ public class LoopTests {
             "          DO 20,K=1,10",
             "            J=J+I",
             "20      CONTINUE",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -73,7 +73,7 @@ public class LoopTests {
             "          DO 20,K=1,10",
             "            J=J+I",
             "20      CONTINUE",
-            "        RETURN I+K",
+            "        ITEST=I+K",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -95,7 +95,7 @@ public class LoopTests {
             "            LEND=900",
             "            LSTEP=5",
             "20      CONTINUE",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -113,7 +113,7 @@ public class LoopTests {
             "        DO 20,I=LSTART,LEND,LSTEP",
             "            J=J+1",
             "20      CONTINUE",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -131,7 +131,7 @@ public class LoopTests {
             "        DO 20,I=LSTART,LEND",
             "            J=J+1",
             "20      CONTINUE",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -148,7 +148,7 @@ public class LoopTests {
             "        DO I=LSTART,LEND",
             "            J=J+1",
             "        ENDDO",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -166,7 +166,7 @@ public class LoopTests {
             "            J=J+1",
             "            LSTART=LSTART+1",
             "        ENDDO",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -185,7 +185,7 @@ public class LoopTests {
             "            J=J+1",
             "            LSTART=LSTART+1",
             "100     CONTINUE",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -201,11 +201,10 @@ public class LoopTests {
             "        DO 20,I=0,LEND",
             "          J=J+I",
             "20      CONTINUE",
-            "        RETURN J",
+            "        ITEST=J",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
         Helper.HelperRunInteger(comp, "ITEST", 45);
     }
-
 }

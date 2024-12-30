@@ -483,7 +483,7 @@ public partial class Compiler {
             if (sym.IsLabel && !sym.Defined) {
                 Messages.Error(MessageCode.UNDEFINEDLABEL, sym.RefLine, $"Undefined label {sym.Name}");
             }
-            if (_saveAll && sym.IsLocal) {
+            if (_saveAll && sym.IsLocal && sym.Modifier != SymModifier.RETVAL) {
                 sym.Modifier |= SymModifier.STATIC;
             }
 

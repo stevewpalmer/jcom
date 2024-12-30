@@ -156,14 +156,14 @@ public class IntrinsicsTests {
     public void ExtIntrALog10() {
         string[] code = [
             "      FUNCTION RALOG10",
-            "        RETURN ALOG10(0.4)",
+            "        RALOG10=ALOG10(0.4)",
             "      END",
             "      FUNCTION RLOG10",
-            "        RETURN LOG10(0.4)",
+            "        RLOG10=LOG10(0.4)",
             "      END",
             "      FUNCTION DDLOG10",
             "        DOUBLE PRECISION DDLOG10",
-            "        RETURN LOG10(0.4D0)",
+            "        DDLOG10=LOG10(0.4D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -184,7 +184,7 @@ public class IntrinsicsTests {
     public void ExtIntrAMod() {
         string[] code = [
             "      FUNCTION RAMOD",
-            "        RETURN AMOD(97.75, 4.75)",
+            "        RAMOD=AMOD(97.75, 4.75)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -289,7 +289,7 @@ public class IntrinsicsTests {
             "      END",
             "      FUNCTION DATAN2",
             "        DOUBLE PRECISION DATAN2",
-            "        RETURN ATAN2(-71.2D0,9.3D0)",
+            "        DATAN2=ATAN2(-71.2D0,9.3D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -309,7 +309,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION RCABS",
             "        REAL RCABS",
-            "        RETURN CABS((-12,3))",
+            "        RCABS=CABS((-12,3))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -327,7 +327,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION RCCOS",
             "        COMPLEX RCCOS",
-            "        RETURN CCOS((32,1))",
+            "        RCCOS=CCOS((32,1))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -363,7 +363,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION RCLOG",
             "        COMPLEX RCLOG",
-            "        RETURN CLOG((32,1))",
+            "        RCLOG=CLOG((32,1))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -381,7 +381,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION CCMPLX",
             "        COMPLEX CCMPLX",
-            "        RETURN CMPLX(65,12)",
+            "        CCMPLX=CMPLX(65,12)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -409,7 +409,7 @@ public class IntrinsicsTests {
             "      END",
             "      FUNCTION CCOS",
             "        COMPLEX CCOS",
-            "        RETURN COS((12,3))",
+            "        CCOS=COS((12,3))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -430,7 +430,7 @@ public class IntrinsicsTests {
     public void ExtIntrCosh() {
         string[] code = [
             "      FUNCTION RCOSH",
-            "        RETURN COSH(0.8)",
+            "        RCOSH=COSH(0.8)",
             "      END",
             "      FUNCTION DCOSH",
             "        DOUBLE PRECISION DCOSH, V",
@@ -456,7 +456,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION CCSIN",
             "        COMPLEX CCSIN",
-            "        RETURN CSIN((32,1))",
+            "        CCSIN=CSIN((32,1))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -474,7 +474,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION CCSQRT",
             "        COMPLEX CCSQRT",
-            "        RETURN CSQRT((49,5))",
+            "        CCSQRT=CSQRT((49,5))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -568,7 +568,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION DDATAN2",
             "        DOUBLE PRECISION DDATAN2",
-            "        RETURN DATAN2(0.5D0, 0.45D0)",
+            "        DDATAN2=DATAN2(0.5D0, 0.45D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -586,19 +586,19 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION DDBLEI",
             "        DOUBLE PRECISION DDBLEI",
-            "        RETURN DBLE(12)",
+            "        DDBLEI=DBLE(12)",
             "      END",
             "      FUNCTION DDBLER",
             "        DOUBLE PRECISION DDBLER",
-            "        RETURN DBLE(12.5)",
+            "        DDBLER=DBLE(12.5)",
             "      END",
             "      FUNCTION DDBLED",
             "        DOUBLE PRECISION DDBLED",
-            "        RETURN DBLE(13.0D2)",
+            "        DDBLED=DBLE(13.0D2)",
             "      END",
             "      FUNCTION DDBLEC",
             "        DOUBLE PRECISION DDBLEC",
-            "        RETURN DBLE((13,5))",
+            "        DDBLEC=DBLE((13,5))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -640,7 +640,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION DDCOSH",
             "        DOUBLE PRECISION DDCOSH",
-            "        RETURN DCOSH(0.147D0)",
+            "        DDCOSH=DCOSH(0.147D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -658,19 +658,19 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION REXP",
             "        REAL REXP",
-            "        RETURN EXP(3.2)",
+            "        REXP=EXP(3.2)",
             "      END",
             "      FUNCTION RDEXP",
             "        DOUBLE PRECISION RDEXP",
-            "        RETURN EXP(3.2D0)",
+            "        RDEXP=EXP(3.2D0)",
             "      END",
             "      FUNCTION DDEXP",
             "        DOUBLE PRECISION DDEXP",
-            "        RETURN DEXP(3.2D0)",
+            "        DDEXP=DEXP(3.2D0)",
             "      END",
             "      FUNCTION CCEXP",
             "        COMPLEX CCEXP",
-            "        RETURN EXP((3.2,0))",
+            "        CCEXP=EXP((3.2,0))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -694,7 +694,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION DDINT",
             "        DOUBLE PRECISION DDINT",
-            "        RETURN DINT(89.38D0)",
+            "        DDINT=DINT(89.38D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -819,7 +819,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION DDSINH",
             "        DOUBLE PRECISION DDSINH",
-            "        RETURN DSINH(0.147D0)",
+            "        DDSINH=DSINH(0.147D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -837,7 +837,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION DDSQRT",
             "        DOUBLE PRECISION DDSQRT",
-            "        RETURN DSQRT(49D0)",
+            "        DDSQRT=DSQRT(49D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -874,7 +874,7 @@ public class IntrinsicsTests {
         string[] code = [
             "      FUNCTION DDTANH",
             "        DOUBLE PRECISION DDTANH",
-            "        RETURN DTANH(0.147D0)",
+            "        DDTANH=DTANH(0.147D0)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -891,7 +891,7 @@ public class IntrinsicsTests {
     public void ExtIntrFloat() {
         string[] code = [
             "      FUNCTION RFLOATI",
-            "        RETURN FLOAT(12)",
+            "        RFLOATI=FLOAT(12)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -907,10 +907,10 @@ public class IntrinsicsTests {
     public void ExtIntrIabs() {
         string[] code = [
             "      FUNCTION ITEST1",
-            "        RETURN IABS(-12)",
+            "        ITEST1=IABS(-12)",
             "      END",
             "      FUNCTION ITEST2",
-            "        RETURN IABS(73)",
+            "        ITEST2=IABS(73)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -928,12 +928,12 @@ public class IntrinsicsTests {
     public void ExtIntrIchar() {
         string[] code = [
             "      FUNCTION ITEST1",
-            "        RETURN ICHAR(\"foo\")",
+            "        ITEST1=ICHAR(\"foo\")",
             "      END",
             "      FUNCTION ITEST2",
             "        CHARACTER *3 STR1",
             "        STR1 = 'HELLO'",
-            "        RETURN ICHAR(STR1)",
+            "        ITEST2=ICHAR(STR1)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -951,7 +951,7 @@ public class IntrinsicsTests {
     public void ExtIntrIdint() {
         string[] code = [
             "      FUNCTION ITEST",
-            "        RETURN IDINT(12.45D1)",
+            "        ITEST=IDINT(12.45D1)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -967,10 +967,10 @@ public class IntrinsicsTests {
     public void ExtIntrIfix() {
         string[] code = [
             "      FUNCTION ITEST",
-            "        RETURN IFIX(12.45E1)",
+            "        ITEST=IFIX(12.45E1)",
             "      END",
             "      FUNCTION ITEST2",
-            "        RETURN INT(12.45E1)",
+            "        ITEST2=INT(12.45E1)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -988,16 +988,16 @@ public class IntrinsicsTests {
     public void ExtIntrInt() {
         string[] code = [
             "      FUNCTION JINTI",
-            "        RETURN INT(12)",
+            "        JINTI=INT(12)",
             "      END",
             "      FUNCTION JINTR",
-            "        RETURN INT(12.5)",
+            "        JINTR=INT(12.5)",
             "      END",
             "      FUNCTION JINTD",
-            "        RETURN INT(13.0D2)",
+            "        JINTD=INT(13.0D2)",
             "      END",
             "      FUNCTION JINTC",
-            "        RETURN INT((13,5))",
+            "        JINTC=INT((13,5))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -1019,15 +1019,15 @@ public class IntrinsicsTests {
     public void ExtIntrLen() {
         string[] code = [
             "      FUNCTION ITEST1",
-            "        RETURN LEN('HALO3')",
+            "        ITEST1=LEN('HALO3')",
             "      END",
             "      FUNCTION ITEST2",
-            "        RETURN LEN('')",
+            "        ITEST2=LEN('')",
             "      END",
             "      FUNCTION ITEST3",
             "        CHARACTER *4 STR",
             "        STR='FORTRAN'//'77'",
-            "        RETURN LEN(STR)",
+            "        ITEST3=LEN(STR)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -1058,7 +1058,7 @@ public class IntrinsicsTests {
             "      END",
             "      FUNCTION CCLOG",
             "        COMPLEX CCLOG",
-            "        RETURN LOG((12,3))",
+            "        CCLOG=LOG((12,3))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -1079,16 +1079,16 @@ public class IntrinsicsTests {
     public void ExtIntrReal() {
         string[] code = [
             "      FUNCTION DREALI",
-            "        RETURN REAL(12)",
+            "        DREALI=REAL(12)",
             "      END",
             "      FUNCTION DREALR",
-            "        RETURN REAL(12.5)",
+            "        DREALR=REAL(12.5)",
             "      END",
             "      FUNCTION DREALD",
-            "        RETURN REAL(13.0D2)",
+            "        DREALD=REAL(13.0D2)",
             "      END",
             "      FUNCTION DREALC",
-            "        RETURN REAL((13,5))",
+            "        DREALC=REAL((13,5))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -1121,7 +1121,7 @@ public class IntrinsicsTests {
             "      END",
             "      FUNCTION CSIN",
             "        COMPLEX CSIN",
-            "        RETURN SIN((12,3))",
+            "        CSIN=SIN((12,3))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -1142,7 +1142,7 @@ public class IntrinsicsTests {
     public void ExtIntrSinh() {
         string[] code = [
             "      FUNCTION RSINH",
-            "        RETURN SINH(0.8)",
+            "        RSINH=SINH(0.8)",
             "      END",
             "      FUNCTION DSINH",
             "        DOUBLE PRECISION DSINH, V",
@@ -1167,7 +1167,7 @@ public class IntrinsicsTests {
     public void ExtIntrSngl() {
         string[] code = [
             "      FUNCTION RTEST",
-            "        RETURN SNGL(12.45D1)",
+            "        RTEST=SNGL(12.45D1)",
             "      END"
         ];
         FortranOptions opts = new();
@@ -1194,7 +1194,7 @@ public class IntrinsicsTests {
             "      END",
             "      FUNCTION CSQRT",
             "        COMPLEX CSQRT",
-            "        RETURN SQRT((12,3))",
+            "        CSQRT=SQRT((12,3))",
             "      END"
         ];
         FortranOptions opts = new();
@@ -1241,7 +1241,7 @@ public class IntrinsicsTests {
     public void ExtIntrTanh() {
         string[] code = [
             "      FUNCTION RTANH",
-            "        RETURN TANH(0.8)",
+            "        RTANH=TANH(0.8)",
             "      END",
             "      FUNCTION DTANH",
             "        DOUBLE PRECISION DTANH, V",

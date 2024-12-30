@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -74,27 +74,27 @@ public class FormatTests {
             "      FUNCTION EXPTEST1",
             "        CHARACTER*7 STR, EXPTEST1",
             "        WRITE (STR, \"E7.2\") 678912.0",
-            "        RETURN STR",
+            "        EXPTEST1=STR",
             "      END",
             "      FUNCTION EXPTEST2",
             "        CHARACTER*9 STR, EXPTEST2",
             "        WRITE (STR, \"E9.2\") -678912.0",
-            "        RETURN STR",
+            "        EXPTEST2=STR",
             "      END",
             "      FUNCTION EXPTEST3",
             "        CHARACTER*11 STR, EXPTEST3",
             "        WRITE (STR, \"E11.2E4\") -678912.0",
-            "        RETURN STR",
+            "        EXPTEST3=STR",
             "      END",
             "      FUNCTION EXPTEST4",
             "        CHARACTER*7 STR, EXPTEST4",
             "        WRITE (STR, \"E7.2\") 8.12D112",
-            "        RETURN STR",
+            "        EXPTEST4=STR",
             "      END",
             "      FUNCTION EXPTEST5",
             "        CHARACTER*8 STR, EXPTEST5",
             "        WRITE (STR, \"E8.2\") 8.12D3",
-            "        RETURN STR",
+            "        EXPTEST5=STR",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());

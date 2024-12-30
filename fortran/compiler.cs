@@ -1136,11 +1136,7 @@ public partial class Compiler : ICompiler {
                 }
             }
             else {
-                ParseNode exprNode = Expression();
-                if (!ValidateAssignmentTypes(thisSymbol.Type, exprNode.Type)) {
-                    Messages.Error(MessageCode.TYPEMISMATCH, "Type mismatch in RETURN statement");
-                }
-                node.ReturnExpression = exprNode;
+                Messages.Error(MessageCode.ALTRETURNNOTALLOWED, "Alternate return value not allowed");
             }
         }
         _hasReturn = true;

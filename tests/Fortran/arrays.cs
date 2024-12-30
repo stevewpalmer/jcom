@@ -57,7 +57,7 @@ public class ArrayTests {
             "        INTEGER A(2)",
             "        A(1) = 45",
             "        A(2) = 78",
-            "        RETURN A(1) + A(2)",
+            "        ITEST=A(1) + A(2)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -73,7 +73,7 @@ public class ArrayTests {
             "        A(-3) = 45",
             "        B = 4",
             "        A(B-2) = 78",
-            "        RETURN A(-3) + A(B-2)",
+            "        ITEST=A(-3) + A(B-2)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -93,7 +93,7 @@ public class ArrayTests {
             "      FUNCTION FOO(R)",
             "      PARAMETER (MAXVAL = 10)",
             "      REAL R(MAXVAL)",
-            "      RETURN R(2)",
+            "      FOO=R(2)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -114,7 +114,7 @@ public class ArrayTests {
             "      FUNCTION FOO(R,N)",
             "      INTEGER N",
             "      REAL R(N)",
-            "      RETURN R(N-8)",
+            "      FOO=R(N-8)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -144,9 +144,7 @@ public class ArrayTests {
 
     // Modifying the array dimensions passed as a parameter should
     // not modify the actual array dimensions.
-    //[Test]
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [Test]
     public void ArrayVerifyDimensions1() {
         string[] code = [
             "      FUNCTION TEST",
@@ -158,7 +156,7 @@ public class ArrayTests {
             "      INTEGER M,N",
             "      REAL R(M,N)",
             "      M=0",
-            "      RETURN R(2,2)",
+            "      FOO=R(2,2)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -177,7 +175,7 @@ public class ArrayTests {
             "      END",
             "      FUNCTION FOO(R)",
             "      REAL R(*)",
-            "      RETURN R(1)+R(2)",
+            "      FOO=R(1)+R(2)",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());

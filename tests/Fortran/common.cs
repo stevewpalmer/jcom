@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -75,7 +75,7 @@ public class CommonTests {
             "      COMMON A,B",
             "      COMMON // J,K",
             "      DATA A,B,J,K /12.0,78.0,-3,100/",
-            "      RETURN ITEST()",
+            "      ICOMMONTEST=ITEST()",
             "      END",
             "      FUNCTION ITEST",
             "      COMMON // X,Y,I,L",
@@ -98,7 +98,7 @@ public class CommonTests {
             "      COMMON /FOO/ J",
             "      COMMON // K,L",
             "      DATA A,B,J,K,L /12.0,78.0,-3,100,10/",
-            "      RETURN ITEST()",
+            "      ICOMMONTEST=ITEST()",
             "      END",
             "      FUNCTION ITEST",
             "      COMMON // X,Y /FOO/ M // I",

@@ -41,7 +41,7 @@ public class ArithmeticTests {
             "      PARAMETER (PI=3.1459, PI2=2*PI)",
             "        REAL A",
             "        A = (PI + PI2) / 3.0",
-            "        RETURN A*100",
+            "        ITEST=A*100",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -56,7 +56,7 @@ public class ArithmeticTests {
             "        INTEGER A",
             "        A = 20",
             "        B = A",
-            "        RETURN A+B",
+            "        TEST= A+B",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -71,7 +71,7 @@ public class ArithmeticTests {
             "        INTEGER A,B",
             "        A = 4543",
             "        B = 784",
-            "        RETURN A-B",
+            "        ITEST=A-B",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -87,7 +87,7 @@ public class ArithmeticTests {
             "        INTEGER B",
             "        A = 90",
             "        B = 45",
-            "        RETURN A*B",
+            "        ITEST=A*B",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -103,7 +103,7 @@ public class ArithmeticTests {
             "        REAL B",
             "        A = 35.60",
             "        B = 1.78",
-            "        RETURN A/B",
+            "        TEST=A/B",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -115,7 +115,7 @@ public class ArithmeticTests {
     public void ArithImplicitPrecedence1() {
         string[] code = [
             "      FUNCTION TEST",
-            "        RETURN 10 + 4 * 6",
+            "        TEST=10 + 4 * 6",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -128,7 +128,7 @@ public class ArithmeticTests {
     public void ArithImplicitPrecedence2() {
         string[] code = [
             "      FUNCTION TEST",
-            "        RETURN 10 ** 3 * 2",
+            "        TEST=10 ** 3 * 2",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
@@ -145,7 +145,7 @@ public class ArithmeticTests {
             "        INTEGER I,J",
             "        I = 10",
             "        J = 0",
-            "        RETURN I/J",
+            "        ITEST=I/J",
             "      END"
         ];
 
@@ -163,7 +163,7 @@ public class ArithmeticTests {
             "      FUNCTION SIMPLIFY1",
             "        REAL LH",
             "        LH=16",
-            "        RETURN LH**(-1) + LH**0 + LH**1",
+            "        SIMPLIFY1=LH**(-1) + LH**0 + LH**1",
             "      END"
         ];
         Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
