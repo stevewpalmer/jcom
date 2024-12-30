@@ -217,7 +217,7 @@ public static partial class Intrinsics {
     }
 
     /// <summary>
-    /// Lexical comparison using ASCII character code: returns true if arg1 > = arg2..
+    /// Lexical comparison using ASCII character code: returns true if arg1 > = arg2.
     /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
@@ -227,7 +227,7 @@ public static partial class Intrinsics {
     }
 
     /// <summary>
-    /// Lexical comparison using ASCII character code: returns true if arg1 > = arg2..
+    /// Lexical comparison using ASCII character code: returns true if arg1 > = arg2.
     /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
@@ -239,7 +239,7 @@ public static partial class Intrinsics {
     }
 
     /// <summary>
-    /// Lexical comparison using ASCII character code: returns true if arg1 > arg2..
+    /// Lexical comparison using ASCII character code: returns true if arg1 > arg2.
     /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
@@ -249,7 +249,7 @@ public static partial class Intrinsics {
     }
 
     /// <summary>
-    /// Lexical comparison using ASCII character code: returns true if arg1 > arg2..
+    /// Lexical comparison using ASCII character code: returns true if arg1 > arg2.
     /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>

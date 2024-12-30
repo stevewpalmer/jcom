@@ -313,7 +313,7 @@ public partial class Compiler {
 
     // RETURN
     //
-    // RETURN [<expression>]
+    //   RETURN [<expression>]
     //
     // Assigns the value specified after the RETURN to the function and returns control to the calling
     // statement. RETURN may also be used to terminate a procedure early. An expression is not allowed
@@ -974,7 +974,7 @@ public partial class Compiler {
     // REPORTs an error where <errnum> is an optional error number taken
     // from MessageCode. If REPORT is used within a TRAP handler then the
     // error is caught and _ERR and _ERRTEXT will be assigned the
-    // specified errnum and it's associated message.
+    // specified errnum, and it's associated message.
     //
     private ExtCallParseNode KReport() {
 
@@ -1019,7 +1019,7 @@ public partial class Compiler {
     //
     // Syntax: PAGE
     //
-    // Clears the screen and puts the cursor at the top left corner (1,1). If output is to another device,
+    // Clears the screen and puts the cursor in the top left corner (1,1). If output is to another device,
     // a CHR$(12) is sent (form feed).
     //
     private static ExtCallParseNode KPage() {

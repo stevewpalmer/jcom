@@ -357,9 +357,9 @@ public partial class Compiler {
     //
     // Syntax: PRINT [AT <row>,<col>:) [USING <form>:] <list>[<mark>)
     //
-    // Prints items as specified. More than one item may be specified in one PRINT statement, separated by a ,
-    // or ;. A comma is a null separator (no spaces between items). A semicolon ; prints spaces to the next
-    // zone (one space by default if ZONE has not been specified).
+    // Prints items as specified. More than one item may be specified in one PRINT statement, separated by a
+    // comma or semicolon. A comma is a null separator (no spaces between items). A semicolon ; prints
+    // spaces to the next zone (one space by default if ZONE has not been specified).
     //
     private ExtCallParseNode KPrint() {
         VarArgParseNode varargs = new();
