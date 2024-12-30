@@ -63,7 +63,7 @@ public static class FileManager {
         if (file == null) {
             throw new JComRuntimeException(JComRuntimeErrors.FILE_NOT_OPEN);
         }
-        return file.ReadChars(count);
+        return file.GetChars(count);
     }
 
     /// <summary>

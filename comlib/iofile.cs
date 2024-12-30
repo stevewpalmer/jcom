@@ -80,7 +80,7 @@ public sealed class StdoutIOFile() : IOFile(IOConstant.Stdout) {
     /// <summary>
     /// Write a string to the console. Note that the string is treated as a single line
     /// and includes an implied newline if the output device is not direct access. Any
-    /// embedded newlines are written but do not contribute the the record count.
+    /// embedded newlines are written but do not contribute to the record count.
     /// </summary>
     /// <param name="str">The string to write</param>
     /// <param name="carriageAtEnd">Whether to write a newline at the end</param>
@@ -193,6 +193,7 @@ public class IOFile : IDisposable {
     private int _recordLength;
     private int _recordIndex = 1;
     private int _readIndex;
+    private char _pushedChar;
 
     /// <summary>
     /// The system file handle object obtained by the Open statement.
@@ -268,7 +269,7 @@ public class IOFile : IDisposable {
 
     /// <summary>
     /// Return the next available free file number. This is absolutely NOT thread
-    /// safe for obvious reasons but it attempts to avoid collisions by generating
+    /// safe for obvious reasons, but it attempts to avoid collisions by generating
     /// a random iodevice not in the _filemap table from a range large enough to
     /// be unique.
     /// </summary>
@@ -474,7 +475,7 @@ public class IOFile : IDisposable {
     /// <summary>
     /// Write a string to the device. Note that the string is treated as a single line
     /// and includes an implied newline if the output device is not direct access. Any
-    /// embedded newlines are written but do not contribute the the record count.
+    /// embedded newlines are written but do not contribute to the record count.
     /// </summary>
     /// <param name="str">The string to write</param>
     /// <param name="carriageAtEnd">Whether a carriage return is appended</param>
@@ -506,6 +507,20 @@ public class IOFile : IDisposable {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         string value = string.Empty;
         ReadCharacters(ref value, count);
+        return value;
+    }
+
+    /// <summary>
+    /// Get the specified number of characters from a formatted file
+    /// stream. Unlike ReadChars, this method returns non-printing characters
+    /// and ignores any formatting.
+    /// </summary>
+    /// <param name="count">The number of characters to read</param>
+    /// <returns>The string read</returns>
+    public virtual string GetChars(int count) {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        string value = string.Empty;
+        GetCharacters(ref value, count);
         return value;
     }
 
@@ -599,7 +614,7 @@ public class IOFile : IDisposable {
     }
 
     /// <summary>
-    /// Write an float to the file stream.
+    /// Write a float to the file stream.
     /// </summary>
     /// <param name="value">The float value to write</param>
     /// <returns>The number of bytes written</returns>
@@ -700,11 +715,31 @@ public class IOFile : IDisposable {
     }
 
     /// <summary>
+    /// Read raw characters from the data file. This operation is only
+    /// permitted on formatted files. The use on an unformatted file will
+    /// result in an exception being thrown.
+    /// </summary>
+    /// <param name="strValue">A reference to the string to be set</param>
+    /// <param name="count">Maximum number of characters to read</param>
+    /// <returns>None</returns>
+    public void GetCharacters(ref string strValue, int count) {
+        ObjectDisposedException.ThrowIf(_isDisposed, this);
+        if (!IsFormatted) {
+            throw new InvalidOperationException("Cannot GET from an unformatted file");
+        }
+        StringBuilder strBuilder = new();
+        while (count-- > 0) {
+            char ch = ReadChar();
+            strBuilder.Append(ch);
+        }
+        strValue = strBuilder.ToString();
+    }
+
+    /// <summary>
     /// Read a given number of characters from the data file.
     /// </summary>
     /// <param name="strValue">A reference to the string to be set</param>
     /// <param name="count">Maximum number of characters to read</param>
-    /// <returns>The number of bytes read</returns>
     public void ReadCharacters(ref string strValue, int count) {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         if (IsFormatted) {
@@ -736,7 +771,7 @@ public class IOFile : IDisposable {
     }
 
     /// <summary>
-    /// Read a string from an formatted data file into a fixed string.
+    /// Read a string from a formatted data file into a fixed string.
     /// The string is truncated to fit the fixed string length.
     /// </summary>
     /// <param name="strValue">A reference to the string to be set</param>
@@ -826,7 +861,9 @@ public class IOFile : IDisposable {
     public bool IsEndOfFile {
         get {
             if (IsFormatted) {
-                return PeekChar() == EOF;
+                char ch = ReadChar();
+                PushChar(ch);
+                return ch == EOF;
             }
             return Handle.Position == Handle.Length;
         }
@@ -979,7 +1016,7 @@ public class IOFile : IDisposable {
     }
 
     // Write a string encoded into the supported output format for the data file. If the string
-    // is less than charsToWrite, it is left padded with spaces. Otherwise if it is longer then
+    // is less than charsToWrite, it is left padded with spaces. Otherwise, if it is longer then
     // it is truncated.
     private void WriteEncodedString(string strToWrite, int charsToWrite) {
         int count = Math.Min(Encoding.ASCII.GetByteCount(strToWrite), charsToWrite);
@@ -1153,19 +1190,21 @@ public class IOFile : IDisposable {
         }
     }
 
+    // Push the specified character back into the input queue
+    private void PushChar(char ch) {
+        _pushedChar = ch;
+    }
+
     // Reads the next character from the input, triggering a load from the
     // input source if this is the first time ReadChar is called.
     private char ReadChar() {
-        char ch = PeekChar();
-        if (ch != EOF && ch != EOL) {
-            ++_readIndex;
-        }
-        return ch;
-    }
-
-    // Peek at the next character in the source
-    private char PeekChar() {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
+        char ch;
+        if (_pushedChar != '\0') {
+            ch = _pushedChar;
+            _pushedChar = '\0';
+            return ch;
+        }
         if (_readIndex == -1) {
             ReadNextLine();
             if (_line == null) {
@@ -1177,7 +1216,11 @@ public class IOFile : IDisposable {
             _readIndex = -1;
             return EOL;
         }
-        return _line[_readIndex];
+        ch = _line[_readIndex];
+        if (ch != EOF && ch != EOL) {
+            ++_readIndex;
+        }
+        return ch;
     }
 
     // Read the next line from the input.
