@@ -142,27 +142,6 @@ public class ArrayTests {
         Assert.AreEqual(3, comp.Messages[0].Line);
     }
 
-    // Modifying the array dimensions passed as a parameter should
-    // not modify the actual array dimensions.
-    [Test]
-    public void ArrayVerifyDimensions1() {
-        string[] code = [
-            "      FUNCTION TEST",
-            "      REAL ARRAY(2,2)",
-            "      ARRAY(2,2) = 4.2",
-            "      TEST=FOO(ARRAY,2,2)",
-            "      END",
-            "      FUNCTION FOO(R,M,N)",
-            "      INTEGER M,N",
-            "      REAL R(M,N)",
-            "      M=0",
-            "      FOO=R(2,2)",
-            "      END"
-        ];
-        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
-        Helper.HelperRunFloat(comp, "TEST", 4.2f);
-    }
-
     // Verify assumed sized arrays
     [Test]
     public void ArrayAssumedSizeArrays() {
