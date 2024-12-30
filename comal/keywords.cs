@@ -711,8 +711,10 @@ public partial class Compiler {
             Err = Globals.Get(Consts.ErrName),
             Message = Globals.Get(Consts.ErrText)
         };
-        CompileBlock(parseNode.Body, [TokenID.KENDTRAP, TokenID.KHANDLER]);
-        CompileBlock(parseNode.Handler, [TokenID.KENDTRAP]);
+        TokenID endToken = CompileBlock(parseNode.Body, [TokenID.KENDTRAP, TokenID.KHANDLER]);
+        if (endToken != TokenID.KENDTRAP) {
+            CompileBlock(parseNode.Handler, [TokenID.KENDTRAP]);
+        }
         return parseNode;
     }
 
