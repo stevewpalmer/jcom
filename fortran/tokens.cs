@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -235,6 +235,7 @@ public static class Tokens {
             case TokenID.DIVIDE: return "/";
             case TokenID.PLUS: return "+";
             case TokenID.MINUS: return "-";
+            case TokenID.CONCAT: return "//";
             case TokenID.EOL: return "end of line";
             case TokenID.ENDOFFILE: return "end of file";
         }
