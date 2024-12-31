@@ -10,7 +10,7 @@
         <Title>Accounts</Title>
         <Authors>Steven Palmer</Authors>
         <Description>Simple personal accounts management program</Description>
-        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
+        <Copyright>(c) Steven Palmer 2013-2025</Copyright>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <LangVersion>default</LangVersion>
     </PropertyGroup>

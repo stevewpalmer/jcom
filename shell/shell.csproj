@@ -10,7 +10,7 @@
         <ReleaseVersion>0.3</ReleaseVersion>
         <RootNamespace>JShell</RootNamespace>
         <Description>Shell</Description>
-        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
+        <Copyright>(c) Steven Palmer 2013-2025</Copyright>
         <Title>Shell</Title>
         <Authors>Steven Palmer</Authors>
         <Nullable>enable</Nullable>

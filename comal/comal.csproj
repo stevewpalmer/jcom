@@ -7,7 +7,7 @@
         <LangVersion>default</LangVersion>
         <ReleaseVersion>0.3</ReleaseVersion>
         <Description>Comal</Description>
-        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
+        <Copyright>(c) Steven Palmer 2013-2025</Copyright>
         <RootNamespace>JComal</RootNamespace>
         <Title>Comal Compiler</Title>
         <Authors>Steven Palmer</Authors>

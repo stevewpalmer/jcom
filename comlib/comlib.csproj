@@ -12,7 +12,7 @@
         <Title>Common Library</Title>
         <Authors>Steven Palmer</Authors>
         <Description>Common Library</Description>
-        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
+        <Copyright>(c) Steven Palmer 2013-2025</Copyright>
     </PropertyGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">

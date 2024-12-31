@@ -29,7 +29,7 @@ The full list of command line arguments can be viewed by specifying the
 
 ```
 $ comal --help
-Comal 1.0.0 (c) Steven Palmer 2013-2024
+Comal 1.0.0 (c) Steven Palmer 2013-2025
 comal [options] [source-files]
 --help              Lists all compiler options (short: -h)
 --version           Display compiler version (short: -v)

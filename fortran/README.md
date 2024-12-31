@@ -14,7 +14,7 @@ The full list of command line arguments can be viewed by specifying the
 
 ```
 $ fort --help
-Fortran Compiler 1.0.0 (c) Steven Palmer 2013-2024
+Fortran Compiler 1.0.0 (c) Steven Palmer 2013-2025
 fort [options] [source-files]
    --help              Lists all compiler options (short: -h)
    --version           Display compiler version (short: -v)

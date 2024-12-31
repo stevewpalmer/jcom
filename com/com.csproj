@@ -11,7 +11,7 @@
         <Title>Core Compiler</Title>
         <Authors>Steven Palmer</Authors>
         <Description>Core Compiler</Description>
-        <Copyright>(c) Steven Palmer 2013-2024</Copyright>
+        <Copyright>(c) Steven Palmer 2013-2025</Copyright>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\comlib\comlib.csproj"/>
