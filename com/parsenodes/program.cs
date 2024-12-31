@@ -299,10 +299,15 @@ public class ProgramParseNode : ParseNode {
     /// <param name="rowCounts">The row counts of all tables that the associated type system metadata contain</param>
     /// <param name="entryPointHandle">Handle of the entrypoint method</param>
     /// <returns>A DebugDirectoryBuilder</returns>
-    private static DebugDirectoryBuilder GeneratePdb(MetadataBuilder pdbBuilder, ImmutableArray<int> rowCounts, MethodDefinitionHandle entryPointHandle) {
+    private DebugDirectoryBuilder GeneratePdb(MetadataBuilder pdbBuilder, ImmutableArray<int> rowCounts, MethodDefinitionHandle entryPointHandle) {
         BlobBuilder portablePdbBlob = new();
         PortablePdbBuilder portablePdbBuilder = new(pdbBuilder, rowCounts, entryPointHandle);
         DebugDirectoryBuilder debugDirectoryBuilder = new();
+
+        BlobContentId pdbContentId = portablePdbBuilder.Serialize(portablePdbBlob);
+        string filename = Path.ChangeExtension(OutputFile, "pdb");
+        debugDirectoryBuilder.AddCodeViewEntry(filename, pdbContentId, portablePdbBuilder.FormatVersion);
+
         debugDirectoryBuilder.AddEmbeddedPortablePdbEntry(portablePdbBlob, portablePdbBuilder.FormatVersion);
         return debugDirectoryBuilder;
     }
@@ -622,9 +627,6 @@ public class ProgramParseNode : ParseNode {
     }
 
     // Sets the filename in the debug info.
-    [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Local")]
-    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     private void SetCurrentDocument(string filename) {
         _currentDoc = Builder.DefineDocument(filename, Guid.Empty, Guid.Empty, Guid.Empty);
     }
