@@ -407,7 +407,9 @@ public static class Tokens {
             case TokenID.KINCSUB:
                 return ":-";
             case TokenID.STRING:
-                return "a string";
+                return "string";
+            case TokenID.REAL:
+                return "number";
             case TokenID.INTEGER:
                 return "an integer";
             case TokenID.IDENT:

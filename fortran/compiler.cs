@@ -186,7 +186,9 @@ public partial class Compiler : ICompiler {
             if (_opts.DevMode) {
                 throw;
             }
-            Messages.Error(MessageCode.COMPILERFAILURE, $"Compiler error: {e.Message}");
+            if (e is not ApplicationException) {
+                Messages.Error(MessageCode.COMPILERFAILURE, $"Compiler error: {e.Message}");
+            }
         }
     }
 
