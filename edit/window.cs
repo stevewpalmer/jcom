@@ -1302,7 +1302,12 @@ public partial class Window {
     /// <returns>Render hint</returns>
     private RenderHint EndOfCurrentLine() {
         RenderHint flags = SaveLastMarkPoint();
-        Buffer.Offset = Buffer.GetLine(Buffer.LineIndex).Length - 1;
+        string line = Buffer.GetLine(Buffer.LineIndex);
+        int offset = line.Length;
+        if (offset > 0 && line[offset - 1] == Consts.EndOfLine) {
+            --offset;
+        }
+        Buffer.Offset = offset;
         return flags | CursorFromOffset();
     }
 

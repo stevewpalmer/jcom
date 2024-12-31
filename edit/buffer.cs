@@ -282,8 +282,12 @@ public class Buffer {
     /// <returns>A StringBuilder object initialised with the line contents</returns>
     private StringBuilder PrepareLine() {
         StringBuilder line = new(_lines[LineIndex]);
-        if (Offset >= line.Length) {
-            int count = Math.Max(0, line.Length - 1);
+        int length = line.Length;
+        if (length > 0 && line[^1] != Consts.EndOfLine) {
+            ++length;
+        }
+        if (Offset >= length) {
+            int count = Math.Max(0, length - 1);
             while (count < Offset) {
                 line.Insert(count++, ' ');
             }
