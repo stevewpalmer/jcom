@@ -234,6 +234,9 @@ public partial class Compiler {
         }
 
         IdentifierToken identToken = ParseIdentifier();
+        if (identToken == null) {
+            return node;
+        }
 
         while (true) {
             IdentifierParseNode identNode = ParseIdentifierFromToken(identToken);

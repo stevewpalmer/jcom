@@ -327,7 +327,9 @@ public partial class Compiler : ICompiler {
             if (_opts.DevMode || _opts.Interactive) {
                 throw;
             }
-            Messages.Error(MessageCode.COMPILERFAILURE, $"Compiler error: {e.Message}");
+            if (e is not ApplicationException) {
+                Messages.Error(MessageCode.COMPILERFAILURE, $"Compiler error: {e.Message}");
+            }
         }
     }
 
@@ -898,7 +900,7 @@ public partial class Compiler : ICompiler {
     }
 
     // Returns the block state to which the specified token belongs.
-    private static BlockState TokenToState(SimpleToken token) {
+    private BlockState TokenToState(SimpleToken token) {
         BlockState state = BlockState.NONE;
         switch (token.ID) {
             case TokenID.KMODULE:
@@ -955,7 +957,7 @@ public partial class Compiler : ICompiler {
                 break;
 
             default:
-                Debug.Assert(false, $"Unhandled token {token.ID} in TokenToState");
+                Messages.Error(MessageCode.UNEXPECTEDTOKEN, $"Unexpected {token.ID} found in statement");
                 break;
         }
         return state;
