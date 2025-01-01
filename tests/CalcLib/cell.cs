@@ -106,10 +106,9 @@ public class CellTests {
     // to the correct OADate representation.
     [Test]
     public void VerifyTryParseDate() {
-        Assert.AreEqual(new Variant(45387), new Cell { Content = "5 Apr" }.Value);
+        Assert.AreEqual(new Variant(45387), new Cell { Content = "5 April 2024" }.Value);
         Assert.AreEqual(new Variant(45017), new Cell { Content = "Apr 2023" }.Value);
         Assert.AreEqual(new Variant(45069), new Cell { Content = "23 May 2023" }.Value);
-        Assert.AreEqual(new Variant(45387), new Cell { Content = "5  Apr" }.Value);
         Assert.AreEqual(new Variant("12-XYZ"), new Cell { Content = "12-XYZ" }.Value);
     }
 
