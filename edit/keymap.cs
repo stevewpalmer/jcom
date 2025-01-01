@@ -327,7 +327,7 @@ public class KeyMap {
         new() { KeyCommand = KeyCommand.KC_CUT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.X },
         new() { KeyCommand = KeyCommand.KC_CWINDOWBOTTOM, KeyChar = 8747 },
         new() { KeyCommand = KeyCommand.KC_CWINDOWBOTTOM, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.End },
-        new() { KeyCommand = KeyCommand.KC_CWINDOWCENTRE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.W },
+        new() { KeyCommand = KeyCommand.KC_CWINDOWCENTRE, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.Q },
         new() { KeyCommand = KeyCommand.KC_CWINDOWTOP, KeyChar = 8224 },
         new() { KeyCommand = KeyCommand.KC_CWINDOWTOP, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.Home },
         new() { KeyCommand = KeyCommand.KC_CWORDLEFT, Modifiers = ConsoleModifiers.Control, Key = ConsoleKey.LeftArrow },

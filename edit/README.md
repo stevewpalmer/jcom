@@ -61,7 +61,7 @@ offending line. You can step through each error with the F3 key.
 | Screen Up                | Ctrl+E                   | Ctrl+E                   |
 | Line to Top of Window    | Ctrl+T                   | Ctrl+T                   |
 | Line to Bottom of Window | Ctrl+B                   | Ctrl+B                   |
-| Centre Screen            | Ctrl+C                   | Ctrl+W                   |
+| Centre Screen            | Ctrl+C                   | Ctrl+Q                   |
 | Mark                     | Alt+M                    | Alt+M                    |
 | Mark Line                | Alt+L                    | Alt+L                    |
 | Mark Column              | Alt+C                    | Alt+C                    |
@@ -81,3 +81,4 @@ offending line. You can step through each error with the F3 key.
 | Translate Again          | Shift+F6                 | Alt+A                    |
 | Toggle Case Search       | Ctrl+F5                  | Ctrl+S                   |
 | Toggle RegEx Search      | Ctrl+F6                  | Ctrl+F                   |
+| Toggle Backup File       | Ctrl+W                   | Ctrl+W                   |
