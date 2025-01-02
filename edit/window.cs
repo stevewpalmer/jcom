@@ -196,7 +196,7 @@ public partial class Window {
         if (searchData.Next()) {
             MarkSearch(searchData);
         }
-        return RenderHint.NONE;
+        return RenderHint.CURSOR_STATUS;
     }
 
     /// <summary>
