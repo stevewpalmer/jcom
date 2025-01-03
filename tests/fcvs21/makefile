@@ -15,15 +15,15 @@ failures: $(FAILTESTS)
 run: $(ALLTESTS)
 	-rm run.out FORT.*
 	-for f in $(ALLTESTS); do $(JRUN) $$f; done >>run.out
-	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.FOR}.dat; done>>run.out
+	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.exe}.dat; done>>run.out
 	-grep "\sFAIL\s" run.out
 
 runall: $(ALLTESTS) $(ALLDATATESTS) $(INTTESTS) $(INTDATATESTS)
 	-rm run.out FORT.*
 	-for f in $(ALLTESTS); do $(JRUN) $$f; done >>run.out
-	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.FOR}.DAT; done>>run.out
+	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.exe}.DAT; done>>run.out
 	-for f in $(INTTESTS); do $(JRUN) $$f; done
-	-for f in $(INTDATATESTS); do $(JRUN) $$f < ./$${f%.FOR}.DAT; done
+	-for f in $(INTDATATESTS); do $(JRUN) $$f < ./$${f%.exe}.DAT; done
 	-grep "\sFAIL\s" run.out
 
 $(ALLTESTS) $(INTTESTS) $(ALLDATATESTS) $(INTDATATESTS): comlib.dll forlib.dll $(DROP)/fort
