@@ -209,6 +209,69 @@ public class Loops {
         Helper.HelperRunFloat(comp, "for'test'3", 30);
     }
 
+    // Test FOR loop with variable start value
+    [Test]
+    public void TestForLoopVarStart() {
+        const string code = @"
+                FUNC for'test'3 CLOSED
+                    total:=0
+                    START:=10
+                    FOR x=START TO 1 STEP -2 DO
+                        total:+x
+                    ENDFOR
+                    ISTART#:=10
+                    FOR x=ISTART TO -45 STEP -5 DO
+                        total:+x
+                    ENDFOR
+                    RETURN total
+                ENDFUNC
+            ";
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "for'test'3", -195);
+    }
+
+    // Test FOR loop with variable end value
+    [Test]
+    public void TestForLoopVarEnd() {
+        const string code = @"
+                FUNC for'test'3 CLOSED
+                    total:=0
+                    ENDS:=1
+                    FOR x=22 TO ENDS STEP -2 DO
+                        total:+x
+                    ENDFOR
+                    IENDS#:=10
+                    FOR x=30 TO -ENDS# STEP -5 DO
+                        total:+x
+                    ENDFOR
+                    RETURN total
+                ENDFUNC
+            ";
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "for'test'3", 237);
+    }
+
+    // Test FOR loop with variable step value
+    [Test]
+    public void TestForLoopVarStep() {
+        const string code = @"
+                FUNC for'test'3 CLOSED
+                    total:=0
+                    STEPS:=-2.5
+                    FOR x=400 TO -300 STEP STEPS DO
+                        total:+x
+                    ENDFOR
+                    STEPS#:=4
+                    FOR x=-40 TO 200 STEP STEPS# DO
+                        total:+x
+                    ENDFOR
+                    RETURN total
+                ENDFUNC
+            ";
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunFloat(comp, "for'test'3", 18930);
+    }
+
     // Test nested FOR loops
     [Test]
     public void TestForLoop4() {

@@ -300,22 +300,19 @@ public sealed class LoopParseNode : ParseNode {
         }
         if (StepExpression.IsConstant) {
             int stepValue = StepExpression.Value.IntValue;
-            emitter.LoadValue(sym.Type, new Variant(stepValue));
-            emitter.Add(sym.Type);
-            if (Math.Abs(stepValue) != 1) {
-                emitter.ConvertType(sym.Type, SymType.INTEGER);
-                emitter.LoadInteger(stepValue);
-                emitter.Div(SymType.INTEGER);
+            if (stepValue != 1) {
+                emitter.LoadValue(sym.Type, new Variant(stepValue));
+                emitter.Div(sym.Type);
             }
         }
         else {
             cg.GenerateExpression(emitter, sym.Type, StepExpression);
             emitter.Dup();
             emitter.StoreLocal(stepVar);
-            emitter.Add(sym.Type);
-            emitter.LoadLocal(stepVar);
             emitter.Div(sym.Type);
         }
         emitter.ConvertType(sym.Type, SymType.INTEGER);
+        emitter.LoadValue(SymType.INTEGER, new Variant(1));
+        emitter.Add(SymType.INTEGER);
     }
 }
