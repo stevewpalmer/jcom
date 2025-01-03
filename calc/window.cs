@@ -635,7 +635,7 @@ public class Window {
             new() {
                 Text = Calc.ExportFilename,
                 Type = FormFieldType.TEXT,
-                Width = 50,
+                Width = 0,
                 AllowFilenameCompletion = true,
                 FilenameCompletionFilter = $"*{Consts.CSVExtension}",
                 Value = new Variant(string.Empty)

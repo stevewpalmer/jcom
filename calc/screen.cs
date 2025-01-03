@@ -288,7 +288,7 @@ public static class Screen {
             new() {
                 Text = Calc.EnterWorksheetName,
                 Type = FormFieldType.TEXT,
-                Width = 50,
+                Width = 0,
                 Value = new Variant(_activeWindow.Sheet.Name)
             }
         ];
@@ -326,7 +326,7 @@ public static class Screen {
             new() {
                 Text = Calc.EnterSaveFilename,
                 Type = FormFieldType.TEXT,
-                Width = 50,
+                Width = 0,
                 AllowFilenameCompletion = true,
                 FilenameCompletionFilter = $"*{Book.DefaultExtension}",
                 Value = new Variant(_activeBook.Name)
@@ -372,7 +372,7 @@ public static class Screen {
                 new() {
                     Text = Calc.EnterEditFilename,
                     Type = FormFieldType.TEXT,
-                    Width = 50,
+                    Width = 0,
                     AllowFilenameCompletion = true,
                     FilenameCompletionFilter = $"*{Book.DefaultExtension}",
                     Value = new Variant(string.Empty)
@@ -403,7 +403,7 @@ public static class Screen {
             new() {
                 Text = Calc.EnterImportFilename,
                 Type = FormFieldType.TEXT,
-                Width = 50,
+                Width = 0,
                 AllowFilenameCompletion = true,
                 FilenameCompletionFilter = $"*{Consts.CSVExtension}",
                 Value = new Variant(string.Empty)
