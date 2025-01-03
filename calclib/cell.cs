@@ -481,6 +481,7 @@ public class Cell(Sheet? sheet) {
     /// applied.
     /// </summary>
     /// <returns>String contents of cell</returns>
+    [JsonIgnore]
     public string Text {
         get {
             string cellValue;
