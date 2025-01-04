@@ -563,7 +563,7 @@ public class CommandBar {
                             inputBuffer.Clear();
                             index = 0;
                         }
-                        if (inputBuffer.Count < currentField.Inner.Width) {
+                        if (inputBuffer.Count < currentField.MaxWidth) {
                             inputBuffer.Insert(index++, input.KeyChar);
                             allfiles = null;
                         }
