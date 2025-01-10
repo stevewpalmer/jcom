@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -87,8 +87,8 @@ public class FixedString : IEquatable<FixedString> {
         int length = existingString.Length;
         _fixedString = new char[length];
         Length = length;
-        RealLength = length;
         Set(existingString);
+        RealLength = existingString.RealLength;
     }
 
     /// <summary>
@@ -341,7 +341,7 @@ public class FixedString : IEquatable<FixedString> {
 
     /// <summary>
     /// Implements the equality operator between two fixed strings.
-    /// </summary>            
+    /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
     /// <returns>True if the two strings are equal, false otherwise</returns>
@@ -351,7 +351,7 @@ public class FixedString : IEquatable<FixedString> {
 
     /// <summary>
     /// Implements the non-equality operator between two fixed strings.
-    /// </summary>            
+    /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
     /// <returns>True if the two strings are different, false otherwise</returns>
@@ -375,7 +375,7 @@ public class FixedString : IEquatable<FixedString> {
 
     /// <summary>
     /// Overload the + operator on two fixed strings to concatenate them.
-    /// </summary>            
+    /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
     /// <returns>The combined string</returns>
@@ -403,6 +403,7 @@ public class FixedString : IEquatable<FixedString> {
         FixedString combinedString = new(length1 + length2);
         combinedString.Copy(0, s1);
         combinedString.Copy(length1, s2);
+        combinedString.RealLength = length1 + length2;
         return combinedString;
     }
 
