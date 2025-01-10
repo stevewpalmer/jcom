@@ -189,9 +189,7 @@ public class Interpreter {
                             break;
 
                         case TokenID.KRUN:
-                            Lines.Reset();
-                            ExecuteLines(opts, Lines);
-                            Lines.Reset();
+                            KRun(opts, line);
                             break;
 
                         case TokenID.KCON:
@@ -630,6 +628,22 @@ public class Interpreter {
         Console.WriteLine("Saved");
 
         IsModified = false;
+    }
+
+    // RUN
+    //
+    // Syntax: RUN [filename
+    //
+    // Runs the program in memory. If a filename is specified, the program
+    // is loaded from disk first.
+    //
+    private void KRun(ComalOptions opts, Line ls) {
+        if (!ls.IsAtEndOfLine) {
+            KLoad(ls);
+        }
+        Lines.Reset();
+        ExecuteLines(opts, Lines);
+        Lines.Reset();
     }
 
     // SCAN

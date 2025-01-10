@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -62,14 +62,12 @@ public class LineTokeniser {
                 case '7':
                 case '8':
                 case '9':
-                    PushChar(ch);
-                    tokens.Add(ParseNumber());
+                    tokens.Add(ParseNumber(ch));
                     break;
 
                 case '.':
                     if (char.IsDigit(PeekChar())) {
-                        PushChar(ch);
-                        tokens.Add(ParseNumber());
+                        tokens.Add(ParseNumber(ch));
                     }
                     break;
 
@@ -301,11 +299,10 @@ public class LineTokeniser {
     }
 
     // Parse a decimal number.
-    private SimpleToken ParseNumber() {
+    private SimpleToken ParseNumber(char ch) {
         StringBuilder str = new();
         bool isFloat = false;
 
-        char ch = GetChar();
         while (char.IsDigit(ch)) {
             str.Append(ch);
             ch = GetChar();

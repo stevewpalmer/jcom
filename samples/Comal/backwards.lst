@@ -1,0 +1,11 @@
+   10 PROC BACKWARDS(REF W$) CLOSED
+   20   LN:=LEN(W$)
+   30   DIM B$ OF 30
+   40   FOR I:=LN TO 1 STEP -1 DO B$:+W$(I)
+   50   W$:=B$
+   60 ENDPROC BACKWARDS
+   70 //
+   80 DIM B$ OF 30
+   90 INPUT "WORD (MAX. 30 CHAR.): ": B$
+  100 BACKWARDS(B$)
+  110 PRINT B$

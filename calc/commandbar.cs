@@ -412,6 +412,9 @@ public class CommandBar {
                 Terminal.Write(column, row, _displayWidth, _fgColour, _bgColour, $"{prompt}:");
                 column += labelWidth;
             }
+            if (width == 0) {
+                width = _displayWidth - column - 1;
+            }
             field.X = column;
             field.Y = row;
             field.MaxWidth = width;
@@ -560,7 +563,7 @@ public class CommandBar {
                             inputBuffer.Clear();
                             index = 0;
                         }
-                        if (inputBuffer.Count < currentField.Inner.Width) {
+                        if (inputBuffer.Count < currentField.MaxWidth) {
                             inputBuffer.Insert(index++, input.KeyChar);
                             allfiles = null;
                         }
