@@ -86,6 +86,43 @@ public class ProcFunc {
         Helper.HelperRunFloat(comp, "test1", 1);
     }
 
+    // Test calling a procedure with a string variable passes
+    // it by value by default.
+    [Test]
+    public void TestStringByVal() {
+        const string code = @"
+                FUNC test1$
+                  B$=""HELLO""
+                  PROC1(B$)
+                  RETURN B$
+                ENDFUNC test1$
+                PROC PROC1(W$)
+                  W$=""GOODBYE""
+                ENDPROC PROC1
+            ";
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunString(comp, "test1$", "HELLO");
+    }
+
+    // Test calling a procedure with a string variable passes
+    // it by value by default.
+    [Test]
+    public void TestStringByRef() {
+        const string code = @"
+                FUNC test1$
+                  DIM B$ OF 10
+                  B$=""HELLO""
+                  PROC1(B$)
+                  RETURN B$
+                ENDFUNC test1$
+                PROC PROC1(REF W$) CLOSED
+                  W$=""GOODBYE""
+                ENDPROC PROC1
+            ";
+        Compiler comp = ComalHelper.HelperCompile(code, new ComalOptions());
+        Helper.HelperRunString(comp, "test1$", "GOODBYE");
+    }
+
     // Test calling a function
     [Test]
     public void TestFunc2() {
