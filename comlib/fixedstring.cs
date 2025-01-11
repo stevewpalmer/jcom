@@ -59,7 +59,6 @@ public class FixedString : IEquatable<FixedString> {
         }
         _fixedString = new char[length];
         Length = length;
-        RealLength = 0;
         Empty();
     }
 
@@ -110,6 +109,7 @@ public class FixedString : IEquatable<FixedString> {
         for (int c = 0; c < Length; ++c) {
             _fixedString[c] = ' ';
         }
+        RealLength = 0;
     }
 
     /// <summary>
@@ -137,10 +137,10 @@ public class FixedString : IEquatable<FixedString> {
     }
 
     /// <summary>
-    /// Return the character at the specified index. Throws an ArgumentOutOfRange
+    /// Set or return the character at the specified index. Throws an ArgumentOutOfRange
     /// exception if the index is less than zero or outside the fixed string length.
     /// </summary>
-    /// <param name="index">Index of the character to return</param>
+    /// <param name="index">Index of the character to set or return</param>
     [IndexerName("Chars")]
     public char this[int index] {
         get {
@@ -153,6 +153,7 @@ public class FixedString : IEquatable<FixedString> {
             if (index < 0 || index >= Length) {
                 throw new IndexOutOfRangeException("index");
             }
+            RealLength = Math.Max(RealLength, index + 1);
             _fixedString[index] = value;
         }
     }
@@ -189,9 +190,6 @@ public class FixedString : IEquatable<FixedString> {
         while (start < Length && index2 < length) {
             newString[index2++] = _fixedString[start++];
         }
-        while (index2 < length) {
-            newString[index2++] = ' ';
-        }
         newString.RealLength = length;
         return newString;
     }
@@ -216,7 +214,7 @@ public class FixedString : IEquatable<FixedString> {
 
     /// <summary>
     /// Copies the specifies string into this string at the given range. The start
-    /// index must be 0 based and must not be larger than the end index. If the end
+    /// index must be 1 based and must not be larger than the end index. If the end
     /// index is beyond the string length then it is constrained to the string
     /// length.
     /// </summary>
