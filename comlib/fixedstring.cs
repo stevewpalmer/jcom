@@ -37,19 +37,6 @@ public class FixedString : IEquatable<FixedString> {
     private readonly char[] _fixedString;
 
     /// <summary>
-    /// Returns the length of this string.
-    /// </summary>
-    /// <returns>The length of the fixed string.</returns>
-    public int RealLength { get; private set; }
-
-    /// <summary>
-    /// Returns the size of this allocated string which is the maximum
-    /// number of characters the string can store.
-    /// </summary>
-    /// <returns>The size of the fixed string.</returns>
-    public int Length { get; }
-
-    /// <summary>
     /// Initialises a new fixed string instance with the given length.
     /// </summary>
     /// <param name="length">Required length of the string</param>
@@ -103,38 +90,22 @@ public class FixedString : IEquatable<FixedString> {
     }
 
     /// <summary>
-    /// Initialise this fixed string to empty.
+    /// Returns the length of this string.
     /// </summary>
-    public void Empty() {
-        for (int c = 0; c < Length; ++c) {
-            _fixedString[c] = ' ';
-        }
-        RealLength = 0;
-    }
+    /// <returns>The length of the fixed string.</returns>
+    public int RealLength { get; private set; }
+
+    /// <summary>
+    /// Returns the size of this allocated string which is the maximum
+    /// number of characters the string can store.
+    /// </summary>
+    /// <returns>The size of the fixed string.</returns>
+    public int Length { get; }
 
     /// <summary>
     /// Return whether the string is empty.
     /// </summary>
     public bool IsEmpty => RealLength == 0;
-
-    /// <summary>
-    /// Performs an implicit conversion between a native string and a
-    /// fixed string.
-    /// </summary>
-    /// <param name="rhs">The source native string</param>
-    /// <returns>Returns new FixedString object.</returns>
-    public static implicit operator FixedString(string rhs) {
-        return new FixedString(rhs);
-    }
-
-    /// <summary>
-    /// Return this fixed string as a character array. The size of the array is the
-    /// length of the fixed string.
-    /// </summary>
-    /// <returns>A character array containing the fixed string characters.</returns>
-    public char[] ToCharArray() {
-        return _fixedString;
-    }
 
     /// <summary>
     /// Set or return the character at the specified index. Throws an ArgumentOutOfRange
@@ -156,6 +127,47 @@ public class FixedString : IEquatable<FixedString> {
             RealLength = Math.Max(RealLength, index + 1);
             _fixedString[index] = value;
         }
+    }
+
+    /// <summary>
+    /// Determines whether the specified <see cref="FixedString" /> is equal to the current <see cref="FixedString" />.
+    /// </summary>
+    /// <param name="otherString">The <see cref="FixedString" /> to compare with the current <see cref="FixedString" />.</param>
+    /// <returns>
+    /// <c>true</c> if the specified <see cref="FixedString" /> is equal to the current
+    /// <see cref="FixedString" />; otherwise, <c>false</c>.
+    /// </returns>
+    public bool Equals(FixedString otherString) {
+        return Compare(otherString) == 0;
+    }
+
+    /// <summary>
+    /// Initialise this fixed string to empty.
+    /// </summary>
+    public void Empty() {
+        for (int c = 0; c < Length; ++c) {
+            _fixedString[c] = ' ';
+        }
+        RealLength = 0;
+    }
+
+    /// <summary>
+    /// Performs an implicit conversion between a native string and a
+    /// fixed string.
+    /// </summary>
+    /// <param name="rhs">The source native string</param>
+    /// <returns>Returns new FixedString object.</returns>
+    public static implicit operator FixedString(string rhs) {
+        return new FixedString(rhs);
+    }
+
+    /// <summary>
+    /// Return this fixed string as a character array. The size of the array is the
+    /// length of the fixed string.
+    /// </summary>
+    /// <returns>A character array containing the fixed string characters.</returns>
+    public char[] ToCharArray() {
+        return _fixedString;
     }
 
     /// <summary>
@@ -251,9 +263,11 @@ public class FixedString : IEquatable<FixedString> {
     /// </summary>
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
-    /// <returns>The return value is 0 if the two strings are equivalent, a negative value if
+    /// <returns>
+    /// The return value is 0 if the two strings are equivalent, a negative value if
     /// the first string is lexically less than the second, or a positive value if the second
-    /// string is lexically greater than the first.</returns>
+    /// string is lexically greater than the first.
+    /// </returns>
     public static int Compare(FixedString s1, FixedString s2) {
         if (Equals(s1, null)) {
             throw new ArgumentNullException(nameof(s1));
@@ -279,9 +293,11 @@ public class FixedString : IEquatable<FixedString> {
     /// Compare this fixed string with the given string.
     /// </summary>
     /// <param name="stringToCompare">String to compare.</param>
-    /// <returns>The return value is 0 if the two strings are equivalent, a negative value if
+    /// <returns>
+    /// The return value is 0 if the two strings are equivalent, a negative value if
     /// the first string is lexically less than the second, or a positive value if the second
-    /// string is lexically greater than the first.</returns>
+    /// string is lexically greater than the first.
+    /// </returns>
     public int Compare(FixedString stringToCompare) {
         return Compare(this, stringToCompare);
     }
@@ -315,26 +331,18 @@ public class FixedString : IEquatable<FixedString> {
     }
 
     /// <summary>
-    /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="FixedString"/>.
+    /// Determines whether the specified <see cref="object" /> is equal to the current <see cref="FixedString" />.
     /// </summary>
-    /// <param name="obj">The <see cref="object"/> to compare with the current <see cref="FixedString"/>.</param>
-    /// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current
-    /// <see cref="FixedString"/>; otherwise, <c>false</c>.</returns>
+    /// <param name="obj">The <see cref="object" /> to compare with the current <see cref="FixedString" />.</param>
+    /// <returns>
+    /// <c>true</c> if the specified <see cref="object" /> is equal to the current
+    /// <see cref="FixedString" />; otherwise, <c>false</c>.
+    /// </returns>
     public override bool Equals(object obj) {
         if (obj is not FixedString otherString) {
             return false;
         }
-        return Compare(otherString) == 0;
-    }
-
-    /// <summary>
-    /// Determines whether the specified <see cref="FixedString"/> is equal to the current <see cref="FixedString"/>.
-    /// </summary>
-    /// <param name="otherString">The <see cref="FixedString"/> to compare with the current <see cref="FixedString"/>.</param>
-    /// <returns><c>true</c> if the specified <see cref="FixedString"/> is equal to the current
-    /// <see cref="FixedString"/>; otherwise, <c>false</c>.</returns>
-    public bool Equals(FixedString otherString) {
-        return Compare(otherString) == 0;
+        return Equals(otherString);
     }
 
     /// <summary>
@@ -358,17 +366,24 @@ public class FixedString : IEquatable<FixedString> {
     }
 
     /// <summary>
-    /// Serves as a hash function for a <see><cref>CCompiler.SymFullType</cref>
-    /// </see>object.
+    /// Serves as a hash function for a FixedString.
     /// </summary>
-    /// <returns>A hash code for this instance that is suitable for use in hashing
-    /// algorithms and data structures such as a hash table.</returns>
+    /// <returns>
+    /// A hash code for this instance that is suitable for use in hashing
+    /// algorithms and data structures such as a hash table.
+    /// </returns>
     public override int GetHashCode() {
-        unchecked {
-            int hash = 17;
-            hash = hash * 23 + _fixedString.GetHashCode();
-            return hash;
+        int num = 352654597;
+        int num2 = num;
+        int d = 0;
+        for (int i = Length; i > 0; i -= 4) {
+            num = ((num << 5) + num + (num >> 27)) ^ _fixedString[d++];
+            if (i <= 2) {
+                break;
+            }
+            num2 = ((num2 << 5) + num2 + (num2 >> 27)) ^ _fixedString[d++];
         }
+        return num + num2 * 1566083941;
     }
 
     /// <summary>
@@ -377,9 +392,7 @@ public class FixedString : IEquatable<FixedString> {
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
     /// <returns>The combined string</returns>
-    public static FixedString operator +(FixedString s1, FixedString s2) {
-        return Concat(s1, s2);
-    }
+    public static FixedString operator +(FixedString s1, FixedString s2) => Concat(s1, s2);
 
     /// <summary>
     /// Merge two fixed strings. The resulting string size is a new fixed
@@ -435,17 +448,13 @@ public class FixedString : IEquatable<FixedString> {
     /// <param name="index">Zero based index at which the substring starts</param>
     /// <param name="length">The length of the substring in characters</param>
     /// <returns>A native string containing the requested substring of the fixed string</returns>
-    public string ToString(int index, int length) {
-        return new string(_fixedString, index, length);
-    }
+    public string ToString(int index, int length) => new(_fixedString, index, length);
 
     /// <summary>
     /// Returns the native string version of this fixed string.
     /// </summary>
-    /// <returns>A <see cref="string"/> that represents the current <see cref="FixedString"/>.</returns>
-    public override string ToString() {
-        return new string(_fixedString, 0, RealLength);
-    }
+    /// <returns>A <see cref="string" /> that represents the current <see cref="FixedString" />.</returns>
+    public override string ToString() => new(_fixedString, 0, RealLength);
 
     // Copy the characters from the specified string to this one at the
     // given offset. The length is respected so only as many characters
