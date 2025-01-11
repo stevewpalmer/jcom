@@ -593,6 +593,25 @@ public class Emitter {
     }
 
     /// <summary>
+    /// Generate the code to pass a FixedString to a procedure or function.
+    /// </summary>
+    /// <param name="identNode">An IdentifierParseNode for the fixed string</param>
+    /// <param name="isByRef">True if the string is being passed by reference or false if
+    /// it is being passed by value.</param>
+    public void LoadFixedString(IdentifierParseNode identNode, bool isByRef) {
+        if (isByRef) {
+            LoadSymbol(identNode.Symbol);
+        }
+        else {
+            // We need to make a local copy of the fixed string and
+            // pass that copy.
+            Type baseType = typeof(FixedString);
+            LoadSymbol(identNode.Symbol);
+            CreateObject(baseType, [typeof(FixedString)]);
+        }
+    }
+
+    /// <summary>
     /// Emit the appropriate load parameter index opcode.
     /// </summary>
     /// <param name="sym">Symbol from which to emit</param>
