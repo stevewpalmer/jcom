@@ -675,7 +675,7 @@ public partial class Compiler {
                     Messages.Error(MessageCode.IDENTIFIERREDEFINITION, $"Identifier {sym.Name} already declared");
                 }
                 if (sym.IsParameter) {
-                    if (!sym.IsArray && !sym.IsMethod && sym.IsValueType) {
+                    if (!sym.IsArray && !sym.IsMethod && (sym.IsValueType || sym.Type == SymType.FIXEDCHAR)) {
                         sym.Linkage = SymLinkage.BYREF;
                     }
                     else {

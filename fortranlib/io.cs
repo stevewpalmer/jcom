@@ -801,9 +801,9 @@ public static class IO {
     /// <param name="blank">A reference variable that will be set to NULL or ZERO</param>
     /// <returns>A zero value if the operation succeeds, or -1 if the operation fails</returns>
     public static int INQUIRE(int iodevice, string filename, ref int iostat, ref bool exists, ref bool opened, ref int number,
-        ref bool named, ref FixedString name, ref FixedString access, ref FixedString sequential,
-        ref FixedString direct, ref FixedString form, ref FixedString formatted, ref FixedString unformatted,
-        ref int recl, ref int nextrec, ref FixedString blank) {
+        ref bool named, FixedString name, FixedString access, FixedString sequential,
+        FixedString direct, FixedString form, FixedString formatted, FixedString unformatted,
+        ref int recl, ref int nextrec, FixedString blank) {
         bool isFileStatement = filename != null;
         IOFile ioobject;
         iostat = 0;
@@ -812,7 +812,7 @@ public static class IO {
             string fixedFilename = filename.Trim();
             exists = File.Exists(fixedFilename);
             named = true;
-            name = fixedFilename;
+            name.Set(fixedFilename);
             ioobject = IOFile.Get(fixedFilename);
             opened = ioobject != null;
             if (opened) {
@@ -826,17 +826,17 @@ public static class IO {
             opened = ioobject != null;
             if (opened) {
                 named = !string.IsNullOrEmpty(ioobject.Path);
-                name = named ? ioobject.Path : string.Empty;
+                name.Set(named ? ioobject.Path : string.Empty);
             }
         }
         if (ioobject != null) {
-            access = ioobject.IsSequential ? "SEQUENTIAL" : "DIRECT";
-            form = ioobject.IsFormatted ? "FORMATTED" : "UNFORMATTED";
-            blank = ioobject.Blank == '0' ? "ZERO" : "NULL";
-            sequential = "YES";
-            direct = "YES";
-            formatted = "YES";
-            unformatted = "YES";
+            access.Set(ioobject.IsSequential ? "SEQUENTIAL" : "DIRECT");
+            form.Set(ioobject.IsFormatted ? "FORMATTED" : "UNFORMATTED");
+            blank.Set(ioobject.Blank == '0' ? "ZERO" : "NULL");
+            sequential.Set("YES");
+            direct.Set("YES");
+            formatted.Set("YES");
+            unformatted.Set("YES");
             if (!ioobject.IsSequential) {
                 recl = ioobject.RecordLength;
                 nextrec = ioobject.RecordIndex;

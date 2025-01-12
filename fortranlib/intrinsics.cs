@@ -812,7 +812,7 @@ public static class Intrinsics {
     /// <param name="s1">First string</param>
     /// <param name="s2">Second string</param>
     /// <returns>The 1 based offset of string s2 within s1, or 0 if not found</returns>
-    public static int INDEX(ref string s1, ref FixedString s2) {
+    public static int INDEX(ref string s1, FixedString s2) {
         ArgumentNullException.ThrowIfNull(s1);
         ArgumentNullException.ThrowIfNull(s2);
         if (s2.Length == 0) {
@@ -1389,6 +1389,16 @@ public static class Intrinsics {
     /// <param name="s">Character argument</param>
     /// <returns>The size of string s</returns>
     public static int SIZE(ref string s) {
+        ArgumentNullException.ThrowIfNull(s);
+        return s.Length;
+    }
+
+    /// <summary>
+    /// Returns size of the character argument.
+    /// </summary>
+    /// <param name="s">Character argument</param>
+    /// <returns>The size of string s</returns>
+    public static int SIZE(FixedString s) {
         ArgumentNullException.ThrowIfNull(s);
         return s.Length;
     }
