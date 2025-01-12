@@ -104,4 +104,21 @@ public class FormatTests {
         Helper.HelperRunString(comp, "EXPTEST4", ".81+113");
         Helper.HelperRunString(comp, "EXPTEST5", "0.81E+04");
     }
+
+    // Test that 0.0 is formatted correctly.
+    [Test]
+    public void FormatZero() {
+        string code = @"
+        FUNCTION ZEROTEST
+          CHARACTER*10 STR, ZEROTEST
+39104     FORMAT(F4.1)
+          STR = 'XXXXXXXXXX'
+          AVS = -0.0001
+          WRITE(STR,39104) AVS
+          ZEROTEST = STR
+        END
+        ";
+        Compiler comp = FortranHelper.HelperCompile(code, new FortranOptions());
+        Helper.HelperRunString(comp, "ZEROTEST", " 0.0      ");
+    }
 }

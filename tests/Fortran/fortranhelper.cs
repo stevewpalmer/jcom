@@ -38,4 +38,12 @@ internal abstract class FortranHelper : Helper {
         Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
         return comp;
     }
+
+    // Compile the given code and return the error count.
+    public static Compiler HelperCompile(string code, FortranOptions opts) {
+        Compiler comp = new(opts);
+        comp.CompileString(code.Split('\n'));
+        Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
+        return comp;
+    }
 }

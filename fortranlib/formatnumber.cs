@@ -266,6 +266,8 @@ public static class FormatNumber {
             formatString = "{0:G}";
         }
         else {
+            // Fix for .NET Core change that treats -0 as negative rather than just 0.
+            value = Math.Abs(value - -0) < 0.1 ? 0 : value;
             formatString = "{0," + record.FieldWidth + ":F" + record.Precision + "}";
         }
         return FormatFloatToWidth(record, string.Format(formatString, value));
