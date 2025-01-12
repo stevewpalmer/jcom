@@ -63,6 +63,7 @@ public partial class Compiler {
 
         // Wrap into a conditional if an ERR label is specified
         if (cilist.Has("ERR")) {
+            node.Type = SymType.INTEGER;
             SwitchParseNode switchNode = new() {
                 CompareExpression = node
             };
@@ -92,6 +93,7 @@ public partial class Compiler {
 
         // Wrap into a conditional if an ERR label is specified.
         if (cilist.Has("ERR")) {
+            node.Type = SymType.INTEGER;
             SwitchParseNode switchNode = new() {
                 CompareExpression = node
             };
@@ -264,6 +266,7 @@ public partial class Compiler {
 
         // Wrap into a conditional if an ERR label is specified.
         if (cilist.Has("ERR")) {
+            node.Type = SymType.INTEGER;
             SwitchParseNode switchNode = new() {
                 CompareExpression = node
             };
