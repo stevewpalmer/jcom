@@ -394,16 +394,6 @@ public static partial class Intrinsics {
     }
 
     /// <summary>
-    /// Returns size of the character argument.
-    /// </summary>
-    /// <param name="s">Character argument</param>
-    /// <returns>The size of string s</returns>
-    public static int SIZE(ref FixedString s) {
-        ArgumentNullException.ThrowIfNull(s);
-        return s.Length;
-    }
-
-    /// <summary>
     /// Returns a string of the given number of spaces.
     /// </summary>
     /// <param name="count">Number of spaces required</param>
