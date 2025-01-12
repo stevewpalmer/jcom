@@ -408,7 +408,7 @@ public partial class Compiler {
                             else {
                                 sym = symbolTable.Add(identToken.Name, new SymFullType(), SymClass.VAR, null, _ls.LineNumber);
                                 sym.Scope = scope;
-                                if (!sym.IsArray && !sym.IsMethod && sym.IsValueType) {
+                                if (!sym.IsArray && !sym.IsMethod && (sym.IsValueType || sym.Type == SymType.FIXEDCHAR)) {
                                     sym.Linkage = SymLinkage.BYREF;
                                 }
                                 parameters.Add(sym);

@@ -108,7 +108,7 @@ public class Strings {
                 t$:=""ABC""
                 t$:+""X""
                 IF LEN(t$)<>4 THEN RETURN FALSE
-                IF t$<>""ABCX "" THEN RETURN FALSE
+                IF t$<>""ABCX"" THEN RETURN FALSE
                 RETURN TRUE
                 ENDFUNC concat
             ";

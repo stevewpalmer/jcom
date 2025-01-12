@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -160,7 +160,7 @@ public sealed class ExtCallParseNode : ParseNode {
         meth = cg.GetMethodForType(LibraryName, Name, paramTypes);
         emitter.Call(meth);
 
-        // If this method returns a value but we're invoking it as a
+        // If this method returns a value, but we're invoking it as a
         // subroutine, discard the return value from the stack
         if (returnType == SymType.NONE && meth.ReturnType != typeof(void)) {
             emitter.Pop();

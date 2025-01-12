@@ -131,12 +131,13 @@ public class ParameterParseNode : ParseNode {
         }
 
         // Parameter is an identifier. If passing by reference, pass the address
-        // of the identifier in the local context. Otherwise extract and pass the
+        // of the identifier in the local context. Otherwise, extract and pass the
         // value.
         if (_paramNode.ID == ParseID.IDENT) {
             IdentifierParseNode identNode = (IdentifierParseNode)_paramNode;
             SymType identType = identNode.Type;
             Symbol symIdent = identNode.Symbol;
+            bool tryConvert = false;
 
             if (!symIdent.IsInline && !identNode.HasSubstring) {
 
@@ -156,7 +157,7 @@ public class ParameterParseNode : ParseNode {
                         emitter.GenerateLoadArray(identNode, false);
                         return symIdent.SystemType;
                     }
-                    if (isByRef) {
+                    if (isByRef && symIdent.Type != SymType.FIXEDCHAR) {
                         cg.LoadAddress(emitter, identNode);
                     }
                     else if (symParam?.Class == SymClass.FUNCTION) {
@@ -165,21 +166,29 @@ public class ParameterParseNode : ParseNode {
                         identType = SymType.INTEGER;
                         identNode.Generate(emitter, cg, identType);
                     }
+                    else if (symIdent.Type == SymType.FIXEDCHAR && !symIdent.IsArray) {
+                        emitter.LoadFixedString(identNode, isByRef);
+                        emitter.ConvertType(symIdent.Type, identType);
+                        tryConvert = true;
+                    }
                     else {
                         identNode.Generate(emitter, cg);
-                        if (symParam != null) {
-                            if (!symParam.IsMethod) {
-                                emitter.ConvertType(identNode.Type, symParam.Type);
-                            }
-                            identType = symParam.Type;
+                        tryConvert = true;
+                    }
+                }
+                if (tryConvert) {
+                    if (symParam != null) {
+                        if (!symParam.IsMethod) {
+                            emitter.ConvertType(identNode.Type, symParam.Type);
                         }
-                        else {
-                            emitter.ConvertType(symIdent.Type, identType);
-                        }
+                        identType = symParam.Type;
+                    }
+                    else {
+                        emitter.ConvertType(symIdent.Type, identType);
                     }
                 }
                 Type paramType = Symbol.SymTypeToSystemType(identType);
-                if (isByRef) {
+                if (isByRef && symIdent.Type != SymType.FIXEDCHAR) {
                     paramType = paramType.MakeByRefType();
                 }
                 return paramType;
@@ -190,7 +199,7 @@ public class ParameterParseNode : ParseNode {
         // addressable object, such as a literal value or an expression,
         // then we need to generate local storage for the result and pass
         // the address of that.
-        if (isByRef) {
+        if (isByRef && _paramNode.Type != SymType.FIXEDCHAR) {
             LocalDescriptor index = locals.New(_paramNode.Type);
 
             SymType exprType = cg.GenerateExpression(emitter, _paramNode.Type, _paramNode);

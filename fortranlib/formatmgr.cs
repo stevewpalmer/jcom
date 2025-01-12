@@ -32,7 +32,7 @@ namespace JFortranLib;
 
 /// <summary>
 /// Defines one format group which is a collection of format specifiers
-/// enclosed in parenthesis.
+/// enclosed in parentheses.
 /// </summary>
 [SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
 internal sealed class FormatGroup {

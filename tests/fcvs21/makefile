@@ -12,7 +12,7 @@ failures: $(FAILTESTS)
 	-for f in $(FAILTESTS); do $(JRUN) $$f; done >>run.out
 	-grep "\sFAIL\s" run.out
 
-run: $(ALLTESTS)
+run: $(ALLTESTS) $(ALLDATATESTS)
 	-rm run.out FORT.*
 	-for f in $(ALLTESTS); do $(JRUN) $$f; done >>run.out
 	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.exe}.dat; done>>run.out
@@ -38,5 +38,5 @@ forlib.dll: $(DROP)/forlib.dll
 	$(JFOR) $<
 
 clean:
-	-rm *.out *.exe *.runtimeconfig.json FORT.*
+	-rm *.out *.exe *.runtimeconfig.json FORT.* DIRFILE SEQFILE
 

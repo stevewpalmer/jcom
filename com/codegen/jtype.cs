@@ -163,7 +163,7 @@ public class JType {
             }
             Debug.Assert(param.IsParameter);
             Type thisType = param.SystemType;
-            if (param.Linkage == SymLinkage.BYREF) {
+            if (param.Linkage == SymLinkage.BYREF && param.Type != SymType.FIXEDCHAR) {
                 thisType = thisType.MakeByRefType();
             }
             paramTypes[c] = thisType;
@@ -184,7 +184,10 @@ public class JType {
             if (param == null) {
                 throw new NullReferenceException("Parameters");
             }
-            if (param.Linkage == SymLinkage.BYREF) {
+
+            // FixedString is treated as a value type semantically so it is never treated as a
+            // ref parameter.
+            if (param.Linkage == SymLinkage.BYREF && param.Type != SymType.FIXEDCHAR) {
                 metb.DefineParameter(paramIndex++, ParameterAttributes.In | ParameterAttributes.Out, param.Name);
             }
             else {
