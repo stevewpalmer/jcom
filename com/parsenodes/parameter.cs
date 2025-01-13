@@ -38,6 +38,7 @@ public class ParameterParseNode : ParseNode {
     /// <param name="paramNode">A ParseNode object that contains the parameter value</param>
     public ParameterParseNode(ParseNode paramNode) {
         _paramNode = paramNode;
+        Type = paramNode.Type;
     }
 
     /// <summary>
@@ -49,6 +50,7 @@ public class ParameterParseNode : ParseNode {
     public ParameterParseNode(ParseNode paramNode, Symbol symbol) {
         _paramNode = paramNode;
         _symbol = symbol;
+        Type = paramNode.Type;
     }
 
     /// <value>
