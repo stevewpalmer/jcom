@@ -101,11 +101,6 @@ public sealed class WriteParseNode : ParseNode {
             emitter.Call(writeManagerType.GetMethod("set_HasErr", [typeof(bool)]));
         }
 
-        // Disable use of separators for BASIC output
-        emitter.LoadLocal(objIndex);
-        emitter.LoadInteger(0);
-        emitter.Call(writeManagerType.GetMethod("set_UseSeparators", [typeof(bool)]));
-
         LocalDescriptor index = emitter.GetTemporary(typeof(int));
 
         // Construct a parsenode that will be called for each item in the loop
