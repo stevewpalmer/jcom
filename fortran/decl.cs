@@ -240,7 +240,7 @@ public partial class Compiler {
                         }
 
                         // Also make sure that the loop control is an identifier. It should be an
-                        // array identifier but we don't particularly check for this. Maybe we should?
+                        // array identifier, but we don't particularly check for this. Maybe we should?
                         if (loopNode.LoopValue.ID != ParseID.IDENT) {
                             Messages.Error(MessageCode.NONCONSTANTDATALOOP, "Implied DO loop in DATA must be an identifier");
                             SkipToEndOfLine();

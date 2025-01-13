@@ -517,7 +517,7 @@ public class IOFile : IDisposable {
     /// </summary>
     /// <param name="count">The number of characters to read</param>
     /// <returns>The string read</returns>
-    public virtual string GetChars(int count) {
+    public string GetChars(int count) {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
         string value = string.Empty;
         GetCharacters(ref value, count);

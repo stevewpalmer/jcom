@@ -248,7 +248,7 @@ public partial class Compiler {
             return ParseImpliedDo();
         }
 
-        // It's an ordinary identifier reference
+        // It's an expression
         _ls.BackToken();
         return Expression();
     }
@@ -690,7 +690,7 @@ public partial class Compiler {
 
                         // Assumed size declaration, which must be the last in
                         // the list. We use a value of 0 for this since the array
-                        // calculations disregard it. However we need to make sure
+                        // calculations disregard it. However, we need to make sure
                         // this IS the last dimension.
                         if (hasAssumedBound) {
                             Messages.Error(MessageCode.ARRAYENDEXPECTED, "Dimensions not permitted after assumed bound");

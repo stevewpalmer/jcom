@@ -108,7 +108,7 @@ public class FormatTests {
     // Test that 0.0 is formatted correctly.
     [Test]
     public void FormatZero() {
-        string code = @"
+        const string code = @"
         FUNCTION ZEROTEST
           CHARACTER*10 STR, ZEROTEST
 39104     FORMAT(F4.1)

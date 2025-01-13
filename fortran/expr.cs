@@ -13,7 +13,7 @@
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
-// 
+//
 // # http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
@@ -643,7 +643,7 @@ public partial class Compiler {
     }
 
     // Do type equalisation on the expression node and report an error if the
-    // two operands types are mismatched (eg. string and integer)
+    // two operands types are mismatched (e.g. string and integer)
     private BinaryOpParseNode TypeEqualise(BinaryOpParseNode node) {
         // Don't check a bogus parse tree.
         if (node.Left == null || node.Right == null) {
@@ -700,8 +700,8 @@ public partial class Compiler {
 
     // Do type equalisation for arithmetic expressions. In this instance,
     // the type of the result is cast to the largest type that can
-    // accommodate the two operands. Anything that evaluates to a non-
-    // arithmetic value yields a type mismatch.
+    // accommodate the two operands. Anything that evaluates to a non-arithmetic
+    // value yields a type mismatch.
     private BinaryOpParseNode ArithmeticEqualise(BinaryOpParseNode node) {
         SymType type1 = node.Left.Type;
         SymType type2 = node.Right.Type;
