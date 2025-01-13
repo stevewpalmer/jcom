@@ -429,7 +429,14 @@ public class Variant {
     /// Returns whether the variant value is zero.
     /// </summary>
     /// <returns><c>true</c> if the variant is zero; otherwise, <c>false</c>.</returns>
-    public bool IsZero => CompareTo(new Variant(0)) == 0;
+    public bool IsZero {
+        get {
+            if (Type == VariantType.COMPLEX) {
+                return ComplexValue.Equals(new Complex(0, 0));
+            }
+            return CompareTo(new Variant(0)) == 0;
+        }
+    }
 
     /// <summary>
     /// Returns whether the variant is a number.
