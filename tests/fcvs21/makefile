@@ -18,6 +18,11 @@ run: $(ALLTESTS) $(ALLDATATESTS)
 	-for f in $(ALLDATATESTS); do $(JRUN) $$f < ./$${f%.exe}.dat; done>>run.out
 	-grep "\sFAIL\s" run.out
 
+inspect: $(INTTESTS)
+	-rm run.out FORT.*
+	-for f in $(INTTESTS); do $(JRUN) $$f; done
+	-grep "\sFAIL\s" run.out
+
 runall: $(ALLTESTS) $(ALLDATATESTS) $(INTTESTS) $(INTDATATESTS)
 	-rm run.out FORT.*
 	-for f in $(ALLTESTS); do $(JRUN) $$f; done >>run.out
