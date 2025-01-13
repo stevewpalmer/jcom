@@ -25,7 +25,6 @@
 
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.SymbolStore;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -178,14 +177,15 @@ public class ProgramParseNode : ParseNode {
                 Version = new Version(VersionString)
             };
 
-            _ab = save ? new PersistedAssemblyBuilder(an, typeof(object).Assembly) :
+            _ab = save ?
+                new PersistedAssemblyBuilder(an, typeof(object).Assembly) :
                 AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
-            Builder = _ab.DefineDynamicModule(DotNetName);
 
             // Make this assembly debuggable if the debug option was specified.
             if (GenerateDebug) {
                 AddDebuggable();
             }
+            Builder = _ab.DefineDynamicModule(DotNetName);
 
             // All code below here needs to move to a TypeParseNode that defines a
             // single class/type. A TypeParseNode should be added as the child of a
@@ -603,7 +603,7 @@ public class ProgramParseNode : ParseNode {
             DebuggableAttribute.DebuggingModes.DisableOptimizations |
             DebuggableAttribute.DebuggingModes.Default
         ]);
-        Builder.SetCustomAttribute(caBuilder);
+        _ab.SetCustomAttribute(caBuilder);
     }
 
     // Mark this assembly as CLS Compliant.
