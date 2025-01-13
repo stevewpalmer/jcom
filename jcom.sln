@@ -36,7 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fortran", "Fortran", "{9FF5
 		samples\Fortran\vowels.f = samples\Fortran\vowels.f
 		samples\Fortran\bottles.f = samples\Fortran\bottles.f
 		samples\Fortran\makefile = samples\Fortran\makefile
-		samples\Fortran\intr.f = samples\Fortran\intr.f
+		samples\Fortran\cmplxd.f = samples\Fortran\cmplxd.f
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Comal", "Comal", "{BAC0DB39-BF1A-4D40-89E0-95655031D755}"

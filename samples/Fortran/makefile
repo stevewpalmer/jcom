@@ -2,8 +2,9 @@ JFLAGS=-w:4 --debug
 DROP=../../drop/bin
 JFOR=$(DROP)/fort $(JFLAGS)
 
-SOURCES=date.exe datest.exe euclid.exe f2ccalc.exe heron.exe \
-	loan.exe petrol.exe reduce.exe stats.exe triang.exe vowels.exe bottles.exe
+SOURCES=bottles.exe cmplxd.exe date.exe datest.exe euclid.exe \
+    f2ccalc.exe heron.exe loan.exe petrol.exe reduce.exe stats.exe \
+    triang.exe vowels.exe
 
 BINARIES=comlib.dll forlib.dll $(DROP)/com.dll $(DROP)/fort
 
@@ -24,4 +25,4 @@ forlib.dll: $(DROP)/forlib.dll
 	$(JFOR) $<
 
 clean:
-	-rm -f *.exe *.dll *.runtimeconfig.json *.out
+	-rm -f *.exe *.dll *.runtimeconfig.json
