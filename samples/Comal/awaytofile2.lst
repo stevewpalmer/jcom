@@ -16,7 +16,7 @@
       160   DIM surnames$(max'recs#), givens$(max'recs#), jobs$(max'recs#), phones$(max'recs#)
       170   my'open("mydatafile.dat")
       180   my'print
-      190   find("job", "news")
+      190   dofind("job", "news")
       200   get("job")
       210   all
       220   
@@ -45,7 +45,7 @@
       450   
       460   // Find the record in which there is a match between the contents of the
       470   // given field and the given string
-      480   PROC find(field$, string$)
+      480   PROC dofind(field$, string$)
       490     curr'rec#:=0
       500     kind$:=field$
       510     what$:=string$
