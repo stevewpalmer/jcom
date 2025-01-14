@@ -22,31 +22,20 @@ hosting portability, I will try and keep this file updated separately.
 
 * CHAINing
 * Non-constant string lengths in DIM...OF
-
-### Cobol
-
-* Implement
+* Support Nested PROC/FUNC.
+    * How can nested proc/func reference a parameter or variable in the parent method??
+    * How do we deal with IMPORT from a PROC/FUNC we’re nested in?
+    * Idea - what if we passed IMPORTed variables as hidden parameters to the nested functions?
 
 ### Editor
 
 * Undo/Redo.
 * Split windows.
 
-## Bugs
+### Calc
 
-### Fortran
-
-* Fix failing ArrayVerifyDimensions1 unit test.
-
-### Comal
-
-* Can no longer generate USE libraries under .net core 7.
-* USE libraries and USE statement not working on Windows.
-* GET$ is skipping over newlines.
-* Fix Nested PROC/FUNC.
-    * How can nested proc/func reference a parameter or variable in the parent method??
-    * How do we deal with IMPORT from a PROC/FUNC we’re nested in?
-    * Idea - what if we passed IMPORTed variables as hidden parameters to the nested functions?
+* Undo/Redo.
+* Split windows.
 
 ### Code Generation
 
