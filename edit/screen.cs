@@ -623,7 +623,7 @@ public static class Screen {
         if (_search != null) {
             _search.TranslateCount = 0;
             flags |= _activeWindow.Translate(_search);
-            StatusBar.Message(_search.MatchSuccess ? string.Format(Edit.TranslateComplete, _search.TranslateCount) : Edit.PatternNotFound);
+            StatusBar.Message(_search.TranslateCount > 0 ? string.Format(Edit.TranslateComplete, _search.TranslateCount) : Edit.PatternNotFound);
         }
         return flags;
     }

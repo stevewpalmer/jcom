@@ -94,6 +94,14 @@ public class Search {
     public int MatchLength { get; private set; }
 
     /// <summary>
+    /// Advance the search position by the given number of spaces.
+    /// </summary>
+    /// <param name="length">Number of spaces to advance</param>
+    public void Advance(int length) {
+        Column += length;
+    }
+
+    /// <summary>
     /// Return the next instance of the search string in the buffer. If a match
     /// is found then matchPoint is set to the (column, row) of the matching string
     /// in offset and lineIndex coordinates, and the function returns true. If no

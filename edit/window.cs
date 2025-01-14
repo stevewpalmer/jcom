@@ -229,6 +229,7 @@ public partial class Window {
             }
             Buffer.Delete(searchData.MatchLength);
             Buffer.Insert(searchData.ReplacementString);
+            searchData.Advance(searchData.ReplacementString.Length);
             flags |= RenderHint.BLOCK | CursorFromLineIndex();
             flags = ApplyRenderHint(flags);
             ++searchData.TranslateCount;
