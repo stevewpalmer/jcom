@@ -62,6 +62,12 @@ internal class CellNode(TokenID tokenID) {
     public TokenID Op { get; } = tokenID;
 
     /// <summary>
+    /// Return the list of dependent cell location referenced by this
+    /// node.
+    /// </summary>
+    public virtual IEnumerable<CellLocation> Dependents(CellLocation sourceCell) => [];
+
+    /// <summary>
     /// Convert a token ID to its string representation.
     /// </summary>
     /// <param name="tokenId">Token ID</param>
@@ -140,6 +146,18 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
     /// </summary>
     /// <returns>String</returns>
     public override string ToString() => $"{TokenToString(Op)}({string.Join(",", Parameters.Select(p => p.ToString()))})";
+
+    /// <summary>
+    /// Return the list of dependent cell location referenced by this
+    /// node.
+    /// </summary>
+    public override IEnumerable<CellLocation> Dependents(CellLocation sourceCell) {
+        List<CellLocation> result = [];
+        foreach (CellNode node in Parameters) {
+            result.AddRange(node.Dependents(sourceCell));
+        }
+        return result;
+    }
 
     /// <summary>
     /// Fix up any address references on the node.
@@ -230,10 +248,7 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
                 SourceLocation = location,
                 UpdateList = context.UpdateList
             };
-            return EvaluateLocation(newContext, new CellLocation {
-                Column = location.Column,
-                Row = location.Row
-            });
+            return EvaluateLocation(newContext, location);
         }
         Cell cell = context.Sheet.GetCell(location, false);
         if (cell.IsEmptyCell) {
@@ -249,7 +264,7 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
             if (context.UpdateList.Contains(cell) && !cell.Error) {
                 return cell.Value;
             }
-            context.ReferenceList.Push(cell.Location);
+            context.ReferenceList.Push(cell.LocationWithSheet);
             Variant result = cell.FormulaTree.Evaluate(context);
             context.ReferenceList.Pop();
             return result;
@@ -275,6 +290,13 @@ internal class BinaryOpNode(TokenID tokenID, CellNode left, CellNode right) : Ce
     /// Right child node
     /// </summary>
     public CellNode Right { get; } = right;
+
+    /// <summary>
+    /// Return the list of dependent cell location referenced by this
+    /// node.
+    /// </summary>
+    public override IEnumerable<CellLocation> Dependents(CellLocation sourceCell) =>
+        Left.Dependents(sourceCell).Concat(Right.Dependents(sourceCell));
 
     /// <summary>
     /// Fix up any address references on the node.
@@ -443,6 +465,15 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     public bool Error { get; private set; }
 
     /// <summary>
+    /// Return the list of dependent cell location referenced by this
+    /// node.
+    /// </summary>
+    public override IEnumerable<CellLocation> Dependents(CellLocation sourceCell) =>
+        [AbsoluteLocation.SheetName == null ?
+            ToAbsolute(sourceCell) :
+            AbsoluteLocation];
+
+    /// <summary>
     /// Fix up any address references on the node.
     /// </summary>
     /// <param name="location">Location of this cell</param>
@@ -543,6 +574,18 @@ internal class RangeNode(LocationNode start, LocationNode end) : CellNode(TokenI
     /// End of range
     /// </summary>
     public LocationNode RangeEnd { get; } = end;
+
+    /// <summary>
+    /// Return the list of dependent cell location referenced by this
+    /// node.
+    /// </summary>
+    public override IEnumerable<CellLocation> Dependents(CellLocation sourceCell) {
+        List<CellLocation> result = [];
+        foreach (CellLocation location in RangeIterator(sourceCell)) {
+            result.AddRange(location with { SheetName = sourceCell.SheetName });
+        }
+        return result;
+    }
 
     /// <summary>
     /// Fix up any address references on the node.

@@ -31,6 +31,7 @@ namespace JCalcLib;
 
 public class Book {
     private readonly List<Sheet> _sheets = [];
+    private readonly CellGraph _cellGraph = new();
     private FileInfo? _fileInfo;
     private bool _modified;
     private int _sheetNumber = 1;
@@ -198,4 +199,23 @@ public class Book {
     public Sheet? Sheet(string sheetName) {
         return _sheets.FirstOrDefault(s => s.Name == sheetName);
     }
+
+    /// <summary>
+    /// Set the dependencies for the specified cell location.
+    /// </summary>
+    /// <param name="location">Absolute cell location</param>
+    /// <param name="dependents">List of absolute dependencies</param>
+    public void SetDependencies(CellLocation location, IEnumerable<CellLocation> dependents) {
+        _cellGraph.RemoveEdges(location);
+        foreach (CellLocation dependent in dependents) {
+            _cellGraph.AddEdge(location, dependent);
+        }
+    }
+
+    /// <summary>
+    /// Return the dependencies for the cell at the specified location.
+    /// </summary>
+    /// <param name="location">Fully qualified location of cell</param>
+    /// <returns>Dependencies</returns>
+    public IEnumerable<CellLocation> Dependents(CellLocation location) => _cellGraph.GetDependents(location);
 }

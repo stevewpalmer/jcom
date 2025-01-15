@@ -84,6 +84,13 @@ public class Cell(Sheet? sheet) {
             }
             if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
                 FormulaTree = formulaTree;
+                if (formulaTree != null && sheet != null) {
+
+                    // Update the DAG on the book with all dependent locations in
+                    // this formula.
+                    CellLocation source = LocationWithSheet;
+                    sheet.Book!.SetDependencies(source, formulaTree.Dependents(source));
+                }
                 ComputedValue = new Variant(0);
                 return;
             }
@@ -193,6 +200,12 @@ public class Cell(Sheet? sheet) {
     /// Cell location
     /// </summary>
     public CellLocation Location { get; set; } = new();
+
+    /// <summary>
+    /// Cell location with sheet name
+    /// </summary>
+    [JsonIgnore]
+    public CellLocation LocationWithSheet => Location with { SheetName = sheet?.Name };
 
     /// <summary>
     /// Return the current cell location as a string that
