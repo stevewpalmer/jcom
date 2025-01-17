@@ -64,7 +64,8 @@ public class Compiler {
     /// </summary>
     private static readonly Compiler[] BuiltIn = [
         new(["f", "f90"], "fort", "--run {0}"),
-        new(["cml", "lst"], "comal", "--ide --run {0}")
+        new(["cml", "lst"], "comal", "--ide --run {0}"),
+        new(["js"], "node", "{0}")
     ];
 
     /// <summary>
