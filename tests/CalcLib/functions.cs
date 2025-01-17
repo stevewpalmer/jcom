@@ -352,6 +352,14 @@ public class FunctionTests {
 
         Assert.AreEqual($"Total comes to {currencyChar}49.68", cell5.Value.StringValue);
 
+        // Verify longer dependency chain
+        CellLocation [] dependents = workBook.Dependents(cell5.LocationWithSheet).ToArray();
+        Assert.AreEqual(4, dependents.Length);
+        Assert.AreEqual(cell1.LocationWithSheet, dependents[0]);
+        Assert.AreEqual(cell4.LocationWithSheet, dependents[1]);
+        Assert.AreEqual(cell2.LocationWithSheet, dependents[2]);
+        Assert.AreEqual(cell3.LocationWithSheet, dependents[3]);
+
         cell1.Value = new Variant("Tomorrow will be ");
         cell2.Value = new Variant("10 June 2024");
         cell3.Value = new Variant("=A1&TEXT(A2, 'dd-mmm-yyyy')");
