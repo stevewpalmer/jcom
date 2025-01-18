@@ -1076,7 +1076,7 @@ public partial class Window {
 
         // Any action which is non-destructive requires an explicit invalidate of
         // the extent to ensure the block mark is removed from the screen.
-        if (action.HasFlag(BlockAction.GET) || indenting) {
+        if (action.HasFlag(BlockAction.GET) || action.HasFlag(BlockAction.DELETE) || indenting) {
             Buffer.InvalidateExtent
                 .Add(markStart)
                 .Add(markEnd);
