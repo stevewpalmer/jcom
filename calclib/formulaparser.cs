@@ -65,7 +65,8 @@ public enum TokenID {
     CONCAT,
     KCONCATENATE,
     COMMA,
-    RANGE
+    RANGE,
+    KAVG
 }
 
 /// <summary>
@@ -495,6 +496,7 @@ public class FormulaParser {
                 return ParseArguments(token.ID, 3);
 
             case TokenID.KSUM:
+            case TokenID.KAVG:
             case TokenID.KCONCATENATE:
                 return ParseArguments(token.ID, 255);
 

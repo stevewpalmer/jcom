@@ -32,6 +32,7 @@ namespace JCalcLib;
 
 public class Sheet {
     private string _name = string.Empty;
+    private HashSet<Cell> _invalidCells = [];
 
     /// <summary>
     /// Maximum number of columns
@@ -138,6 +139,12 @@ public class Sheet {
     public bool Modified { get; internal set; }
 
     /// <summary>
+    /// Whether the sheet is fully loaded and initalised.
+    /// </summary>
+    [JsonIgnore]
+    public bool Ready { get; internal set; }
+
+    /// <summary>
     /// Returns the active cell
     /// </summary>
     [JsonIgnore]
@@ -231,25 +238,66 @@ public class Sheet {
     }
 
     /// <summary>
+    /// Trigger a full recalculate of all formula on the sheet
+    /// </summary>
+    public void FullRecalculate() {
+        _invalidCells = [];
+        foreach (CellList cellList in ColumnList) {
+            _invalidCells.UnionWith(cellList.FormulaCells);
+        }
+        foreach (Cell cell in _invalidCells) {
+            Debug.Assert(cell.FormulaTree != null);
+            CellLocation source = cell.LocationWithSheet;
+            Book!.SetDependencies(source, cell.FormulaTree.Dependents(source));
+        }
+        Calculate();
+    }
+
+    /// <summary>
+    /// Mark the specified sheet cell as invalid if it is a formula and also marks the
+    /// sheet as modified. We also rebuild the dependencies for this cell based on any
+    /// cell references in the formula. Finally, we determine the list of cells that
+    /// are dependent on this one (dependees) and mark those as invalid so that they
+    /// are subsequently recalculated when the Calculate function is called.
+    /// </summary>
+    /// <param name="cell">Cell to mark as invalid</param>
+    public void InvalidateCell(Cell cell) {
+        if (Ready) {
+            Modified = true;
+            CellLocation source = cell.LocationWithSheet;
+            if (cell.HasFormula) {
+                Debug.Assert(cell.FormulaTree != null);
+                Book!.SetDependencies(source, cell.FormulaTree.Dependents(source));
+                _invalidCells.Add(cell);
+                NeedRecalculate = true;
+            }
+            foreach (CellLocation location in Book!.Dependees(source)) {
+                Debug.Assert(location.SheetName != null);
+                Sheet? dependeeSheet = Book!.Sheet(location.SheetName);
+                Cell dependeeCell = dependeeSheet!.GetCell(location, false);
+                Debug.Assert(dependeeCell.HasFormula);
+                dependeeSheet._invalidCells.Add(dependeeCell);
+                dependeeSheet.NeedRecalculate = true;
+            }
+        }
+    }
+
+    /// <summary>
     /// Recalculate all formulas on the sheet and update the values
     /// on the formula cells.
     /// </summary>
     public IEnumerable<Cell> Calculate() {
         Debug.Assert(Book != null);
-        List<Cell> formulaCells = [];
-        foreach (CellList cellList in ColumnList) {
-            formulaCells.AddRange(cellList.FormulaCells);
-        }
         List<Cell> cellsToUpdate = [];
-        foreach (Cell cell in formulaCells) {
+        foreach (Cell cell in _invalidCells) {
             try {
                 CalculationContext context = new() {
                     ReferenceList = new Stack<CellLocation>(),
                     UpdateList = cellsToUpdate.ToArray(),
-                    SourceLocation = cell.Location,
+                    SourceLocation = cell.LocationWithSheet,
                     Sheet = this
                 };
-                context.ReferenceList.Push(cell.Location);
+                context.ReferenceList.Push(cell.LocationWithSheet);
                 Debug.Assert(cell.FormulaTree != null);
                 cell.ComputedValue = cell.FormulaTree.Evaluate(context);
                 cellsToUpdate.Add(cell);
@@ -259,6 +307,7 @@ public class Sheet {
                 cellsToUpdate.Add(cell);
             }
         }
+        _invalidCells = [];
         NeedRecalculate = false;
         return cellsToUpdate;
     }
@@ -369,6 +418,7 @@ public class Sheet {
     public void DeleteCell(Cell cell) {
         CellList? cellList = CellListForColumn(cell.Location.Column, false);
         if (cellList != null) {
+            InvalidateCell(cell);
             cellList.Cells.Remove(cell);
             Modified = true;
         }

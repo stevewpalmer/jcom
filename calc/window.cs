@@ -97,6 +97,9 @@ public class Window {
         }
         if (flags.HasFlag(RenderHint.CONTENTS)) {
             InvalidateExtent.Clear();
+            if (Sheet.NeedRecalculate) {
+                Sheet.Calculate();
+            }
             Render();
         }
     }
@@ -824,7 +827,6 @@ public class Window {
                 Cell cell = Sheet.GetCell(Sheet.Location, true);
                 cell.Content = cellValue;
                 InvalidateCells([cell]);
-                Sheet.NeedRecalculate = true;
 
                 hint = result switch {
                     CellInputResponse.ACCEPT => RenderHint.CURSOR,

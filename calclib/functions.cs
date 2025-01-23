@@ -34,6 +34,18 @@ namespace JCalcLib;
 public static class Functions {
 
     /// <summary>
+    /// Calculate the average of all cells and constants in the argument list.
+    /// </summary>
+    /// <param name="arguments">Function parameters</param>
+    /// <returns>A variant containing the average of the arguments</returns>
+    public static Variant AVG(IEnumerable<Variant> arguments) {
+        Variant sumTotal = new(0);
+        Variant totalValues = new(arguments.Count());
+        sumTotal = arguments.Aggregate(sumTotal, (current, value) => current + value);
+        return new Variant(sumTotal / totalValues);
+    }
+
+    /// <summary>
     /// Calculate the sum of all cells and constants in the argument list.
     /// </summary>
     /// <param name="arguments">Function parameters</param>

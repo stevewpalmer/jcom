@@ -53,7 +53,8 @@ internal class CellNode(TokenID tokenID) {
         { TokenID.KEDATE, "EDATE" },
         { TokenID.KDAYS360, "DAYS360" },
         { TokenID.KCONCATENATE, "CONCATENATE" },
-        { TokenID.KTEXT, "TEXT" }
+        { TokenID.KTEXT, "TEXT" },
+        { TokenID.KAVG, "AVG" }
     };
 
     /// <summary>

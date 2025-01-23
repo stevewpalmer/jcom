@@ -32,14 +32,6 @@ public class CellGraph {
     private readonly Dictionary<CellLocation, HashSet<CellLocation>> _dependents = [];
 
     /// <summary>
-    /// Clear the graph prior to a rebuild.
-    /// </summary>
-    public void Clear() {
-        _dependents.Clear();
-        _dependees.Clear();
-    }
-
-    /// <summary>
     /// Add an edge between two cell locations such that <paramref name="from" />
     /// has a dependency on <paramref name="to" />.
     /// </summary>
@@ -61,23 +53,6 @@ public class CellGraph {
     }
 
     /// <summary>
-    /// Remove the specified location from the list of dependencies and
-    /// dependees.
-    /// </summary>
-    /// <param name="from">Cell location</param>
-    public void RemoveEdges(CellLocation from) {
-        Debug.Assert(from.SheetName != null);
-        foreach (CellLocation to in _dependents.Keys) {
-            _dependents[to].Remove(from);
-        }
-        foreach (CellLocation to in _dependees.Keys) {
-            _dependees[to].Remove(from);
-        }
-        _dependents.Remove(from);
-        _dependees.Remove(from);
-    }
-
-    /// <summary>
     /// Retrieve a full list of dependencies on the specified cell location.
     /// </summary>
     /// <param name="from">Cell location</param>
@@ -86,6 +61,18 @@ public class CellGraph {
         Debug.Assert(from.SheetName != null);
         HashSet<CellLocation> result = [];
         InternalGetDependents(from, result);
+        return result;
+    }
+
+    /// <summary>
+    /// Retrieve a full list of dependees on the specified cell location.
+    /// </summary>
+    /// <param name="from">Cell location</param>
+    /// <returns>List of dependees</returns>
+    public IEnumerable<CellLocation> GetDependees(CellLocation from) {
+        Debug.Assert(from.SheetName != null);
+        HashSet<CellLocation> result = [];
+        InternalGetDependees(from, result);
         return result;
     }
 
@@ -104,6 +91,26 @@ public class CellGraph {
             foreach (CellLocation to in dependent) {
                 result.Add(to);
                 result.UnionWith(GetDependents(to));
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Walk the list of neighbours of the specified cell location and add it to
+    /// the list of results. Stops if we detect a cycle due to the cell location
+    /// already existing in the result set.
+    /// </summary>
+    /// <param name="from">Cell location to locate</param>
+    /// <param name="result">Cumulative list of neighbours</param>
+    private void InternalGetDependees(CellLocation from, HashSet<CellLocation> result) {
+        if (result.Contains(from)) {
+            return;
+        }
+        if (_dependees.TryGetValue(from, out HashSet<CellLocation>? dependees)) {
+            foreach (CellLocation to in dependees) {
+                result.Add(to);
+                result.UnionWith(GetDependees(to));
             }
         }
     }

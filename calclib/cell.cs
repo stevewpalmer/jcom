@@ -75,38 +75,29 @@ public class Cell(Sheet? sheet) {
         set {
             FormulaTree = null;
             Error = false;
-            if (sheet != null) {
-                sheet.Modified = true;
-            }
+            Variant assignedValue;
             if (value.StringValue == "") {
-                ComputedValue = new Variant();
-                return;
+                assignedValue = new Variant();
             }
-            if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
+            else if (TryParseFormula(value.StringValue, Location, out CellNode? formulaTree)) {
                 FormulaTree = formulaTree;
-                if (formulaTree != null && sheet != null) {
-
-                    // Update the DAG on the book with all dependent locations in
-                    // this formula.
-                    CellLocation source = LocationWithSheet;
-                    sheet.Book!.SetDependencies(source, formulaTree.Dependents(source));
-                }
-                ComputedValue = new Variant(0);
-                return;
+                assignedValue = new Variant(0);
             }
-            if (double.TryParse(value.StringValue, out double doubleValue)) {
-                ComputedValue = new Variant(doubleValue);
-                return;
+            else if (double.TryParse(value.StringValue, out double doubleValue)) {
+                assignedValue = new Variant(doubleValue);
             }
-            if (TryParseDate(value.StringValue, out Variant _dateValue, out string _format)) {
+            else if (TryParseDate(value.StringValue, out Variant _dateValue, out string _format)) {
                 if (!Format.HasValue) {
                     CellFormat = CellFormat.CUSTOM;
                     CustomFormatString = _format;
                 }
-                ComputedValue = _dateValue;
-                return;
+                assignedValue = _dateValue;
             }
-            ComputedValue = value;
+            else {
+                assignedValue = value;
+            }
+            sheet?.InvalidateCell(this);
+            ComputedValue = assignedValue;
         }
     }
 

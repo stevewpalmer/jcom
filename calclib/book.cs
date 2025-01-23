@@ -68,7 +68,7 @@ public class Book {
     /// Create an empty workbook with just one sheet.
     /// </summary>
     public Book() {
-        _sheets.Add(new Sheet(this, 1));
+        _sheets.Add(new Sheet(this, 1) { Ready = true });
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public class Book {
     public void New() {
         _fileInfo = null;
         _sheets.Clear();
-        _sheets.Add(new Sheet(this, 1));
+        _sheets.Add(new Sheet(this, 1) { Ready = true });
     }
 
     /// <summary>
@@ -116,13 +116,18 @@ public class Book {
                     sheet.Modified = false;
                     _sheets.Add(sheet);
                 }
+
+                // At this point, none of the cell dependencies have been computed so all
+                // sheets will require a full recalculate to build those dependencies and
+                // calculate all the initial values.
                 foreach (Sheet sheet in _sheets) {
-                    sheet.Calculate();
+                    sheet.Ready = true;
+                    sheet.FullRecalculate();
                 }
             }
         }
         catch (Exception) {
-            _sheets.Add(new Sheet(this, 1));
+            _sheets.Add(new Sheet(this, 1){ Ready = true });
             FileInfo info = new(path);
             throw new FileLoadException(null, info.FullName);
         }
@@ -158,7 +163,7 @@ public class Book {
     /// </summary>
     /// <returns>The new worksheet</returns>
     public Sheet AddSheet() {
-        Sheet newSheet = new(this, _sheetNumber++);
+        Sheet newSheet = new(this, _sheetNumber++) { Ready = true };
         _sheets.Add(newSheet);
         Modified = true;
         return newSheet;
@@ -206,7 +211,6 @@ public class Book {
     /// <param name="location">Absolute cell location</param>
     /// <param name="dependents">List of absolute dependencies</param>
     public void SetDependencies(CellLocation location, IEnumerable<CellLocation> dependents) {
-        _cellGraph.RemoveEdges(location);
         foreach (CellLocation dependent in dependents) {
             _cellGraph.AddEdge(location, dependent);
         }
@@ -218,4 +222,11 @@ public class Book {
     /// <param name="location">Fully qualified location of cell</param>
     /// <returns>Dependencies</returns>
     public IEnumerable<CellLocation> Dependents(CellLocation location) => _cellGraph.GetDependents(location);
+
+    /// <summary>
+    /// Return the dependees for the cell at the specified location.
+    /// </summary>
+    /// <param name="location">Fully qualified location of cell</param>
+    /// <returns>Dependees</returns>
+    public IEnumerable<CellLocation> Dependees(CellLocation location) => _cellGraph.GetDependees(location);
 }
