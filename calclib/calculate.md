@@ -39,5 +39,19 @@ both C1 and C3. Now cell A2 is a dependee of not just C1 but of C2 and C3
 and thus all three cells will need to be recalculated if A2 changes. A
 key aspect of the graph is that the order of calculation matters. Cell C1
 needs to be calculated first, followed by C2 and then C3 in that order.
-This is achieved by following the edges from A2 to C1, then C2 and C3 in
-that order.
+This is achieved by following the edges from A2 to C1, then C1 to C2 and
+C2 to C3.
+
+### Updating The Graph
+
+There are two main operations on the spreadsheets that will require changes
+to the graph.
+
+1. Changing a cell, including editing, adding or removing a formula.
+2. Adding or removing rows and columns.
+
+Changing a cell necessitates removing all existing dependencies from the
+cell and thus removal of all edges leading out from the graph node for that
+cell and cells leading in. However, we do not remove the dependent cell as
+another cell can still be dependent on the value of that cell even if it is
+no longer a formula or is blank.

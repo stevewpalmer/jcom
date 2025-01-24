@@ -265,6 +265,7 @@ public class Sheet {
         if (Ready) {
             Modified = true;
             CellLocation source = cell.LocationWithSheet;
+            Book!.RemoveDependencies(source);
             if (cell.HasFormula) {
                 Debug.Assert(cell.FormulaTree != null);
                 Book!.SetDependencies(source, cell.FormulaTree.Dependents(source));

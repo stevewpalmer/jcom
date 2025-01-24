@@ -78,6 +78,7 @@ public class Book {
     public void New() {
         _fileInfo = null;
         _sheets.Clear();
+        _cellGraph.Clear();
         _sheets.Add(new Sheet(this, 1) { Ready = true });
     }
 
@@ -214,6 +215,14 @@ public class Book {
         foreach (CellLocation dependent in dependents) {
             _cellGraph.AddEdge(location, dependent);
         }
+    }
+
+    /// <summary>
+    /// Remove all dependencies from the specified location.
+    /// </summary>
+    /// <param name="location">Location to remove</param>
+    public void RemoveDependencies(CellLocation location) {
+        _cellGraph.DeleteEdges(location);
     }
 
     /// <summary>

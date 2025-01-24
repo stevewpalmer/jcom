@@ -443,7 +443,6 @@ public class Window {
                 cellsToUpdate.Add(cell);
             }
             InvalidateCells(cellsToUpdate);
-            Sheet.NeedRecalculate = true;
         }
         ClearBlock();
         return RenderHint.NONE;

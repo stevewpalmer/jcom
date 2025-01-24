@@ -32,6 +32,14 @@ public class CellGraph {
     private readonly Dictionary<CellLocation, HashSet<CellLocation>> _dependents = [];
 
     /// <summary>
+    /// Clear the graph.
+    /// </summary>
+    public void Clear() {
+        _dependents.Clear();
+        _dependees.Clear();
+    }
+
+    /// <summary>
     /// Add an edge between two cell locations such that <paramref name="from" />
     /// has a dependency on <paramref name="to" />.
     /// </summary>
@@ -50,6 +58,19 @@ public class CellGraph {
             _dependees.Add(to, value2);
         }
         value2.Add(from);
+    }
+
+    /// <summary>
+    /// Remove all edges leading from the specified cell.
+    /// </summary>
+    /// <param name="from">Dependent cell</param>
+    public void DeleteEdges(CellLocation from) {
+        if (_dependents.ContainsKey(from)) {
+            foreach (CellLocation to in _dependents[from]) {
+                _dependees[to].Remove(from);
+            }
+            _dependents[from] = [];
+        }
     }
 
     /// <summary>
