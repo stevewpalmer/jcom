@@ -41,16 +41,16 @@ public class ParsingTests {
     public void VerifyCellValueParseNode() {
         Book workBook = new();
         Sheet sheet = workBook.Sheets.First();
-        Cell cell1 = new(sheet) { Content = "=A1+A2" };
+        Cell cell1 = new(sheet) { Content = "=A2+A3" };
 
         Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
         Assert.AreEqual(TokenID.PLUS, cell1.FormulaTree.Op);
 
         Assert.AreEqual("?", CellNode.TokenToString(TokenID.EOL));
 
-        Cell cell2 = new(sheet) { Content = "=A1+A2" };
+        Cell cell2 = new(sheet) { Content = "=A2+A3" };
         Assert.IsTrue(cell2.HasFormula);
-        Assert.AreEqual("=A1+A2", cell2.Content);
+        Assert.AreEqual("=A2+A3", cell2.Content);
     }
 
     // Verify the creation of a BinaryOpParseNode
@@ -71,7 +71,7 @@ public class ParsingTests {
     public void VerifyAddition() {
         Book workBook = new();
         Sheet sheet = workBook.Sheets.First();
-        Cell cell1 = new(sheet) { Content = "=A1+A2" };
+        Cell cell1 = new(sheet) { Content = "=A2+A3" };
         Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
         BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
@@ -81,11 +81,11 @@ public class ParsingTests {
 
         LocationNode left = (LocationNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
-        Assert.AreEqual(new CellLocation("A1"), left.AbsoluteLocation);
+        Assert.AreEqual(new CellLocation("A2"), left.AbsoluteLocation);
 
         LocationNode right = (LocationNode)pn.Right;
         Assert.AreEqual(TokenID.ADDRESS, right.Op);
-        Assert.AreEqual(new CellLocation("A2"), right.AbsoluteLocation);
+        Assert.AreEqual(new CellLocation("A3"), right.AbsoluteLocation);
     }
 
     // Verify a binary multiplication formula
@@ -93,7 +93,7 @@ public class ParsingTests {
     public void VerifyMultiplication() {
         Book workBook = new();
         Sheet sheet = workBook.Sheets.First();
-        Cell cell1 = new(sheet) { Content = "=A1*14" };
+        Cell cell1 = new(sheet) { Content = "=A2*14" };
         Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
         BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
@@ -103,7 +103,7 @@ public class ParsingTests {
 
         LocationNode left = (LocationNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
-        Assert.AreEqual(new CellLocation("A1"), left.AbsoluteLocation);
+        Assert.AreEqual(new CellLocation("A2"), left.AbsoluteLocation);
 
         NumberNode right = (NumberNode)pn.Right;
         Assert.AreEqual(TokenID.NUMBER, right.Op);
@@ -346,7 +346,7 @@ public class ParsingTests {
     public void VerifyParenthesis() {
         Book workBook = new();
         Sheet sheet = workBook.Sheets.First();
-        Cell cell1 = new(sheet) { Content = "=A1*(A2+A3)" };
+        Cell cell1 = new(sheet) { Content = "=A2*(A3+A4)" };
         Assert.IsTrue(cell1.FormulaTree is BinaryOpNode);
 
         BinaryOpNode pn = (BinaryOpNode)cell1.FormulaTree;
@@ -356,15 +356,15 @@ public class ParsingTests {
 
         LocationNode left = (LocationNode)pn.Left;
         Assert.AreEqual(TokenID.ADDRESS, left.Op);
-        Assert.AreEqual(new CellLocation("A1"), left.AbsoluteLocation);
+        Assert.AreEqual(new CellLocation("A2"), left.AbsoluteLocation);
 
         BinaryOpNode right = (BinaryOpNode)pn.Right;
         Assert.AreEqual(TokenID.PLUS, right.Op);
 
-        Assert.AreEqual("=A1*(A2+A3)", cell1.Content);
+        Assert.AreEqual("=A2*(A3+A4)", cell1.Content);
 
-        Cell cell3 = new(sheet) { Content = "= ( A1 + A2 ) * A3" };
-        Assert.AreEqual("=(A1+A2)*A3", cell3.Content);
+        Cell cell3 = new(sheet) { Content = "= ( A2 + A3 ) * A4" };
+        Assert.AreEqual("=(A2+A3)*A4", cell3.Content);
 
         // Missing closing parenthesis should throw an exception
         Cell cell2 = new(sheet);

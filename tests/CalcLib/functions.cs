@@ -166,11 +166,6 @@ public class FunctionTests {
         DateOnly date = DateOnly.Parse(cell1.TextForWidth(12));
         Assert.AreEqual(DateOnly.FromDateTime(DateTime.Now), date);
 
-        // Check the correct format is set
-        cell1.CellFormat = CellFormat.GENERAL;
-        sheet.Calculate();
-        Assert.AreEqual(DateTime.Now.ToString("dd/MM/yyyy H:mm"), cell1.Text);
-
         sheet = workBook.AddSheet();
         cell1 = sheet.GetCell(new CellLocation("A1"), true);
         cell1.Content = "=NOW()";

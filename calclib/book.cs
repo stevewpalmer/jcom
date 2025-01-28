@@ -68,7 +68,7 @@ public class Book {
     /// Create an empty workbook with just one sheet.
     /// </summary>
     public Book() {
-        _sheets.Add(new Sheet(this, 1) { Ready = true });
+        AddSheet();
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public class Book {
         _fileInfo = null;
         _sheets.Clear();
         _cellGraph.Clear();
-        _sheets.Add(new Sheet(this, 1) { Ready = true });
+        AddSheet();
     }
 
     /// <summary>

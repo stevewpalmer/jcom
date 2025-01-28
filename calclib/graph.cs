@@ -105,13 +105,12 @@ public class CellGraph {
     /// <param name="from">Cell location to locate</param>
     /// <param name="result">Cumulative list of neighbours</param>
     private void InternalGetDependents(CellLocation from, HashSet<CellLocation> result) {
-        if (result.Contains(from)) {
-            return;
-        }
         if (_dependents.TryGetValue(from, out HashSet<CellLocation>? dependent)) {
             foreach (CellLocation to in dependent) {
-                result.Add(to);
-                result.UnionWith(GetDependents(to));
+                if (!result.Add(to)) {
+                    return;
+                }
+                InternalGetDependents(to, result);
             }
         }
     }
@@ -130,8 +129,10 @@ public class CellGraph {
         }
         if (_dependees.TryGetValue(from, out HashSet<CellLocation>? dependees)) {
             foreach (CellLocation to in dependees) {
-                result.Add(to);
-                result.UnionWith(GetDependees(to));
+                if (!result.Add(to)) {
+                    return;
+                }
+                InternalGetDependees(to, result);
             }
         }
     }

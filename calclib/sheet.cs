@@ -562,11 +562,14 @@ public class Sheet {
     /// <param name="row">Row to fix</param>
     /// <param name="offset">Offset to be applied to the column and/or row</param>
     private void FixupFormulaCells(int column, int row, int offset) {
-        NeedRecalculate = false;
+        bool adjusted = false;
         foreach (Cell cell in ColumnList.SelectMany(cellList => cellList.FormulaCells)) {
             if (cell.FixupFormula(column, row, offset)) {
-                NeedRecalculate = true;
+                adjusted = true;
             }
+        }
+        if (adjusted) {
+            FullRecalculate();
         }
     }
 

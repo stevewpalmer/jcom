@@ -142,7 +142,7 @@ public class CellTests {
         Assert.IsTrue(number15.Value.IsNumber);
         Assert.AreEqual(text.Value, new Variant("TEXT"));
         Assert.AreEqual(text.Content, "TEXT");
-        Assert.IsTrue(new Cell(workBook.Sheets.First()) { Content = "=A1+B2" }.HasFormula);
+        Assert.IsTrue(new Cell(workBook.Sheets.First()) { Content = "=B1+B2" }.HasFormula);
 
         Cell date = new() { Content = "4 June 1980" };
         Assert.AreEqual("4-June-1980", date.Text);
