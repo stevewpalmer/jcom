@@ -124,9 +124,6 @@ public class CellGraph {
     /// <param name="from">Cell location to locate</param>
     /// <param name="result">Cumulative list of neighbours</param>
     private void InternalGetDependees(CellLocation from, HashSet<CellLocation> result) {
-        if (result.Contains(from)) {
-            return;
-        }
         if (_dependees.TryGetValue(from, out HashSet<CellLocation>? dependees)) {
             foreach (CellLocation to in dependees) {
                 if (!result.Add(to)) {
