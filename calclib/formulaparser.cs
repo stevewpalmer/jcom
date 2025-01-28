@@ -25,7 +25,9 @@
 
 using System.Diagnostics;
 using System.Drawing;
+using System.Reflection;
 using System.Text;
+using JComLib;
 
 namespace JCalcLib;
 
@@ -51,22 +53,11 @@ public enum TokenID {
     EXP,
     EOL,
     TEXT,
-    KSUM,
-    KNOW,
-    KTODAY,
-    KYEAR,
-    KMONTH,
-    KTIME,
-    KDATE,
-    KEDATE,
-    KDAYS360,
-    KTEXT,
+    FUNCTION,
     COLON,
     CONCAT,
-    KCONCATENATE,
     COMMA,
-    RANGE,
-    KAVG
+    RANGE
 }
 
 /// <summary>
@@ -169,9 +160,9 @@ public class FormulaParser {
                     PushChar(ch);
 
                     string name = str.ToString();
-                    KeyValuePair<TokenID, string> node = CellNode.Functions.FirstOrDefault(item => item.Value == name.ToUpper());
-                    if (node.Key != TokenID.NONE) {
-                        tokens.Add(new SimpleToken(node.Key));
+                    MethodInfo? methodInfo = FunctionNode.GetFunction(name);
+                    if (methodInfo != null) {
+                        tokens.Add(new FunctionToken(name, methodInfo));
                         break;
                     }
                     if (!CellLocation.TryParseAddress(name, out CellLocation _)) {
@@ -478,27 +469,9 @@ public class FormulaParser {
                 return node;
             }
 
-            case TokenID.KTODAY:
-            case TokenID.KNOW:
-                return ParseArguments(token.ID, 0);
-
-            case TokenID.KYEAR:
-            case TokenID.KMONTH:
-                return ParseArguments(token.ID, 1);
-
-            case TokenID.KDAYS360:
-            case TokenID.KEDATE:
-            case TokenID.KTEXT:
-                return ParseArguments(token.ID, 2);
-
-            case TokenID.KDATE:
-            case TokenID.KTIME:
-                return ParseArguments(token.ID, 3);
-
-            case TokenID.KSUM:
-            case TokenID.KAVG:
-            case TokenID.KCONCATENATE:
-                return ParseArguments(token.ID, 255);
+            case TokenID.FUNCTION:
+                FunctionToken functiontoken = (FunctionToken)token;
+                return ParseArguments(functiontoken);
 
             case TokenID.PLUS:
                 return Operand();
@@ -560,12 +533,16 @@ public class FormulaParser {
     /// Parse the argument list to a function based on the specified
     /// rules.
     /// </summary>
-    /// <param name="id">Function token ID</param>
-    /// <param name="maxCount">Maximum number of arguments</param>
+    /// <param name="functionToken">Function token</param>
     /// <returns>A function node</returns>
-    private FunctionNode ParseArguments(TokenID id, int maxCount) {
+    private FunctionNode ParseArguments(FunctionToken functionToken) {
         List<CellNode> args = [];
         ExpectToken(TokenID.LPAREN);
+        ParameterInfo[] parameters = functionToken.MethodInfo.GetParameters();
+        int maxCount = functionToken.MethodInfo.GetParameters().Length;
+        if (maxCount > 0 && parameters[0].ParameterType == typeof(IEnumerable<Variant>)) {
+            maxCount = 255;
+        }
         if (PeekToken().ID != TokenID.RPAREN) {
             while (maxCount-- > 0) {
                 args.Add(Expression(0));
@@ -577,7 +554,7 @@ public class FormulaParser {
             }
         }
         ExpectToken(TokenID.RPAREN);
-        return new FunctionNode(id, args.ToArray());
+        return new FunctionNode(functionToken.MethodInfo, args.ToArray());
     }
 
     /// <summary>
@@ -587,7 +564,8 @@ public class FormulaParser {
     /// <param name="id">Token ID</param>
     /// <returns>Precedence level</returns>
     internal static int Precedence(TokenID id) =>
-        CellNode.Functions.ContainsKey(id) ? 20 : id switch {
+        id switch {
+            TokenID.FUNCTION => 20,
             TokenID.NUMBER => 20,
             TokenID.ADDRESS => 20,
             TokenID.TEXT => 20,
@@ -675,5 +653,28 @@ public class FormulaParser {
         /// Returns the string.
         /// </summary>
         public string Value { get; }
+    }
+
+    private class FunctionToken : SimpleToken {
+
+        /// <summary>
+        /// Creates a function token with the given name.
+        /// </summary>
+        /// <param name="name">A string specifying the function name</param>
+        /// <param name="methodInfo">A MethodInfo with details of the function call</param>
+        public FunctionToken(string name, MethodInfo methodInfo) : base(TokenID.FUNCTION) {
+            Name = name;
+            MethodInfo = methodInfo;
+        }
+
+        /// <summary>
+        /// Returns the function name.
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Returns the function MethodInfo detailing the call semantics.
+        /// </summary>
+        public MethodInfo MethodInfo { get; }
     }
 }

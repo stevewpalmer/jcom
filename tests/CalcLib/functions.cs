@@ -55,6 +55,23 @@ public class FunctionTests {
     }
 
     /// <summary>
+    /// Verify the LEN function
+    /// </summary>
+    [Test]
+    public void VerifyLen() {
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
+        cell1.Content = "Edge of Darkness";
+        cell2.Content = "=LEN(A1)";
+        cell3.Content = "=LEN(CONCATENATE('HELLO',' ','WORLD'))";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(11), cell3.Value);
+    }
+
+    /// <summary>
     /// Verify the DATE function
     /// </summary>
     [Test]

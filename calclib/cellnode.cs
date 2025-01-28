@@ -40,24 +40,6 @@ namespace JCalcLib;
 internal class CellNode(TokenID tokenID) {
 
     /// <summary>
-    /// List of built-in functions
-    /// </summary>
-    public static readonly Dictionary<TokenID, string> Functions = new() {
-        { TokenID.KSUM, "SUM" },
-        { TokenID.KNOW, "NOW" },
-        { TokenID.KTODAY, "TODAY" },
-        { TokenID.KYEAR, "YEAR" },
-        { TokenID.KMONTH, "MONTH" },
-        { TokenID.KTIME, "TIME" },
-        { TokenID.KDATE, "DATE" },
-        { TokenID.KEDATE, "EDATE" },
-        { TokenID.KDAYS360, "DAYS360" },
-        { TokenID.KCONCATENATE, "CONCATENATE" },
-        { TokenID.KTEXT, "TEXT" },
-        { TokenID.KAVG, "AVG" }
-    };
-
-    /// <summary>
     /// Operator
     /// </summary>
     public TokenID Op { get; } = tokenID;
@@ -89,7 +71,8 @@ internal class CellNode(TokenID tokenID) {
             TokenID.COLON => ":",
             TokenID.CONCAT => "&",
             TokenID.COMMA => ",",
-            _ => Functions.GetValueOrDefault(tokenId, "?")
+            TokenID.FUNCTION => "function",
+            _ => "?"
         };
 
     /// <summary>
@@ -128,8 +111,9 @@ internal class CellNode(TokenID tokenID) {
 /// <summary>
 /// Node for a function call.
 /// </summary>
-/// <param name="tokenID">Node token ID</param>
-internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(tokenID) {
+/// <param name="methodInfo">Function method info</param>
+/// <param name="parameters">Function parameters</param>
+internal class FunctionNode(MethodInfo methodInfo, CellNode[] parameters) : CellNode(TokenID.FUNCTION) {
 
     /// <summary>
     /// Function parameter list
@@ -137,16 +121,21 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
     public CellNode[] Parameters { get; } = parameters;
 
     /// <summary>
+    /// Function parameter list
+    /// </summary>
+    public MethodInfo MethodInfo { get; } = methodInfo;
+
+    /// <summary>
     /// Convert this node to its raw string.
     /// </summary>
     /// <returns>String</returns>
-    public override string ToRawString() => $"{TokenToString(Op)}({string.Join(",", Parameters.Select(p => p.ToRawString()))})";
+    public override string ToRawString() => $"{MethodInfo.Name}({string.Join(",", Parameters.Select(p => p.ToRawString()))})";
 
     /// <summary>
     /// Convert this node to its string.
     /// </summary>
     /// <returns>String</returns>
-    public override string ToString() => $"{TokenToString(Op)}({string.Join(",", Parameters.Select(p => p.ToString()))})";
+    public override string ToString() => $"{MethodInfo.Name}({string.Join(",", Parameters.Select(p => p.ToString()))})";
 
     /// <summary>
     /// Return the list of dependent cell location referenced by this
@@ -183,13 +172,26 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
     /// <param name="context">The calculation context</param>
     /// <returns>The variant result from the function</returns>
     public override Variant Evaluate(CalculationContext context) {
-        string name = TokenToString(Op);
-        Debug.Assert(name != null);
-        MethodInfo? method = typeof(Functions).GetMethod(name, BindingFlags.Static | BindingFlags.Public, [typeof(IEnumerable<Variant>)]);
-        Debug.Assert(method != null);
-        Variant? result = method.Invoke(null, [Arguments(context)]) as Variant;
+        Debug.Assert(MethodInfo != null);
+        ParameterInfo[] parameterInfo = MethodInfo.GetParameters();
+        object[]? parameters = null;
+        if (parameterInfo.Length > 0) {
+            if (parameterInfo[0].ParameterType == typeof(IEnumerable<Variant>)) {
+                parameters = [Arguments(context)];
+            }
+            else {
+                List<Variant> collectedParameters = [];
+                foreach (Variant arg in Arguments(context)) {
+                    if (collectedParameters.Count < parameterInfo.Length) {
+                        collectedParameters.Add(arg);
+                    }
+                }
+                parameters = collectedParameters.ToArray();
+            }
+        }
+        Variant? result = MethodInfo.Invoke(null, parameters) as Variant;
         Debug.Assert(result != null);
-        if (Op == TokenID.KNOW) {
+        if (MethodInfo.Name == "NOW") {
             CellLocation sourceLocation = context.ReferenceList.First();
             Cell cell = context.Sheet.GetCell(sourceLocation, false);
             if (cell.Format is null or CellFormat.GENERAL) {
@@ -198,6 +200,16 @@ internal class FunctionNode(TokenID tokenID, CellNode[] parameters) : CellNode(t
             }
         }
         return result;
+    }
+
+    /// <summary>
+    /// Look up a function given its name.
+    /// </summary>
+    /// <param name="name">Function name</param>
+    /// <returns>A MethodInfo describing the function</returns>
+    public static MethodInfo? GetFunction(string name) {
+        Debug.Assert(name != null);
+        return typeof(Functions).GetMethod(name, BindingFlags.Static | BindingFlags.Public);
     }
 
     /// <summary>
@@ -470,9 +482,7 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     /// node.
     /// </summary>
     public override IEnumerable<CellLocation> Dependents(CellLocation sourceCell) =>
-        [AbsoluteLocation.SheetName == null ?
-            ToAbsolute(sourceCell) :
-            AbsoluteLocation];
+        [AbsoluteLocation.SheetName == null ? ToAbsolute(sourceCell) : AbsoluteLocation];
 
     /// <summary>
     /// Fix up any address references on the node.
@@ -551,9 +561,7 @@ internal class LocationNode(CellLocation absoluteLocation, Point relativeLocatio
     /// <returns>A variant</returns>
     public override Variant Evaluate(CalculationContext context) {
         CellLocation sourceLocation = context.ReferenceList.Peek();
-        CellLocation absoluteLocation = AbsoluteLocation.SheetName == null ?
-            ToAbsolute(sourceLocation) :
-            AbsoluteLocation;
+        CellLocation absoluteLocation = AbsoluteLocation.SheetName == null ? ToAbsolute(sourceLocation) : AbsoluteLocation;
         return FunctionNode.EvaluateLocation(context, absoluteLocation);
     }
 }

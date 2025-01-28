@@ -56,11 +56,20 @@ public static class Functions {
     }
 
     /// <summary>
+    /// Returns the length of a string.
+    /// </summary>
+    /// <param name="str">A variant specifying the string</param>
+    /// <returns>A variant containing the length of the input string</returns>
+    public static Variant LEN(Variant str) {
+        return new Variant(str.StringValue.Length);
+    }
+
+    /// <summary>
     /// Returns the current date and time as a serial number.
     /// </summary>
     /// <param name="_">Function parameters</param>
     /// <returns>A variant containing the serial number of the current date and time</returns>
-    public static Variant NOW(IEnumerable<Variant> _) {
+    public static Variant NOW() {
         return new Variant(DateTime.Now.ToOADate());
     }
 
@@ -69,32 +78,32 @@ public static class Functions {
     /// </summary>
     /// <param name="_">Function parameters</param>
     /// <returns>A variant containing the serial number of the current date</returns>
-    public static Variant TODAY(IEnumerable<Variant> _) {
+    public static Variant TODAY() {
         return new Variant(DateTime.Now.ToOADate());
     }
 
     /// <summary>
     /// Returns a serial number representing the specified time on the current date.
     /// </summary>
-    /// <param name="arguments">Function parameters</param>
+    /// <param name="hour">Variant specifying the hour element</param>
+    /// <param name="minute">Variant specifying the minute element</param>
+    /// <param name="second">Variant specifying the second element</param>
     /// <returns>A variant containing the serial number of the specified time</returns>
-    public static Variant TIME(IEnumerable<Variant> arguments) {
-        Variant[] parts = arguments.ToArray();
-        Debug.Assert(parts.Length == 3);
+    public static Variant TIME(Variant hour, Variant minute, Variant second) {
         DateTime oaBaseDate = DateTime.FromOADate(0);
-        TimeSpan ts = new(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
+        TimeSpan ts = new(hour.IntValue, minute.IntValue, second.IntValue);
         return new Variant(oaBaseDate.Add(ts).ToOADate());
     }
 
     /// <summary>
     /// Returns a serial number representing the specified date.
     /// </summary>
-    /// <param name="arguments">Function parameters</param>
+    /// <param name="day">Variant specifying the hour element</param>
+    /// <param name="month">Variant specifying the hour element</param>
+    /// <param name="year">Variant specifying the hour element</param>
     /// <returns>A variant containing the serial number of the specified date</returns>
-    public static Variant DATE(IEnumerable<Variant> arguments) {
-        Variant[] parts = arguments.ToArray();
-        Debug.Assert(parts.Length == 3);
-        DateTime ts = new(parts[0].IntValue, parts[1].IntValue, parts[2].IntValue);
+    public static Variant DATE(Variant day, Variant month, Variant year) {
+        DateTime ts = new(day.IntValue, month.IntValue, year.IntValue);
         return new Variant(ts.ToOADate());
     }
 
@@ -102,14 +111,13 @@ public static class Functions {
     /// Returns the serial number that represents the date that is the indicated number
     /// of months before or after a specified date (the start_date).
     /// </summary>
-    /// <param name="arguments">Function parameters</param>
+    /// <param name="initialDate">Variant specifying the initial date</param>
+    /// <param name="months">Variant specifying the month</param>
     /// <returns>A variant containing the serial number of the computed date</returns>
-    public static Variant EDATE(IEnumerable<Variant> arguments) {
-        Variant[] parts = arguments.ToArray();
-        Debug.Assert(parts.Length == 2);
+    public static Variant EDATE(Variant initialDate, Variant months) {
         try {
-            DateTime date = DateTime.FromOADate(parts[0].DoubleValue);
-            date = date.AddMonths(parts[1].IntValue);
+            DateTime date = DateTime.FromOADate(initialDate.DoubleValue);
+            date = date.AddMonths(months.IntValue);
             return new Variant(date.ToOADate());
         }
         catch {
@@ -122,17 +130,16 @@ public static class Functions {
     /// which is used in some accounting calculations. The method applied is the European method and
     /// will require updates to support the NASD method.
     /// </summary>
-    /// <param name="arguments">Function parameters</param>
+    /// <param name="date1">Variant specifying the first date</param>
+    /// <param name="date2">Variant specifying the second date</param>
     /// <returns>
     /// A variant containing the number of days between the two days according to
     /// a 360-day year.
     /// </returns>
-    public static Variant DAYS360(IEnumerable<Variant> arguments) {
-        Variant[] parts = arguments.ToArray();
-        Debug.Assert(parts.Length == 2);
+    public static Variant DAYS360(Variant date1, Variant date2) {
         try {
-            DateTime startDate = DateTime.FromOADate(parts[0].DoubleValue);
-            DateTime endDate = DateTime.FromOADate(parts[1].DoubleValue);
+            DateTime startDate = DateTime.FromOADate(date1.DoubleValue);
+            DateTime endDate = DateTime.FromOADate(date2.DoubleValue);
             if (endDate < startDate) {
                 (endDate, startDate) = (startDate, endDate);
             }
@@ -156,12 +163,11 @@ public static class Functions {
     /// <summary>
     /// Extract and return the year part of a date.
     /// </summary>
-    /// <param name="arguments">Function parameters</param>
+    /// <param name="inputDate">Variant specifying the input date</param>
     /// <returns>A vatiant containing the year part of a date</returns>
-    public static Variant YEAR(IEnumerable<Variant> arguments) {
-        Variant result = arguments.First();
+    public static Variant YEAR(Variant inputDate) {
         try {
-            DateTime date = DateTime.FromOADate(result.DoubleValue);
+            DateTime date = DateTime.FromOADate(inputDate.DoubleValue);
             return new Variant(date.Year);
         }
         catch {
@@ -172,12 +178,11 @@ public static class Functions {
     /// <summary>
     /// Extract and return the month part of a date.
     /// </summary>
-    /// <param name="arguments">Function parameters</param>
+    /// <param name="inputDate">Variant specifying the input date</param>
     /// <returns>A variant containing the month value of a date</returns>
-    public static Variant MONTH(IEnumerable<Variant> arguments) {
-        Variant result = arguments.First();
+    public static Variant MONTH(Variant inputDate) {
         try {
-            DateTime date = DateTime.FromOADate(result.DoubleValue);
+            DateTime date = DateTime.FromOADate(inputDate.DoubleValue);
             return new Variant(date.Month);
         }
         catch {
@@ -199,17 +204,16 @@ public static class Functions {
     /// value is specified in the first parameter and the format in the second
     /// parameter.
     /// </summary>
-    /// <param name="arguments">Function parameters</param>
+    /// <param name="value">Variant specifying the value to format</param>
+    /// <param name="formatString">Variant specifying the format string</param>
     /// <returns>
     /// A variant containing the result of the value parameter formatted using the
     /// format specified in the format parameter. If the format parameter does not specify a
     /// valid number or string format then the text is returned unchanged.
     /// </returns>
-    public static Variant TEXT(IEnumerable<Variant> arguments) {
-        Variant[] parts = arguments.ToArray();
-        Debug.Assert(parts.Length == 2);
-        NumberFormat customFormat = new(parts[1].StringValue);
+    public static Variant TEXT(Variant value, Variant formatString) {
+        NumberFormat customFormat = new(formatString.StringValue);
         CultureInfo culture = CultureInfo.CurrentCulture;
-        return new Variant(customFormat.Format(parts[0].DoubleValue, culture));
+        return new Variant(customFormat.Format(value.DoubleValue, culture));
     }
 }

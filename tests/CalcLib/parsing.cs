@@ -416,13 +416,7 @@ public class ParsingTests {
         Assert.IsTrue(FormulaParser.Precedence(pn.Left.Op) == FormulaParser.Precedence(pn.Right.Op));
 
         // Verify precedences
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.KSUM) == 20);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.KCONCATENATE) == 20);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.KNOW) == 20);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.KTODAY) == 20);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.KMONTH) == 20);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.KYEAR) == 20);
-        Assert.IsTrue(FormulaParser.Precedence(TokenID.KTIME) == 20);
+        Assert.IsTrue(FormulaParser.Precedence(TokenID.FUNCTION) == 20);
         Assert.IsTrue(FormulaParser.Precedence(TokenID.NUMBER) == 20);
         Assert.IsTrue(FormulaParser.Precedence(TokenID.ADDRESS) == 20);
         Assert.IsTrue(FormulaParser.Precedence(TokenID.TEXT) == 20);
@@ -453,7 +447,7 @@ public class ParsingTests {
         Assert.IsTrue(cell.FormulaTree.GetType() == typeof(FunctionNode));
 
         FunctionNode functionNode = (FunctionNode)cell.FormulaTree;
-        Assert.AreEqual(TokenID.KSUM, functionNode.Op);
+        Assert.AreEqual(TokenID.FUNCTION, functionNode.Op);
         Assert.AreEqual("SUM(A2:A4)", functionNode.ToString());
         Assert.AreEqual("SUM(R(1)C(0):R(3)C(0))", functionNode.ToRawString());
 
