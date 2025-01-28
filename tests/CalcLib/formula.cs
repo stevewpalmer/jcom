@@ -56,6 +56,18 @@ public class FormulaTests {
         Assert.AreEqual(cell1.LocationWithSheet, dependents[0]);
         Assert.AreEqual(cell2.LocationWithSheet, dependents[1]);
         Assert.AreEqual(cell3.LocationWithSheet, dependents[2]);
+
+        CellLocation [] dependees = workBook.Dependees(cell1.LocationWithSheet).ToArray();
+        Assert.AreEqual(1, dependees.Length);
+        Assert.AreEqual(cell4.LocationWithSheet, dependees[0]);
+
+        dependees = workBook.Dependees(cell2.LocationWithSheet).ToArray();
+        Assert.AreEqual(1, dependees.Length);
+        Assert.AreEqual(cell4.LocationWithSheet, dependees[0]);
+
+        dependees = workBook.Dependees(cell2.LocationWithSheet).ToArray();
+        Assert.AreEqual(1, dependees.Length);
+        Assert.AreEqual(cell4.LocationWithSheet, dependees[0]);
     }
 
     // Verify the = operator
@@ -315,6 +327,7 @@ public class FormulaTests {
         cell1.Content = "4.5";
         cell2.Content = "167.03";
         cell3.Content = "=A1*B2";
+        Assert.IsTrue(sheet.NeedRecalculate);
         sheet.Calculate();
         Assert.AreEqual(new Variant(751.635), cell3.Value);
 
