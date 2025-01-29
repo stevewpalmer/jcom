@@ -65,8 +65,8 @@ public class CellGraph {
     /// </summary>
     /// <param name="from">Dependent cell</param>
     public void DeleteEdges(CellLocation from) {
-        if (_dependents.ContainsKey(from)) {
-            foreach (CellLocation to in _dependents[from]) {
+        if (_dependents.TryGetValue(from, out HashSet<CellLocation>? value)) {
+            foreach (CellLocation to in value) {
                 _dependees[to].Remove(from);
             }
             _dependents[from] = [];
@@ -114,7 +114,6 @@ public class CellGraph {
             }
         }
     }
-
 
     /// <summary>
     /// Walk the list of neighbours of the specified cell location and add it to

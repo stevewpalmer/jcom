@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
 using System.Globalization;
 using ExcelNumberFormat;
 using JComLib;
@@ -32,17 +31,15 @@ namespace JCalcLib;
 
 // ReSharper disable UnusedMember.Global
 public static class Functions {
-
     /// <summary>
     /// Calculate the average of all cells and constants in the argument list.
     /// </summary>
     /// <param name="arguments">Function parameters</param>
     /// <returns>A variant containing the average of the arguments</returns>
-    public static Variant AVG(IEnumerable<Variant> arguments) {
-        Variant sumTotal = new(0);
-        Variant totalValues = new(arguments.Count());
-        sumTotal = arguments.Aggregate(sumTotal, (current, value) => current + value);
-        return new Variant(sumTotal / totalValues);
+    public static Variant AVG(params Variant[] arguments) {
+        Variant totalValues = new(arguments.Length);
+        Variant sumTotal = arguments.Aggregate(new Variant(0), (current, value) => current + value);
+        return totalValues.IntValue > 0 ? new Variant(sumTotal / totalValues) : new Variant(0);
     }
 
     /// <summary>
@@ -50,9 +47,8 @@ public static class Functions {
     /// </summary>
     /// <param name="arguments">Function parameters</param>
     /// <returns>A variant containing the sum of the arguments</returns>
-    public static Variant SUM(IEnumerable<Variant> arguments) {
-        Variant sumTotal = new(0);
-        return arguments.Aggregate(sumTotal, (current, value) => current + value);
+    public static Variant SUM(params Variant[] arguments) {
+        return arguments.Aggregate(new Variant(0), (current, value) => current + value);
     }
 
     /// <summary>
@@ -67,7 +63,6 @@ public static class Functions {
     /// <summary>
     /// Returns the current date and time as a serial number.
     /// </summary>
-    /// <param name="_">Function parameters</param>
     /// <returns>A variant containing the serial number of the current date and time</returns>
     public static Variant NOW() {
         return new Variant(DateTime.Now.ToOADate());
@@ -76,7 +71,6 @@ public static class Functions {
     /// <summary>
     /// Returns the current date as a serial number.
     /// </summary>
-    /// <param name="_">Function parameters</param>
     /// <returns>A variant containing the serial number of the current date</returns>
     public static Variant TODAY() {
         return new Variant(DateTime.Now.ToOADate());
@@ -195,8 +189,8 @@ public static class Functions {
     /// </summary>
     /// <param name="arguments">Function parameters</param>
     /// <returns>A variant containing the result of the concatenation</returns>
-    public static Variant CONCATENATE(IEnumerable<Variant> arguments) {
-        return new Variant(string.Concat(arguments));
+    public static Variant CONCATENATE(params Variant[] arguments) {
+        return new Variant(string.Concat(arguments.ToList()));
     }
 
     /// <summary>

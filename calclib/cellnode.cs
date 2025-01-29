@@ -123,7 +123,7 @@ internal class FunctionNode(MethodInfo methodInfo, CellNode[] parameters) : Cell
     /// <summary>
     /// Function parameter list
     /// </summary>
-    public MethodInfo MethodInfo { get; } = methodInfo;
+    private MethodInfo MethodInfo { get; } = methodInfo;
 
     /// <summary>
     /// Convert this node to its raw string.
@@ -175,19 +175,18 @@ internal class FunctionNode(MethodInfo methodInfo, CellNode[] parameters) : Cell
         Debug.Assert(MethodInfo != null);
         ParameterInfo[] parameterInfo = MethodInfo.GetParameters();
         object[]? parameters = null;
+        Variant[] arguments = Arguments(context);
         if (parameterInfo.Length > 0) {
-            if (parameterInfo[0].ParameterType == typeof(IEnumerable<Variant>)) {
-                parameters = [Arguments(context)];
-            }
-            else {
-                List<Variant> collectedParameters = [];
-                foreach (Variant arg in Arguments(context)) {
-                    if (collectedParameters.Count < parameterInfo.Length) {
-                        collectedParameters.Add(arg);
-                    }
+            List<object> collectedParameters = [];
+            for (int c = 0; c < parameterInfo.Length; c++) {
+                bool isParam = parameterInfo[c].GetCustomAttributes(typeof(ParamArrayAttribute), false).Length > 0;
+                if (isParam) {
+                    collectedParameters.Add(new ArraySegment<Variant>(arguments, c, arguments.Length - c).ToArray());
+                    break;
                 }
-                parameters = collectedParameters.ToArray();
+                collectedParameters.Add(c < arguments.Length ? arguments[c] : new Variant(0));
             }
+            parameters = collectedParameters.ToArray();
         }
         Variant? result = MethodInfo.Invoke(null, parameters) as Variant;
         Debug.Assert(result != null);
@@ -213,29 +212,29 @@ internal class FunctionNode(MethodInfo methodInfo, CellNode[] parameters) : Cell
     }
 
     /// <summary>
-    /// Iterator that returns the Variant value of all cells specified by the function
+    /// Returns the Variant value of all cells specified by the function
     /// parameter list.
     /// </summary>
     /// <param name="context">Calculation context</param>
-    /// <returns>The next Variant from the referenced cells</returns>
-    private IEnumerable<Variant> Arguments(CalculationContext context) {
+    /// <returns>An array of arguments</returns>
+    private Variant [] Arguments(CalculationContext context) {
         CellLocation sourceLocation = context.ReferenceList.First();
+        List<Variant> args = [];
         foreach (CellNode parameter in Parameters) {
             if (parameter is RangeNode rangeNode) {
-                foreach (CellLocation location in rangeNode.RangeIterator(sourceLocation)) {
-                    Variant result = EvaluateLocation(context, location);
-                    if (result.HasValue) {
-                        yield return result;
-                    }
-                }
+                args.AddRange(rangeNode
+                    .RangeIterator(sourceLocation)
+                    .Select(location => EvaluateLocation(context, location))
+                    .Where(result => result.HasValue));
             }
             else {
                 Variant result = parameter.Evaluate(context);
                 if (result.HasValue) {
-                    yield return result;
+                    args.Add(result);
                 }
             }
         }
+        return args.ToArray();
     }
 
     /// <summary>

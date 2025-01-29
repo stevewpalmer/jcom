@@ -29,6 +29,7 @@ using System.Linq;
 using JCalcLib;
 using JComLib;
 using NUnit.Framework;
+using TestUtilities;
 
 namespace CalcLibTests;
 
@@ -48,10 +49,8 @@ public class FunctionTests {
         TimeOnly time = TimeOnly.Parse(cell1.TextForWidth(12));
         Assert.AreEqual(new TimeOnly(12, 40, 30), time);
 
-        cell1.Content = "=TIME(12)";
-        cell1.CellFormat = CellFormat.TIME_HMS;
-        sheet.Calculate();
-        Assert.IsTrue(cell1.Error);
+        // Incorrect number of arguments to TIME()
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("=TIME(12)", cell1.Location).Parse(); });
     }
 
     /// <summary>
@@ -274,10 +273,54 @@ public class FunctionTests {
         sheet.Calculate();
         Assert.IsTrue(cell5.Value == 253);
 
-        // Empty sum!
-        cell5.Content = "=SUM()";
+        // Empty SUM is an error
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("=SUM()", cell5.Location).Parse(); });
+    }
+
+    /// <summary>
+    /// Verify the AVG function
+    /// </summary>
+    [Test]
+    public void VerifyAverage() {
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        Cell cell3 = sheet.GetCell(new CellLocation("A3"), true);
+        Cell cell4 = sheet.GetCell(new CellLocation("A4"), true);
+        Cell cell5 = sheet.GetCell(new CellLocation("A5"), true);
+
+        // Simple range average
+        cell1.Content = "56";
+        cell2.Content = "78";
+        cell3.Content = "13";
+        cell5.Content = "=AVG(A1:A3)";
         sheet.Calculate();
-        Assert.AreEqual(new Variant(0), cell5.Value);
+        Assert.AreEqual(new Variant("49"), cell5.Value);
+
+        // Multiple ranges average
+        cell4.Content = "-7";
+        cell5.Content = "=AVG(A1:A2,A3:A4)";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(35), cell5.Value);
+
+        // Average literals
+        cell5.Content = "=AVG(40,50,60,70,80)";
+        sheet.Calculate();
+        Assert.AreEqual(new Variant(60), cell5.Value);
+
+        // Average with expressions
+        cell5.Content = "=AVG(3*4,9/3)";
+        sheet.Calculate();
+        Assert.IsTrue(cell5.Value == 7.5);
+
+        // Average with strings and mixed expression types
+        cell5.Content = "=AVG(A1,A2:A4,90,\"Hello\",4*6)";
+        sheet.Calculate();
+        Assert.IsTrue(Helper.DoubleCompare(cell5.Value.DoubleValue, 36.285714285714285));
+
+        // Empty AVG is an error
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("=AVG()", cell5.Location).Parse(); });
     }
 
     /// <summary>
@@ -334,10 +377,8 @@ public class FunctionTests {
         sheet.Calculate();
         Assert.AreEqual(new Variant("The answer is 12, right?"), cell5.Value);
 
-        // Empty concatenation!
-        cell5.Content = "=CONCATENATE()";
-        sheet.Calculate();
-        Assert.AreEqual(new Variant(""), cell5.Value);
+        // Empty concatenation is an error
+        Assert.Throws<FormatException>(delegate { _ = new FormulaParser("=CONCATENATE()", cell5.Location).Parse(); });
     }
 
     /// <summary>

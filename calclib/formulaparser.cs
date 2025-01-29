@@ -35,8 +35,7 @@ namespace JCalcLib;
 /// List of cell node tokens
 /// </summary>
 public enum TokenID {
-    NONE = 0,
-    ADDRESS,
+    ADDRESS = 1,
     NUMBER,
     MULTIPLY,
     DIVIDE,
@@ -162,7 +161,7 @@ public class FormulaParser {
                     string name = str.ToString();
                     MethodInfo? methodInfo = FunctionNode.GetFunction(name);
                     if (methodInfo != null) {
-                        tokens.Add(new FunctionToken(name, methodInfo));
+                        tokens.Add(new FunctionToken(methodInfo));
                         break;
                     }
                     if (!CellLocation.TryParseAddress(name, out CellLocation _)) {
@@ -522,9 +521,7 @@ public class FormulaParser {
 
             // If this is a reference to a cell on another sheet, there is no relative location.
             absoluteLocation = new CellLocation(addressToken.Address);
-            relativeLocation = absoluteLocation.SheetName != null ?
-                new Point(0, 0) :
-                new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
+            relativeLocation = absoluteLocation.SheetName != null ? new Point(0, 0) : new Point(absoluteLocation.Column - _location.Column, absoluteLocation.Row - _location.Row);
         }
         return new LocationNode(absoluteLocation, relativeLocation);
     }
@@ -539,18 +536,19 @@ public class FormulaParser {
         List<CellNode> args = [];
         ExpectToken(TokenID.LPAREN);
         ParameterInfo[] parameters = functionToken.MethodInfo.GetParameters();
-        int maxCount = functionToken.MethodInfo.GetParameters().Length;
-        if (maxCount > 0 && parameters[0].ParameterType == typeof(IEnumerable<Variant>)) {
-            maxCount = 255;
+        int maxCount = parameters.Length;
+        if (maxCount > 0) {
+            bool isParam = parameters.Last().GetCustomAttributes(typeof(ParamArrayAttribute), false).Length > 0;
+            if (isParam) {
+                maxCount = 255;
+            }
         }
-        if (PeekToken().ID != TokenID.RPAREN) {
-            while (maxCount-- > 0) {
-                args.Add(Expression(0));
-                SimpleToken token = GetNextToken();
-                if (token.ID != TokenID.COMMA) {
-                    PushToken(token);
-                    break;
-                }
+        while (maxCount-- > 0) {
+            args.Add(Expression(0));
+            SimpleToken token = GetNextToken();
+            if (token.ID != TokenID.COMMA) {
+                PushToken(token);
+                break;
             }
         }
         ExpectToken(TokenID.RPAREN);
@@ -660,17 +658,10 @@ public class FormulaParser {
         /// <summary>
         /// Creates a function token with the given name.
         /// </summary>
-        /// <param name="name">A string specifying the function name</param>
         /// <param name="methodInfo">A MethodInfo with details of the function call</param>
-        public FunctionToken(string name, MethodInfo methodInfo) : base(TokenID.FUNCTION) {
-            Name = name;
+        public FunctionToken(MethodInfo methodInfo) : base(TokenID.FUNCTION) {
             MethodInfo = methodInfo;
         }
-
-        /// <summary>
-        /// Returns the function name.
-        /// </summary>
-        public string Name { get; }
 
         /// <summary>
         /// Returns the function MethodInfo detailing the call semantics.
