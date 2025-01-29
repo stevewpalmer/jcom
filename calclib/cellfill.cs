@@ -126,9 +126,11 @@ public class CellDateVariantFiller : ICellTypeFiller {
             switch (cell.CellFormat) {
                 case CellFormat.DATE_DMY:
                 case CellFormat.DATE_DM:
+                case CellFormat.CUSTOM when cell.CustomFormatString!.Contains('d'):
                     dayDelta = (deltaDateTime - cellDateTime).Days;
                     break;
                 case CellFormat.DATE_MY:
+                case CellFormat.CUSTOM when cell.CustomFormatString!.Contains('M'):
                     monthDelta = (deltaDateTime.Year - cellDateTime.Year) * 12 + deltaDateTime.Month - cellDateTime.Month;
                     break;
             }

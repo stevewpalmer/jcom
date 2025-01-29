@@ -68,6 +68,14 @@ public class FormulaTests {
         dependees = workBook.Dependees(cell2.LocationWithSheet).ToArray();
         Assert.AreEqual(1, dependees.Length);
         Assert.AreEqual(cell4.LocationWithSheet, dependees[0]);
+
+        // Make sure resetting a workbook removes all existing dependents
+        // and dependees.
+        workBook.New();
+        dependees = workBook.Dependees(cell2.LocationWithSheet).ToArray();
+        dependents = workBook.Dependents(cell4.LocationWithSheet).ToArray();
+        Assert.IsEmpty(dependees);
+        Assert.IsEmpty(dependents);
     }
 
     // Verify the = operator

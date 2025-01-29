@@ -182,6 +182,72 @@ public class FillerTests {
     }
 
     /// <summary>
+    /// Test a custom date field filler
+    /// </summary>
+    [Test]
+    public void VerifyCustomDMFill() {
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        cell1.Content = "1 October 1983";
+        cell1.CellFormat = CellFormat.CUSTOM;
+        cell1.CustomFormatString = "dd MMM yy";
+        cell2.Content = "2 October 1983";
+        cell2.CellFormat = CellFormat.CUSTOM;
+        cell2.CustomFormatString = "dd MMM yy";
+
+        List<CellLocation> cellLocations = [];
+        for (int row = 1; row < 10; row++) {
+            cellLocations.Add(new CellLocation(1, row));
+        }
+
+        CellFiller filler = new(sheet, cellLocations);
+        filler.Process();
+
+        DateTime startDate = new(1983, 10, 1);
+        foreach (CellLocation location in cellLocations) {
+            Cell cell = sheet.GetCell(location, false);
+            Assert.AreEqual(startDate.ToString("dd MMM yy"), cell.Text);
+            Assert.AreEqual(CellFormat.CUSTOM, cell.CellFormat);
+            startDate = startDate.AddDays(1);
+        }
+    }
+
+    /// <summary>
+    /// Test a custom month field filler
+    /// </summary>
+    [Test]
+    public void VerifyCustomMFill() {
+        Book workBook = new();
+        Sheet sheet = workBook.Sheets.First();
+        Cell cell1 = sheet.GetCell(new CellLocation("A1"), true);
+        Cell cell2 = sheet.GetCell(new CellLocation("A2"), true);
+        cell1.Content = "1 October 1983";
+        cell1.CellFormat = CellFormat.CUSTOM;
+        cell1.CustomFormatString = "MMM";
+        cell2.Content = "1 November 1983";
+        cell2.CellFormat = CellFormat.CUSTOM;
+        cell2.CustomFormatString = "MMM";
+
+        List<CellLocation> cellLocations = [];
+        for (int row = 1; row < 10; row++) {
+            cellLocations.Add(new CellLocation(1, row));
+        }
+
+        CellFiller filler = new(sheet, cellLocations);
+        filler.Process();
+
+        DateTime startDate = new(1983, 10, 1);
+        foreach (CellLocation location in cellLocations) {
+            Cell cell = sheet.GetCell(location, false);
+            Assert.AreEqual(startDate.ToString("MMM"), cell.Text);
+            Assert.AreEqual(CellFormat.CUSTOM, cell.CellFormat);
+            startDate = startDate.AddMonths(1);
+        }
+    }
+
+    /// <summary>
     /// Test a horizontal fill.
     /// </summary>
     [Test]
