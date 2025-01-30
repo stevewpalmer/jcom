@@ -452,23 +452,24 @@ public class Sheet {
                         break;
                     }
                     int columnWidth = ColumnWidth(++fwdColumnIndex);
-                    widths.Add(columnWidth);
+                    widths.Add(Math.Min(columnWidth, width - size));
                     size += columnWidth;
                 } while (size < labelLength);
                 string labelCellText = cell.TextForWidth(labelLength);
                 int index = 0;
                 foreach (int columnWidth in widths) {
-                    if (columnIndex >= column) {
-                        spans.Add(new AnsiTextSpan(Utilities.SpanBound(labelCellText, index, columnWidth)) {
+                    int realWidth = Math.Min(columnWidth, width - totalWidth);
+                    if (columnIndex >= column && realWidth > 0) {
+                        spans.Add(new AnsiTextSpan(Utilities.SpanBound(labelCellText, index, realWidth)) {
                             ForegroundColour = cell.Style.TextColour,
                             BackgroundColour = cell.Style.BackgroundColour,
-                            Width = columnWidth,
+                            Width = realWidth,
                             Bold = cell.Style.Bold,
                             Italic = cell.Style.Italic,
                             Underline = cell.Style.Underline,
                             Alignment = AnsiAlignment.NONE
                         });
-                        totalWidth += columnWidth;
+                        totalWidth += realWidth;
                     }
                     index += columnWidth;
                     columnIndex++;
