@@ -257,8 +257,8 @@ public class Sheet {
     /// Mark the specified sheet cell as invalid if it is a formula and also marks the
     /// sheet as modified. We also rebuild the dependencies for this cell based on any
     /// cell references in the formula. Finally, we determine the list of cells that
-    /// are dependent on this one (dependees) and mark those as invalid so that they
-    /// are subsequently recalculated when the Calculate function is called.
+    /// are dependent on this one and mark those as invalid so that they are subsequently
+    /// recalculated when the Calculate function is called.
     /// </summary>
     /// <param name="cell">Cell to mark as invalid</param>
     public void InvalidateCell(Cell cell) {
@@ -272,13 +272,13 @@ public class Sheet {
                 _invalidCells.Add(cell);
                 NeedRecalculate = true;
             }
-            foreach (CellLocation location in Book!.Dependees(source)) {
+            foreach (CellLocation location in Book!.Precedents(source)) {
                 Debug.Assert(location.SheetName != null);
-                Sheet? dependeeSheet = Book!.Sheet(location.SheetName);
-                Cell dependeeCell = dependeeSheet!.GetCell(location, false);
-                Debug.Assert(dependeeCell.HasFormula);
-                dependeeSheet._invalidCells.Add(dependeeCell);
-                dependeeSheet.NeedRecalculate = true;
+                Sheet? precedentSheet = Book!.Sheet(location.SheetName);
+                Cell precedentCell = precedentSheet!.GetCell(location, false);
+                Debug.Assert(precedentCell.HasFormula);
+                precedentSheet._invalidCells.Add(precedentCell);
+                precedentSheet.NeedRecalculate = true;
             }
         }
     }

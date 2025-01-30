@@ -57,24 +57,24 @@ public class FormulaTests {
         Assert.AreEqual(cell2.LocationWithSheet, dependents[1]);
         Assert.AreEqual(cell3.LocationWithSheet, dependents[2]);
 
-        CellLocation [] dependees = workBook.Dependees(cell1.LocationWithSheet).ToArray();
-        Assert.AreEqual(1, dependees.Length);
-        Assert.AreEqual(cell4.LocationWithSheet, dependees[0]);
+        CellLocation [] precedents = workBook.Precedents(cell1.LocationWithSheet).ToArray();
+        Assert.AreEqual(1, precedents.Length);
+        Assert.AreEqual(cell4.LocationWithSheet, precedents[0]);
 
-        dependees = workBook.Dependees(cell2.LocationWithSheet).ToArray();
-        Assert.AreEqual(1, dependees.Length);
-        Assert.AreEqual(cell4.LocationWithSheet, dependees[0]);
+        precedents = workBook.Precedents(cell2.LocationWithSheet).ToArray();
+        Assert.AreEqual(1, precedents.Length);
+        Assert.AreEqual(cell4.LocationWithSheet, precedents[0]);
 
-        dependees = workBook.Dependees(cell2.LocationWithSheet).ToArray();
-        Assert.AreEqual(1, dependees.Length);
-        Assert.AreEqual(cell4.LocationWithSheet, dependees[0]);
+        precedents = workBook.Precedents(cell2.LocationWithSheet).ToArray();
+        Assert.AreEqual(1, precedents.Length);
+        Assert.AreEqual(cell4.LocationWithSheet, precedents[0]);
 
         // Make sure resetting a workbook removes all existing dependents
-        // and dependees.
+        // and precedents.
         workBook.New();
-        dependees = workBook.Dependees(cell2.LocationWithSheet).ToArray();
+        precedents = workBook.Precedents(cell2.LocationWithSheet).ToArray();
         dependents = workBook.Dependents(cell4.LocationWithSheet).ToArray();
-        Assert.IsEmpty(dependees);
+        Assert.IsEmpty(precedents);
         Assert.IsEmpty(dependents);
     }
 

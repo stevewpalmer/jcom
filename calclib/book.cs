@@ -229,13 +229,13 @@ public class Book {
     /// Return the dependencies for the cell at the specified location.
     /// </summary>
     /// <param name="location">Fully qualified location of cell</param>
-    /// <returns>Dependencies</returns>
+    /// <returns>A collection of dependent cell locations</returns>
     public IEnumerable<CellLocation> Dependents(CellLocation location) => _cellGraph.GetDependents(location);
 
     /// <summary>
-    /// Return the dependees for the cell at the specified location.
+    /// Return the precedents for the cell at the specified location.
     /// </summary>
     /// <param name="location">Fully qualified location of cell</param>
-    /// <returns>Dependees</returns>
-    public IEnumerable<CellLocation> Dependees(CellLocation location) => _cellGraph.GetDependees(location);
+    /// <returns>A collection of precedent cell locations</returns>
+    public IEnumerable<CellLocation> Precedents(CellLocation location) => _cellGraph.GetPrecedents(location);
 }

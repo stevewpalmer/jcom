@@ -10,8 +10,8 @@ such as in cell C2:
 ```
 C2: =B4*SUM(A1:A3)
 ```
-which has four dependencies: cells B4, A1, A2 and A3. Each of those four
-cells are dependee cells in that they are referenced by at least one other
+which has four precedents: cells B4, A1, A2 and A3. Each of those four
+cells are precedent cells in that they are referenced by at least one other
 cell.
 
 The graph thus will have the following edges:
@@ -21,7 +21,7 @@ C2<->A1
 C2<->A2
 C2<->A3
 ```
-The cells on the left are dependee cells. Changes to dependee cells will
+The cells on the right are precedent cells. Changes to precedent cells will
 trigger an update on the dependent cell. Thus, a change to cell A2 will
 trigger a recalculation of the formula at C2 and the value displayed in
 that cell.
@@ -35,7 +35,7 @@ C2:=C1+AVG(SUM(B1:B3))
 C3:=C1+C2
 ```
 The resulting graph will have edges leading from C2 to C1 and from C3 to
-both C1 and C3. Now cell A2 is a dependee of not just C1 but of C2 and C3
+both C1 and C3. Now cell A2 is a precedent of not just C1 but of C2 and C3
 and thus all three cells will need to be recalculated if A2 changes. A
 key aspect of the graph is that the order of calculation matters. Cell C1
 needs to be calculated first, followed by C2 and then C3 in that order.

@@ -28,7 +28,7 @@ using System.Diagnostics;
 namespace JCalcLib;
 
 public class CellGraph {
-    private readonly Dictionary<CellLocation, HashSet<CellLocation>> _dependees = [];
+    private readonly Dictionary<CellLocation, HashSet<CellLocation>> _precedents = [];
     private readonly Dictionary<CellLocation, HashSet<CellLocation>> _dependents = [];
 
     /// <summary>
@@ -36,15 +36,15 @@ public class CellGraph {
     /// </summary>
     public void Clear() {
         _dependents.Clear();
-        _dependees.Clear();
+        _precedents.Clear();
     }
 
     /// <summary>
     /// Add an edge between two cell locations such that <paramref name="from" />
     /// has a dependency on <paramref name="to" />.
     /// </summary>
-    /// <param name="from">Dependee cell</param>
-    /// <param name="to">Dependency cell</param>
+    /// <param name="from">Precedent cell</param>
+    /// <param name="to">Dependent cell</param>
     public void AddEdge(CellLocation from, CellLocation to) {
         Debug.Assert(from.SheetName != null);
         Debug.Assert(to.SheetName != null);
@@ -53,9 +53,9 @@ public class CellGraph {
             _dependents.Add(from, value1);
         }
         value1.Add(to);
-        if (!_dependees.TryGetValue(to, out HashSet<CellLocation>? value2)) {
+        if (!_precedents.TryGetValue(to, out HashSet<CellLocation>? value2)) {
             value2 = [];
-            _dependees.Add(to, value2);
+            _precedents.Add(to, value2);
         }
         value2.Add(from);
     }
@@ -67,7 +67,7 @@ public class CellGraph {
     public void DeleteEdges(CellLocation from) {
         if (_dependents.TryGetValue(from, out HashSet<CellLocation>? value)) {
             foreach (CellLocation to in value) {
-                _dependees[to].Remove(from);
+                _precedents[to].Remove(from);
             }
             _dependents[from] = [];
         }
@@ -86,14 +86,14 @@ public class CellGraph {
     }
 
     /// <summary>
-    /// Retrieve a full list of dependees on the specified cell location.
+    /// Retrieve a full list of precedents on the specified cell location.
     /// </summary>
     /// <param name="from">Cell location</param>
-    /// <returns>List of dependees</returns>
-    public IEnumerable<CellLocation> GetDependees(CellLocation from) {
+    /// <returns>List of precedents</returns>
+    public IEnumerable<CellLocation> GetPrecedents(CellLocation from) {
         Debug.Assert(from.SheetName != null);
         HashSet<CellLocation> result = [];
-        InternalGetDependees(from, result);
+        InternalGetPrecedents(from, result);
         return result;
     }
 
@@ -122,13 +122,13 @@ public class CellGraph {
     /// </summary>
     /// <param name="from">Cell location to locate</param>
     /// <param name="result">Cumulative list of neighbours</param>
-    private void InternalGetDependees(CellLocation from, HashSet<CellLocation> result) {
-        if (_dependees.TryGetValue(from, out HashSet<CellLocation>? dependees)) {
-            foreach (CellLocation to in dependees) {
+    private void InternalGetPrecedents(CellLocation from, HashSet<CellLocation> result) {
+        if (_precedents.TryGetValue(from, out HashSet<CellLocation>? precedents)) {
+            foreach (CellLocation to in precedents) {
                 if (!result.Add(to)) {
                     return;
                 }
-                InternalGetDependees(to, result);
+                InternalGetPrecedents(to, result);
             }
         }
     }
