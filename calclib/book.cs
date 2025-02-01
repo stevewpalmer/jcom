@@ -98,6 +98,7 @@ public class Book {
             Sheet[]? inputSheets = JsonSerializer.Deserialize<Sheet[]>(stream);
             if (inputSheets != null) {
                 _sheets.Clear();
+                _cellGraph.Clear();
                 _sheetNumber = 1;
                 foreach (Sheet inputSheet in inputSheets) {
 
