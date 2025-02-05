@@ -27,7 +27,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Text;
-using JComLib;
 
 namespace JCalcLib;
 
@@ -365,16 +364,6 @@ public class FormulaParser {
             return ch;
         }
         return AtLineEnd() ? EOL : _line[_index++];
-    }
-
-    /// <summary>
-    /// Parse the next token from the formula string.
-    /// </summary>
-    /// <returns>A SimpleToken represented the parsed token</returns>
-    private SimpleToken PeekToken() {
-        Debug.Assert(_pushedToken == null);
-        Debug.Assert(_tindex < tokens.Count);
-        return tokens[_tindex];
     }
 
     /// <summary>
