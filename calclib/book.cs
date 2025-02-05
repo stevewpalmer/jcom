@@ -191,6 +191,11 @@ public class Book {
     public string Name => _fileInfo == null ? DefaultFilename : _fileInfo.Name;
 
     /// <summary>
+    /// Debugger flag.
+    /// </summary>
+    public bool Debug { get; set; }
+
+    /// <summary>
     /// Return the fully qualified file name with path.
     /// </summary>
     public string Filename {

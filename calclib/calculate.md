@@ -55,3 +55,19 @@ cell and thus removal of all edges leading out from the graph node for that
 cell and cells leading in. However, we do not remove the dependent cell as
 another cell can still be dependent on the value of that cell even if it is
 no longer a formula or is blank.
+
+Adding or removing rows and columns is more significant in that this causes
+many cell addresses to potentially change. For example, in the example above,
+removing column A will invalidate the formula in both C2 and C3. In this
+example:
+```
+A1:=SUM(C1:C3)
+```
+removing column B will cause the formula to be adjusted to:
+```
+A1:=SUM(B1:B3)
+```
+and thus the dependencies for formulas on every adjusted cell will need to be
+recalculated. This is achieved in the same way as when we change a cell since
+the effect of the adjustment is identical to changing the formula with new
+cell references.

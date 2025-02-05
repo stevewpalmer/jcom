@@ -96,7 +96,9 @@ public static class Screen {
     /// Initialise the workbook from the specified file.
     /// </summary>
     /// <param name="filename">Workbook filename</param>
-    public static void OpenBook(string filename) {
+    /// <param name="debug">Optional flag to enable debug mode</param>
+    public static void OpenBook(string filename, bool debug = false) {
+        _activeBook.Debug = debug;
         if (!string.IsNullOrEmpty(filename)) {
             RenderBook();
             Status.Message($"Loading {filename}...");

@@ -30,8 +30,16 @@ internal static class Program {
     private static void Main(string[] args) {
 
         Screen.Open();
-        string filename = args.Length == 1 ? args[0] : string.Empty;
-        Screen.OpenBook(filename);
+        bool debug = false;
+        string filename = string.Empty;
+        foreach (string arg in args) {
+            if (arg == "-debug") {
+                debug = true;
+                continue;
+            }
+            filename = arg;
+        }
+        Screen.OpenBook(filename, debug);
         Screen.StartKeyboardLoop();
         Screen.Close();
     }

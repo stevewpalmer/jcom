@@ -31,8 +31,6 @@ using JComLib;
 namespace JCalcLib;
 
 public class Sheet {
-    private string _name = string.Empty;
-    private HashSet<Cell> _invalidCells = [];
 
     /// <summary>
     /// Maximum number of columns
@@ -63,6 +61,9 @@ public class Sheet {
     /// Maximum number of decimal places
     /// </summary>
     public const int MaxDecimalPlaces = 15;
+
+    private HashSet<Cell> _invalidCells = [];
+    private string _name = string.Empty;
 
     /// <summary>
     /// Empty constructor with no sheet number
@@ -310,7 +311,31 @@ public class Sheet {
         }
         _invalidCells = [];
         NeedRecalculate = false;
+        if (Book!.Debug) {
+            DumpDependencies();
+        }
         return cellsToUpdate;
+    }
+
+    /// <summary>
+    /// Output the list of formulas and their dependents and precedents
+    /// to a data file.
+    /// </summary>
+    private void DumpDependencies() {
+        List<Cell> formulaCells = [];
+        foreach (CellList cellList in ColumnList) {
+            formulaCells.AddRange(cellList.FormulaCells);
+        }
+
+        using FileStream stream = File.Create("dependency.dbg");
+        using StreamWriter textStream = new(stream);
+        foreach (Cell formulaCell in formulaCells) {
+            textStream.WriteLine($"Cell: {formulaCell.Address}");
+            textStream.WriteLine($"  Formula: {formulaCell.FormulaTree}");
+            textStream.WriteLine($"  Dependencies: {string.Join(", ", Book!.Dependents(formulaCell.LocationWithSheet).Select(d => d.Address))}");
+            textStream.WriteLine($"  Precedents: {string.Join(", ", Book!.Precedents(formulaCell.LocationWithSheet).Select(d => d.Address))}");
+            textStream.WriteLine();
+        }
     }
 
     /// <summary>
@@ -566,11 +591,12 @@ public class Sheet {
         bool adjusted = false;
         foreach (Cell cell in ColumnList.SelectMany(cellList => cellList.FormulaCells)) {
             if (cell.FixupFormula(column, row, offset)) {
+                InvalidateCell(cell);
                 adjusted = true;
             }
         }
         if (adjusted) {
-            FullRecalculate();
+            Calculate();
         }
     }
 

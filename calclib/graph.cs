@@ -81,7 +81,7 @@ public class CellGraph {
     public IEnumerable<CellLocation> GetDependents(CellLocation from) {
         Debug.Assert(from.SheetName != null);
         HashSet<CellLocation> result = [];
-        InternalGetDependents(from, result);
+        InternalGetDependents(from, result, []);
         return result;
     }
 
@@ -93,7 +93,7 @@ public class CellGraph {
     public IEnumerable<CellLocation> GetPrecedents(CellLocation from) {
         Debug.Assert(from.SheetName != null);
         HashSet<CellLocation> result = [];
-        InternalGetPrecedents(from, result);
+        InternalGetPrecedents(from, result, []);
         return result;
     }
 
@@ -104,13 +104,16 @@ public class CellGraph {
     /// </summary>
     /// <param name="from">Cell location to locate</param>
     /// <param name="result">Cumulative list of neighbours</param>
-    private void InternalGetDependents(CellLocation from, HashSet<CellLocation> result) {
+    /// <param name="sources">List of cells walked</param>
+    private void InternalGetDependents(CellLocation from, HashSet<CellLocation> result, List<CellLocation> sources) {
+        if (sources.Contains(from)) {
+            return;
+        }
+        sources.Add(from);
         if (_dependents.TryGetValue(from, out HashSet<CellLocation>? dependent)) {
             foreach (CellLocation to in dependent) {
-                if (!result.Add(to)) {
-                    return;
-                }
-                InternalGetDependents(to, result);
+                result.Add(to);
+                InternalGetDependents(to, result, sources);
             }
         }
     }
@@ -122,13 +125,16 @@ public class CellGraph {
     /// </summary>
     /// <param name="from">Cell location to locate</param>
     /// <param name="result">Cumulative list of neighbours</param>
-    private void InternalGetPrecedents(CellLocation from, HashSet<CellLocation> result) {
+    /// <param name="sources">List of cells walked</param>
+    private void InternalGetPrecedents(CellLocation from, HashSet<CellLocation> result, List<CellLocation> sources) {
+        if (sources.Contains(from)) {
+            return;
+        }
+        sources.Add(from);
         if (_precedents.TryGetValue(from, out HashSet<CellLocation>? precedents)) {
             foreach (CellLocation to in precedents) {
-                if (!result.Add(to)) {
-                    return;
-                }
-                InternalGetPrecedents(to, result);
+                result.Add(to);
+                InternalGetPrecedents(to, result, sources);
             }
         }
     }
