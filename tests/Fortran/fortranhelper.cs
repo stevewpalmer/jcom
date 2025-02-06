@@ -34,7 +34,7 @@ internal abstract class FortranHelper : Helper {
     // Compile the given code and return the error count.
     public static Compiler HelperCompile(string[] code, FortranOptions opts) {
         Compiler comp = new(opts);
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
         return comp;
     }
@@ -42,7 +42,7 @@ internal abstract class FortranHelper : Helper {
     // Compile the given code and return the error count.
     public static Compiler HelperCompile(string code, FortranOptions opts) {
         Compiler comp = new(opts);
-        comp.CompileString(code.Split('\n'));
+        comp.CompileLines(code.Split('\n'));
         Assert.AreEqual(0, comp.Messages.ErrorCount, $"Compiler Errors : {string.Join("\n", comp.Messages)}");
         return comp;
     }

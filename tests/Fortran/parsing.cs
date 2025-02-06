@@ -44,7 +44,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.ErrorCount);
     }
 
@@ -60,7 +60,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(2, comp.Messages.ErrorCount);
         Assert.AreEqual(MessageCode.IDENTIFIERREDEFINITION, comp.Messages[0].Code);
         Assert.AreEqual(3, comp.Messages[0].Line);
@@ -87,7 +87,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.Count);
     }
 
@@ -107,7 +107,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(2, comp.Messages.Count);
         Assert.AreEqual(MessageCode.TYPEMISMATCH, comp.Messages[0].Code);
         Assert.AreEqual(5, comp.Messages[0].Line);
@@ -126,7 +126,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(1, comp.Messages.Count);
         Assert.AreEqual(MessageCode.CANNOTASSIGNTOCONST, comp.Messages[0].Code);
         Assert.AreEqual(3, comp.Messages[0].Line);
@@ -146,7 +146,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(1, comp.Messages.Count);
         Assert.AreEqual(MessageCode.DIVISIONBYZERO, comp.Messages[0].Code);
         Assert.AreEqual(3, comp.Messages[0].Line);
@@ -164,7 +164,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.Count);
     }
 
@@ -181,7 +181,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(1, comp.Messages.Count);
         Assert.AreEqual(MessageCode.UNDEFINEDVARIABLE, comp.Messages[0].Code);
         Assert.AreEqual(5, comp.Messages[0].Line);
@@ -199,7 +199,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(1, comp.Messages.Count);
         Assert.AreEqual(MessageCode.TOKENNOTPERMITTED, comp.Messages[0].Code);
     }
@@ -219,7 +219,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.Count);
     }
 
@@ -238,7 +238,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(3, comp.Messages.Count);
         Assert.AreEqual(MessageCode.TYPEMISMATCH, comp.Messages[0].Code);
         Assert.AreEqual(MessageCode.TYPEMISMATCH, comp.Messages[1].Code);
@@ -256,7 +256,7 @@ public class ParsingTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.ErrorCount);
     }
 }

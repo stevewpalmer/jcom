@@ -141,7 +141,7 @@ public class LexicalTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.ErrorCount);
     }
 
@@ -174,7 +174,7 @@ public class LexicalTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(1, comp.Messages.ErrorCount);
         Assert.AreEqual(21, comp.Messages[0].Line);
         Assert.AreEqual(MessageCode.TOOMANYCONTINUATION, comp.Messages[0].Code);

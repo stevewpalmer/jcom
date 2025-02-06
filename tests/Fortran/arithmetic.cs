@@ -150,7 +150,7 @@ public class ArithmeticTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(0, comp.Messages.ErrorCount);
         Assert.Throws<DivideByZeroException>(() => comp.Execute("ITEST"));
     }

@@ -86,14 +86,7 @@ public partial class Compiler : ICompiler {
     /// </summary>
     /// <param name="filename">The full path and file name to be compiled</param>
     public void Compile(string filename) {
-        List<string> lines = [];
-        using (StreamReader sr = new(filename)) {
-            while (sr.Peek() != -1) {
-                string line = sr.ReadLine();
-                lines.Add(line);
-            }
-        }
-        CompileString(filename, lines.ToArray());
+        CompileLines(filename, File.ReadAllLines(filename));
     }
 
     /// <summary>
@@ -101,8 +94,8 @@ public partial class Compiler : ICompiler {
     /// This function exists primarily for unit tests.
     /// </summary>
     /// <param name="lines">An array of strings representing the source file</param>
-    public void CompileString(string[] lines) {
-        CompileString(null, lines);
+    public void CompileLines(string[] lines) {
+        CompileLines(null, lines);
     }
 
     /// <summary>
@@ -149,7 +142,7 @@ public partial class Compiler : ICompiler {
     public MessageCollection Messages { get; init; }
 
     // Compile an array of source lines.
-    private void CompileString(string filename, string[] lines) {
+    private void CompileLines(string filename, string[] lines) {
         try {
             _parsingIf = false;
             _blockDepth = 0;

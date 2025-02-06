@@ -135,7 +135,7 @@ public class ArrayTests {
         ];
 
         Compiler comp = new(new FortranOptions());
-        comp.CompileString(code);
+        comp.CompileLines(code);
         Assert.AreEqual(1, comp.Messages.ErrorCount);
         Assert.AreEqual(MessageCode.ARRAYILLEGALBOUNDS, comp.Messages[0].Code);
         Assert.AreEqual(3, comp.Messages[0].Line);
