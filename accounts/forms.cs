@@ -253,7 +253,7 @@ public class TForm {
     /// Draw the form at the current scroll offset
     /// </summary>
     private void DrawForm() {
-        int pageHeight = Terminal.Height - 2;
+        int pageHeight = Terminal.Height - 3;
         int pageWidth = Terminal.Width;
         bool didShowCursor = false;
 
@@ -287,7 +287,7 @@ public class TForm {
     /// the Enter key is pressed.
     /// </summary>
     public TDisplayFormResult DisplayForm() {
-        int pageHeight = Terminal.Height - 2;
+        int pageHeight = Terminal.Height - 3;
 
         // Adjust selection if necessary
         while (SelectedItem < _fields.Count && !_fields[SelectedItem].IsSelectable) {

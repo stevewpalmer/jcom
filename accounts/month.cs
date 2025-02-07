@@ -105,10 +105,7 @@ public static class Month {
         form.EndSection(sectionName);
         form.SelectedItem = selectedItem;
 
-        // Show overspend balance
-        rowIndex += 2;
-        form.AddLabel(rowIndex, 12, "Overspend");
-        form.AddLabel(rowIndex, 36, 10, TAlign.Right, "");
+        // Show total spend
         rowIndex += 2;
 
         // Show exit balance at the end
@@ -121,7 +118,6 @@ public static class Month {
             // Calculate the current total
             double total = statement.EntryBalance;
             int totalIndex = form.Count - 1;
-            int overspendIndex = totalIndex - 2;
 
             for (int index = 0; index < form.Count; index++) {
                 if (form.Fields(index).FieldType == TFieldType.Currency) {
@@ -130,10 +126,6 @@ public static class Month {
                 }
             }
             form.Fields(totalIndex).Value = total.ToString("F2");
-
-            // Show overspend
-            double overspend = Math.Abs(Math.Max(0, statement.EntryBalance - total));
-            form.Fields(overspendIndex).Value = overspend.ToString("F2");
 
             // Activate the picker
             result = form.DisplayForm();
@@ -145,9 +137,11 @@ public static class Month {
                     insertIndex++;
                 }
 
+                int day = int.Parse(form.Fields(insertIndex - 2).Value);
+
                 form.SelectedItem = insertIndex + 1;
                 rowIndex = form.Fields(insertIndex).Row + 1;
-                form.InsertNumeric(insertIndex + 1, rowIndex, 4, 6, DateTime.Now.Day, "{0}-" + TDate.ShortMonthName(thisMonth));
+                form.InsertNumeric(insertIndex + 1, rowIndex, 4, 6, day, "{0}-" + TDate.ShortMonthName(thisMonth));
                 form.InsertText(insertIndex + 2, rowIndex, 12, 20, "");
                 form.InsertCurrency(insertIndex + 3, rowIndex, 36, 0);
                 insertIndex += 4;
