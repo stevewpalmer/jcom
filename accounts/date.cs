@@ -26,20 +26,10 @@ public class TDate : IComparable {
     }
 
     /// <summary>
-    /// Given a month index in the range 1 to 12, return the name of
-    /// the month in the current culture.
+    /// Return this TDate as a DateTime
     /// </summary>
-    /// <param name="month">Index of month</param>
-    /// <returns>Name of month</returns>
-    public static string MonthName(int month) => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
-
-    /// <summary>
-    /// Given a month index in the range 1 to 12, return the short name of
-    /// the month in the current culture.
-    /// </summary>
-    /// <param name="month">Index of month</param>
-    /// <returns>Short name of month</returns>
-    public static string ShortMonthName(int month) => CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month);
+    [JsonIgnore]
+    public DateTime AsDateTime => new(Year, Month, Day);
 
     /// <summary>
     /// Year
@@ -69,5 +59,35 @@ public class TDate : IComparable {
             ? new DateTime(Year, Month, Day)
                 .CompareTo(new DateTime(other.Year, other.Month, other.Day))
             : -1;
+    }
+
+    /// <summary>
+    /// Given a month index in the range 1 to 12, return the name of
+    /// the month in the current culture.
+    /// </summary>
+    /// <param name="month">Index of month</param>
+    /// <returns>Name of month</returns>
+    public static string MonthName(int month) => CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(month);
+
+    /// <summary>
+    /// Given a month index in the range 1 to 12, return the short name of
+    /// the month in the current culture.
+    /// </summary>
+    /// <param name="month">Index of month</param>
+    /// <returns>Short name of month</returns>
+    public static string ShortMonthName(int month) => CultureInfo.CurrentCulture.DateTimeFormat.GetAbbreviatedMonthName(month);
+
+    /// <summary>
+    /// Return this TDate as a string.
+    /// </summary>
+    /// <returns>String representation of date</returns>
+    public override string ToString() => AsDateTime.ToString(CultureInfo.CurrentCulture);
+
+    /// <summary>
+    /// Return the hash code of this date
+    /// </summary>
+    /// <returns>Hash code</returns>
+    public override int GetHashCode() {
+        return Year.GetHashCode() ^ Month.GetHashCode() ^ Day.GetHashCode();
     }
 }

@@ -27,7 +27,7 @@ using System.Text.Json;
 
 namespace JAccounts;
 
-public class TStatement {
+public class TStatement : IEquatable<TStatement> {
 
     /// <summary>
     /// Statement constructor with a specified year, month and set
@@ -40,6 +40,16 @@ public class TStatement {
         Year = theYear;
         Month = theMonth;
         Records = theRecords;
+    }
+
+    /// <summary>
+    /// Create a statement from another statement.
+    /// </summary>
+    /// <param name="statement">Statement to copy</param>
+    public TStatement(TStatement statement) {
+        Year = statement.Year;
+        Month = statement.Month;
+        Records = new List<TRecord>(statement.Records);
     }
 
     /// <summary>
@@ -69,11 +79,6 @@ public class TStatement {
     public double ExitBalance => EntryBalance + Records.Sum(record => record.Value);
 
     /// <summary>
-    /// Is this a future statement?
-    /// </summary>
-    public bool IsFuture => Year > DateTime.Now.Year || Year == DateTime.Now.Year && Month > DateTime.Now.Month;
-
-    /// <summary>
     /// Save this statement
     /// </summary>
     public void Save() {
@@ -92,4 +97,11 @@ public class TStatement {
             WriteIndented = true
         });
     }
+
+    /// <summary>
+    /// Statements are equal if the year and month match.
+    /// </summary>
+    /// <param name="other">Other statement to compare</param>
+    /// <returns>True if we match, false otherwise</returns>
+    public bool Equals(TStatement? other) => Year == other?.Year && Month == other?.Month;
 }

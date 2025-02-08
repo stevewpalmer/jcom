@@ -23,11 +23,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace JAccounts;
 
-public class TRecord {
+public class TRecord : IEquatable<TRecord> {
 
     /// <summary>
     /// Default constructor for JSON deserialization.
@@ -64,4 +65,18 @@ public class TRecord {
     /// </summary>
     [JsonInclude]
     public TDate Date { get; set; } = new();
+
+    /// <summary>
+    /// Compare this record with another.
+    /// </summary>
+    /// <returns>True if the records match, false otherwise</returns>
+    public bool Equals(TRecord? obj) {
+        return obj != null && Name == obj.Name && Date.CompareTo(obj.Date) == 0;
+    }
+
+    /// <summary>
+    /// Return the hash code of this record.
+    /// </summary>
+    /// <returns>Hash code</returns>
+    public override int GetHashCode() => Name.GetHashCode() ^ Value.GetHashCode() ^ Date.GetHashCode();
 }

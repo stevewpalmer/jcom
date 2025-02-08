@@ -104,8 +104,11 @@ public static class Month {
         }
         form.EndSection(sectionName);
         form.SelectedItem = selectedItem;
+        rowIndex += 1;
 
         // Show total spend
+        form.AddLabel(rowIndex, 12, "Total");
+        form.AddLabel(rowIndex, 36, 10, TAlign.Right, "");
         rowIndex += 2;
 
         // Show exit balance at the end
@@ -116,8 +119,9 @@ public static class Month {
         do {
 
             // Calculate the current total
-            double total = statement.EntryBalance;
-            int totalIndex = form.Count - 1;
+            double total = 0;
+            int exitBalanceIndex = form.Count - 1;
+            int totalIndex = exitBalanceIndex - 2;
 
             for (int index = 0; index < form.Count; index++) {
                 if (form.Fields(index).FieldType == TFieldType.Currency) {
@@ -126,6 +130,7 @@ public static class Month {
                 }
             }
             form.Fields(totalIndex).Value = total.ToString("F2");
+            form.Fields(exitBalanceIndex).Value = (statement.EntryBalance + total).ToString("F2");
 
             // Activate the picker
             result = form.DisplayForm();
@@ -189,7 +194,7 @@ public static class Month {
 
         // Save the results
         if (result == TDisplayFormResult.Save) {
-            statement.Records = [];
+            List<TRecord> records = [];
             int index = form.FindSection(sectionName);
             do {
                 int theDay = Convert.ToInt32(form.Fields(index).Value);
@@ -198,12 +203,13 @@ public static class Month {
                 TDate theDate = new(thisYear, thisMonth, theDay);
 
                 if (!string.IsNullOrEmpty(theName)) {
-                    statement.Records.Add(new TRecord(theName, theValue, theDate));
+                    records.Add(new TRecord(theName, theValue, theDate));
                 }
                 index += 3;
 
             } while (!form.Fields(index).IsSection);
-            statement.Save();
+            statement.Records = records.OrderBy(r => r.Date).ToList();
+            account.SaveStatement(statement);
 
             // Recalculate entry balance so changes here flow to the next months.
             account.UpdateEntryBalances();

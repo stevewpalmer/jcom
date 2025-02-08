@@ -49,24 +49,27 @@ public static class Fixed {
         // Show header
         form.AddLabel(rowIndex, 4, "_Description");
         form.AddLabel(rowIndex, 28, 10, TAlign.Right, "_Amount");
-        form.AddLabel(rowIndex, 44, "_Day");
+        form.AddLabel(rowIndex, 44, "_Frequency");
+        form.AddLabel(rowIndex, 54, "_Day");
         rowIndex += 2;
 
         // Show current fixed records
-        List<TRecord> fixedRecords = account.ReadFixed();
+        //List<TStanding> fixedRecords = account.Fixed;
         form.BeginSection(sectionName);
 
-        foreach (TRecord record in fixedRecords) {
+        foreach (TStanding record in account.Fixed) {
             form.AddText(rowIndex, 4, 20, record.Name);
             form.AddCurrency(rowIndex, 28, record.Value);
-            form.AddNumeric(rowIndex, 44, 2, record.Date.Day, "");
+            form.AddNumeric(rowIndex, 44, 2, (int)record.Frequency, "");
+            form.AddNumeric(rowIndex, 54, 2, record.Day, "");
             rowIndex++;
         }
 
         // Add a blank row for new entries
         form.AddText(rowIndex, 4, 20, "");
         form.AddCurrency(rowIndex, 28, 0);
-        form.AddNumeric(rowIndex, 44, 2, 1, "");
+        form.AddNumeric(rowIndex, 44, 1, 1, "");
+        form.AddNumeric(rowIndex, 54, 2, 1, "");
         form.EndSection(sectionName);
         rowIndex += 2;
 
@@ -85,16 +88,6 @@ public static class Fixed {
                 if (form.Fields(index).FieldType == TFieldType.Currency) {
                     double value = Convert.ToDouble(form.Fields(index).Value);
                     total += value;
-                }
-                if (form.Fields(index).FieldType == TFieldType.Numeric) {
-                    int value = Convert.ToInt32(form.Fields(index).Value);
-                    if (value < 1) {
-                        value = 1;
-                    }
-                    if (value > 31) {
-                        value = 31;
-                    }
-                    form.Fields(index).Value = value.ToString();
                 }
             }
             form.Fields(totalIndex).Value = total.ToString("F2");
@@ -115,8 +108,9 @@ public static class Fixed {
                 rowIndex = form.Fields(insertIndex).Row + 1;
                 form.InsertText(insertIndex + 1, rowIndex, 4, 20, "");
                 form.InsertCurrency(insertIndex + 2, rowIndex, 28, 0);
-                form.InsertNumeric(insertIndex + 3, rowIndex, 44, 2, 1, "");
-                insertIndex += 4;
+                form.InsertNumeric(insertIndex + 3, rowIndex, 44, 1, 1, "");
+                form.InsertNumeric(insertIndex + 4, rowIndex, 54, 2, 1, "");
+                insertIndex += 5;
 
                 // Adjust row positions of rest of form
                 while (insertIndex < form.Count) {
@@ -135,10 +129,11 @@ public static class Fixed {
                 }
 
                 // Don't delete the last row
-                if (!(form.Fields(deleteIndex - 1).IsSection && form.Fields(deleteIndex + 3).IsSection)) {
-                    if (form.Fields(deleteIndex + 3).IsSection) {
-                        form.SelectedItem = deleteIndex - 3;
+                if (!(form.Fields(deleteIndex - 1).IsSection && form.Fields(deleteIndex + 4).IsSection)) {
+                    if (form.Fields(deleteIndex + 4).IsSection) {
+                        form.SelectedItem = deleteIndex - 4;
                     }
+                    form.DeleteField(deleteIndex);
                     form.DeleteField(deleteIndex);
                     form.DeleteField(deleteIndex);
                     form.DeleteField(deleteIndex);
@@ -161,20 +156,21 @@ public static class Fixed {
 
         // Save the results
         if (result == TDisplayFormResult.Save) {
-            fixedRecords.Clear();
+            List<TStanding> fixedRecords = [];
             int index = form.FindSection(sectionName);
             do {
                 string theName = form.Fields(index).Value;
                 double theValue = Convert.ToDouble(form.Fields(index + 1).Value);
-                TDate theDate = new(2019, 1, Convert.ToInt32(form.Fields(index + 2).Value));
+                TFrequency frequency = (TFrequency)Convert.ToInt32(form.Fields(index + 2).Value);
+                int day = Convert.ToInt32(form.Fields(index + 3).Value);
 
                 if (!string.IsNullOrEmpty(theName)) {
-                    fixedRecords.Add(new TRecord(theName, theValue, theDate));
+                    fixedRecords.Add(new TStanding(theName, theValue, frequency, day));
                 }
 
-                index += 3;
+                index += 4;
             } while (!form.Fields(index).IsSection);
-            TAccount.SaveFixed(fixedRecords);
+            account.SaveFixed(fixedRecords);
 
             // Recalculate entry balance so changes here flow to the next months.
             account.UpdateEntryBalances();

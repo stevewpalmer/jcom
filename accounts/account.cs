@@ -28,10 +28,29 @@ using System.Text.Json;
 namespace JAccounts;
 
 public class TAccount {
-    private List<TRecord> _fixed = [];
-    private readonly List<TStatement> _statements = [];
     private const double _startBalance = 0.0;
+    private readonly List<TStatement> _statements = [];
+    private List<TStanding> _fixed = [];
     private bool hasFixedRecords;
+
+    /// <summary>
+    /// Return the number of statements
+    /// </summary>
+    public int Count => _statements.Count;
+
+    /// <summary>
+    /// Read the fixed incomings and outgoings entries record
+    /// </summary>
+    /// <returns></returns>
+    public List<TStanding> Fixed {
+        get {
+            if (!hasFixedRecords) {
+                _fixed = LoadFixed(Utils.FixedDataFile);
+                hasFixedRecords = true;
+            }
+            return _fixed;
+        }
+    }
 
     /// <summary>
     /// Initialise this account.
@@ -57,21 +76,10 @@ public class TAccount {
     /// <param name="index">Index of statement</param>
     /// <returns>Statement</returns>
     public TStatement Get(int index) {
-
         TStatement statement = _statements[index];
-        if (statement.Records.Count == 0 && statement.IsFuture) {
-            statement.Records = ReadFixed();
-        }
-
-        // Recalculate the entry balance
-        UpdateEntryBalances();
+        MergeFixed(statement);
         return statement;
     }
-
-    /// <summary>
-    /// Return the number of statements
-    /// </summary>
-    public int Count => _statements.Count;
 
     /// <summary>
     /// Retrieve the statement for the specified year and month.
@@ -79,8 +87,11 @@ public class TAccount {
     /// <param name="year">Requested year</param>
     /// <param name="month">Requested month</param>
     /// <returns>The statement for the given year and month, or null if none exist</returns>
-    public TStatement? Get(int year, int month) {
-        return _statements.FirstOrDefault(statement => statement.Year == year && statement.Month == month);
+    public TStatement Get(int year, int month) {
+        TStatement? existing = _statements.FirstOrDefault(statement => statement.Year == year && statement.Month == month);
+        TStatement statement = existing == null ? new TStatement(year, month, []) : new TStatement(existing);
+        MergeFixed(statement);
+        return statement;
     }
 
     /// <summary>
@@ -114,9 +125,7 @@ public class TAccount {
                 TStatement oneMonth = new(theYear, theMonth, records) {
                     EntryBalance = entryBalance
                 };
-                if (oneMonth.Records.Count == 0 && oneMonth.IsFuture) {
-                    oneMonth.Records = ReadFixed();
-                }
+                MergeFixed(oneMonth);
                 entryBalance = oneMonth.ExitBalance;
                 _statements.Add(oneMonth);
             }
@@ -131,9 +140,6 @@ public class TAccount {
 
         List<TCategory> list = [];
         foreach (TStatement statement in _statements.Where(statement => statement.Year == theYear)) {
-            if (statement.Records.Count == 0 && statement.IsFuture) {
-                statement.Records = ReadFixed();
-            }
             foreach (TRecord record in statement.Records) {
                 string itemName = record.Name;
                 double itemValue = record.Value;
@@ -156,22 +162,10 @@ public class TAccount {
     }
 
     /// <summary>
-    /// Read the fixed incomings and outgoings entries record
-    /// </summary>
-    /// <returns></returns>
-    public List<TRecord> ReadFixed() {
-        if (!hasFixedRecords) {
-            _fixed = ReadDataFile(Utils.FixedDataFile);
-            hasFixedRecords = true;
-        }
-        return _fixed;
-    }
-
-    /// <summary>
     /// Save the fixed expenditure data file.
     /// </summary>
     /// <param name="records">Fixed expenditure records</param>
-    public static void SaveFixed(List<TRecord> records) {
+    public void SaveFixed(List<TStanding> records) {
         string fileName = Utils.FixedDataFile;
         string backupFile = $"{fileName}.bak";
 
@@ -185,6 +179,17 @@ public class TAccount {
         JsonSerializer.Serialize(stream, records, new JsonSerializerOptions {
             WriteIndented = true
         });
+        _fixed = records;
+    }
+
+    /// <summary>
+    /// Save changes to the specified statement.
+    /// </summary>
+    /// <param name="statement">Statement to save</param>
+    public void SaveStatement(TStatement statement) {
+        _statements.Remove(statement);
+        _statements.Add(statement);
+        statement.Save();
     }
 
     /// <summary>
@@ -212,11 +217,38 @@ public class TAccount {
 
         foreach (TStatement statement in _statements) {
             statement.EntryBalance = entryBalance;
-            if (statement.Records.Count == 0 && statement.IsFuture) {
-                statement.Records = ReadFixed();
-            }
             entryBalance = statement.ExitBalance;
         }
+    }
+
+    /// <summary>
+    /// Open the fixed expenditures data file and retrieve the records. If the file
+    /// does not exist, an empty record list is returned.
+    /// </summary>
+    /// <param name="fileName">Name of file to be read</param>
+    /// <returns>A list of fixed expenditure records</returns>
+    private static List<TStanding> LoadFixed(string fileName) {
+        List<TStanding> records = [];
+        if (File.Exists(fileName)) {
+            using FileStream inputFile = File.Open(fileName, FileMode.Open);
+            records = JsonSerializer.Deserialize<List<TStanding>>(inputFile) ?? [];
+        }
+        return records;
+    }
+
+    /// <summary>
+    /// Merge in fixed expenditures into the specified statement. Only fixed expenditures dated
+    /// later than today are merged.
+    /// </summary>
+    /// <param name="statement">Statement into which to merge</param>
+    private void MergeFixed(TStatement statement) {
+        if (Fixed.Count > 0) {
+            IEnumerable<TRecord> fixeds = Fixed.SelectMany(r => r.Records(statement.Year, statement.Month));
+            List<TRecord> records = new(statement.Records);
+            records.AddRange(fixeds.Where(f => f.Date.AsDateTime > DateTime.Now));
+            statement.Records = records.Distinct().OrderBy(r => r.Date).ToList();
+        }
+        UpdateEntryBalances();
     }
 
     /// <summary>
