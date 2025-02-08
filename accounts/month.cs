@@ -43,7 +43,7 @@ public static class Month {
     /// <param name="thisMonth">Month to show</param>
     public static void Show(TAccount account, int thisYear, int thisMonth) {
         TForm form = new(TForm.CanPrint);
-        int rowIndex = 4;
+        int rowIndex = TForm.FirstRow;
         TDisplayFormResult result;
         int selectedItem = -1;
         int insertDay = DateTime.Now.Day;

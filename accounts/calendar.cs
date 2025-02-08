@@ -40,7 +40,7 @@ public static class Calendar {
             Utils.ShowTitle("Calendar");
 
             TForm form = new(TForm.Simple);
-            int rowIndex = 4;
+            int rowIndex = TForm.FirstRow;
 
             // Display instructions line.
             form.AddLabel(rowIndex, 4, "_Choose a year to see the summary for that year. Choose a month to");

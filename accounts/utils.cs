@@ -98,13 +98,4 @@ public static class Utils {
     private static void PrintBar(int y, string barText) {
         Terminal.Write(0, y, Terminal.Width, ReverseColour, BackgroundColour, $" {barText}");
     }
-
-    /// <summary>
-    /// Return a string of the given number of spaces.
-    /// </summary>
-    /// <param name="theWidth">Number of spaces required</param>
-    /// <returns>A string with the given number of spaces</returns>
-    public static string Space(int theWidth) {
-        return " ".PadRight(theWidth);
-    }
 }

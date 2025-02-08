@@ -38,7 +38,7 @@ public static class Fixed {
         Utils.ShowTitle("Fixed Incomings and Outgoings");
 
         TForm form = new(TForm.CanPrint);
-        int rowIndex = 4;
+        int rowIndex = TForm.FirstRow;
 
         // Display instructions line
         form.AddLabel(rowIndex, 4, "Enter name and amount of incoming and outgoings. Use negative values for outgoings.");

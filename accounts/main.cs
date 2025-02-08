@@ -58,9 +58,9 @@ internal static class Program {
             for (int index = 0; index < mainMenu.Length; index++) {
                 int screenWidth = Terminal.Width;
 
-                string itemString = (" " + char.ToUpper(mainMenu[index].ShortcutKey) + Utils.Space(6))[..6];
-                itemString += (" " + mainMenu[index].Name.ToUpper() + Utils.Space(16))[..16];
-                itemString += (" -  " + mainMenu[index].Title + Utils.Space(50))[..50];
+                string itemString = (" " + char.ToUpper(mainMenu[index].ShortcutKey) + Utilities.EmptyString(6))[..6];
+                itemString += (" " + mainMenu[index].Name.ToUpper() + Utilities.EmptyString(16))[..16];
+                itemString += (" -  " + mainMenu[index].Title + Utilities.EmptyString(50))[..50];
 
                 int rowIndex = 4 + index * 2;
                 int columnIndex = (screenWidth - itemString.Length) / 2;

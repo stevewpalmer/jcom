@@ -42,7 +42,7 @@ public static class Search {
         Utils.ShowTitle("Search Statements");
 
         do {
-            int rowIndex = 4;
+            int rowIndex = TForm.FirstRow;
 
             form.AddLabel(rowIndex, 4, "Enter payment or amount to search for:");
             form.AddText(rowIndex + 2, 4, 50, "");

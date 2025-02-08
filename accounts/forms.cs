@@ -65,6 +65,8 @@ public class TForm {
     public const int Simple = 1;
     public const int CanPrint = 2;
 
+    public const int FirstRow = 3;
+
     /// <summary>
     /// Item selected in form when form is closed.
     /// </summary>
@@ -262,13 +264,13 @@ public class TForm {
         if (lastRow > pageHeight) {
             lastRow = pageHeight;
         }
-        if (firstRow <= 4) {
-            firstRow = 3;
+        if (firstRow < FirstRow) {
+            firstRow = FirstRow;
         }
         Utils.ScreenClear(firstRow, 0, lastRow, pageWidth);
         for (int itemIndex = 0; itemIndex < _fields.Count; itemIndex++) {
             bool isSelected = itemIndex == SelectedItem;
-            if (_fields[itemIndex].Row + _scrollOffset > 3 && _fields[itemIndex].Row + _scrollOffset <= pageHeight) {
+            if (_fields[itemIndex].Row + _scrollOffset >= FirstRow && _fields[itemIndex].Row + _scrollOffset <= pageHeight) {
                 if (!_fields[itemIndex].IsSection) {
                     bool showCursor = false;
                     if (_fields[itemIndex].IsEditable && isSelected && !didShowCursor) {
@@ -343,7 +345,7 @@ public class TForm {
                             }
                         }
                     }
-                    else if (_fields[0].Row + _scrollOffset < 4) {
+                    else if (_fields[0].Row + _scrollOffset < FirstRow) {
                         _scrollOffset += 1;
                         DrawForm();
                     }
@@ -461,13 +463,13 @@ public class TForm {
                     int diff2 = _fields[SelectedItem].Row + _scrollOffset;
 
                     // Do we need to scroll?
-                    if (diff2 < 4 || diff2 > pageHeight) {
+                    if (diff2 < FirstRow || diff2 > pageHeight) {
                         if (_fields[^1].Row + _scrollOffset > pageHeight) {
                             _scrollOffset = pageHeight - _fields[^1].Row;
                             DrawForm();
                         }
-                        else if (_fields[0].Row + _scrollOffset < 4) {
-                            _scrollOffset = 4 - _fields[0].Row;
+                        else if (_fields[0].Row + _scrollOffset < FirstRow) {
+                            _scrollOffset = FirstRow - _fields[0].Row;
                             DrawForm();
                         }
                     }
