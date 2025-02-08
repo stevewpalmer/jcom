@@ -52,13 +52,7 @@ public static class Month {
         Utils.ShowTitle($"Statement for {TDate.MonthName(thisMonth)} {thisYear}");
 
         // Get the statement for this year and month
-        TStatement? statement = account.Get(thisYear, thisMonth);
-        if (statement == null) {
-            TForm errorForm = new(TForm.Simple);
-            errorForm.AddLabel(rowIndex, 4, $"Unable to find a statement for {TDate.MonthName(thisMonth)} {thisYear}.");
-            errorForm.DisplayForm();
-            return;
-        }
+        TStatement statement = account.Get(thisYear, thisMonth);
 
         // Display instructions line
         form.AddLabel(rowIndex, 4, "Here you can add and remove entries for this month. Use negative values for outgoings.");

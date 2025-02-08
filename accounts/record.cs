@@ -23,7 +23,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace JAccounts;
@@ -78,5 +77,6 @@ public class TRecord : IEquatable<TRecord> {
     /// Return the hash code of this record.
     /// </summary>
     /// <returns>Hash code</returns>
+    // ReSharper disable NonReadonlyMemberInGetHashCode
     public override int GetHashCode() => Name.GetHashCode() ^ Value.GetHashCode() ^ Date.GetHashCode();
 }

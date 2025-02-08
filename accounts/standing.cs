@@ -123,7 +123,7 @@ public class TStanding {
     /// <summary>
     /// Returns the nearest week day for the given day in a month. If the day falls
     /// on a Saturday or Sunday, the next Monday is returned unless that falls in
-    /// the next month in which case the previous Friday is returned. Otherwise
+    /// the next month in which case the previous Friday is returned. Otherwise,
     /// the day is returned unchanged unless it falls outside the number of days in
     /// the month in which case it is set to the last weekday in that month.
     /// </summary>

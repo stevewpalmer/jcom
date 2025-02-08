@@ -56,14 +56,13 @@ public static class Year {
         }
 
         // Entry and exit balance for year
-        TStatement? statement = account.Get(thisYear, 1);
-        if (statement != null) {
-            form.AddLabel(rowIndex, 4, $"Entry Balance for {thisYear}");
-            form.AddLabel(rowIndex, 30, 10, TAlign.Right, statement.EntryBalance.ToString("F2"));
-            form.AddLabel(rowIndex + 1, 4, $"Exit Balance for {thisYear}");
-            form.AddLabel(rowIndex + 1, 30, 10, TAlign.Right, statement.ExitBalance.ToString("F2"));
-            rowIndex += 3;
-        }
+        TStatement startOfYear = account.Get(thisYear, 1);
+        TStatement endOfYear = account.Get(thisYear, 12);
+        form.AddLabel(rowIndex, 4, $"Entry Balance for {thisYear}");
+        form.AddLabel(rowIndex, 30, 10, TAlign.Right, startOfYear.EntryBalance.ToString("F2"));
+        form.AddLabel(rowIndex + 1, 4, $"Exit Balance for {thisYear}");
+        form.AddLabel(rowIndex + 1, 30, 10, TAlign.Right, endOfYear.ExitBalance.ToString("F2"));
+        rowIndex += 3;
 
         // Headers
         form.AddLabel(rowIndex, 4, "_Category");

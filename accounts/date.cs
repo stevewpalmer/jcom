@@ -87,6 +87,7 @@ public class TDate : IComparable {
     /// Return the hash code of this date
     /// </summary>
     /// <returns>Hash code</returns>
+    // ReSharper disable NonReadonlyMemberInGetHashCode
     public override int GetHashCode() {
         return Year.GetHashCode() ^ Month.GetHashCode() ^ Day.GetHashCode();
     }

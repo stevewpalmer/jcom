@@ -49,6 +49,7 @@ public class TStatement : IEquatable<TStatement> {
     public TStatement(TStatement statement) {
         Year = statement.Year;
         Month = statement.Month;
+        EntryBalance = statement.EntryBalance;
         Records = new List<TRecord>(statement.Records);
     }
 
@@ -103,5 +104,5 @@ public class TStatement : IEquatable<TStatement> {
     /// </summary>
     /// <param name="other">Other statement to compare</param>
     /// <returns>True if we match, false otherwise</returns>
-    public bool Equals(TStatement? other) => Year == other?.Year && Month == other?.Month;
+    public bool Equals(TStatement? other) => Year == other?.Year && Month == other.Month;
 }
