@@ -98,10 +98,10 @@ public static class Month {
         }
         form.EndSection(sectionName);
         form.SelectedItem = selectedItem;
-        rowIndex += 2;
+        rowIndex += 1;
 
-        // Show total spend
-        form.AddLabel(rowIndex, 12, "Total");
+        // Show remaining balance
+        form.AddLabel(rowIndex, 12, "Remaining");
         form.AddLabel(rowIndex, 36, 10, TAlign.Right, "");
         rowIndex += 2;
 
@@ -114,16 +114,22 @@ public static class Month {
 
             // Calculate the current total
             double total = 0;
+            double totalToDate = 0;
             int exitBalanceIndex = form.Count - 1;
-            int totalIndex = exitBalanceIndex - 2;
+            int remainingIndex = exitBalanceIndex - 2;
 
-            for (int index = 0; index < form.Count; index++) {
-                if (form.Fields(index).FieldType == TFieldType.Currency) {
-                    double value = Convert.ToDouble(form.Fields(index).Value);
-                    total += value;
+            int index = form.FindSection(sectionName);
+            do {
+                int dayOfMonth = Convert.ToInt32(form.Fields(index).Value);
+                double value = Convert.ToDouble(form.Fields(index + 2).Value);
+                total += value;
+                if (new DateTime(statement.Year, statement.Month, dayOfMonth) <= DateTime.Today) {
+                    totalToDate += value;
                 }
-            }
-            form.Fields(totalIndex).Value = total.ToString("F2");
+                index += 3;
+            } while (!form.Fields(index).IsSection);
+
+            form.Fields(remainingIndex).Value = (statement.EntryBalance + totalToDate).ToString("F2");
             form.Fields(exitBalanceIndex).Value = (statement.EntryBalance + total).ToString("F2");
 
             // Activate the picker
