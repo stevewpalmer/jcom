@@ -42,14 +42,16 @@ public static class Fixed {
 
         // Display instructions line
         form.AddLabel(rowIndex, 4, "Enter name and amount of incoming and outgoings. Use negative values for outgoings.");
-        form.AddLabel(rowIndex + 1, 4, "For the Day, enter the day of the month when the amount is debited or credited.");
-        form.AddLabel(rowIndex + 3, 4, "Note: changes here only affect future months.");
-        rowIndex += 5;
+        form.AddLabel(rowIndex + 1, 4, "For the Type, 0 = specific day, 1 = repeats every week on a day, 2 = nearest weekday.");
+        form.AddLabel(rowIndex + 2, 4, "For Type 0 or 2, enter the day of the month when the amount is debited or credited.");
+        form.AddLabel(rowIndex + 3, 4, "For Type 1, set Day to 0 for Sunday through to 6 for Saturday.");
+        form.AddLabel(rowIndex + 4, 4, "Note: changes here only affect future months.");
+        rowIndex += 6;
 
         // Show header
         form.AddLabel(rowIndex, 4, "_Description");
         form.AddLabel(rowIndex, 28, 10, TAlign.Right, "_Amount");
-        form.AddLabel(rowIndex, 44, "_Frequency");
+        form.AddLabel(rowIndex, 44, "_Type");
         form.AddLabel(rowIndex, 54, "_Day");
         rowIndex += 2;
 
@@ -133,10 +135,10 @@ public static class Fixed {
                     if (form.Fields(deleteIndex + 4).IsSection) {
                         form.SelectedItem = deleteIndex - 4;
                     }
-                    form.DeleteField(deleteIndex);
-                    form.DeleteField(deleteIndex);
-                    form.DeleteField(deleteIndex);
-                    form.DeleteField(deleteIndex);
+                    form.Delete(deleteIndex);
+                    form.Delete(deleteIndex);
+                    form.Delete(deleteIndex);
+                    form.Delete(deleteIndex);
 
                     // Adjust row positions of rest of form
                     while (deleteIndex < form.Count) {

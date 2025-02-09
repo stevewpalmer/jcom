@@ -57,8 +57,8 @@ public enum TDisplayFormResult {
 
 public class TForm {
     private int _scrollOffset;
-    private List<TField> _fields = [];
-    private int _caps;
+    private readonly List<TField> _fields;
+    private readonly int _caps;
 
     // Form editing capability
     // Simple means no editing capability
@@ -86,13 +86,6 @@ public class TForm {
     /// Constructor for a TForm with capabilities.
     /// </summary>
     public TForm(int caps) {
-        Init(caps);
-    }
-
-    /// <summary>
-    /// Common initialiser for a TForm
-    /// </summary>
-    private void Init(int caps) {
         SelectedItem = 1;
         IsModified = false;
         _fields = [];
@@ -221,7 +214,7 @@ public class TForm {
     /// <summary>
     /// Delete a field at the specified index
     /// </summary>
-    public void DeleteField(int deleteIndex) {
+    public void Delete(int deleteIndex) {
         if (deleteIndex < 0) {
             deleteIndex = 0;
         }
@@ -254,7 +247,7 @@ public class TForm {
     /// <summary>
     /// Draw the form at the current scroll offset
     /// </summary>
-    private void DrawForm() {
+    private void Draw() {
         int pageHeight = Terminal.Height - 3;
         int pageWidth = Terminal.Width;
         bool didShowCursor = false;
@@ -316,7 +309,7 @@ public class TForm {
         if (selectable && _fields[SelectedItem].Row > pageHeight && diff > 0) {
             _scrollOffset = -diff;
         }
-        DrawForm();
+        Draw();
 
         // Show the cursor if we're editing
         Console.CursorVisible = (_caps & Simple) != Simple;
@@ -350,7 +343,7 @@ public class TForm {
                     }
                     if (!indexChanged && _fields[0].Row + _scrollOffset < FirstRow) {
                         _scrollOffset += 1;
-                        DrawForm();
+                        Draw();
                     }
                     break;
 
@@ -373,7 +366,7 @@ public class TForm {
                     }
                     if (!indexChanged && _fields[^1].Row + _scrollOffset >= pageHeight) {
                         _scrollOffset -= 1;
-                        DrawForm();
+                        Draw();
                     }
                     break;
 
@@ -471,11 +464,11 @@ public class TForm {
                     if (diff2 < FirstRow || diff2 > pageHeight) {
                         if (_fields[^1].Row + _scrollOffset > pageHeight) {
                             _scrollOffset = pageHeight - _fields[^1].Row;
-                            DrawForm();
+                            Draw();
                         }
                         else if (_fields[0].Row + _scrollOffset < FirstRow) {
                             _scrollOffset = FirstRow - _fields[0].Row;
-                            DrawForm();
+                            Draw();
                         }
                     }
                     if (_fields[previousSelectedIndex].IsEditable) {

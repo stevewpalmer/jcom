@@ -172,9 +172,9 @@ public static class Month {
                     if (form.Fields(deleteIndex + 3).IsSection) {
                         form.SelectedItem = deleteIndex - 3;
                     }
-                    form.DeleteField(deleteIndex);
-                    form.DeleteField(deleteIndex);
-                    form.DeleteField(deleteIndex);
+                    form.Delete(deleteIndex);
+                    form.Delete(deleteIndex);
+                    form.Delete(deleteIndex);
 
                     // Adjust row positions of rest of form
                     while (deleteIndex < form.Count) {
