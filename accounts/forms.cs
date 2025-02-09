@@ -326,11 +326,13 @@ public class TForm {
             int previousSelectedIndex = SelectedItem;
             ConsoleKeyInfo keyInfo = Console.ReadKey(true);
             lastKey = keyInfo.Key;
+            bool indexChanged;
             switch (lastKey) {
                 case ConsoleKey.Escape:
                     return TDisplayFormResult.Cancel;
 
                 case ConsoleKey.UpArrow:
+                    indexChanged = false;
                     if (selectable) {
                         int currentRow = _fields[SelectedItem].Row;
                         int currentColumn = _fields[SelectedItem].Column;
@@ -340,18 +342,20 @@ public class TForm {
                             if (_fields[newIndex].Row < currentRow && _fields[newIndex].Column <= currentColumn) {
                                 if (_fields[newIndex].IsSelectable) {
                                     SelectedItem = newIndex;
+                                    indexChanged = true;
                                     break;
                                 }
                             }
                         }
                     }
-                    else if (_fields[0].Row + _scrollOffset < FirstRow) {
+                    if (!indexChanged && _fields[0].Row + _scrollOffset < FirstRow) {
                         _scrollOffset += 1;
                         DrawForm();
                     }
                     break;
 
                 case ConsoleKey.DownArrow:
+                    indexChanged = false;
                     if (selectable) {
                         int currentRow = _fields[SelectedItem].Row;
                         int currentColumn = _fields[SelectedItem].Column;
@@ -361,12 +365,13 @@ public class TForm {
                             if (_fields[newIndex].Row > currentRow && _fields[newIndex].Column >= currentColumn) {
                                 if (_fields[newIndex].IsSelectable) {
                                     SelectedItem = newIndex;
+                                    indexChanged = true;
                                     break;
                                 }
                             }
                         }
                     }
-                    else if (_fields[^1].Row + _scrollOffset >= pageHeight) {
+                    if (!indexChanged && _fields[^1].Row + _scrollOffset >= pageHeight) {
                         _scrollOffset -= 1;
                         DrawForm();
                     }

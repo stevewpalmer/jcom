@@ -139,7 +139,8 @@ public class TAccount {
     public IEnumerable<TCategory> Categories(int theYear) {
 
         List<TCategory> list = [];
-        foreach (TStatement statement in _statements.Where(statement => statement.Year == theYear)) {
+        for (int month = 1; month <= 12; month++) {
+            TStatement statement = Get(theYear, month);
             foreach (TRecord record in statement.Records) {
                 string itemName = record.Name;
                 double itemValue = record.Value;
@@ -215,7 +216,7 @@ public class TAccount {
     public void UpdateEntryBalances() {
         double entryBalance = _startBalance;
 
-        foreach (TStatement statement in _statements) {
+        foreach (TStatement statement in _statements.OrderBy(r => r.Year).ThenBy(r => r.Month)) {
             statement.EntryBalance = entryBalance;
             entryBalance = statement.ExitBalance;
         }

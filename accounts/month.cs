@@ -98,7 +98,7 @@ public static class Month {
         }
         form.EndSection(sectionName);
         form.SelectedItem = selectedItem;
-        rowIndex += 1;
+        rowIndex += 2;
 
         // Show total spend
         form.AddLabel(rowIndex, 12, "Total");
