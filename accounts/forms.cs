@@ -56,9 +56,6 @@ public enum TDisplayFormResult {
 }
 
 public class TForm {
-    private int _scrollOffset;
-    private readonly List<TField> _fields;
-    private readonly int _caps;
 
     // Form editing capability
     // Simple means no editing capability
@@ -66,6 +63,20 @@ public class TForm {
     public const int CanPrint = 2;
 
     public const int FirstRow = 3;
+    private readonly int _caps;
+    private readonly List<TField> _fields;
+    private int _scrollOffset;
+
+    /// <summary>
+    /// Constructor for a TForm with capabilities.
+    /// </summary>
+    public TForm(int caps) {
+        SelectedItem = 1;
+        IsModified = false;
+        _fields = [];
+        _scrollOffset = 0;
+        _caps = caps;
+    }
 
     /// <summary>
     /// Item selected in form when form is closed.
@@ -78,20 +89,14 @@ public class TForm {
     public bool IsModified { get; private set; }
 
     /// <summary>
+    /// Return count of fields on the form
+    /// </summary>
+    public int Count => _fields.Count;
+
+    /// <summary>
     /// Get a single field.
     /// </summary>
     public TField Fields(int index) => _fields[index];
-
-    /// <summary>
-    /// Constructor for a TForm with capabilities.
-    /// </summary>
-    public TForm(int caps) {
-        SelectedItem = 1;
-        IsModified = false;
-        _fields = [];
-        _scrollOffset = 0;
-        _caps = caps;
-    }
 
     /// <summary>
     /// Add a named section to the form
@@ -225,11 +230,6 @@ public class TForm {
     }
 
     /// <summary>
-    /// Return count of fields on the form
-    /// </summary>
-    public int Count => _fields.Count;
-
-    /// <summary>
     /// Find a section by name and return the index of the field
     /// immediately after that section
     /// </summary>
@@ -253,14 +253,10 @@ public class TForm {
         bool didShowCursor = false;
 
         int firstRow = _fields[0].Row;
-        int lastRow = _fields[^1].Row + 1;
-        if (lastRow > pageHeight) {
-            lastRow = pageHeight;
-        }
         if (firstRow < FirstRow) {
             firstRow = FirstRow;
         }
-        Utils.ScreenClear(firstRow, 0, lastRow, pageWidth);
+        Utils.ScreenClear(firstRow, 0, pageHeight, pageWidth);
         for (int itemIndex = 0; itemIndex < _fields.Count; itemIndex++) {
             bool isSelected = itemIndex == SelectedItem;
             if (_fields[itemIndex].Row + _scrollOffset >= FirstRow && _fields[itemIndex].Row + _scrollOffset <= pageHeight) {

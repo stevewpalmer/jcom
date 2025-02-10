@@ -95,6 +95,7 @@ public static class Month {
             form.AddText(rowIndex, 12, 20, "");
             form.AddCurrency(rowIndex, 36, 0);
             selectedItem = form.Count - 2;
+            rowIndex++;
         }
         form.EndSection(sectionName);
         form.SelectedItem = selectedItem;

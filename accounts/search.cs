@@ -24,7 +24,6 @@
 // under the License.
 
 using System.Globalization;
-using JComLib;
 
 namespace JAccounts;
 
@@ -37,71 +36,65 @@ public static class Search {
     public static void SearchStatements(TAccount account) {
         TForm form = new(TForm.Simple);
         TDisplayFormResult result;
-        int maxRowIndex = 8;
 
         Utils.ShowTitle("Search Statements");
 
+        string searchText = "";
         do {
             int rowIndex = TForm.FirstRow;
 
+            form.Clear();
             form.AddLabel(rowIndex, 4, "Enter payment or amount to search for:");
             form.AddText(rowIndex + 2, 4, 50, "");
             int searchFieldIndex = form.Count - 1;
 
+            if (!string.IsNullOrEmpty(searchText)) {
+                bool hasHeader = false;
+                double total = 0;
+                rowIndex += 4;
+
+                for (int index = 0; index < account.Count; index++) {
+                    TStatement statement = account.Get(index);
+                    foreach (TRecord record in statement.Records) {
+                        string theName = record.Name;
+                        double theValue = record.Value;
+                        TDate theDate = record.Date;
+
+                        if (theName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                            theValue.ToString(CultureInfo.InvariantCulture).Contains(searchText)) {
+                            if (!hasHeader) {
+                                form.AddLabel(rowIndex, 4, 6, TAlign.Left, "_Date");
+                                form.AddLabel(rowIndex, 12, 20, TAlign.Left, "_Description");
+                                form.AddLabel(rowIndex, 36, 10, TAlign.Right, "_Amount");
+                                rowIndex += 2;
+                                hasHeader = true;
+                            }
+                            form.AddLabel(rowIndex, 4, 6, TAlign.Left, $"{theDate.Day}-{TDate.ShortMonthName(statement.Month)}");
+                            form.AddLabel(rowIndex, 12, 20, TAlign.Left, theName);
+                            form.AddLabel(rowIndex, 36, 10, TAlign.Right, theValue.ToString("F2"));
+                            rowIndex += 1;
+
+                            total += theValue;
+                        }
+                    }
+                }
+
+                // Show total if we found any results
+                if (hasHeader) {
+                    form.AddLabel(rowIndex + 1, 4, "_Total");
+                    form.AddLabel(rowIndex + 1, 36, 10, TAlign.Right, total.ToString("F2"));
+                    ++rowIndex;
+                }
+                else {
+                    form.AddLabel(rowIndex, 4, $"No results found for {searchText}");
+                }
+                form.Fields(searchFieldIndex).Value = "";
+            }
+
             form.SelectedItem = searchFieldIndex;
             result = form.DisplayForm();
             if (result == TDisplayFormResult.Pick) {
-
-                // Get the text to search for
-                string searchText = form.Fields(searchFieldIndex).Value.Trim();
-                if (!string.IsNullOrEmpty(searchText)) {
-                    bool hasHeader = false;
-                    double total = 0;
-
-                    form.Clear();
-                    rowIndex = 8;
-                    Utils.ScreenClear(rowIndex, 4, maxRowIndex, Terminal.Width);
-
-                    for (int index = 0; index < account.Count; index++) {
-                        TStatement statement = account.Get(index);
-                        foreach (TRecord record in statement.Records) {
-                            string theName = record.Name;
-                            double theValue = record.Value;
-                            TDate theDate = record.Date;
-
-                            if (theName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                                theValue.ToString(CultureInfo.InvariantCulture).Contains(searchText)) {
-                                if (!hasHeader) {
-                                    form.AddLabel(rowIndex, 4, 6, TAlign.Left, "_Date");
-                                    form.AddLabel(rowIndex, 12, 20, TAlign.Left, "_Description");
-                                    form.AddLabel(rowIndex, 36, 10, TAlign.Right, "_Amount");
-                                    rowIndex += 2;
-                                    hasHeader = true;
-                                }
-                                form.AddLabel(rowIndex, 4, 6, TAlign.Left, $"{theDate.Day}-{TDate.ShortMonthName(statement.Month)}");
-                                form.AddLabel(rowIndex, 12, 20, TAlign.Left, theName);
-                                form.AddLabel(rowIndex, 36, 10, TAlign.Right, theValue.ToString("F2"));
-                                rowIndex += 1;
-
-                                total += theValue;
-                            }
-                        }
-                    }
-
-                    // Show total if we found any results
-                    if (hasHeader) {
-                        form.AddLabel(rowIndex + 1, 4, "_Total");
-                        form.AddLabel(rowIndex + 1, 36, 10, TAlign.Right, total.ToString("F2"));
-                        ++rowIndex;
-                    }
-                    else {
-                        form.AddLabel(rowIndex, 4, $"No results found for {searchText}");
-                    }
-                    maxRowIndex = rowIndex;
-                }
-
-                // Clear the search field
-                form.Fields(searchFieldIndex).Value = "";
+                searchText = form.Fields(searchFieldIndex).Value.Trim();
             }
 
         } while (result != TDisplayFormResult.Cancel);
