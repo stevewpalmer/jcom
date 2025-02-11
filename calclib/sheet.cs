@@ -352,6 +352,9 @@ public class Sheet {
             ++ColumnList[c].Index;
             foreach (Cell cell in ColumnList[c].Cells) {
                 CellLocation cellLocation = cell.Location;
+                if (cell.HasFormula) {
+                    Book!.RemoveDependencies(cell.LocationWithSheet);
+                }
                 ++cellLocation.Column;
                 cell.Location = cellLocation;
             }
@@ -372,6 +375,9 @@ public class Sheet {
             foreach (Cell cell in ColumnList[c].Cells) {
                 if (cell.Location.Row >= row) {
                     CellLocation cellLocation = cell.Location;
+                    if (cell.HasFormula) {
+                        Book!.RemoveDependencies(cell.LocationWithSheet);
+                    }
                     ++cellLocation.Row;
                     cell.Location = cellLocation;
                 }
@@ -400,6 +406,9 @@ public class Sheet {
             --ColumnList[c].Index;
             foreach (Cell cell in ColumnList[c].Cells) {
                 CellLocation cellLocation = cell.Location;
+                if (cell.HasFormula) {
+                    Book!.RemoveDependencies(cell.LocationWithSheet);
+                }
                 --cellLocation.Column;
                 cell.Location = cellLocation;
             }
@@ -426,6 +435,9 @@ public class Sheet {
                 }
                 if (cell.Location.Row > row) {
                     CellLocation cellLocation = cell.Location;
+                    if (cell.HasFormula) {
+                        Book!.RemoveDependencies(cell.LocationWithSheet);
+                    }
                     --cellLocation.Row;
                     cell.Location = cellLocation;
                 }
